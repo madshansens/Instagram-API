@@ -3,7 +3,7 @@ require_once 'InstagramException.php';
 
 class Instagram {
 
-  const API_URL = 'https://instagram.com/api/v1/';
+  const API_URL = 'https://i.instagram.com/api/v1/';
 
   protected $username; // Instagram username
   protected $password; // Instagram password
@@ -12,6 +12,7 @@ class Instagram {
   protected $agent;     // User agent
   protected $uuid;      // UUID
   protected $device_id; // Device ID
+  protected $username_id;
 
   public function Instagram($username, $password, $debug = false)
   {
@@ -44,6 +45,7 @@ class Instagram {
     {
       throw new InstagramException($login['message']);
     }
+    $this->username_id = $login['logged_in_user']['pk'];
 
     return $login;
   }
@@ -78,6 +80,11 @@ class Instagram {
     $conf = $this->sendRequest('media/configure/', true, $new_data, $this->agent, true);
   }
 
+  public function getUsernameInfo($usernameId)
+  {
+    return $this->sendRequest("users/$usernameId/info/", false, null, $this->agent, true);
+  }
+
   protected function generateUserAgent()
   {
   	$resolutions = array('720x1280', '320x480', '480x800', '1024x768', '1280x720', '768x1024', '480x320');
@@ -109,13 +116,13 @@ class Instagram {
 
   protected function getPostData($filename)
   {
-  	if(!$filename)
+  	if(empty($filename))
     {
   		echo "The image doesn't exist " . $filename;
   	} else {
   		$post_data = array(
         'device_timestamp' => time(),
-  			'photo' => '@'.$filename
+  			'photo' => $filename
       );
   		return $post_data;
   	}
