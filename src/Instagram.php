@@ -18,6 +18,7 @@ class Instagram {
   protected $username_id;         // Username ID
   protected $token;               // _csrftoken
   protected $isLoggedIn = false;  // Session status
+  protected $rank_token;          // Rank token
 
   /**
     * Default class constructor.
@@ -49,6 +50,7 @@ class Instagram {
     {
       $this->isLoggedIn = true;
       $this->username_id = file_get_contents($this->IGDataPath . 'userId.dat');
+      $this->rank_token = $this->username_id . "_" . $this->uuid;
     }
   }
 
@@ -85,6 +87,7 @@ class Instagram {
       $this->isLoggedIn = true;
       $this->username_id = $login[1]['logged_in_user']['pk'];
       file_put_contents($this->IGDataPath . 'userId.dat', $this->username_id);
+      $this->rank_token = $this->username_id . "_" . $this->uuid;
       preg_match('#Set-Cookie: csrftoken=([^;]+)#', $login[0], $match);
       $this->token = $match[1];
 
@@ -454,7 +457,7 @@ class Instagram {
       return;
     }
 
-    $tags = $this->request("usertags/$this->username_id/feed/?rank_token=$this->username_id" . "_" . "$this->uuid&ranked_content=true&")[1];
+    $tags = $this->request("usertags/$this->username_id/feed/?rank_token=$this->rank_token&ranked_content=true&")[1];
 
     if ($tags['status'] != 'ok')
     {
@@ -509,7 +512,7 @@ class Instagram {
       return;
     }
 
-    $query = $this->request("fbsearch/topsearch/?context=blended&query=$query&rank_token=$this->username_id" . "_" . $this->uuid)[1];
+    $query = $this->request("fbsearch/topsearch/?context=blended&query=$query&rank_token=$this->rank_token")[1];
 
     if ($query['status'] != 'ok')
     {
@@ -518,6 +521,25 @@ class Instagram {
     }
 
     return $query;
+  }
+
+  public function getTimeline()
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $timeline = $this->request("feed/timeline/?rank_token=$this->rank_token&ranked_content=true&")[1];
+
+    if ($timeline['status'] != 'ok')
+    {
+      throw new InstagramException("Error while requesting recent activity\n");
+      return;
+    }
+
+    return $timeline;
   }
 
   protected function generateSignature($data)
