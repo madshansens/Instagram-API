@@ -416,6 +416,31 @@ class Instagram {
     return $activity;
   }
 
+  /**
+  * I dont know this yet
+  *
+  * @return array
+  *   v2 inbox data
+  */
+  public function getv2Inbox()
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $inbox = $this->request("direct_v2/inbox/?")[1];
+
+    if ($inbox['status'] != 'ok')
+    {
+      throw new InstagramException("Error while requesting recent activity\n");
+      return;
+    }
+
+    return $inbox;
+  }
+
   protected function generateSignature($data)
   {
     $hash = hash_hmac('sha256', $data, self::IG_SIG_KEY);
