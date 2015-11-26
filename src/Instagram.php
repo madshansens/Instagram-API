@@ -466,6 +466,34 @@ class Instagram {
     return $tags;
   }
 
+  /**
+  * Get user locations media
+  *
+  * @param string $usernameId
+  *   Username id
+  *
+  * @return array
+  *   Geo Media data
+  */
+  public function getGeoMedia($usernameId)
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $locations = $this->request("maps/user/$usernameId/")[1];
+
+    if ($locations['status'] != 'ok')
+    {
+      throw new InstagramException("Error while requesting recent activity\n");
+      return;
+    }
+
+    return $locations;
+  }
+
   protected function generateSignature($data)
   {
     $hash = hash_hmac('sha256', $data, self::IG_SIG_KEY);
