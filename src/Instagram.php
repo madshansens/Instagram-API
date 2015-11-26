@@ -394,6 +394,17 @@ class Instagram {
   }
 
   /**
+  * Get self username info
+  *
+  * @return array
+  *   Username data
+  */
+  public function getSelfUsernameInfo()
+  {
+    return $this->getUsernameInfo($this->username_id);
+  }
+
+  /**
   * Get recent activity
   *
   * @return array
@@ -411,7 +422,7 @@ class Instagram {
 
     if ($activity['status'] != 'ok')
     {
-      throw new InstagramException("Error while requesting recent activity\n");
+      throw new InstagramException($activity['message'] . "\n");
       return;
     }
 
@@ -436,7 +447,7 @@ class Instagram {
 
     if ($inbox['status'] != 'ok')
     {
-      throw new InstagramException("Error while requesting recent activity\n");
+      throw new InstagramException($inbox['message'] . "\n");
       return;
     }
 
@@ -446,10 +457,12 @@ class Instagram {
   /**
   * Get user tags
   *
+  * @param String $usernameId
+  *
   * @return array
   *   user tags data
   */
-  public function getUserTags()
+  public function getUserTags($usernameId)
   {
     if (!$this->isLoggedIn)
     {
@@ -457,15 +470,26 @@ class Instagram {
       return;
     }
 
-    $tags = $this->request("usertags/$this->username_id/feed/?rank_token=$this->rank_token&ranked_content=true&")[1];
+    $tags = $this->request("usertags/$usernameId/feed/?rank_token=$this->rank_token&ranked_content=true&")[1];
 
     if ($tags['status'] != 'ok')
     {
-      throw new InstagramException("Error while requesting recent activity\n");
+      throw new InstagramException($tags['message'] . "\n");
       return;
     }
 
     return $tags;
+  }
+
+  /**
+  * Get self user tags
+  *
+  * @return array
+  *   self user tags data
+  */
+  public function getSelfUserTags()
+  {
+    return $this->getUserTags($this->username_id);
   }
 
   /**
@@ -489,11 +513,22 @@ class Instagram {
 
     if ($locations['status'] != 'ok')
     {
-      throw new InstagramException("Error while requesting recent activity\n");
+      throw new InstagramException($locations['message'] . "\n");
       return;
     }
 
     return $locations;
+  }
+
+  /**
+  * Get self user locations media
+  *
+  * @return array
+  *   Geo Media data
+  */
+  public function getSelfGeoMedia()
+  {
+    return $this->getGeoMedia($this->username_id);
   }
 
   /**
@@ -516,7 +551,7 @@ class Instagram {
 
     if ($query['status'] != 'ok')
     {
-      throw new InstagramException("Error while requesting recent activity\n");
+      throw new InstagramException($query['message'] . "\n");
       return;
     }
 
@@ -541,7 +576,7 @@ class Instagram {
 
     if ($timeline['status'] != 'ok')
     {
-      throw new InstagramException("Error while requesting recent activity\n");
+      throw new InstagramException($timeline['message'] . "\n");
       return;
     }
 
@@ -569,7 +604,7 @@ class Instagram {
 
     if ($userFeed['status'] != 'ok')
     {
-      throw new InstagramException("Error while requesting recent activity\n");
+      throw new InstagramException($userFeed['message'] . "\n");
       return;
     }
 
@@ -585,6 +620,25 @@ class Instagram {
   public function getSelfUserFeed()
   {
     return $this->getUserFeed($this->username_id);
+  }
+
+  public function getPopularFeed()
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $popularFeed = $this->request("feed/popular/?people_teaser_supported=1&rank_token=$this->rank_token&ranked_content=true&")[1];
+
+    if ($popularFeed['status'] != 'ok')
+    {
+      throw new InstagramException($popularFeed['message'] . "\n");
+      return;
+    }
+
+    return $popularFeed;
   }
 
   protected function generateSignature($data)
