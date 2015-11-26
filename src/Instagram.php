@@ -493,6 +493,33 @@ class Instagram {
     return $locations;
   }
 
+  /**
+  * Search
+  *
+  * @param string $query
+  *
+  * @return array
+  *   query data
+  */
+  public function search($query)
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $query = $this->request("fbsearch/topsearch/?context=blended&query=$query&rank_token=$this->username_id" . "_" . $this->uuid)[1];
+
+    if ($query['status'] != 'ok')
+    {
+      throw new InstagramException("Error while requesting recent activity\n");
+      return;
+    }
+
+    return $query;
+  }
+
   protected function generateSignature($data)
   {
     $hash = hash_hmac('sha256', $data, self::IG_SIG_KEY);
