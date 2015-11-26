@@ -441,6 +441,31 @@ class Instagram {
     return $inbox;
   }
 
+  /**
+  * Get user tags
+  *
+  * @return array
+  *   user tags data
+  */
+  public function getUserTags()
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $tags = $this->request("usertags/$this->username_id/feed/?rank_token=$this->username_id" . "_" . "$this->uuid&ranked_content=true&")[1];
+
+    if ($tags['status'] != 'ok')
+    {
+      throw new InstagramException("Error while requesting recent activity\n");
+      return;
+    }
+
+    return $tags;
+  }
+
   protected function generateSignature($data)
   {
     $hash = hash_hmac('sha256', $data, self::IG_SIG_KEY);
