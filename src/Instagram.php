@@ -497,14 +497,14 @@ class Instagram {
   }
 
   /**
-  * Search
+  * Search users
   *
   * @param string $query
   *
   * @return array
   *   query data
   */
-  public function search($query)
+  public function searchUsers($query)
   {
     if (!$this->isLoggedIn)
     {
