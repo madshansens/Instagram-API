@@ -41,16 +41,14 @@ class Instagram {
     $this->device_id = 'android-' . str_split(md5(rand(1000, 9999)), 16)[rand(0, 1)];
 
     if (!is_null($IGDataPath))
-    {
       $this->IGDataPath = $IGDataPath;
-    }
-    else {
+    else
       $this->IGDataPath = __DIR__ . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR;
-    }
 
     if (file_exists($this->IGDataPath . 'cookies.dat'))
     {
       $this->isLoggedIn = true;
+      $this->username_id = file_get_contents($this->IGDataPath . 'userId.dat');
     }
   }
 
@@ -86,6 +84,7 @@ class Instagram {
 
       $this->isLoggedIn = true;
       $this->username_id = $login[1]['logged_in_user']['pk'];
+      file_put_contents($this->IGDataPath . 'userId.dat', $this->username_id);
       preg_match('#Set-Cookie: csrftoken=([^;]+)#', $login[0], $match);
       $this->token = $match[1];
 
