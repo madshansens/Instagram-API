@@ -551,10 +551,13 @@ class Instagram {
   /**
   * Get user feed
   *
+  * @param String $usernameId
+  *    Username id
+  *
   * @return array
-  *   user feed data
+  *   User feed data
   */
-  public function getUserFeed()
+  public function getUserFeed($usernameId)
   {
     if (!$this->isLoggedIn)
     {
@@ -562,7 +565,7 @@ class Instagram {
       return;
     }
 
-    $userFeed = $this->request("feed/popular/?people_teaser_supported=1&rank_token=$this->rank_token&ranked_content=true&")[1];
+    $userFeed = $this->request("feed/user/$usernameId/?rank_token=$this->rank_token&ranked_content=true&")[1];
 
     if ($userFeed['status'] != 'ok')
     {
@@ -571,6 +574,17 @@ class Instagram {
     }
 
     return $userFeed;
+  }
+
+  /**
+  * Get self user feed
+  *
+  * @return array
+  *   User feed data
+  */
+  public function getSelfUserFeed()
+  {
+    return $this->getUserFeed($this->username_id);
   }
 
   protected function generateSignature($data)
