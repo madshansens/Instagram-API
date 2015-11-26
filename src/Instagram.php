@@ -523,6 +523,12 @@ class Instagram {
     return $query;
   }
 
+  /**
+  * Get timeline data
+  *
+  * @return array
+  *   timeline data
+  */
   public function getTimeline()
   {
     if (!$this->isLoggedIn)
@@ -540,6 +546,31 @@ class Instagram {
     }
 
     return $timeline;
+  }
+
+  /**
+  * Get user feed
+  *
+  * @return array
+  *   user feed data
+  */
+  public function getUserFeed()
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $userFeed = $this->request("feed/popular/?people_teaser_supported=1&rank_token=$this->rank_token&ranked_content=true&")[1];
+
+    if ($userFeed['status'] != 'ok')
+    {
+      throw new InstagramException("Error while requesting recent activity\n");
+      return;
+    }
+
+    return $userFeed;
   }
 
   protected function generateSignature($data)
