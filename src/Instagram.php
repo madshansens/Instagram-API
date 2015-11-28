@@ -669,6 +669,26 @@ class Instagram {
     return $query;
   }
 
+
+  /**
+  * Checks if the username is already taken (exists)
+  *
+  * @param string $username
+  *
+  * @return array
+  *   Username availability data
+  */
+  public function checkUsername($username)
+  {
+    $data = json_encode(array(
+        '_uuid'  => $this->uuid,
+        'username'   => $username,
+        '_csrftoken' => $this->token
+    ));
+
+    return $this->request("users/check_username/", $this->generateSignature($data))[1];
+  }
+
   /**
   * Get timeline data
   *
