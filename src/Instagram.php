@@ -622,6 +622,12 @@ class Instagram {
     return $this->getUserFeed($this->username_id);
   }
 
+  /**
+  * Get popular feed
+  *
+  * @return array
+  *   popular feed data
+  */
   public function getPopularFeed()
   {
     if (!$this->isLoggedIn)
@@ -639,6 +645,37 @@ class Instagram {
     }
 
     return $popularFeed;
+  }
+
+  /**
+  * Get user followers
+  *
+  * @param String $usernameId
+  *   Username id
+  *
+  * @return array
+  *   followers data
+  */
+  public function getUserFollowers($usernameId)
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    return $this->request("friendships/$usernameId/followers/?ig_sig_key_version=" . self::SIG_KEY_VERSION . "&rank_token=$this->rank_token")[1];
+  }
+
+  /**
+  * Get self user followers
+  *
+  * @return array
+  *   followers data
+  */
+  public function getSelfUserFollowers()
+  {
+    return $this->getUserFollowers($this->username_id);
   }
 
   protected function generateSignature($data)
@@ -725,7 +762,8 @@ class Instagram {
      echo "REQUEST: $endpoint\n";
      if (!is_null($post))
      {
-       echo "DATA: $post\n";
+       if (!is_array($post))
+        echo "DATA: $post\n";
      }
      echo "RESPONSE: $body\n\n";
    }
