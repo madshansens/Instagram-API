@@ -954,6 +954,17 @@ class Instagram {
     return $this->request("friendships/destroy/$userId/", $this->generateSignature($data))[1];
   }
 
+  /**
+  * Get liked media
+  *
+  * @return array
+  *   Liked media data
+  */
+  public function getLikedMedia()
+  {
+    return $this->request("feed/liked/?")[1];
+  }
+
   public function generateSignature($data)
   {
     $hash = hash_hmac('sha256', $data, Constants::IG_SIG_KEY);
