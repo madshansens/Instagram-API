@@ -10,10 +10,12 @@ class InstagramRegistration
   protected $debug;
   protected $IGDataPath;
   protected $username;
+  protected $uuid;
 
   public function InstagramRegistration($debug = false, $IGDataPath = null)
   {
     $this->debug = $debug;
+    $this->uuid = $this->generateUUID(true);
     if (!is_null($IGDataPath))
       $this->IGDataPath = $IGDataPath;
     else
@@ -55,7 +57,7 @@ class InstagramRegistration
   public function createAccount($username, $password, $email)
   {
       $data = json_encode(array(
-          '_uuid'  => $this->generateUUID(true),
+          '_uuid'  => $this->uuid,
           'username'   => $username,
           'password'   => $password,
           'device_id'  => $this->generateUUID(true),
