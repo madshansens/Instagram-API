@@ -15,6 +15,7 @@ class Instagram {
   protected $token;               // _csrftoken
   protected $isLoggedIn = false;  // Session status
   protected $rank_token;          // Rank token
+  protected $IGDataPath;          // Data storage path
 
   /**
     * Default class constructor.
@@ -895,6 +896,22 @@ class Instagram {
   public function getDirectShare()
   {
     return $this->request("direct_share/inbox/?")[1];
+  }
+
+  /**
+  * Backups all your uploaded photos :)
+  *
+  */
+  public function backup()
+  {
+    $myUploads = $this->getSelfUserFeed();
+    foreach ($myUploads['items'] as $item)
+    {
+      if(!is_dir($this->IGDataPath . 'backup/' . "$this->username-" . date("Y-m-d")))
+        mkdir($this->IGDataPath . 'backup/' . "$this->username-" . date("Y-m-d"));
+      file_put_contents($this->IGDataPath . 'backup/' . "$this->username-" . date("Y-m-d") . "/" . $item['id'] . ".jpg",
+      file_get_contents($item['image_versions2']['candidates'][0]['url']));
+    }
   }
 
   public function generateSignature($data)
