@@ -942,7 +942,7 @@ class Instagram {
   * @return array
   *   Friendship status data
   */
-  public function follow($userId)
+  public function unfollow($userId)
   {
     $data = json_encode(array(
         '_uuid'  => $this->uuid,
