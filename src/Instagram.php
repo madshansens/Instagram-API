@@ -889,6 +889,18 @@ class Instagram {
     return $this->request("accounts/set_phone_and_name/", $this->generateSignature($data))[1];
   }
 
+
+  /**
+  * Get direct share
+  *
+  * @return array
+  *   Direct share data
+  */
+  public function getDirectShare()
+  {
+    return $this->request("direct_share/inbox/?")[1];
+  }
+
   public function generateSignature($data)
   {
     $hash = hash_hmac('sha256', $data, self::IG_SIG_KEY);
