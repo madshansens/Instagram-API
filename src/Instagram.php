@@ -955,6 +955,46 @@ class Instagram {
   }
 
   /**
+  * Block
+  *
+  * @param String $userId
+  *
+  * @return array
+  *   Friendship status data
+  */
+  public function block($userId)
+  {
+    $data = json_encode(array(
+        '_uuid'  => $this->uuid,
+        '_uid'   => $this->username_id,
+        'user_id'   => $userId,
+        '_csrftoken' => $this->token
+    ));
+
+    return $this->request("friendships/block/$userId/", $this->generateSignature($data))[1];
+  }
+
+  /**
+  * Unblock
+  *
+  * @param String $userId
+  *
+  * @return array
+  *   Friendship status data
+  */
+  public function unblock($userId)
+  {
+    $data = json_encode(array(
+        '_uuid'  => $this->uuid,
+        '_uid'   => $this->username_id,
+        'user_id'   => $userId,
+        '_csrftoken' => $this->token
+    ));
+
+    return $this->request("friendships/unblock/$userId/", $this->generateSignature($data))[1];
+  }
+
+  /**
   * Get liked media
   *
   * @return array
