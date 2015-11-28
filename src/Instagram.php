@@ -46,11 +46,12 @@ class Instagram {
     else
       $this->IGDataPath = __DIR__ . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR;
 
-    if (file_exists($this->IGDataPath . 'cookies.dat'))
+    if (file_exists($this->IGDataPath . "$this->username-cookies.dat"))
     {
       $this->isLoggedIn = true;
-      $this->username_id = file_get_contents($this->IGDataPath . 'userId.dat');
+      $this->username_id = trim(file_get_contents($this->IGDataPath . "$username-userId.dat"));
       $this->rank_token = $this->username_id . "_" . $this->uuid;
+      $this->token = trim(file_get_contents($this->IGDataPath . "$username-token.dat"));
     }
   }
 
@@ -90,6 +91,7 @@ class Instagram {
       $this->rank_token = $this->username_id . "_" . $this->uuid;
       preg_match('#Set-Cookie: csrftoken=([^;]+)#', $login[0], $match);
       $this->token = $match[1];
+      file_put_contents($this->IGDataPath . 'token.dat', $this->token);
 
       return $login[1];
     }
@@ -190,8 +192,8 @@ class Instagram {
 		curl_setopt($ch, CURLOPT_HEADER, true);
 		curl_setopt($ch, CURLOPT_VERBOSE, false);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-		curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath . 'cookies.dat');
-		curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath . 'cookies.dat');
+		curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath . "$this->username-cookies.dat");
+		curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath . "$this->username-cookies.dat");
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
@@ -346,8 +348,8 @@ class Instagram {
     curl_setopt($ch, CURLOPT_HEADER, true);
     curl_setopt($ch, CURLOPT_VERBOSE, false);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath . 'cookies.dat');
-    curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath . 'cookies.dat');
+    curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath . "$this->username-cookies.dat");
+    curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath . "$this->username-cookies.dat");
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
@@ -671,25 +673,6 @@ class Instagram {
 
 
   /**
-  * Checks if the username is already taken (exists)
-  *
-  * @param string $username
-  *
-  * @return array
-  *   Username availability data
-  */
-  public function checkUsername($username)
-  {
-    $data = json_encode(array(
-        '_uuid'  => $this->uuid,
-        'username'   => $username,
-        '_csrftoken' => $this->token
-    ));
-
-    return $this->request("users/check_username/", $this->generateSignature($data))[1];
-  }
-
-  /**
   * Get timeline data
   *
   * @return array
@@ -883,19 +866,42 @@ class Instagram {
     return $this->request("media/$mediaId/comments/?")[1];
   }
 
-  protected function generateSignature($data)
+  /**
+  * Set name and phone (Optional)
+  *
+  * @param String $name
+  *
+  * @param String $phone
+  *
+  * @return array
+  *   Set status data
+  */
+  public function setNameAndPhone($name = "", $phone = "")
+  {
+    $data = json_encode(array(
+        '_uuid'  => $this->uuid,
+        '_uid'   => $this->username_id,
+        'first_name'   => $name,
+        'phone_numer'  => $phone,
+        '_csrftoken' => $this->token
+    ));
+
+    return $this->request("accounts/set_phone_and_name/", $this->generateSignature($data))[1];
+  }
+
+  public function generateSignature($data)
   {
     $hash = hash_hmac('sha256', $data, self::IG_SIG_KEY);
 
     return 'ig_sig_key_version=4&signed_body=' . $hash . '.' . urlencode($data);
   }
 
-  protected function generateDeviceId()
+  public function generateDeviceId()
   {
     return 'android-' . str_split(md5(rand(1000, 9999)), 16)[rand(0, 1)];
   }
 
-  protected function generateUUID($type)
+  public function generateUUID($type)
   {
     $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
       mt_rand(0, 0xffff), mt_rand(0, 0xffff),
@@ -945,8 +951,8 @@ class Instagram {
    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
    curl_setopt($ch, CURLOPT_HEADER, true);
    curl_setopt($ch, CURLOPT_VERBOSE, false);
-   curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath . 'cookies.dat');
-   curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath . 'cookies.dat');
+   curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath . "$this->username-cookies.dat");
+   curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath . "$this->username-cookies.dat");
 
    if ($post) {
 
