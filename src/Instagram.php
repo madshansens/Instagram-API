@@ -244,6 +244,44 @@ class Instagram {
       return $this->request('media/configure/', $this->generateSignature(json_encode($post)));
   }
 
+
+  /**
+  * Edit media
+  *
+  * @param String $mediaId
+  *   Media id
+  *
+  * @param String $captionText
+  *   Caption text
+  *
+  * @return array
+  *   edit media data
+  */
+  public function editMedia($mediaId, $captionText = "")
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $data = json_encode(array(
+        '_uuid'  => $this->uuid,
+        '_uid'   => $this->username_id,
+        '_csrftoken' => $this->token,
+        'caption_text'   => $captionText
+    ));
+
+    return $this->request("media/$mediaId/edit_media/", $this->generateSignature($data))[1];
+  }
+
+
+  /**
+  * Sets account to public
+  *
+  * @param String $photo
+  *   Path to photo
+  */
   public function changeProfilePicture($photo)
   {
     if (!$this->isLoggedIn)
@@ -321,6 +359,13 @@ class Instagram {
     curl_close($ch);
   }
 
+
+  /**
+  * Remove profile picture
+  *
+  * @return array
+  *   status request data
+  */
   public function removeProfilePicture()
   {
     if (!$this->isLoggedIn)
@@ -338,6 +383,12 @@ class Instagram {
     return $this->request("accounts/remove_profile_picture/", $this->generateSignature($data))[1];
   }
 
+  /**
+  * Sets account to private
+  *
+  * @return array
+  *   status request data
+  */
   public function setPrivateAccount()
   {
     if (!$this->isLoggedIn)
@@ -355,6 +406,12 @@ class Instagram {
     return $this->request("accounts/set_private/", $this->generateSignature($data))[1];
   }
 
+  /**
+  * Sets account to public
+  *
+  * @return array
+  *   status request data
+  */
   public function setPublicAccount()
   {
     if (!$this->isLoggedIn)
