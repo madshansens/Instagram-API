@@ -678,6 +678,60 @@ class Instagram {
     return $this->getUserFollowers($this->username_id);
   }
 
+  /**
+  * Like photo or video
+  *
+  * @param String $mediaId
+  *   Media id
+  *
+  * @return array
+  *   status request
+  */
+  public function like($mediaId)
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $data = json_encode(array(
+        '_uuid'  => $this->uuid,
+        '_uid'   => $this->username_id,
+        '_csrftoken' => $this->token,
+        'media_id'   => $mediaId
+    ));
+
+    return $this->request("media/$mediaId/like/", $this->generateSignature($data))[1];
+  }
+
+  /**
+  * Unlike photo or video
+  *
+  * @param String $mediaId
+  *   Media id
+  *
+  * @return array
+  *   status request
+  */
+  public function unlike($mediaId)
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $data = json_encode(array(
+        '_uuid'  => $this->uuid,
+        '_uid'   => $this->username_id,
+        '_csrftoken' => $this->token,
+        'media_id'   => $mediaId
+    ));
+
+    return $this->request("media/$mediaId/unlike/", $this->generateSignature($data))[1];
+  }
+
   protected function generateSignature($data)
   {
     $hash = hash_hmac('sha256', $data, self::IG_SIG_KEY);
