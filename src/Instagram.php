@@ -914,6 +914,46 @@ class Instagram {
     }
   }
 
+  /**
+  * Follow
+  *
+  * @param String $userId
+  *
+  * @return array
+  *   Friendship status data
+  */
+  public function follow($userId)
+  {
+    $data = json_encode(array(
+        '_uuid'  => $this->uuid,
+        '_uid'   => $this->username_id,
+        'user_id'   => $userId,
+        '_csrftoken' => $this->token
+    ));
+
+    return $this->request("friendships/create/$userId/", $this->generateSignature($data))[1];
+  }
+
+  /**
+  * Unfollow
+  *
+  * @param String $userId
+  *
+  * @return array
+  *   Friendship status data
+  */
+  public function follow($userId)
+  {
+    $data = json_encode(array(
+        '_uuid'  => $this->uuid,
+        '_uid'   => $this->username_id,
+        'user_id'   => $userId,
+        '_csrftoken' => $this->token
+    ));
+
+    return $this->request("friendships/destroy/$userId/", $this->generateSignature($data))[1];
+  }
+
   public function generateSignature($data)
   {
     $hash = hash_hmac('sha256', $data, Constants::IG_SIG_KEY);
