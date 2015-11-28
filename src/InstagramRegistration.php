@@ -1,6 +1,6 @@
 <?php
 
-require_once 'Instagram.php';
+require_once 'Constants.php';
 require_once 'InstagramException.php';
 
 
@@ -80,9 +80,9 @@ class InstagramRegistration
 
   public function generateSignature($data)
   {
-    $hash = hash_hmac('sha256', $data, 'c1c7d84501d2f0df05c378f5efb9120909ecfb39dff5494aa361ec0deadb509a');
+    $hash = hash_hmac('sha256', $data, Constants::IG_SIG_KEY);
 
-    return 'ig_sig_key_version=4&signed_body=' . $hash . '.' . urlencode($data);
+    return 'ig_sig_key_version=' . Constants::SIG_KEY_VERSION . '&signed_body=' . $hash . '.' . urlencode($data);
   }
 
   public function generateUUID($type)
@@ -102,8 +102,8 @@ class InstagramRegistration
 
    $ch = curl_init();
 
-   curl_setopt($ch, CURLOPT_URL, 'https://i.instagram.com/api/v1/' . $endpoint);
-   curl_setopt($ch, CURLOPT_USERAGENT, 'Instagram 7.10.0 Android (23/6.0; 515dpi; 1440x2416; huawei/google; Nexus 6P; angler; angler; en_US)');
+   curl_setopt($ch, CURLOPT_URL, Constants::API_URL . $endpoint);
+   curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
    curl_setopt($ch, CURLOPT_HEADER, true);

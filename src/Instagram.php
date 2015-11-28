@@ -1,13 +1,9 @@
 <?php
+
+require_once 'Constants.php';
 require_once 'InstagramException.php';
 
 class Instagram {
-
-  const API_URL         = 'https://i.instagram.com/api/v1/';
-  const USER_AGENT      = 'Instagram 7.10.0 Android (23/6.0; 515dpi; 1440x2416; huawei/google; Nexus 6P; angler; angler; en_US)';
-  const IG_SIG_KEY      = 'c1c7d84501d2f0df05c378f5efb9120909ecfb39dff5494aa361ec0deadb509a';
-  const SIG_KEY_VERSION = '4';
-
 
   protected $username;            // Instagram username
   protected $password;            // Instagram password
@@ -139,7 +135,7 @@ class Instagram {
       return;
     }
 
-		$endpoint = self::API_URL. 'upload/photo/';
+		$endpoint = Constants::API_URL. 'upload/photo/';
 		$boundary = $this->uuid;
 		$bodies = [
 			[
@@ -186,7 +182,7 @@ class Instagram {
 
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $endpoint);
-		curl_setopt($ch, CURLOPT_USERAGENT, self::USER_AGENT);
+		curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_HEADER, true);
@@ -304,18 +300,18 @@ class Instagram {
       '_uid'       => $this->username_id
     ));
 
-    $endpoint = self::API_URL. 'accounts/change_profile_picture/';
+    $endpoint = Constants::API_URL. 'accounts/change_profile_picture/';
     $boundary = $this->uuid;
     $bodies = [
       [
         'type' => 'form-data',
         'name' => 'ig_sig_key_version',
-        'data' => self::SIG_KEY_VERSION
+        'data' => Constants::SIG_KEY_VERSION
       ],
       [
         'type' => 'form-data',
         'name' => 'signed_body',
-        'data' => hash_hmac('sha256', $uData, self::IG_SIG_KEY) . $uData
+        'data' => hash_hmac('sha256', $uData, Constants::IG_SIG_KEY) . $uData
       ],
       [
         'type' => 'form-data',
@@ -342,7 +338,7 @@ class Instagram {
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $endpoint);
-    curl_setopt($ch, CURLOPT_USERAGENT, self::USER_AGENT);
+    curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($ch, CURLOPT_HEADER, true);
@@ -633,7 +629,7 @@ class Instagram {
       return;
     }
 
-    $query = $this->request("users/search/?ig_sig_key_version=" . self::SIG_KEY_VERSION . "&is_typeahead=true&query=$query&rank_token=$this->rank_token")[1];
+    $query = $this->request("users/search/?ig_sig_key_version=" . Constants::SIG_KEY_VERSION . "&is_typeahead=true&query=$query&rank_token=$this->rank_token")[1];
 
     if ($query['status'] != 'ok')
     {
@@ -778,7 +774,7 @@ class Instagram {
       return;
     }
 
-    return $this->request("friendships/$usernameId/followers/?ig_sig_key_version=" . self::SIG_KEY_VERSION . "&rank_token=$this->rank_token")[1];
+    return $this->request("friendships/$usernameId/followers/?ig_sig_key_version=" . Constants::SIG_KEY_VERSION . "&rank_token=$this->rank_token")[1];
   }
 
   /**
@@ -903,9 +899,9 @@ class Instagram {
 
   public function generateSignature($data)
   {
-    $hash = hash_hmac('sha256', $data, self::IG_SIG_KEY);
+    $hash = hash_hmac('sha256', $data, Constants::IG_SIG_KEY);
 
-    return 'ig_sig_key_version=4&signed_body=' . $hash . '.' . urlencode($data);
+    return 'ig_sig_key_version=' . Constants::SIG_KEY_VERSION .'&signed_body=' . $hash . '.' . urlencode($data);
   }
 
   public function generateDeviceId()
@@ -957,8 +953,8 @@ class Instagram {
 
    $ch = curl_init();
 
-   curl_setopt($ch, CURLOPT_URL, self::API_URL . $endpoint);
-   curl_setopt($ch, CURLOPT_USERAGENT, self::USER_AGENT);
+   curl_setopt($ch, CURLOPT_URL, Constants::API_URL . $endpoint);
+   curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
    curl_setopt($ch, CURLOPT_HEADER, true);
