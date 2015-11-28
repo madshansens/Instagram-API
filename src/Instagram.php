@@ -589,6 +589,33 @@ class Instagram {
   }
 
   /**
+  * facebook user search
+  *
+  * @param string $query
+  *
+  * @return array
+  *   query data
+  */
+  public function fbUserSearch($query)
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $query = $this->request("fbsearch/topsearch/?context=blended&query=$query&rank_token=$this->rank_token")[1];
+
+    if ($query['status'] != 'ok')
+    {
+      throw new InstagramException($query['message'] . "\n");
+      return;
+    }
+
+    return $query;
+  }
+
+  /**
   * Search users
   *
   * @param string $query
@@ -604,7 +631,34 @@ class Instagram {
       return;
     }
 
-    $query = $this->request("fbsearch/topsearch/?context=blended&query=$query&rank_token=$this->rank_token")[1];
+    $query = $this->request("users/search/?ig_sig_key_version=" . self::SIG_KEY_VERSION . "&is_typeahead=true&query=$query&rank_token=$this->rank_token")[1];
+
+    if ($query['status'] != 'ok')
+    {
+      throw new InstagramException($query['message'] . "\n");
+      return;
+    }
+
+    return $query;
+  }
+
+  /**
+  * Search tags
+  *
+  * @param string $query
+  *
+  * @return array
+  *   query data
+  */
+  public function searchTags($query)
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $query = $this->request("tags/search/?is_typeahead=true&q=ha&rank_token=$this->rank_token")[1];
 
     if ($query['status'] != 'ok')
     {
@@ -787,6 +841,26 @@ class Instagram {
     ));
 
     return $this->request("media/$mediaId/unlike/", $this->generateSignature($data))[1];
+  }
+
+  /**
+  * Get media comments
+  *
+  * @param String $mediaId
+  *   Media id
+  *
+  * @return array
+  *   Media comments data
+  */
+  public function getMediaComments($mediaId)
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    return $this->request("media/$mediaId/comments/?")[1];
   }
 
   protected function generateSignature($data)
