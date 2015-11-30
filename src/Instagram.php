@@ -789,6 +789,24 @@ class Instagram {
     return $this->getUserFollowers($this->username_id);
   }
 
+
+  /**
+  * Get the users we are following
+  *
+  * @return array
+  *   users we are following data
+  */
+  public function getUsersFollowing()
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    return $this->request("friendships/following/?ig_sig_key_version=" . Constants::SIG_KEY_VERSION . "&rank_token=$this->rank_token")[1];
+  }
+
   /**
   * Like photo or video
   *
