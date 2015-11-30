@@ -84,11 +84,11 @@ class Instagram {
 
       $this->isLoggedIn = true;
       $this->username_id = $login[1]['logged_in_user']['pk'];
-      file_put_contents($this->IGDataPath . 'userId.dat', $this->username_id);
+      file_put_contents($this->IGDataPath . $this->username .'-userId.dat', $this->username_id);
       $this->rank_token = $this->username_id . "_" . $this->uuid;
       preg_match('#Set-Cookie: csrftoken=([^;]+)#', $login[0], $match);
       $this->token = $match[1];
-      file_put_contents($this->IGDataPath . 'token.dat', $this->token);
+      file_put_contents($this->IGDataPath . $this->username . '-token.dat', $this->token);
 
       return $login[1];
     }
