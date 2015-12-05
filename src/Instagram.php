@@ -428,6 +428,47 @@ class Instagram {
     return $this->request("accounts/set_public/", $this->generateSignature($data))[1];
   }
 
+  /**
+  * Edit profile
+  *
+  * @param String $url
+  *   Url - website. "" for nothing
+  * @param String $phone
+  *   Phone number. "" for nothing
+  * @param String $first_name
+  *   Name. "" for nothing
+  * @param String $email
+  *   Email. Required.
+  * @param boolean $private
+  *   Is your profile private?. True / False
+  *
+  * @return array
+  *   edit profile data
+  */
+  public function editProfile($url, $phone, $first_name, $biography, $email, $private)
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $data = json_encode(array(
+        '_uuid'         => $this->uuid,
+        '_uid'          => $this->username_id,
+        '_csrftoken'    => $this->token,
+        'external_url'  => $url,
+        'phone_number'  => $phone,
+        'first_name'    => $first_name,
+        'biography'     => $biography,
+        'email'         => $email,
+        'gender'        => '1',
+        'is_private'    => $private
+    ));
+
+    return $this->request("accounts/edit_profile/", $this->generateSignature($data))[1];
+  }
+
 
   /**
   * Get username info
