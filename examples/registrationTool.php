@@ -37,5 +37,5 @@ $result = $r->createAccount($username, $password, $email);
 
 if (isset($result['account_created']) && ($result['account_created'] == true))
 {
-  "Your account was successfully created! :)"
+  echo "Your account was successfully created! :)";
 }
