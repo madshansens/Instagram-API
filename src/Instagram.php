@@ -43,7 +43,8 @@ class Instagram {
     else
       $this->IGDataPath = __DIR__ . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR;
 
-    if (file_exists($this->IGDataPath . "$this->username-cookies.dat"))
+    if ((file_exists($this->IGDataPath . "$this->username-cookies.dat")) && (file_exists($this->IGDataPath . "$this->username-userId.dat"))
+    && (file_exists($this->IGDataPath . "$this->username-token.dat")))
     {
       $this->isLoggedIn = true;
       $this->username_id = trim(file_get_contents($this->IGDataPath . "$username-userId.dat"));
@@ -439,13 +440,15 @@ class Instagram {
   *   Name. "" for nothing
   * @param String $email
   *   Email. Required.
+  * @param int $gender
+  *   Gender. male = 1 , female = 0
   * @param boolean $private
   *   Is your profile private?. True / False
   *
   * @return array
   *   edit profile data
   */
-  public function editProfile($url, $phone, $first_name, $biography, $email, $private)
+  public function editProfile($url, $phone, $first_name, $biography, $email, $gender, $private)
   {
     if (!$this->isLoggedIn)
     {
@@ -462,7 +465,7 @@ class Instagram {
         'first_name'    => $first_name,
         'biography'     => $biography,
         'email'         => $email,
-        'gender'        => '1',
+        'gender'        => $gender,
         'is_private'    => $private
     ));
 
