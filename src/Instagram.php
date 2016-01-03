@@ -686,6 +686,29 @@ class Instagram {
   }
 
   /**
+  * Search users using addres book
+  *
+  * @param array $contacts
+  *
+  * @return array
+  *   query data
+  */
+  public function syncFromAdressBook($contacts)
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $data = array(
+        'contacts'  => json_encode($contacts, true)
+      );
+
+    return $this->request("address_book/link/?include=extra_display_name,thumbnails", $data)[1];
+  }
+
+  /**
   * Search tags
   *
   * @param string $query
