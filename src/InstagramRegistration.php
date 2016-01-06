@@ -12,7 +12,7 @@ class InstagramRegistration
   protected $username;
   protected $uuid;
 
-  public function InstagramRegistration($debug = false, $IGDataPath = null)
+  public function __construct($debug = false, $IGDataPath = null)
   {
     $this->debug = $debug;
     $this->uuid = $this->generateUUID(true);
