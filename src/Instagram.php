@@ -29,7 +29,7 @@ class Instagram {
     * @param $IGDataPath
     *  Default folder to store data, you can change it.
     */
-  public function Instagram($username, $password, $debug = false, $IGDataPath = null)
+  public function __construct($username, $password, $debug = false, $IGDataPath = null)
   {
     $this->username = $username;
     $this->password = $password;
