@@ -136,14 +136,13 @@ class Instagram {
       throw new InstagramException("Not logged in\n");
       return;
     }
-
 		$endpoint = Constants::API_URL. 'upload/photo/';
 		$boundary = $this->uuid;
 		$bodies = [
 			[
 				'type' => 'form-data',
 				'name' => 'upload_id',
-				'data' => round(microtime(true)*1000)
+				'data' => number_format(round(microtime(true)*1000), 0, '', '')
 			],
 			[
 				'type' => 'form-data',
@@ -231,10 +230,10 @@ class Instagram {
        ),
        'device'      =>
        array(
-          'manufacturer'    => 'asus',
-          'model'           => 'Nexus 7',
-          'android_version' => 22,
-          'android_release' => '5.1'
+          'manufacturer'    => 'lg',
+          'model'           => 'Nexus 5',
+          'android_version' => 23,
+          'android_release' => '6.0.1'
        ),
        '_csrftoken'  => $this->token,
        '_uuid'       => $this->uuid,
