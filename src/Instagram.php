@@ -276,6 +276,38 @@ class Instagram {
 
 
   /**
+  * Comment media
+  *
+  * @param String $mediaId
+  *   Media id
+  *
+  * @param String $commentText
+  *   Comment Text
+  *
+  * @return array
+  *   comment media data
+  */
+  public function comment($mediaId, $commentText)
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $data = json_encode(array(
+        '_uuid'  => $this->uuid,
+        '_uid'   => $this->username_id,
+        '_csrftoken' => $this->token,
+        'comment_text'   => $commentText
+    ));
+
+    return $this->request("media/$mediaId/comment/", $this->generateSignature($data))[1];
+  }
+
+
+
+  /**
   * Sets account to public
   *
   * @param String $photo
