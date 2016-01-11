@@ -856,6 +856,26 @@ class Instagram {
     return $popularFeed;
   }
 
+/**
+  * Get user followings
+  *
+  * @param String $usernameId
+  *   Username id
+  *
+  * @return array
+  *   followers data
+  */
+   public function getUserFollowings($usernameId,$maxid = null)
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    return $this->request("friendships/$usernameId/following/?max_id=$maxid&ig_sig_key_version=" . Constants::SIG_KEY_VERSION . "&rank_token=$this->rank_token")[1];
+  }
+
   /**
   * Get user followers
   *
@@ -865,7 +885,7 @@ class Instagram {
   * @return array
   *   followers data
   */
-  public function getUserFollowers($usernameId)
+  public function getUserFollowers($usernameId,$maxid = null)
   {
     if (!$this->isLoggedIn)
     {
@@ -873,7 +893,7 @@ class Instagram {
       return;
     }
 
-    return $this->request("friendships/$usernameId/followers/?ig_sig_key_version=" . Constants::SIG_KEY_VERSION . "&rank_token=$this->rank_token")[1];
+    return $this->request("friendships/$usernameId/followers/?max_id=$maxid&ig_sig_key_version=" . Constants::SIG_KEY_VERSION . "&rank_token=$this->rank_token")[1];
   }
 
   /**
