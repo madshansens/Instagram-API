@@ -755,7 +755,7 @@ class Instagram {
       return;
     }
 
-    $query = $this->request("tags/search/?is_typeahead=true&q=ha&rank_token=$this->rank_token")[1];
+    $query = $this->request("tags/search/?is_typeahead=true&q=$query&rank_token=$this->rank_token")[1];
 
     if ($query['status'] != 'ok')
     {
