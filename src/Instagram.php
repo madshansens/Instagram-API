@@ -142,6 +142,30 @@ class Instagram {
 
     return $userFeed;
   }
+  
+  /**
+   * Get media likers
+   * 
+   * @param string $mediaId
+   * 
+   * @return array
+   */
+  public function getMediaLikers($mediaId)
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $likers=$this->request("media/$mediaId/likers/?")[1];
+    if ($likers['status'] != 'ok')
+    {
+      throw new InstagramException($userFeed['message'] . "\n");
+      return;
+    }
+    return $likers;
+  }
 
   /**
   * Upload photo to Instagram
