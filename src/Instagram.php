@@ -275,6 +275,31 @@ class Instagram {
     return $this->request("media/$mediaId/edit_media/", $this->generateSignature($data))[1];
   }
 
+  /**
+  * Delete photo or video
+  *
+  * @param String $mediaId
+  *   Media id
+  *
+  * @return array
+  *   delete request data
+  */
+  public function deleteMedia($mediaId)
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+    $data = json_encode(array(
+        '_uuid'  => $this->uuid,
+        '_uid'   => $this->username_id,
+        '_csrftoken' => $this->token,
+        'media_id'   => $mediaId
+    ));
+    return $this->request("media/$mediaId/delete/", $this->generateSignature($data))[1];
+  }
+
 
   /**
   * Comment media
