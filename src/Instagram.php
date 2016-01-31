@@ -487,6 +487,23 @@ class Instagram {
   }
 
   /**
+  * Get personal profile data
+  *
+  * @return array
+  *   profile data
+  */
+  public function getProfileData()
+  {
+    if (!$this->isLoggedIn)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    return $this->request("accounts/current_user/?edit=true", $this->generateSignature($data))[1];
+  }
+
+  /**
   * Edit profile
   *
   * @param String $url
@@ -499,13 +516,11 @@ class Instagram {
   *   Email. Required.
   * @param int $gender
   *   Gender. male = 1 , female = 0
-  * @param boolean $private
-  *   Is your profile private?. True / False
   *
   * @return array
   *   edit profile data
   */
-  public function editProfile($url, $phone, $first_name, $biography, $email, $gender, $private)
+  public function editProfile($url, $phone, $first_name, $biography, $email, $gender)
   {
     if (!$this->isLoggedIn)
     {
@@ -519,11 +534,11 @@ class Instagram {
         '_csrftoken'    => $this->token,
         'external_url'  => $url,
         'phone_number'  => $phone,
+        'username'      => $this->username,
         'first_name'    => $first_name,
         'biography'     => $biography,
         'email'         => $email,
-        'gender'        => $gender,
-        'is_private'    => $private
+        'gender'        => $gender
     ));
 
     return $this->request("accounts/edit_profile/", $this->generateSignature($data))[1];
@@ -1092,7 +1107,7 @@ class Instagram {
         '_uuid'  => $this->uuid,
         '_uid'   => $this->username_id,
         'first_name'   => $name,
-        'phone_numer'  => $phone,
+        'phone_number'  => $phone,
         '_csrftoken' => $this->token
     ));
 
