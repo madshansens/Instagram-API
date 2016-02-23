@@ -57,15 +57,19 @@ class InstagramRegistration
   public function createAccount($username, $password, $email)
   {
       $data = json_encode(array(
-          '_uuid'  => $this->uuid,
-          'username'   => $username,
-          'password'   => $password,
-          'device_id'  => $this->generateUUID(true),
-          'email'      => $email,
-          '_csrftoken' => 'missing'
+          'phone_id'    => $this->uuid,
+          '_csrftoken'  => 'missing',
+          'username'    => $username,
+          'first_name'  => '',
+          'guid'        => $this->uuid,
+          'device_id'   => 'android-' . str_split(md5(mt_rand(1000, 9999)), 17)[mt_rand(0, 1)],
+          'email'       => $email,
+          'force_sign_up_code' => '',
+          'qs_stamp'    => '',
+          'password'    => $password
       ));
 
-      $result = $this->request("accounts/create/", $this->generateSignature($data), $username);
+      $result = $this->request("accounts/create/", $this->generateSignature($data));
       if (isset($result[1]['account_created']) && ($result[1]['account_created'] == true))
       {
         $this->username_id = $result[1]['created_user']['pk'];

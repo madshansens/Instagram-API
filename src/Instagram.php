@@ -63,19 +63,19 @@ class Instagram {
   {
     if (!$this->isLoggedIn)
     {
-      $fetch = $this->request('si/fetch_headers/?challenge_type=signup&guid=' . $this->generateUUID(false));
+      $fetch = $this->request('si/fetch_headers/?challenge_type=signup&guid=' . $this->generateUUID(false), null, true);
       preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token);
 
       $data = array(
           'device_id' => $this->device_id,
           'guid'      => $this->uuid,
+          'phone_id'  => $this->generateUUID(true),
           'username'  => $this->username,
           'password'  => $this->password,
-          'csrftoken' => $token[1],
           'login_attempt_count' => '0'
       );
 
-      $login = $this->request('accounts/login/', $this->generateSignature(json_encode($data)));
+      $login = $this->request('accounts/login/', $this->generateSignature(json_encode($data)), true);
 
       if ($login[1]['status'] == 'fail')
       {
@@ -91,8 +91,60 @@ class Instagram {
       $this->token = $match[1];
       file_put_contents($this->IGDataPath . $this->username . '-token.dat', $this->token);
 
+      $this->syncFeatures();
+      $this->autoCompleteUserList();
+      $this->timelineFeed();
+      $this->getv2Inbox();
+      $this->getRecentActivity();
+
       return $login[1];
     }
+
+    $this->timelineFeed();
+    $this->getv2Inbox();
+    $this->getRecentActivity();
+
+  }
+
+  public function syncFeatures()
+  {
+    $data = json_encode(array(
+        '_uuid'  => $this->uuid,
+        '_uid'   => $this->username_id,
+        'id'     => $this->username_id,
+        '_csrftoken' => $this->token,
+        'experiments'   => Constants::EXPERIMENTS
+    ));
+
+    return $this->request("qe/sync/", $this->generateSignature($data))[1];
+  }
+
+  protected function autoCompleteUserList()
+  {
+    return $this->request("friendships/autocomplete_user_list/")[1];
+  }
+
+  protected function timelineFeed()
+  {
+    return $this->request("feed/timeline/")[1];
+  }
+
+  protected function megaphoneLog()
+  {
+    return $this->request("megaphone/log/")[1];
+  }
+
+  protected function expose()
+  {
+    $data = json_encode(array(
+        '_uuid'  => $this->uuid,
+        '_uid'   => $this->username_id,
+        'id'     => $this->username_id,
+        '_csrftoken' => $this->token,
+        'experiment'   => 'ig_android_profile_contextual_feed'
+    ));
+
+    $this->request("qe/expose/", $this->generateSignature($data))[1];
   }
 
   /**
@@ -103,12 +155,6 @@ class Instagram {
   */
   public function logout()
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     $logout = $this->request('accounts/logout/');
 
     if ($logout == 'ok')
@@ -131,12 +177,6 @@ class Instagram {
   */
 	public function uploadPhoto($photo, $caption = null)
   {
-
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
 		$endpoint = Constants::API_URL. 'upload/photo/';
 		$boundary = $this->uuid;
 		$bodies = [
@@ -154,19 +194,20 @@ class Instagram {
 				'type' => 'form-data',
 				'name' => '_csrftoken',
 				'data' => $this->token
-			]/*,
+			],
 			[
 				"type"=>"form-data",
-				"name"=>"image_compression"
-			//	"data"=>"Your JSON DATA COMPRESSION HERE"
-			]*/,
+				"name"=>"image_compression",
+			  "data"=>'{"lib_name":"jt","lib_version":"1.3.0","quality":"70"}'
+			],
 			[
 				'type' => 'form-data',
 				'name' => 'photo',
 				'data' => file_get_contents($photo),
-				'filename' => basename($photo),
+				'filename' => 'pending_media_'.number_format(round(microtime(true)*1000), 0, '', '').'.jpg',
 				'headers' =>
         [
+          'Content-Transfer-Encoding: binary',
 					'Content-type: application/octet-stream'
 				]
 			]
@@ -174,12 +215,13 @@ class Instagram {
 
 		$data = $this->buildBody($bodies,$boundary);
 		$headers = [
-				'Proxy-Connection: keep-alive',
-				'Connection: keep-alive',
+				'Connection: close',
 				'Accept: */*',
 				'Content-type: multipart/form-data; boundary='.$boundary,
-				'Accept-Language: en-en',
-				'Accept-Encoding: gzip, deflate',
+        'Content-Length: '. strlen($data),
+        'Cookie2: $Version=1',
+        'Accept-Language: en-US',
+        'Accept-Encoding: gzip',
 		];
 
 		$ch = curl_init();
@@ -188,7 +230,7 @@ class Instagram {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt($ch, CURLOPT_HEADER, true);
-		curl_setopt($ch, CURLOPT_VERBOSE, false);
+		curl_setopt($ch, CURLOPT_VERBOSE, $this->debug);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath . "$this->username-cookies.dat");
 		curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath . "$this->username-cookies.dat");
@@ -208,40 +250,127 @@ class Instagram {
       return;
     }
 
+    if ($this->debug)
+    {
+      echo 'RESPONSE: ' . substr($resp, $header_len) . "\n\n";
+    }
+
     $configure = $this->configure($upload['upload_id'], $photo, $caption);
+    $this->expose();
 
 		return $configure[1];
 	}
 
-  protected function configure($upload_id, $photo, $caption = null)
+  public function direct_share($media_id, $recipients, $text = null)
+  {
+      if (!is_array($recipients)) {
+        $recipients = array($recipients);
+      }
+
+      $string = array();
+      foreach($recipients as $recipient) {
+        $string[] = "\"$recipient\"";
+      }
+
+      $recipeint_users = implode(",", $string);
+
+      $endpoint = Constants::API_URL. "direct_v2/threads/broadcast/media_share/?media_type=photo";
+  		$boundary = $this->uuid;
+  		$bodies = [
+  			[
+  				'type' => 'form-data',
+  				'name' => 'media_id',
+  				'data' => $media_id
+  			],
+  			[
+  				'type' => 'form-data',
+  				'name' => 'recipient_users',
+  				'data' => "[[$recimient_users]]"
+  			],
+  			[
+  				'type' => 'form-data',
+  				'name' => 'client_context',
+  				'data' => $this->uuid
+  			],
+  			[
+  				'type' => 'form-data',
+  				'name' => 'thread_ids',
+  				'data' => '["0"]'
+  			],
+  			[
+  				'type' => 'form-data',
+  				'name' => 'text',
+  				'data' => is_null($text) ? '' : $text
+  			]
+  		];
+
+  		$data = $this->buildBody($bodies,$boundary);
+  		$headers = [
+  				'Proxy-Connection: keep-alive',
+  				'Connection: keep-alive',
+  				'Accept: */*',
+  				'Content-type: multipart/form-data; boundary='.$boundary,
+  				'Accept-Language: en-en',
+  		];
+
+  		$ch = curl_init();
+  		curl_setopt($ch, CURLOPT_URL, $endpoint);
+  		curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
+  		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+  		curl_setopt($ch, CURLOPT_HEADER, true);
+  		curl_setopt($ch, CURLOPT_VERBOSE, $this->debug);
+  		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+  		curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath . "$this->username-cookies.dat");
+  		curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath . "$this->username-cookies.dat");
+  		curl_setopt($ch, CURLOPT_POST, true);
+  		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+  		$resp       = curl_exec($ch);
+  		$header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+  		$header     = substr($resp, 0, $header_len);
+  		$upload     = json_decode(substr($resp, $header_len), true);
+
+      var_dump($upload);
+
+  		curl_close($ch);
+  }
+
+  protected function configure($upload_id, $photo, $caption = '')
   {
 
     $size = getimagesize($photo)[0];
 
-    $post = array(
-      'caption'     => $caption,
-      'upload_id'   => $upload_id,
-      'source_type' => 3,
-      'edits'       =>
-       array(
-          'crop_zoom'          => 1.0000000,
-          'crop_center'        => array(0.0, -0.0),
+     $post = json_encode(array(
+        'upload_id' => $upload_id,
+        'camera_model' => 'HM1S',
+        'source_type' => 3,
+        'date_time_original' => date("Y:m:d H:i:s"),
+        'camera_make' => 'XIAOMI',
+        'edits' => array(
           'crop_original_size' => array($size, $size),
-          'black_pixels_ratio' => 0
-       ),
-       'device'      =>
-       array(
-          'manufacturer'    => 'lg',
-          'model'           => 'Nexus 5',
-          'android_version' => 23,
-          'android_release' => '6.0.1'
-       ),
-       '_csrftoken'  => $this->token,
-       '_uuid'       => $this->uuid,
-       '_uid'        => $this->username_id
-     );
+          'crop_zoom' => 1.3333334,
+          'crop_center' => array(0.0, -0.0)
+        ),
+        'extra' => array(
+          'source_width' => $size,
+          'source_height' => $size
+        ),
+        'device' => array(
+          "manufacturer" => "Xiaomi",
+          "model" => "HM 1SW",
+          "android_version" => 18,
+          "android_release" => "4.3"
+        ),
+        '_csrftoken'  => $this->token,
+        '_uuid'       => $this->uuid,
+        '_uid'        => $this->username_id,
+        'caption' => $caption
+     ));
 
-      return $this->request('media/configure/', $this->generateSignature(json_encode($post)));
+     $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]', $post);
+
+      $image = $this->request('media/configure/', $this->generateSignature($post))[1];
   }
 
 
@@ -259,11 +388,6 @@ class Instagram {
   */
   public function editMedia($mediaId, $captionText = "")
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
 
     $data = json_encode(array(
         '_uuid'  => $this->uuid,
@@ -284,13 +408,30 @@ class Instagram {
   * @return array
   *   delete request data
   */
+  public function mediaInfo($mediaId)
+  {
+
+    $data = json_encode(array(
+        '_uuid'  => $this->uuid,
+        '_uid'   => $this->username_id,
+        '_csrftoken' => $this->token,
+        'media_id'   => $mediaId
+    ));
+    return $this->request("media/$mediaId/info/", $this->generateSignature($data))[1];
+  }
+
+  /**
+  * Delete photo or video
+  *
+  * @param String $mediaId
+  *   Media id
+  *
+  * @return array
+  *   delete request data
+  */
   public function deleteMedia($mediaId)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
+
     $data = json_encode(array(
         '_uuid'  => $this->uuid,
         '_uid'   => $this->username_id,
@@ -315,11 +456,6 @@ class Instagram {
   */
   public function comment($mediaId, $commentText)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
 
     $data = json_encode(array(
         '_uuid'  => $this->uuid,
@@ -341,11 +477,6 @@ class Instagram {
   */
   public function changeProfilePicture($photo)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
 
     if (is_null($photo))
     {
@@ -401,7 +532,7 @@ class Instagram {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($ch, CURLOPT_HEADER, true);
-    curl_setopt($ch, CURLOPT_VERBOSE, false);
+    curl_setopt($ch, CURLOPT_VERBOSE, $this->debug);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath . "$this->username-cookies.dat");
     curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath . "$this->username-cookies.dat");
@@ -425,11 +556,6 @@ class Instagram {
   */
   public function removeProfilePicture()
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
 
     $data = json_encode(array(
         '_uuid'  => $this->uuid,
@@ -448,11 +574,6 @@ class Instagram {
   */
   public function setPrivateAccount()
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
 
     $data = json_encode(array(
         '_uuid'  => $this->uuid,
@@ -471,11 +592,6 @@ class Instagram {
   */
   public function setPublicAccount()
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
 
     $data = json_encode(array(
         '_uuid'  => $this->uuid,
@@ -494,12 +610,6 @@ class Instagram {
   */
   public function getProfileData()
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     return $this->request("accounts/current_user/?edit=true", $this->generateSignature($data))[1];
   }
 
@@ -522,11 +632,6 @@ class Instagram {
   */
   public function editProfile($url, $phone, $first_name, $biography, $email, $gender)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
 
     $data = json_encode(array(
         '_uuid'         => $this->uuid,
@@ -535,7 +640,7 @@ class Instagram {
         'external_url'  => $url,
         'phone_number'  => $phone,
         'username'      => $this->username,
-        'first_name'    => $first_name,
+        'full_name'     => $first_name,
         'biography'     => $biography,
         'email'         => $email,
         'gender'        => $gender
@@ -556,12 +661,6 @@ class Instagram {
   */
   public function getUsernameInfo($usernameId)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     return $this->request("users/$usernameId/info/")[1];
   }
 
@@ -584,12 +683,6 @@ class Instagram {
   */
   public function getRecentActivity()
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     $activity = $this->request("news/inbox/?")[1];
 
     if ($activity['status'] != 'ok')
@@ -609,12 +702,6 @@ class Instagram {
   */
   public function getv2Inbox()
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     $inbox = $this->request("direct_v2/inbox/?")[1];
 
     if ($inbox['status'] != 'ok')
@@ -636,12 +723,6 @@ class Instagram {
   */
   public function getUserTags($usernameId)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     $tags = $this->request("usertags/$usernameId/feed/?rank_token=$this->rank_token&ranked_content=true&")[1];
 
     if ($tags['status'] != 'ok')
@@ -673,12 +754,6 @@ class Instagram {
    */
   public function tagFeed($tag)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     $userFeed = $this->request("feed/tag/$tag/?rank_token=$this->rank_token&ranked_content=true&")[1];
 
     if ($userFeed['status'] != 'ok')
@@ -699,12 +774,6 @@ class Instagram {
    */
   public function getMediaLikers($mediaId)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     $likers = $this->request("media/$mediaId/likers/?")[1];
     if ($likers['status'] != 'ok')
     {
@@ -726,12 +795,6 @@ class Instagram {
   */
   public function getGeoMedia($usernameId)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     $locations = $this->request("maps/user/$usernameId/")[1];
 
     if ($locations['status'] != 'ok')
@@ -764,12 +827,6 @@ class Instagram {
   */
   public function fbUserSearch($query)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     $query = $this->request("fbsearch/topsearch/?context=blended&query=$query&rank_token=$this->rank_token")[1];
 
     if ($query['status'] != 'ok')
@@ -791,12 +848,6 @@ class Instagram {
   */
   public function searchUsers($query)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     $query = $this->request("users/search/?ig_sig_key_version=" . Constants::SIG_KEY_VERSION . "&is_typeahead=true&query=$query&rank_token=$this->rank_token")[1];
 
     if ($query['status'] != 'ok')
@@ -818,12 +869,6 @@ class Instagram {
   */
   public function syncFromAdressBook($contacts)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     $data = array(
         'contacts'  => json_encode($contacts, true)
       );
@@ -841,12 +886,6 @@ class Instagram {
   */
   public function searchTags($query)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     $query = $this->request("tags/search/?is_typeahead=true&q=$query&rank_token=$this->rank_token")[1];
 
     if ($query['status'] != 'ok')
@@ -867,12 +906,6 @@ class Instagram {
   */
   public function getTimeline()
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     $timeline = $this->request("feed/timeline/?rank_token=$this->rank_token&ranked_content=true&")[1];
 
     if ($timeline['status'] != 'ok')
@@ -895,12 +928,6 @@ class Instagram {
   */
   public function getUserFeed($usernameId)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     $userFeed = $this->request("feed/user/$usernameId/?rank_token=$this->rank_token&ranked_content=true&")[1];
 
     if ($userFeed['status'] != 'ok')
@@ -931,12 +958,6 @@ class Instagram {
   */
   public function getPopularFeed()
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     $popularFeed = $this->request("feed/popular/?people_teaser_supported=1&rank_token=$this->rank_token&ranked_content=true&")[1];
 
     if ($popularFeed['status'] != 'ok')
@@ -959,12 +980,6 @@ class Instagram {
   */
    public function getUserFollowings($usernameId,$maxid = null)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     return $this->request("friendships/$usernameId/following/?max_id=$maxid&ig_sig_key_version=" . Constants::SIG_KEY_VERSION . "&rank_token=$this->rank_token")[1];
   }
 
@@ -979,12 +994,6 @@ class Instagram {
   */
   public function getUserFollowers($usernameId,$maxid = null)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     return $this->request("friendships/$usernameId/followers/?max_id=$maxid&ig_sig_key_version=" . Constants::SIG_KEY_VERSION . "&rank_token=$this->rank_token")[1];
   }
 
@@ -1008,12 +1017,6 @@ class Instagram {
   */
   public function getUsersFollowing()
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     return $this->request("friendships/following/?ig_sig_key_version=" . Constants::SIG_KEY_VERSION . "&rank_token=$this->rank_token")[1];
   }
 
@@ -1028,12 +1031,6 @@ class Instagram {
   */
   public function like($mediaId)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     $data = json_encode(array(
         '_uuid'  => $this->uuid,
         '_uid'   => $this->username_id,
@@ -1055,12 +1052,6 @@ class Instagram {
   */
   public function unlike($mediaId)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     $data = json_encode(array(
         '_uuid'  => $this->uuid,
         '_uid'   => $this->username_id,
@@ -1082,12 +1073,6 @@ class Instagram {
   */
   public function getMediaComments($mediaId)
   {
-    if (!$this->isLoggedIn)
-    {
-      throw new InstagramException("Not logged in\n");
-      return;
-    }
-
     return $this->request("media/$mediaId/comments/?")[1];
   }
 
@@ -1268,7 +1253,7 @@ class Instagram {
       if(isset($b["filename"]))
       {
         $ext = pathinfo($b["filename"], PATHINFO_EXTENSION);
-        $body .= "; filename=\"".substr(bin2hex($b["filename"]),0,48).".".$ext."\"";
+        $body .= "; filename=\"" . 'pending_media_' . number_format(round(microtime(true)*1000), 0, '', '') .".".$ext."\"";
       }
       if(isset($b["headers"]) && is_array($b["headers"]))
       {
@@ -1285,7 +1270,21 @@ class Instagram {
     return $body;
   }
 
-  protected function request($endpoint, $post = null) {
+  protected function request($endpoint, $post = null, $login = false) {
+
+    if (!$this->isLoggedIn && !$login)
+    {
+      throw new InstagramException("Not logged in\n");
+      return;
+    }
+
+    $headers = [
+        'Connection: close',
+        'Accept: */*',
+        'Content-type: application/x-www-form-urlencoded; charset=UTF-8',
+        'Cookie2: $Version=1',
+        'Accept-Language: en-US'
+    ];
 
    $ch = curl_init();
 
@@ -1294,6 +1293,7 @@ class Instagram {
    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
    curl_setopt($ch, CURLOPT_HEADER, true);
+   curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
    curl_setopt($ch, CURLOPT_VERBOSE, false);
    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
    curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath . "$this->username-cookies.dat");
@@ -1319,7 +1319,7 @@ class Instagram {
      if (!is_null($post))
      {
        if (!is_array($post))
-        echo "DATA: $post\n";
+        echo "DATA: " . urldecode($post) . "\n";
      }
      echo "RESPONSE: $body\n\n";
    }

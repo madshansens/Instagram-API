@@ -2,12 +2,12 @@
 
 require_once '../src/InstagramRegistration.php';
 
-$r = new InstagramRegistration(true);
-
-
 // NOTE: THIS IS A CLI TOOL
 /// DEBUG MODE ///
-$debug = true;
+$debug = false;
+
+$r = new InstagramRegistration($debug);
+
 
 echo "###########################\n";
 echo "#                         #\n";
