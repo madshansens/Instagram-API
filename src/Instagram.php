@@ -466,7 +466,29 @@ class Instagram {
 
     return $this->request("media/$mediaId/comment/", $this->generateSignature($data))[1];
   }
-
+  
+  /**
+  * Delete Comment
+  *
+  * @param String $mediaId
+  *   Media ID
+  *
+  * @param String $commentId
+  *   Comment ID
+  *
+  * @return array
+  *   Delete comment data
+  */
+  public function deleteComment($mediaId, $commentId)
+  {
+    $data = json_encode(array(
+        '_uuid'  => $this->uuid,
+        '_uid'   => $this->username_id,
+        '_csrftoken' => $this->token,
+        'caption_text'   => $captionText
+    ));
+    return $this->request("media/$mediaId/comment/$commentId/delete/", $this->generateSignature($data))[1];
+  }
 
 
   /**
