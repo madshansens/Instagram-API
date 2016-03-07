@@ -36,8 +36,8 @@ class Instagram
       $this->debug = $debug;
 
       $this->uuid = $this->generateUUID(true);
-      $this->device_id = 'android-'.str_split(md5(rand(1000, 9999)), 16)[rand(0, 1)];
-
+      $this->device_id = $this->generateDeviceId(md5($username.$password));
+      die($this->device_id);
       if (!is_null($IGDataPath)) {
           $this->IGDataPath = $IGDataPath;
       } else {
@@ -1222,9 +1222,9 @@ class Instagram
         return 'ig_sig_key_version='.Constants::SIG_KEY_VERSION.'&signed_body='.$hash.'.'.urlencode($data);
     }
 
-    public function generateDeviceId()
+    public function generateDeviceId($seed)
     {
-        return 'android-'.str_split(md5(rand(1000, 9999)), 16)[rand(0, 1)];
+        return 'android-'.substr(md5($seed), 16);
     }
 
     public function generateUUID($type)
