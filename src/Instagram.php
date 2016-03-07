@@ -1224,7 +1224,9 @@ class Instagram
 
     public function generateDeviceId($seed)
     {
-        return 'android-'.substr(md5($seed), 16);
+        // Neutralize username/password -> device correlation
+        $volatile_seed = filemtime(__DIR__);
+        return 'android-'.substr(md5($seed.$volatile_seed), 16);
     }
 
     public function generateUUID($type)
