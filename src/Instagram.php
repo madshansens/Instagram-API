@@ -5,7 +5,7 @@ require_once 'InstagramException.php';
 
 class Instagram
 {
-    protected $username;            // Instagram username
+  protected $username;            // Instagram username
   protected $password;            // Instagram password
   protected $debug;               // Debug
 
@@ -37,7 +37,7 @@ class Instagram
 
       $this->uuid = $this->generateUUID(true);
       $this->device_id = $this->generateDeviceId(md5($username.$password));
-      die($this->device_id);
+
       if (!is_null($IGDataPath)) {
           $this->IGDataPath = $IGDataPath;
       } else {
