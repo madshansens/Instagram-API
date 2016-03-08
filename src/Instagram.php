@@ -941,6 +941,62 @@ class Instagram
   }
 
   /**
+  * Get hashtag feed
+  *
+  * @param String $hashtagString
+  *    Hashtag string, not including the #
+  *
+  * @return array
+  *   Hashtag feed data
+  */
+  public function getHashtagFeed($hashtagString, $maxid = null)
+  {
+    if (is_null($maxid)) {
+      $endpoint = "feed/tag/$hashtagString/?rank_token=$this->rank_token&ranked_content=true&";
+    } else {
+      $endpoint = "feed/tag/$hashtagString/?max_id=" . $maxid . "&rank_token=$this->rank_token&ranked_content=true&";
+    }
+
+    $hashtagFeed = $this->request($endpoint)[1];
+
+    if ($hashtagFeed['status'] != 'ok')
+    {
+      throw new InstagramException($hashtagFeed['message'] . "\n");
+      return;
+    }
+
+    return $hashtagFeed;
+  }
+
+  /**
+  * Get location feed
+  *
+  * @param String $locationId
+  *    location id
+  *
+  * @return array
+  *   Location feed data
+  */
+  public function getLocationFeed($locationId, $maxid = null)
+  {
+    if (is_null($maxid)) {
+      $endpoint = "feed/location/$locationId/?rank_token=$this->rank_token&ranked_content=true&";
+    } else {
+      $endpoint = "feed/location/$locationId/?max_id=" . $maxid . "&rank_token=$this->rank_token&ranked_content=true&";
+    }
+
+    $locationFeed = $this->request($endpoint)[1];
+
+    if ($locationFeed['status'] != 'ok')
+    {
+      throw new InstagramException($locationFeed['message'] . "\n");
+      return;
+    }
+
+    return $locationFeed;
+  }
+
+  /**
    * Get self user feed.
    *
    * @return array
