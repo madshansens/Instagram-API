@@ -5,7 +5,7 @@ require_once 'InstagramException.php';
 
 class Instagram
 {
-    protected $username;            // Instagram username
+  protected $username;            // Instagram username
   protected $password;            // Instagram password
   protected $debug;               // Debug
 
@@ -36,7 +36,7 @@ class Instagram
       $this->debug = $debug;
 
       $this->uuid = $this->generateUUID(true);
-      $this->device_id = 'android-'.str_split(md5(rand(1000, 9999)), 16)[rand(0, 1)];
+      $this->device_id = $this->generateDeviceId(md5($username.$password));
 
       if (!is_null($IGDataPath)) {
           $this->IGDataPath = $IGDataPath;
@@ -1278,9 +1278,11 @@ class Instagram
         return 'ig_sig_key_version='.Constants::SIG_KEY_VERSION.'&signed_body='.$hash.'.'.urlencode($data);
     }
 
-    public function generateDeviceId()
+    public function generateDeviceId($seed)
     {
-        return 'android-'.str_split(md5(rand(1000, 9999)), 16)[rand(0, 1)];
+        // Neutralize username/password -> device correlation
+        $volatile_seed = filemtime(__DIR__);
+        return 'android-'.substr(md5($seed.$volatile_seed), 16);
     }
 
     public function generateUUID($type)
