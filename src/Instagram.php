@@ -975,6 +975,29 @@ class Instagram
   }
 
   /**
+   * Get locations
+   *
+   * @param String $query
+   *    search query
+   *
+   * @return array
+   *   Location location data
+   */
+  public function searchLocation($query)
+  {
+      $endpoint = "fbsearch/places/?rank_token=$this->rank_token&query=" . $query;
+
+      $locationFeed = $this->request($endpoint)[1];
+
+      if ($locationFeed['status'] != 'ok') {
+          throw new InstagramException($locationFeed['message'] . "\n");
+          return;
+      }
+
+      return $locationFeed;
+  }
+
+  /**
   * Get location feed
   *
   * @param String $locationId
