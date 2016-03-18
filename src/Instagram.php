@@ -703,6 +703,25 @@ class Instagram
   }
 
   /**
+   * Get recent activity from accounts followed.
+   *
+   * @return array
+   *   Recent activity data of follows
+   */
+  public function getFollowingRecentActivity()
+  {
+      $activity = $this->request('news/?')[1];
+
+      if ($activity['status'] != 'ok') {
+          throw new InstagramException($activity['message']."\n");
+
+          return;
+      }
+
+      return $activity;
+  }
+
+  /**
    * I dont know this yet.
    *
    * @return array
