@@ -331,8 +331,6 @@ class Instagram
         $header = substr($resp, 0, $header_len);
         $upload = json_decode(substr($resp, $header_len), true);
 
-        var_dump($upload);
-
         curl_close($ch);
     }
 
