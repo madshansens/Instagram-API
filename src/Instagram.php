@@ -391,6 +391,25 @@ class Instagram
 
       return $this->request("media/$mediaId/edit_media/", $this->generateSignature($data))[1];
   }
+  
+  /**
+   * Remove yourself from a tagged media
+   *
+   * @param string $mediaId
+   *   Media id
+   *
+   * @return array
+   *   edit media data
+   */
+  public function removeSelftag($mediaId)
+  {
+      $data = json_encode([
+        '_uuid'          => $this->uuid,
+        '_uid'           => $this->username_id,
+        '_csrftoken'     => $this->token,
+    ]);
+      return $this->request("usertags/$mediaId/remove/", $this->generateSignature($data))[1];
+  }
 
   /**
    * Delete photo or video.
