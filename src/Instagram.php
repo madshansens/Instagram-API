@@ -255,7 +255,7 @@ class Instagram
         $configure = $this->configure($upload['upload_id'], $photo, $caption);
         $this->expose();
 
-        return $configure[1];
+        return $configure;
     }
 
     public function direct_share($media_id, $recipients, $text = null)
@@ -330,8 +330,6 @@ class Instagram
         $header = substr($resp, 0, $header_len);
         $upload = json_decode(substr($resp, $header_len), true);
 
-        var_dump($upload);
-
         curl_close($ch);
     }
 
@@ -368,7 +366,7 @@ class Instagram
 
         $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]', $post);
 
-        $image = $this->request('media/configure/', $this->generateSignature($post))[1];
+        return $this->request('media/configure/', $this->generateSignature($post))[1];
     }
 
   /**
