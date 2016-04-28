@@ -619,6 +619,13 @@ class Instagram
    */
   public function getProfileData()
   {
+    
+    $data = json_encode([
+        '_uuid'      => $this->uuid,
+        '_uid'       => $this->username_id,
+        '_csrftoken' => $this->token,
+    ]);
+    
       return $this->request('accounts/current_user/?edit=true', $this->generateSignature($data))[1];
   }
 
