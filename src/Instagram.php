@@ -1,5 +1,6 @@
 <?php
 
+require_once 'func.php';
 require_once 'Constants.php';
 require_once 'InstagramException.php';
 
@@ -172,15 +173,21 @@ class Instagram
      * @return array
      *               Upload data
      */
-    public function uploadPhoto($photo, $caption = null)
+    public function uploadPhoto($photo, $caption = null, $upload_id = null)
     {
         $endpoint = Constants::API_URL.'upload/photo/';
         $boundary = $this->uuid;
+
+        if (!is_null($upload_id))
+          $fileToUpload = createVideoIcon($photo);
+        else
+          $fileToUpload = file_get_contents($photo);
+
         $bodies = [
             [
                 'type' => 'form-data',
                 'name' => 'upload_id',
-                'data' => number_format(round(microtime(true) * 1000), 0, '', ''),
+                'data' => $upload_id,
             ],
             [
                 'type' => 'form-data',
@@ -200,7 +207,7 @@ class Instagram
             [
                 'type'     => 'form-data',
                 'name'     => 'photo',
-                'data'     => file_get_contents($photo),
+                'data'     => $fileToUpload,
                 'filename' => 'pending_media_'.number_format(round(microtime(true) * 1000), 0, '', '').'.jpg',
                 'headers'  => [
           'Content-Transfer-Encoding: binary',
@@ -252,7 +259,135 @@ class Instagram
             echo 'RESPONSE: '.substr($resp, $header_len)."\n\n";
         }
 
-        $configure = $this->configure($upload['upload_id'], $photo, $caption);
+        if (!is_null($upload_id))
+        {
+          $configure = $this->configure($upload['upload_id'], $photo, $caption);
+          $this->expose();
+        }
+
+        return $configure;
+    }
+
+    public function uploadVideo($video, $caption = null)
+    {
+      $videoData = file_get_contents($video);
+
+      $endpoint = Constants::API_URL. 'upload/video/';
+      $boundary = $this->uuid;
+      $upload_id = round(microtime(true)*1000);
+      $bodies = [
+          [
+              'type' => 'form-data',
+              'name' => 'upload_id',
+              'data' => $upload_id
+          ],
+          [
+              'type' => 'form-data',
+              'name' => '_csrftoken',
+              'data' => $this->token,
+          ],
+          [
+              'type' => 'form-data',
+              'name' => 'media_type',
+              'data'   => '2',
+          ],
+          [
+              'type' => 'form-data',
+              'name' => '_uuid',
+              'data' => $this->uuid
+          ]
+      ];
+
+      $data = $this->buildBody($bodies,$boundary);
+      $headers = [
+          'Connection: keep-alive',
+          'Accept: */*',
+          'Host: i.instagram.com',
+          'Content-type: multipart/form-data; boundary='.$boundary,
+          'Accept-Language: en-en',
+      ];
+
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_URL, $endpoint);
+      curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+      curl_setopt($ch, CURLOPT_HEADER, true);
+      curl_setopt($ch, CURLOPT_VERBOSE, false);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+      curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath . "$this->username-cookies.dat");
+      curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath . "$this->username-cookies.dat");
+      curl_setopt($ch, CURLOPT_POST, true);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+      $resp       = curl_exec($ch);
+      $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+
+      $body       = json_decode(substr($resp, $header_len), true);
+
+
+      $uploadUrl = $body['video_upload_urls'][3]['url'];
+      $job = $body['video_upload_urls'][3]['job'];
+
+      $request_size = floor(strlen($videoData)/4);
+
+      $lastRequestExtra = (strlen($videoData) - ($request_size*4));
+
+      for($a = 0; $a <= 3; $a++){
+          $start = ($a*$request_size);
+          $end = ($a+1)*$request_size+($a == 3?$lastRequestExtra:0);
+
+          $headers = [
+              'Connection: keep-alive',
+              'Accept: */*',
+              'Host: upload.instagram.com',
+              'Cookie2: $Version=1',
+              'Accept-Encoding: gzip, deflate',
+              'Content-Type: application/octet-stream',
+              'Session-ID: ' . $upload_id,
+              'Accept-Language: en-en',
+              'Content-Disposition: attachment; filename="video.mov"',
+              'Content-Length: ' . ($end-$start),
+              'Content-Range: ' . "bytes ".$start."-" .($end-1)."/" . strlen($videoData),
+              'job: '.$job
+          ];
+          $ch = curl_init();
+          curl_setopt($ch, CURLOPT_URL, $uploadUrl);
+          curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
+          curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+          curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+          curl_setopt($ch, CURLOPT_HEADER, true);
+          curl_setopt($ch, CURLOPT_VERBOSE, false);
+          curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+          curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath . "$this->username-cookies.dat");
+          curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath . "$this->username-cookies.dat");
+          curl_setopt($ch, CURLOPT_POST, true);
+          curl_setopt($ch, CURLOPT_POSTFIELDS, substr($videoData,$start,$end));
+
+          $result = curl_exec($ch);
+          $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+          $body       = substr($result, $header_len);
+          $array[] = [$body];
+      }
+        $resp = curl_exec($ch);
+        $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $header = substr($resp, 0, $header_len);
+        $upload = json_decode(substr($resp, $header_len), true);
+
+        curl_close($ch);
+
+        if ($upload['status'] == 'fail') {
+            throw new InstagramException($upload['message']);
+
+            return;
+        }
+
+        if ($this->debug) {
+            echo 'RESPONSE: '.substr($resp, $header_len)."\n\n";
+        }
+
+        $configure = $this->configureVideo($upload_id, $video, $caption);
         $this->expose();
 
         return $configure;
@@ -333,6 +468,47 @@ class Instagram
         curl_close($ch);
     }
 
+    protected function configureVideo($upload_id, $video, $caption = "")
+    {
+        $this->uploadPhoto($video, null, $upload_id);
+
+        $size = getimagesize($video)[0];
+
+        $post = json_encode([
+        'upload_id'          => $upload_id,
+        'source_type'        => "3",
+        'poster_frame_index' => 0,
+        'length'             => 0.00,
+        'audio_muted'        => false,
+        'filter_type'        => "0",
+        'video_result'       => 'deprecated',
+        'clips'              => [
+          'length'           => getSeconds($video),
+          'source_type'      => "3",
+          'camera_position'  => 'back',
+        ],
+        'extra' => [
+          'source_width'  => 960,
+          'source_height' => 1280,
+        ],
+        'device' => [
+          'manufacturer'    => 'Xiaomi',
+          'model'           => 'HM 1SW',
+          'android_version' => 18,
+          'android_release' => '4.3',
+        ],
+        '_csrftoken'  => $this->token,
+        '_uuid'       => $this->uuid,
+        '_uid'        => $this->username_id,
+        'caption'     => $caption,
+     ]);
+
+        $post = str_replace('"length":0', '"length":0.00', $post);
+
+
+        return $this->request('media/configure/?video=1', $this->generateSignature($post))[1];
+    }
+
     protected function configure($upload_id, $photo, $caption = '')
     {
         $size = getimagesize($photo)[0];
@@ -391,7 +567,7 @@ class Instagram
 
       return $this->request("media/$mediaId/edit_media/", $this->generateSignature($data))[1];
   }
-  
+
   /**
    * Remove yourself from a tagged media
    *
@@ -636,13 +812,13 @@ class Instagram
    */
   public function getProfileData()
   {
-    
+
     $data = json_encode([
         '_uuid'      => $this->uuid,
         '_uid'       => $this->username_id,
         '_csrftoken' => $this->token,
     ]);
-    
+
       return $this->request('accounts/current_user/?edit=true', $this->generateSignature($data))[1];
   }
 
