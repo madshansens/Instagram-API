@@ -919,9 +919,7 @@ class Instagram
    */
   public function syncFromAdressBook($contacts)
   {
-      $data = [
-        'contacts'  => json_encode($contacts, true),
-      ];
+      $data = "contacts=".json_encode($contacts, true);
 
       return $this->request('address_book/link/?include=extra_display_name,thumbnails', $data)[1];
   }
