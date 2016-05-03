@@ -7,8 +7,8 @@ $username = '';
 $password = '';
 $debug    = false;
 
-$photo    = '';     // path to the photo
-$caption  = '';     // caption
+$video   = '';     // path to the video
+$caption = '';     // caption
 //////////////////////
 
 $i = new Instagram($username, $password, $debug);
@@ -21,7 +21,7 @@ try {
 }
 
 try {
-    $i->uploadPhoto($photo, $caption);
+    $i->uploadVideo($video, $caption);
 } catch (Exception $e) {
     echo $e->getMessage();
 }
