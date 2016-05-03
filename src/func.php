@@ -2,24 +2,30 @@
 
 function getSeconds($file)
 {
- $ffmpeg = checkFFMPEG();
- if($ffmpeg){
-   $time = exec("$ffmpeg -i ". $file ." 2>&1 | grep 'Duration' | cut -d ' ' -f 4");
-   $duration = explode(":",$time);
-   $seconds = $duration[0]*3600 + $duration[1]*60+ round($duration[2]);
+    $ffmpeg = checkFFMPEG();
+    if ($ffmpeg) {
+        $time = exec("$ffmpeg -i ".$file." 2>&1 | grep 'Duration' | cut -d ' ' -f 4");
+        $duration = explode(':', $time);
+        $seconds = $duration[0] * 3600 + $duration[1] * 60 + round($duration[2]);
 
-   return $seconds;
- }
- return mt_rand(15,300);
+        return $seconds;
+    }
+
+    return mt_rand(15, 300);
 }
 
 function checkFFMPEG()
 {
-   @exec('ffmpeg -version 2>&1', $output, $returnvalue);
-   if($returnvalue === 0) return "ffmpeg";
-   @exec('avconv -version 2>&1', $output, $returnvalue);
-   if($returnvalue === 0) return "avconv";
-   return false;
+    @exec('ffmpeg -version 2>&1', $output, $returnvalue);
+    if ($returnvalue === 0) {
+        return 'ffmpeg';
+    }
+    @exec('avconv -version 2>&1', $output, $returnvalue);
+    if ($returnvalue === 0) {
+        return 'avconv';
+    }
+
+    return false;
 }
 
 function createVideoIcon($file)
@@ -32,7 +38,7 @@ function createVideoIcon($file)
         @unlink($preview);
 
         //capture video preview
-        $command = $ffmpeg. ' -i "'.$file.'" -f mjpeg -ss 00:00:01 -vframes 1 "'.$preview.'" 2>&1';
+        $command = $ffmpeg.' -i "'.$file.'" -f mjpeg -ss 00:00:01 -vframes 1 "'.$preview.'" 2>&1';
         @exec($command);
 
         return createIconGD($preview);
@@ -57,7 +63,7 @@ function createIconGD($file, $size = 100, $raw = true)
 
     imagecopyresampled($image_p, $image, 0, 0, $x, $y, $size, $size, $smallestSide, $smallestSide);
     ob_start();
-    imagejpeg($image_p,NULL,50);
+    imagejpeg($image_p, null, 50);
     $i = ob_get_contents();
     ob_end_clean();
 

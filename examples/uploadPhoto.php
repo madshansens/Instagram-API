@@ -5,10 +5,10 @@ require '../src/Instagram.php';
 /////// CONFIG ///////
 $username = '';
 $password = '';
-$debug    = false;
+$debug = false;
 
-$photo    = '';     // path to the photo
-$caption  = '';     // caption
+$photo = '';     // path to the photo
+$caption = '';     // caption
 //////////////////////
 
 $i = new Instagram($username, $password, $debug);
