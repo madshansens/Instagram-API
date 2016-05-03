@@ -1311,12 +1311,12 @@ class Instagram
   }
 
   /**
-   * Get the users we are following.
+   * Get self users we are following.
    *
    * @return array
    *   users we are following data
    */
-  public function getUsersFollowing()
+  public function getSelfUsersFollowing()
   {
       return $this->request('friendships/following/?ig_sig_key_version='.Constants::SIG_KEY_VERSION."&rank_token=$this->rank_token")[1];
   }
