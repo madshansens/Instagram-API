@@ -63,7 +63,7 @@ function createIconGD($file, $size = 100, $raw = true)
 
     imagecopyresampled($image_p, $image, 0, 0, $x, $y, $size, $size, $smallestSide, $smallestSide);
     ob_start();
-    imagejpeg($image_p, null, 50);
+    imagejpeg($image_p, null, 95);
     $i = ob_get_contents();
     ob_end_clean();
 
