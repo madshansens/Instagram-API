@@ -6,7 +6,7 @@ require_once 'InstagramException.php';
 
 class Instagram
 {
-  protected $username;            // Instagram username
+    protected $username;            // Instagram username
   protected $password;            // Instagram password
   protected $debug;               // Debug
 
@@ -178,10 +178,11 @@ class Instagram
         $endpoint = Constants::API_URL.'upload/photo/';
         $boundary = $this->uuid;
 
-        if (!is_null($upload_id))
-          $fileToUpload = createVideoIcon($photo);
-        else
-          $fileToUpload = file_get_contents($photo);
+        if (!is_null($upload_id)) {
+            $fileToUpload = createVideoIcon($photo);
+        } else {
+            $fileToUpload = file_get_contents($photo);
+        }
 
         $bodies = [
             [
@@ -259,10 +260,9 @@ class Instagram
             echo 'RESPONSE: '.substr($resp, $header_len)."\n\n";
         }
 
-        if (!is_null($upload_id))
-        {
-          $configure = $this->configure($upload['upload_id'], $photo, $caption);
-          $this->expose();
+        if (!is_null($upload_id)) {
+            $configure = $this->configure($upload['upload_id'], $photo, $caption);
+            $this->expose();
         }
 
         return $configure;
@@ -270,16 +270,16 @@ class Instagram
 
     public function uploadVideo($video, $caption = null)
     {
-      $videoData = file_get_contents($video);
+        $videoData = file_get_contents($video);
 
-      $endpoint = Constants::API_URL. 'upload/video/';
-      $boundary = $this->uuid;
-      $upload_id = round(microtime(true)*1000);
-      $bodies = [
+        $endpoint = Constants::API_URL.'upload/video/';
+        $boundary = $this->uuid;
+        $upload_id = round(microtime(true) * 1000);
+        $bodies = [
           [
               'type' => 'form-data',
               'name' => 'upload_id',
-              'data' => $upload_id
+              'data' => $upload_id,
           ],
           [
               'type' => 'form-data',
@@ -287,19 +287,19 @@ class Instagram
               'data' => $this->token,
           ],
           [
-              'type' => 'form-data',
-              'name' => 'media_type',
+              'type'   => 'form-data',
+              'name'   => 'media_type',
               'data'   => '2',
           ],
           [
               'type' => 'form-data',
               'name' => '_uuid',
-              'data' => $this->uuid
-          ]
+              'data' => $this->uuid,
+          ],
       ];
 
-      $data = $this->buildBody($bodies,$boundary);
-      $headers = [
+        $data = $this->buildBody($bodies, $boundary);
+        $headers = [
           'Connection: keep-alive',
           'Accept: */*',
           'Host: i.instagram.com',
@@ -307,69 +307,68 @@ class Instagram
           'Accept-Language: en-en',
       ];
 
-      $ch = curl_init();
-      curl_setopt($ch, CURLOPT_URL, $endpoint);
-      curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-      curl_setopt($ch, CURLOPT_HEADER, true);
-      curl_setopt($ch, CURLOPT_VERBOSE, false);
-      curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-      curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath . "$this->username-cookies.dat");
-      curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath . "$this->username-cookies.dat");
-      curl_setopt($ch, CURLOPT_POST, true);
-      curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $endpoint);
+        curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath."$this->username-cookies.dat");
+        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath."$this->username-cookies.dat");
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
-      $resp       = curl_exec($ch);
-      $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $resp = curl_exec($ch);
+        $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 
-      $body       = json_decode(substr($resp, $header_len), true);
+        $body = json_decode(substr($resp, $header_len), true);
 
+        $uploadUrl = $body['video_upload_urls'][3]['url'];
+        $job = $body['video_upload_urls'][3]['job'];
 
-      $uploadUrl = $body['video_upload_urls'][3]['url'];
-      $job = $body['video_upload_urls'][3]['job'];
+        $request_size = floor(strlen($videoData) / 4);
 
-      $request_size = floor(strlen($videoData)/4);
+        $lastRequestExtra = (strlen($videoData) - ($request_size * 4));
 
-      $lastRequestExtra = (strlen($videoData) - ($request_size*4));
+        for ($a = 0; $a <= 3; $a++) {
+            $start = ($a * $request_size);
+            $end = ($a + 1) * $request_size + ($a == 3 ? $lastRequestExtra : 0);
 
-      for($a = 0; $a <= 3; $a++){
-          $start = ($a*$request_size);
-          $end = ($a+1)*$request_size+($a == 3?$lastRequestExtra:0);
-
-          $headers = [
+            $headers = [
               'Connection: keep-alive',
               'Accept: */*',
               'Host: upload.instagram.com',
               'Cookie2: $Version=1',
               'Accept-Encoding: gzip, deflate',
               'Content-Type: application/octet-stream',
-              'Session-ID: ' . $upload_id,
+              'Session-ID: '.$upload_id,
               'Accept-Language: en-en',
               'Content-Disposition: attachment; filename="video.mov"',
-              'Content-Length: ' . ($end-$start),
-              'Content-Range: ' . "bytes ".$start."-" .($end-1)."/" . strlen($videoData),
-              'job: '.$job
+              'Content-Length: '.($end - $start),
+              'Content-Range: '.'bytes '.$start.'-'.($end - 1).'/'.strlen($videoData),
+              'job: '.$job,
           ];
-          $ch = curl_init();
-          curl_setopt($ch, CURLOPT_URL, $uploadUrl);
-          curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
-          curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-          curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-          curl_setopt($ch, CURLOPT_HEADER, true);
-          curl_setopt($ch, CURLOPT_VERBOSE, false);
-          curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-          curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath . "$this->username-cookies.dat");
-          curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath . "$this->username-cookies.dat");
-          curl_setopt($ch, CURLOPT_POST, true);
-          curl_setopt($ch, CURLOPT_POSTFIELDS, substr($videoData,$start,$end));
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $uploadUrl);
+            curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_HEADER, true);
+            curl_setopt($ch, CURLOPT_VERBOSE, false);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath."$this->username-cookies.dat");
+            curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath."$this->username-cookies.dat");
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, substr($videoData, $start, $end));
 
-          $result = curl_exec($ch);
-          $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-          $body       = substr($result, $header_len);
-          $array[] = [$body];
-      }
+            $result = curl_exec($ch);
+            $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+            $body = substr($result, $header_len);
+            $array[] = [$body];
+        }
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
@@ -468,7 +467,7 @@ class Instagram
         curl_close($ch);
     }
 
-    protected function configureVideo($upload_id, $video, $caption = "")
+    protected function configureVideo($upload_id, $video, $caption = '')
     {
         $this->uploadPhoto($video, null, $upload_id);
 
@@ -476,15 +475,15 @@ class Instagram
 
         $post = json_encode([
         'upload_id'          => $upload_id,
-        'source_type'        => "3",
+        'source_type'        => '3',
         'poster_frame_index' => 0,
         'length'             => 0.00,
         'audio_muted'        => false,
-        'filter_type'        => "0",
+        'filter_type'        => '0',
         'video_result'       => 'deprecated',
         'clips'              => [
           'length'           => getSeconds($video),
-          'source_type'      => "3",
+          'source_type'      => '3',
           'camera_position'  => 'back',
         ],
         'extra' => [
@@ -504,7 +503,6 @@ class Instagram
      ]);
 
         $post = str_replace('"length":0', '"length":0.00', $post);
-
 
         return $this->request('media/configure/?video=1', $this->generateSignature($post))[1];
     }
@@ -569,7 +567,7 @@ class Instagram
   }
 
   /**
-   * Remove yourself from a tagged media
+   * Remove yourself from a tagged media.
    *
    * @param string $mediaId
    *   Media id
@@ -584,6 +582,7 @@ class Instagram
         '_uid'           => $this->username_id,
         '_csrftoken'     => $this->token,
     ]);
+
       return $this->request("usertags/$mediaId/remove/", $this->generateSignature($data))[1];
   }
 
@@ -812,8 +811,7 @@ class Instagram
    */
   public function getProfileData()
   {
-
-    $data = json_encode([
+      $data = json_encode([
         '_uuid'      => $this->uuid,
         '_uid'       => $this->username_id,
         '_csrftoken' => $this->token,
@@ -1095,7 +1093,7 @@ class Instagram
    */
   public function syncFromAdressBook($contacts)
   {
-      $data = "contacts=".json_encode($contacts, true);
+      $data = 'contacts='.json_encode($contacts, true);
 
       return $this->request('address_book/link/?include=extra_display_name,thumbnails', $data)[1];
   }
@@ -1163,37 +1161,37 @@ class Instagram
   }
 
   /**
-  * Get hashtag feed
-  *
-  * @param String $hashtagString
-  *    Hashtag string, not including the #
-  *
-  * @return array
-  *   Hashtag feed data
-  */
+   * Get hashtag feed.
+   *
+   * @param string $hashtagString
+   *    Hashtag string, not including the #
+   *
+   * @return array
+   *   Hashtag feed data
+   */
   public function getHashtagFeed($hashtagString, $maxid = null)
   {
-    if (is_null($maxid)) {
-      $endpoint = "feed/tag/$hashtagString/?rank_token=$this->rank_token&ranked_content=true&";
-    } else {
-      $endpoint = "feed/tag/$hashtagString/?max_id=" . $maxid . "&rank_token=$this->rank_token&ranked_content=true&";
-    }
+      if (is_null($maxid)) {
+          $endpoint = "feed/tag/$hashtagString/?rank_token=$this->rank_token&ranked_content=true&";
+      } else {
+          $endpoint = "feed/tag/$hashtagString/?max_id=".$maxid."&rank_token=$this->rank_token&ranked_content=true&";
+      }
 
-    $hashtagFeed = $this->request($endpoint)[1];
+      $hashtagFeed = $this->request($endpoint)[1];
 
-    if ($hashtagFeed['status'] != 'ok')
-    {
-      throw new InstagramException($hashtagFeed['message'] . "\n");
-      return;
-    }
+      if ($hashtagFeed['status'] != 'ok') {
+          throw new InstagramException($hashtagFeed['message']."\n");
 
-    return $hashtagFeed;
+          return;
+      }
+
+      return $hashtagFeed;
   }
 
   /**
-   * Get locations
+   * Get locations.
    *
-   * @param String $query
+   * @param string $query
    *    search query
    *
    * @return array
@@ -1201,12 +1199,13 @@ class Instagram
    */
   public function searchLocation($query)
   {
-      $endpoint = "fbsearch/places/?rank_token=$this->rank_token&query=" . $query;
+      $endpoint = "fbsearch/places/?rank_token=$this->rank_token&query=".$query;
 
       $locationFeed = $this->request($endpoint)[1];
 
       if ($locationFeed['status'] != 'ok') {
-          throw new InstagramException($locationFeed['message'] . "\n");
+          throw new InstagramException($locationFeed['message']."\n");
+
           return;
       }
 
@@ -1214,31 +1213,31 @@ class Instagram
   }
 
   /**
-  * Get location feed
-  *
-  * @param String $locationId
-  *    location id
-  *
-  * @return array
-  *   Location feed data
-  */
+   * Get location feed.
+   *
+   * @param string $locationId
+   *    location id
+   *
+   * @return array
+   *   Location feed data
+   */
   public function getLocationFeed($locationId, $maxid = null)
   {
-    if (is_null($maxid)) {
-      $endpoint = "feed/location/$locationId/?rank_token=$this->rank_token&ranked_content=true&";
-    } else {
-      $endpoint = "feed/location/$locationId/?max_id=" . $maxid . "&rank_token=$this->rank_token&ranked_content=true&";
-    }
+      if (is_null($maxid)) {
+          $endpoint = "feed/location/$locationId/?rank_token=$this->rank_token&ranked_content=true&";
+      } else {
+          $endpoint = "feed/location/$locationId/?max_id=".$maxid."&rank_token=$this->rank_token&ranked_content=true&";
+      }
 
-    $locationFeed = $this->request($endpoint)[1];
+      $locationFeed = $this->request($endpoint)[1];
 
-    if ($locationFeed['status'] != 'ok')
-    {
-      throw new InstagramException($locationFeed['message'] . "\n");
-      return;
-    }
+      if ($locationFeed['status'] != 'ok') {
+          throw new InstagramException($locationFeed['message']."\n");
 
-    return $locationFeed;
+          return;
+      }
+
+      return $locationFeed;
   }
 
   /**
@@ -1527,6 +1526,7 @@ class Instagram
     {
         // Neutralize username/password -> device correlation
         $volatile_seed = filemtime(__DIR__);
+
         return 'android-'.substr(md5($seed.$volatile_seed), 16);
     }
 

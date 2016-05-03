@@ -3,8 +3,8 @@
 class Constants
 {
     /**
-      * Constant declarations.
-      */
+     * Constant declarations.
+     */
     const API_URL = 'https://i.instagram.com/api/v1/';
     const USER_AGENT = 'Instagram 7.19.1 Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)';
     const IG_SIG_KEY = '8082724c0ba508df900162dfe68ecb3c435873f595df87a8e19230f1fa4f6e13';

@@ -5,9 +5,9 @@ require '../src/Instagram.php';
 /////// CONFIG ///////
 $username = '';
 $password = '';
-$debug    = false;
+$debug = false;
 
-$video   = '';     // path to the video
+$video = '';     // path to the video
 $caption = '';     // caption
 //////////////////////
 
