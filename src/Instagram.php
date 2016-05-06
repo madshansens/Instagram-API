@@ -181,6 +181,7 @@ class Instagram
         if (!is_null($upload_id)) {
             $fileToUpload = createVideoIcon($photo);
         } else {
+            $upload_id = number_format(round(microtime(true) * 1000), 0, '', '');
             $fileToUpload = file_get_contents($photo);
         }
 
@@ -260,10 +261,8 @@ class Instagram
             echo 'RESPONSE: '.substr($resp, $header_len)."\n\n";
         }
 
-        if (!is_null($upload_id)) {
-            $configure = $this->configure($upload['upload_id'], $photo, $caption);
-            $this->expose();
-        }
+        $configure = $this->configure($upload['upload_id'], $photo, $caption);
+        $this->expose();
 
         return $configure;
     }
