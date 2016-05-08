@@ -1082,6 +1082,28 @@ class Instagram
       return $query;
   }
 
+    /**
+   * Search exact username
+   *
+   * @param string usernameName username as STRING not an id
+   *
+   * @return array
+   *   query data
+   *
+   */
+  public function searchUsername($usernameName)
+  {
+      $query = $this->request("users/$usernameName/usernameinfo/")[1];
+
+      if ($query['status'] != 'ok') {
+          throw new InstagramException($query['message']."\n");
+
+          return;
+      }
+
+      return $query;
+  }
+
   /**
    * Search users using addres book.
    *
