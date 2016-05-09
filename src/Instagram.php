@@ -6,7 +6,7 @@ require_once 'InstagramException.php';
 
 class Instagram
 {
-    protected $username;            // Instagram username
+  protected $username;            // Instagram username
   protected $password;            // Instagram password
   protected $debug;               // Debug
 
@@ -32,11 +32,7 @@ class Instagram
    */
   public function __construct($username, $password, $debug = false, $IGDataPath = null)
   {
-      $this->username = $username;
-      $this->password = $password;
       $this->debug = $debug;
-
-      $this->uuid = $this->generateUUID(true);
       $this->device_id = $this->generateDeviceId(md5($username.$password));
 
       if (!is_null($IGDataPath)) {
@@ -44,6 +40,24 @@ class Instagram
       } else {
           $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR;
       }
+
+      $this->setUser($username, $password);
+  }
+
+  /**
+   * Set the user. Manage multiple accounts.
+   *
+   * @param string $username
+   *   Your Instagram username.
+   * @param string $password
+   *   Your Instagram password.
+   */
+  public function setUser($username, $password)
+  {
+      $this->username = $username;
+      $this->password = $password;
+
+      $this->uuid = $this->generateUUID(true);
 
       if ((file_exists($this->IGDataPath."$this->username-cookies.dat")) && (file_exists($this->IGDataPath."$this->username-userId.dat"))
     && (file_exists($this->IGDataPath."$this->username-token.dat"))) {
@@ -57,12 +71,15 @@ class Instagram
   /**
    * Login to Instagram.
    *
+   * @param bool $force
+   *   Force login to Instagram, this will create a new session
+   *
    * @return array
    *    Login data
    */
-  public function login()
+  public function login($force = false)
   {
-      if (!$this->isLoggedIn) {
+      if (!$this->isLoggedIn || $force) {
           $fetch = $this->request('si/fetch_headers/?challenge_type=signup&guid='.$this->generateUUID(false), null, true);
           preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token);
 
@@ -99,7 +116,11 @@ class Instagram
           return $login[1];
       }
 
-      $this->timelineFeed();
+      $check = $this->timelineFeed();
+      if(isset($check['message']) && $check['message'] == 'login_required')
+      {
+        $this->login(true);
+      }
       $this->getv2Inbox();
       $this->getRecentActivity();
   }
