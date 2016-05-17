@@ -489,7 +489,7 @@ class Instagram
 
     protected function configureVideo($upload_id, $video, $caption = '')
     {
-        $this->uploadPhoto($video, null, $upload_id);
+        $this->uploadPhoto($video, $caption, $upload_id);
 
         $size = getimagesize($video)[0];
 
