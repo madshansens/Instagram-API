@@ -1180,18 +1180,26 @@ class Instagram
       return $timeline;
   }
 
-  /**
-   * Get user feed.
-   *
-   * @param string $usernameId
-   *    Username id
-   *
-   * @return array
-   *   User feed data
-   */
-  public function getUserFeed($usernameId)
+    /**
+     * Get user feed.
+     * @param string $usernameId
+     *    Username id
+     * @param null $maxid
+     *    Max Id
+     * @param null $count
+     *    Count
+     * @return array User feed data
+     *    User feed data
+     * @throws InstagramException
+     */
+  public function getUserFeed($usernameId, $maxid = null, $count = null)
   {
-      $userFeed = $this->request("feed/user/$usernameId/?rank_token=$this->rank_token&ranked_content=true&")[1];
+      $userFeed = $this->request(
+          "feed/user/$usernameId/?rank_token=$this->rank_token&"
+          .(!is_null($maxid) ? "&max_id=".$maxid : '')
+          .(!is_null($count) ? "&count=".$maxid : '')
+          ."ranked_content=true&"
+      )[1];
 
       if ($userFeed['status'] != 'ok') {
           throw new InstagramException($userFeed['message']."\n");
