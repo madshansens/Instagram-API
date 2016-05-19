@@ -84,6 +84,8 @@ class Instagram
           preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token);
 
           $data = [
+          'phone_id'            => $this->generateUUID(true),
+          '_csrftoken'          => $token[0],
           'username'            => $this->username,
           'guid'                => $this->uuid,
           'device_id'           => $this->device_id,
