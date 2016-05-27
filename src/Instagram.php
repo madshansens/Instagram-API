@@ -684,7 +684,7 @@ class Instagram
    * @return array
    *   Delete comment data
    */
-  public function deleteComment($mediaId, $commentId)
+  public function deleteComment($mediaId, $captionText, $commentId)
   {
       $data = json_encode([
         '_uuid'          => $this->uuid,
