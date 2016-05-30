@@ -1555,6 +1555,25 @@ class Instagram
 
       return $this->request("friendships/unblock/$userId/", $this->generateSignature($data))[1];
   }
+  
+  /**
+   * Show User Friendship.
+   *
+   * @param string $userId
+   *
+   * @return array
+   *   Friendship relationship data
+   */
+  public function userFriendship($userId)
+  {
+      $data = json_encode([
+        '_uuid'      => $this->uuid,
+        '_uid'       => $this->username_id,
+        'user_id'    => $userId,
+        '_csrftoken' => $this->token,
+    ]);
+      return $this->request("friendships/show/$userId/", $this->generateSignature($data))[1];
+  }
 
   /**
    * Get liked media.
