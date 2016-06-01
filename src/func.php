@@ -1,5 +1,15 @@
 <?php
 
+/**
+   * Length of the file in Seconds
+   *
+   * @param string $file
+   *    path to the file name
+   *
+   * @return integer
+   *    length of the file in seconds
+   */
+
 function getSeconds($file)
 {
     $ffmpeg = checkFFMPEG();
@@ -14,6 +24,12 @@ function getSeconds($file)
     return mt_rand(15, 300);
 }
 
+/**
+   * Check for ffmpeg/avconv dependencies
+   * @return string/boolean
+   *    name of the library if present, false otherwise
+   */
+
 function checkFFMPEG()
 {
     @exec('ffmpeg -version 2>&1', $output, $returnvalue);
@@ -27,6 +43,14 @@ function checkFFMPEG()
 
     return false;
 }
+
+/**
+   * Creating a video icon/thumbnail
+   * @param string $file
+   *    path to the video file
+   * @return image
+   *    icon/thumbnail for the video
+   */
 
 function createVideoIcon($file)
 {
@@ -45,6 +69,15 @@ function createVideoIcon($file)
     }
 }
 
+/**
+   * Implements the actual logic behind creating the icon/thumbnail
+   *
+   * @param string $file
+   *    path to the file name
+   *
+   * @return image
+   *    icon/thumbnail for the video
+   */
 function createIconGD($file, $size = 100, $raw = true)
 {
     list($width, $height) = getimagesize($file);
