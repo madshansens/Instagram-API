@@ -15,6 +15,12 @@ Instagram's private API.
 composer require mgp25/instagram-php
 ```
 
+### Dependencies
+
+`curl`, `gd` and `ffmpeg`
+
+For more info: https://github.com/mgp25/Instagram-API/wiki/Dependencies
+
 ### Why did i do the API?
 
 Unfortunately WhatsApp blocked me (Yes, WhatsApp, _sigh..._) and my UUID, so they blocked me the use of any account on my mobile phone. There was a way to bypass it, but it was not a final solution, so I decided to do this.
