@@ -1169,9 +1169,12 @@ class Instagram
    * @return array
    *   timeline data
    */
-  public function getTimeline()
+  public function getTimeline($maxid = null)
   {
-      $timeline = $this->request("feed/timeline/?rank_token=$this->rank_token&ranked_content=true&")[1];
+      $timeline = $this->request(
+          "feed/timeline/?rank_token=$this->rank_token&ranked_content=true"
+          .(!is_null($maxid) ? "&max_id=".$maxid : '')
+      )[1];
 
       if ($timeline['status'] != 'ok') {
           throw new InstagramException($timeline['message']."\n");
