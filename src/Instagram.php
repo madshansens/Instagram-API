@@ -609,7 +609,7 @@ class Instagram
   }
 
   /**
-   * Delete photo or video.
+   * Media info
    *
    * @param string $mediaId
    *   Media id
