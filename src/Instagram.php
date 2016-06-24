@@ -1073,6 +1073,7 @@ class Instagram
    */
   public function fbUserSearch($query)
   {
+      $query = rawurlencode($query);
       $query = $this->request("fbsearch/topsearch/?context=blended&query=$query&rank_token=$this->rank_token")[1];
 
       if ($query['status'] != 'ok') {
@@ -1254,6 +1255,7 @@ class Instagram
    */
   public function searchLocation($query)
   {
+      $query = rawurlencode($query);
       $endpoint = "fbsearch/places/?rank_token=$this->rank_token&query=".$query;
 
       $locationFeed = $this->request($endpoint)[1];
