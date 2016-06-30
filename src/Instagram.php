@@ -425,7 +425,7 @@ class Instagram
             $string[] = "\"$recipient\"";
         }
 
-        $recipeint_users = implode(',', $string);
+        $recipient_users = implode(',', $string);
 
         $endpoint = Constants::API_URL.'direct_v2/threads/broadcast/media_share/?media_type=photo';
         $boundary = $this->uuid;
@@ -438,7 +438,7 @@ class Instagram
             [
                 'type' => 'form-data',
                 'name' => 'recipient_users',
-                'data' => "[[$recimient_users]]",
+                'data' => "[[$recipient_users]]",
             ],
             [
                 'type' => 'form-data',
