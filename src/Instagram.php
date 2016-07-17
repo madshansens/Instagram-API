@@ -169,7 +169,7 @@ class Instagram
     }
 
   /**
-   * Login to Instagram.
+   * Logout of Instagram.
    *
    * @return bool
    *    Returns true if logged out correctly
@@ -1586,9 +1586,10 @@ class Instagram
    * @return array
    *   Liked media data
    */
-  public function getLikedMedia()
+  public function getLikedMedia($maxid = null)
   {
-      return $this->request('feed/liked/?')[1];
+      $endpoint = 'feed/liked/?' . (!is_null($maxid) ? 'max_id='.$maxid.'&' : '');
+      return $this->request($endpoint)[1];
   }
 
     public function generateSignature($data)
