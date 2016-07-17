@@ -169,7 +169,7 @@ class Instagram
     }
 
   /**
-   * Login to Instagram.
+   * Logout of Instagram.
    *
    * @return bool
    *    Returns true if logged out correctly
