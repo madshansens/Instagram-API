@@ -2,8 +2,8 @@
 
 namespace InstagramAPI;
 
-class HttpInterface {
-
+class HttpInterface
+{
     protected $parent;
     protected $userAgent;
 

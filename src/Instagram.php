@@ -4,7 +4,7 @@ namespace InstagramAPI;
 
 class Instagram
 {
-  public $username;            // Instagram username
+    public $username;            // Instagram username
   public $password;            // Instagram password
   public $debug;               // Debug
 
@@ -16,7 +16,7 @@ class Instagram
   public $rank_token;          // Rank token
   public $IGDataPath;          // Data storage path
   public $http;
-  public $settings;
+    public $settings;
 
   /**
    * Default class constructor.
@@ -136,9 +136,8 @@ class Instagram
       }
 
       $check = $this->timelineFeed();
-      if(isset($check['message']) && $check['message'] == 'login_required')
-      {
-        $this->login(true);
+      if (isset($check['message']) && $check['message'] == 'login_required') {
+          $this->login(true);
       }
       $this->getv2Inbox();
       $this->getRecentActivity();
@@ -359,7 +358,7 @@ class Instagram
   }
 
   /**
-   * Media info
+   * Media info.
    *
    * @param string $mediaId
    *   Media id
@@ -789,14 +788,13 @@ class Instagram
       return $query;
   }
 
-    /**
-   * Search exact username
+  /**
+   * Search exact username.
    *
    * @param string usernameName username as STRING not an id
    *
    * @return array
    *   query data
-   *
    */
   public function searchUsername($usernameName)
   {
@@ -857,7 +855,7 @@ class Instagram
   {
       $timeline = $this->http->request(
           "feed/timeline/?rank_token=$this->rank_token&ranked_content=true"
-          .(!is_null($maxid) ? "&max_id=".$maxid : '')
+          .(!is_null($maxid) ? '&max_id='.$maxid : '')
       )[1];
 
       if ($timeline['status'] != 'ok') {
@@ -869,25 +867,28 @@ class Instagram
       return $timeline;
   }
 
-    /**
-     * Get user feed.
-     * @param string $usernameId
-     *    Username id
-     * @param null $maxid
-     *    Max Id
-     * @param null $minTimestamp
-     *    Min timestamp
-     * @return array User feed data
-     *    User feed data
-     * @throws InstagramException
-     */
+  /**
+   * Get user feed.
+   *
+   * @param string $usernameId
+   *    Username id
+   * @param null $maxid
+   *    Max Id
+   * @param null $minTimestamp
+   *    Min timestamp
+   *
+   * @throws InstagramException
+   *
+   * @return array User feed data
+   *    User feed data
+   */
   public function getUserFeed($usernameId, $maxid = null, $minTimestamp = null)
   {
       $userFeed = $this->http->request(
           "feed/user/$usernameId/?rank_token=$this->rank_token"
-          .(!is_null($maxid) ? "&max_id=".$maxid : '')
-          .(!is_null($minTimestamp) ? "&min_timestamp=".$minTimestamp : '')
-          ."&ranked_content=true"
+          .(!is_null($maxid) ? '&max_id='.$maxid : '')
+          .(!is_null($minTimestamp) ? '&min_timestamp='.$minTimestamp : '')
+          .'&ranked_content=true'
       )[1];
 
       if ($userFeed['status'] != 'ok') {
@@ -1260,6 +1261,7 @@ class Instagram
         'user_id'    => $userId,
         '_csrftoken' => $this->token,
     ]);
+
       return $this->http->request("friendships/show/$userId/", SignatureUtils::generateSignature($data))[1];
   }
 
@@ -1271,7 +1273,8 @@ class Instagram
    */
   public function getLikedMedia($maxid = null)
   {
-      $endpoint = 'feed/liked/?' . (!is_null($maxid) ? 'max_id='.$maxid.'&' : '');
+      $endpoint = 'feed/liked/?'.(!is_null($maxid) ? 'max_id='.$maxid.'&' : '');
+
       return $this->http->request($endpoint)[1];
   }
 }

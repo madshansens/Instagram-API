@@ -2,18 +2,17 @@
 
 namespace InstagramAPI;
 
-class Utils {
-
+class Utils
+{
     /**
-       * Length of the file in Seconds
-       *
-       * @param string $file
-       *    path to the file name
-       *
-       * @return integer
-       *    length of the file in seconds
-       */
-
+     * Length of the file in Seconds.
+     *
+     * @param string $file
+     *                     path to the file name
+     *
+     * @return int
+     *             length of the file in seconds
+     */
     public static function getSeconds($file)
     {
         $ffmpeg = self::checkFFMPEG();
@@ -29,11 +28,11 @@ class Utils {
     }
 
     /**
-       * Check for ffmpeg/avconv dependencies
-       * @return string/boolean
-       *    name of the library if present, false otherwise
-       */
-
+     * Check for ffmpeg/avconv dependencies.
+     *
+     * @return string/boolean
+     *                        name of the library if present, false otherwise
+     */
     public static function checkFFMPEG()
     {
         @exec('ffmpeg -version 2>&1', $output, $returnvalue);
@@ -49,13 +48,14 @@ class Utils {
     }
 
     /**
-       * Creating a video icon/thumbnail
-       * @param string $file
-       *    path to the video file
-       * @return image
-       *    icon/thumbnail for the video
-       */
-
+     * Creating a video icon/thumbnail.
+     *
+     * @param string $file
+     *                     path to the video file
+     *
+     * @return image
+     *               icon/thumbnail for the video
+     */
     public static function createVideoIcon($file)
     {
         /* should install ffmpeg for the method to work successfully  */
@@ -74,14 +74,14 @@ class Utils {
     }
 
     /**
-       * Implements the actual logic behind creating the icon/thumbnail
-       *
-       * @param string $file
-       *    path to the file name
-       *
-       * @return image
-       *    icon/thumbnail for the video
-       */
+     * Implements the actual logic behind creating the icon/thumbnail.
+     *
+     * @param string $file
+     *                     path to the file name
+     *
+     * @return image
+     *               icon/thumbnail for the video
+     */
     public static function createIconGD($file, $size = 100, $raw = true)
     {
         list($width, $height) = getimagesize($file);

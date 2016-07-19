@@ -2,7 +2,8 @@
 
 namespace InstagramAPI;
 
-class SignatureUtils {
+class SignatureUtils
+{
     public static function generateSignature($data)
     {
         $hash = hash_hmac('sha256', $data, Constants::IG_SIG_KEY);
