@@ -111,15 +111,16 @@ class Instagram
       ];
 
           $login = $this->http->request('accounts/login/', SignatureUtils::generateSignature(json_encode($data)), true);
+          $response = new LoginResponse($login[1]);
 
-          if ($login[1]['status'] == 'fail') {
-              throw new InstagramException($login[1]['message']);
+          if (!$response->isOk()) {
+              throw new InstagramException($response->getMessage());
 
-              return;
+              return $response;
           }
 
           $this->isLoggedIn = true;
-          $this->username_id = $login[1]['logged_in_user']['pk'];
+          $this->username_id = $response->getUsernameId();
           $this->settings->set('username_id', $this->username_id);
           $this->rank_token = $this->username_id.'_'.$this->uuid;
           preg_match('#Set-Cookie: csrftoken=([^;]+)#', $login[0], $match);
@@ -132,7 +133,7 @@ class Instagram
           $this->getv2Inbox();
           $this->getRecentActivity();
 
-          return $login[1];
+          return $response;
       }
 
       $check = $this->timelineFeed();
