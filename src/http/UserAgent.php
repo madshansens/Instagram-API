@@ -2,8 +2,8 @@
 
 namespace InstagramAPI;
 
-class UserAgent{
-
+class UserAgent
+{
     protected function getDeviceData()
     {
         $csvfile = __DIR__.'/devices.csv';
@@ -20,7 +20,8 @@ class UserAgent{
 
     public function buildUserAgent()
     {
-        $deviceData =  $this->getDeviceData();
+        $deviceData = $this->getDeviceData();
+
         return sprintf('Instagram %s Android (18/4.3; 320dpi; 720x1280; %s; %s; %s; qcom; en_US)', Constants::VERSION, $deviceData[0], $deviceData[1], $deviceData[2]);
     }
 }
