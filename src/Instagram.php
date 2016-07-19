@@ -51,7 +51,7 @@ class Instagram
       }
 
       if (($this->settings->get('user_agent') == null) || (intval($this->settings->get('version')) < intval(Constants::VERSION))) {
-          $userAgent = new UserAgent();
+          $userAgent = new UserAgent($this);
           $ua = $userAgent->buildUserAgent();
           $this->settings->set('user_agent', $ua);
       }
@@ -263,10 +263,10 @@ class Instagram
           'source_height' => 1280,
         ],
         'device' => [
-          'manufacturer'    => 'Xiaomi',
-          'model'           => 'HM 1SW',
-          'android_version' => 18,
-          'android_release' => '4.3',
+          'manufacturer'    => $this->settings->get('manufacturer'),
+          'model'           => $this->settings->get('model'),
+          'android_version' => Constants::ANDROID_VERSION,
+          'android_release' => Constants::ANDROID_RELEASE,
         ],
         '_csrftoken'  => $this->token,
         '_uuid'       => $this->uuid,
@@ -285,10 +285,10 @@ class Instagram
 
         $post = json_encode([
         'upload_id'          => $upload_id,
-        'camera_model'       => 'HM1S',
+        'camera_model'       => str_replace(" ", "", $this->settings->get('model')),
         'source_type'        => 3,
         'date_time_original' => date('Y:m:d H:i:s'),
-        'camera_make'        => 'XIAOMI',
+        'camera_make'        => $this->settings->get('manufacturer'),
         'edits'              => [
           'crop_original_size' => [$size, $size],
           'crop_zoom'          => 1.3333334,
@@ -299,10 +299,10 @@ class Instagram
           'source_height' => $size,
         ],
         'device' => [
-          'manufacturer'    => 'Xiaomi',
-          'model'           => 'HM 1SW',
-          'android_version' => 18,
-          'android_release' => '4.3',
+          'manufacturer'    => $this->settings->get('manufacturer'),
+          'model'           => $this->settings->get('model'),
+          'android_version' => Constants::ANDROID_VERSION,
+          'android_release' => Constants::ANDROID_RELEASE,
         ],
         '_csrftoken'  => $this->token,
         '_uuid'       => $this->uuid,
