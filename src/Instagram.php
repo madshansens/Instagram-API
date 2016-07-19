@@ -32,7 +32,7 @@ class Instagram
   public function __construct($username, $password, $debug = false, $IGDataPath = null)
   {
       $this->debug = $debug;
-      $this->device_id = $this->generateDeviceId(md5($username.$password));
+      $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
       $this->http = new HttpInterface($this);
 
       if (!is_null($IGDataPath)) {
@@ -57,7 +57,7 @@ class Instagram
       $this->username = $username;
       $this->password = $password;
 
-      $this->uuid = $this->generateUUID(true);
+      $this->uuid = SignatureUtils::generateUUID(true);
 
       if ((file_exists($this->IGDataPath."$this->username-cookies.dat")) && (file_exists($this->IGDataPath."$this->username-userId.dat"))
     && (file_exists($this->IGDataPath."$this->username-token.dat"))) {
@@ -80,11 +80,11 @@ class Instagram
   public function login($force = false)
   {
       if (!$this->isLoggedIn || $force) {
-          $fetch = $this->http->request('si/fetch_headers/?challenge_type=signup&guid='.$this->generateUUID(false), null, true);
+          $fetch = $this->http->request('si/fetch_headers/?challenge_type=signup&guid='.SignatureUtils::generateUUID(false), null, true);
           preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token);
 
           $data = [
-          'phone_id'            => $this->generateUUID(true),
+          'phone_id'            => SignatureUtils::generateUUID(true),
           '_csrftoken'          => $token[0],
           'username'            => $this->username,
           'guid'                => $this->uuid,
@@ -93,7 +93,7 @@ class Instagram
           'login_attempt_count' => '0',
       ];
 
-          $login = $this->http->request('accounts/login/', $this->generateSignature(json_encode($data)), true);
+          $login = $this->http->request('accounts/login/', SignatureUtils::generateSignature(json_encode($data)), true);
 
           if ($login[1]['status'] == 'fail') {
               throw new InstagramException($login[1]['message']);
@@ -137,7 +137,7 @@ class Instagram
         'experiments'   => Constants::EXPERIMENTS,
     ]);
 
-        return $this->http->request('qe/sync/', $this->generateSignature($data))[1];
+        return $this->http->request('qe/sync/', SignatureUtils::generateSignature($data))[1];
     }
 
     protected function autoCompleteUserList()
@@ -165,7 +165,7 @@ class Instagram
         'experiment'   => 'ig_android_profile_contextual_feed',
     ]);
 
-        $this->http->request('qe/expose/', $this->generateSignature($data))[1];
+        $this->http->request('qe/expose/', SignatureUtils::generateSignature($data))[1];
     }
 
   /**
@@ -259,7 +259,7 @@ class Instagram
 
         $post = str_replace('"length":0', '"length":0.00', $post);
 
-        return $this->http->request('media/configure/?video=1', $this->generateSignature($post))[1];
+        return $this->http->request('media/configure/?video=1', SignatureUtils::generateSignature($post))[1];
     }
 
     public function configure($upload_id, $photo, $caption = '')
@@ -295,7 +295,7 @@ class Instagram
 
         $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]', $post);
 
-        return $this->http->request('media/configure/', $this->generateSignature($post))[1];
+        return $this->http->request('media/configure/', SignatureUtils::generateSignature($post))[1];
     }
 
   /**
@@ -318,7 +318,7 @@ class Instagram
         'caption_text'   => $captionText,
     ]);
 
-      return $this->http->request("media/$mediaId/edit_media/", $this->generateSignature($data))[1];
+      return $this->http->request("media/$mediaId/edit_media/", SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -338,7 +338,7 @@ class Instagram
         '_csrftoken'     => $this->token,
     ]);
 
-      return $this->http->request("usertags/$mediaId/remove/", $this->generateSignature($data))[1];
+      return $this->http->request("usertags/$mediaId/remove/", SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -359,7 +359,7 @@ class Instagram
         'media_id'   => $mediaId,
     ]);
 
-      return $this->http->request("media/$mediaId/info/", $this->generateSignature($data))[1];
+      return $this->http->request("media/$mediaId/info/", SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -380,7 +380,7 @@ class Instagram
         'media_id'   => $mediaId,
     ]);
 
-      return $this->http->request("media/$mediaId/delete/", $this->generateSignature($data))[1];
+      return $this->http->request("media/$mediaId/delete/", SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -403,7 +403,7 @@ class Instagram
         'comment_text'   => $commentText,
     ]);
 
-      return $this->http->request("media/$mediaId/comment/", $this->generateSignature($data))[1];
+      return $this->http->request("media/$mediaId/comment/", SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -426,7 +426,7 @@ class Instagram
         'caption_text'   => $captionText,
     ]);
 
-      return $this->http->request("media/$mediaId/comment/$commentId/delete/", $this->generateSignature($data))[1];
+      return $this->http->request("media/$mediaId/comment/$commentId/delete/", SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -454,7 +454,7 @@ class Instagram
         '_csrftoken' => $this->token,
     ]);
 
-      return $this->http->request('accounts/remove_profile_picture/', $this->generateSignature($data))[1];
+      return $this->http->request('accounts/remove_profile_picture/', SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -471,7 +471,7 @@ class Instagram
         '_csrftoken' => $this->token,
     ]);
 
-      return $this->http->request('accounts/set_private/', $this->generateSignature($data))[1];
+      return $this->http->request('accounts/set_private/', SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -488,7 +488,7 @@ class Instagram
         '_csrftoken' => $this->token,
     ]);
 
-      return $this->http->request('accounts/set_public/', $this->generateSignature($data))[1];
+      return $this->http->request('accounts/set_public/', SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -505,7 +505,7 @@ class Instagram
         '_csrftoken' => $this->token,
     ]);
 
-      return $this->http->request('accounts/current_user/?edit=true', $this->generateSignature($data))[1];
+      return $this->http->request('accounts/current_user/?edit=true', SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -540,7 +540,7 @@ class Instagram
         'gender'        => $gender,
     ]);
 
-      return $this->http->request('accounts/edit_profile/', $this->generateSignature($data))[1];
+      return $this->http->request('accounts/edit_profile/', SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -1061,7 +1061,7 @@ class Instagram
         'media_id'   => $mediaId,
     ]);
 
-      return $this->http->request("media/$mediaId/like/", $this->generateSignature($data))[1];
+      return $this->http->request("media/$mediaId/like/", SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -1082,7 +1082,7 @@ class Instagram
         'media_id'   => $mediaId,
     ]);
 
-      return $this->http->request("media/$mediaId/unlike/", $this->generateSignature($data))[1];
+      return $this->http->request("media/$mediaId/unlike/", SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -1118,7 +1118,7 @@ class Instagram
         '_csrftoken'    => $this->token,
     ]);
 
-      return $this->http->request('accounts/set_phone_and_name/', $this->generateSignature($data))[1];
+      return $this->http->request('accounts/set_phone_and_name/', SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -1164,7 +1164,7 @@ class Instagram
         '_csrftoken' => $this->token,
     ]);
 
-      return $this->http->request("friendships/create/$userId/", $this->generateSignature($data))[1];
+      return $this->http->request("friendships/create/$userId/", SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -1184,7 +1184,7 @@ class Instagram
         '_csrftoken' => $this->token,
     ]);
 
-      return $this->http->request("friendships/destroy/$userId/", $this->generateSignature($data))[1];
+      return $this->http->request("friendships/destroy/$userId/", SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -1204,7 +1204,7 @@ class Instagram
         '_csrftoken' => $this->token,
     ]);
 
-      return $this->http->request("friendships/block/$userId/", $this->generateSignature($data))[1];
+      return $this->http->request("friendships/block/$userId/", SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -1224,7 +1224,7 @@ class Instagram
         '_csrftoken' => $this->token,
     ]);
 
-      return $this->http->request("friendships/unblock/$userId/", $this->generateSignature($data))[1];
+      return $this->http->request("friendships/unblock/$userId/", SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -1243,7 +1243,7 @@ class Instagram
         'user_id'    => $userId,
         '_csrftoken' => $this->token,
     ]);
-      return $this->http->request("friendships/show/$userId/", $this->generateSignature($data))[1];
+      return $this->http->request("friendships/show/$userId/", SignatureUtils::generateSignature($data))[1];
   }
 
   /**
@@ -1257,32 +1257,4 @@ class Instagram
       $endpoint = 'feed/liked/?' . (!is_null($maxid) ? 'max_id='.$maxid.'&' : '');
       return $this->http->request($endpoint)[1];
   }
-
-    public function generateSignature($data)
-    {
-        $hash = hash_hmac('sha256', $data, Constants::IG_SIG_KEY);
-
-        return 'ig_sig_key_version='.Constants::SIG_KEY_VERSION.'&signed_body='.$hash.'.'.urlencode($data);
-    }
-
-    public function generateDeviceId($seed)
-    {
-        // Neutralize username/password -> device correlation
-        $volatile_seed = filemtime(__DIR__);
-
-        return 'android-'.substr(md5($seed.$volatile_seed), 16);
-    }
-
-    public function generateUUID($type)
-    {
-        $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-      mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-      mt_rand(0, 0xffff),
-      mt_rand(0, 0x0fff) | 0x4000,
-      mt_rand(0, 0x3fff) | 0x8000,
-      mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-    );
-
-        return $type ? $uuid : str_replace('-', '', $uuid);
-    }
 }
