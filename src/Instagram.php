@@ -46,11 +46,16 @@ class Instagram
 
       $this->settings = new Settings($this->IGDataPath.'settings-'.$username.'.dat');
 
-      if ($this->settings->get('user_agent') == null) {
+      if ($this->settings->get('version') == null) {
+          $this->settings->set('version', Constants::VERSION);
+      }
+
+      if (($this->settings->get('user_agent') == null) || (intval($this->settings->get('version')) < intval(Constants::VERSION))) {
           $userAgent = new UserAgent();
           $ua = $userAgent->buildUserAgent();
           $this->settings->set('user_agent', $ua);
       }
+
       $this->http = new HttpInterface($this);
 
       $this->setUser($username, $password);

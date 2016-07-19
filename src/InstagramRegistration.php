@@ -8,6 +8,7 @@ class InstagramRegistration
     protected $IGDataPath;
     protected $username;
     protected $uuid;
+    protected $userAgent;
 
     public function __construct($debug = false, $IGDataPath = null)
     {
@@ -18,6 +19,8 @@ class InstagramRegistration
         } else {
             $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR;
         }
+
+        $this->userAgent = 'Instagram '.Constants::VERSION.' Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)';
     }
 
   /**
@@ -103,7 +106,7 @@ class InstagramRegistration
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
-        curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
+        curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
