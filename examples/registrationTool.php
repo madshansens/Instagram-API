@@ -6,7 +6,7 @@ require_once '../src/InstagramRegistration.php';
 /// DEBUG MODE ///
 $debug = false;
 
-$r = new InstagramRegistration($debug);
+$r = new \InstagramAPI\InstagramRegistration($debug);
 
 echo "###########################\n";
 echo "#                         #\n";

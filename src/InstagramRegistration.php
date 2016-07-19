@@ -1,7 +1,6 @@
 <?php
 
-require_once 'Constants.php';
-require_once 'InstagramException.php';
+namespace InstagramAPI;
 
 class InstagramRegistration
 {

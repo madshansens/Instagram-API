@@ -11,7 +11,7 @@ $photo = '';     // path to the photo
 $caption = '';     // caption
 //////////////////////
 
-$i = new Instagram($username, $password, $debug);
+$i = new \InstagramAPI\Instagram($username, $password, $debug);
 
 try {
     $i->login();

@@ -8,3 +8,7 @@ sigs/sigKeys
 *.jpg
 
 *.DS_Store
+
+vendor
+
+*.lock

@@ -1,8 +1,6 @@
 <?php
 
-require_once 'func.php';
-require_once 'Constants.php';
-require_once 'InstagramException.php';
+namespace InstagramAPI;
 
 class Instagram
 {
@@ -1560,7 +1558,7 @@ class Instagram
 
       return $this->request("friendships/unblock/$userId/", $this->generateSignature($data))[1];
   }
-  
+
   /**
    * Show User Friendship.
    *

@@ -1,5 +1,7 @@
 <?php
 
+namespace InstagramAPI;
+
 /**
    * Length of the file in Seconds
    *
