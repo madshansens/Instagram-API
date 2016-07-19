@@ -16,6 +16,7 @@ class Instagram
   public $rank_token;          // Rank token
   public $IGDataPath;          // Data storage path
   public $http;
+  public $settings;
 
   /**
    * Default class constructor.
@@ -33,13 +34,24 @@ class Instagram
   {
       $this->debug = $debug;
       $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
-      $this->http = new HttpInterface($this);
 
       if (!is_null($IGDataPath)) {
           $this->IGDataPath = $IGDataPath;
       } else {
-          $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR;
+          $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
+          if (!file_exists($this->IGDataPath)) {
+              mkdir($this->IGDataPath, 0777, true);
+          }
       }
+
+      $this->settings = new Settings($this->IGDataPath.'settings-'.$username.'.dat');
+
+      if ($this->settings->get('user_agent') == null) {
+          $userAgent = new UserAgent();
+          $ua = $userAgent->buildUserAgent();
+          $this->settings->set('user_agent', $ua);
+      }
+      $this->http = new HttpInterface($this);
 
       $this->setUser($username, $password);
   }
@@ -59,12 +71,12 @@ class Instagram
 
       $this->uuid = SignatureUtils::generateUUID(true);
 
-      if ((file_exists($this->IGDataPath."$this->username-cookies.dat")) && (file_exists($this->IGDataPath."$this->username-userId.dat"))
-    && (file_exists($this->IGDataPath."$this->username-token.dat"))) {
+      if ((file_exists($this->IGDataPath."$this->username-cookies.dat")) && ($this->settings->get('username_id') != null)
+    && ($this->settings->get('token') != null)) {
           $this->isLoggedIn = true;
-          $this->username_id = trim(file_get_contents($this->IGDataPath."$username-userId.dat"));
+          $this->username_id = $this->settings->get('username_id');
           $this->rank_token = $this->username_id.'_'.$this->uuid;
-          $this->token = trim(file_get_contents($this->IGDataPath."$username-token.dat"));
+          $this->token = $this->settings->get('token');
       }
   }
 
@@ -103,11 +115,11 @@ class Instagram
 
           $this->isLoggedIn = true;
           $this->username_id = $login[1]['logged_in_user']['pk'];
-          file_put_contents($this->IGDataPath.$this->username.'-userId.dat', $this->username_id);
+          $this->settings->set('username_id', $this->username_id);
           $this->rank_token = $this->username_id.'_'.$this->uuid;
           preg_match('#Set-Cookie: csrftoken=([^;]+)#', $login[0], $match);
           $this->token = $match[1];
-          file_put_contents($this->IGDataPath.$this->username.'-token.dat', $this->token);
+          $this->settings->set('token', $this->token);
 
           $this->syncFeatures();
           $this->autoCompleteUserList();

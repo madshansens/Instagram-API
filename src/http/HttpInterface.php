@@ -5,10 +5,12 @@ namespace InstagramAPI;
 class HttpInterface {
 
     protected $parent;
+    protected $userAgent;
 
     public function __construct($parent)
     {
         $this->parent = $parent;
+        $this->userAgent = $this->parent->settings->get('user_agent');
     }
 
     public function request($endpoint, $post = null, $login = false)
@@ -30,7 +32,7 @@ class HttpInterface {
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
-        curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
+        curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
@@ -124,7 +126,7 @@ class HttpInterface {
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $endpoint);
-        curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
+        curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
@@ -201,7 +203,7 @@ class HttpInterface {
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $endpoint);
-        curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
+        curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
@@ -244,7 +246,7 @@ class HttpInterface {
           ];
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $uploadUrl);
-            curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
+            curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -335,7 +337,7 @@ class HttpInterface {
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $endpoint);
-        curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
+        curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
@@ -410,7 +412,7 @@ class HttpInterface {
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $endpoint);
-        curl_setopt($ch, CURLOPT_USERAGENT, Constants::USER_AGENT);
+        curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
