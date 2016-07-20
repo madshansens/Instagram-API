@@ -142,12 +142,12 @@ class HttpInterface
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
-        $upload = json_decode(substr($resp, $header_len), true);
+        $upload = new UploadPhotoResponse(json_decode(substr($resp, $header_len), true));
 
         curl_close($ch);
 
-        if ($upload['status'] == 'fail') {
-            throw new InstagramException($upload['message']);
+        if (!$upload->isOk()) {
+            throw new InstagramException($upload->getMessage());
 
             return;
         }
@@ -156,7 +156,7 @@ class HttpInterface
             echo 'RESPONSE: '.substr($resp, $header_len)."\n\n";
         }
 
-        $configure = $this->parent->configure($upload['upload_id'], $photo, $caption);
+        $configure = $this->parent->configure($upload->getUploadId(), $photo, $caption);
         $this->parent->expose();
 
         return $configure;
@@ -217,10 +217,10 @@ class HttpInterface
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 
-        $body = json_decode(substr($resp, $header_len), true);
+        $body = new UploadJobVideoResponse(json_decode(substr($resp, $header_len), true));
 
-        $uploadUrl = $body['video_upload_urls'][3]['url'];
-        $job = $body['video_upload_urls'][3]['job'];
+        $uploadUrl = $body->getVideoUploadUrl();
+        $job = $body->getVideoUploadJob();
 
         $request_size = floor(strlen($videoData) / 4);
 
@@ -266,15 +266,9 @@ class HttpInterface
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
-        $upload = json_decode(substr($resp, $header_len), true);
+        $upload = new UploadVideoResponse(json_decode(substr($resp, $header_len), true));
 
         curl_close($ch);
-
-        if ($upload['status'] == 'fail') {
-            throw new InstagramException($upload['message']);
-
-            return;
-        }
 
         if ($this->parent->debug) {
             echo 'RESPONSE: '.substr($resp, $header_len)."\n\n";

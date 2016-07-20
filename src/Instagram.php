@@ -276,7 +276,7 @@ class Instagram
 
         $post = str_replace('"length":0', '"length":0.00', $post);
 
-        return $this->http->request('media/configure/?video=1', SignatureUtils::generateSignature($post))[1];
+        return new ConfigureVideoResponse($this->http->request('media/configure/?video=1', SignatureUtils::generateSignature($post))[1]);
     }
 
     public function configure($upload_id, $photo, $caption = '')
@@ -312,7 +312,7 @@ class Instagram
 
         $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]', $post);
 
-        return $this->http->request('media/configure/', SignatureUtils::generateSignature($post))[1];
+        return new ConfigureResponse($this->http->request('media/configure/', SignatureUtils::generateSignature($post))[1]);
     }
 
   /**
