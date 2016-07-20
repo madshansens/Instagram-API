@@ -376,7 +376,7 @@ class Instagram
         'media_id'   => $mediaId,
     ]);
 
-      return $this->http->request("media/$mediaId/info/", SignatureUtils::generateSignature($data))[1];
+      return new MediaInfoResponse($this->http->request("media/$mediaId/info/", SignatureUtils::generateSignature($data))[1]);
   }
 
   /**
