@@ -11,11 +11,19 @@ Instagram's private API.
 - ![btc](https://camo.githubusercontent.com/4bc31b03fc4026aa2f14e09c25c09b81e06d5e71/687474703a2f2f7777772e6d6f6e747265616c626974636f696e2e636f6d2f696d672f66617669636f6e2e69636f) Bitcoin: 1DCEpC9wYXeUGXS58qSsqKzyy7HLTTXNYe 
 
 ----------
-### Installation
+## Installation
+
+### Composer
 
 ```sh
 composer require mgp25/instagram-php
 ```
+
+See [examples](https://github.com/mgp25/Instagram-API/tree/master/examples) for usage.
+
+### Don't have Composer?
+
+You can download it here: [https://getcomposer.org/](https://getcomposer.org/)
 
 ### Dependencies
 
@@ -23,7 +31,7 @@ composer require mgp25/instagram-php
 
 For more info: https://github.com/mgp25/Instagram-API/wiki/Dependencies
 
-### Why did i do the API?
+## Why did i do the API?
 
 Unfortunately WhatsApp blocked me (Yes, WhatsApp, _sigh..._) and my UUID, so they blocked me the use of any account on my mobile phone. There was a way to bypass it, but it was not a final solution, so I decided to do this.
 
