@@ -16,7 +16,7 @@ $i = new \InstagramAPI\Instagram($username, $password, $debug);
 
 try {
     $i->login();
-} catch (InstagramException $e) {
+} catch (Exception $e) {
     $e->getMessage();
     exit();
 }
