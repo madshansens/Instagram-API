@@ -53,6 +53,7 @@ class Instagram
       if (($this->settings->get('user_agent') == null) || (intval($this->settings->get('version')) < intval(Constants::VERSION))) {
           $userAgent = new UserAgent($this);
           $ua = $userAgent->buildUserAgent();
+          $this->settings->set('version', Constants::VERSION);
           $this->settings->set('user_agent', $ua);
       }
 
