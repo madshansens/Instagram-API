@@ -69,7 +69,7 @@ class Utils
             $command = $ffmpeg.' -i "'.$file.'" -f mjpeg -ss 00:00:01 -vframes 1 "'.$preview.'" 2>&1';
             @exec($command);
 
-            return self::createIconGD($preview);
+            return file_get_contents($preview);
         }
     }
 
