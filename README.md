@@ -19,21 +19,31 @@ Instagram's private API.
 composer require mgp25/instagram-php
 ```
 
-See [examples](https://github.com/mgp25/Instagram-API/tree/master/examples) for usage.
+```php
+require("../vendor/autoload.php");
+$instagram = new \Instagram\Instagram();
+```
+
+If you want to test code that is in the master branch, which hasn't been pushed as a release, you can use dev-master.
+
+```
+composer require mgp25/instagram-api dev-master
+```
+
 
 ### Don't have Composer?
 
 You can download it here: [https://getcomposer.org/](https://getcomposer.org/)
 
-### Dependencies
+## Examples
 
-`curl`, `gd` and `ffmpeg`
+All examples can be found [here](https://github.com/mgp25/Instagram-API/tree/master/examples)
 
-For more info: https://github.com/mgp25/Instagram-API/wiki/Dependencies
 
 ## Why did i do the API?
 
-Unfortunately WhatsApp blocked me (Yes, WhatsApp, _sigh..._) and my UUID, so they blocked me the use of any account on my mobile phone. There was a way to bypass it, but it was not a final solution, so I decided to do this.
+After legal measures, Facebook, WhatsApp and Instagram blocked my accounts. In order to use Instagram
+ on my phone i needed a new phone, as they banned my UDID, so that is basically why i made this API.
 
 ### What is Instagram?
 According to [the company](https://instagram.com/about/faq/):
