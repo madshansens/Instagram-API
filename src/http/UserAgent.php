@@ -6,9 +6,11 @@ class UserAgent
 {
     protected $parent;
 
-    public function __construct($parent) {
+    public function __construct($parent)
+    {
         $this->parent = $parent;
     }
+
     protected function getDeviceData()
     {
         $csvfile = __DIR__.'/devices.csv';

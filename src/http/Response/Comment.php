@@ -2,8 +2,8 @@
 
 namespace InstagramAPI;
 
-class Comment {
-
+class Comment
+{
     protected $username_id;
     protected $comment;
     protected $user;
@@ -15,15 +15,18 @@ class Comment {
         $this->user = new User($commentData['user']);
     }
 
-    public function getUsernameId() {
+    public function getUsernameId()
+    {
         return $this->username_id;
     }
 
-    public function getComment() {
+    public function getComment()
+    {
         return $this->comment;
     }
 
-    public function getUser() {
+    public function getUser()
+    {
         return $this->user;
     }
 }
