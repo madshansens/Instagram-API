@@ -2,8 +2,8 @@
 
 namespace InstagramAPI;
 
-class ConfigureVideoResponse extends Response {
-
+class ConfigureVideoResponse extends Response
+{
     protected $upload_id;
     protected $media_id;
     protected $image_url;
@@ -22,19 +22,23 @@ class ConfigureVideoResponse extends Response {
         $this->setStatus($response['status']);
     }
 
-    public function getUploadId() {
+    public function getUploadId()
+    {
         return $this->upload_id;
     }
 
-    public function getMediaId() {
+    public function getMediaId()
+    {
         return $this->media_id;
     }
 
-    public function getImageUrl() {
+    public function getImageUrl()
+    {
         return $this->image_url;
     }
 
-    public function getVideoUrl() {
+    public function getVideoUrl()
+    {
         return $this->video_url;
     }
 }

@@ -2,8 +2,8 @@
 
 namespace InstagramAPI;
 
-class UploadJobVideoResponse extends Response {
-
+class UploadJobVideoResponse extends Response
+{
     protected $upload_id;
     protected $video_upload_urls;
 
@@ -18,19 +18,23 @@ class UploadJobVideoResponse extends Response {
         $this->setStatus($response['status']);
     }
 
-    public function getUploadId() {
+    public function getUploadId()
+    {
         return $this->upload_id;
     }
 
-    public function getVideoUploadUrls() {
+    public function getVideoUploadUrls()
+    {
         return $this->video_upload_urls;
     }
 
-    public function getVideoUploadUrl() {
+    public function getVideoUploadUrl()
+    {
         return $this->getVideoUploadUrls()[3]['url'];
     }
 
-    public function getVideoUploadJob() {
+    public function getVideoUploadJob()
+    {
         return $this->getVideoUploadUrls()[3]['job'];
     }
 }

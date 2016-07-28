@@ -2,8 +2,8 @@
 
 namespace InstagramAPI;
 
-class UploadPhotoResponse extends Response {
-
+class UploadPhotoResponse extends Response
+{
     protected $upload_id;
 
     public function __construct($response)
@@ -16,7 +16,8 @@ class UploadPhotoResponse extends Response {
         $this->setStatus($response['status']);
     }
 
-    public function getUploadId() {
+    public function getUploadId()
+    {
         return $this->upload_id;
     }
 }

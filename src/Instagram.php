@@ -286,7 +286,7 @@ class Instagram
 
         $post = json_encode([
         'upload_id'          => $upload_id,
-        'camera_model'       => str_replace(" ", "", $this->settings->get('model')),
+        'camera_model'       => str_replace(' ', '', $this->settings->get('model')),
         'source_type'        => 3,
         'date_time_original' => date('Y:m:d H:i:s'),
         'camera_make'        => $this->settings->get('manufacturer'),

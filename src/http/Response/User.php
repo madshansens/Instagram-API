@@ -2,8 +2,8 @@
 
 namespace InstagramAPI;
 
-class User {
-
+class User
+{
     protected $username;
     protected $profile_pic_url;
     protected $full_name;
@@ -21,28 +21,33 @@ class User {
         $this->is_private = $userData['is_private'];
     }
 
-    public function getUsername(){
+    public function getUsername()
+    {
         return $this->username;
     }
 
-    public function getProfilePicUrl() {
+    public function getProfilePicUrl()
+    {
         return $this->profile_pic_url;
     }
 
-    public function getFullName() {
+    public function getFullName()
+    {
         return $this->full_name;
     }
 
-    public function getUsernameId() {
+    public function getUsernameId()
+    {
         return $this->pk;
     }
 
-    public function isVerified() {
+    public function isVerified()
+    {
         return $this->is_verified;
     }
 
-    public function isPrivate() {
+    public function isPrivate()
+    {
         return $this->is_private;
     }
-
 }
