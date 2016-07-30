@@ -6,6 +6,10 @@ class HttpInterface
 {
     protected $parent;
     protected $userAgent;
+    protected $proxy = null;
+    protected $proxyPort;
+    protected $proxyUser = null;
+    protected $proxyPass;
 
     public function __construct($parent)
     {
@@ -42,6 +46,16 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
         curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
+
+        if (!is_null($this->proxy)) {
+            curl_setopt($ch, CURLOPT_PROXYPORT, $this->proxyPort);
+            curl_setopt($ch, CURLOPT_PROXYTYPE, 'HTTP');
+            curl_setopt($ch, CURLOPT_PROXY, $this->proxy);
+        }
+
+        if (!is_null($this->proxyUser)) {
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxyUser . ':' . $this->proxyPass);
+        }
 
         if ($post) {
             curl_setopt($ch, CURLOPT_POST, true);
@@ -139,6 +153,16 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
+        if (!is_null($this->proxy)) {
+            curl_setopt($ch, CURLOPT_PROXYPORT, $this->proxyPort);
+            curl_setopt($ch, CURLOPT_PROXYTYPE, 'HTTP');
+            curl_setopt($ch, CURLOPT_PROXY, $this->proxy);
+        }
+
+        if (!is_null($this->proxyUser)) {
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxyUser . ':' . $this->proxyPass);
+        }
+
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
@@ -213,6 +237,16 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+        if (!is_null($this->proxy)) {
+            curl_setopt($ch, CURLOPT_PROXYPORT, $this->proxyPort);
+            curl_setopt($ch, CURLOPT_PROXYTYPE, 'HTTP');
+            curl_setopt($ch, CURLOPT_PROXY, $this->proxy);
+        }
+
+        if (!is_null($this->proxyUser)) {
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxyUser . ':' . $this->proxyPass);
+        }
 
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
@@ -344,6 +378,16 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
+        if (!is_null($this->proxy)) {
+            curl_setopt($ch, CURLOPT_PROXYPORT, $this->proxyPort);
+            curl_setopt($ch, CURLOPT_PROXYTYPE, 'HTTP');
+            curl_setopt($ch, CURLOPT_PROXY, $this->proxy);
+        }
+
+        if (!is_null($this->proxyUser)) {
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxyUser . ':' . $this->proxyPass);
+        }
+
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
@@ -419,6 +463,16 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
+        if (!is_null($this->proxy)) {
+            curl_setopt($ch, CURLOPT_PROXYPORT, $this->proxyPort);
+            curl_setopt($ch, CURLOPT_PROXYTYPE, 'HTTP');
+            curl_setopt($ch, CURLOPT_PROXY, $this->proxy);
+        }
+
+        if (!is_null($this->proxyUser)) {
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxyUser . ':' . $this->proxyPass);
+        }
+
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
@@ -448,5 +502,28 @@ class HttpInterface
         $body .= '--'.$boundary.'--';
 
         return $body;
+    }
+
+
+    public function setProxy($proxy)
+    {
+        $this->proxy = $proxy;
+    }
+
+    public function setProxyPort($port)
+    {
+        $this->proxyPort = $port;
+    }
+
+    public function setProxyCredentials($username, $password)
+    {
+        $this->proxyUser = $username;
+        $this->proxyPass = $password;
+    }
+
+    public function clearProxy()
+    {
+        $this->proxy = null;
+        $this->proxyUser = null;
     }
 }

@@ -106,6 +106,13 @@ class Instagram
   {
       if (!$this->isLoggedIn || $force) {
           $fetch = $this->http->request('si/fetch_headers/?challenge_type=signup&guid='.SignatureUtils::generateUUID(false), null, true);
+
+          if ($fetch[0] == '') {
+              throw new InstagramException("Couldn't get challenge, check your connection");
+
+              return $response;
+          }
+
           preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token);
 
           $data = [
@@ -1285,5 +1292,25 @@ class Instagram
       $endpoint = 'feed/liked/?'.(!is_null($maxid) ? 'max_id='.$maxid.'&' : '');
 
       return $this->http->request($endpoint)[1];
+  }
+
+  public function setProxy($proxy)
+  {
+      $this->http->setProxy($proxy);
+  }
+
+  public function setProxyPort($port)
+  {
+      $this->http->setProxyPort($port);
+  }
+
+  public function setProxyCredentials($username, $password)
+  {
+      $this->http->setProxyCredentials($username, $password);
+  }
+
+  public function clearProxy()
+  {
+      $this->http->clearProxy();
   }
 }
