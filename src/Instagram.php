@@ -79,6 +79,11 @@ class Instagram
 
   protected function checkSettings($username)
   {
+      $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
+      if (!file_exists($this->IGDataPath)) {
+          mkdir($this->IGDataPath, 0777, true);
+      }
+
       $this->settings = new Settings($this->IGDataPath.'settings-'.$username.'.dat');
 
       if ($this->settings->get('version') == null) {
@@ -107,7 +112,7 @@ class Instagram
       if (!$this->isLoggedIn || $force) {
           $fetch = $this->http->request('si/fetch_headers/?challenge_type=signup&guid='.SignatureUtils::generateUUID(false), null, true);
 
-          if ($fetch[0] == '') {
+          if (!isset($fetch[0]) || ($fetch[1]['status'] == 'fail')) {
               throw new InstagramException("Couldn't get challenge, check your connection");
 
               return $response;
