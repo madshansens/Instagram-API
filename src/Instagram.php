@@ -44,18 +44,7 @@ class Instagram
           }
       }
 
-      $this->settings = new Settings($this->IGDataPath.'settings-'.$username.'.dat');
-
-      if ($this->settings->get('version') == null) {
-          $this->settings->set('version', Constants::VERSION);
-      }
-
-      if (($this->settings->get('user_agent') == null) || (intval($this->settings->get('version')) < intval(Constants::VERSION))) {
-          $userAgent = new UserAgent($this);
-          $ua = $userAgent->buildUserAgent();
-          $this->settings->set('version', Constants::VERSION);
-          $this->settings->set('user_agent', $ua);
-      }
+      $this->checkSettings($username);
 
       $this->http = new HttpInterface($this);
 
@@ -75,6 +64,8 @@ class Instagram
       $this->username = $username;
       $this->password = $password;
 
+      $this->checkSettings($username);
+
       $this->uuid = SignatureUtils::generateUUID(true);
 
       if ((file_exists($this->IGDataPath."$this->username-cookies.dat")) && ($this->settings->get('username_id') != null)
@@ -83,6 +74,22 @@ class Instagram
           $this->username_id = $this->settings->get('username_id');
           $this->rank_token = $this->username_id.'_'.$this->uuid;
           $this->token = $this->settings->get('token');
+      }
+  }
+
+  protected function checkSettings($username)
+  {
+      $this->settings = new Settings($this->IGDataPath.'settings-'.$username.'.dat');
+
+      if ($this->settings->get('version') == null) {
+          $this->settings->set('version', Constants::VERSION);
+      }
+
+      if (($this->settings->get('user_agent') == null) || (intval($this->settings->get('version')) < intval(Constants::VERSION))) {
+          $userAgent = new UserAgent($this);
+          $ua = $userAgent->buildUserAgent();
+          $this->settings->set('version', Constants::VERSION);
+          $this->settings->set('user_agent', $ua);
       }
   }
 
