@@ -74,6 +74,8 @@ class Instagram
           $this->username_id = $this->settings->get('username_id');
           $this->rank_token = $this->username_id.'_'.$this->uuid;
           $this->token = $this->settings->get('token');
+      }else{
+          $this->isLoggedIn = false;
       }
   }
 
