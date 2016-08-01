@@ -23,6 +23,50 @@ class InstagramRegistration
         $this->userAgent = 'Instagram '.Constants::VERSION.' Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)';
     }
 
+    /**
+     * Set the proxy.
+     *
+     * @param string $proxy
+     *   Full proxy string. Ex: user:pass@192.168.0.0:8080
+     *   Use $proxy = "" to clear proxy
+     * @param integer $port
+     *   Port of proxy
+     * @param string $username
+     *   Username for proxy
+     * @param string $password
+     *   Password for proxy
+     * @throws InstagramException
+     *
+     */
+    public function setProxy($proxy, $port = null, $username = null, $password = null)
+    {
+        if($proxy == ""){
+            $this->proxy = "";
+            return;
+        }
+
+        $proxy = parse_url($proxy);
+
+        if(!is_null($port) && is_int($port)) {
+            $proxy["port"] = $port;
+        }
+
+        if (!is_null($username) && !is_null($password)) {
+            $proxy["user"] = $username;
+            $proxy["pass"] = $password;
+        }
+
+        if (!empty($proxy["host"]) && isset($proxy["port"]) && is_int($proxy["port"])) {
+            $this->proxy = $proxy["host"].":".$proxy["port"];
+        } else {
+            throw new InstagramException('Proxy host error. Please check ip address and port of proxy.');
+        }
+
+        if (isset($proxy["user"]) && isset($proxy["pass"])) {
+            $this->proxy_auth = $proxy["user"].":".$proxy["pass"];
+        }
+    }
+    
   /**
    * Checks if the username is already taken (exists).
    *
@@ -122,6 +166,13 @@ class InstagramRegistration
         if ($post) {
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        }
+
+        if ($this->proxy) {
+            curl_setopt($ch, CURLOPT_PROXY, $this->proxy);
+            if ($this->proxy_auth) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxy_auth);
+            }
         }
 
         $resp = curl_exec($ch);
