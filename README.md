@@ -21,7 +21,7 @@ composer require mgp25/instagram-php
 
 ```php
 require("../vendor/autoload.php");
-$instagram = new \Instagram\Instagram();
+$instagram = new \InstagramAPI\Instagram();
 ```
 
 If you want to test code that is in the master branch, which hasn't been pushed as a release, you can use dev-master.
