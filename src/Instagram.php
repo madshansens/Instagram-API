@@ -98,6 +98,51 @@ class Instagram
       }
   }
 
+
+    /**
+     * Set the proxy.
+     *
+     * @param string $proxy
+     *   Full proxy string. Ex: user:pass@192.168.0.0:8080
+     *   Use $proxy = "" to clear proxy
+     * @param integer $port
+     *   Port of proxy
+     * @param string $username
+     *   Username for proxy
+     * @param string $password
+     *   Password for proxy
+     * @throws InstagramException
+     *
+     */
+    public function setProxy($proxy, $port = null, $username = null, $password = null)
+    {
+        if($proxy == ""){
+            $this->proxy = "";
+            return;
+        }
+
+        $proxy = parse_url($proxy);
+
+        if(!is_null($port) && is_int($port)) {
+            $proxy["port"] = $port;
+        }
+
+        if (!is_null($username) && !is_null($password)) {
+            $proxy["user"] = $username;
+            $proxy["pass"] = $password;
+        }
+
+        if (!empty($proxy["host"]) && isset($proxy["port"]) && is_int($proxy["port"])) {
+            $this->proxy = $proxy["host"].":".$proxy["port"];
+        } else {
+            throw new InstagramException('Proxy host error. Please check ip address and port of proxy.');
+        }
+
+        if (isset($proxy["user"]) && isset($proxy["pass"])) {
+            $this->proxy_auth = $proxy["user"].":".$proxy["pass"];
+        }
+    }
+
   /**
    * Login to Instagram.
    *
@@ -1299,23 +1344,5 @@ class Instagram
       return $this->http->request($endpoint)[1];
   }
 
-  public function setProxy($proxy)
-  {
-      $this->http->setProxy($proxy);
-  }
 
-  public function setProxyPort($port)
-  {
-      $this->http->setProxyPort($port);
-  }
-
-  public function setProxyCredentials($username, $password)
-  {
-      $this->http->setProxyCredentials($username, $password);
-  }
-
-  public function clearProxy()
-  {
-      $this->http->clearProxy();
-  }
 }
