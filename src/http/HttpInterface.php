@@ -47,19 +47,17 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
         curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
 
-        if (!is_null($this->proxy)) {
-            curl_setopt($ch, CURLOPT_PROXYPORT, $this->proxyPort);
-            curl_setopt($ch, CURLOPT_PROXYTYPE, 'HTTP');
-            curl_setopt($ch, CURLOPT_PROXY, $this->proxy);
-        }
-
-        if (!is_null($this->proxyUser)) {
-            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxyUser . ':' . $this->proxyPass);
-        }
 
         if ($post) {
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        }
+
+        if ($this->parent->proxy) {
+            curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxy);
+            if ($this->parent->proxy_auth) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxy_auth);
+            }
         }
 
         $resp = curl_exec($ch);
@@ -153,14 +151,11 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
-        if (!is_null($this->proxy)) {
-            curl_setopt($ch, CURLOPT_PROXYPORT, $this->proxyPort);
-            curl_setopt($ch, CURLOPT_PROXYTYPE, 'HTTP');
-            curl_setopt($ch, CURLOPT_PROXY, $this->proxy);
-        }
-
-        if (!is_null($this->proxyUser)) {
-            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxyUser . ':' . $this->proxyPass);
+        if ($this->parent->proxy) {
+            curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxy);
+            if ($this->parent->proxy_auth) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxy_auth);
+            }
         }
 
         $resp = curl_exec($ch);
@@ -238,14 +233,11 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
-        if (!is_null($this->proxy)) {
-            curl_setopt($ch, CURLOPT_PROXYPORT, $this->proxyPort);
-            curl_setopt($ch, CURLOPT_PROXYTYPE, 'HTTP');
-            curl_setopt($ch, CURLOPT_PROXY, $this->proxy);
-        }
-
-        if (!is_null($this->proxyUser)) {
-            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxyUser . ':' . $this->proxyPass);
+        if ($this->parent->proxy) {
+            curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxy);
+            if ($this->parent->proxy_auth) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxy_auth);
+            }
         }
 
         $resp = curl_exec($ch);
@@ -291,6 +283,13 @@ class HttpInterface
             curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, substr($videoData, $start, $end));
+
+            if ($this->parent->proxy) {
+                curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxy);
+                if ($this->parent->proxy_auth) {
+                    curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxy_auth);
+                }
+            }
 
             $result = curl_exec($ch);
             $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
@@ -378,14 +377,11 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
-        if (!is_null($this->proxy)) {
-            curl_setopt($ch, CURLOPT_PROXYPORT, $this->proxyPort);
-            curl_setopt($ch, CURLOPT_PROXYTYPE, 'HTTP');
-            curl_setopt($ch, CURLOPT_PROXY, $this->proxy);
-        }
-
-        if (!is_null($this->proxyUser)) {
-            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxyUser . ':' . $this->proxyPass);
+        if ($this->parent->proxy) {
+            curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxy);
+            if ($this->parent->proxy_auth) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxy_auth);
+            }
         }
 
         $resp = curl_exec($ch);
@@ -463,14 +459,11 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
-        if (!is_null($this->proxy)) {
-            curl_setopt($ch, CURLOPT_PROXYPORT, $this->proxyPort);
-            curl_setopt($ch, CURLOPT_PROXYTYPE, 'HTTP');
-            curl_setopt($ch, CURLOPT_PROXY, $this->proxy);
-        }
-
-        if (!is_null($this->proxyUser)) {
-            curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxyUser . ':' . $this->proxyPass);
+        if ($this->parent->proxy) {
+            curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxy);
+            if ($this->parent->proxy_auth) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxy_auth);
+            }
         }
 
         $resp = curl_exec($ch);
@@ -505,25 +498,4 @@ class HttpInterface
     }
 
 
-    public function setProxy($proxy)
-    {
-        $this->proxy = $proxy;
-    }
-
-    public function setProxyPort($port)
-    {
-        $this->proxyPort = $port;
-    }
-
-    public function setProxyCredentials($username, $password)
-    {
-        $this->proxyUser = $username;
-        $this->proxyPass = $password;
-    }
-
-    public function clearProxy()
-    {
-        $this->proxy = null;
-        $this->proxyUser = null;
-    }
 }
