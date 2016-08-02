@@ -17,6 +17,8 @@ class Instagram
   public $IGDataPath;          // Data storage path
   public $http;
     public $settings;
+    public $proxy = null;        // Proxy
+    public $proxy_auth = null;   // Proxy Auth
 
   /**
    * Default class constructor.

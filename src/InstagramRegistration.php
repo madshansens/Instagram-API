@@ -9,6 +9,8 @@ class InstagramRegistration
     protected $username;
     protected $uuid;
     protected $userAgent;
+    protected $proxy = null;        // Proxy
+    protected $proxy_auth = null;   // Proxy Auth
 
     public function __construct($debug = false, $IGDataPath = null)
     {
