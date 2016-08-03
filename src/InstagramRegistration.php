@@ -106,7 +106,7 @@ class InstagramRegistration
           'username'           => $username,
           'first_name'         => '',
           'guid'               => $this->uuid,
-          'device_id'          => 'android-'.str_split(md5(mt_rand(1000, 9999)), 17)[mt_rand(0, 1)],
+          'device_id'          => $this->generateDeviceId(md5($username.$password)),
           'email'              => $email,
           'force_sign_up_code' => '',
           'qs_stamp'           => '',
@@ -126,6 +126,11 @@ class InstagramRegistration
 
       return $result;
   }
+
+    public function generateDeviceId($seed)
+    {
+        return 'android-'.substr(md5($seed), 16);
+    }
 
     public function generateSignature($data)
     {
