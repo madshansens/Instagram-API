@@ -17,6 +17,8 @@ class Instagram
   public $IGDataPath;          // Data storage path
   public $http;
     public $settings;
+    public $proxy = null;        // Proxy
+    public $proxy_auth = null;   // Proxy Auth
 
   /**
    * Default class constructor.
@@ -74,6 +76,8 @@ class Instagram
           $this->username_id = $this->settings->get('username_id');
           $this->rank_token = $this->username_id.'_'.$this->uuid;
           $this->token = $this->settings->get('token');
+      }else{
+          $this->isLoggedIn = false;
       }
   }
 
