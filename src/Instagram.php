@@ -241,6 +241,36 @@ class Instagram
         return $this->http->request('megaphone/log/')[1];
     }
 
+    /**
+     * Pending Inbox
+     *
+     * @return array
+     *   Pending Inbox Data
+     */
+    public function getPendingInbox()
+    {
+        $pendingInbox = $this->request('direct_v2/pending_inbox/?')[1];
+
+        if ($pendingInbox['status'] != 'ok') {
+            throw new InstagramException($pendingInbox['message']."\n");
+
+            return;
+        }
+
+        return $pendingInbox;
+    }
+
+    /**
+     * Explore Tab
+     *
+     * @return array
+     *   Explore data
+     */
+    public function explore()
+    {
+        return $this->request('discover/explore/?')[1];
+    }
+
     public function expose()
     {
         $data = json_encode([
@@ -516,6 +546,42 @@ class Instagram
   }
 
   /**
+   * Delete Comment Bulk
+   *
+   * @param string $mediaId
+   *   Media id
+   *
+   * @param string $commentIds
+   *   List of comments to delete
+   *
+   * @return array
+   *   Delete Comment Bulk Data
+   */
+  public function deleteCommentsBulk($mediaId, $commentIds)
+  {
+      if (!is_array($commentIds)) {
+          $commentIds = [$commentIds];
+      }
+
+      $string = [];
+      foreach ($commentIds as $commentId) {
+          $string[] = "$commentId";
+      }
+
+      $comment_ids_to_delete = implode(',', $string);
+
+      $data = json_encode([
+        '_uuid'      => $this->uuid,
+        '_uid'       => $this->username_id,
+        '_csrftoken' => $this->token,
+        'comment_ids_to_delete' => $comment_ids_to_delete,
+      ]);
+
+      return $this->http->request("media/$mediaId/comment/bulk_delete/", SignatureUtils::generateSignature($data))[1];
+  }
+
+
+  /**
    * Sets account to public.
    *
    * @param string $photo
@@ -628,6 +694,32 @@ class Instagram
 
       return $this->http->request('accounts/edit_profile/', SignatureUtils::generateSignature($data))[1];
   }
+
+  /**
+   * Change Password
+   *
+   * @param string $oldPassword
+   *   Old Password
+   * @param string $newPassword
+   *   New Password
+   *
+   * @return array
+   *   Change Password Data
+   */
+  public function changePassword($oldPassword, $newPassword)
+  {
+      $data = json_encode([
+        '_uuid'          => $this->uuid,
+        '_uid'           => $this->username_id,
+        '_csrftoken'     => $this->token,
+        'old_password'   => $oldPassword,
+        'new_password1'  => $newPassword,
+        'new_password2'  => $newPassword,
+      ]);
+
+      return $this->http->request("accounts/change_password/", SignatureUtils::generateSignature($data))[1];
+  }
+
 
   /**
    * Get username info.
