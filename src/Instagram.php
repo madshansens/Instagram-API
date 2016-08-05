@@ -338,6 +338,53 @@ class Instagram
         $this->http->direct_share($media_id, $recipients, $text);
     }
 
+    /**
+     * Direct Thread Data
+     *
+     * @param string $threadId
+     *   Thread Id
+     *
+     * @return array
+     *   Direct Thread Data
+     */
+    public function directThread($threadId)
+    {
+
+        $directThread = $this->request("direct_v2/threads/$threadId/?")[1];
+
+        if ($directThread['status'] != 'ok') {
+            throw new InstagramException($directThread['message']."\n");
+
+            return;
+        }
+
+        return $directThread;
+    }
+
+
+    /**
+     * Direct Thread Action
+     *
+     * @param string $threadId
+     *   Thread Id
+     *
+     * @param string $threadAction
+     *   Thread Action 'approve' OR 'decline' OR 'block'
+     *
+     * @return array
+     *   Direct Thread Action Data
+     */
+    public function directThreadAction($threadId, $threadAction)
+    {
+        $data = json_encode([
+          '_uuid'      => $this->uuid,
+          '_uid'       => $this->username_id,
+          '_csrftoken' => $this->token,
+        ]);
+
+        return $this->request("direct_v2/threads/$threadId/$threadAction/", $this->generateSignature($data))[1];
+    }
+
     public function configureVideo($upload_id, $video, $caption = '')
     {
         $this->uploadPhoto($video, $caption, $upload_id);
