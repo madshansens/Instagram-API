@@ -2,15 +2,16 @@
 
 namespace InstagramAPI;
 
-class Checkpoint {
-
+class Checkpoint
+{
     protected $username;
     protected $settingsPath;
     protected $settings;
     protected $userAgent;
     protected $debug;
 
-    public function __construct($username, $settingsPath = null, $debug = false) {
+    public function __construct($username, $settingsPath = null, $debug = false)
+    {
         $this->username = $username;
         $this->debug = $debug;
         if (is_null($settingsPath)) {
@@ -23,26 +24,29 @@ class Checkpoint {
         $this->userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_3_3 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Mobile/13G34 Instagram 8.5.2 (iPhone5,2; iPhone OS 9_3_3; es_ES; es-ES; scale=2.00; 640x1136)';
     }
 
-    public function doCheckpoint() {
+    public function doCheckpoint()
+    {
         $token = $this->checkpointFirstStep();
         $this->checkpointSecondStep($token);
 
         return $token;
     }
 
-    public function checkpointFirstStep() {
-        $response = $this->request("https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/".$this->settings->get('username_id')."/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss");
+    public function checkpointFirstStep()
+    {
+        $response = $this->request('https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/'.$this->settings->get('username_id').'/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss');
 
         preg_match('#Set-Cookie: csrftoken=([^;]+)#', $response[0], $token);
 
         return $token;
     }
 
-    public function checkpointSecondStep($token) {
+    public function checkpointSecondStep($token)
+    {
         $post =
             [
                 'csrfmiddlewaretoken' => $token[1],
-                'email'               => 'Verificar por correo electrónico'
+                'email'               => 'Verificar por correo electrónico',
             ];
 
         $headers =
@@ -51,20 +55,21 @@ class Checkpoint {
                 'Connection: keep-alive',
                 'Proxy-Connection: keep-alive',
                 'Accept-Language: es-es',
-                "Referer: https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/".$this->settings->get('username_id')."/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss",
-                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                'Referer: https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/'.$this->settings->get('username_id').'/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss',
+                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             ];
 
-        $this->request("https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/".$this->settings->get('username_id')."/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss", $headers, $post);
+        $this->request('https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/'.$this->settings->get('username_id').'/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss', $headers, $post);
 
         return $token;
     }
 
-    public function checkpointThird($code, $token) {
+    public function checkpointThird($code, $token)
+    {
         $post =
             [
                 'csrfmiddlewaretoken' => $token,
-                'response_code'       => $code
+                'response_code'       => $code,
             ];
 
         $headers =
@@ -73,11 +78,11 @@ class Checkpoint {
                 'Connection: keep-alive',
                 'Proxy-Connection: keep-alive',
                 'Accept-Language: es-es',
-                "Referer: https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/".$this->settings->get('username_id')."/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss",
-                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                'Referer: https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/'.$this->settings->get('username_id').'/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss',
+                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             ];
 
-        $this->request("https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/".$this->settings->get('username_id')."/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss", $headers, $post);
+        $this->request('https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/'.$this->settings->get('username_id').'/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss', $headers, $post);
     }
 
     public function request($endpoint, $headers = null, $post = null, $first = true)
@@ -100,7 +105,7 @@ class Checkpoint {
 
 
         if ($post) {
-            curl_setopt($ch,CURLOPT_POST, sizeof($post));
+            curl_setopt($ch, CURLOPT_POST, count($post));
             curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
         }
 

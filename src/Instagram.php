@@ -76,74 +76,74 @@ class Instagram
           $this->username_id = $this->settings->get('username_id');
           $this->rank_token = $this->username_id.'_'.$this->uuid;
           $this->token = $this->settings->get('token');
-      }else{
+      } else {
           $this->isLoggedIn = false;
       }
   }
 
-  protected function checkSettings($username)
-  {
-      $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
-      if (!file_exists($this->IGDataPath)) {
-          mkdir($this->IGDataPath, 0777, true);
-      }
+    protected function checkSettings($username)
+    {
+        $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
+        if (!file_exists($this->IGDataPath)) {
+            mkdir($this->IGDataPath, 0777, true);
+        }
 
-      $this->settings = new Settings($this->IGDataPath.'settings-'.$username.'.dat');
+        $this->settings = new Settings($this->IGDataPath.'settings-'.$username.'.dat');
 
-      if ($this->settings->get('version') == null) {
-          $this->settings->set('version', Constants::VERSION);
-      }
+        if ($this->settings->get('version') == null) {
+            $this->settings->set('version', Constants::VERSION);
+        }
 
-      if (($this->settings->get('user_agent') == null) || (intval($this->settings->get('version')) < intval(Constants::VERSION))) {
-          $userAgent = new UserAgent($this);
-          $ua = $userAgent->buildUserAgent();
-          $this->settings->set('version', Constants::VERSION);
-          $this->settings->set('user_agent', $ua);
-      }
-  }
-
+        if (($this->settings->get('user_agent') == null) || (intval($this->settings->get('version')) < intval(Constants::VERSION))) {
+            $userAgent = new UserAgent($this);
+            $ua = $userAgent->buildUserAgent();
+            $this->settings->set('version', Constants::VERSION);
+            $this->settings->set('user_agent', $ua);
+        }
+    }
 
     /**
      * Set the proxy.
      *
      * @param string $proxy
-     *   Full proxy string. Ex: user:pass@192.168.0.0:8080
-     *   Use $proxy = "" to clear proxy
-     * @param integer $port
-     *   Port of proxy
+     *                         Full proxy string. Ex: user:pass@192.168.0.0:8080
+     *                         Use $proxy = "" to clear proxy
+     * @param int    $port
+     *                         Port of proxy
      * @param string $username
-     *   Username for proxy
+     *                         Username for proxy
      * @param string $password
-     *   Password for proxy
-     * @throws InstagramException
+     *                         Password for proxy
      *
+     * @throws InstagramException
      */
     public function setProxy($proxy, $port = null, $username = null, $password = null)
     {
-        if($proxy == ""){
-            $this->proxy = "";
+        if ($proxy == '') {
+            $this->proxy = '';
+
             return;
         }
 
         $proxy = parse_url($proxy);
 
-        if(!is_null($port) && is_int($port)) {
-            $proxy["port"] = $port;
+        if (!is_null($port) && is_int($port)) {
+            $proxy['port'] = $port;
         }
 
         if (!is_null($username) && !is_null($password)) {
-            $proxy["user"] = $username;
-            $proxy["pass"] = $password;
+            $proxy['user'] = $username;
+            $proxy['pass'] = $password;
         }
 
-        if (!empty($proxy["host"]) && isset($proxy["port"]) && is_int($proxy["port"])) {
-            $this->proxy = $proxy["host"].":".$proxy["port"];
+        if (!empty($proxy['host']) && isset($proxy['port']) && is_int($proxy['port'])) {
+            $this->proxy = $proxy['host'].':'.$proxy['port'];
         } else {
             throw new InstagramException('Proxy host error. Please check ip address and port of proxy.');
         }
 
-        if (isset($proxy["user"]) && isset($proxy["pass"])) {
-            $this->proxy_auth = $proxy["user"].":".$proxy["pass"];
+        if (isset($proxy['user']) && isset($proxy['pass'])) {
+            $this->proxy_auth = $proxy['user'].':'.$proxy['pass'];
         }
     }
 
@@ -242,10 +242,10 @@ class Instagram
     }
 
     /**
-     * Pending Inbox
+     * Pending Inbox.
      *
      * @return array
-     *   Pending Inbox Data
+     *               Pending Inbox Data
      */
     public function getPendingInbox()
     {
@@ -261,10 +261,10 @@ class Instagram
     }
 
     /**
-     * Explore Tab
+     * Explore Tab.
      *
      * @return array
-     *   Explore data
+     *               Explore data
      */
     public function explore()
     {
@@ -339,17 +339,16 @@ class Instagram
     }
 
     /**
-     * Direct Thread Data
+     * Direct Thread Data.
      *
      * @param string $threadId
-     *   Thread Id
+     *                         Thread Id
      *
      * @return array
-     *   Direct Thread Data
+     *               Direct Thread Data
      */
     public function directThread($threadId)
     {
-
         $directThread = $this->request("direct_v2/threads/$threadId/?")[1];
 
         if ($directThread['status'] != 'ok') {
@@ -361,18 +360,16 @@ class Instagram
         return $directThread;
     }
 
-
     /**
-     * Direct Thread Action
+     * Direct Thread Action.
      *
      * @param string $threadId
-     *   Thread Id
-     *
+     *                             Thread Id
      * @param string $threadAction
-     *   Thread Action 'approve' OR 'decline' OR 'block'
+     *                             Thread Action 'approve' OR 'decline' OR 'block'
      *
      * @return array
-     *   Direct Thread Action Data
+     *               Direct Thread Action Data
      */
     public function directThreadAction($threadId, $threadAction)
     {
@@ -593,11 +590,10 @@ class Instagram
   }
 
   /**
-   * Delete Comment Bulk
+   * Delete Comment Bulk.
    *
    * @param string $mediaId
    *   Media id
-   *
    * @param string $commentIds
    *   List of comments to delete
    *
@@ -618,15 +614,14 @@ class Instagram
       $comment_ids_to_delete = implode(',', $string);
 
       $data = json_encode([
-        '_uuid'      => $this->uuid,
-        '_uid'       => $this->username_id,
-        '_csrftoken' => $this->token,
+        '_uuid'                 => $this->uuid,
+        '_uid'                  => $this->username_id,
+        '_csrftoken'            => $this->token,
         'comment_ids_to_delete' => $comment_ids_to_delete,
       ]);
 
       return $this->http->request("media/$mediaId/comment/bulk_delete/", SignatureUtils::generateSignature($data))[1];
   }
-
 
   /**
    * Sets account to public.
@@ -743,7 +738,7 @@ class Instagram
   }
 
   /**
-   * Change Password
+   * Change Password.
    *
    * @param string $oldPassword
    *   Old Password
@@ -764,9 +759,8 @@ class Instagram
         'new_password2'  => $newPassword,
       ]);
 
-      return $this->http->request("accounts/change_password/", SignatureUtils::generateSignature($data))[1];
+      return $this->http->request('accounts/change_password/', SignatureUtils::generateSignature($data))[1];
   }
-
 
   /**
    * Get username info.
@@ -1486,6 +1480,4 @@ class Instagram
 
       return $this->http->request($endpoint)[1];
   }
-
-
 }
