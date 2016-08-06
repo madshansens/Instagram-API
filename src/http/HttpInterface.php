@@ -496,6 +496,4 @@ class HttpInterface
 
         return $body;
     }
-
-
 }
