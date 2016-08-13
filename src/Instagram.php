@@ -15,6 +15,7 @@ class Instagram
   public $isLoggedIn = false;  // Session status
   public $rank_token;          // Rank token
   public $IGDataPath;          // Data storage path
+  public $customPath = false;
   public $http;
     public $settings;
     public $proxy = null;        // Proxy
@@ -39,6 +40,7 @@ class Instagram
 
       if (!is_null($IGDataPath)) {
           $this->IGDataPath = $IGDataPath;
+          $this->customPath = true;
       } else {
           $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
           if (!file_exists($this->IGDataPath)) {
@@ -83,7 +85,9 @@ class Instagram
 
     protected function checkSettings($username)
     {
-        $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
+        if (!$this->customPath)
+            $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
+
         if (!file_exists($this->IGDataPath)) {
             mkdir($this->IGDataPath, 0777, true);
         }
@@ -94,7 +98,8 @@ class Instagram
             $this->settings->set('version', Constants::VERSION);
         }
 
-        if (($this->settings->get('user_agent') == null) || (intval($this->settings->get('version')) < intval(Constants::VERSION))) {
+
+        if (($this->settings->get('user_agent') == null) || (version_compare($this->settings->get('version'), Constants::VERSION) == -1)  ) {
             $userAgent = new UserAgent($this);
             $ua = $userAgent->buildUserAgent();
             $this->settings->set('version', Constants::VERSION);
