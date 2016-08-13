@@ -567,27 +567,25 @@ class Instagram
   }
 
   /**
-   * Delete Comment.
-   *
-   * @param string $mediaId
-   *   Media ID
-   * @param string $commentId
-   *   Comment ID
-   *
-   * @return array
-   *   Delete comment data
-   */
-  public function deleteComment($mediaId, $captionText, $commentId)
-  {
-      $data = json_encode([
-        '_uuid'          => $this->uuid,
-        '_uid'           => $this->username_id,
-        '_csrftoken'     => $this->token,
-        'caption_text'   => $captionText,
-    ]);
-
-      return $this->http->request("media/$mediaId/comment/$commentId/delete/", SignatureUtils::generateSignature($data))[1];
-  }
+     * Delete Comment.
+     *
+     * @param string $mediaId
+     *   Media ID
+     * @param string $commentId
+     *   Comment ID
+     *
+     * @return array
+     *   Delete comment data
+     */
+    public function deleteComment($mediaId, $commentId)
+    {
+        $data = json_encode([
+          '_uuid'          => $this->uuid,
+          '_uid'           => $this->username_id,
+          '_csrftoken'     => $this->token,
+      ]);
+        return $this->http->request("media/$mediaId/comment/$commentId/delete/", SignatureUtils::generateSignature($data))[1];
+    }
 
   /**
    * Delete Comment Bulk.
