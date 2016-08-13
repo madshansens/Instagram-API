@@ -7,6 +7,7 @@ class ConfigureResponse extends Response
     protected $upload_id;
     protected $media_id;
     protected $image_url;
+    protected $media_code;
 
     public function __construct($response)
     {
@@ -14,6 +15,7 @@ class ConfigureResponse extends Response
             $this->upload_id = $response['upload_id'];
             $this->media_id = $response['media']['id'];
             $this->image_url = $response['media']['image_versions2']['candidates']['0']['url'];
+            $this->media_code = $response['media']['code'];
         } else {
             $this->setMessage($response['message']);
         }
@@ -33,5 +35,15 @@ class ConfigureResponse extends Response
     public function getImageUrl()
     {
         return $this->image_url;
+    }
+
+    public function getMediaCode()
+    {
+        return $this->media_code;
+    }
+
+    public function getMediaUrl()
+    {
+        return 'https://www.instagram.com/p/' . $this->getMediaCode() . '/';
     }
 }
