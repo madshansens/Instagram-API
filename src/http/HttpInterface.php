@@ -6,10 +6,6 @@ class HttpInterface
 {
     protected $parent;
     protected $userAgent;
-    protected $proxy = null;
-    protected $proxyPort;
-    protected $proxyUser = null;
-    protected $proxyPass;
 
     public function __construct($parent)
     {
@@ -176,6 +172,11 @@ class HttpInterface
         }
 
         $configure = $this->parent->configure($upload->getUploadId(), $photo, $caption);
+
+        if (!$configure->isOk()) {
+            throw new InstagramException($configure->getMessage());
+        }
+        
         $this->parent->expose();
 
         return $configure;
