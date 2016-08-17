@@ -126,7 +126,7 @@ class Instagram
     public function setProxy($proxy, $port = null, $username = null, $password = null)
     {
         $this->proxy = $proxy;
-        
+
         if ($proxy == '') {
             return;
         }
@@ -166,8 +166,10 @@ class Instagram
   {
       if (!$this->isLoggedIn || $force) {
           $fetch = $this->http->request('si/fetch_headers/?challenge_type=signup&guid='.SignatureUtils::generateUUID(false), null, true);
+          $header = $fetch[0];
+          $response = new ChallengeResponse($fetch[1]);
 
-          if (!isset($fetch[0]) || ($fetch[1]['status'] == 'fail')) {
+          if (!isset($header) || (!$response->isOk())) {
               throw new InstagramException("Couldn't get challenge, check your connection");
 
               return $response;
