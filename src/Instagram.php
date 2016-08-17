@@ -173,8 +173,11 @@ class Instagram
               return $response;
           }
 
-          preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token);
-
+          if(!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token)){
+              throw new InstagramException("Missing csfrtoken");
+              return $response;
+          }
+          
           $data = [
           'phone_id'            => SignatureUtils::generateUUID(true),
           '_csrftoken'          => $token[0],
