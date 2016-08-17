@@ -177,7 +177,7 @@ class Instagram
               throw new InstagramException("Missing csfrtoken");
               return $response;
           }
-          
+
           $data = [
           'phone_id'            => SignatureUtils::generateUUID(true),
           '_csrftoken'          => $token[0],
@@ -735,7 +735,7 @@ class Instagram
         'external_url'  => $url,
         'phone_number'  => $phone,
         'username'      => $this->username,
-        'full_name'     => $first_name,
+        'first_name'    => $first_name,
         'biography'     => $biography,
         'email'         => $email,
         'gender'        => $gender,
