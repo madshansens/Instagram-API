@@ -6,10 +6,6 @@ class HttpInterface
 {
     protected $parent;
     protected $userAgent;
-    protected $proxy = null;
-    protected $proxyPort;
-    protected $proxyUser = null;
-    protected $proxyPass;
 
     public function __construct($parent)
     {
@@ -54,9 +50,9 @@ class HttpInterface
         }
 
         if ($this->parent->proxy) {
-            curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxy);
-            if ($this->parent->proxy_auth) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxy_auth);
+            curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxyHost);
+            if ($this->parent->proxyAuth) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxyAuth);
             }
         }
 
@@ -152,9 +148,9 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
         if ($this->parent->proxy) {
-            curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxy);
-            if ($this->parent->proxy_auth) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxy_auth);
+            curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxyHost);
+            if ($this->parent->proxyAuth) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxyAuth);
             }
         }
 
@@ -176,6 +172,11 @@ class HttpInterface
         }
 
         $configure = $this->parent->configure($upload->getUploadId(), $photo, $caption);
+
+        if (!$configure->isOk()) {
+            throw new InstagramException($configure->getMessage());
+        }
+        
         $this->parent->expose();
 
         return $configure;
@@ -234,9 +235,9 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
         if ($this->parent->proxy) {
-            curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxy);
-            if ($this->parent->proxy_auth) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxy_auth);
+            curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxyHost);
+            if ($this->parent->proxyAuth) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxyAuth);
             }
         }
 
@@ -285,9 +286,9 @@ class HttpInterface
             curl_setopt($ch, CURLOPT_POSTFIELDS, substr($videoData, $start, $end));
 
             if ($this->parent->proxy) {
-                curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxy);
-                if ($this->parent->proxy_auth) {
-                    curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxy_auth);
+                curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxyHost);
+                if ($this->parent->proxyAuth) {
+                    curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxyAuth);
                 }
             }
 
@@ -378,9 +379,9 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
         if ($this->parent->proxy) {
-            curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxy);
-            if ($this->parent->proxy_auth) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxy_auth);
+            curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxyHost);
+            if ($this->parent->proxyAuth) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxyAuth);
             }
         }
 
@@ -460,9 +461,9 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
         if ($this->parent->proxy) {
-            curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxy);
-            if ($this->parent->proxy_auth) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxy_auth);
+            curl_setopt($ch, CURLOPT_PROXY, $this->parent->proxyHost);
+            if ($this->parent->proxyAuth) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->parent->proxyAuth);
             }
         }
 

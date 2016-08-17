@@ -18,8 +18,9 @@ class Instagram
   public $customPath = false;
   public $http;
     public $settings;
-    public $proxy = null;        // Proxy
-    public $proxy_auth = null;   // Proxy Auth
+    public $proxy = null;           // Full Proxy
+    public $proxyHost = null;       // Proxy Host and Port
+    public $proxyAuth = null;       // Proxy User and Pass
 
   /**
    * Default class constructor.
@@ -124,9 +125,9 @@ class Instagram
      */
     public function setProxy($proxy, $port = null, $username = null, $password = null)
     {
+        $this->proxy = $proxy;
+        
         if ($proxy == '') {
-            $this->proxy = '';
-
             return;
         }
 
@@ -142,13 +143,13 @@ class Instagram
         }
 
         if (!empty($proxy['host']) && isset($proxy['port']) && is_int($proxy['port'])) {
-            $this->proxy = $proxy['host'].':'.$proxy['port'];
+            $this->proxyHost = $proxy['host'].':'.$proxy['port'];
         } else {
             throw new InstagramException('Proxy host error. Please check ip address and port of proxy.');
         }
 
         if (isset($proxy['user']) && isset($proxy['pass'])) {
-            $this->proxy_auth = $proxy['user'].':'.$proxy['pass'];
+            $this->proxyAuth = $proxy['user'].':'.$proxy['pass'];
         }
     }
 
@@ -172,7 +173,10 @@ class Instagram
               return $response;
           }
 
-          preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token);
+          if(!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token)){
+              throw new InstagramException("Missing csfrtoken");
+              return $response;
+          }
 
           $data = [
           'phone_id'            => SignatureUtils::generateUUID(true),
@@ -731,7 +735,7 @@ class Instagram
         'external_url'  => $url,
         'phone_number'  => $phone,
         'username'      => $this->username,
-        'full_name'     => $first_name,
+        'first_name'    => $first_name,
         'biography'     => $biography,
         'email'         => $email,
         'gender'        => $gender,

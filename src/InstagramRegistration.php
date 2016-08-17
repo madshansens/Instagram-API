@@ -9,8 +9,9 @@ class InstagramRegistration
     protected $username;
     protected $uuid;
     protected $userAgent;
-    protected $proxy = null;        // Proxy
-    protected $proxy_auth = null;   // Proxy Auth
+    protected $proxy = null;           // Full Proxy
+    protected $proxyHost = null;       // Proxy Host and Port
+    protected $proxyAuth = null;       // Proxy User and Pass
 
     public function __construct($debug = false, $IGDataPath = null)
     {
@@ -42,9 +43,9 @@ class InstagramRegistration
      */
     public function setProxy($proxy, $port = null, $username = null, $password = null)
     {
-        if ($proxy == '') {
-            $this->proxy = '';
+        $this->proxy = $proxy;
 
+        if ($proxy == '') {
             return;
         }
 
@@ -60,13 +61,13 @@ class InstagramRegistration
         }
 
         if (!empty($proxy['host']) && isset($proxy['port']) && is_int($proxy['port'])) {
-            $this->proxy = $proxy['host'].':'.$proxy['port'];
+            $this->proxyHost = $proxy['host'].':'.$proxy['port'];
         } else {
             throw new InstagramException('Proxy host error. Please check ip address and port of proxy.');
         }
 
         if (isset($proxy['user']) && isset($proxy['pass'])) {
-            $this->proxy_auth = $proxy['user'].':'.$proxy['pass'];
+            $this->proxyAuth = $proxy['user'].':'.$proxy['pass'];
         }
     }
 
@@ -177,9 +178,9 @@ class InstagramRegistration
         }
 
         if ($this->proxy) {
-            curl_setopt($ch, CURLOPT_PROXY, $this->proxy);
-            if ($this->proxy_auth) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxy_auth);
+            curl_setopt($ch, CURLOPT_PROXY, $this->proxyHost);
+            if ($this->proxyAuth) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxyAuth);
             }
         }
 
