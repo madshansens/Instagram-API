@@ -32,4 +32,29 @@ class MediaInfoResponse extends Response
         $this->setStatus($response['status']);
         $this->setFullResponse($response);
     }
+
+    public function getTakenTime()
+    {
+        return $this->taken_at;
+    }
+
+    public function getImageUrl()
+    {
+        return $this->image_url;
+    }
+
+    public function getLikeCount()
+    {
+        return $this->like_count;
+    }
+
+    public function getLikers()
+    {
+        return $this->likers;
+    }
+
+    public function getComments()
+    {
+        return $this->comments;
+    }
 }
