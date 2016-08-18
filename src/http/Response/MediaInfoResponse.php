@@ -30,5 +30,6 @@ class MediaInfoResponse extends Response
             $this->setMessage($response['message']);
         }
         $this->setStatus($response['status']);
+        $this->setFullResponse($response);
     }
 }
