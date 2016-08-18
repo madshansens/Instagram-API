@@ -1489,4 +1489,16 @@ class Instagram
 
       return $this->http->request($endpoint)[1];
   }
+
+  public function verifyPeer($enable)
+  {
+      $this->http->verifyPeer($enable);
+  }
+
+  public function verifyHost($enable)
+  {
+      $this->http->verifyHost($enable);
+  }
+
+
 }
