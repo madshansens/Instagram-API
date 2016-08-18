@@ -9,6 +9,7 @@ class Response
 
     protected $status;
     protected $message;
+    protected $fullResponse;
 
     public function setStatus($status)
     {
@@ -30,6 +31,16 @@ class Response
         return $this->message;
     }
 
+    public function setFullResponse($response)
+    {
+        $this->fullResponse = $response;
+    }
+
+    public function getFullResponse()
+    {
+        return $this->fullResponse;
+    }
+    
     public function isOk()
     {
         return $this->getStatus() == self::STATUS_OK;
