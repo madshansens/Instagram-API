@@ -1234,7 +1234,7 @@ class Instagram
     */
    public function getUserFollowings($usernameId, $maxid = null)
    {
-       return $this->http->request("friendships/$usernameId/following/?max_id=$maxid&ig_sig_key_version=".Constants::SIG_KEY_VERSION."&rank_token=$this->rank_token")[1];
+       return new FollowingResponse($this->http->request("friendships/$usernameId/following/?max_id=$maxid&ig_sig_key_version=".Constants::SIG_KEY_VERSION."&rank_token=$this->rank_token")[1]);
    }
 
   /**
