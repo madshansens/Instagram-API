@@ -1270,7 +1270,7 @@ class Instagram
    */
   public function getSelfUsersFollowing()
   {
-      return $this->http->request('friendships/following/?ig_sig_key_version='.Constants::SIG_KEY_VERSION."&rank_token=$this->rank_token")[1];
+      return $this->getUserFollowings($this->username_id);
   }
 
   /**
