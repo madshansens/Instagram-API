@@ -960,6 +960,19 @@ class Instagram
       return $this->getGeoMedia($this->username_id);
   }
 
+  public function searchLocation($latitude, $longitude)
+  {
+      $locations = new LocationResponse($this->http->request("location_search/?rank_token=$this->rank_token&latitude=$latitude&longitude=$longitude")[1]);
+
+      if (!$locations->isOk()) {
+          throw new InstagramException($locations->getMessage()."\n");
+
+          return;
+      }
+
+      return $locations;
+  }
+
   /**
    * facebook user search.
    *
@@ -1157,7 +1170,7 @@ class Instagram
    * @return array
    *   Location location data
    */
-  public function searchLocation($query)
+  public function searchFBLocation($query)
   {
       $query = rawurlencode($query);
       $endpoint = "fbsearch/places/?rank_token=$this->rank_token&query=".$query;
