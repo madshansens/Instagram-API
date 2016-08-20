@@ -44,6 +44,6 @@ class ConfigureResponse extends Response
 
     public function getMediaUrl()
     {
-        return 'https://www.instagram.com/p/' . $this->getMediaCode() . '/';
+        return 'https://www.instagram.com/p/'.$this->getMediaCode().'/';
     }
 }

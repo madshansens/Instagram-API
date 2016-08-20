@@ -16,7 +16,7 @@ class Instagram
   public $rank_token;          // Rank token
   public $IGDataPath;          // Data storage path
   public $customPath = false;
-  public $http;
+    public $http;
     public $settings;
     public $proxy = null;           // Full Proxy
     public $proxyHost = null;       // Proxy Host and Port
@@ -86,8 +86,9 @@ class Instagram
 
     protected function checkSettings($username)
     {
-        if (!$this->customPath)
+        if (!$this->customPath) {
             $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
+        }
 
         if (!file_exists($this->IGDataPath)) {
             mkdir($this->IGDataPath, 0777, true);
@@ -100,7 +101,7 @@ class Instagram
         }
 
 
-        if (($this->settings->get('user_agent') == null) || (version_compare($this->settings->get('version'), Constants::VERSION) == -1)  ) {
+        if (($this->settings->get('user_agent') == null) || (version_compare($this->settings->get('version'), Constants::VERSION) == -1)) {
             $userAgent = new UserAgent($this);
             $ua = $userAgent->buildUserAgent();
             $this->settings->set('version', Constants::VERSION);
@@ -175,8 +176,9 @@ class Instagram
               return $response;
           }
 
-          if(!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token)){
-              throw new InstagramException("Missing csfrtoken");
+          if (!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token)) {
+              throw new InstagramException('Missing csfrtoken');
+
               return $response;
           }
 
@@ -577,16 +579,16 @@ class Instagram
       return $this->http->request("media/$mediaId/comment/", SignatureUtils::generateSignature($data))[1];
   }
 
-  /**
+    /**
      * Delete Comment.
      *
      * @param string $mediaId
-     *   Media ID
+     *                          Media ID
      * @param string $commentId
-     *   Comment ID
+     *                          Comment ID
      *
      * @return array
-     *   Delete comment data
+     *               Delete comment data
      */
     public function deleteComment($mediaId, $commentId)
     {
@@ -595,6 +597,7 @@ class Instagram
           '_uid'           => $this->username_id,
           '_csrftoken'     => $this->token,
       ]);
+
         return $this->http->request("media/$mediaId/comment/$commentId/delete/", SignatureUtils::generateSignature($data))[1];
     }
 
@@ -1490,14 +1493,13 @@ class Instagram
       return $this->http->request($endpoint)[1];
   }
 
-  public function verifyPeer($enable)
-  {
-      $this->http->verifyPeer($enable);
-  }
+    public function verifyPeer($enable)
+    {
+        $this->http->verifyPeer($enable);
+    }
 
-  public function verifyHost($enable)
-  {
-      $this->http->verifyHost($enable);
-  }
-
+    public function verifyHost($enable)
+    {
+        $this->http->verifyHost($enable);
+    }
 }

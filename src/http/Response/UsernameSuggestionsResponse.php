@@ -22,5 +22,4 @@ class UsernameSuggestionsResponse extends Response
     {
         return $this->username_suggestions;
     }
-
 }
