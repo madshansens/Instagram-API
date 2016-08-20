@@ -1013,15 +1013,20 @@ class Instagram
    */
   public function searchUsername($usernameName)
   {
-      $query = $this->http->request("users/$usernameName/usernameinfo/")[1];
+      $query = new UsernameInfoResponse($this->http->request("users/$usernameName/usernameinfo/")[1]);
 
-      if ($query['status'] != 'ok') {
-          throw new InstagramException($query['message']."\n");
+      if (!$query->isOk()) {
+          throw new InstagramException($query->getMessage()."\n");
 
           return;
       }
 
       return $query;
+  }
+
+  public function getUsernameId($username)
+  {
+      return $this->searchUsername($username)->getUsernameId();
   }
 
   /**
