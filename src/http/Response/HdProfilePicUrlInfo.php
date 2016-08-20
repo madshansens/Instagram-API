@@ -12,7 +12,7 @@ class HdProfilePicUrlInfo
     {
         $this->url = $response['url'];
         $this->width = $response['width'];
-        $this->height = $response['height']
+        $this->height = $response['height'];
     }
 
     public function getUrl()
