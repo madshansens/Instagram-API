@@ -44,5 +44,4 @@ class CheckEmailResponse extends Response
     {
         return $this->username_suggestions;
     }
-
 }

@@ -40,7 +40,7 @@ class Response
     {
         return $this->fullResponse;
     }
-    
+
     public function isOk()
     {
         return $this->getStatus() == self::STATUS_OK;

@@ -98,29 +98,29 @@ class InstagramRegistration
       return new CheckUsernameResponse($this->request('users/check_username/', SignatureUtils::generateSignature($data))[1]);
   }
 
-  public function checkEmail($email)
-  {
-      $data = json_encode([
+    public function checkEmail($email)
+    {
+        $data = json_encode([
           'qe_id'        => SignatureUtils::generateUUID(true),
           'waterfall_id' => SignatureUtils::generateUUID(true),
           'email'        => $email,
           '_csrftoken'   => 'missing',
       ]);
 
-      return new CheckEmailResponse($this->request('users/check_email/', SignatureUtils::generateSignature($data))[1]);
-  }
+        return new CheckEmailResponse($this->request('users/check_email/', SignatureUtils::generateSignature($data))[1]);
+    }
 
-  public function usernameSuggestions($email, $name)
-  {
-      $data = json_encode([
-          'name'        => SignatureUtils::generateUUID(true),
+    public function usernameSuggestions($email, $name)
+    {
+        $data = json_encode([
+          'name'         => SignatureUtils::generateUUID(true),
           'waterfall_id' => SignatureUtils::generateUUID(true),
           'email'        => $email,
           '_csrftoken'   => 'missing',
       ]);
 
-      return new UsernameSuggestionsResponse($this->request('accounts/username_suggestions/', SignatureUtils::generateSignature($data))[1]);
-  }
+        return new UsernameSuggestionsResponse($this->request('accounts/username_suggestions/', SignatureUtils::generateSignature($data))[1]);
+    }
 
   /**
    * Register account.
@@ -136,18 +136,18 @@ class InstagramRegistration
   {
       $token = $this->getCsfrtoken();
       $data = json_encode([
-          'allow_contacts_sync'=> 'true',
-          'phone_id'           => $this->uuid,
-          '_csrftoken'         => $token,
-          'username'           => $username,
-          'first_name'         => $name,
-          'guid'               => $this->uuid,
-          'device_id'          => SignatureUtils::generateDeviceId(md5($username.$password)),
-          'email'              => $email,
-          'force_sign_up_code' => '',
-          'waterfall_id'       => $this->waterfall_id,
-          'qs_stamp'           => '',
-          'password'           => $password,
+          'allow_contacts_sync' => 'true',
+          'phone_id'            => $this->uuid,
+          '_csrftoken'          => $token,
+          'username'            => $username,
+          'first_name'          => $name,
+          'guid'                => $this->uuid,
+          'device_id'           => SignatureUtils::generateDeviceId(md5($username.$password)),
+          'email'               => $email,
+          'force_sign_up_code'  => '',
+          'waterfall_id'        => $this->waterfall_id,
+          'qs_stamp'            => '',
+          'password'            => $password,
       ]);
 
       $result = $this->request('accounts/create/', SignatureUtils::generateSignature($data));
@@ -164,25 +164,26 @@ class InstagramRegistration
       return $response;
   }
 
-  public function getCsfrtoken()
-  {
-      $fetch = $this->request('si/fetch_headers/', null, true);
-      $header = $fetch[0];
-      $response = new ChallengeResponse($fetch[1]);
+    public function getCsfrtoken()
+    {
+        $fetch = $this->request('si/fetch_headers/', null, true);
+        $header = $fetch[0];
+        $response = new ChallengeResponse($fetch[1]);
 
-      if (!isset($header) || (!$response->isOk())) {
-          throw new InstagramException("Couldn't get challenge, check your connection");
+        if (!isset($header) || (!$response->isOk())) {
+            throw new InstagramException("Couldn't get challenge, check your connection");
 
-          return $response;
-      }
+            return $response;
+        }
 
-      if(!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token)){
-          throw new InstagramException("Missing csfrtoken");
-          return $response;
-      }
+        if (!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token)) {
+            throw new InstagramException('Missing csfrtoken');
 
-      return substr($token[0], 22);
-  }
+            return $response;
+        }
+
+        return substr($token[0], 22);
+    }
 
     public function request($endpoint, $post = null)
     {
