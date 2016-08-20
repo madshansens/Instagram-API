@@ -29,5 +29,4 @@ class HdProfilePicUrlInfo
     {
         return $this->height;
     }
-
 }
