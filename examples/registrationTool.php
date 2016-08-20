@@ -20,21 +20,33 @@ do {
     $username = trim(fgets(STDIN));
 
     $check = $r->checkUsername($username);
-    if ($check['available'] == false) {
+    if (!$check->isAvailable()) {
         echo "Username $username not available, try with another one\n\n";
     }
-} while ($check['available'] == false);
+} while (!$check->isAvailable());
 
 echo "Username $username is available\n\n";
 
 echo "\nPassword: ";
 $password = trim(fgets(STDIN));
 
-echo "\nEmail: ";
-$email = trim(fgets(STDIN));
+do {
+    echo "\nEmail: ";
+    $email = trim(fgets(STDIN));
+
+    $check = $r->checkEmail($email);
+    if (!$check->isAvailable()) {
+        echo "Email is not available, try with another one\n\n";
+    }
+} while (!$check->isAvailable());
+
+echo "\nName (Optional): ";
+$name = trim(fgets(STDIN));
 
 $result = $r->createAccount($username, $password, $email);
 
-if (isset($result['account_created']) && ($result['account_created'] == true)) {
-    echo 'Your account was successfully created! :)';
+if ($result->isAccountCreated()) {
+    echo "Your account was successfully created! :)\n";
+} else {
+    echo "Error during registration.\n";
 }

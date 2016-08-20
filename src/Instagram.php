@@ -1500,5 +1500,4 @@ class Instagram
       $this->http->verifyHost($enable);
   }
 
-
 }
