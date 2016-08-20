@@ -914,8 +914,8 @@ class Instagram
    */
   public function getMediaLikers($mediaId)
   {
-      $likers = $this->http->request("media/$mediaId/likers/?")[1];
-      if ($likers['status'] != 'ok') {
+      $likers = new MediaLikersResponse($this->http->request("media/$mediaId/likers/")[1]);
+      if (!$likers->isOk()) {
           throw new InstagramException($likers['message']."\n");
 
           return;
