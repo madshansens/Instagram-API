@@ -89,9 +89,11 @@ class Item
             $this->video_duration = $item['video_duration'];
         }
         $this->user = new User($item['user']);
-        if (array_key_exists('likers', $item)) {
-            $this->likers = $item['likers'];
+        $likers = [];
+        foreach($item['likers'] as $liker) {
+            $likers[] = new User($liker);
         }
+        $this->likers = $likers;
         if (array_key_exists('like_count', $item)) {
             $this->like_count = $item['like_count'];
         }
@@ -125,7 +127,7 @@ class Item
 
     public function getUsernameId()
     {
-        return $this->pk;
+        return $this->user->getUsernameId();
     }
 
     public function getMediaId()
@@ -286,5 +288,10 @@ class Item
     public function getUsertags()
     {
         return $this->usertags;
+    }
+
+    public function getlikers()
+    {
+        return $this->likers;
     }
 }
