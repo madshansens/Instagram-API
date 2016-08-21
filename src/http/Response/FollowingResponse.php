@@ -5,6 +5,7 @@ namespace InstagramAPI;
 class FollowingResponse extends Response
 {
     protected $followings;
+    protected $next_max_id;
 
     public function __construct($response)
     {
@@ -14,6 +15,7 @@ class FollowingResponse extends Response
                 $users[] = new User($user);
             }
             $this->followings = $users;
+            $this->next_max_id;
         } else {
             $this->setMessage($response['message']);
         }
@@ -23,5 +25,10 @@ class FollowingResponse extends Response
     public function getFollowings()
     {
         return $this->followings;
+    }
+
+    public function getNextMaxId()
+    {
+        return $this->next_max_id;
     }
 }
