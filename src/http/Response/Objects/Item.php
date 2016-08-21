@@ -70,7 +70,9 @@ class Item
         }
         $this->comments = $comments;
         $this->comment_count = $item['comment_count'];
-        $this->caption = $item['caption'];
+        if (!is_null($item['caption'])) {
+            $this->caption = new Caption($item['caption']);
+        }
         $this->caption_is_edited = $item['caption_is_edited'];
         $this->photo_of_you = $item['photo_of_you'];
         if (array_key_exists('video_versions', $item)) {

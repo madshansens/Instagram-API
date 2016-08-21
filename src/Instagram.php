@@ -922,10 +922,10 @@ class Instagram
    */
   public function tagFeed($tag)
   {
-      $userFeed = $this->http->request("feed/tag/$tag/?rank_token=$this->rank_token&ranked_content=true&")[1];
+      $userFeed = new TagFeedResponse($this->http->request("feed/tag/$tag/?rank_token=$this->rank_token&ranked_content=true&")[1]);
 
-      if ($userFeed['status'] != 'ok') {
-          throw new InstagramException($userFeed['message']."\n");
+      if (!$userFeed->isOk()) {
+          throw new InstagramException($userFeed->getMessage()."\n");
 
           return;
       }
@@ -944,7 +944,7 @@ class Instagram
   {
       $likers = new MediaLikersResponse($this->http->request("media/$mediaId/likers/")[1]);
       if (!$likers->isOk()) {
-          throw new InstagramException($likers['message']."\n");
+          throw new InstagramException($likers->getMessage()."\n");
 
           return;
       }
