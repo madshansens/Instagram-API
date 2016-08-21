@@ -15,7 +15,7 @@ class FollowingResponse extends Response
                 $users[] = new User($user);
             }
             $this->followings = $users;
-            $this->next_max_id;
+            $this->next_max_id = $response['next_max_id'];
         } else {
             $this->setMessage($response['message']);
         }
