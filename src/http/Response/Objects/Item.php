@@ -35,6 +35,11 @@ class Item
     protected $like_count = 0;
     protected $preview = '';
     protected $has_liked = false;
+    protected $explore_context = '';
+    protected $explore_source_token = '';
+    protected $explore = '';
+    protected $impression_token = '';
+
 
     public function __construct($item)
     {
@@ -92,6 +97,18 @@ class Item
         }
         if (array_key_exists('has_liked', $item)) {
             $this->has_liked = $item['has_liked'];
+        }
+        if (array_key_exists('explore_context', $item)) {
+            $this->explore_context = $item['explore_context'];
+        }
+        if (array_key_exists('explore_source_token', $item)) {
+            $this->explore_source_token = $item['explore_source_token'];
+        }
+        if (array_key_exists('explore', $item)) {
+            $this->explore = new Explore($item['explore']);
+        }
+        if (array_key_exists('impression_token', $item)) {
+            $this->impression_token = $item['impression_token'];
         }
     }
 
@@ -238,5 +255,25 @@ class Item
     public function hasLiked()
     {
         return $this->has_liked;
+    }
+
+    public function getExploreContext()
+    {
+        return $this->explore_context;
+    }
+
+    public function getExploreSourceToken()
+    {
+        return $this->explore_source_token;
+    }
+
+    public function getExplore()
+    {
+        return $this->explore;
+    }
+
+    public function getImpressionToken()
+    {
+        return $this->impression_token;
     }
 }

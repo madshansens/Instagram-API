@@ -286,7 +286,14 @@ class Instagram
      */
     public function explore()
     {
-        return $this->http->request('discover/explore/?')[1];
+        $explore = new ExploreResponse($this->http->request('discover/explore/?')[1]);
+
+        if (!$explore->isOk()) {
+            throw new InstagramException($explore->getMessage()."\n");
+
+            return;
+        }
+        return $explore;
     }
 
     public function expose()
