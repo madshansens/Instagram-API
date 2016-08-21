@@ -870,10 +870,10 @@ class Instagram
    */
   public function getv2Inbox()
   {
-      $inbox = $this->http->request('direct_v2/inbox/?')[1];
+      $inbox = new V2InboxResponse($this->http->request('direct_v2/inbox/?')[1]);
 
-      if ($inbox['status'] != 'ok') {
-          throw new InstagramException($inbox['message']."\n");
+      if (!$inbox->isOk()) {
+          throw new InstagramException($inbox->getMessage()."\n");
 
           return;
       }
