@@ -12,9 +12,15 @@ class FriendshipStatus
     public function __construct($data)
     {
         $this->following = $data['following'];
-        $this->incoming_request = $data['incoming_request'];
-        $this->outgoing_request = $data['outgoing_request'];
-        $this->is_private = $data['is_private'];
+        if (array_key_exists('source_token', $data)) {
+            $this->incoming_request = $data['incoming_request'];
+        }
+        if (array_key_exists('source_token', $data)) {
+            $this->outgoing_request = $data['outgoing_request'];
+        }
+        if (array_key_exists('is_private', $data)) {
+            $this->is_private = $data['is_private'];
+        }
     }
 
     public function getFollowing()

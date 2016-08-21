@@ -317,9 +317,9 @@ class Instagram
    */
   public function logout()
   {
-      $logout = $this->http->request('accounts/logout/');
+      $logout = new LogoutResponse($this->http->request('accounts/logout/')[1]);
 
-      if ($logout == 'ok') {
+      if ($logout->isOk()) {
           return true;
       } else {
           return false;
