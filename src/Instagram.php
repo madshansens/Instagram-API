@@ -244,9 +244,9 @@ class Instagram
         return $this->http->request('qe/sync/', SignatureUtils::generateSignature($data))[1];
     }
 
-    protected function autoCompleteUserList()
+    public function autoCompleteUserList()
     {
-        return $this->http->request('friendships/autocomplete_user_list/')[1];
+        return new autoCompleteUserListResponse($this->http->request('friendships/autocomplete_user_list/')[1]);
     }
 
     public function timelineFeed()

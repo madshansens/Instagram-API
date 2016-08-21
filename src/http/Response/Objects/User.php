@@ -10,8 +10,10 @@ class User
     protected $profile_pic_url;
     protected $full_name;
     protected $pk;
-    protected $is_verified;
-    protected $is_private;
+    protected $is_verified = false;
+    protected $is_private = false;
+    protected $coeff_weight = 0;
+    protected $friendship_status = null;
 
     public function __construct($userData)
     {
@@ -28,6 +30,12 @@ class User
         }
         if (array_key_exists('is_favorite', $userData)) {
             $this->is_favorite = $userData['is_favorite'];
+        }
+        if (array_key_exists('coeff_weight', $userData)) {
+            $this->coeff_weight = $userData['coeff_weight'];
+        }
+        if (array_key_exists('friendship_status', $userData)) {
+            $this->friendship_status = new FriendshipStatus($userData['friendship_status']);
         }
     }
 
@@ -69,5 +77,15 @@ class User
     public function isFavorite()
     {
         return $this->is_favorite;
+    }
+
+    public function getCoeffWeight()
+    {
+        return $this->coeff_weight;
+    }
+
+    public function getFriendshipStatus()
+    {
+        return $this->friendship_status;
     }
 }
