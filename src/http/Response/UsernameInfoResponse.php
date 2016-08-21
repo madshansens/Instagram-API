@@ -56,7 +56,9 @@ class UsernameInfoResponse extends Response
             $this->follower_count = $response['user']['follower_count'];
             $this->pk = $response['user']['pk'];
             $this->username = $response['user']['username'];
-            $this->geo_media_count = $response['user']['geo_media_count'];
+            if (array_key_exists('geo_media_count', $response['user'])) {
+                $this->geo_media_count = $response['user']['geo_media_count'];
+            }
             $this->profile_pic_url = $response['user']['profile_pic_url'];
             if (array_key_exists('can_see_organic_insights', $response['user'])) {
                 $this->can_see_organic_insights = $response['user']['can_see_organic_insights'];

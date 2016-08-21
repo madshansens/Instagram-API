@@ -365,10 +365,10 @@ class Instagram
 
     /**
      * Send direct message to user by inbox
-     * 
+     *
      * @param  (array | int) $recipients Users id
      * @param  string        $text       Text message
-     * @return void          
+     * @return void
      */
     public function direct_message($recipients, $text)
     {
@@ -891,10 +891,10 @@ class Instagram
    */
   public function getUserTags($usernameId)
   {
-      $tags = $this->http->request("usertags/$usernameId/feed/?rank_token=$this->rank_token&ranked_content=true&")[1];
+      $tags = new UsertagsResponse($this->http->request("usertags/$usernameId/feed/?rank_token=$this->rank_token&ranked_content=true&")[1]);
 
-      if ($tags['status'] != 'ok') {
-          throw new InstagramException($tags['message']."\n");
+      if (!$tags->isOk()) {
+          throw new InstagramException($tags->getMessage()."\n");
 
           return;
       }
@@ -922,10 +922,10 @@ class Instagram
    */
   public function tagFeed($tag)
   {
-      $userFeed = $this->http->request("feed/tag/$tag/?rank_token=$this->rank_token&ranked_content=true&")[1];
+      $userFeed = new TagFeedResponse($this->http->request("feed/tag/$tag/?rank_token=$this->rank_token&ranked_content=true&")[1]);
 
-      if ($userFeed['status'] != 'ok') {
-          throw new InstagramException($userFeed['message']."\n");
+      if (!$userFeed->isOk()) {
+          throw new InstagramException($userFeed->getMessage()."\n");
 
           return;
       }
@@ -944,7 +944,7 @@ class Instagram
   {
       $likers = new MediaLikersResponse($this->http->request("media/$mediaId/likers/")[1]);
       if (!$likers->isOk()) {
-          throw new InstagramException($likers['message']."\n");
+          throw new InstagramException($likers->getMessage()."\n");
 
           return;
       }

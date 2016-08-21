@@ -39,6 +39,7 @@ class Item
     protected $explore_source_token = '';
     protected $explore = '';
     protected $impression_token = '';
+    protected $usertags = null;
 
 
     public function __construct($item)
@@ -69,7 +70,9 @@ class Item
         }
         $this->comments = $comments;
         $this->comment_count = $item['comment_count'];
-        $this->caption = $item['caption'];
+        if (!is_null($item['caption'])) {
+            $this->caption = new Caption($item['caption']);
+        }
         $this->caption_is_edited = $item['caption_is_edited'];
         $this->photo_of_you = $item['photo_of_you'];
         if (array_key_exists('video_versions', $item)) {
@@ -109,6 +112,9 @@ class Item
         }
         if (array_key_exists('impression_token', $item)) {
             $this->impression_token = $item['impression_token'];
+        }
+        if (array_key_exists('usertags', $item)) {
+            $this->usertags = $item['usertags'];
         }
     }
 
@@ -275,5 +281,10 @@ class Item
     public function getImpressionToken()
     {
         return $this->impression_token;
+    }
+
+    public function getUsertags()
+    {
+        return $this->usertags;
     }
 }
