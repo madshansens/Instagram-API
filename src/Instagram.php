@@ -365,10 +365,10 @@ class Instagram
 
     /**
      * Send direct message to user by inbox
-     * 
+     *
      * @param  (array | int) $recipients Users id
      * @param  string        $text       Text message
-     * @return void          
+     * @return void
      */
     public function direct_message($recipients, $text)
     {
@@ -891,10 +891,10 @@ class Instagram
    */
   public function getUserTags($usernameId)
   {
-      $tags = $this->http->request("usertags/$usernameId/feed/?rank_token=$this->rank_token&ranked_content=true&")[1];
+      $tags = new UsertagsResponse($this->http->request("usertags/$usernameId/feed/?rank_token=$this->rank_token&ranked_content=true&")[1]);
 
-      if ($tags['status'] != 'ok') {
-          throw new InstagramException($tags['message']."\n");
+      if (!$tags->isOk()) {
+          throw new InstagramException($tags->getMessage()."\n");
 
           return;
       }
