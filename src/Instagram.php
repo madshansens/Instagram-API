@@ -210,10 +210,12 @@ class Instagram
           $this->settings->set('token', $this->token);
 
           $this->syncFeatures();
-          $this->autoCompleteUserList();
           $this->timelineFeed();
+          $this->getReelsTrayFeed();
+          $this->autoCompleteUserList();
           $this->getv2Inbox();
           $this->getRecentActivity();
+          $this->explore();
 
           return $response;
       }
@@ -222,8 +224,11 @@ class Instagram
       if (isset($check['message']) && $check['message'] == 'login_required') {
           $this->login(true);
       }
+    //  $this->getReelsTrayFeed();
+    //  $this->autoCompleteUserList();
       $this->getv2Inbox();
       $this->getRecentActivity();
+    //  $this->explore();
   }
 
     public function syncFeatures()
@@ -281,7 +286,7 @@ class Instagram
      */
     public function explore()
     {
-        return $this->request('discover/explore/?')[1];
+        return $this->http->request('discover/explore/?')[1];
     }
 
     public function expose()
@@ -350,6 +355,7 @@ class Instagram
     {
         $this->http->direct_share($media_id, $recipients, $text);
     }
+
 
     /**
      * Direct Thread Data.
@@ -807,7 +813,7 @@ class Instagram
    */
   public function getRecentActivity()
   {
-      $activity = $this->http->request('news/inbox/?')[1];
+      $activity = $this->http->request('news/inbox/')[1];
 
       if ($activity['status'] != 'ok') {
           throw new InstagramException($activity['message']."\n");
@@ -1098,6 +1104,19 @@ class Instagram
       }
 
       return $timeline;
+  }
+
+  public function getReelsTrayFeed()
+  {
+      $feed = new ReelsTrayFeedResponse($this->http->request('feed/reels_tray/')[1]);
+
+      if (!$feed->isOk()) {
+          throw new InstagramException($feed->getMessage()."\n");
+
+          return;
+      }
+
+      return $feed;
   }
 
   /**

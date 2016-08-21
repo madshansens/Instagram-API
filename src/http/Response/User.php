@@ -19,7 +19,9 @@ class User
         $this->profile_pic_url = $userData['profile_pic_url'];
         $this->full_name = $userData['full_name'];
         $this->pk = $userData['pk'];
-        $this->is_verified = $userData['is_verified'];
+        if (array_key_exists('is_verified', $userData)) {
+            $this->is_verified = $userData['is_verified'];
+        }
         $this->is_private = $userData['is_private'];
         if (array_key_exists('has_anonymous_profile_picture', $userData)) {
             $this->has_anonymous_profile_picture = $userData['has_anonymous_profile_picture'];

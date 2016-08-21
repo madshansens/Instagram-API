@@ -26,6 +26,7 @@ class HttpInterface
         $headers = [
         'Connection: close',
         'Accept: */*',
+        'X-IG-Capabilities: 3QI=',
         'Content-type: application/x-www-form-urlencoded; charset=UTF-8',
         'Cookie2: $Version=1',
         'Accept-Language: en-US',
