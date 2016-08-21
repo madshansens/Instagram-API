@@ -8,7 +8,10 @@ class InstagramRegistration
     protected $IGDataPath;
     protected $username;
     protected $uuid;
+    protected $waterfall_id;
+    protected $token;
     protected $userAgent;
+    protected $settings;
     protected $proxy = null;           // Full Proxy
     protected $proxyHost = null;       // Proxy Host and Port
     protected $proxyAuth = null;       // Proxy User and Pass
@@ -16,7 +19,9 @@ class InstagramRegistration
     public function __construct($debug = false, $IGDataPath = null)
     {
         $this->debug = $debug;
-        $this->uuid = $this->generateUUID(true);
+        $this->uuid = SignatureUtils::generateUUID(true);
+        $this->waterfall_id = SignatureUtils::generateUUID(true);
+
         if (!is_null($IGDataPath)) {
             $this->IGDataPath = $IGDataPath;
         } else {
@@ -87,8 +92,35 @@ class InstagramRegistration
           '_csrftoken' => 'missing',
       ]);
 
-      return $this->request('users/check_username/', $this->generateSignature($data))[1];
+      $this->username = $username;
+      $this->settings = new Settings($this->IGDataPath.$username.DIRECTORY_SEPARATOR.'settings-'.$username.'.dat');
+
+      return new CheckUsernameResponse($this->request('users/check_username/', SignatureUtils::generateSignature($data))[1]);
   }
+
+    public function checkEmail($email)
+    {
+        $data = json_encode([
+          'qe_id'        => SignatureUtils::generateUUID(true),
+          'waterfall_id' => SignatureUtils::generateUUID(true),
+          'email'        => $email,
+          '_csrftoken'   => 'missing',
+      ]);
+
+        return new CheckEmailResponse($this->request('users/check_email/', SignatureUtils::generateSignature($data))[1]);
+    }
+
+    public function usernameSuggestions($email, $name)
+    {
+        $data = json_encode([
+          'name'         => SignatureUtils::generateUUID(true),
+          'waterfall_id' => SignatureUtils::generateUUID(true),
+          'email'        => $email,
+          '_csrftoken'   => 'missing',
+      ]);
+
+        return new UsernameSuggestionsResponse($this->request('accounts/username_suggestions/', SignatureUtils::generateSignature($data))[1]);
+    }
 
   /**
    * Register account.
@@ -100,58 +132,57 @@ class InstagramRegistration
    * @return array
    *   Registration data
    */
-  public function createAccount($username, $password, $email)
+  public function createAccount($username, $password, $email, $name = '')
   {
+      $token = $this->getCsfrtoken();
       $data = json_encode([
-          'phone_id'           => $this->uuid,
-          '_csrftoken'         => 'missing',
-          'username'           => $username,
-          'first_name'         => '',
-          'guid'               => $this->uuid,
-          'device_id'          => $this->generateDeviceId(md5($username.$password)),
-          'email'              => $email,
-          'force_sign_up_code' => '',
-          'qs_stamp'           => '',
-          'password'           => $password,
+          'allow_contacts_sync' => 'true',
+          'phone_id'            => $this->uuid,
+          '_csrftoken'          => $token,
+          'username'            => $username,
+          'first_name'          => $name,
+          'guid'                => $this->uuid,
+          'device_id'           => SignatureUtils::generateDeviceId(md5($username.$password)),
+          'email'               => $email,
+          'force_sign_up_code'  => '',
+          'waterfall_id'        => $this->waterfall_id,
+          'qs_stamp'            => '',
+          'password'            => $password,
       ]);
 
-      $result = $this->request('accounts/create/', $this->generateSignature($data));
-      if (isset($result[1]['account_created']) && ($result[1]['account_created'] == true)) {
-          $this->username_id = $result[1]['created_user']['pk'];
-          file_put_contents($this->IGDataPath."$username-userId.dat", $this->username_id);
-          preg_match('#Set-Cookie: csrftoken=([^;]+)#', $result[0], $match);
+      $result = $this->request('accounts/create/', SignatureUtils::generateSignature($data));
+      $header = $result[0];
+      $response = new AccountCreationResponse($result[1]);
+      if ($response->isAccountCreated()) {
+          $this->username_id = $response->getUsernameId();
+          $this->settings->set('username_id', $this->username_id);
+          preg_match('#Set-Cookie: csrftoken=([^;]+)#', $header, $match);
           $token = $match[1];
-          $this->username = $username;
-          file_put_contents($this->IGDataPath."$username-token.dat", $token);
-          rename($this->IGDataPath.'cookies.dat', $this->IGDataPath."$username-cookies.dat");
+          $this->settings->set('token', $token);
       }
 
-      return $result;
+      return $response;
   }
 
-    public function generateDeviceId($seed)
+    public function getCsfrtoken()
     {
-        return 'android-'.substr(md5($seed), 16);
-    }
+        $fetch = $this->request('si/fetch_headers/', null, true);
+        $header = $fetch[0];
+        $response = new ChallengeResponse($fetch[1]);
 
-    public function generateSignature($data)
-    {
-        $hash = hash_hmac('sha256', $data, Constants::IG_SIG_KEY);
+        if (!isset($header) || (!$response->isOk())) {
+            throw new InstagramException("Couldn't get challenge, check your connection");
 
-        return 'ig_sig_key_version='.Constants::SIG_KEY_VERSION.'&signed_body='.$hash.'.'.urlencode($data);
-    }
+            return $response;
+        }
 
-    public function generateUUID($type)
-    {
-        $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-      mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-      mt_rand(0, 0xffff),
-      mt_rand(0, 0x0fff) | 0x4000,
-      mt_rand(0, 0x3fff) | 0x8000,
-      mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-    );
+        if (!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token)) {
+            throw new InstagramException('Missing csfrtoken');
 
-        return $type ? $uuid : str_replace('-', '', $uuid);
+            return $response;
+        }
+
+        return substr($token[0], 22);
     }
 
     public function request($endpoint, $post = null)
@@ -164,13 +195,9 @@ class InstagramRegistration
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_VERBOSE, false);
-        if (file_exists($this->IGDataPath."$this->username-cookies.dat")) {
-            curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath."$this->username-cookies.dat");
-            curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath."$this->username-cookies.dat");
-        } else {
-            curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath.'cookies.dat');
-            curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath.'cookies.dat');
-        }
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath.$this->username.DIRECTORY_SEPARATOR."$this->username-cookies.dat");
+        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath.$this->username.DIRECTORY_SEPARATOR."$this->username-cookies.dat");
+
 
         if ($post) {
             curl_setopt($ch, CURLOPT_POST, true);

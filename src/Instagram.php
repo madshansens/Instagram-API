@@ -16,7 +16,7 @@ class Instagram
   public $rank_token;          // Rank token
   public $IGDataPath;          // Data storage path
   public $customPath = false;
-  public $http;
+    public $http;
     public $settings;
     public $proxy = null;           // Full Proxy
     public $proxyHost = null;       // Proxy Host and Port
@@ -86,8 +86,9 @@ class Instagram
 
     protected function checkSettings($username)
     {
-        if (!$this->customPath)
+        if (!$this->customPath) {
             $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
+        }
 
         if (!file_exists($this->IGDataPath)) {
             mkdir($this->IGDataPath, 0777, true);
@@ -100,7 +101,7 @@ class Instagram
         }
 
 
-        if (($this->settings->get('user_agent') == null) || (version_compare($this->settings->get('version'), Constants::VERSION) == -1)  ) {
+        if (($this->settings->get('user_agent') == null) || (version_compare($this->settings->get('version'), Constants::VERSION) == -1)) {
             $userAgent = new UserAgent($this);
             $ua = $userAgent->buildUserAgent();
             $this->settings->set('version', Constants::VERSION);
@@ -175,8 +176,9 @@ class Instagram
               return $response;
           }
 
-          if(!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token)){
-              throw new InstagramException("Missing csfrtoken");
+          if (!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token)) {
+              throw new InstagramException('Missing csfrtoken');
+
               return $response;
           }
 
@@ -208,20 +210,25 @@ class Instagram
           $this->settings->set('token', $this->token);
 
           $this->syncFeatures();
-          $this->autoCompleteUserList();
           $this->timelineFeed();
+          $this->getReelsTrayFeed();
+          $this->autoCompleteUserList();
           $this->getv2Inbox();
           $this->getRecentActivity();
+          $this->explore();
 
           return $response;
       }
 
       $check = $this->timelineFeed();
-      if (isset($check['message']) && $check['message'] == 'login_required') {
+      if ($check->getMessage() == 'login_required') {
           $this->login(true);
       }
+    //  $this->getReelsTrayFeed();
+    //  $this->autoCompleteUserList();
       $this->getv2Inbox();
       $this->getRecentActivity();
+    //  $this->explore();
   }
 
     public function syncFeatures()
@@ -237,14 +244,14 @@ class Instagram
         return $this->http->request('qe/sync/', SignatureUtils::generateSignature($data))[1];
     }
 
-    protected function autoCompleteUserList()
+    public function autoCompleteUserList()
     {
-        return $this->http->request('friendships/autocomplete_user_list/')[1];
+        return new autoCompleteUserListResponse($this->http->request('friendships/autocomplete_user_list/')[1]);
     }
 
-    protected function timelineFeed()
+    public function timelineFeed()
     {
-        return $this->http->request('feed/timeline/')[1];
+        return new TimelineFeedResponse($this->http->request('feed/timeline/')[1]);
     }
 
     protected function megaphoneLog()
@@ -279,7 +286,14 @@ class Instagram
      */
     public function explore()
     {
-        return $this->request('discover/explore/?')[1];
+        $explore = new ExploreResponse($this->http->request('discover/explore/?')[1]);
+
+        if (!$explore->isOk()) {
+            throw new InstagramException($explore->getMessage()."\n");
+
+            return;
+        }
+        return $explore;
     }
 
     public function expose()
@@ -303,9 +317,9 @@ class Instagram
    */
   public function logout()
   {
-      $logout = $this->http->request('accounts/logout/');
+      $logout = new LogoutResponse($this->http->request('accounts/logout/')[1]);
 
-      if ($logout == 'ok') {
+      if ($logout->isOk()) {
           return true;
       } else {
           return false;
@@ -348,6 +362,19 @@ class Instagram
     {
         $this->http->direct_share($media_id, $recipients, $text);
     }
+
+    /**
+     * Send direct message to user by inbox
+     * 
+     * @param  (array | int) $recipients Users id
+     * @param  string        $text       Text message
+     * @return void          
+     */
+    public function direct_message($recipients, $text)
+    {
+        $this->http->direct_message($recipients, $text);
+    }
+
 
     /**
      * Direct Thread Data.
@@ -577,16 +604,16 @@ class Instagram
       return $this->http->request("media/$mediaId/comment/", SignatureUtils::generateSignature($data))[1];
   }
 
-  /**
+    /**
      * Delete Comment.
      *
      * @param string $mediaId
-     *   Media ID
+     *                          Media ID
      * @param string $commentId
-     *   Comment ID
+     *                          Comment ID
      *
      * @return array
-     *   Delete comment data
+     *               Delete comment data
      */
     public function deleteComment($mediaId, $commentId)
     {
@@ -595,6 +622,7 @@ class Instagram
           '_uid'           => $this->username_id,
           '_csrftoken'     => $this->token,
       ]);
+
         return $this->http->request("media/$mediaId/comment/$commentId/delete/", SignatureUtils::generateSignature($data))[1];
     }
 
@@ -804,7 +832,7 @@ class Instagram
    */
   public function getRecentActivity()
   {
-      $activity = $this->http->request('news/inbox/?')[1];
+      $activity = $this->http->request('news/inbox/')[1];
 
       if ($activity['status'] != 'ok') {
           throw new InstagramException($activity['message']."\n");
@@ -842,10 +870,10 @@ class Instagram
    */
   public function getv2Inbox()
   {
-      $inbox = $this->http->request('direct_v2/inbox/?')[1];
+      $inbox = new V2InboxResponse($this->http->request('direct_v2/inbox/?')[1]);
 
-      if ($inbox['status'] != 'ok') {
-          throw new InstagramException($inbox['message']."\n");
+      if (!$inbox->isOk()) {
+          throw new InstagramException($inbox->getMessage()."\n");
 
           return;
       }
@@ -914,8 +942,8 @@ class Instagram
    */
   public function getMediaLikers($mediaId)
   {
-      $likers = $this->http->request("media/$mediaId/likers/?")[1];
-      if ($likers['status'] != 'ok') {
+      $likers = new MediaLikersResponse($this->http->request("media/$mediaId/likers/")[1]);
+      if (!$likers->isOk()) {
           throw new InstagramException($likers['message']."\n");
 
           return;
@@ -955,6 +983,19 @@ class Instagram
   public function getSelfGeoMedia()
   {
       return $this->getGeoMedia($this->username_id);
+  }
+
+  public function searchLocation($latitude, $longitude)
+  {
+      $locations = new LocationResponse($this->http->request("location_search/?rank_token=$this->rank_token&latitude=$latitude&longitude=$longitude")[1]);
+
+      if (!$locations->isOk()) {
+          throw new InstagramException($locations->getMessage()."\n");
+
+          return;
+      }
+
+      return $locations;
   }
 
   /**
@@ -1010,15 +1051,20 @@ class Instagram
    */
   public function searchUsername($usernameName)
   {
-      $query = $this->http->request("users/$usernameName/usernameinfo/")[1];
+      $query = new UsernameInfoResponse($this->http->request("users/$usernameName/usernameinfo/")[1]);
 
-      if ($query['status'] != 'ok') {
-          throw new InstagramException($query['message']."\n");
+      if (!$query->isOk()) {
+          throw new InstagramException($query->getMessage()."\n");
 
           return;
       }
 
       return $query;
+  }
+
+  public function getUsernameId($username)
+  {
+      return $this->searchUsername($username)->getUsernameId();
   }
 
   /**
@@ -1077,6 +1123,19 @@ class Instagram
       }
 
       return $timeline;
+  }
+
+  public function getReelsTrayFeed()
+  {
+      $feed = new ReelsTrayFeedResponse($this->http->request('feed/reels_tray/')[1]);
+
+      if (!$feed->isOk()) {
+          throw new InstagramException($feed->getMessage()."\n");
+
+          return;
+      }
+
+      return $feed;
   }
 
   /**
@@ -1149,7 +1208,7 @@ class Instagram
    * @return array
    *   Location location data
    */
-  public function searchLocation($query)
+  public function searchFBLocation($query)
   {
       $query = rawurlencode($query);
       $endpoint = "fbsearch/places/?rank_token=$this->rank_token&query=".$query;
@@ -1234,7 +1293,7 @@ class Instagram
     */
    public function getUserFollowings($usernameId, $maxid = null)
    {
-       return $this->http->request("friendships/$usernameId/following/?max_id=$maxid&ig_sig_key_version=".Constants::SIG_KEY_VERSION."&rank_token=$this->rank_token")[1];
+       return new FollowingResponse($this->http->request("friendships/$usernameId/following/?max_id=$maxid&ig_sig_key_version=".Constants::SIG_KEY_VERSION."&rank_token=$this->rank_token")[1]);
    }
 
   /**
@@ -1248,7 +1307,7 @@ class Instagram
    */
   public function getUserFollowers($usernameId, $maxid = null)
   {
-      return $this->http->request("friendships/$usernameId/followers/?max_id=$maxid&ig_sig_key_version=".Constants::SIG_KEY_VERSION."&rank_token=$this->rank_token")[1];
+      return new FollowerResponse($this->http->request("friendships/$usernameId/followers/?max_id=$maxid&ig_sig_key_version=".Constants::SIG_KEY_VERSION."&rank_token=$this->rank_token")[1]);
   }
 
   /**
@@ -1270,7 +1329,7 @@ class Instagram
    */
   public function getSelfUsersFollowing()
   {
-      return $this->http->request('friendships/following/?ig_sig_key_version='.Constants::SIG_KEY_VERSION."&rank_token=$this->rank_token")[1];
+      return $this->getUserFollowings($this->username_id);
   }
 
   /**
@@ -1490,15 +1549,13 @@ class Instagram
       return $this->http->request($endpoint)[1];
   }
 
-  public function verifyPeer($enable)
-  {
-      $this->http->verifyPeer($enable);
-  }
+    public function verifyPeer($enable)
+    {
+        $this->http->verifyPeer($enable);
+    }
 
-  public function verifyHost($enable)
-  {
-      $this->http->verifyHost($enable);
-  }
-
-
+    public function verifyHost($enable)
+    {
+        $this->http->verifyHost($enable);
+    }
 }
