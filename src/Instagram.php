@@ -363,6 +363,18 @@ class Instagram
         $this->http->direct_share($media_id, $recipients, $text);
     }
 
+    /**
+     * Send direct message to user by inbox
+     * 
+     * @param  (array | int) $recipients Users id
+     * @param  string        $text       Text message
+     * @return void          
+     */
+    public function direct_message($recipients, $text)
+    {
+        $this->http->direct_message($recipients, $text);
+    }
+
 
     /**
      * Direct Thread Data.
