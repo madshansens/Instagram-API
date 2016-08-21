@@ -13,7 +13,7 @@ class ReelsTrayFeedResponse extends Response
             foreach($response['tray'] as $tray) {
                 $items = [];
                 foreach($tray['items'] as $item) {
-                    $items[] = new Items($item);
+                    $items[] = new Item($item);
                 }
 
                 $trays[] = new Tray($items, $tray['user'], $tray['can_reply'], $tray['expiring_at']);

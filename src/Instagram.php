@@ -221,7 +221,7 @@ class Instagram
       }
 
       $check = $this->timelineFeed();
-      if (isset($check['message']) && $check['message'] == 'login_required') {
+      if ($check->getMessage() == 'login_required') {
           $this->login(true);
       }
     //  $this->getReelsTrayFeed();
@@ -249,9 +249,9 @@ class Instagram
         return $this->http->request('friendships/autocomplete_user_list/')[1];
     }
 
-    protected function timelineFeed()
+    public function timelineFeed()
     {
-        return $this->http->request('feed/timeline/')[1];
+        return new TimelineFeedResponse($this->http->request('feed/timeline/')[1]);
     }
 
     protected function megaphoneLog()

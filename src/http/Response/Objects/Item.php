@@ -2,7 +2,7 @@
 
 namespace InstagramAPI;
 
-class Items
+class Item
 {
     const PHOTO = 1;
     const VIDEO = 2;
@@ -18,19 +18,23 @@ class Items
     protected $image_versions2;
     protected $original_width;
     protected $original_height;
-    protected $view_count = '';
+    protected $view_count = 0;
     protected $organic_tracking_token;
     protected $has_more_comments;
     protected $max_num_visible_preview_comments;
     protected $comments;
-    protected $comment_count;
+    protected $comment_count = 0;
     protected $caption = null;
     protected $caption_is_edited;
     protected $photo_of_you;
     protected $video_versions = '';
-    protected $has_audio = '';
+    protected $has_audio = false;
     protected $video_duration = '';
     protected $user;
+    protected $likers = '';
+    protected $like_count = 0;
+    protected $preview = '';
+    protected $has_liked = false;
 
     public function __construct($item)
     {
@@ -77,6 +81,18 @@ class Items
             $this->video_duration = $item['video_duration'];
         }
         $this->user = new User($item['user']);
+        if (array_key_exists('likers', $item)) {
+            $this->likers = $item['likers'];
+        }
+        if (array_key_exists('like_count', $item)) {
+            $this->like_count = $item['like_count'];
+        }
+        if (array_key_exists('preview', $item)) {
+            $this->preview = $item['preview'];
+        }
+        if (array_key_exists('has_liked', $item)) {
+            $this->has_liked = $item['has_liked'];
+        }
     }
 
     public function getTakenAt()
@@ -202,5 +218,25 @@ class Items
     public function getUser()
     {
         return $this->user;
+    }
+
+    public function getMediaLikers()
+    {
+        return $this->likers;
+    }
+
+    public function getLikeCount()
+    {
+        return $this->like_count;
+    }
+
+    public function getPreview()
+    {
+        return $this->preview;
+    }
+
+    public function hasLiked()
+    {
+        return $this->has_liked;
     }
 }
