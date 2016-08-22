@@ -90,9 +90,11 @@ class Item
         }
         $this->user = new User($item['user']);
         $likers = [];
-        foreach($item['likers'] as $liker) {
-            $likers[] = new User($liker);
-        }
+		if ( (isset($item['likers'])) && (!empty($item['likers'])) ) {
+			foreach($item['likers'] as $liker) {
+				$likers[] = new User($liker);
+			}
+		}
         $this->likers = $likers;
         if (array_key_exists('like_count', $item)) {
             $this->like_count = $item['like_count'];

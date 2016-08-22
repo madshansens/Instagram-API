@@ -22,9 +22,11 @@ class TimelineFeedResponse extends Response
             $this->more_available = $response['more_available'];
             $this->next_max_id = $response['next_max_id'];
             $messages = [];
-            foreach($response['_messages'] as $message) {
-                $messages[] = new _Message($message);
-            }
+			if ( (isset($response['_messages'])) && (isset($response['_messages'])) ) {
+				foreach($response['_messages'] as $message) {
+					$messages[] = new _Message($message);
+				}
+			}
             $this->_messages = $messages;
             $items = [];
             foreach($response['feed_items'] as $item) {
