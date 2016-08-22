@@ -53,9 +53,11 @@ class Item
         $this->client_cache_key = $item['client_cache_key'];
         $this->filter_type = $item['filter_type'];
         $images = [];
-        foreach($item['image_versions2']['candidates'] as $image) {
-            $images[] = new HdProfilePicUrlInfo($image);
-        }
+		if ( (isset($item['image_versions2']['candidates'])) && (!empty($item['image_versions2']['candidates'])) ) {
+			foreach($item['image_versions2']['candidates'] as $image) {
+				$images[] = new HdProfilePicUrlInfo($image);
+			}
+		}
         $this->image_versions2 = $images;
         $this->original_width = $item['original_width'];
         if (isset($item['view_count'])) {
@@ -65,9 +67,11 @@ class Item
         $this->has_more_comments = $item['has_more_comments'];
         $this->max_num_visible_preview_comments = $item['max_num_visible_preview_comments'];
         $comments = [];
-        foreach($item['comments'] as $comment) {
-            $comments[] = new Comment($comment);
-        }
+		if ( (isset($item['comments'])) && (!empty($item['comments'])) ) {
+			foreach($item['comments'] as $comment) {
+				$comments[] = new Comment($comment);
+			}
+		}
         $this->comments = $comments;
         $this->comment_count = $item['comment_count'];
         if (isset($item['caption'])) {
