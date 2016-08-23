@@ -37,7 +37,7 @@ class TimelineFeedResponse extends Response
 				}
 			}
             $this->feed_items = $items;
-            $this->megaphone = new FeedAysf($response['megaphone']['feed_aysf']);
+            $this->megaphone = (isset($response['megaphone'])) ? new FeedAysf($response['megaphone']['feed_aysf']) : NULL;
         } else {
             $this->setMessage($response['message']);
         }
