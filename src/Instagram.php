@@ -736,7 +736,7 @@ class Instagram
         '_csrftoken' => $this->token,
     ]);
 
-      return $this->http->request('accounts/current_user/?edit=true', SignatureUtils::generateSignature($data))[1];
+      return new ProfileResponse($this->http->request('accounts/current_user/?edit=true', SignatureUtils::generateSignature($data))[1]);
   }
 
   /**
@@ -771,7 +771,7 @@ class Instagram
         'gender'        => $gender,
     ]);
 
-      return $this->http->request('accounts/edit_profile/', SignatureUtils::generateSignature($data))[1];
+      return new ProfileResponse($this->http->request('accounts/edit_profile/', SignatureUtils::generateSignature($data))[1]);
   }
 
   /**
