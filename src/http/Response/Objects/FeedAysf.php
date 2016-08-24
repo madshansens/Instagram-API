@@ -25,9 +25,11 @@ class FeedAysf
         $this->landing_site_title = $data['landing_site_title'];
         $this->is_dismissable = $data['is_dismissable'];
         $suggestions = [];
-        foreach($data['suggestions'] as $suggestion) {
-            $suggestions[] = new Suggestion($suggestion);
-        }
+		if ( (isset($data['suggestions'])) && (!empty($data['suggestions'])) ) {
+			foreach($data['suggestions'] as $suggestion) {
+				$suggestions[] = new Suggestion($suggestion);
+			}
+		}
         $this->suggestions = $suggestions;
         $this->should_refill = $data['should_refill'];
         $this->display_new_unit = $data['display_new_unit'];
