@@ -337,9 +337,9 @@ class Instagram
      * @return array
      *               Upload data
      */
-    public function uploadPhoto($photo, $caption = null, $upload_id = null)
+    public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null)
     {
-        return $this->http->uploadPhoto($photo, $caption, $upload_id);
+        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview);
     }
 
     /**
@@ -353,9 +353,9 @@ class Instagram
      * @return array
      *               Upload data
      */
-    public function uploadVideo($video, $caption = null)
+    public function uploadVideo($video, $caption = null, $customPreview = null)
     {
-        return $this->http->uploadVideo($video, $caption);
+        return $this->http->uploadVideo($video, $caption, $customPreview);
     }
 
     public function direct_share($media_id, $recipients, $text = null)
@@ -420,9 +420,9 @@ class Instagram
         return $this->request("direct_v2/threads/$threadId/$threadAction/", $this->generateSignature($data))[1];
     }
 
-    public function configureVideo($upload_id, $video, $caption = '')
+    public function configureVideo($upload_id, $video, $caption = '', $customPreview = null)
     {
-        $this->uploadPhoto($video, $caption, $upload_id);
+        $this->uploadPhoto($video, $caption, $upload_id, $customPreview);
 
         $size = getimagesize($video)[0];
 

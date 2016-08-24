@@ -79,13 +79,15 @@ class HttpInterface
         return [$header, json_decode($body, true)];
     }
 
-    public function uploadPhoto($photo, $caption = null, $upload_id = null)
+    public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null)
     {
         $endpoint = Constants::API_URL.'upload/photo/';
         $boundary = $this->parent->uuid;
 
-        if (!is_null($upload_id)) {
+        if (!is_null($upload_id) && is_null($customPreview)) {
             $fileToUpload = Utils::createVideoIcon($photo);
+        } elseif (!is_null($customPreview)) {
+            $fileToUpload = $customPreview;
         } else {
             $upload_id = number_format(round(microtime(true) * 1000), 0, '', '');
             $fileToUpload = file_get_contents($photo);
@@ -185,7 +187,7 @@ class HttpInterface
         return $configure;
     }
 
-    public function uploadVideo($video, $caption = null)
+    public function uploadVideo($video, $caption = null, $customPreview = null)
     {
         $videoData = file_get_contents($video);
 
@@ -311,7 +313,7 @@ class HttpInterface
             echo 'RESPONSE: '.substr($resp, $header_len)."\n\n";
         }
 
-        $configure = $this->parent->configureVideo($upload_id, $video, $caption);
+        $configure = $this->parent->configureVideo($upload_id, $video, $caption, $customPreview);
         $this->parent->expose();
 
         return $configure;
@@ -493,7 +495,7 @@ class HttpInterface
 
         $endpoint = Constants::API_URL.'direct_v2/threads/broadcast/text/';
         $boundary = $this->parent->uuid;
-        $bodies = [            
+        $bodies = [
             [
                 'type' => 'form-data',
                 'name' => 'recipient_users',
