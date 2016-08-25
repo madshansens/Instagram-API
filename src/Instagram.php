@@ -267,10 +267,10 @@ class Instagram
      */
     public function getPendingInbox()
     {
-        $pendingInbox = $this->request('direct_v2/pending_inbox/?')[1];
+        $pendingInbox = new PendingInboxResponse($this->http->request('direct_v2/pending_inbox/?')[1]);
 
-        if ($pendingInbox['status'] != 'ok') {
-            throw new InstagramException($pendingInbox['message']."\n");
+        if (!$pendingInbox->isOk()) {
+            throw new InstagramException($pendingInbox->getMessage()."\n");
 
             return;
         }
@@ -306,7 +306,7 @@ class Instagram
         'experiment'   => 'ig_android_profile_contextual_feed',
     ]);
 
-        $this->http->request('qe/expose/', SignatureUtils::generateSignature($data))[1];
+        return new ExposeResponse($this->http->request('qe/expose/', SignatureUtils::generateSignature($data))[1]);
     }
 
   /**
