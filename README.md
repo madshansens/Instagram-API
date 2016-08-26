@@ -27,7 +27,7 @@ $instagram = new \InstagramAPI\Instagram();
 If you want to test code that is in the master branch, which hasn't been pushed as a release, you can use master.
 
 ```
-composer require mgp25/instagram-api master
+composer require mgp25/instagram-php master
 ```
 
 
