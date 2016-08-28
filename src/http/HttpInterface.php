@@ -79,15 +79,13 @@ class HttpInterface
         return [$header, json_decode($body, true)];
     }
 
-    public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null)
+    public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null, $reel_flag = false)
     {
         $endpoint = Constants::API_URL.'upload/photo/';
         $boundary = $this->parent->uuid;
 
         if (!is_null($upload_id) && is_null($customPreview)) {
             $fileToUpload = Utils::createVideoIcon($photo);
-        } elseif (!is_null($customPreview)) {
-            $fileToUpload = file_get_contents($customPreview);
         } else {
             $upload_id = number_format(round(microtime(true) * 1000), 0, '', '');
             $fileToUpload = file_get_contents($photo);
@@ -176,7 +174,11 @@ class HttpInterface
             echo 'RESPONSE: '.substr($resp, $header_len)."\n\n";
         }
 
-        $configure = $this->parent->configure($upload->getUploadId(), $photo, $caption);
+        if($reel_flag) {
+          $configure = $this->parent->configure_to_reel($upload->getUploadId(), $photo);
+        } else {
+          $configure = $this->parent->configure($upload->getUploadId(), $photo, $caption);
+        }
 
         if (!$configure->isOk()) {
             throw new InstagramException($configure->getMessage());

@@ -342,6 +342,11 @@ class Instagram
         return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview);
     }
 
+    public function uploadPhotoReel($photo, $caption = null, $upload_id = null, $customPreview = null)
+    {
+        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, true);
+    }
+
     /**
      * Upload video to Instagram.
      *
@@ -494,6 +499,38 @@ class Instagram
         $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]', $post);
 
         return new ConfigureResponse($this->http->request('media/configure/', SignatureUtils::generateSignature($post))[1]);
+    }
+
+    public function configureToReel($upload_id, $photo)
+    {
+      $size = getimagesize($photo)[0];
+
+      $post = json_encode([
+          'upload_id'          => $upload_id,
+          'source_type'        => 3,
+          'edits'              => [
+              'crop_original_size' => [$size, $size],
+              'crop_zoom'          => 1.3333334,
+              'crop_center'        => [0.0, 0.0],
+          ],
+          'extra' => [
+              'source_width'  => $size,
+              'source_height' => $size,
+          ],
+          'device' => [
+              'manufacturer'    => $this->settings->get('manufacturer'),
+              'model'           => $this->settings->get('model'),
+              'android_version' => Constants::ANDROID_VERSION,
+              'android_release' => Constants::ANDROID_RELEASE,
+          ],
+          '_csrftoken'  => $this->token,
+          '_uuid'       => $this->uuid,
+          '_uid'        => $this->username_id
+      ]);
+
+      $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,0.0]', $post);
+
+      return new ConfigureResponse($this->http->request('media/configure_to_reel/', SignatureUtils::generateSignature($post))[1]);
     }
 
   /**
