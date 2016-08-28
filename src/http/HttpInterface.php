@@ -86,10 +86,12 @@ class HttpInterface
 
         if (!is_null($upload_id) && is_null($customPreview)) {
             $fileToUpload = Utils::createVideoIcon($photo);
-        } else {
+       } elseif (!is_null($customPreview)) {
+            $fileToUpload = file_get_contents($customPreview);
+       } else {
             $upload_id = number_format(round(microtime(true) * 1000), 0, '', '');
             $fileToUpload = file_get_contents($photo);
-        }
+       }
 
         $bodies = [
             [
