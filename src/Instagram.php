@@ -1192,15 +1192,15 @@ class Instagram
    */
   public function getUserFeed($usernameId, $maxid = null, $minTimestamp = null)
   {
-      $userFeed = $this->http->request(
+      $userFeed = new UserFeedResponse($this->http->request(
           "feed/user/$usernameId/?rank_token=$this->rank_token"
           .(!is_null($maxid) ? '&max_id='.$maxid : '')
           .(!is_null($minTimestamp) ? '&min_timestamp='.$minTimestamp : '')
           .'&ranked_content=true'
-      )[1];
+      )[1]);
 
-      if ($userFeed['status'] != 'ok') {
-          throw new InstagramException($userFeed['message']."\n");
+      if (!$userFeed->isOk()) {
+          throw new InstagramException($userFeed->getMessage()."\n");
 
           return;
       }
@@ -1295,9 +1295,9 @@ class Instagram
    * @return array
    *   User feed data
    */
-  public function getSelfUserFeed()
+  public function getSelfUserFeed($max_id = null)
   {
-      return $this->getUserFeed($this->username_id);
+      return $this->getUserFeed($this->username_id, $max_id);
   }
 
   /**
@@ -1463,14 +1463,28 @@ class Instagram
    */
   public function backup()
   {
-      $myUploads = $this->getSelfUserFeed();
-      foreach ($myUploads['items'] as $item) {
-          if (!is_dir($this->IGDataPath.'backup/'."$this->username-".date('Y-m-d'))) {
-              mkdir($this->IGDataPath.'backup/'."$this->username-".date('Y-m-d'));
+      $go = false;
+      do {
+          if (!$go)
+            $myUploads = $this->getSelfUserFeed();
+          else
+            $myUploads = $this->getSelfUserFeed(!is_null($myUploads->getNextMaxId()) ? $myUploads->getNextMaxId() : null);
+          if(!is_dir($this->IGDataPath.'backup/'))
+            mkdir($this->IGDataPath.'backup/');
+          foreach ($myUploads->getItems() as $item) {
+              if (!is_dir($this->IGDataPath.'backup/'."$this->username-".date('Y-m-d'))) {
+                  mkdir($this->IGDataPath.'backup/'."$this->username-".date('Y-m-d'));
+              }
+              if (!is_null($item->getVideoVersions())) {
+                  file_put_contents($this->IGDataPath.'backup/'."$this->username-".date('Y-m-d').'/'.$item->getMediaId().'.mp4',
+                    file_get_contents($item->getVideoVersions()[0]->getUrl()));
+              } else {
+                  file_put_contents($this->IGDataPath.'backup/'."$this->username-".date('Y-m-d').'/'.$item->getMediaId().'.jpg',
+                    file_get_contents($item->getImageVersions()[0]->getUrl()));
+              }
           }
-          file_put_contents($this->IGDataPath.'backup/'."$this->username-".date('Y-m-d').'/'.$item['id'].'.jpg',
-      file_get_contents($item['image_versions2']['candidates'][0]['url']));
-      }
+          $go = true;
+      } while(!is_null($myUploads->getNextMaxId()));
   }
 
   /**
