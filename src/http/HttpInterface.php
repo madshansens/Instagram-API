@@ -175,7 +175,7 @@ class HttpInterface
         }
 
         if($reel_flag) {
-          $configure = $this->parent->configure_to_reel($upload->getUploadId(), $photo);
+          $configure = $this->parent->configureToReel($upload->getUploadId(), $photo);
         } else {
           $configure = $this->parent->configure($upload->getUploadId(), $photo, $caption);
         }
