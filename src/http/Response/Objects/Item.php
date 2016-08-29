@@ -93,7 +93,7 @@ class Item
             $this->video_duration = $item['video_duration'];
         }
         $this->user = new User($item['user']);
-        $likers = [];
+        $likers = array();
 		if ( (isset($item['likers'])) && (!empty($item['likers'])) ) {
 			foreach($item['likers'] as $liker) {
 				$likers[] = new User($liker);
