@@ -27,7 +27,7 @@ class Item
     protected $caption = null;
     protected $caption_is_edited;
     protected $photo_of_you;
-    protected $video_versions = '';
+    protected $video_versions = null;
     protected $has_audio = false;
     protected $video_duration = '';
     protected $user;

@@ -267,10 +267,10 @@ class Instagram
      */
     public function getPendingInbox()
     {
-        $pendingInbox = $this->request('direct_v2/pending_inbox/?')[1];
+        $pendingInbox = new PendingInboxResponse($this->http->request('direct_v2/pending_inbox/?')[1]);
 
-        if ($pendingInbox['status'] != 'ok') {
-            throw new InstagramException($pendingInbox['message']."\n");
+        if (!$pendingInbox->isOk()) {
+            throw new InstagramException($pendingInbox->getMessage()."\n");
 
             return;
         }
@@ -306,7 +306,7 @@ class Instagram
         'experiment'   => 'ig_android_profile_contextual_feed',
     ]);
 
-        $this->http->request('qe/expose/', SignatureUtils::generateSignature($data))[1];
+        return new ExposeResponse($this->http->request('qe/expose/', SignatureUtils::generateSignature($data))[1]);
     }
 
   /**
@@ -337,9 +337,14 @@ class Instagram
      * @return array
      *               Upload data
      */
-    public function uploadPhoto($photo, $caption = null, $upload_id = null)
+    public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null)
     {
-        return $this->http->uploadPhoto($photo, $caption, $upload_id);
+        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview);
+    }
+
+    public function uploadPhotoReel($photo, $caption = null, $upload_id = null, $customPreview = null)
+    {
+        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, true);
     }
 
     /**
@@ -353,9 +358,9 @@ class Instagram
      * @return array
      *               Upload data
      */
-    public function uploadVideo($video, $caption = null)
+    public function uploadVideo($video, $caption = null, $customPreview = null)
     {
-        return $this->http->uploadVideo($video, $caption);
+        return $this->http->uploadVideo($video, $caption, $customPreview);
     }
 
     public function direct_share($media_id, $recipients, $text = null)
@@ -420,9 +425,9 @@ class Instagram
         return $this->request("direct_v2/threads/$threadId/$threadAction/", $this->generateSignature($data))[1];
     }
 
-    public function configureVideo($upload_id, $video, $caption = '')
+    public function configureVideo($upload_id, $video, $caption = '', $customPreview = null)
     {
-        $this->uploadPhoto($video, $caption, $upload_id);
+        $this->uploadPhoto($video, $caption, $upload_id, $customPreview);
 
         $size = getimagesize($video)[0];
 
@@ -494,6 +499,38 @@ class Instagram
         $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]', $post);
 
         return new ConfigureResponse($this->http->request('media/configure/', SignatureUtils::generateSignature($post))[1]);
+    }
+
+    public function configureToReel($upload_id, $photo)
+    {
+      $size = getimagesize($photo)[0];
+
+      $post = json_encode([
+          'upload_id'          => $upload_id,
+          'source_type'        => 3,
+          'edits'              => [
+              'crop_original_size' => [$size, $size],
+              'crop_zoom'          => 1.3333334,
+              'crop_center'        => [0.0, 0.0],
+          ],
+          'extra' => [
+              'source_width'  => $size,
+              'source_height' => $size,
+          ],
+          'device' => [
+              'manufacturer'    => $this->settings->get('manufacturer'),
+              'model'           => $this->settings->get('model'),
+              'android_version' => Constants::ANDROID_VERSION,
+              'android_release' => Constants::ANDROID_RELEASE,
+          ],
+          '_csrftoken'  => $this->token,
+          '_uuid'       => $this->uuid,
+          '_uid'        => $this->username_id
+      ]);
+
+      $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,0.0]', $post);
+
+      return new ConfigureResponse($this->http->request('media/configure_to_reel/', SignatureUtils::generateSignature($post))[1]);
     }
 
   /**
@@ -736,7 +773,7 @@ class Instagram
         '_csrftoken' => $this->token,
     ]);
 
-      return $this->http->request('accounts/current_user/?edit=true', SignatureUtils::generateSignature($data))[1];
+      return new ProfileResponse($this->http->request('accounts/current_user/?edit=true', SignatureUtils::generateSignature($data))[1]);
   }
 
   /**
@@ -771,7 +808,7 @@ class Instagram
         'gender'        => $gender,
     ]);
 
-      return $this->http->request('accounts/edit_profile/', SignatureUtils::generateSignature($data))[1];
+      return new ProfileResponse($this->http->request('accounts/edit_profile/', SignatureUtils::generateSignature($data))[1]);
   }
 
   /**
@@ -1155,15 +1192,15 @@ class Instagram
    */
   public function getUserFeed($usernameId, $maxid = null, $minTimestamp = null)
   {
-      $userFeed = $this->http->request(
+      $userFeed = new UserFeedResponse($this->http->request(
           "feed/user/$usernameId/?rank_token=$this->rank_token"
           .(!is_null($maxid) ? '&max_id='.$maxid : '')
           .(!is_null($minTimestamp) ? '&min_timestamp='.$minTimestamp : '')
           .'&ranked_content=true'
-      )[1];
+      )[1]);
 
-      if ($userFeed['status'] != 'ok') {
-          throw new InstagramException($userFeed['message']."\n");
+      if (!$userFeed->isOk()) {
+          throw new InstagramException($userFeed->getMessage()."\n");
 
           return;
       }
@@ -1258,9 +1295,9 @@ class Instagram
    * @return array
    *   User feed data
    */
-  public function getSelfUserFeed()
+  public function getSelfUserFeed($max_id = null)
   {
-      return $this->getUserFeed($this->username_id);
+      return $this->getUserFeed($this->username_id, $max_id);
   }
 
   /**
@@ -1426,14 +1463,28 @@ class Instagram
    */
   public function backup()
   {
-      $myUploads = $this->getSelfUserFeed();
-      foreach ($myUploads['items'] as $item) {
-          if (!is_dir($this->IGDataPath.'backup/'."$this->username-".date('Y-m-d'))) {
-              mkdir($this->IGDataPath.'backup/'."$this->username-".date('Y-m-d'));
+      $go = false;
+      do {
+          if (!$go)
+            $myUploads = $this->getSelfUserFeed();
+          else
+            $myUploads = $this->getSelfUserFeed(!is_null($myUploads->getNextMaxId()) ? $myUploads->getNextMaxId() : null);
+          if(!is_dir($this->IGDataPath.'backup/'))
+            mkdir($this->IGDataPath.'backup/');
+          foreach ($myUploads->getItems() as $item) {
+              if (!is_dir($this->IGDataPath.'backup/'."$this->username-".date('Y-m-d'))) {
+                  mkdir($this->IGDataPath.'backup/'."$this->username-".date('Y-m-d'));
+              }
+              if (!is_null($item->getVideoVersions())) {
+                  file_put_contents($this->IGDataPath.'backup/'."$this->username-".date('Y-m-d').'/'.$item->getMediaId().'.mp4',
+                    file_get_contents($item->getVideoVersions()[0]->getUrl()));
+              } else {
+                  file_put_contents($this->IGDataPath.'backup/'."$this->username-".date('Y-m-d').'/'.$item->getMediaId().'.jpg',
+                    file_get_contents($item->getImageVersions()[0]->getUrl()));
+              }
           }
-          file_put_contents($this->IGDataPath.'backup/'."$this->username-".date('Y-m-d').'/'.$item['id'].'.jpg',
-      file_get_contents($item['image_versions2']['candidates'][0]['url']));
-      }
+          $go = true;
+      } while(!is_null($myUploads->getNextMaxId()));
   }
 
   /**
