@@ -21,20 +21,20 @@ class User
         $this->profile_pic_url = $userData['profile_pic_url'];
         $this->full_name = $userData['full_name'];
         $this->pk = $userData['pk'];
-        if (array_key_exists('is_verified', $userData)) {
+        if (isset($userData['is_verified'])) {
             $this->is_verified = $userData['is_verified'];
         }
         $this->is_private = $userData['is_private'];
-        if (array_key_exists('has_anonymous_profile_picture', $userData)) {
+        if (isset($userData['has_anonymous_profile_picture'])) {
             $this->has_anonymous_profile_picture = $userData['has_anonymous_profile_picture'];
         }
-        if (array_key_exists('is_favorite', $userData)) {
+        if (isset($userData['is_favorite'])) {
             $this->is_favorite = $userData['is_favorite'];
         }
-        if (array_key_exists('coeff_weight', $userData)) {
+        if (isset($userData['coeff_weight'])) {
             $this->coeff_weight = $userData['coeff_weight'];
         }
-        if (array_key_exists('friendship_status', $userData)) {
+        if (isset($userData['friendship_status'])) {
             $this->friendship_status = new FriendshipStatus($userData['friendship_status']);
         }
     }

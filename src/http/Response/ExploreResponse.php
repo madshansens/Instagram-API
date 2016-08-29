@@ -21,7 +21,9 @@ class ExploreResponse extends Response
             $this->max_id = $response['max_id'];
             $items = [];
             foreach($response['items'] as $item) {
-                $items[] = new Item($item['media']);
+				if (isset($item['media'])) {
+                	$items[] = new Item($item['media']);
+				}
             }
             $this->items = $items;
         } else {
