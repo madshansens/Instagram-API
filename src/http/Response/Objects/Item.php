@@ -53,69 +53,75 @@ class Item
         $this->client_cache_key = $item['client_cache_key'];
         $this->filter_type = $item['filter_type'];
         $images = [];
-        foreach($item['image_versions2']['candidates'] as $image) {
-            $images[] = new HdProfilePicUrlInfo($image);
-        }
+		if ( (isset($item['image_versions2']['candidates'])) && (!empty($item['image_versions2']['candidates'])) ) {
+			foreach($item['image_versions2']['candidates'] as $image) {
+				$images[] = new HdProfilePicUrlInfo($image);
+			}
+		}
         $this->image_versions2 = $images;
         $this->original_width = $item['original_width'];
-        if (array_key_exists('view_count', $item)) {
+        if (isset($item['view_count'])) {
             $this->view_count = $item['view_count'];
         }
         $this->organic_tracking_token = $item['organic_tracking_token'];
         $this->has_more_comments = $item['has_more_comments'];
         $this->max_num_visible_preview_comments = $item['max_num_visible_preview_comments'];
         $comments = [];
-        foreach($item['comments'] as $comment) {
-            $comments[] = new Comment($comment);
-        }
+		if ( (isset($item['comments'])) && (!empty($item['comments'])) ) {
+			foreach($item['comments'] as $comment) {
+				$comments[] = new Comment($comment);
+			}
+		}
         $this->comments = $comments;
         $this->comment_count = $item['comment_count'];
-        if (!is_null($item['caption'])) {
+        if (isset($item['caption'])) {
             $this->caption = new Caption($item['caption']);
         }
         $this->caption_is_edited = $item['caption_is_edited'];
         $this->photo_of_you = $item['photo_of_you'];
-        if (array_key_exists('video_versions', $item)) {
+        if (isset($item['video_versions'])) {
             $videos = [];
             foreach ($item['video_versions'] as $video) {
                 $videos[] = new VideoVersions($video);
             }
             $this->video_versions = $videos;
         }
-        if (array_key_exists('has_audio', $item)) {
+        if (isset($item['has_audio'])) {
             $this->has_audio = $item['has_audio'];
         }
-        if (array_key_exists('video_duration', $item)) {
+        if (isset($item['video_duration'])) {
             $this->video_duration = $item['video_duration'];
         }
         $this->user = new User($item['user']);
         $likers = [];
-        foreach($item['likers'] as $liker) {
-            $likers[] = new User($liker);
-        }
+		if ( (isset($item['likers'])) && (!empty($item['likers'])) ) {
+			foreach($item['likers'] as $liker) {
+				$likers[] = new User($liker);
+			}
+		}
         $this->likers = $likers;
-        if (array_key_exists('like_count', $item)) {
+        if (isset($item['like_count'])) {
             $this->like_count = $item['like_count'];
         }
-        if (array_key_exists('preview', $item)) {
+        if (isset($item['preview'])) {
             $this->preview = $item['preview'];
         }
-        if (array_key_exists('has_liked', $item)) {
+        if (isset($item['has_liked'])) {
             $this->has_liked = $item['has_liked'];
         }
-        if (array_key_exists('explore_context', $item)) {
+        if (isset($item['explore_context'])) {
             $this->explore_context = $item['explore_context'];
         }
-        if (array_key_exists('explore_source_token', $item)) {
+        if (isset($item['explore_source_token'])) {
             $this->explore_source_token = $item['explore_source_token'];
         }
-        if (array_key_exists('explore', $item)) {
+        if (isset($item['explore'])) {
             $this->explore = new Explore($item['explore']);
         }
-        if (array_key_exists('impression_token', $item)) {
+        if (isset($item['impression_token'])) {
             $this->impression_token = $item['impression_token'];
         }
-        if (array_key_exists('usertags', $item)) {
+        if (isset($item['usertags'])) {
             $this->usertags = $item['usertags'];
         }
     }
