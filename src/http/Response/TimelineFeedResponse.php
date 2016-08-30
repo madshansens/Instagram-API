@@ -22,22 +22,22 @@ class TimelineFeedResponse extends Response
             $this->more_available = $response['more_available'];
             $this->next_max_id = $response['next_max_id'];
             $messages = [];
-			if ( (isset($response['_messages'])) && (!empty($response['_messages'])) ) {
-				foreach($response['_messages'] as $message) {
-					$messages[] = new _Message($message);
-				}
-			}
+            if ((isset($response['_messages'])) && (!empty($response['_messages']))) {
+                foreach ($response['_messages'] as $message) {
+                    $messages[] = new _Message($message);
+                }
+            }
             $this->_messages = $messages;
             $items = [];
-			if ( (isset($response['feed_items'])) && (!empty($response['feed_items'])) ) {
-				foreach($response['feed_items'] as $item) {
-					if ( (isset($item['media_or_ad'])) ) {
-						$items[] = new Item($item['media_or_ad']);
-					}
-				}
-			}
+            if ((isset($response['feed_items'])) && (!empty($response['feed_items']))) {
+                foreach ($response['feed_items'] as $item) {
+                    if ((isset($item['media_or_ad']))) {
+                        $items[] = new Item($item['media_or_ad']);
+                    }
+                }
+            }
             $this->feed_items = $items;
-            $this->megaphone = (isset($response['megaphone'])) ? new FeedAysf($response['megaphone']['feed_aysf']) : NULL;
+            $this->megaphone = (isset($response['megaphone'])) ? new FeedAysf($response['megaphone']['feed_aysf']) : null;
         } else {
             $this->setMessage($response['message']);
         }

@@ -86,12 +86,12 @@ class HttpInterface
 
         if (!is_null($upload_id) && is_null($customPreview)) {
             $fileToUpload = Utils::createVideoIcon($photo);
-       } elseif (!is_null($customPreview)) {
+        } elseif (!is_null($customPreview)) {
             $fileToUpload = file_get_contents($customPreview);
-       } else {
+        } else {
             $upload_id = number_format(round(microtime(true) * 1000), 0, '', '');
             $fileToUpload = file_get_contents($photo);
-       }
+        }
 
         $bodies = [
             [
@@ -176,10 +176,10 @@ class HttpInterface
             echo 'RESPONSE: '.substr($resp, $header_len)."\n\n";
         }
 
-        if($reel_flag) {
-          $configure = $this->parent->configureToReel($upload->getUploadId(), $photo);
+        if ($reel_flag) {
+            $configure = $this->parent->configureToReel($upload->getUploadId(), $photo);
         } else {
-          $configure = $this->parent->configure($upload->getUploadId(), $photo, $caption);
+            $configure = $this->parent->configure($upload->getUploadId(), $photo, $caption);
         }
 
         if (!$configure->isOk()) {

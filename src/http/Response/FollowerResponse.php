@@ -15,7 +15,7 @@ class FollowerResponse extends Response
                 $users[] = new User($user);
             }
             $this->followers = $users;
-            $this->next_max_id = isset($response['next_max_id']) ? $response['next_max_id'] : NULL;
+            $this->next_max_id = isset($response['next_max_id']) ? $response['next_max_id'] : null;
         } else {
             $this->setMessage($response['message']);
         }
@@ -27,10 +27,8 @@ class FollowerResponse extends Response
         return $this->followers;
     }
 
-    public  function getNextMaxId()
+    public function getNextMaxId()
     {
         return $this->next_max_id;
     }
-
 }
-

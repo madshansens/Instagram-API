@@ -11,7 +11,7 @@ class autoCompleteUserListResponse extends Response
     {
         $this->expires = $response['expires'];
         $users = [];
-        foreach($response['users'] as $user) {
+        foreach ($response['users'] as $user) {
             $users[] = new User($user);
         }
         $this->users = $users;

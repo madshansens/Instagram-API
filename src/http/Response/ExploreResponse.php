@@ -20,10 +20,10 @@ class ExploreResponse extends Response
             $this->next_max_id = $response['next_max_id'];
             $this->max_id = $response['max_id'];
             $items = [];
-            foreach($response['items'] as $item) {
-				if (isset($item['media'])) {
-                	$items[] = new Item($item['media']);
-				}
+            foreach ($response['items'] as $item) {
+                if (isset($item['media'])) {
+                    $items[] = new Item($item['media']);
+                }
             }
             $this->items = $items;
         } else {
