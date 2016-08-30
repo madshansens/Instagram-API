@@ -10,14 +10,18 @@ class ReelsTrayFeedResponse extends Response
     {
         if (self::STATUS_OK == $response['status']) {
             $trays = [];
-            foreach($response['tray'] as $tray) {
-                $items = [];
-                foreach($tray['items'] as $item) {
-                    $items[] = new Item($item);
-                }
-
-                $trays[] = new Tray($items, $tray['user'], $tray['can_reply'], $tray['expiring_at']);
-            }
+			if ( (isset($response['tray'])) && (!empty($response['tray'])) ) {
+				foreach($response['tray'] as $tray) {
+					$items = [];
+					if ( (isset($tray['items'])) && (!empty($tray['items'])) ) {
+						foreach($tray['items'] as $item) {
+							$items[] = new Item($item);
+						}
+					}
+	
+					$trays[] = new Tray($items, $tray['user'], $tray['can_reply'], $tray['expiring_at']);
+				}
+			}
             $this->trays = $trays;
         } else {
             $this->setMessage($response['message']);
