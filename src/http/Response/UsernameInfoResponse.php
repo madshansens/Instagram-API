@@ -45,7 +45,7 @@ class UsernameInfoResponse extends Response
             }
             if (array_key_exists('hd_profile_pic_versions', $response['user'])) {
                 $profile_pics_vers = [];
-                foreach($response['user']['hd_profile_pic_versions'] as $profile_pic) {
+                foreach ($response['user']['hd_profile_pic_versions'] as $profile_pic) {
                     $profile_pics_vers[] = new HdProfilePicUrlInfo($profile_pic);
                 }
                 $this->hd_profile_pic_versions = $profile_pics_vers;
@@ -201,5 +201,4 @@ class UsernameInfoResponse extends Response
     {
         return $this->external_url;
     }
-
 }

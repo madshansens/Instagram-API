@@ -293,6 +293,7 @@ class Instagram
 
             return;
         }
+
         return $explore;
     }
 
@@ -369,17 +370,17 @@ class Instagram
     }
 
     /**
-     * Send direct message to user by inbox
+     * Send direct message to user by inbox.
      *
-     * @param  (array | int) $recipients Users id
-     * @param  string        $text       Text message
+     * @param (array | int) $recipients Users id
+     * @param string        $text       Text message
+     *
      * @return void
      */
     public function direct_message($recipients, $text)
     {
         $this->http->direct_message($recipients, $text);
     }
-
 
     /**
      * Direct Thread Data.
@@ -503,9 +504,9 @@ class Instagram
 
     public function configureToReel($upload_id, $photo)
     {
-      $size = getimagesize($photo)[0];
+        $size = getimagesize($photo)[0];
 
-      $post = json_encode([
+        $post = json_encode([
           'upload_id'          => $upload_id,
           'source_type'        => 3,
           'edits'              => [
@@ -525,12 +526,12 @@ class Instagram
           ],
           '_csrftoken'  => $this->token,
           '_uuid'       => $this->uuid,
-          '_uid'        => $this->username_id
+          '_uid'        => $this->username_id,
       ]);
 
-      $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,0.0]', $post);
+        $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,0.0]', $post);
 
-      return new ConfigureResponse($this->http->request('media/configure_to_reel/', SignatureUtils::generateSignature($post))[1]);
+        return new ConfigureResponse($this->http->request('media/configure_to_reel/', SignatureUtils::generateSignature($post))[1]);
     }
 
   /**
@@ -1022,18 +1023,18 @@ class Instagram
       return $this->getGeoMedia($this->username_id);
   }
 
-  public function searchLocation($latitude, $longitude)
-  {
-      $locations = new LocationResponse($this->http->request("location_search/?rank_token=$this->rank_token&latitude=$latitude&longitude=$longitude")[1]);
+    public function searchLocation($latitude, $longitude)
+    {
+        $locations = new LocationResponse($this->http->request("location_search/?rank_token=$this->rank_token&latitude=$latitude&longitude=$longitude")[1]);
 
-      if (!$locations->isOk()) {
-          throw new InstagramException($locations->getMessage()."\n");
+        if (!$locations->isOk()) {
+            throw new InstagramException($locations->getMessage()."\n");
 
-          return;
-      }
+            return;
+        }
 
-      return $locations;
-  }
+        return $locations;
+    }
 
   /**
    * facebook user search.
@@ -1099,10 +1100,10 @@ class Instagram
       return $query;
   }
 
-  public function getUsernameId($username)
-  {
-      return $this->searchUsername($username)->getUsernameId();
-  }
+    public function getUsernameId($username)
+    {
+        return $this->searchUsername($username)->getUsernameId();
+    }
 
   /**
    * Search users using addres book.
@@ -1162,18 +1163,18 @@ class Instagram
       return $timeline;
   }
 
-  public function getReelsTrayFeed()
-  {
-      $feed = new ReelsTrayFeedResponse($this->http->request('feed/reels_tray/')[1]);
+    public function getReelsTrayFeed()
+    {
+        $feed = new ReelsTrayFeedResponse($this->http->request('feed/reels_tray/')[1]);
 
-      if (!$feed->isOk()) {
-          throw new InstagramException($feed->getMessage()."\n");
+        if (!$feed->isOk()) {
+            throw new InstagramException($feed->getMessage()."\n");
 
-          return;
-      }
+            return;
+        }
 
-      return $feed;
-  }
+        return $feed;
+    }
 
   /**
    * Get user feed.
@@ -1465,12 +1466,14 @@ class Instagram
   {
       $go = false;
       do {
-          if (!$go)
-            $myUploads = $this->getSelfUserFeed();
-          else
-            $myUploads = $this->getSelfUserFeed(!is_null($myUploads->getNextMaxId()) ? $myUploads->getNextMaxId() : null);
-          if(!is_dir($this->IGDataPath.'backup/'))
-            mkdir($this->IGDataPath.'backup/');
+          if (!$go) {
+              $myUploads = $this->getSelfUserFeed();
+          } else {
+              $myUploads = $this->getSelfUserFeed(!is_null($myUploads->getNextMaxId()) ? $myUploads->getNextMaxId() : null);
+          }
+          if (!is_dir($this->IGDataPath.'backup/')) {
+              mkdir($this->IGDataPath.'backup/');
+          }
           foreach ($myUploads->getItems() as $item) {
               if (!is_dir($this->IGDataPath.'backup/'."$this->username-".date('Y-m-d'))) {
                   mkdir($this->IGDataPath.'backup/'."$this->username-".date('Y-m-d'));
@@ -1484,7 +1487,7 @@ class Instagram
               }
           }
           $go = true;
-      } while(!is_null($myUploads->getNextMaxId()));
+      } while (!is_null($myUploads->getNextMaxId()));
   }
 
   /**

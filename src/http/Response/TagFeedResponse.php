@@ -16,13 +16,13 @@ class TagFeedResponse extends Response
         if (self::STATUS_OK == $response['status']) {
             $this->num_results = $response['num_results'];
             $rankedItems = [];
-            foreach($response['ranked_items'] as $rankItem) {
+            foreach ($response['ranked_items'] as $rankItem) {
                 $rankedItems[] = new Item($rankItem);
             }
             $this->ranked_items = $rankedItems;
             $this->auto_load_more_enabled = $response['auto_load_more_enabled'];
             $items = [];
-            foreach($response['items'] as $item) {
+            foreach ($response['items'] as $item) {
                 $items[] = new Item($item);
             }
             $this->items = $items;

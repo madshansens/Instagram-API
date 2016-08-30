@@ -41,7 +41,6 @@ class Item
     protected $impression_token = '';
     protected $usertags = null;
 
-
     public function __construct($item)
     {
         $this->taken_at = $item['taken_at'];
@@ -53,11 +52,11 @@ class Item
         $this->client_cache_key = $item['client_cache_key'];
         $this->filter_type = $item['filter_type'];
         $images = [];
-		if ( (isset($item['image_versions2']['candidates'])) && (!empty($item['image_versions2']['candidates'])) ) {
-			foreach($item['image_versions2']['candidates'] as $image) {
-				$images[] = new HdProfilePicUrlInfo($image);
-			}
-		}
+        if ((isset($item['image_versions2']['candidates'])) && (!empty($item['image_versions2']['candidates']))) {
+            foreach ($item['image_versions2']['candidates'] as $image) {
+                $images[] = new HdProfilePicUrlInfo($image);
+            }
+        }
         $this->image_versions2 = $images;
         $this->original_width = $item['original_width'];
         if (isset($item['view_count'])) {
@@ -67,11 +66,11 @@ class Item
         $this->has_more_comments = $item['has_more_comments'];
         $this->max_num_visible_preview_comments = $item['max_num_visible_preview_comments'];
         $comments = [];
-		if ( (isset($item['comments'])) && (!empty($item['comments'])) ) {
-			foreach($item['comments'] as $comment) {
-				$comments[] = new Comment($comment);
-			}
-		}
+        if ((isset($item['comments'])) && (!empty($item['comments']))) {
+            foreach ($item['comments'] as $comment) {
+                $comments[] = new Comment($comment);
+            }
+        }
         $this->comments = $comments;
         $this->comment_count = $item['comment_count'];
         if (isset($item['caption'])) {
@@ -93,12 +92,12 @@ class Item
             $this->video_duration = $item['video_duration'];
         }
         $this->user = new User($item['user']);
-        $likers = array();
-		if ( (isset($item['likers'])) && (!empty($item['likers'])) ) {
-			foreach($item['likers'] as $liker) {
-				$likers[] = new User($liker);
-			}
-		}
+        $likers = [];
+        if ((isset($item['likers'])) && (!empty($item['likers']))) {
+            foreach ($item['likers'] as $liker) {
+                $likers[] = new User($liker);
+            }
+        }
         $this->likers = $likers;
         if (isset($item['like_count'])) {
             $this->like_count = $item['like_count'];

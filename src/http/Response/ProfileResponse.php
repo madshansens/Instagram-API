@@ -26,18 +26,17 @@ class ProfileResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            foreach($response['user'] as $p=>$v){
-                $this->$p=$v;
+            foreach ($response['user'] as $p => $v) {
+                $this->$p = $v;
             }
             $this->hd_profile_pic_url_info = new HdProfilePicUrlInfo($this->hd_profile_pic_url_info);
             if (isset($this->hd_profile_pic_versions)) {
                 $profile_pics_vers = [];
-                foreach($this->hd_profile_pic_versions as $profile_pic) {
+                foreach ($this->hd_profile_pic_versions as $profile_pic) {
                     $profile_pics_vers[] = new HdProfilePicUrlInfo($profile_pic);
                 }
                 $this->hd_profile_pic_versions = $profile_pics_vers;
             }
-
         } else {
             $this->setMessage($response['message']);
         }
