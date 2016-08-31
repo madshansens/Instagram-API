@@ -59,6 +59,7 @@ class Item
         }
         $this->image_versions2 = $images;
         $this->original_width = $item['original_width'];
+        $this->original_height = $item['original_height'];
         if (isset($item['view_count'])) {
             $this->view_count = $item['view_count'];
         }
