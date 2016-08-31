@@ -393,7 +393,7 @@ class Instagram
      */
     public function directThread($threadId)
     {
-        $directThread = $this->request("direct_v2/threads/$threadId/?")[1];
+        $directThread = $this->http->request("direct_v2/threads/$threadId/?")[1];
 
         if ($directThread['status'] != 'ok') {
             throw new InstagramException($directThread['message']."\n");
@@ -423,7 +423,7 @@ class Instagram
           '_csrftoken' => $this->token,
         ]);
 
-        return $this->request("direct_v2/threads/$threadId/$threadAction/", $this->generateSignature($data))[1];
+        return $this->http->request("direct_v2/threads/$threadId/$threadAction/", $this->generateSignature($data))[1];
     }
 
     public function configureVideo($upload_id, $video, $caption = '', $customPreview = null)
