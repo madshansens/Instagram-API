@@ -1421,7 +1421,7 @@ class Instagram
    * @return array
    *   Media comments data
    */
-  public function getMediaComments($mediaId, $maxid)
+  public function getMediaComments($mediaId, $maxid = null)
   {
       return new CommentResponse($this->http->request("media/$mediaId/comments/?max_id=$maxid&ig_sig_key_version=".Constants::SIG_KEY_VERSION)[1]);
   }

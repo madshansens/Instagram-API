@@ -7,7 +7,7 @@ class CommentResponse extends Response
     protected $comments;
     protected $has_more_comments;
     protected $next_max_id;
-    
+
 
     public function __construct($response)
     {
@@ -35,10 +35,9 @@ class CommentResponse extends Response
         return $this->next_max_id;
     }
 
-    public function has_more_comments()
+    public function hasMoreComments()
     {
         return $this->has_more_comments;
     }
 
 }
-
