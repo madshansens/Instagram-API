@@ -13,7 +13,7 @@ class CommentResponse extends Response
     {
         if (self::STATUS_OK == $response['status']) {
 
-            $this->next_max_id = $response['next_max_id'];
+            $this->next_max_id = isset($response['next_max_id']) ? $response['next_max_id'] : null;
             $comments = [];
             foreach ($response['comments'] as $comment) {
                 $comments[] = new Comment($comment);
