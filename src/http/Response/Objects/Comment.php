@@ -11,7 +11,6 @@ class Comment
     protected $bit_flags;
     protected $user;
     protected $comment;
-    protected $media_id;
     protected $pk;
     
 
@@ -24,7 +23,6 @@ class Comment
         $this->bit_flags = $commentData['bit_flags'];
         $this->user = new User($commentData['user']);
         $this->comment = $commentData['text'];
-        $this->media_id = $commentData['media_id'];
         $this->pk = $commentData['pk'];
     }
 
@@ -61,11 +59,6 @@ class Comment
     public function getComment()
     {
         return $this->comment;
-    }
-
-    public function getMediaId()
-    {
-        return $this->media_id;
     }
 
     public function getCommentId()
