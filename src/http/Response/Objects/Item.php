@@ -122,7 +122,7 @@ class Item
             $this->impression_token = $item['impression_token'];
         }
         if (isset($item['usertags'])) {
-            $this->usertags = $item['usertags'];
+            $this->usertags = new Usertag($item['usertags']);
         }
     }
 

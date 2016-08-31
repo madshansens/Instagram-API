@@ -11,7 +11,7 @@ class Usertag
     {
         $ins = [];
         foreach ($data['in'] as $in) {
-            $in[] = new In($in);
+            $ins[] = new In($in);
         }
         $this->in = $ins;
     }
