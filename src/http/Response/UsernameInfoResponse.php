@@ -28,6 +28,8 @@ class UsernameInfoResponse extends Response
     protected $hd_profile_pic_url_info;
     protected $usertag_review_enabled = false;
     protected $external_url;
+    protected $is_favorite;
+    protected $is_verified;
 
     public function __construct($response)
     {
@@ -64,6 +66,8 @@ class UsernameInfoResponse extends Response
                 $this->can_see_organic_insights = $response['user']['can_see_organic_insights'];
             }
             $this->is_private = $response['user']['is_private'];
+            $this->is_favorite = $response['user']['is_favorite'];
+            $this->is_favorite = $response['user']['is_verified'];
             if (array_key_exists('can_convert_to_business', $response['user'])) {
                 $this->can_convert_to_business = $response['user']['can_convert_to_business'];
             }
@@ -170,6 +174,16 @@ class UsernameInfoResponse extends Response
     public function isPrivate()
     {
         return $this->is_private;
+    }
+
+    public function isFavorite()
+    {
+        return $this->is_favorite;
+    }
+
+    public function isVerified()
+    {
+        return $this->is_verified;
     }
 
     public function canConvertToBusiness()
