@@ -848,7 +848,7 @@ class Instagram
    */
   public function getUsernameInfo($usernameId)
   {
-      return $this->http->request("users/$usernameId/info/")[1];
+      return new UsernameInfoResponse($this->http->request("users/$usernameId/info/")[1]);
   }
 
   /**
