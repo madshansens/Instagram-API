@@ -306,7 +306,7 @@ class Item
         return $this->id;
     }
 
-    public function getUsernameId()
+    public function getPk()
     {
         return $this->pk;
     }
