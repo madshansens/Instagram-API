@@ -300,4 +300,14 @@ class Item
     {
         return $this->likers;
     }
+
+    public function getMediaId()
+    {
+        return $this->id;
+    }
+
+    public function getUsernameId()
+    {
+        return $this->pk;
+    }
 }
