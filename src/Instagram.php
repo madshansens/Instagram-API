@@ -254,7 +254,21 @@ class Instagram
 
     public function autoCompleteUserList()
     {
-        return new autoCompleteUserListResponse($this->http->request('friendships/autocomplete_user_list/')[1]);
+        return new autoCompleteUserListResponse($this->http->request('friendships/autocomplete_user_list/?version=2')[1]);
+    }
+
+    public function pushRegister($deviceToken)
+    {
+        $data = json_encode([
+        '_uuid'         => $this->uuid,
+        'device_id'     => $this->device_id,
+        'device_type'   => 'android',
+        'device_token'  => $deviceToken.
+        '_csrftoken'    => $this->token,
+        'users'         => $this->username_id,
+    ]);
+
+        return $this->http->request('push/register/?platform=10&device_type=android', SignatureUtils::generateSignature($data))[1];
     }
 
     public function timelineFeed()
@@ -294,7 +308,7 @@ class Instagram
      */
     public function getRankedRecipients()
     {
-        $ranked_recipients = new RankedRecipientsResponse($this->http->request('direct_v2/ranked_recipients/')[1]);
+        $ranked_recipients = new RankedRecipientsResponse($this->http->request('direct_v2/ranked_recipients/?show_threads=true')[1]);
 
         if (!$ranked_recipients->isOk()) {
             throw new InstagramException($ranked_recipients->getMessage()."\n");
