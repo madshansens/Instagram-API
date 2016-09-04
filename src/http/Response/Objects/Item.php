@@ -301,11 +301,6 @@ class Item
         return $this->likers;
     }
 
-    public function getMediaId()
-    {
-        return $this->id;
-    }
-
     public function getPk()
     {
         return $this->pk;
