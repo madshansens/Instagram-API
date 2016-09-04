@@ -210,11 +210,14 @@ class Instagram
           $this->settings->set('token', $this->token);
 
           $this->syncFeatures();
-          $this->timelineFeed();
-          $this->getReelsTrayFeed();
           $this->autoCompleteUserList();
+          $this->timelineFeed();
+          $this->getRankedRecipients();
+          $this->getRecentRecipients();
+          //$this->megaphoneLog();
           $this->getv2Inbox();
           $this->getRecentActivity();
+          $this->getReelsTrayFeed();
           $this->explore();
 
           return $response;
@@ -224,11 +227,16 @@ class Instagram
       if ($check->getMessage() == 'login_required') {
           $this->login(true);
       }
-    //  $this->getReelsTrayFeed();
-    //  $this->autoCompleteUserList();
+      $this->autoCompleteUserList();
+      $this->getReelsTrayFeed();
+      $this->getRankedRecipients();
+      //push register
+      $this->getRecentRecipients();
+      //push register
+      //$this->megaphoneLog();
       $this->getv2Inbox();
       $this->getRecentActivity();
-    //  $this->explore();
+      $this->explore();
   }
 
     public function syncFeatures()
@@ -246,7 +254,21 @@ class Instagram
 
     public function autoCompleteUserList()
     {
-        return new autoCompleteUserListResponse($this->http->request('friendships/autocomplete_user_list/')[1]);
+        return new autoCompleteUserListResponse($this->http->request('friendships/autocomplete_user_list/?version=2')[1]);
+    }
+
+    public function pushRegister($deviceToken)
+    {
+        $data = json_encode([
+        '_uuid'         => $this->uuid,
+        'device_id'     => $this->device_id,
+        'device_type'   => 'android',
+        'device_token'  => $deviceToken.
+        '_csrftoken'    => $this->token,
+        'users'         => $this->username_id,
+    ]);
+
+        return $this->http->request('push/register/?platform=10&device_type=android', SignatureUtils::generateSignature($data))[1];
     }
 
     public function timelineFeed()
@@ -279,6 +301,45 @@ class Instagram
     }
 
     /**
+     * Ranked recipients.
+     *
+     * @return array
+     *              Ranked recipients Data
+     */
+    public function getRankedRecipients()
+    {
+        $ranked_recipients = new RankedRecipientsResponse($this->http->request('direct_v2/ranked_recipients/?show_threads=true')[1]);
+
+        if (!$ranked_recipients->isOk()) {
+            throw new InstagramException($ranked_recipients->getMessage()."\n");
+
+            return;
+        }
+
+        return $ranked_recipients;
+    }
+
+    /**
+     * Recent recipients.
+     *
+     * @return array
+     *              Ranked recipients Data
+     */
+    public function getRecentRecipients()
+    {
+        $recent_recipients = new RecentRecipientsResponse($this->http->request('direct_share/recent_recipients/')[1]);
+
+        if (!$recent_recipients->isOk()) {
+            throw new InstagramException($recent_recipients->getMessage()."\n");
+
+            return;
+        }
+
+        return $recent_recipients;
+    }
+
+
+    /**
      * Explore Tab.
      *
      * @return array
@@ -286,7 +347,7 @@ class Instagram
      */
     public function explore()
     {
-        $explore = new ExploreResponse($this->http->request('discover/explore/?')[1]);
+        $explore = new ExploreResponse($this->http->request('discover/explore/')[1]);
 
         if (!$explore->isOk()) {
             throw new InstagramException($explore->getMessage()."\n");
