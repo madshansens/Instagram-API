@@ -2,20 +2,16 @@
 
 namespace InstagramAPI;
 
-class autoCompleteUserListResponse extends Response
+class RankedRecipientsResponse extends Response
 {
     protected $expires;
-    protected $users;
+    protected $ranked_recipients;
 
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
             $this->expires = $response['expires'];
-            $users = [];
-            foreach ($response['users'] as $user) {
-                $users[] = new User($user);
-            }
-            $this->users = $users;
+            $this->ranked_recipients = $response['ranked_recipients'];
         } else {
             $this->setMessage($response['message']);
         }
@@ -27,8 +23,8 @@ class autoCompleteUserListResponse extends Response
         return $this->expires;
     }
 
-    public function getUsers()
+    public function getRankedRecipients()
     {
-        return $this->users;
+        return $this->ranked_recipients;
     }
 }
