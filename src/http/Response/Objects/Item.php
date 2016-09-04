@@ -301,13 +301,13 @@ class Item
         return $this->likers;
     }
 
-    public function getPk()
-    {
-        return $this->pk;
-    }
-
-    public function getId()
+    public function getMediaId()
     {
         return $this->id;
+    }
+
+    public function getUsernameId()
+    {
+        return $this->pk;
     }
 }
