@@ -263,7 +263,7 @@ class Instagram
         '_uuid'         => $this->uuid,
         'device_id'     => $this->device_id,
         'device_type'   => 'android',
-        'device_token'  => $deviceToken.
+        'device_token'  => $deviceToken,
         '_csrftoken'    => $this->token,
         'users'         => $this->username_id,
     ]);
