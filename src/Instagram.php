@@ -166,6 +166,7 @@ class Instagram
   public function login($force = false)
   {
       if (!$this->isLoggedIn || $force) {
+          $this->syncFeatures(true);
           $fetch = $this->http->request('si/fetch_headers/?challenge_type=signup&guid='.SignatureUtils::generateUUID(false), null, true);
           $header = $fetch[0];
           $response = new ChallengeResponse($fetch[1]);
@@ -214,7 +215,7 @@ class Instagram
           $this->timelineFeed();
           $this->getRankedRecipients();
           $this->getRecentRecipients();
-          //$this->megaphoneLog();
+          $this->megaphoneLog();
           $this->getv2Inbox();
           $this->getRecentActivity();
           $this->getReelsTrayFeed();
@@ -233,23 +234,30 @@ class Instagram
       //push register
       $this->getRecentRecipients();
       //push register
-      //$this->megaphoneLog();
+      $this->megaphoneLog();
       $this->getv2Inbox();
       $this->getRecentActivity();
       $this->explore();
   }
 
-    public function syncFeatures()
+    public function syncFeatures($prelogin = false)
     {
-        $data = json_encode([
-        '_uuid'         => $this->uuid,
-        '_uid'          => $this->username_id,
-        'id'            => $this->username_id,
-        '_csrftoken'    => $this->token,
-        'experiments'   => Constants::EXPERIMENTS,
-    ]);
+        if ($prelogin) {
+            $data = json_encode([
+                'id'            => SignatureUtils::generateUUID(true),
+                'experiments'   => Constants::LOGIN_EXPERIMENTS,
+            ]);
+        } else {
+            $data = json_encode([
+                '_uuid'         => $this->uuid,
+                '_uid'          => $this->username_id,
+                '_csrftoken'    => $this->token,
+                'id'            => $this->username_id,
+                'experiments'   => Constants::EXPERIMENTS,
+            ]);
+        }
 
-        return $this->http->request('qe/sync/', SignatureUtils::generateSignature($data))[1];
+        return new SyncResponse($this->http->request('qe/sync/', SignatureUtils::generateSignature($data))[1]);
     }
 
     public function autoCompleteUserList()
@@ -257,18 +265,26 @@ class Instagram
         return new autoCompleteUserListResponse($this->http->request('friendships/autocomplete_user_list/?version=2')[1]);
     }
 
-    public function pushRegister($deviceToken)
+    public function pushRegister($gcmToken)
     {
-        $data = json_encode([
-        '_uuid'         => $this->uuid,
-        'device_id'     => $this->device_id,
-        'device_type'   => 'android',
-        'device_token'  => $deviceToken,
-        '_csrftoken'    => $this->token,
-        'users'         => $this->username_id,
-    ]);
+        $deviceToken = json_encode([
+            'k' => $gcmToken,
+            'v' => 0,
+            't' => 'fbns-b64',
+        ]);
 
-        return $this->http->request('push/register/?platform=10&device_type=android', SignatureUtils::generateSignature($data))[1];
+        $data = json_encode([
+            '_uuid'                 => $this->uuid,
+            'guid'                  => $this->uuid,
+            'phone_id'              => SignatureUtils::generateUUID(true),
+            'device_type'           => 'android_mqtt',
+            'device_token'          => $deviceToken,
+            'is_main_push_channel'  => true,
+            '_csrftoken'            => $this->token,
+            'users'                 => $this->username_id,
+        ]);
+
+        return $this->http->request('push/register/?platform=10&device_type=android_mqtt', SignatureUtils::generateSignature($data))[1];
     }
 
     public function timelineFeed()
@@ -278,7 +294,17 @@ class Instagram
 
     protected function megaphoneLog()
     {
-        return $this->http->request('megaphone/log/')[1];
+        $data = [
+            'type'          => 'feed_aysf',
+            'action'        => 'seen',
+            'reason'        => "",
+            '_uuid'         => $this->uuid,
+            'device_id'     => $this->device_id,
+            '_csrftoken'    => $this->token,
+            'uuid'          => md5(time()),
+        ];
+
+        return new MegaphoneLogResponse($this->http->request('megaphone/log/', http_build_query($data))[1]);
     }
 
     /**
