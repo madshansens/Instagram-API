@@ -750,7 +750,7 @@ class Instagram
           '_csrftoken'     => $this->token,
       ]);
 
-        return new $this->http->request("media/$mediaId/comment/$commentId/delete/", SignatureUtils::generateSignature($data))[1];
+        return $this->http->request("media/$mediaId/comment/$commentId/delete/", SignatureUtils::generateSignature($data))[1];
     }
 
   /**
