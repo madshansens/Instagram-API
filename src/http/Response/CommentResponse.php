@@ -4,40 +4,22 @@ namespace InstagramAPI;
 
 class CommentResponse extends Response
 {
-    protected $comments;
-    protected $has_more_comments;
-    protected $next_max_id;
-
+    protected $comment = null;
 
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-
-            $this->next_max_id = isset($response['next_max_id']) ? $response['next_max_id'] : null;
-            $comments = [];
-            foreach ($response['comments'] as $comment) {
-                $comments[] = new Comment($comment);
+            if ((isset($commentData['comment'])) && (!empty($commentData['comment']))) {
+                $this->comment = new Comment($response['comment']);
             }
-            $this->comments = $comments;
         } else {
             $this->setMessage($response['message']);
         }
         $this->setStatus($response['status']);
     }
 
-    public function getComments()
+    public function getComment()
     {
-        return $this->comments;
+        return $this->comment;
     }
-
-    public function getNextMaxId()
-    {
-        return $this->next_max_id;
-    }
-
-    public function hasMoreComments()
-    {
-        return $this->has_more_comments;
-    }
-
 }

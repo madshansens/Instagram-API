@@ -643,7 +643,7 @@ class Instagram
         'caption_text'   => $captionText,
     ]);
 
-      return $this->http->request("media/$mediaId/edit_media/", SignatureUtils::generateSignature($data))[1];
+      return new MediaResponse($this->http->request("media/$mediaId/edit_media/", SignatureUtils::generateSignature($data))[1]['media']);
   }
 
   /**
@@ -663,7 +663,7 @@ class Instagram
         '_csrftoken'     => $this->token,
     ]);
 
-      return $this->http->request("usertags/$mediaId/remove/", SignatureUtils::generateSignature($data))[1];
+      return new MediaResponse($this->http->request("usertags/$mediaId/remove/", SignatureUtils::generateSignature($data))[1]);
   }
 
   /**
@@ -728,7 +728,7 @@ class Instagram
         'comment_text'   => $commentText,
     ]);
 
-      return $this->http->request("media/$mediaId/comment/", SignatureUtils::generateSignature($data))[1];
+      return new CommentResponse($this->http->request("media/$mediaId/comment/", SignatureUtils::generateSignature($data))[1]);
   }
 
     /**
@@ -750,7 +750,7 @@ class Instagram
           '_csrftoken'     => $this->token,
       ]);
 
-        return $this->http->request("media/$mediaId/comment/$commentId/delete/", SignatureUtils::generateSignature($data))[1];
+        return new $this->http->request("media/$mediaId/comment/$commentId/delete/", SignatureUtils::generateSignature($data))[1];
     }
 
   /**
@@ -1512,7 +1512,7 @@ class Instagram
    */
   public function getMediaComments($mediaId, $maxid = null)
   {
-      return new CommentResponse($this->http->request("media/$mediaId/comments/?max_id=$maxid&ig_sig_key_version=".Constants::SIG_KEY_VERSION)[1]);
+      return new MediaCommentsResponse($this->http->request("media/$mediaId/comments/?max_id=$maxid&ig_sig_key_version=".Constants::SIG_KEY_VERSION)[1]);
   }
 
   /**
