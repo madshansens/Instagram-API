@@ -67,7 +67,9 @@ class UsernameInfoResponse extends Response
             }
             $this->is_private = $response['user']['is_private'];
             $this->is_favorite = $response['user']['is_favorite'];
-            $this->is_favorite = $response['user']['is_verified'];
+            if (array_key_exists('is_verified', $response['user'])) {
+                $this->is_favorite = $response['user']['is_verified'];
+            }
             if (array_key_exists('can_convert_to_business', $response['user'])) {
                 $this->can_convert_to_business = $response['user']['can_convert_to_business'];
             }

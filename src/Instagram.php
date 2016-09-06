@@ -247,6 +247,8 @@ class Instagram
                 'id'            => SignatureUtils::generateUUID(true),
                 'experiments'   => Constants::LOGIN_EXPERIMENTS,
             ]);
+
+            return new SyncResponse($this->http->request('qe/sync/', SignatureUtils::generateSignature($data), true)[1]);
         } else {
             $data = json_encode([
                 '_uuid'         => $this->uuid,
@@ -255,9 +257,9 @@ class Instagram
                 'id'            => $this->username_id,
                 'experiments'   => Constants::EXPERIMENTS,
             ]);
-        }
 
-        return new SyncResponse($this->http->request('qe/sync/', SignatureUtils::generateSignature($data))[1]);
+            return new SyncResponse($this->http->request('qe/sync/', SignatureUtils::generateSignature($data))[1]);
+        }
     }
 
     public function autoCompleteUserList()

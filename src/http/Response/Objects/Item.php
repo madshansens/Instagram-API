@@ -64,8 +64,12 @@ class Item
             $this->view_count = $item['view_count'];
         }
         $this->organic_tracking_token = $item['organic_tracking_token'];
-        $this->has_more_comments = $item['has_more_comments'];
-        $this->max_num_visible_preview_comments = $item['max_num_visible_preview_comments'];
+        if ((isset($item['has_more_comments'])) && (!empty($item['has_more_comments']))) {
+            $this->has_more_comments = $item['has_more_comments'];
+        }
+        if ((isset($item['max_num_visible_preview_comments'])) && (!empty($item['max_num_visible_preview_comments']))) {
+            $this->max_num_visible_preview_comments = $item['max_num_visible_preview_comments'];
+        }
         $comments = [];
         if ((isset($item['comments'])) && (!empty($item['comments']))) {
             foreach ($item['comments'] as $comment) {
@@ -73,7 +77,9 @@ class Item
             }
         }
         $this->comments = $comments;
-        $this->comment_count = $item['comment_count'];
+        if ((isset($item['comment_count'])) && (!empty($item['comment_count']))) {
+            $this->comment_count = $item['comment_count'];
+        }
         if (isset($item['caption'])) {
             $this->caption = new Caption($item['caption']);
         }
