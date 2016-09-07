@@ -66,9 +66,9 @@ class HttpInterface
 
         if ($this->parent->debug) {
             if ($post) {
-                echo "\033[34m POST: \033[0m  $endpoint\n";
+                echo Utils::colouredString('POST:  ', 'light_blue') . $endpoint . "\n";
             } else {
-                echo "\033[34m GET: \033[0m $endpoint\n";
+                echo Utils::colouredString('GET:  ', 'light_blue') . $endpoint ."\n";
             }
             if (!is_null($post)) {
                 if (!is_array($post)) {
@@ -77,12 +77,12 @@ class HttpInterface
             }
             $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            echo "\033[32m ← $httpCode $bytes \t \033[0m\n";
+            echo Utils::colouredString("← $httpCode \t $bytes", 'green') . "\n";
 
             if ($this->parent->truncatedDebug && strlen($body) > 1000) {
-                echo "\033[36m RESPONSE: \033[0m" .substr($body, 0, 1000) . "...\n\n";
+                echo Utils::colouredString('RESPONSE: ', 'cyan') .substr($body, 0, 1000) . "...\n\n";
             } else {
-                echo "\033[36m RESPONSE: \033[0m$body\n\n";
+                echo Utils::colouredString('RESPONSE: ', 'cyan') . $body . "\n\n";
             }
         }
 
