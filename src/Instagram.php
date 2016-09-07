@@ -7,6 +7,7 @@ class Instagram
     public $username;            // Instagram username
   public $password;            // Instagram password
   public $debug;               // Debug
+  public $truncatedDebug;
 
   public $uuid;                // UUID
   public $device_id;           // Device ID
@@ -34,9 +35,10 @@ class Instagram
    * @param $IGDataPath
    *  Default folder to store data, you can change it.
    */
-  public function __construct($username, $password, $debug = false, $IGDataPath = null)
+  public function __construct($username, $password, $debug = false, $IGDataPath = null, $truncatedDebug = false)
   {
       $this->debug = $debug;
+      $this->truncatedDebug = $truncatedDebug;
       $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
 
       if (!is_null($IGDataPath)) {

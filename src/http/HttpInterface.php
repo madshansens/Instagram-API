@@ -64,17 +64,29 @@ class HttpInterface
         $header = substr($resp, 0, $header_len);
         $body = substr($resp, $header_len);
 
-        curl_close($ch);
-
         if ($this->parent->debug) {
-            echo "REQUEST: $endpoint\n";
+            if ($post) {
+                echo "\033[34m POST: \033[0m  $endpoint\n";
+            } else {
+                echo "\033[34m GET: \033[0m $endpoint\n";
+            }
             if (!is_null($post)) {
                 if (!is_array($post)) {
                     echo 'DATA: '.urldecode($post)."\n";
                 }
             }
-            echo "RESPONSE: $body\n\n";
+            $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            echo "\033[32m ← $httpCode $bytes \t \033[0m\n";
+
+            if ($this->parent->truncatedDebug && strlen($body) > 1000) {
+                echo "\033[36m RESPONSE: \033[0m" .substr($body, 0, 1000) . "...\n\n";
+            } else {
+                echo "\033[36m RESPONSE: \033[0m$body\n\n";
+            }
         }
+
+        curl_close($ch);
 
         return [$header, json_decode($body, true)];
     }
