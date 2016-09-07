@@ -9,7 +9,7 @@ class Instagram
   public $debug;               // Debug
   public $truncatedDebug;
 
-  public $uuid;                // UUID
+    public $uuid;                // UUID
   public $device_id;           // Device ID
   public $username_id;         // Username ID
   public $token;               // _csrftoken
@@ -301,7 +301,7 @@ class Instagram
         $data = [
             'type'          => 'feed_aysf',
             'action'        => 'seen',
-            'reason'        => "",
+            'reason'        => '',
             '_uuid'         => $this->uuid,
             'device_id'     => $this->device_id,
             '_csrftoken'    => $this->token,
@@ -334,7 +334,7 @@ class Instagram
      * Ranked recipients.
      *
      * @return array
-     *              Ranked recipients Data
+     *               Ranked recipients Data
      */
     public function getRankedRecipients()
     {
@@ -353,7 +353,7 @@ class Instagram
      * Recent recipients.
      *
      * @return array
-     *              Ranked recipients Data
+     *               Ranked recipients Data
      */
     public function getRecentRecipients()
     {
@@ -367,7 +367,6 @@ class Instagram
 
         return $recent_recipients;
     }
-
 
     /**
      * Explore Tab.
