@@ -112,7 +112,7 @@ class Utils
 
     public static function formatBytes($bytes, $precision = 2)
     {
-        $units = array('B', 'kB', 'mB', 'gB', 'tB');
+        $units = ['B', 'kB', 'mB', 'gB', 'tB'];
 
         $bytes = max($bytes, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
@@ -120,7 +120,7 @@ class Utils
 
         $bytes /= pow(1024, $pow);
 
-        return round($bytes, $precision) . '' . $units[$pow];
+        return round($bytes, $precision).''.$units[$pow];
     }
 
     public static function colouredString($string, $colour)
@@ -142,13 +142,13 @@ class Utils
         $colours['light_gray'] = '0;37';
         $colours['white'] = '1;37';
 
-        $colored_string = "";
+        $colored_string = '';
 
         if (isset($colours[$colour])) {
-        $colored_string .= "\033[" . $colours[$colour] . "m";
+            $colored_string .= "\033[".$colours[$colour].'m';
         }
 
-        $colored_string .=  $string . "\033[0m";
+        $colored_string .=  $string."\033[0m";
 
         return $colored_string;
     }

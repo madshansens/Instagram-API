@@ -15,7 +15,6 @@ class Comment
     protected $type = null;
     protected $media_id = null;
 
-
     public function __construct($commentData)
     {
         $this->status = $commentData['status'];

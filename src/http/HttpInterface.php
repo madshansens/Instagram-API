@@ -66,9 +66,9 @@ class HttpInterface
 
         if ($this->parent->debug) {
             if ($post) {
-                echo Utils::colouredString('POST:  ', 'light_blue') . $endpoint . "\n";
+                echo Utils::colouredString('POST:  ', 'light_blue').$endpoint."\n";
             } else {
-                echo Utils::colouredString('GET:  ', 'light_blue') . $endpoint ."\n";
+                echo Utils::colouredString('GET:  ', 'light_blue').$endpoint."\n";
             }
             if (!is_null($post)) {
                 if (!is_array($post)) {
@@ -77,12 +77,12 @@ class HttpInterface
             }
             $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            echo Utils::colouredString("← $httpCode \t $bytes", 'green') . "\n";
+            echo Utils::colouredString("← $httpCode \t $bytes", 'green')."\n";
 
             if ($this->parent->truncatedDebug && strlen($body) > 1000) {
-                echo Utils::colouredString('RESPONSE: ', 'cyan') .substr($body, 0, 1000) . "...\n\n";
+                echo Utils::colouredString('RESPONSE: ', 'cyan').substr($body, 0, 1000)."...\n\n";
             } else {
-                echo Utils::colouredString('RESPONSE: ', 'cyan') . $body . "\n\n";
+                echo Utils::colouredString('RESPONSE: ', 'cyan').$body."\n\n";
             }
         }
 
