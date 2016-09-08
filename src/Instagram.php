@@ -1113,17 +1113,28 @@ class Instagram
       return $this->getGeoMedia($this->username_id);
   }
 
-    public function searchLocation($latitude, $longitude)
-    {
-        $locations = new LocationResponse($this->http->request("location_search/?rank_token=$this->rank_token&latitude=$latitude&longitude=$longitude")[1]);
+  public function searchLocation($latitude, $longitude, $query = null)
+  {
+    $locationQuery = [
+        'rank_token'  => $this->rank_token,
+        'latitude'    => $latitude,
+        'longitude'   => $longitude,
+    ];
 
-        if (!$locations->isOk()) {
-            throw new InstagramException($locations->getMessage()."\n");
+    if (!is_null($query)) {
+        $locationQuery['timestamp'] =  time();
+    } else {
+        $locationQuery['search_query'] = $query;
+    }
+    $locations = new LocationResponse($this->http->request("location_search/?" . http_build_query($locationQuery))[1]);
 
-            return;
-        }
+    if (!$locations->isOk()) {
+        throw new InstagramException($locations->getMessage()."\n");
 
-        return $locations;
+        return;
+    }
+
+    return $locations;
     }
 
   /**
