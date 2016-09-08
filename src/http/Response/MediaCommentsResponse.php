@@ -4,12 +4,14 @@ namespace InstagramAPI;
 
 class MediaCommentsResponse extends Response
 {
-    protected $item;
+    protected $item = null;
 
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            $this->item = new Item($response['media']);
+            if ((isset($response['media'])) && (!empty($response['media']))) {
+                $this->item = new Item($response['media']);
+            }
         } else {
             $this->setMessage($response['message']);
         }
