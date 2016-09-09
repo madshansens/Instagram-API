@@ -66,7 +66,9 @@ class UsernameInfoResponse extends Response
                 $this->can_see_organic_insights = $response['user']['can_see_organic_insights'];
             }
             $this->is_private = $response['user']['is_private'];
-            $this->is_favorite = $response['user']['is_favorite'];
+            if (array_key_exists('is_favorite', $response['user'])) {
+                $this->is_favorite = $response['user']['is_favorite'];
+            }
             if (array_key_exists('is_verified', $response['user'])) {
                 $this->is_favorite = $response['user']['is_verified'];
             }
