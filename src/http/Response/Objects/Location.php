@@ -15,7 +15,9 @@ class Location
     {
         $this->name = $location['name'];
         $this->external_id_source = $location['external_id_source'];
-        $this->address = $location['address'];
+        if ((isset($location['address'])) && (!empty($location['address']))) {
+            $this->address = $location['address'];
+        }
         $this->lat = $location['lat'];
         $this->lng = $location['lng'];
         $this->external_id = $location['external_id'];

@@ -428,14 +428,14 @@ class Instagram
      * @return array
      *               Upload data
      */
-    public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null)
+    public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null, $location = null)
     {
-        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview);
+        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, $location);
     }
 
     public function uploadPhotoReel($photo, $caption = null, $upload_id = null, $customPreview = null)
     {
-        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, true);
+        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, null, true);
     }
 
     /**
@@ -556,11 +556,12 @@ class Instagram
         return new ConfigureVideoResponse($this->http->request('media/configure/?video=1', SignatureUtils::generateSignature($post))[1]);
     }
 
-    public function configure($upload_id, $photo, $caption = '')
+    public function configure($upload_id, $photo, $caption = '', $location = null)
     {
+        $caption = is_null($caption) ? '' : $caption;
         $size = getimagesize($photo)[0];
 
-        $post = json_encode([
+        $post = [
         'upload_id'          => $upload_id,
         'camera_model'       => str_replace(' ', '', $this->settings->get('model')),
         'source_type'        => 3,
@@ -585,7 +586,29 @@ class Instagram
         '_uuid'       => $this->uuid,
         '_uid'        => $this->username_id,
         'caption'     => $caption,
-     ]);
+     ];
+
+     if (!is_null($location))
+     {
+         $loc = [
+             $location->getExternalIdSource() .'_id' => $location->getExternalId(),
+             'name' => $location->getName(),
+             'lat'  => $location->getLatitude(),
+             'lng'  => $location->getLongitude(),
+             'address'  => $location->getAddress(),
+             'external_source'  => $location->getExternalIdSource(),
+         ];
+
+         $post['location'] = json_encode($loc);
+         $post['geotag_enabled'] = true;
+         $post['media_latitude'] = $location->getLatitude();
+         $post['posting_latitude'] = $location->getLatitude();
+         $post['media_longitude'] = $location->getLongitude();
+         $post['posting_longitude'] = $location->getLongitude();
+         $post['altitude'] = mt_rand(10, 800);
+     }
+
+     $post = json_encode($post);
 
         $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]', $post);
 
