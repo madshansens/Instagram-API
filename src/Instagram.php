@@ -428,14 +428,14 @@ class Instagram
      * @return array
      *               Upload data
      */
-    public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null, $location = null)
+    public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null, $location = null, $filter = null)
     {
-        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, $location);
+        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, $location, $filter);
     }
 
     public function uploadPhotoReel($photo, $caption = null, $upload_id = null, $customPreview = null)
     {
-        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, null, true);
+        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, null, null, true);
     }
 
     /**
@@ -556,7 +556,7 @@ class Instagram
         return new ConfigureVideoResponse($this->http->request('media/configure/?video=1', SignatureUtils::generateSignature($post))[1]);
     }
 
-    public function configure($upload_id, $photo, $caption = '', $location = null)
+    public function configure($upload_id, $photo, $caption = '', $location = null, $filter = null)
     {
         $caption = is_null($caption) ? '' : $caption;
         $size = getimagesize($photo)[0];
@@ -606,6 +606,10 @@ class Instagram
          $post['media_longitude'] = $location->getLongitude();
          $post['posting_longitude'] = $location->getLongitude();
          $post['altitude'] = mt_rand(10, 800);
+     }
+
+     if (!is_null($filter)) {
+         $post['edits']['filter_type'] = Utils::getFilterCode($filter);
      }
 
      $post = json_encode($post);

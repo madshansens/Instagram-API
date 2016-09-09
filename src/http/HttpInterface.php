@@ -91,7 +91,7 @@ class HttpInterface
         return [$header, json_decode($body, true)];
     }
 
-    public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null, $location = null, $reel_flag = false)
+    public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null, $location = null, $filter = null, $reel_flag = false)
     {
         $endpoint = Constants::API_URL.'upload/photo/';
         $boundary = $this->parent->uuid;
@@ -191,7 +191,7 @@ class HttpInterface
         if ($reel_flag) {
             $configure = $this->parent->configureToReel($upload->getUploadId(), $photo);
         } else {
-            $configure = $this->parent->configure($upload->getUploadId(), $photo, $caption, $location);
+            $configure = $this->parent->configure($upload->getUploadId(), $photo, $caption, $location, $filter);
         }
 
         if (!$configure->isOk()) {
