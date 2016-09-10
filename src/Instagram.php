@@ -433,7 +433,7 @@ class Instagram
         return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, $location, $filter);
     }
 
-    public function uploadPhotoReel($photo, $caption = null, $upload_id = null, $customPreview = null)
+    public function uploadPhotoStory($photo, $caption = null, $upload_id = null, $customPreview = null)
     {
         return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, null, null, true);
     }
