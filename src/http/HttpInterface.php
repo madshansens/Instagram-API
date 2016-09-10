@@ -66,9 +66,19 @@ class HttpInterface
 
         if ($this->parent->debug) {
             if ($post) {
-                echo Utils::colouredString('POST:  ', 'light_blue').$endpoint."\n";
+                if (php_sapi_name() == "cli") {
+                    $method = Utils::colouredString('POST:  ', 'light_blue');
+                } else {
+                    $method = 'POST:  ';
+                }
+                echo $method.$endpoint."\n";
             } else {
-                echo Utils::colouredString('GET:  ', 'light_blue').$endpoint."\n";
+                if (php_sapi_name() == "cli") {
+                    $method = Utils::colouredString('GET:  ', 'light_blue');
+                } else {
+                    $method = 'GET:  ';
+                }
+                echo $method.$endpoint."\n";
             }
             if (!is_null($post)) {
                 if (!is_array($post)) {
@@ -77,12 +87,26 @@ class HttpInterface
             }
             $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            echo Utils::colouredString("← $httpCode \t $bytes", 'green')."\n";
+            if (php_sapi_name() == "cli") {
+                echo Utils::colouredString("← $httpCode \t $bytes", 'green')."\n";
+            } else {
+                echo "← $httpCode \t $bytes\n";
+            }
 
             if ($this->parent->truncatedDebug && strlen($body) > 1000) {
-                echo Utils::colouredString('RESPONSE: ', 'cyan').substr($body, 0, 1000)."...\n\n";
+                if (php_sapi_name() == "cli") {
+                    $res = Utils::colouredString('RESPONSE: ', 'cyan');
+                } else {
+                    $res = 'RESPONSE: ';
+                }
+                echo $res.substr($body, 0, 1000)."...\n\n";
             } else {
-                echo Utils::colouredString('RESPONSE: ', 'cyan').$body."\n\n";
+                if (php_sapi_name() == "cli") {
+                    $res = Utils::colouredString('RESPONSE: ', 'cyan');
+                } else {
+                    $res = 'RESPONSE: ';
+                }
+                echo $res.$body."\n\n";
             }
         }
 
