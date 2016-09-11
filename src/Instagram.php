@@ -588,31 +588,30 @@ class Instagram
         'caption'     => $caption,
      ];
 
-     if (!is_null($location))
-     {
-         $loc = [
-             $location->getExternalIdSource() .'_id' => $location->getExternalId(),
-             'name' => $location->getName(),
-             'lat'  => $location->getLatitude(),
-             'lng'  => $location->getLongitude(),
-             'address'  => $location->getAddress(),
-             'external_source'  => $location->getExternalIdSource(),
+        if (!is_null($location)) {
+            $loc = [
+             $location->getExternalIdSource().'_id' => $location->getExternalId(),
+             'name'                                 => $location->getName(),
+             'lat'                                  => $location->getLatitude(),
+             'lng'                                  => $location->getLongitude(),
+             'address'                              => $location->getAddress(),
+             'external_source'                      => $location->getExternalIdSource(),
          ];
 
-         $post['location'] = json_encode($loc);
-         $post['geotag_enabled'] = true;
-         $post['media_latitude'] = $location->getLatitude();
-         $post['posting_latitude'] = $location->getLatitude();
-         $post['media_longitude'] = $location->getLongitude();
-         $post['posting_longitude'] = $location->getLongitude();
-         $post['altitude'] = mt_rand(10, 800);
-     }
+            $post['location'] = json_encode($loc);
+            $post['geotag_enabled'] = true;
+            $post['media_latitude'] = $location->getLatitude();
+            $post['posting_latitude'] = $location->getLatitude();
+            $post['media_longitude'] = $location->getLongitude();
+            $post['posting_longitude'] = $location->getLongitude();
+            $post['altitude'] = mt_rand(10, 800);
+        }
 
-     if (!is_null($filter)) {
-         $post['edits']['filter_type'] = Utils::getFilterCode($filter);
-     }
+        if (!is_null($filter)) {
+            $post['edits']['filter_type'] = Utils::getFilterCode($filter);
+        }
 
-     $post = json_encode($post);
+        $post = json_encode($post);
 
         $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]', $post);
 
@@ -1140,28 +1139,28 @@ class Instagram
       return $this->getGeoMedia($this->username_id);
   }
 
-  public function searchLocation($latitude, $longitude, $query = null)
-  {
-    $locationQuery = [
+    public function searchLocation($latitude, $longitude, $query = null)
+    {
+        $locationQuery = [
         'rank_token'  => $this->rank_token,
         'latitude'    => $latitude,
         'longitude'   => $longitude,
     ];
 
-    if (!is_null($query)) {
-        $locationQuery['timestamp'] =  time();
-    } else {
-        $locationQuery['search_query'] = $query;
-    }
-    $locations = new LocationResponse($this->http->request("location_search/?" . http_build_query($locationQuery))[1]);
+        if (!is_null($query)) {
+            $locationQuery['timestamp'] = time();
+        } else {
+            $locationQuery['search_query'] = $query;
+        }
+        $locations = new LocationResponse($this->http->request('location_search/?'.http_build_query($locationQuery))[1]);
 
-    if (!$locations->isOk()) {
-        throw new InstagramException($locations->getMessage()."\n");
+        if (!$locations->isOk()) {
+            throw new InstagramException($locations->getMessage()."\n");
 
-        return;
-    }
+            return;
+        }
 
-    return $locations;
+        return $locations;
     }
 
   /**
