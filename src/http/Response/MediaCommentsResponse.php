@@ -5,8 +5,10 @@ namespace InstagramAPI;
 class MediaCommentsResponse extends Response
 {
     protected $has_more_comments = false;
+    protected $caption_is_edited = false;
     protected $comments = [];
     protected $next_max_id = null;
+    protected $comment_count = 0;
 
     public function __construct($response)
     {
@@ -14,10 +16,16 @@ class MediaCommentsResponse extends Response
             if (isset($response['comments'])) {
                 foreach ($response['comments'] as $comment) {
                     $this->comments[] = new Comment($comment);
-                }    
+                }
             }
             $this->has_more_comments = $response['has_more_comments'];
             $this->next_max_id = $response['next_max_id'];
+            if (isset($response['caption_is_edited'])) {
+                $this->caption_is_edited = $response['caption_is_edited'];
+            }
+            if (isset($response['caption_is_edited'])) {
+                $this->comment_count = $response['comment_count'];
+            }
         } else {
             $this->setMessage($response['message']);
         }
@@ -35,5 +43,15 @@ class MediaCommentsResponse extends Response
     public function getComments()
     {
         return $this->comments;
+    }
+
+    public function isCaptionEdited()
+    {
+        return $this->caption_is_edited;
+    }
+
+    public function getCommentsCounter()
+    {
+        return $this->comment_count;
     }
 }
