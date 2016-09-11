@@ -36,10 +36,12 @@ class MediaCommentsResponse extends Response
     {
         return $this->next_max_id;
     }
+
     public function hasMoreComments()
     {
         return $this->has_more_comments;
     }
+
     public function getComments()
     {
         return $this->comments;

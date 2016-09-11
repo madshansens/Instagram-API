@@ -66,14 +66,14 @@ class HttpInterface
 
         if ($this->parent->debug) {
             if ($post) {
-                if (php_sapi_name() == "cli") {
+                if (php_sapi_name() == 'cli') {
                     $method = Utils::colouredString('POST:  ', 'light_blue');
                 } else {
                     $method = 'POST:  ';
                 }
                 echo $method.$endpoint."\n";
             } else {
-                if (php_sapi_name() == "cli") {
+                if (php_sapi_name() == 'cli') {
                     $method = Utils::colouredString('GET:  ', 'light_blue');
                 } else {
                     $method = 'GET:  ';
@@ -87,21 +87,21 @@ class HttpInterface
             }
             $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if (php_sapi_name() == "cli") {
+            if (php_sapi_name() == 'cli') {
                 echo Utils::colouredString("← $httpCode \t $bytes", 'green')."\n";
             } else {
                 echo "← $httpCode \t $bytes\n";
             }
 
             if ($this->parent->truncatedDebug && strlen($body) > 1000) {
-                if (php_sapi_name() == "cli") {
+                if (php_sapi_name() == 'cli') {
                     $res = Utils::colouredString('RESPONSE: ', 'cyan');
                 } else {
                     $res = 'RESPONSE: ';
                 }
                 echo $res.substr($body, 0, 1000)."...\n\n";
             } else {
-                if (php_sapi_name() == "cli") {
+                if (php_sapi_name() == 'cli') {
                     $res = Utils::colouredString('RESPONSE: ', 'cyan');
                 } else {
                     $res = 'RESPONSE: ';
