@@ -9,7 +9,7 @@ class Param
 
     public function __construct($data)
     {
-        $this->name  = $data['name'];
+        $this->name = $data['name'];
         $this->value = $data['value'];
     }
 

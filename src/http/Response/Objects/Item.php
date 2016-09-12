@@ -43,22 +43,22 @@ class Item
 
     public function __construct($item)
     {
-        $this->taken_at         = $item['taken_at'];
-        $this->pk               = $item['pk'];
-        $this->id               = $item['id'];
+        $this->taken_at = $item['taken_at'];
+        $this->pk = $item['pk'];
+        $this->id = $item['id'];
         $this->device_timestamp = $item['device_timestamp'];
-        $this->media_type       = $item['media_type'];
-        $this->code             = $item['code'];
+        $this->media_type = $item['media_type'];
+        $this->code = $item['code'];
         $this->client_cache_key = $item['client_cache_key'];
-        $this->filter_type      = $item['filter_type'];
-        $images                 = [];
+        $this->filter_type = $item['filter_type'];
+        $images = [];
         if ((isset($item['image_versions2']['candidates'])) && (!empty($item['image_versions2']['candidates']))) {
             foreach ($item['image_versions2']['candidates'] as $image) {
                 $images[] = new HdProfilePicUrlInfo($image);
             }
         }
         $this->image_versions2 = $images;
-        $this->original_width  = $item['original_width'];
+        $this->original_width = $item['original_width'];
         $this->original_height = $item['original_height'];
         if (isset($item['view_count'])) {
             $this->view_count = $item['view_count'];
@@ -84,7 +84,7 @@ class Item
             $this->caption = new Caption($item['caption']);
         }
         $this->caption_is_edited = $item['caption_is_edited'];
-        $this->photo_of_you      = $item['photo_of_you'];
+        $this->photo_of_you = $item['photo_of_you'];
         if (isset($item['video_versions'])) {
             $videos = [];
             foreach ($item['video_versions'] as $video) {
@@ -99,7 +99,7 @@ class Item
             $this->video_duration = $item['video_duration'];
         }
         $this->user = new User($item['user']);
-        $likers     = [];
+        $likers = [];
         if ((isset($item['likers'])) && (!empty($item['likers']))) {
             foreach ($item['likers'] as $liker) {
                 $likers[] = new User($liker);

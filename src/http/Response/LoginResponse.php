@@ -15,12 +15,12 @@ class LoginResponse extends Response
     public function __construct($response)
     {
         if (isset($response['logged_in_user']['username'])) {
-            $this->username                      = $response['logged_in_user']['username'];
+            $this->username = $response['logged_in_user']['username'];
             $this->has_anonymous_profile_picture = $response['logged_in_user']['has_anonymous_profile_picture'];
-            $this->profile_pic_url               = $response['logged_in_user']['profile_pic_url'];
-            $this->full_name                     = $response['logged_in_user']['full_name'];
-            $this->pk                            = $response['logged_in_user']['pk'];
-            $this->is_private                    = $response['logged_in_user']['is_private'];
+            $this->profile_pic_url = $response['logged_in_user']['profile_pic_url'];
+            $this->full_name = $response['logged_in_user']['full_name'];
+            $this->pk = $response['logged_in_user']['pk'];
+            $this->is_private = $response['logged_in_user']['is_private'];
         } else {
             $this->setMessage($response['message']);
         }

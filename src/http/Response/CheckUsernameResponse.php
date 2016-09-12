@@ -12,7 +12,7 @@ class CheckUsernameResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            $this->username  = $response['username'];
+            $this->username = $response['username'];
             $this->available = $response['available'];
             if (array_key_exists('error', $response)) {
                 $this->error = $response['error'];

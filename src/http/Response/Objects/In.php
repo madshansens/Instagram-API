@@ -10,7 +10,7 @@ class In
     public function __construct($data)
     {
         $this->position = new Position($data['position']);
-        $this->user     = new User($data['user']);
+        $this->user = new User($data['user']);
     }
 
     /**

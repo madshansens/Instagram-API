@@ -11,9 +11,9 @@ class Tray
 
     public function __construct($items, $user, $can_reply, $expiring_at)
     {
-        $this->items       = $items;
-        $this->user        = $user;
-        $this->can_reply   = $can_reply;
+        $this->items = $items;
+        $this->user = $user;
+        $this->can_reply = $can_reply;
         $this->expiring_at = $expiring_at;
     }
 

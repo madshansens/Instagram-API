@@ -16,19 +16,19 @@ class TimelineFeedResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            $this->num_results            = $response['num_results'];
-            $this->is_direct_v2_enabled   = $response['is_direct_v2_enabled'];
+            $this->num_results = $response['num_results'];
+            $this->is_direct_v2_enabled = $response['is_direct_v2_enabled'];
             $this->auto_load_more_enabled = $response['auto_load_more_enabled'];
-            $this->more_available         = $response['more_available'];
-            $this->next_max_id            = $response['next_max_id'];
-            $messages                     = [];
+            $this->more_available = $response['more_available'];
+            $this->next_max_id = $response['next_max_id'];
+            $messages = [];
             if ((isset($response['_messages'])) && (!empty($response['_messages']))) {
                 foreach ($response['_messages'] as $message) {
                     $messages[] = new _Message($message);
                 }
             }
             $this->_messages = $messages;
-            $items           = [];
+            $items = [];
             if ((isset($response['feed_items'])) && (!empty($response['feed_items']))) {
                 foreach ($response['feed_items'] as $item) {
                     if ((isset($item['media_or_ad']))) {
@@ -37,7 +37,7 @@ class TimelineFeedResponse extends Response
                 }
             }
             $this->feed_items = $items;
-            $this->megaphone  = (isset($response['megaphone']['feed_aysf'])) ? new FeedAysf($response['megaphone']['feed_aysf']) : null;
+            $this->megaphone = (isset($response['megaphone']['feed_aysf'])) ? new FeedAysf($response['megaphone']['feed_aysf']) : null;
         } else {
             $this->setMessage($response['message']);
         }

@@ -12,9 +12,9 @@ class ConfigureResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            $this->upload_id  = $response['upload_id'];
-            $this->media_id   = $response['media']['id'];
-            $this->image_url  = $response['media']['image_versions2']['candidates']['0']['url'];
+            $this->upload_id = $response['upload_id'];
+            $this->media_id = $response['media']['id'];
+            $this->image_url = $response['media']['image_versions2']['candidates']['0']['url'];
             $this->media_code = $response['media']['code'];
         } else {
             $this->setMessage($response['message']);
@@ -44,6 +44,6 @@ class ConfigureResponse extends Response
 
     public function getMediaUrl()
     {
-        return 'https://www.instagram.com/p/' . $this->getMediaCode() . '/';
+        return 'https://www.instagram.com/p/'.$this->getMediaCode().'/';
     }
 }

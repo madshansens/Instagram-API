@@ -9,7 +9,7 @@ class _Message
 
     public function __construct($data)
     {
-        $this->key  = $data['key'];
+        $this->key = $data['key'];
         $this->time = $data['time'];
     }
 

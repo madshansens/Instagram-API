@@ -15,8 +15,8 @@ class Experiment
             $params[] = new Param($param);
         }
         $this->params = $params;
-        $this->group  = $data['group'];
-        $this->name   = $data['name'];
+        $this->group = $data['group'];
+        $this->name = $data['name'];
     }
 
     /**

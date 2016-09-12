@@ -16,13 +16,13 @@ class UserFeedResponse extends Response
             if (array_key_exists('next_max_id', $response)) {
                 $this->next_max_id = $response['next_max_id'];
             }
-            $this->num_results            = $response['num_results'];
+            $this->num_results = $response['num_results'];
             $this->auto_load_more_enabled = $response['auto_load_more_enabled'];
-            $items                        = [];
+            $items = [];
             foreach ($response['items'] as $item) {
                 $items[] = new Item($item);
             }
-            $this->items          = $items;
+            $this->items = $items;
             $this->more_available = $response['more_available'];
         } else {
             $this->setMessage($response['message']);

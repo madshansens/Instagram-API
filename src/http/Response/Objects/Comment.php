@@ -22,13 +22,13 @@ class Comment
             $this->username_id = $commentData['user_id'];
         }
         $this->created_at_utc = $commentData['created_at_utc'];
-        $this->created_at     = $commentData['created_at'];
+        $this->created_at = $commentData['created_at'];
         if ((isset($commentData['bit_flags'])) && (!empty($commentData['bit_flags']))) {
             $this->bit_flags = $commentData['bit_flags'];
         }
-        $this->user    = new User($commentData['user']);
+        $this->user = new User($commentData['user']);
         $this->comment = $commentData['text'];
-        $this->pk      = $commentData['pk'];
+        $this->pk = $commentData['pk'];
         if ((isset($commentData['type'])) && (!empty($commentData['type']))) {
             $this->type = $commentData['type'];
         }

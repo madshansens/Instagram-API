@@ -17,10 +17,10 @@ class User
 
     public function __construct($userData)
     {
-        $this->username        = $userData['username'];
+        $this->username = $userData['username'];
         $this->profile_pic_url = $userData['profile_pic_url'];
-        $this->full_name       = $userData['full_name'];
-        $this->pk              = $userData['pk'];
+        $this->full_name = $userData['full_name'];
+        $this->pk = $userData['pk'];
         if (isset($userData['is_verified'])) {
             $this->is_verified = $userData['is_verified'];
         }

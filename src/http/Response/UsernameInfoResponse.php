@@ -34,11 +34,11 @@ class UsernameInfoResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            $this->usertags_count                = $response['user']['usertags_count'];
+            $this->usertags_count = $response['user']['usertags_count'];
             $this->has_anonymous_profile_picture = $response['user']['has_anonymous_profile_picture'];
-            $this->full_name                     = $response['user']['full_name'];
-            $this->following_count               = $response['user']['following_count'];
-            $this->auto_expand_chaining          = $response['user']['auto_expand_chaining'];
+            $this->full_name = $response['user']['full_name'];
+            $this->following_count = $response['user']['following_count'];
+            $this->auto_expand_chaining = $response['user']['auto_expand_chaining'];
             if (array_key_exists('external_lynx_url', $response['user'])) {
                 $this->external_lynx_url = $response['user']['external_lynx_url'];
             }
@@ -52,12 +52,12 @@ class UsernameInfoResponse extends Response
                 }
                 $this->hd_profile_pic_versions = $profile_pics_vers;
             }
-            $this->biography      = $response['user']['biography'];
-            $this->has_chaining   = $response['user']['has_chaining'];
-            $this->media_count    = $response['user']['media_count'];
+            $this->biography = $response['user']['biography'];
+            $this->has_chaining = $response['user']['has_chaining'];
+            $this->media_count = $response['user']['media_count'];
             $this->follower_count = $response['user']['follower_count'];
-            $this->pk             = $response['user']['pk'];
-            $this->username       = $response['user']['username'];
+            $this->pk = $response['user']['pk'];
+            $this->username = $response['user']['username'];
             if (array_key_exists('geo_media_count', $response['user'])) {
                 $this->geo_media_count = $response['user']['geo_media_count'];
             }
