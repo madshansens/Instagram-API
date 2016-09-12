@@ -20,6 +20,9 @@ class SyncResponse extends Response
         $this->setStatus($response['status']);
     }
 
+    /**
+     * @return Experiment[]
+     */
     public function getExperiments()
     {
         return $this->experiments;

@@ -17,16 +17,16 @@ class Suggestion
 
     public function __construct($data)
     {
-        $this->media_infos = $data['media_infos'];
+        $this->media_infos    = $data['media_infos'];
         $this->social_context = $data['social_context'];
-        $this->algorithm = $data['algorithm'];
+        $this->algorithm      = $data['algorithm'];
         $this->thumbnail_urls = $data['thumbnail_urls'];
-        $this->value = $data['value'];
-        $this->caption = $data['caption'];
-        $this->user = new User($data['user']);
-        $this->large_urls = $data['large_urls'];
-        $this->media_ids = $data['media_ids'];
-        $this->icon = $data['icon'];
+        $this->value          = $data['value'];
+        $this->caption        = $data['caption'];
+        $this->user           = new User($data['user']);
+        $this->large_urls     = $data['large_urls'];
+        $this->media_ids      = $data['media_ids'];
+        $this->icon           = $data['icon'];
     }
 
     public function getMediaInfo()
@@ -59,6 +59,9 @@ class Suggestion
         return $this->caption;
     }
 
+    /**
+     * @return User
+     */
     public function getUser()
     {
         return $this->user;

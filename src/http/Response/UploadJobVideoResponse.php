@@ -10,7 +10,7 @@ class UploadJobVideoResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            $this->upload_id = $response['upload_id'];
+            $this->upload_id         = $response['upload_id'];
             $this->video_upload_urls = $response['video_upload_urls'];
         } else {
             $this->setMessage($response['message']);

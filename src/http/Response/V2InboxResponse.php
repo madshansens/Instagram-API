@@ -14,10 +14,10 @@ class V2InboxResponse extends Response
     {
         if (self::STATUS_OK == $response['status']) {
             $this->pending_requests_total = $response['pending_requests_total'];
-            $this->seq_id = $response['seq_id'];
+            $this->seq_id                 = $response['seq_id'];
             $this->pending_requests_users = $response['pending_requests_users'];
-            $this->inbox = new Inbox($response['inbox']);
-            $this->subscription = $response['subscription'];
+            $this->inbox                  = new Inbox($response['inbox']);
+            $this->subscription           = $response['subscription'];
         } else {
             $this->setMessage($response['message']);
         }
@@ -39,6 +39,9 @@ class V2InboxResponse extends Response
         return $this->pending_requests_users;
     }
 
+    /**
+     * @return Inbox
+     */
     public function getInbox()
     {
         return $this->inbox;

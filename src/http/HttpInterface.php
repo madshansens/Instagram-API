@@ -115,6 +115,16 @@ class HttpInterface
         return [$header, json_decode($body, true)];
     }
 
+    /**
+     * @param $photo
+     * @param null $caption
+     * @param null $upload_id
+     * @param null $customPreview
+     * @param null $location
+     * @param null $filter
+     * @param bool $reel_flag
+     * @throws InstagramException
+     */
     public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null, $location = null, $filter = null, $reel_flag = false)
     {
         $endpoint = Constants::API_URL.'upload/photo/';

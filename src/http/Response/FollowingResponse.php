@@ -14,7 +14,7 @@ class FollowingResponse extends Response
             foreach ($response['users'] as $user) {
                 $users[] = new User($user);
             }
-            $this->followings = $users;
+            $this->followings  = $users;
             $this->next_max_id = isset($response['next_max_id']) ? $response['next_max_id'] : null;
         } else {
             $this->setMessage($response['message']);
@@ -22,6 +22,9 @@ class FollowingResponse extends Response
         $this->setStatus($response['status']);
     }
 
+    /**
+     * @return User
+     */
     public function getFollowings()
     {
         return $this->followings;

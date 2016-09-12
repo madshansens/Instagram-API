@@ -13,7 +13,7 @@ class ConfigureVideoResponse extends Response
     {
         if (self::STATUS_OK == $response['status']) {
             $this->upload_id = $response['upload_id'];
-            $this->media_id = $response['media']['id'];
+            $this->media_id  = $response['media']['id'];
             $this->image_url = $response['media']['image_versions2']['candidates']['0']['url'];
             $this->video_url = $response['media']['video_versions'][0]['url'];
         } else {

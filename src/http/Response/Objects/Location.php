@@ -13,13 +13,13 @@ class Location
 
     public function __construct($location)
     {
-        $this->name = $location['name'];
+        $this->name               = $location['name'];
         $this->external_id_source = $location['external_id_source'];
         if ((isset($location['address'])) && (!empty($location['address']))) {
             $this->address = $location['address'];
         }
-        $this->lat = $location['lat'];
-        $this->lng = $location['lng'];
+        $this->lat         = $location['lat'];
+        $this->lng         = $location['lng'];
         $this->external_id = $location['external_id'];
     }
 

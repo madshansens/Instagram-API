@@ -18,6 +18,9 @@ class CommentResponse extends Response
         $this->setStatus($response['status']);
     }
 
+    /**
+     * @return Comment|null
+     */
     public function getComment()
     {
         return $this->comment;
