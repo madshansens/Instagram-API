@@ -123,6 +123,7 @@ class HttpInterface
      * @param null $location
      * @param null $filter
      * @param bool $reel_flag
+     *
      * @throws InstagramException
      */
     public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null, $location = null, $filter = null, $reel_flag = false)

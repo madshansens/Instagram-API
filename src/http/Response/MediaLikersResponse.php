@@ -14,7 +14,7 @@ class MediaLikersResponse extends Response
             foreach ($response['users'] as $user) {
                 $users[] = new User($user);
             }
-            $this->likers     = $users;
+            $this->likers = $users;
             $this->user_count = $response['user_count'];
         } else {
             $this->setMessage($response['message']);

@@ -25,17 +25,17 @@ class AccountCreationResponse extends Response
     public function __construct($response)
     {
         if ((self::STATUS_OK == $response['status']) && (is_null($response['errors']))) {
-            $this->username                      = $response['created_user']['username'];
+            $this->username = $response['created_user']['username'];
             $this->has_anonymous_profile_picture = $response['created_user']['has_anonymous_profile_picture'];
-            $this->allow_contacts_sync           = $response['created_user']['allow_contacts_sync'];
-            $this->nux_private_first_page        = $response['created_user']['nux_private_first_page'];
-            $this->profile_pic_url               = $response['created_user']['profile_pic_url'];
-            $this->full_name                     = $response['created_user']['full_name'];
-            $this->pk                            = $response['created_user']['pk'];
-            $this->hd_profile_pic_url_info       = new HdProfilePicUrlInfo($response['created_user']['hd_profile_pic_url_info']);
-            $this->nux_private_enabled           = $response['created_user']['nux_private_enabled'];
-            $this->is_private                    = $response['created_user']['is_private'];
-            $this->account_created               = $response['account_created'];
+            $this->allow_contacts_sync = $response['created_user']['allow_contacts_sync'];
+            $this->nux_private_first_page = $response['created_user']['nux_private_first_page'];
+            $this->profile_pic_url = $response['created_user']['profile_pic_url'];
+            $this->full_name = $response['created_user']['full_name'];
+            $this->pk = $response['created_user']['pk'];
+            $this->hd_profile_pic_url_info = new HdProfilePicUrlInfo($response['created_user']['hd_profile_pic_url_info']);
+            $this->nux_private_enabled = $response['created_user']['nux_private_enabled'];
+            $this->is_private = $response['created_user']['is_private'];
+            $this->account_created = $response['account_created'];
         } else {
             if (array_key_exists('message', $response)) {
                 $this->setMessage($response['message']);
@@ -44,11 +44,11 @@ class AccountCreationResponse extends Response
                 $this->errors = $response['errors'];
             }
             if (is_null($this->errors)) {
-                $this->feedback_title   = $response['feedback_title'];
+                $this->feedback_title = $response['feedback_title'];
                 $this->feedback_message = $response['feedback_message'];
-                $this->spam             = $response['spam'];
-                $this->feedback_action  = $response['feedback_action'];
-                $this->feedback_url     = $response['feedback_url'];
+                $this->spam = $response['spam'];
+                $this->feedback_action = $response['feedback_action'];
+                $this->feedback_url = $response['feedback_url'];
             }
         }
         $this->setStatus($response['status']);

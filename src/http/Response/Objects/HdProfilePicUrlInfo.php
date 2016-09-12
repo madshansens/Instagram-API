@@ -10,8 +10,8 @@ class HdProfilePicUrlInfo
 
     public function __construct($response)
     {
-        $this->url    = $response['url'];
-        $this->width  = $response['width'];
+        $this->url = $response['url'];
+        $this->width = $response['width'];
         $this->height = $response['height'];
     }
 

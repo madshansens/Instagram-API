@@ -11,9 +11,9 @@ class VideoVersions
 
     public function __construct($response)
     {
-        $this->url    = $response['url'];
-        $this->type   = $response['type'];
-        $this->width  = $response['width'];
+        $this->url = $response['url'];
+        $this->type = $response['type'];
+        $this->width = $response['width'];
         $this->height = $response['height'];
     }
 
