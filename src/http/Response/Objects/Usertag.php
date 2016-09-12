@@ -16,6 +16,9 @@ class Usertag
         $this->in = $ins;
     }
 
+    /**
+     * @return In[]
+     */
     public function getIn()
     {
         return $this->in;

@@ -58,6 +58,9 @@ class ProfileResponse extends Response
         return $this->has_anonymous_profile_picture;
     }
 
+    /**
+     * @return HdProfilePicUrlInfo[]
+     */
     public function getHdProfilePicVersions()
     {
         return $this->hd_profile_pic_versions;
@@ -113,6 +116,9 @@ class ProfileResponse extends Response
         return $this->country_code;
     }
 
+    /**
+     * @return HdProfilePicUrlInfo
+     */
     public function getHdProfilePicUrlInfo()
     {
         return $this->hd_profile_pic_url_info;

@@ -21,6 +21,9 @@ class LocationResponse extends Response
         $this->setStatus($response['status']);
     }
 
+    /**
+     * @return Location[]
+     */
     public function getVenues()
     {
         return $this->venues;

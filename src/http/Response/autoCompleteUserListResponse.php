@@ -11,7 +11,7 @@ class autoCompleteUserListResponse extends Response
     {
         if (self::STATUS_OK == $response['status']) {
             $this->expires = $response['expires'];
-            $users = [];
+            $users         = [];
             foreach ($response['users'] as $user) {
                 $users[] = new User($user);
             }
@@ -27,6 +27,9 @@ class autoCompleteUserListResponse extends Response
         return $this->expires;
     }
 
+    /**
+     * @return User[]
+     */
     public function getUsers()
     {
         return $this->users;

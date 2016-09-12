@@ -15,7 +15,7 @@ class CheckEmailResponse extends Response
         if (self::STATUS_OK == $response['status']) {
             $this->confirmed = $response['confirmed'];
             $this->available = $response['available'];
-            $this->valid = $response['valid'];
+            $this->valid     = $response['valid'];
             if (array_key_exists('username_suggestions', $response)) {
                 $this->username_suggestions = $response['username_suggestions'];
             }

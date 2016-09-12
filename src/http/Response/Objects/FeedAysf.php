@@ -18,23 +18,23 @@ class FeedAysf
 
     public function __construct($data)
     {
-        $this->landing_site_type = $data['landing_site_type'];
-        $this->uuid = $data['uuid'];
-        $this->view_all_text = $data['view_all_text'];
-        $this->feed_position = $data['feed_position'];
+        $this->landing_site_type  = $data['landing_site_type'];
+        $this->uuid               = $data['uuid'];
+        $this->view_all_text      = $data['view_all_text'];
+        $this->feed_position      = $data['feed_position'];
         $this->landing_site_title = $data['landing_site_title'];
-        $this->is_dismissable = $data['is_dismissable'];
-        $suggestions = [];
+        $this->is_dismissable     = $data['is_dismissable'];
+        $suggestions              = [];
         if ((isset($data['suggestions'])) && (!empty($data['suggestions']))) {
             foreach ($data['suggestions'] as $suggestion) {
                 $suggestions[] = new Suggestion($suggestion);
             }
         }
-        $this->suggestions = $suggestions;
-        $this->should_refill = $data['should_refill'];
-        $this->display_new_unit = $data['display_new_unit'];
+        $this->suggestions        = $suggestions;
+        $this->should_refill      = $data['should_refill'];
+        $this->display_new_unit   = $data['display_new_unit'];
         $this->fetch_user_details = $data['fetch_user_details'];
-        $this->title = $data['title'];
+        $this->title              = $data['title'];
     }
 
     public function getLandingSiteType()
@@ -67,6 +67,9 @@ class FeedAysf
         return $this->is_dismissable;
     }
 
+    /**
+     * @return Suggestion[]
+     */
     public function getSuggestions()
     {
         return $this->suggestions;

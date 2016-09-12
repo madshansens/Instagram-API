@@ -11,9 +11,9 @@ class PendingInboxResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            $this->seq_id = $response['seq_id'];
+            $this->seq_id                 = $response['seq_id'];
             $this->pending_requests_total = $response['pending_requests_total'];
-            $this->inbox = new Inbox($response['inbox']);
+            $this->inbox                  = new Inbox($response['inbox']);
         } else {
             $this->setMessage($response['message']);
         }
@@ -30,6 +30,9 @@ class PendingInboxResponse extends Response
         return $this->pending_requests_total;
     }
 
+    /**
+     * @return Inbox
+     */
     public function getInbox()
     {
         return $this->inbox;
