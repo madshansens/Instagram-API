@@ -1034,7 +1034,7 @@ class Instagram
      */
     public function getRecentActivity()
     {
-        $activity = $this->http->request('news/inbox/')[1];
+        $activity = $this->http->request('news/inbox/?activity_module=all')[1];
 
         if ($activity['status'] != 'ok') {
             throw new InstagramException($activity['message']."\n");
@@ -1569,7 +1569,7 @@ class Instagram
      */
     public function getUserFollowers($usernameId, $maxid = null)
     {
-        return new FollowerResponse($this->http->request("friendships/$usernameId/followers/?max_id=$maxid&ig_sig_key_version=".Constants::SIG_KEY_VERSION."&rank_token=$this->rank_token")[1]);
+        return new FollowerResponse($this->http->request("friendships/$usernameId/followers/?rank_token=$this->rank_token".(!is_null($maxid) ? '&max_id='.$maxid : ''))[1]);
     }
 
     /**
@@ -1804,14 +1804,7 @@ class Instagram
      */
     public function userFriendship($userId)
     {
-        $data = json_encode([
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            'user_id'    => $userId,
-            '_csrftoken' => $this->token,
-        ]);
-
-        return $this->http->request("friendships/show/$userId/", SignatureUtils::generateSignature($data))[1];
+        return $this->http->request("friendships/show/$userId/")[1];
     }
 
     /**
