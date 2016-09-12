@@ -26,7 +26,8 @@ class HttpInterface
         $headers = [
         'Connection: close',
         'Accept: */*',
-        'X-IG-Capabilities: 3QI=',
+        'X-IG-Capabilities: 3Q4=',
+        'X-IG-Connection-Type: WIFI',
         'Content-type: application/x-www-form-urlencoded; charset=UTF-8',
         'Cookie2: $Version=1',
         'Accept-Language: en-US',
@@ -82,7 +83,12 @@ class HttpInterface
             }
             if (!is_null($post)) {
                 if (!is_array($post)) {
-                    echo 'DATA: '.urldecode($post)."\n";
+                    if (php_sapi_name() == 'cli') {
+                        $dat = Utils::colouredString('DATA: ', 'yellow');
+                    } else {
+                        $dat = 'DATA: ';
+                    }
+                    echo $dat.urldecode($post)."\n";
                 }
             }
             $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
