@@ -1578,9 +1578,9 @@ class Instagram
      * @return FollowerResponse
      *                          followers data
      */
-    public function getSelfUserFollowers()
+    public function getSelfUserFollowers($max_id = null)
     {
-        return $this->getUserFollowers($this->username_id);
+        return $this->getUserFollowers($this->username_id, $max_id);
     }
 
     /**
@@ -1589,9 +1589,9 @@ class Instagram
      * @return FollowingResponse
      *                           users we are following data
      */
-    public function getSelfUsersFollowing()
+    public function getSelfUsersFollowing($max_id = null)
     {
-        return $this->getUserFollowings($this->username_id);
+        return $this->getUserFollowings($this->username_id, $max_id);
     }
 
     /**
