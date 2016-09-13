@@ -22,7 +22,6 @@ class MediaCommentsResponse extends Response
             if (isset($response['next_max_id'])) {
                 $this->next_max_id = $response['next_max_id'];
             }
-            $this->next_max_id = $response['next_max_id'];
             if (isset($response['caption_is_edited'])) {
                 $this->caption_is_edited = $response['caption_is_edited'];
             }
