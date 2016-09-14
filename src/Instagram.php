@@ -612,15 +612,15 @@ class Instagram
      */
     public function configure($upload_id, $photo, $caption = '', $location = null, $filter = null)
     {
-        $caption = is_null($caption) ? '' : $caption;
         $size = getimagesize($photo)[0];
 
         $post = [
             'upload_id'          => $upload_id,
             'camera_model'       => str_replace(' ', '', $this->settings->get('model')),
-            'source_type'        => 3,
+            'source_type'        => 1,
             'date_time_original' => date('Y:m:d H:i:s'),
             'camera_make'        => $this->settings->get('manufacturer'),
+            'geotag_enabled'     => false,
             'edits'              => [
                 'crop_original_size' => [$size, $size],
                 'crop_zoom'          => 1.3333334,
@@ -636,11 +636,17 @@ class Instagram
                 'android_version' => Constants::ANDROID_VERSION,
                 'android_release' => Constants::ANDROID_RELEASE,
             ],
-            '_csrftoken' => $this->token,
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            'caption'    => $caption,
+            '_csrftoken'    => $this->token,
+            '_uuid'         => $this->uuid,
+            '_uid'          => $this->username_id,
+            'waterfall_id'  => SignatureUtils::generateUUID(false),
+            'scene_type'    => 1,
         ];
+
+        if(!is_null($caption)) {
+            $post['caption'] = $caption;
+        }
+
 
         if (!is_null($location)) {
             $loc = [
