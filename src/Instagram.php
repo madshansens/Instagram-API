@@ -412,6 +412,26 @@ class Instagram
     }
 
     /**
+     * Home Channel
+     *
+     * @throws InstagramException discoverChannel data
+     *
+     * @return DiscoverChannelResponse|void
+     */
+     public function discoverChannels()
+     {
+         $discoverChannels = new DiscoverChannelsResponse($this->http->request('discover/channels_home/')[1]);
+
+         if (!$discoverChannels->isOk()) {
+             throw new InstagramException($discoverChannels->getMessage()."\n");
+
+             return;
+         }
+
+         return $discoverChannels;
+     }
+
+    /**
      * @return ExposeResponse
      */
     public function expose()
