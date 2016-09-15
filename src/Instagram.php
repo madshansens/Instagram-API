@@ -633,39 +633,34 @@ class Instagram
     public function configure($upload_id, $photo, $caption = '', $location = null, $filter = null)
     {
         $size = getimagesize($photo)[0];
+        if(is_null($caption)) {
+            $caption = '';
+        }
 
         $post = [
+            '_csrftoken'         => $this->token,
+            'media_folder'       => 'Instagram',
+            'source_type'        => 4,
+            '_uid'               => $this->username_id,
+            '_uuid'              => $this->uuid,
+            'caption'            => $caption,
             'upload_id'          => $upload_id,
-            'camera_model'       => str_replace(' ', '', $this->settings->get('model')),
-            'source_type'        => 1,
-            'date_time_original' => date('Y:m:d H:i:s'),
-            'camera_make'        => $this->settings->get('manufacturer'),
-            'geotag_enabled'     => false,
-            'edits'              => [
-                'crop_original_size' => [$size, $size],
-                'crop_zoom'          => 1.3333334,
-                'crop_center'        => [0.0, -0.0],
-            ],
-            'extra' => [
-                'source_width'  => $size,
-                'source_height' => $size,
-            ],
             'device' => [
                 'manufacturer'    => $this->settings->get('manufacturer'),
                 'model'           => $this->settings->get('model'),
                 'android_version' => Constants::ANDROID_VERSION,
                 'android_release' => Constants::ANDROID_RELEASE,
             ],
-            '_csrftoken'    => $this->token,
-            '_uuid'         => $this->uuid,
-            '_uid'          => $this->username_id,
-            'waterfall_id'  => SignatureUtils::generateUUID(false),
-            'scene_type'    => 1,
+            'edits'              => [
+                'crop_original_size' => [$size, $size],
+                'crop_center'        => [0, 0],
+                'crop_zoom'          => 1,
+            ],
+            'extra' => [
+                'source_width'  => $size,
+                'source_height' => $size,
+            ],
         ];
-
-        if(!is_null($caption)) {
-            $post['caption'] = $caption;
-        }
 
 
         if (!is_null($location)) {
@@ -694,8 +689,10 @@ class Instagram
         $post = json_encode($post);
 
         $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]', $post);
+        $post = str_replace('"crop_zoom":1', '"crop_zoom":1.0', $post);
+        $post = str_replace('"crop_original_size":'."[$size,$size]", '"crop_original_size":'."[$size.0,$size.0]", $post);
 
-        return new ConfigureResponse($this->http->request('media/configure/', SignatureUtils::generateSignature($post))[1]);
+        return new ConfigureResponse($this->http->request('media/configure/?', SignatureUtils::generateSignature($post))[1]);
     }
 
     /**

@@ -29,7 +29,6 @@ class HttpInterface
         'X-IG-Capabilities: 3Q4=',
         'X-IG-Connection-Type: WIFI',
         'Content-type: application/x-www-form-urlencoded; charset=UTF-8',
-        'Cookie2: $Version=1',
         'Accept-Language: en-US',
     ];
 
@@ -165,7 +164,7 @@ class HttpInterface
             [
                 'type' => 'form-data',
                 'name' => 'image_compression',
-              'data'   => '{"lib_name":"jt","lib_version":"1.3.0","quality":"70"}',
+                'data' => '{"lib_name":"jt","lib_version":"1.3.0","quality":"87"}',
             ],
             [
                 'type'     => 'form-data',
@@ -173,7 +172,7 @@ class HttpInterface
                 'data'     => $fileToUpload,
                 'filename' => 'pending_media_'.number_format(round(microtime(true) * 1000), 0, '', '').'.jpg',
                 'headers'  => [
-          'Content-Transfer-Encoding: binary',
+                    'Content-Transfer-Encoding: binary',
                     'Content-type: application/octet-stream',
                 ],
             ],
@@ -181,13 +180,13 @@ class HttpInterface
 
         $data = $this->buildBody($bodies, $boundary);
         $headers = [
-                'Connection: close',
-                'Accept: */*',
+                'X-IG-Capabilities: 3Q4=',
+                'X-IG-Connection-Type: WIFI',
                 'Content-type: multipart/form-data; boundary='.$boundary,
-        'Content-Length: '.strlen($data),
-        'Cookie2: $Version=1',
-        'Accept-Language: en-US',
-        'Accept-Encoding: gzip',
+                'Content-Length: '.strlen($data),
+                'Accept-Language: en-US',
+                'Accept-Encoding: gzip, deflate',
+                'Connection: close',
         ];
 
         $ch = curl_init();
@@ -196,7 +195,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_VERBOSE, $this->parent->debug);
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -217,16 +216,46 @@ class HttpInterface
         $header = substr($resp, 0, $header_len);
         $upload = new UploadPhotoResponse(json_decode(substr($resp, $header_len), true));
 
+        if ($this->parent->debug) {
+            $endp = 'upload/photo/';
+            if (php_sapi_name() == 'cli') {
+                $method = Utils::colouredString('POST:  ', 'light_blue');
+            } else {
+                $method = 'POST:  ';
+            }
+            echo $method.$endp."\n";
+
+
+            $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
+            if (php_sapi_name() == 'cli') {
+                $dat = Utils::colouredString('→ '.$uploadBytes, 'yellow');
+            } else {
+                $dat = '→ '.$uploadBytes;
+            }
+            echo $dat."\n";
+
+            $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            if (php_sapi_name() == 'cli') {
+                echo Utils::colouredString("← $httpCode \t $bytes", 'green')."\n";
+            } else {
+                echo "← $httpCode \t $bytes\n";
+            }
+
+            if (php_sapi_name() == 'cli') {
+                $res = Utils::colouredString('RESPONSE: ', 'cyan');
+            } else {
+                $res = 'RESPONSE: ';
+            }
+            echo $res.substr($resp, $header_len)."\n\n";
+        }
+
         curl_close($ch);
 
         if (!$upload->isOk()) {
             throw new InstagramException($upload->getMessage());
 
             return;
-        }
-
-        if ($this->parent->debug) {
-            echo 'RESPONSE: '.substr($resp, $header_len)."\n\n";
         }
 
         if ($reel_flag) {
@@ -239,7 +268,7 @@ class HttpInterface
             throw new InstagramException($configure->getMessage());
         }
 
-        $this->parent->expose();
+        //$this->parent->expose();
 
         return $configure;
     }
