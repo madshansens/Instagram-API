@@ -1519,15 +1519,15 @@ class Instagram
     public function getLocationFeed($locationId, $maxid = null)
     {
         if (is_null($maxid)) {
-            $endpoint = "feed/location/$locationId/?rank_token=$this->rank_token&ranked_content=true&";
+            $endpoint = "feed/location/$locationId/";
         } else {
-            $endpoint = "feed/location/$locationId/?max_id=".$maxid."&rank_token=$this->rank_token&ranked_content=true&";
+            $endpoint = "feed/location/$locationId/?max_id=".$maxid;
         }
 
-        $locationFeed = $this->http->request($endpoint)[1];
+        $locationFeed = new LocationFeedResponse($this->http->request($endpoint)[1]);
 
-        if ($locationFeed['status'] != 'ok') {
-            throw new InstagramException($locationFeed['message']."\n");
+        if (!$locationFeed->isOk()) {
+            throw new InstagramException($locationFeed->getMessage()."\n");
 
             return;
         }

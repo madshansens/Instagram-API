@@ -49,7 +49,7 @@ class TagFeedResponse extends Response
         return $this->ranked_items;
     }
 
-    public function getAutoLoadMoreEnabled()
+    public function autoLoadMoreEnabled()
     {
         return $this->auto_load_more_enabled;
     }
