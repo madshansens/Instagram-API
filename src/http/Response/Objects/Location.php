@@ -5,22 +5,30 @@ namespace InstagramAPI;
 class Location
 {
     protected $name;
-    protected $external_id_source;
+    protected $external_id_source = null;
     protected $address;
     protected $lat;
     protected $lng;
-    protected $external_id;
+    protected $external_id = null;
+    protected $city = null;
 
     public function __construct($location)
     {
         $this->name = $location['name'];
-        $this->external_id_source = $location['external_id_source'];
+        if (array_key_exists('external_id_source', $location)) {
+            $this->external_id_source = $location['external_id_source'];
+        }
         if ((isset($location['address'])) && (!empty($location['address']))) {
             $this->address = $location['address'];
         }
         $this->lat = $location['lat'];
         $this->lng = $location['lng'];
-        $this->external_id = $location['external_id'];
+        if (array_key_exists('external_id', $location)) {
+            $this->external_id = $location['external_id'];
+        }
+        if (array_key_exists('city', $location)) {
+            $this->city = $location['city'];
+        }
     }
 
     public function getName()
@@ -51,5 +59,10 @@ class Location
     public function getExternalId()
     {
         return $this->external_id;
+    }
+
+    public function getCity()
+    {
+        return $this->getCity;
     }
 }

@@ -1494,10 +1494,10 @@ class Instagram
         $query = rawurlencode($query);
         $endpoint = "fbsearch/places/?rank_token=$this->rank_token&query=".$query;
 
-        $locationFeed = $this->http->request($endpoint)[1];
+        $locationFeed = new FBLocationResponse($this->http->request($endpoint)[1]);
 
-        if ($locationFeed['status'] != 'ok') {
-            throw new InstagramException($locationFeed['message']."\n");
+        if (!$locationFeed->isOk()) {
+            throw new InstagramException($locationFeed->getMessage()."\n");
 
             return;
         }
