@@ -1462,15 +1462,15 @@ class Instagram
     public function getHashtagFeed($hashtagString, $maxid = null)
     {
         if (is_null($maxid)) {
-            $endpoint = "feed/tag/$hashtagString/?rank_token=$this->rank_token&ranked_content=true&";
+            $endpoint = "feed/tag/$hashtagString/";
         } else {
-            $endpoint = "feed/tag/$hashtagString/?max_id=".$maxid."&rank_token=$this->rank_token&ranked_content=true&";
+            $endpoint = "feed/tag/$hashtagString/?max_id=".$maxid;
         }
 
-        $hashtagFeed = $this->http->request($endpoint)[1];
+        $hashtagFeed = new TagFeedResponse($this->http->request($endpoint)[1]);
 
-        if ($hashtagFeed['status'] != 'ok') {
-            throw new InstagramException($hashtagFeed['message']."\n");
+        if (!$hashtagFeed->isOk()) {
+            throw new InstagramException($hashtagFeed->getMessage()."\n");
 
             return;
         }
