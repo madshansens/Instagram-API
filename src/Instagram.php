@@ -806,7 +806,7 @@ class Instagram
             'media_id'   => $mediaId,
         ]);
 
-        return $this->http->request("media/$mediaId/delete/", SignatureUtils::generateSignature($data))[1];
+        return new MediaDeleteResponse($this->http->request("media/$mediaId/delete/", SignatureUtils::generateSignature($data))[1]);
     }
 
     /**
@@ -848,7 +848,7 @@ class Instagram
             '_csrftoken' => $this->token,
         ]);
 
-        return $this->http->request("media/$mediaId/comment/$commentId/delete/", SignatureUtils::generateSignature($data))[1];
+        return new DeleteCommentResponse($this->http->request("media/$mediaId/comment/$commentId/delete/", SignatureUtils::generateSignature($data))[1]);
     }
 
     /**
@@ -882,7 +882,7 @@ class Instagram
             'comment_ids_to_delete' => $comment_ids_to_delete,
         ]);
 
-        return $this->http->request("media/$mediaId/comment/bulk_delete/", SignatureUtils::generateSignature($data))[1];
+        return new DeleteCommentResponse($this->http->request("media/$mediaId/comment/bulk_delete/", SignatureUtils::generateSignature($data))[1]);
     }
 
     /**
@@ -893,7 +893,7 @@ class Instagram
      */
     public function changeProfilePicture($photo)
     {
-        $this->http->changeProfilePicture($photo);
+        return new ProfileResponse($this->http->changeProfilePicture($photo));
     }
 
     /**
@@ -910,7 +910,7 @@ class Instagram
             '_csrftoken' => $this->token,
         ]);
 
-        return $this->http->request('accounts/remove_profile_picture/', SignatureUtils::generateSignature($data))[1];
+        return new ProfileResponse($this->http->request('accounts/remove_profile_picture/', SignatureUtils::generateSignature($data))[1]);
     }
 
     /**
@@ -927,7 +927,7 @@ class Instagram
             '_csrftoken' => $this->token,
         ]);
 
-        return $this->http->request('accounts/set_private/', SignatureUtils::generateSignature($data))[1];
+        return new ProfileResponse($this->http->request('accounts/set_private/', SignatureUtils::generateSignature($data))[1]);
     }
 
     /**
@@ -944,7 +944,7 @@ class Instagram
             '_csrftoken' => $this->token,
         ]);
 
-        return $this->http->request('accounts/set_public/', SignatureUtils::generateSignature($data))[1];
+        return new ProfileResponse($this->http->request('accounts/set_public/', SignatureUtils::generateSignature($data))[1]);
     }
 
     /**

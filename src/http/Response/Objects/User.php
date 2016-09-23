@@ -14,6 +14,7 @@ class User
     protected $is_private = false;
     protected $coeff_weight = 0;
     protected $friendship_status = null;
+    protected $hd_profile_pic_versions;
 
     public function __construct($userData)
     {

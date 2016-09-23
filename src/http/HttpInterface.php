@@ -452,7 +452,6 @@ class HttpInterface
           'Accept: */*',
           'Content-type: multipart/form-data; boundary='.$boundary,
           'Accept-Language: en-en',
-          'Accept-Encoding: gzip, deflate',
       ];
 
         $ch = curl_init();
@@ -461,7 +460,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_VERBOSE, $this->parent->debug);
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -481,6 +480,40 @@ class HttpInterface
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
         $upload = json_decode(substr($resp, $header_len), true);
+
+        if ($this->parent->debug) {
+            $endp = 'accounts/change_profile_picture/';
+            if (php_sapi_name() == 'cli') {
+                $method = Utils::colouredString('POST:  ', 'light_blue');
+            } else {
+                $method = 'POST:  ';
+            }
+            echo $method.$endp."\n";
+
+
+            $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
+            if (php_sapi_name() == 'cli') {
+                $dat = Utils::colouredString('→ '.$uploadBytes, 'yellow');
+            } else {
+                $dat = '→ '.$uploadBytes;
+            }
+            echo $dat."\n";
+
+            $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            if (php_sapi_name() == 'cli') {
+                echo Utils::colouredString("← $httpCode \t $bytes", 'green')."\n";
+            } else {
+                echo "← $httpCode \t $bytes\n";
+            }
+
+            if (php_sapi_name() == 'cli') {
+                $res = Utils::colouredString('RESPONSE: ', 'cyan');
+            } else {
+                $res = 'RESPONSE: ';
+            }
+            echo $res.substr($resp, $header_len)."\n\n";
+        }
 
         curl_close($ch);
     }
