@@ -1144,27 +1144,6 @@ class Instagram
         return $this->getUserTags($this->username_id);
     }
 
-    /**
-     * Get tagged media.
-     *
-     * @param string $tag
-     *
-     * @throws InstagramException
-     *
-     * @return TagFeedResponse
-     */
-    public function tagFeed($tag)
-    {
-        $userFeed = new TagFeedResponse($this->http->request("feed/tag/$tag/?rank_token=$this->rank_token&ranked_content=true&")[1]);
-
-        if (!$userFeed->isOk()) {
-            throw new InstagramException($userFeed->getMessage()."\n");
-
-            return;
-        }
-
-        return $userFeed;
-    }
 
     /**
      * Get media likers.
