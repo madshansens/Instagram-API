@@ -1185,10 +1185,10 @@ class Instagram
      */
     public function getGeoMedia($usernameId)
     {
-        $locations = $this->http->request("maps/user/$usernameId/")[1];
+        $locations = new GeoMediaResponse($this->http->request("maps/user/$usernameId/")[1]);
 
-        if ($locations['status'] != 'ok') {
-            throw new InstagramException($locations['message']."\n");
+        if (!$locations->isOk()) {
+            throw new InstagramException($locations->getMessage()."\n");
 
             return;
         }
