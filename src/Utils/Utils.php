@@ -148,7 +148,7 @@ class Utils
             $colored_string .= "\033[".$colours[$colour].'m';
         }
 
-        $colored_string .=  $string."\033[0m";
+        $colored_string .= $string."\033[0m";
 
         return $colored_string;
     }

@@ -411,13 +411,13 @@ class Instagram
         return $explore;
     }
 
-    /**
-     * Home Channel
-     *
-     * @throws InstagramException discoverChannel data
-     *
-     * @return DiscoverChannelResponse|void
-     */
+     /**
+      * Home Channel.
+      *
+      * @throws InstagramException discoverChannel data
+      *
+      * @return DiscoverChannelResponse|void
+      */
      public function discoverChannels()
      {
          $discoverChannels = new DiscoverChannelsResponse($this->http->request('discover/channels_home/')[1]);
@@ -633,7 +633,7 @@ class Instagram
     public function configure($upload_id, $photo, $caption = '', $location = null, $filter = null)
     {
         $size = getimagesize($photo)[0];
-        if(is_null($caption)) {
+        if (is_null($caption)) {
             $caption = '';
         }
 
@@ -645,7 +645,7 @@ class Instagram
             '_uuid'              => $this->uuid,
             'caption'            => $caption,
             'upload_id'          => $upload_id,
-            'device' => [
+            'device'             => [
                 'manufacturer'    => $this->settings->get('manufacturer'),
                 'model'           => $this->settings->get('model'),
                 'android_version' => Constants::ANDROID_VERSION,
@@ -1143,7 +1143,6 @@ class Instagram
     {
         return $this->getUserTags($this->username_id);
     }
-
 
     /**
      * Get media likers.
