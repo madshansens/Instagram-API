@@ -24,6 +24,7 @@ class UserFeedResponse extends Response
             }
             $this->items = $items;
             $this->more_available = $response['more_available'];
+            $this->setFullResponse( $response );
         } else {
             $this->setMessage($response['message']);
         }
