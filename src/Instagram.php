@@ -1057,10 +1057,10 @@ class Instagram
      */
     public function getRecentActivity()
     {
-        $activity = $this->http->request('news/inbox/?activity_module=all')[1];
+        $activity = new ActivityNewsResponse($this->http->request('news/inbox/?activity_module=all')[1]);
 
-        if ($activity['status'] != 'ok') {
-            throw new InstagramException($activity['message']."\n");
+        if (!$activity->isOk()) {
+            throw new InstagramException($activity->getMessage()."\n");
 
             return;
         }

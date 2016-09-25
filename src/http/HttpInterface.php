@@ -342,8 +342,41 @@ class HttpInterface
         $job = $body->getVideoUploadJob();
 
         $request_size = floor(strlen($videoData) / 4);
-
         $lastRequestExtra = (strlen($videoData) - ($request_size * 4));
+
+        if ($this->parent->debug) {
+            $endp = 'upload/video/';
+            if (php_sapi_name() == 'cli') {
+                $method = Utils::colouredString('POST:  ', 'light_blue');
+            } else {
+                $method = 'POST:  ';
+            }
+            echo $method.$endp."\n";
+
+
+            $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
+            if (php_sapi_name() == 'cli') {
+                $dat = Utils::colouredString('→ '.$uploadBytes, 'yellow');
+            } else {
+                $dat = '→ '.$uploadBytes;
+            }
+            echo $dat."\n";
+
+            $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            if (php_sapi_name() == 'cli') {
+                echo Utils::colouredString("← $httpCode \t $bytes", 'green')."\n";
+            } else {
+                echo "← $httpCode \t $bytes\n";
+            }
+
+            if (php_sapi_name() == 'cli') {
+                $res = Utils::colouredString('RESPONSE: ', 'cyan');
+            } else {
+                $res = 'RESPONSE: ';
+            }
+            echo $res.substr($resp, $header_len)."\n\n";
+        }
 
         for ($a = 0; $a <= 3; $a++) {
             $start = ($a * $request_size);
@@ -388,20 +421,52 @@ class HttpInterface
             $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
             $body = substr($result, $header_len);
             $array[] = [$body];
+
+            //here another debug when improved echo debugging
         }
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
         $upload = new UploadVideoResponse(json_decode(substr($resp, $header_len), true));
 
-        curl_close($ch);
-
         if ($this->parent->debug) {
-            echo 'RESPONSE: '.substr($resp, $header_len)."\n\n";
+            $endp = 'upload/photo/';
+            if (php_sapi_name() == 'cli') {
+                $method = Utils::colouredString('POST:  ', 'light_blue');
+            } else {
+                $method = 'POST:  ';
+            }
+            echo $method.$endp."\n";
+
+
+            $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
+            if (php_sapi_name() == 'cli') {
+                $dat = Utils::colouredString('→ '.$uploadBytes, 'yellow');
+            } else {
+                $dat = '→ '.$uploadBytes;
+            }
+            echo $dat."\n";
+
+            $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            if (php_sapi_name() == 'cli') {
+                echo Utils::colouredString("← $httpCode \t $bytes", 'green')."\n";
+            } else {
+                echo "← $httpCode \t $bytes\n";
+            }
+
+            if (php_sapi_name() == 'cli') {
+                $res = Utils::colouredString('RESPONSE: ', 'cyan');
+            } else {
+                $res = 'RESPONSE: ';
+            }
+            echo $res.substr($resp, $header_len)."\n\n";
         }
 
+        curl_close($ch);
+
         $configure = $this->parent->configureVideo($upload_id, $video, $caption, $customPreview);
-        $this->parent->expose();
+        //$this->parent->expose();
 
         return $configure;
     }
