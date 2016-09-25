@@ -18,7 +18,6 @@ class CommentResponse extends Response
             }
 
             $this->setFullResponse($response);
-
         } else {
             $this->setMessage($response['message']);
         }

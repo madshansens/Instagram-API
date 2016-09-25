@@ -15,10 +15,10 @@ $debug = false;
 
 $i = new \InstagramAPI\Instagram($username, $password, $debug);
 
-try{
+try {
     $i->login();
 } catch (Exception $e) {
-    echo "something went wrong ". $e->getMessage()."\n";
+    echo 'something went wrong '.$e->getMessage()."\n";
     exit(0);
 }
 try {
@@ -26,18 +26,18 @@ try {
     $followers = [];
 
     do {
-        if(is_null($helper)) {
+        if (is_null($helper)) {
             $helper = $i->getSelfUserFollowers();
         } else {
             $helper = $i->getSelfUserFollowers($helper->getNextMaxId());
         }
         $followers = array_merge($followers, $helper->getFollowers());
-    } while(!is_null($helper->getNextMaxId()));
+    } while (!is_null($helper->getNextMaxId()));
 
     echo "My followers: \n";
     foreach ($followers as $follower) {
-        echo '- '. $follower->getUsername() . "\n";
+        echo '- '.$follower->getUsername()."\n";
     }
 } catch (Exception $e) {
-  echo $e->getMessage();
+    echo $e->getMessage();
 }
