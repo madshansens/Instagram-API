@@ -28,6 +28,9 @@ class MediaCommentsResponse extends Response
             if (isset($response['caption_is_edited'])) {
                 $this->comment_count = $response['comment_count'];
             }
+
+            $this->setFullResponse($response);
+            
         } else {
             $this->setMessage($response['message']);
         }
