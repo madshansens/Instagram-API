@@ -1020,7 +1020,15 @@ class Instagram
             'new_password2' => $newPassword,
         ]);
 
-        return $this->http->request('accounts/change_password/', SignatureUtils::generateSignature($data))[1];
+        $pw = new ChangePasswordResponse($this->http->request('accounts/change_password/', SignatureUtils::generateSignature($data))[1]);
+
+        if (!$pw->isOk()) {
+            throw new InstagramException($pw->getMessage()."\n");
+
+            return;
+        }
+
+        return $pw;
     }
 
     /**
@@ -1078,10 +1086,10 @@ class Instagram
      */
     public function getFollowingRecentActivity()
     {
-        $activity = $this->http->request('news/?')[1];
+        $activity = new FollowingRecentActivityResponse($this->http->request('news/?')[1]);
 
-        if ($activity['status'] != 'ok') {
-            throw new InstagramException($activity['message']."\n");
+        if (!$activity->isOk()) {
+            throw new InstagramException($activity->getMessage()."\n");
 
             return;
         }
