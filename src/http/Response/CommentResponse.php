@@ -12,6 +12,13 @@ class CommentResponse extends Response
             if ((isset($commentData['comment'])) && (!empty($commentData['comment']))) {
                 $this->comment = new Comment($response['comment']);
             }
+
+            if (array_key_exists('next_max_id', $response)) {
+                $this->next_max_id = $response['next_max_id'];
+            }
+
+            $this->setFullResponse($response);
+
         } else {
             $this->setMessage($response['message']);
         }
@@ -24,5 +31,10 @@ class CommentResponse extends Response
     public function getComment()
     {
         return $this->comment;
+    }
+
+    public function getNextMaxId()
+    {
+        return $this->next_max_id;
     }
 }
