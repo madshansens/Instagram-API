@@ -1520,9 +1520,9 @@ class Instagram
      * @return UserFeedResponse
      *                          User feed data
      */
-    public function getSelfUserFeed($max_id = null)
+    public function getSelfUserFeed($max_id = null, $minTimestamp = null)
     {
-        return $this->getUserFeed($this->username_id, $max_id);
+        return $this->getUserFeed($this->username_id, $max_id, $minTimestamp);
     }
 
     /**
