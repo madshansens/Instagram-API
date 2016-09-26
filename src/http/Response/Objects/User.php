@@ -15,6 +15,12 @@ class User
     protected $coeff_weight = 0;
     protected $friendship_status = null;
     protected $hd_profile_pic_versions;
+    protected $byline;
+    protected $search_social_context;
+    protected $unseen_count;
+    protected $mutual_followers_count;
+    protected $follower_count;
+    protected $social_context;
 
     public function __construct($userData)
     {
@@ -37,6 +43,24 @@ class User
         }
         if (isset($userData['friendship_status'])) {
             $this->friendship_status = new FriendshipStatus($userData['friendship_status']);
+        }
+        if (isset($userData['byline'])) {
+            $this->byline = $userData['byline'];
+        }
+        if (isset($userData['search_social_context'])) {
+            $this->search_social_context = $userData['search_social_context'];
+        }
+        if (isset($userData['unseen_count'])) {
+            $this->unseen_count = $userData['unseen_count'];
+        }
+        if (isset($userData['mutual_followers_count'])) {
+            $this->mutual_followers_count = $userData['mutual_followers_count'];
+        }
+        if (isset($userData['follower_count'])) {
+            $this->follower_count = $userData['follower_count'];
+        }
+        if (isset($userData['social_context'])) {
+            $this->social_context = $userData['social_context'];
         }
     }
 
@@ -91,5 +115,35 @@ class User
     public function getFriendshipStatus()
     {
         return $this->friendship_status;
+    }
+
+    public function getByline()
+    {
+        return $this->byline;
+    }
+
+    public function searchSocialContext()
+    {
+        return $this->search_social_context;
+    }
+
+    public function getUnseenCount()
+    {
+        return $this->unseen_count;
+    }
+
+    public function getMutualFollowersCount()
+    {
+        return $this->mutual_followers_count;
+    }
+
+    public function getFollowerCount()
+    {
+        return $this->follower_count;
+    }
+
+    public function getSocialContext()
+    {
+        return $this->social_context;
     }
 }

@@ -1253,10 +1253,10 @@ class Instagram
     public function fbUserSearch($query)
     {
         $query = rawurlencode($query);
-        $query = $this->http->request("fbsearch/topsearch/?context=blended&query=$query&rank_token=$this->rank_token")[1];
+        $query = new FBSearchResponse($this->http->request("fbsearch/topsearch/?context=blended&query=$query&rank_token=$this->rank_token")[1]);
 
-        if ($query['status'] != 'ok') {
-            throw new InstagramException($query['message']."\n");
+        if (!$query->isOk()) {
+            throw new InstagramException($query->getMessage()."\n");
 
             return;
         }
