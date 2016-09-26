@@ -1276,10 +1276,10 @@ class Instagram
      */
     public function searchUsers($query)
     {
-        $query = $this->http->request('users/search/?ig_sig_key_version='.Constants::SIG_KEY_VERSION."&is_typeahead=true&query=$query&rank_token=$this->rank_token")[1];
+        $query = new SearchUserResponse($this->http->request('users/search/?ig_sig_key_version='.Constants::SIG_KEY_VERSION."&is_typeahead=true&query=$query&rank_token=$this->rank_token")[1]);
 
-        if ($query['status'] != 'ok') {
-            throw new InstagramException($query['message']."\n");
+        if (!$query->isOk()) {
+            throw new InstagramException($query->getMessage()."\n");
 
             return;
         }
