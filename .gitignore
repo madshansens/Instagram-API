@@ -14,3 +14,7 @@ vendor
 *.lock
 
 backup/
+
+*.sublime-project
+
+*.sublime-workspace

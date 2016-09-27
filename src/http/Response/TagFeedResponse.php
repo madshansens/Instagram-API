@@ -15,8 +15,8 @@ class TagFeedResponse extends Response
     {
         if (self::STATUS_OK == $response['status']) {
             $this->num_results = $response['num_results'];
+            $rankedItems = [];
             if (array_key_exists('ranked_items', $response)) {
-                $rankedItems = [];
                 foreach ($response['ranked_items'] as $rankItem) {
                     $rankedItems[] = new Item($rankItem);
                 }
