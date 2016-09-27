@@ -19,7 +19,7 @@ class DiscoverChannelsResponse extends Response
             $row_items = [];
             foreach ($response['items'] as $key => $item) {
                 if (!isset($response['items'][$key]['title'])) {
-                    foreach($item['row_items'] as $keyi => $row_item) {
+                    foreach ($item['row_items'] as $keyi => $row_item) {
                         $row_items[$keyi] = new RowItem($row_item);
                     }
                     $this->items[$key] = $row_items;

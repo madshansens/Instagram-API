@@ -411,13 +411,13 @@ class Instagram
         return $explore;
     }
 
-    /**
-     * Home Channel
-     *
-     * @throws InstagramException discoverChannel data
-     *
-     * @return DiscoverChannelResponse|void
-     */
+     /**
+      * Home Channel.
+      *
+      * @throws InstagramException discoverChannel data
+      *
+      * @return DiscoverChannelResponse|void
+      */
      public function discoverChannels()
      {
          $discoverChannels = new DiscoverChannelsResponse($this->http->request('discover/channels_home/')[1]);
@@ -633,7 +633,7 @@ class Instagram
     public function configure($upload_id, $photo, $caption = '', $location = null, $filter = null)
     {
         $size = getimagesize($photo)[0];
-        if(is_null($caption)) {
+        if (is_null($caption)) {
             $caption = '';
         }
 
@@ -645,7 +645,7 @@ class Instagram
             '_uuid'              => $this->uuid,
             'caption'            => $caption,
             'upload_id'          => $upload_id,
-            'device' => [
+            'device'             => [
                 'manufacturer'    => $this->settings->get('manufacturer'),
                 'model'           => $this->settings->get('model'),
                 'android_version' => Constants::ANDROID_VERSION,
@@ -1020,7 +1020,15 @@ class Instagram
             'new_password2' => $newPassword,
         ]);
 
-        return $this->http->request('accounts/change_password/', SignatureUtils::generateSignature($data))[1];
+        $pw = new ChangePasswordResponse($this->http->request('accounts/change_password/', SignatureUtils::generateSignature($data))[1]);
+
+        if (!$pw->isOk()) {
+            throw new InstagramException($pw->getMessage()."\n");
+
+            return;
+        }
+
+        return $pw;
     }
 
     /**
@@ -1078,10 +1086,10 @@ class Instagram
      */
     public function getFollowingRecentActivity()
     {
-        $activity = $this->http->request('news/?')[1];
+        $activity = new FollowingRecentActivityResponse($this->http->request('news/?')[1]);
 
-        if ($activity['status'] != 'ok') {
-            throw new InstagramException($activity['message']."\n");
+        if (!$activity->isOk()) {
+            throw new InstagramException($activity->getMessage()."\n");
 
             return;
         }
@@ -1144,7 +1152,6 @@ class Instagram
         return $this->getUserTags($this->username_id);
     }
 
-
     /**
      * Get media likers.
      *
@@ -1178,10 +1185,10 @@ class Instagram
      */
     public function getGeoMedia($usernameId)
     {
-        $locations = $this->http->request("maps/user/$usernameId/")[1];
+        $locations = new GeoMediaResponse($this->http->request("maps/user/$usernameId/")[1]);
 
-        if ($locations['status'] != 'ok') {
-            throw new InstagramException($locations['message']."\n");
+        if (!$locations->isOk()) {
+            throw new InstagramException($locations->getMessage()."\n");
 
             return;
         }
@@ -1246,10 +1253,10 @@ class Instagram
     public function fbUserSearch($query)
     {
         $query = rawurlencode($query);
-        $query = $this->http->request("fbsearch/topsearch/?context=blended&query=$query&rank_token=$this->rank_token")[1];
+        $query = new FBSearchResponse($this->http->request("fbsearch/topsearch/?context=blended&query=$query&rank_token=$this->rank_token")[1]);
 
-        if ($query['status'] != 'ok') {
-            throw new InstagramException($query['message']."\n");
+        if (!$query->isOk()) {
+            throw new InstagramException($query->getMessage()."\n");
 
             return;
         }
@@ -1269,10 +1276,10 @@ class Instagram
      */
     public function searchUsers($query)
     {
-        $query = $this->http->request('users/search/?ig_sig_key_version='.Constants::SIG_KEY_VERSION."&is_typeahead=true&query=$query&rank_token=$this->rank_token")[1];
+        $query = new SearchUserResponse($this->http->request('users/search/?ig_sig_key_version='.Constants::SIG_KEY_VERSION."&is_typeahead=true&query=$query&rank_token=$this->rank_token")[1]);
 
-        if ($query['status'] != 'ok') {
-            throw new InstagramException($query['message']."\n");
+        if (!$query->isOk()) {
+            throw new InstagramException($query->getMessage()."\n");
 
             return;
         }
