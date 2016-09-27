@@ -21,24 +21,9 @@ class AdaptImage
                 throw new Exception('Error: You did not specify image.');
                 exit;
             }
-            $this->sizes = @getimagesize($photo);
-            $this->width = $this->sizes['0'];
-            $this->height = $this->sizes['1'];
-            //Check image extension
-            switch ($this->sizes['mime']) {
-                case 'image/jpeg':
-                    $this->images = @imagecreatefromjpeg($photo);
-                    break;
-                case 'image/png':
-                    $this->images = @imagecreatefrompng($photo);
-                    break;
-                case 'image/gif':
-                    $this->images = @imagecreatefromgif($photo);
-                    break;
-                default:
-                    throw new Exception('Error: Unidentified image extension.');
-                    exit;
-            }
+            $this->images = @imagecreatefromstring($photo);
+            $this->width = ImageSX($this->images);
+            $this->height = ImageSY($this->images);
             //IMAGE PROCESS
             if ($this->width <= 320 && $this->height <= 320) {
                 $this->newHeight = round((320 / $this->width) * $this->height);

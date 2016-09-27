@@ -138,7 +138,7 @@ class HttpInterface
         $helper = new AdaptImage();
 
         if (!is_null($upload_id) && is_null($customPreview)) {
-            $fileToUpload = Utils::createVideoIcon($photo);
+            $fileToUpload = $helper->checkAndProcess(Utils::createVideoIcon($photo));
         } elseif (!is_null($customPreview)) {
             $fileToUpload = file_get_contents($customPreview);
         } else {
