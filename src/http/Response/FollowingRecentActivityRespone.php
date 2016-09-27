@@ -2,7 +2,7 @@
 
 namespace InstagramAPI;
 
-class FollowingRecentActivityResponse extends Response
+class FollowingRecentActivityRespone extends Response
 {
     protected $stories;
 
