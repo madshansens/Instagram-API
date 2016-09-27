@@ -17,7 +17,7 @@ class SearchUserResponse extends Response
             foreach ($response['users'] as $user) {
                 $this->users[] = new User($user);
             }
-            $this->setFullResponse( $response );
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }
