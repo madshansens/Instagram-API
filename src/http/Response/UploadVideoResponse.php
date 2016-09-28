@@ -5,11 +5,15 @@ namespace InstagramAPI;
 class UploadVideoResponse extends Response
 {
     protected $upload_id;
+    protected $message = null;
 
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
             $this->upload_id = $response['upload_id'];
+            if (isset($response['message'])) {
+                $this->setMessage($response['message']);
+            }
         } else {
             $this->setMessage($response['message']);
         }

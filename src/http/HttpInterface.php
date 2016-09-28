@@ -66,53 +66,19 @@ class HttpInterface
 
         if ($this->parent->debug) {
             if ($post) {
-                if (php_sapi_name() == 'cli') {
-                    $method = Utils::colouredString('POST:  ', 'light_blue');
-                } else {
-                    $method = 'POST:  ';
-                }
-                echo $method.$endpoint."\n";
+                Debug::printRequest('POST', $endpoint);
             } else {
-                if (php_sapi_name() == 'cli') {
-                    $method = Utils::colouredString('GET:  ', 'light_blue');
-                } else {
-                    $method = 'GET:  ';
-                }
-                echo $method.$endpoint."\n";
+                Debug::printRequest('GET', $endpoint);
             }
-            if (!is_null($post)) {
-                if (!is_array($post)) {
-                    if (php_sapi_name() == 'cli') {
-                        $dat = Utils::colouredString('DATA: ', 'yellow');
-                    } else {
-                        $dat = 'DATA: ';
-                    }
-                    echo $dat.urldecode($post)."\n";
-                }
+            if ((!is_null($post) && (!is_array($post)))) {
+                Debug::printPostData($post);
             }
             $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if (php_sapi_name() == 'cli') {
-                echo Utils::colouredString("← $httpCode \t $bytes", 'green')."\n";
-            } else {
-                echo "← $httpCode \t $bytes\n";
-            }
 
-            if ($this->parent->truncatedDebug && strlen($body) > 1000) {
-                if (php_sapi_name() == 'cli') {
-                    $res = Utils::colouredString('RESPONSE: ', 'cyan');
-                } else {
-                    $res = 'RESPONSE: ';
-                }
-                echo $res.substr($body, 0, 1000)."...\n\n";
-            } else {
-                if (php_sapi_name() == 'cli') {
-                    $res = Utils::colouredString('RESPONSE: ', 'cyan');
-                } else {
-                    $res = 'RESPONSE: ';
-                }
-                echo $res.$body."\n\n";
-            }
+            Debug::printHttpCode($httpCode, $bytes);
+            Debug::printResponse($body, $this->parent->truncatedDebug);
+
         }
 
         curl_close($ch);
@@ -133,7 +99,7 @@ class HttpInterface
      */
     public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null, $location = null, $filter = null, $reel_flag = false)
     {
-        $endpoint = Constants::API_URL.'upload/photo/';
+        $endpoint = 'upload/photo/';
         $boundary = $this->parent->uuid;
         $helper = new AdaptImage();
 
@@ -191,7 +157,7 @@ class HttpInterface
         ];
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $endpoint);
+        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -218,37 +184,15 @@ class HttpInterface
         $upload = new UploadPhotoResponse(json_decode(substr($resp, $header_len), true));
 
         if ($this->parent->debug) {
-            $endp = 'upload/photo/';
-            if (php_sapi_name() == 'cli') {
-                $method = Utils::colouredString('POST:  ', 'light_blue');
-            } else {
-                $method = 'POST:  ';
-            }
-            echo $method.$endp."\n";
-
+            Debug::printRequest('POST', $endpoint);
 
             $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
-            if (php_sapi_name() == 'cli') {
-                $dat = Utils::colouredString('→ '.$uploadBytes, 'yellow');
-            } else {
-                $dat = '→ '.$uploadBytes;
-            }
-            echo $dat."\n";
+            Debug::printUpload($uploadBytes);
 
             $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if (php_sapi_name() == 'cli') {
-                echo Utils::colouredString("← $httpCode \t $bytes", 'green')."\n";
-            } else {
-                echo "← $httpCode \t $bytes\n";
-            }
-
-            if (php_sapi_name() == 'cli') {
-                $res = Utils::colouredString('RESPONSE: ', 'cyan');
-            } else {
-                $res = 'RESPONSE: ';
-            }
-            echo $res.substr($resp, $header_len)."\n\n";
+            Debug::printHttpCode($httpCode, $bytes);
+            Debug::printResponse(substr($resp, $header_len));
         }
 
         curl_close($ch);
@@ -278,7 +222,7 @@ class HttpInterface
     {
         $videoData = file_get_contents($video);
 
-        $endpoint = Constants::API_URL.'upload/video/';
+        $endpoint = 'upload/video/';
         $boundary = $this->parent->uuid;
         $upload_id = round(microtime(true) * 1000);
         $bodies = [
@@ -314,7 +258,7 @@ class HttpInterface
       ];
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $endpoint);
+        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -345,37 +289,15 @@ class HttpInterface
         $lastRequestExtra = (strlen($videoData) - ($request_size * 4));
 
         if ($this->parent->debug) {
-            $endp = 'upload/video/';
-            if (php_sapi_name() == 'cli') {
-                $method = Utils::colouredString('POST:  ', 'light_blue');
-            } else {
-                $method = 'POST:  ';
-            }
-            echo $method.$endp."\n";
-
+            Debug::printRequest('POST', $endpoint);
 
             $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
-            if (php_sapi_name() == 'cli') {
-                $dat = Utils::colouredString('→ '.$uploadBytes, 'yellow');
-            } else {
-                $dat = '→ '.$uploadBytes;
-            }
-            echo $dat."\n";
+            Debug::printUpload($uploadBytes);
 
             $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if (php_sapi_name() == 'cli') {
-                echo Utils::colouredString("← $httpCode \t $bytes", 'green')."\n";
-            } else {
-                echo "← $httpCode \t $bytes\n";
-            }
-
-            if (php_sapi_name() == 'cli') {
-                $res = Utils::colouredString('RESPONSE: ', 'cyan');
-            } else {
-                $res = 'RESPONSE: ';
-            }
-            echo $res.substr($resp, $header_len)."\n\n";
+            Debug::printHttpCode($httpCode, $bytes);
+            Debug::printResponse(substr($resp, $header_len));
         }
 
         for ($a = 0; $a <= 3; $a++) {
@@ -422,45 +344,36 @@ class HttpInterface
             $body = substr($result, $header_len);
             $array[] = [$body];
 
-            //here another debug when improved echo debugging
+            if ($this->parent->debug) {
+                Debug::printRequest('POST', $uploadUrl);
+
+                $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
+                Debug::printUpload($uploadBytes);
+
+                $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                Debug::printHttpCode($httpCode, $bytes);
+                Debug::printResponse($body);
+            }
         }
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
         $upload = new UploadVideoResponse(json_decode(substr($resp, $header_len), true));
 
+        if (!is_null($upload->getMessage())) {
+            throw new InstagramException($upload->getMessage()."\n");
+
+            return;
+        }
+
         if ($this->parent->debug) {
-            $endp = 'upload/photo/';
-            if (php_sapi_name() == 'cli') {
-                $method = Utils::colouredString('POST:  ', 'light_blue');
-            } else {
-                $method = 'POST:  ';
-            }
-            echo $method.$endp."\n";
-
-
-            $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
-            if (php_sapi_name() == 'cli') {
-                $dat = Utils::colouredString('→ '.$uploadBytes, 'yellow');
-            } else {
-                $dat = '→ '.$uploadBytes;
-            }
-            echo $dat."\n";
+            Debug::printRequest('POST', $endpoint);
 
             $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if (php_sapi_name() == 'cli') {
-                echo Utils::colouredString("← $httpCode \t $bytes", 'green')."\n";
-            } else {
-                echo "← $httpCode \t $bytes\n";
-            }
-
-            if (php_sapi_name() == 'cli') {
-                $res = Utils::colouredString('RESPONSE: ', 'cyan');
-            } else {
-                $res = 'RESPONSE: ';
-            }
-            echo $res.substr($resp, $header_len)."\n\n";
+            Debug::printHttpCode($httpCode, $bytes);
+            Debug::printResponse(substr($resp, $header_len), $this->parent->truncatedDebug);
         }
 
         curl_close($ch);
@@ -485,7 +398,7 @@ class HttpInterface
         '_uid'       => $this->parent->username_id,
       ]);
 
-        $endpoint = Constants::API_URL.'accounts/change_profile_picture/';
+        $endpoint = 'accounts/change_profile_picture/';
         $boundary = $this->parent->uuid;
         $bodies = [
         [
@@ -520,7 +433,7 @@ class HttpInterface
       ];
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $endpoint);
+        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -547,37 +460,15 @@ class HttpInterface
         $upload = json_decode(substr($resp, $header_len), true);
 
         if ($this->parent->debug) {
-            $endp = 'accounts/change_profile_picture/';
-            if (php_sapi_name() == 'cli') {
-                $method = Utils::colouredString('POST:  ', 'light_blue');
-            } else {
-                $method = 'POST:  ';
-            }
-            echo $method.$endp."\n";
-
+            Debug::printRequest('POST', $endpoint);
 
             $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
-            if (php_sapi_name() == 'cli') {
-                $dat = Utils::colouredString('→ '.$uploadBytes, 'yellow');
-            } else {
-                $dat = '→ '.$uploadBytes;
-            }
-            echo $dat."\n";
+            Debug::printUpload($uploadBytes);
 
             $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if (php_sapi_name() == 'cli') {
-                echo Utils::colouredString("← $httpCode \t $bytes", 'green')."\n";
-            } else {
-                echo "← $httpCode \t $bytes\n";
-            }
-
-            if (php_sapi_name() == 'cli') {
-                $res = Utils::colouredString('RESPONSE: ', 'cyan');
-            } else {
-                $res = 'RESPONSE: ';
-            }
-            echo $res.substr($resp, $header_len)."\n\n";
+            Debug::printHttpCode($httpCode, $bytes);
+            Debug::printResponse(substr($resp, $header_len));
         }
 
         curl_close($ch);
@@ -596,7 +487,7 @@ class HttpInterface
 
         $recipient_users = implode(',', $string);
 
-        $endpoint = Constants::API_URL.'direct_v2/threads/broadcast/media_share/?media_type=photo';
+        $endpoint = 'direct_v2/threads/broadcast/media_share/?media_type=photo';
         $boundary = $this->parent->uuid;
         $bodies = [
             [
@@ -636,7 +527,7 @@ class HttpInterface
         ];
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $endpoint);
+        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -662,6 +553,18 @@ class HttpInterface
         $header = substr($resp, 0, $header_len);
         $upload = json_decode(substr($resp, $header_len), true);
 
+        if ($this->parent->debug) {
+            Debug::printRequest('POST', $endpoint);
+
+            $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
+            Debug::printUpload($uploadBytes);
+
+            $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            Debug::printHttpCode($httpCode, $bytes);
+            Debug::printResponse(substr($resp, $header_len));
+        }
+
         curl_close($ch);
     }
 
@@ -678,7 +581,7 @@ class HttpInterface
 
         $recipient_users = implode(',', $string);
 
-        $endpoint = Constants::API_URL.'direct_v2/threads/broadcast/text/';
+        $endpoint = 'direct_v2/threads/broadcast/text/';
         $boundary = $this->parent->uuid;
         $bodies = [
             [
@@ -713,7 +616,7 @@ class HttpInterface
         ];
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $endpoint);
+        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -738,6 +641,18 @@ class HttpInterface
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
         $upload = json_decode(substr($resp, $header_len), true);
+
+        if ($this->parent->debug) {
+            Debug::printRequest('POST', $endpoint);
+
+            $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
+            Debug::printUpload($uploadBytes);
+
+            $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            Debug::printHttpCode($httpCode, $bytes);
+            Debug::printResponse(substr($resp, $header_len));
+        }
 
         curl_close($ch);
     }
