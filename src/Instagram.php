@@ -1084,9 +1084,9 @@ class Instagram
      * @return mixed
      *               Recent activity data of follows
      */
-    public function getFollowingRecentActivity()
+    public function getFollowingRecentActivity($maxid = null)
     {
-        $activity = new FollowingRecentActivityResponse($this->http->request('news/?')[1]);
+        $activity = new FollowingRecentActivityResponse($this->http->request('news/?'.(!is_null($maxid) ? '&max_id='.$maxid : ''))[1]);
 
         if (!$activity->isOk()) {
             throw new InstagramException($activity->getMessage()."\n");
