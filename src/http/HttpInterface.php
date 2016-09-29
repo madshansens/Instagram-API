@@ -531,7 +531,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_VERBOSE, $this->parent->debug);
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -620,7 +620,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_VERBOSE, $this->parent->debug);
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
