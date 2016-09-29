@@ -78,7 +78,6 @@ class HttpInterface
 
             Debug::printHttpCode($httpCode, $bytes);
             Debug::printResponse($body, $this->parent->truncatedDebug);
-
         }
 
         curl_close($ch);
