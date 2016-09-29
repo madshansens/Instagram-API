@@ -22,8 +22,8 @@ class AdaptImage
                 exit;
             }
             $this->images = @imagecreatefromstring($photo);
-            $this->width = ImageSX($this->images);
-            $this->height = ImageSY($this->images);
+            $this->width = imagesx($this->images);
+            $this->height = imagesy($this->images);
             //IMAGE PROCESS
             if ($this->width <= 320 && $this->height <= 320) {
                 $this->newHeight = round((320 / $this->width) * $this->height);
