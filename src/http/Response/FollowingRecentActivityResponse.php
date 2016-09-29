@@ -5,7 +5,7 @@ namespace InstagramAPI;
 class FollowingRecentActivityResponse extends Response
 {
     protected $stories;
-	protected $next_max_id;
+    protected $next_max_id;
 
     public function __construct($response)
     {
@@ -14,9 +14,9 @@ class FollowingRecentActivityResponse extends Response
             foreach ($response['stories'] as $story) {
                 $this->stories[] = new Story($story);
             }
-			if (isset($response['next_max_id'])) {
-				$this->next_max_id = $response['next_max_id'];
-			}
+            if (isset($response['next_max_id'])) {
+                $this->next_max_id = $response['next_max_id'];
+            }
         } else {
             $this->setMessage($response['message']);
         }
@@ -27,8 +27,8 @@ class FollowingRecentActivityResponse extends Response
     {
         return $this->stories;
     }
-	
-	public function getNextMaxId()
+    
+    public function getNextMaxId()
     {
         return $this->next_max_id;
     }
