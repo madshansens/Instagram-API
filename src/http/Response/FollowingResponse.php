@@ -6,6 +6,7 @@ class FollowingResponse extends Response
 {
     protected $followings;
     protected $next_max_id;
+    protected $big_list;
 
     public function __construct($response)
     {
@@ -15,6 +16,7 @@ class FollowingResponse extends Response
                 $users[] = new User($user);
             }
             $this->followings = $users;
+            $this->big_list = $response['big_list'];
             $this->next_max_id = isset($response['next_max_id']) ? $response['next_max_id'] : null;
         } else {
             $this->setMessage($response['message']);
@@ -33,5 +35,10 @@ class FollowingResponse extends Response
     public function getNextMaxId()
     {
         return $this->next_max_id;
+    }
+
+    public function isBigList()
+    {
+        return $this->big_list;
     }
 }
