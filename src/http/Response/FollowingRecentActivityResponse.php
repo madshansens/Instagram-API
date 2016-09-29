@@ -27,7 +27,7 @@ class FollowingRecentActivityResponse extends Response
     {
         return $this->stories;
     }
-    
+
     public function getNextMaxId()
     {
         return $this->next_max_id;
