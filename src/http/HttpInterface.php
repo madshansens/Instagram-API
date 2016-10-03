@@ -28,7 +28,7 @@ class HttpInterface
         'Accept: */*',
         'X-IG-Capabilities: '.Constants::X_IG_Capabilities,
         'X-IG-Connection-Type: WIFI',
-        'Content-type: application/x-www-form-urlencoded; charset=UTF-8',
+        'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
         'Accept-Language: en-US',
     ];
 
@@ -139,7 +139,7 @@ class HttpInterface
                 'filename' => 'pending_media_'.number_format(round(microtime(true) * 1000), 0, '', '').'.jpg',
                 'headers'  => [
                     'Content-Transfer-Encoding: binary',
-                    'Content-type: application/octet-stream',
+                    'Content-Type: application/octet-stream',
                 ],
             ],
         ];
@@ -148,7 +148,7 @@ class HttpInterface
         $headers = [
                 'X-IG-Capabilities: '.Constants::X_IG_Capabilities,
                 'X-IG-Connection-Type: WIFI',
-                'Content-type: multipart/form-data; boundary='.$boundary,
+                'Content-Type: multipart/form-data; boundary='.$boundary,
                 'Content-Length: '.strlen($data),
                 'Accept-Language: en-US',
                 'Accept-Encoding: gzip, deflate',
@@ -252,7 +252,7 @@ class HttpInterface
           'Connection: keep-alive',
           'Accept: */*',
           'Host: i.instagram.com',
-          'Content-type: multipart/form-data; boundary='.$boundary,
+          'Content-Type: multipart/form-data; boundary='.$boundary,
           'Accept-Language: en-en',
       ];
 
@@ -416,7 +416,7 @@ class HttpInterface
           'data'     => file_get_contents($photo),
           'filename' => 'profile_pic',
           'headers'  => [
-            'Content-type: application/octet-stream',
+            'Content-Type: application/octet-stream',
             'Content-Transfer-Encoding: binary',
           ],
         ],
@@ -427,7 +427,7 @@ class HttpInterface
           'Proxy-Connection: keep-alive',
           'Connection: keep-alive',
           'Accept: */*',
-          'Content-type: multipart/form-data; boundary='.$boundary,
+          'Content-Type: multipart/form-data; boundary='.$boundary,
           'Accept-Language: en-en',
       ];
 
@@ -521,7 +521,7 @@ class HttpInterface
                 'Proxy-Connection: keep-alive',
                 'Connection: keep-alive',
                 'Accept: */*',
-                'Content-type: multipart/form-data; boundary='.$boundary,
+                'Content-Type: multipart/form-data; boundary='.$boundary,
                 'Accept-Language: en-en',
         ];
 
@@ -610,7 +610,7 @@ class HttpInterface
                 'Proxy-Connection: keep-alive',
                 'Connection: keep-alive',
                 'Accept: */*',
-                'Content-type: multipart/form-data; boundary='.$boundary,
+                'Content-Type: multipart/form-data; boundary='.$boundary,
                 'Accept-Language: en-en',
         ];
 
