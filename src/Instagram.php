@@ -750,7 +750,7 @@ class Instagram
             'caption_text' => $captionText,
         ]);
 
-        return new MediaResponse($this->http->request("media/$mediaId/edit_media/", SignatureUtils::generateSignature($data))[1]['media']);
+        return new EditMediaResponse($this->http->request("media/$mediaId/edit_media/", SignatureUtils::generateSignature($data))[1]['media']);
     }
 
     /**
