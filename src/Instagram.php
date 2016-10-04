@@ -570,7 +570,7 @@ class Instagram
             '_csrftoken' => $this->token,
         ]);
 
-        return $this->http->request("direct_v2/threads/$threadId/$threadAction/", $this->generateSignature($data))[1];
+        return $this->http->request("direct_v2/threads/$threadId/$threadAction/", SignatureUtils::generateSignature($data))[1];
     }
 
     /**
