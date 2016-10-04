@@ -4,7 +4,7 @@ namespace InstagramAPI;
 
 class LocationFeedResponse extends Response
 {
-    protected $ranked_items;
+    protected $ranked_items = null;
     protected $media_count;
     protected $num_results;
     protected $auto_load_more_enabled;
@@ -15,9 +15,13 @@ class LocationFeedResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            $items = [];
-            foreach ($response['items'] as $item) {
-                $this->items[] = new Item($item);
+            if (array_key_exists('ranked_items', $response))
+            {
+                    $ranked_items = [];
+                    foreach ($response['ranked_items'] as $ranked_item) 
+                    {
+                        $this->ranked_items[] = new Item($ranked_item);
+                    }
             }
             $ranked_items = [];
             foreach ($response['ranked_items'] as $ranked_item) {
