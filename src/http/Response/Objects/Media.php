@@ -15,7 +15,7 @@ class Media
 
     public function getMediaUrl()
     {
-        return $this->media;
+        return $this->image;
     }
 
     public function getMediaId()
