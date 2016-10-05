@@ -17,15 +17,10 @@ class LocationFeedResponse extends Response
         if (self::STATUS_OK == $response['status']) {
             if (array_key_exists('ranked_items', $response))
             {
-                    $ranked_items = [];
-                    foreach ($response['ranked_items'] as $ranked_item) 
-                    {
-                        $this->ranked_items[] = new Item($ranked_item);
-                    }
-            }
-            $ranked_items = [];
-            foreach ($response['ranked_items'] as $ranked_item) {
-                $this->ranked_items[] = new Item($ranked_item);
+                foreach ($response['ranked_items'] as $ranked_item) 
+                {
+                    $this->ranked_items[] = new Item($ranked_item);
+                }
             }
             $this->media_count = $response['media_count'];
             $this->num_results = $response['num_results'];
