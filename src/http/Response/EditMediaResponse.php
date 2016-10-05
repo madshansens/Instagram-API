@@ -2,8 +2,8 @@
 
 namespace InstagramAPI;
 
-class EditMediaResponse extends Response {
-
+class EditMediaResponse extends Response
+{
     protected $taken_at;
     protected $image_url;
     protected $like_count;

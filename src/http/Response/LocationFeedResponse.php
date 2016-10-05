@@ -15,10 +15,8 @@ class LocationFeedResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            if (array_key_exists('ranked_items', $response))
-            {
-                foreach ($response['ranked_items'] as $ranked_item) 
-                {
+            if (array_key_exists('ranked_items', $response)) {
+                foreach ($response['ranked_items'] as $ranked_item) {
                     $this->ranked_items[] = new Item($ranked_item);
                 }
             }
