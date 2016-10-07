@@ -23,11 +23,13 @@ class MediaInfoResponse extends Response
                 }
                 $this->likers = $likers;
             }
-            $comments = [];
-            foreach ($response['items'][0]['comments'] as $comment) {
-                $comments[] = new Comment($comment);
+            if (isset($response['items'][0]['comments'])) {
+                $comments = [];
+                foreach ($response['items'][0]['comments'] as $comment) {
+                    $comments[] = new Comment($comment);
+                }
+                $this->comments = $comments;
             }
-            $this->comments = $comments;
         } else {
             $this->setMessage($response['message']);
         }
