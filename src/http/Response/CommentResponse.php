@@ -9,7 +9,7 @@ class CommentResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            if ((isset($commentData['comment'])) && (!empty($commentData['comment']))) {
+            if ((isset($response['comment'])) && (!empty($response['comment']))) {
                 $this->comment = new Comment($response['comment']);
             }
 

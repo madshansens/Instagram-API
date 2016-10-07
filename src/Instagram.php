@@ -176,14 +176,10 @@ class Instagram
 
             if (!isset($header) || (!$response->isOk())) {
                 throw new InstagramException("Couldn't get challenge, check your connection");
-
-                return $response;
             }
 
             if (!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token)) {
                 throw new InstagramException('Missing csfrtoken');
-
-                return $response;
             }
 
             $data = [
@@ -201,8 +197,6 @@ class Instagram
 
             if (!$response->isOk()) {
                 throw new InstagramException($response->getMessage());
-
-                return $response;
             }
 
             $this->isLoggedIn = true;
