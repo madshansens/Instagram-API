@@ -9,7 +9,7 @@ class GeoMediaResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            $this->geo_media = array();
+            $this->geo_media = [];
             foreach ($response['geo_media'] as $geoMedia) {
                 $this->geo_media[] = new GeoMedia($geoMedia);
             }

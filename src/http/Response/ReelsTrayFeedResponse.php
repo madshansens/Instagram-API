@@ -9,10 +9,10 @@ class ReelsTrayFeedResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            $trays = array();
+            $trays = [];
             if ((isset($response['tray'])) && (!empty($response['tray']))) {
                 foreach ($response['tray'] as $tray) {
-                    $items = array();
+                    $items = [];
                     if ((isset($tray['items'])) && (!empty($tray['items']))) {
                         foreach ($tray['items'] as $item) {
                             $items[] = new Item($item);

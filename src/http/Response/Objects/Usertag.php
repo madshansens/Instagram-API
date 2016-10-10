@@ -9,7 +9,7 @@ class Usertag
 
     public function __construct($data)
     {
-        $ins = array();
+        $ins = [];
         foreach ($data['in'] as $in) {
             $ins[] = new In($in);
         }

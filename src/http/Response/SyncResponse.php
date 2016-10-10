@@ -9,7 +9,7 @@ class SyncResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            $experiments = array();
+            $experiments = [];
             foreach ($response['experiments'] as $experiment) {
                 $experiments[] = new Experiment($experiment);
             }

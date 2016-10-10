@@ -10,7 +10,7 @@ class Experiment
 
     public function __construct($data)
     {
-        $params = array();
+        $params = [];
         foreach ($data['params'] as $param) {
             $params[] = new Param($param);
         }

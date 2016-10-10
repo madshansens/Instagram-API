@@ -51,7 +51,7 @@ class Item
         $this->code = $item['code'];
         $this->client_cache_key = $item['client_cache_key'];
         $this->filter_type = $item['filter_type'];
-        $images = array();
+        $images = [];
         if ((isset($item['image_versions2']['candidates'])) && (!empty($item['image_versions2']['candidates']))) {
             foreach ($item['image_versions2']['candidates'] as $image) {
                 $images[] = new HdProfilePicUrlInfo($image);
@@ -70,7 +70,7 @@ class Item
         if ((isset($item['max_num_visible_preview_comments'])) && (!empty($item['max_num_visible_preview_comments']))) {
             $this->max_num_visible_preview_comments = $item['max_num_visible_preview_comments'];
         }
-        $comments = array();
+        $comments = [];
         if ((isset($item['comments'])) && (!empty($item['comments']))) {
             foreach ($item['comments'] as $comment) {
                 $comments[] = new Comment($comment);
@@ -86,7 +86,7 @@ class Item
         $this->caption_is_edited = $item['caption_is_edited'];
         $this->photo_of_you = $item['photo_of_you'];
         if (isset($item['video_versions'])) {
-            $videos = array();
+            $videos = [];
             foreach ($item['video_versions'] as $video) {
                 $videos[] = new VideoVersions($video);
             }
@@ -99,7 +99,7 @@ class Item
             $this->video_duration = $item['video_duration'];
         }
         $this->user = new User($item['user']);
-        $likers = array();
+        $likers = [];
         if ((isset($item['likers'])) && (!empty($item['likers']))) {
             foreach ($item['likers'] as $liker) {
                 $likers[] = new User($liker);

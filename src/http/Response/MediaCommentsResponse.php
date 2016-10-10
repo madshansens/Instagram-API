@@ -6,7 +6,7 @@ class MediaCommentsResponse extends Response
 {
     protected $has_more_comments = false;
     protected $caption_is_edited = false;
-    protected $comments = array();
+    protected $comments = [];
     protected $next_max_id = null;
     protected $comment_count = 0;
 

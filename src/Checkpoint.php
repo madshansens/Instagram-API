@@ -43,19 +43,19 @@ class Checkpoint
 
     public function checkpointSecondStep($token)
     {
-        $post = array(
+        $post = [
             'csrfmiddlewaretoken' => $token[1],
             'email' => 'Verificar por correo electrónico',
-        );
+        ];
 
-        $headers = array(
+        $headers = [
             'Origin: https://i.instagram.com',
             'Connection: keep-alive',
             'Proxy-Connection: keep-alive',
             'Accept-Language: es-es',
             'Referer: https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/'.$this->settings->get('username_id').'/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss',
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        );
+        ];
 
         $this->request('https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/'.$this->settings->get('username_id').'/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss', $headers, $post);
 
@@ -64,19 +64,19 @@ class Checkpoint
 
     public function checkpointThird($code, $token)
     {
-        $post = array(
+        $post = [
             'csrfmiddlewaretoken' => $token,
             'response_code' => $code,
-        );
+        ];
 
-        $headers = array(
+        $headers = [
             'Origin: https://i.instagram.com',
             'Connection: keep-alive',
             'Proxy-Connection: keep-alive',
             'Accept-Language: es-es',
             'Referer: https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/'.$this->settings->get('username_id').'/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss',
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        );
+        ];
 
         $this->request('https://i.instagram.com/integrity/checkpoint/checkpoint_logged_out_main/'.$this->settings->get('username_id').'/?next=instagram%3A%2F%2Fcheckpoint%2Fdismiss', $headers, $post);
     }
@@ -121,6 +121,6 @@ class Checkpoint
             echo "RESPONSE: $body\n\n";
         }
 
-        return array($header, json_decode($body, true));
+        return [$header, json_decode($body, true)];
     }
 }

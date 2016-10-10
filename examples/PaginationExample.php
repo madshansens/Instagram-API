@@ -23,7 +23,7 @@ try {
 }
 try {
     $helper = null;
-    $followers = array();
+    $followers = [];
 
     do {
         if (is_null($helper)) {

@@ -10,7 +10,7 @@ class FollowerResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            $users = array();
+            $users = [];
             foreach ($response['users'] as $user) {
                 $users[] = new User($user);
             }

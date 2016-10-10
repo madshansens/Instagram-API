@@ -10,7 +10,7 @@ class FollowingRecentActivityResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            $this->stories = array();
+            $this->stories = [];
             foreach ($response['stories'] as $story) {
                 $this->stories[] = new Story($story);
             }

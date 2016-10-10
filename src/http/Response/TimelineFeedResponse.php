@@ -21,14 +21,14 @@ class TimelineFeedResponse extends Response
             $this->auto_load_more_enabled = $response['auto_load_more_enabled'];
             $this->more_available = $response['more_available'];
             $this->next_max_id = $response['next_max_id'];
-            $messages = array();
+            $messages = [];
             if ((isset($response['_messages'])) && (!empty($response['_messages']))) {
                 foreach ($response['_messages'] as $message) {
                     $messages[] = new _Message($message);
                 }
             }
             $this->_messages = $messages;
-            $items = array();
+            $items = [];
             if ((isset($response['feed_items'])) && (!empty($response['feed_items']))) {
                 foreach ($response['feed_items'] as $item) {
                     if ((isset($item['media_or_ad']))) {

@@ -80,11 +80,11 @@ class InstagramRegistration
     */
     public function checkUsername($username)
     {
-        $data = json_encode(array(
+        $data = json_encode([
             '_uuid' => $this->uuid,
             'username' => $username,
             '_csrftoken' => 'missing',
-        ));
+        ]);
 
         $this->username = $username;
         $this->settings = new Settings($this->IGDataPath.$username.DIRECTORY_SEPARATOR.'settings-'.$username.'.dat');
@@ -100,24 +100,24 @@ class InstagramRegistration
      */
     public function checkEmail($email)
     {
-        $data = json_encode(array(
+        $data = json_encode([
             'qe_id' => SignatureUtils::generateUUID(true),
             'waterfall_id' => SignatureUtils::generateUUID(true),
             'email' => $email,
             '_csrftoken' => 'missing',
-        ));
+        ]);
 
         return new CheckEmailResponse($this->request('users/check_email/', SignatureUtils::generateSignature($data))[1]);
     }
 
     public function usernameSuggestions($email, $name)
     {
-        $data = json_encode(array(
+        $data = json_encode([
             'name' => SignatureUtils::generateUUID(true),
             'waterfall_id' => SignatureUtils::generateUUID(true),
             'email' => $email,
             '_csrftoken' => 'missing',
-        ));
+        ]);
 
         return new UsernameSuggestionsResponse($this->request('accounts/username_suggestions/', SignatureUtils::generateSignature($data))[1]);
     }
@@ -134,7 +134,7 @@ class InstagramRegistration
     public function createAccount($username, $password, $email, $name = '')
     {
         $token = $this->getCsfrtoken();
-        $data = json_encode(array(
+        $data = json_encode([
             'allow_contacts_sync' => 'true',
             'phone_id' => $this->uuid,
             '_csrftoken' => $token,
@@ -147,7 +147,7 @@ class InstagramRegistration
             'waterfall_id' => $this->waterfall_id,
             'qs_stamp' => '',
             'password' => $password,
-        ));
+        ]);
 
         $result = $this->request('accounts/create/', SignatureUtils::generateSignature($data));
         $header = $result[0];
@@ -222,6 +222,6 @@ class InstagramRegistration
             echo "RESPONSE: $body\n\n";
         }
 
-        return array($header, json_decode($body, true));
+        return [$header, json_decode($body, true)];
     }
 }

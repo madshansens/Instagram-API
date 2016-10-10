@@ -15,8 +15,8 @@ class DiscoverChannelsResponse extends Response
             $this->auto_load_more_enabled = $response['auto_load_more_enabled'];
             $this->more_available = $response['more_available'];
             $this->next_max_id = $response['next_max_id'];
-            $items = array();
-            $row_items = array();
+            $items = [];
+            $row_items = [];
             foreach ($response['items'] as $key => $item) {
                 if (!isset($response['items'][$key]['title'])) {
                     foreach ($item['row_items'] as $keyi => $row_item) {

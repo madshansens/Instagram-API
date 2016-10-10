@@ -17,14 +17,14 @@ class MediaInfoResponse extends Response
             $this->image_url = $response['items'][0]['image_versions2']['candidates']['0']['url'];
             $this->like_count = $response['items'][0]['like_count'];
             if (isset($response['items'][0]['likers'])) {
-                $likers = array();
+                $likers = [];
                 foreach ($response['items'][0]['likers'] as $liker) {
                     $likers[] = new User($liker);
                 }
                 $this->likers = $likers;
             }
             if (isset($response['items'][0]['comments'])) {
-                $comments = array();
+                $comments = [];
                 foreach ($response['items'][0]['comments'] as $comment) {
                     $comments[] = new Comment($comment);
                 }

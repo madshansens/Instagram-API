@@ -112,7 +112,7 @@ class Utils
 
     public static function formatBytes($bytes, $precision = 2)
     {
-        $units = array('B', 'kB', 'mB', 'gB', 'tB');
+        $units = ['B', 'kB', 'mB', 'gB', 'tB'];
 
         $bytes = max($bytes, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
@@ -155,7 +155,7 @@ class Utils
 
     public static function getFilterCode($filter)
     {
-        $filters = array();
+        $filters = [];
         $filters[108] = 'Charmes';
         $filters[116] = 'Ashby';
         $filters[117] = 'Helena';

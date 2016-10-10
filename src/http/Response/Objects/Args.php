@@ -14,12 +14,12 @@ class Args
     public function __construct($args)
     {
         if (isset($args['media'])) {
-            $this->media = array();
+            $this->media = [];
             foreach ($args['media'] as $media) {
                 $this->media[] = new Media($media);
             }
         }
-        $this->links = array();
+        $this->links = [];
         foreach ($args['links'] as $link) {
             $this->links[] = new Link($link);
         }

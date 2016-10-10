@@ -19,7 +19,7 @@ class ExploreResponse extends Response
             $this->more_available = $response['more_available'];
             $this->next_max_id = $response['next_max_id'];
             $this->max_id = $response['max_id'];
-            $items = array();
+            $items = [];
             foreach ($response['items'] as $item) {
                 if (isset($item['media'])) {
                     $items[] = new Item($item['media']);
