@@ -24,13 +24,13 @@ class HttpInterface
         }
 
         $headers = [
-        'Connection: close',
-        'Accept: */*',
-        'X-IG-Capabilities: '.Constants::X_IG_Capabilities,
-        'X-IG-Connection-Type: WIFI',
-        'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
-        'Accept-Language: en-US',
-    ];
+            'Connection: close',
+            'Accept: */*',
+            'X-IG-Capabilities: '.Constants::X_IG_Capabilities,
+            'X-IG-Connection-Type: WIFI',
+            'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+            'Accept-Language: en-US',
+        ];
 
         $ch = curl_init();
 
@@ -45,7 +45,6 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
         curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
-
 
         if ($post) {
             curl_setopt($ch, CURLOPT_POST, true);
@@ -133,11 +132,11 @@ class HttpInterface
                 'data' => '{"lib_name":"jt","lib_version":"1.3.0","quality":"87"}',
             ],
             [
-                'type'     => 'form-data',
-                'name'     => 'photo',
-                'data'     => $fileToUpload,
+                'type' => 'form-data',
+                'name' => 'photo',
+                'data' => $fileToUpload,
                 'filename' => 'pending_media_'.number_format(round(microtime(true) * 1000), 0, '', '').'.jpg',
-                'headers'  => [
+                'headers' => [
                     'Content-Transfer-Encoding: binary',
                     'Content-Type: application/octet-stream',
                 ],
@@ -225,36 +224,36 @@ class HttpInterface
         $boundary = $this->parent->uuid;
         $upload_id = round(microtime(true) * 1000);
         $bodies = [
-          [
-              'type' => 'form-data',
-              'name' => 'upload_id',
-              'data' => $upload_id,
-          ],
-          [
-              'type' => 'form-data',
-              'name' => '_csrftoken',
-              'data' => $this->parent->token,
-          ],
-          [
-              'type'   => 'form-data',
-              'name'   => 'media_type',
-              'data'   => '2',
-          ],
-          [
-              'type' => 'form-data',
-              'name' => '_uuid',
-              'data' => $this->parent->uuid,
-          ],
-      ];
+            [
+                'type' => 'form-data',
+                'name' => 'upload_id',
+                'data' => $upload_id,
+            ],
+            [
+                'type' => 'form-data',
+                'name' => '_csrftoken',
+                'data' => $this->parent->token,
+            ],
+            [
+                'type' => 'form-data',
+                'name' => 'media_type',
+                'data' => '2',
+            ],
+            [
+                'type' => 'form-data',
+                'name' => '_uuid',
+                'data' => $this->parent->uuid,
+            ],
+        ];
 
         $data = $this->buildBody($bodies, $boundary);
         $headers = [
-          'Connection: keep-alive',
-          'Accept: */*',
-          'Host: i.instagram.com',
-          'Content-Type: multipart/form-data; boundary='.$boundary,
-          'Accept-Language: en-en',
-      ];
+            'Connection: keep-alive',
+            'Accept: */*',
+            'Host: i.instagram.com',
+            'Content-Type: multipart/form-data; boundary='.$boundary,
+            'Accept-Language: en-en',
+        ];
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
@@ -299,24 +298,25 @@ class HttpInterface
             Debug::printResponse(substr($resp, $header_len));
         }
 
-        for ($a = 0; $a <= 3; $a++) {
+        for ($a = 0; $a <= 3; ++$a) {
             $start = ($a * $request_size);
             $end = ($a + 1) * $request_size + ($a == 3 ? $lastRequestExtra : 0);
 
             $headers = [
-              'Connection: keep-alive',
-              'Accept: */*',
-              'Host: upload.instagram.com',
-              'Cookie2: $Version=1',
-              'Accept-Encoding: gzip, deflate',
-              'Content-Type: application/octet-stream',
-              'Session-ID: '.$upload_id,
-              'Accept-Language: en-en',
-              'Content-Disposition: attachment; filename="video.mov"',
-              'Content-Length: '.($end - $start),
-              'Content-Range: '.'bytes '.$start.'-'.($end - 1).'/'.strlen($videoData),
-              'job: '.$job,
-          ];
+                'Connection: keep-alive',
+                'Accept: */*',
+                'Host: upload.instagram.com',
+                'Cookie2: $Version=1',
+                'Accept-Encoding: gzip, deflate',
+                'Content-Type: application/octet-stream',
+                'Session-ID: '.$upload_id,
+                'Accept-Language: en-en',
+                'Content-Disposition: attachment; filename="video.mov"',
+                'Content-Length: '.($end - $start),
+                'Content-Range: '.'bytes '.$start.'-'.($end - 1).'/'.strlen($videoData),
+                'job: '.$job,
+            ];
+
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $uploadUrl);
             curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
@@ -392,44 +392,44 @@ class HttpInterface
         }
 
         $uData = json_encode([
-        '_csrftoken' => $this->parent->token,
-        '_uuid'      => $this->parent->uuid,
-        '_uid'       => $this->parent->username_id,
-      ]);
+            '_csrftoken' => $this->parent->token,
+            '_uuid' => $this->parent->uuid,
+            '_uid' => $this->parent->username_id,
+        ]);
 
         $endpoint = 'accounts/change_profile_picture/';
         $boundary = $this->parent->uuid;
         $bodies = [
-        [
-          'type' => 'form-data',
-          'name' => 'ig_sig_key_version',
-          'data' => Constants::SIG_KEY_VERSION,
-        ],
-        [
-          'type' => 'form-data',
-          'name' => 'signed_body',
-          'data' => hash_hmac('sha256', $uData, Constants::IG_SIG_KEY).$uData,
-        ],
-        [
-          'type'     => 'form-data',
-          'name'     => 'profile_pic',
-          'data'     => file_get_contents($photo),
-          'filename' => 'profile_pic',
-          'headers'  => [
-            'Content-Type: application/octet-stream',
-            'Content-Transfer-Encoding: binary',
-          ],
-        ],
-      ];
+            [
+                'type' => 'form-data',
+                'name' => 'ig_sig_key_version',
+                'data' => Constants::SIG_KEY_VERSION,
+            ],
+            [
+                'type' => 'form-data',
+                'name' => 'signed_body',
+                'data' => hash_hmac('sha256', $uData, Constants::IG_SIG_KEY).$uData,
+            ],
+            [
+                'type' => 'form-data',
+                'name' => 'profile_pic',
+                'data' => file_get_contents($photo),
+                'filename' => 'profile_pic',
+                'headers' => [
+                    'Content-Type: application/octet-stream',
+                    'Content-Transfer-Encoding: binary',
+                ],
+            ],
+        ];
 
         $data = $this->buildBody($bodies, $boundary);
         $headers = [
-          'Proxy-Connection: keep-alive',
-          'Connection: keep-alive',
-          'Accept: */*',
-          'Content-Type: multipart/form-data; boundary='.$boundary,
-          'Accept-Language: en-en',
-      ];
+            'Proxy-Connection: keep-alive',
+            'Connection: keep-alive',
+            'Accept: */*',
+            'Content-Type: multipart/form-data; boundary='.$boundary,
+            'Accept-Language: en-en',
+        ];
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
@@ -518,11 +518,11 @@ class HttpInterface
 
         $data = $this->buildBody($bodies, $boundary);
         $headers = [
-                'Proxy-Connection: keep-alive',
-                'Connection: keep-alive',
-                'Accept: */*',
-                'Content-Type: multipart/form-data; boundary='.$boundary,
-                'Accept-Language: en-en',
+            'Proxy-Connection: keep-alive',
+            'Connection: keep-alive',
+            'Accept: */*',
+            'Content-Type: multipart/form-data; boundary='.$boundary,
+            'Accept-Language: en-en',
         ];
 
         $ch = curl_init();
@@ -607,11 +607,11 @@ class HttpInterface
 
         $data = $this->buildBody($bodies, $boundary);
         $headers = [
-                'Proxy-Connection: keep-alive',
-                'Connection: keep-alive',
-                'Accept: */*',
-                'Content-Type: multipart/form-data; boundary='.$boundary,
-                'Accept-Language: en-en',
+            'Proxy-Connection: keep-alive',
+            'Connection: keep-alive',
+            'Accept: */*',
+            'Content-Type: multipart/form-data; boundary='.$boundary,
+            'Accept-Language: en-en',
         ];
 
         $ch = curl_init();

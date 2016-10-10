@@ -34,15 +34,10 @@ class InstagramRegistration
     /**
      * Set the proxy.
      *
-     * @param string $proxy
-     *                         Full proxy string. Ex: user:pass@192.168.0.0:8080
-     *                         Use $proxy = "" to clear proxy
-     * @param int    $port
-     *                         Port of proxy
-     * @param string $username
-     *                         Username for proxy
-     * @param string $password
-     *                         Password for proxy
+     * @param string $proxy Full proxy string. Ex: user:pass@192.168.0.0:8080 Use $proxy = "" to clear proxy
+     * @param int    $port Port of proxy
+     * @param string $username Username for proxy
+     * @param string $password Password for proxy
      *
      * @throws InstagramException
      */
@@ -76,36 +71,41 @@ class InstagramRegistration
         }
     }
 
-  /**
-   * Checks if the username is already taken (exists).
-   *
-   * @param string $username
-   *
-   * @return array
-   *   Username availability data
-   */
-  public function checkUsername($username)
-  {
-      $data = json_encode([
-          '_uuid'      => $this->uuid,
-          'username'   => $username,
-          '_csrftoken' => 'missing',
-      ]);
+    /**
+    * Checks if the username is already taken (exists).
+    *
+    * @param string $username
+    *
+    * @return CheckUsernameResponse
+    */
+    public function checkUsername($username)
+    {
+        $data = json_encode([
+            '_uuid' => $this->uuid,
+            'username' => $username,
+            '_csrftoken' => 'missing',
+        ]);
 
-      $this->username = $username;
-      $this->settings = new Settings($this->IGDataPath.$username.DIRECTORY_SEPARATOR.'settings-'.$username.'.dat');
+        $this->username = $username;
+        $this->settings = new Settings($this->IGDataPath.$username.DIRECTORY_SEPARATOR.'settings-'.$username.'.dat');
 
-      return new CheckUsernameResponse($this->request('users/check_username/', SignatureUtils::generateSignature($data))[1]);
-  }
+        return new CheckUsernameResponse($this->request('users/check_username/', SignatureUtils::generateSignature($data))[1]);
+    }
 
+    /**
+     * Checks if the email is already used (exists).
+     *
+     * @param  string $email
+     * @return CheckEmailResponse
+     */
     public function checkEmail($email)
     {
         $data = json_encode([
-          'qe_id'        => SignatureUtils::generateUUID(true),
-          'waterfall_id' => SignatureUtils::generateUUID(true),
-          'email'        => $email,
-          '_csrftoken'   => 'missing',
-      ]);
+            'qe_id' => SignatureUtils::generateUUID(true),
+            'waterfall_id' => SignatureUtils::generateUUID(true),
+            'email' => $email,
+            '_csrftoken' => 'missing',
+        ]);
 
         return new CheckEmailResponse($this->request('users/check_email/', SignatureUtils::generateSignature($data))[1]);
     }
@@ -113,56 +113,55 @@ class InstagramRegistration
     public function usernameSuggestions($email, $name)
     {
         $data = json_encode([
-          'name'         => SignatureUtils::generateUUID(true),
-          'waterfall_id' => SignatureUtils::generateUUID(true),
-          'email'        => $email,
-          '_csrftoken'   => 'missing',
-      ]);
+            'name' => SignatureUtils::generateUUID(true),
+            'waterfall_id' => SignatureUtils::generateUUID(true),
+            'email' => $email,
+            '_csrftoken' => 'missing',
+        ]);
 
         return new UsernameSuggestionsResponse($this->request('accounts/username_suggestions/', SignatureUtils::generateSignature($data))[1]);
     }
 
-  /**
-   * Register account.
-   *
-   * @param string $username
-   * @param string $password
-   * @param string $email
-   *
-   * @return array
-   *   Registration data
-   */
-  public function createAccount($username, $password, $email, $name = '')
-  {
-      $token = $this->getCsfrtoken();
-      $data = json_encode([
-          'allow_contacts_sync' => 'true',
-          'phone_id'            => $this->uuid,
-          '_csrftoken'          => $token,
-          'username'            => $username,
-          'first_name'          => $name,
-          'guid'                => $this->uuid,
-          'device_id'           => SignatureUtils::generateDeviceId(md5($username.$password)),
-          'email'               => $email,
-          'force_sign_up_code'  => '',
-          'waterfall_id'        => $this->waterfall_id,
-          'qs_stamp'            => '',
-          'password'            => $password,
-      ]);
+    /**
+    * Register account.
+    *
+    * @param string $username
+    * @param string $password
+    * @param string $email
+    *
+    * @return array AccountCreationResponse
+    */
+    public function createAccount($username, $password, $email, $name = '')
+    {
+        $token = $this->getCsfrtoken();
+        $data = json_encode([
+            'allow_contacts_sync' => 'true',
+            'phone_id' => $this->uuid,
+            '_csrftoken' => $token,
+            'username' => $username,
+            'first_name' => $name,
+            'guid' => $this->uuid,
+            'device_id' => SignatureUtils::generateDeviceId(md5($username.$password)),
+            'email' => $email,
+            'force_sign_up_code' => '',
+            'waterfall_id' => $this->waterfall_id,
+            'qs_stamp' => '',
+            'password' => $password,
+        ]);
 
-      $result = $this->request('accounts/create/', SignatureUtils::generateSignature($data));
-      $header = $result[0];
-      $response = new AccountCreationResponse($result[1]);
-      if ($response->isAccountCreated()) {
-          $this->username_id = $response->getUsernameId();
-          $this->settings->set('username_id', $this->username_id);
-          preg_match('#Set-Cookie: csrftoken=([^;]+)#', $header, $match);
-          $token = $match[1];
-          $this->settings->set('token', $token);
-      }
+        $result = $this->request('accounts/create/', SignatureUtils::generateSignature($data));
+        $header = $result[0];
+        $response = new AccountCreationResponse($result[1]);
+        if ($response->isAccountCreated()) {
+            $this->username_id = $response->getUsernameId();
+            $this->settings->set('username_id', $this->username_id);
+            preg_match('#Set-Cookie: csrftoken=([^;]+)#', $header, $match);
+            $token = $match[1];
+            $this->settings->set('token', $token);
+        }
 
-      return $response;
-  }
+        return $response;
+    }
 
     public function getCsfrtoken()
     {
@@ -172,14 +171,10 @@ class InstagramRegistration
 
         if (!isset($header) || (!$response->isOk())) {
             throw new InstagramException("Couldn't get challenge, check your connection");
-
-            return $response;
         }
 
         if (!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token)) {
             throw new InstagramException('Missing csfrtoken');
-
-            return $response;
         }
 
         return substr($token[0], 22);
@@ -197,7 +192,6 @@ class InstagramRegistration
         curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath.$this->username.DIRECTORY_SEPARATOR."$this->username-cookies.dat");
         curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath.$this->username.DIRECTORY_SEPARATOR."$this->username-cookies.dat");
-
 
         if ($post) {
             curl_setopt($ch, CURLOPT_POST, true);
