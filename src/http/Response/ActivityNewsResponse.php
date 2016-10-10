@@ -14,11 +14,11 @@ class ActivityNewsResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            $this->new_stories = [];
+            $this->new_stories = array();
             foreach ($response['new_stories'] as $story) {
                 $this->new_stories[] = new Story($story);
             }
-            $this->old_stories = [];
+            $this->old_stories = array();
             foreach ($response['old_stories'] as $story) {
                 $this->old_stories[] = new Story($story);
             }

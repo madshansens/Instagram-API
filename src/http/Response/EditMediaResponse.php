@@ -17,14 +17,14 @@ class EditMediaResponse extends Response
             $this->image_url = $response['media']['image_versions2']['candidates']['0']['url'];
             $this->like_count = $response['media']['like_count'];
             if (isset($response['media']['likers'])) {
-                $likers = [];
+                $likers = array();
                 foreach ($response['media']['likers'] as $liker) {
                     $likers[] = new User($liker);
                 }
                 $this->likers = $likers;
             }
             if (isset($response['media']['comments'])) {
-                $comments = [];
+                $comments = array();
                 foreach ($response['media']['comments'] as $comment) {
                     $comments[] = new Comment($comment);
                 }

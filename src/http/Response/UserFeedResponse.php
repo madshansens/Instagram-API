@@ -18,7 +18,7 @@ class UserFeedResponse extends Response
             }
             $this->num_results = $response['num_results'];
             $this->auto_load_more_enabled = $response['auto_load_more_enabled'];
-            $items = [];
+            $items = array();
             foreach ($response['items'] as $item) {
                 $items[] = new Item($item);
             }

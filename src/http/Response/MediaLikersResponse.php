@@ -10,7 +10,7 @@ class MediaLikersResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            $users = [];
+            $users = array();
             foreach ($response['users'] as $user) {
                 $users[] = new User($user);
             }

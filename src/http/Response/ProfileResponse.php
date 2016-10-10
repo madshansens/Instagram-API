@@ -31,7 +31,7 @@ class ProfileResponse extends Response
             }
             $this->hd_profile_pic_url_info = new HdProfilePicUrlInfo($this->hd_profile_pic_url_info);
             if (isset($this->hd_profile_pic_versions)) {
-                $profile_pics_vers = [];
+                $profile_pics_vers = array();
                 foreach ($this->hd_profile_pic_versions as $profile_pic) {
                     $profile_pics_vers[] = new HdProfilePicUrlInfo($profile_pic);
                 }

@@ -10,7 +10,7 @@ class LocationResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            $locations = [];
+            $locations = array();
             foreach ($response['venues'] as $location) {
                 $locations[] = new Location($location);
             }

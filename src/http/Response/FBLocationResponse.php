@@ -11,7 +11,7 @@ class FBLocationResponse extends Response
     {
         if (self::STATUS_OK == $response['status']) {
             $this->has_more = $response['has_more'];
-            $items = [];
+            $items = array();
             foreach ($response['items'] as $item) {
                 $this->items[] = new LocationItem($item);
             }

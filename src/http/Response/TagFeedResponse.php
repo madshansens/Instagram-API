@@ -15,7 +15,7 @@ class TagFeedResponse extends Response
     {
         if (self::STATUS_OK == $response['status']) {
             $this->num_results = $response['num_results'];
-            $rankedItems = [];
+            $rankedItems = array();
             if (array_key_exists('ranked_items', $response)) {
                 foreach ($response['ranked_items'] as $rankItem) {
                     $rankedItems[] = new Item($rankItem);
@@ -23,7 +23,7 @@ class TagFeedResponse extends Response
             }
             $this->ranked_items = $rankedItems;
             $this->auto_load_more_enabled = $response['auto_load_more_enabled'];
-            $items = [];
+            $items = array();
             foreach ($response['items'] as $item) {
                 $items[] = new Item($item);
             }

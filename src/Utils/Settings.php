@@ -10,7 +10,7 @@ class Settings
     public function __construct($path)
     {
         $this->path = $path;
-        $this->sets = [];
+        $this->sets = array();
         if (file_exists($path)) {
             $fp = fopen($path, 'rb');
             while ($line = fgets($fp, 2048)) {

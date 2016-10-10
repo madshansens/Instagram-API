@@ -15,7 +15,7 @@ class UserAgent
     {
         $csvfile = __DIR__.'/devices.csv';
         $file_handle = fopen($csvfile, 'r');
-        $line_of_text = [];
+        $line_of_text = array();
         while (!feof($file_handle)) {
             $line_of_text[] = fgetcsv($file_handle, 1024);
         }

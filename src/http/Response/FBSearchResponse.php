@@ -13,15 +13,15 @@ class FBSearchResponse extends Response
     {
         if (self::STATUS_OK == $response['status']) {
             $this->has_more = $response['has_more'];
-            $this->hashtags = [];
+            $this->hashtags = array();
             foreach ($response['hashtags'] as $hashtags) {
                 $this->hashtags[] = new Hashtags($hashtags);
             }
-            $this->users = [];
+            $this->users = array();
             foreach ($response['users'] as $users) {
                 $this->users[] = new Users($users);
             }
-            $this->places = [];
+            $this->places = array();
             foreach ($response['places'] as $places) {
                 $this->places[] = new Place($places);
             }

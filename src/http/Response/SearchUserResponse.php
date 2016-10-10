@@ -13,7 +13,7 @@ class SearchUserResponse extends Response
         if (self::STATUS_OK == $response['status']) {
             $this->has_more = $response['has_more'];
             $this->num_results = $response['num_results'];
-            $this->users = [];
+            $this->users = array();
             foreach ($response['users'] as $user) {
                 $this->users[] = new User($user);
             }
