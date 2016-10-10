@@ -45,7 +45,7 @@ class Checkpoint
     {
         $post = [
             'csrfmiddlewaretoken' => $token[1],
-            'email' => 'Verificar por correo electrónico',
+            'email'               => 'Verificar por correo electrónico',
         ];
 
         $headers = [
@@ -66,7 +66,7 @@ class Checkpoint
     {
         $post = [
             'csrfmiddlewaretoken' => $token,
-            'response_code' => $code,
+            'response_code'       => $code,
         ];
 
         $headers = [

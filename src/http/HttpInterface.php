@@ -132,11 +132,11 @@ class HttpInterface
                 'data' => '{"lib_name":"jt","lib_version":"1.3.0","quality":"87"}',
             ],
             [
-                'type' => 'form-data',
-                'name' => 'photo',
-                'data' => $fileToUpload,
+                'type'     => 'form-data',
+                'name'     => 'photo',
+                'data'     => $fileToUpload,
                 'filename' => 'pending_media_'.number_format(round(microtime(true) * 1000), 0, '', '').'.jpg',
-                'headers' => [
+                'headers'  => [
                     'Content-Transfer-Encoding: binary',
                     'Content-Type: application/octet-stream',
                 ],
@@ -393,8 +393,8 @@ class HttpInterface
 
         $uData = json_encode([
             '_csrftoken' => $this->parent->token,
-            '_uuid' => $this->parent->uuid,
-            '_uid' => $this->parent->username_id,
+            '_uuid'      => $this->parent->uuid,
+            '_uid'       => $this->parent->username_id,
         ]);
 
         $endpoint = 'accounts/change_profile_picture/';
@@ -411,11 +411,11 @@ class HttpInterface
                 'data' => hash_hmac('sha256', $uData, Constants::IG_SIG_KEY).$uData,
             ],
             [
-                'type' => 'form-data',
-                'name' => 'profile_pic',
-                'data' => file_get_contents($photo),
+                'type'     => 'form-data',
+                'name'     => 'profile_pic',
+                'data'     => file_get_contents($photo),
                 'filename' => 'profile_pic',
-                'headers' => [
+                'headers'  => [
                     'Content-Type: application/octet-stream',
                     'Content-Transfer-Encoding: binary',
                 ],

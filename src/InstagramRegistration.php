@@ -34,8 +34,8 @@ class InstagramRegistration
     /**
      * Set the proxy.
      *
-     * @param string $proxy Full proxy string. Ex: user:pass@192.168.0.0:8080 Use $proxy = "" to clear proxy
-     * @param int    $port Port of proxy
+     * @param string $proxy    Full proxy string. Ex: user:pass@192.168.0.0:8080 Use $proxy = "" to clear proxy
+     * @param int    $port     Port of proxy
      * @param string $username Username for proxy
      * @param string $password Password for proxy
      *
@@ -72,17 +72,17 @@ class InstagramRegistration
     }
 
     /**
-    * Checks if the username is already taken (exists).
-    *
-    * @param string $username
-    *
-    * @return CheckUsernameResponse
-    */
+     * Checks if the username is already taken (exists).
+     *
+     * @param string $username
+     *
+     * @return CheckUsernameResponse
+     */
     public function checkUsername($username)
     {
         $data = json_encode([
-            '_uuid' => $this->uuid,
-            'username' => $username,
+            '_uuid'      => $this->uuid,
+            'username'   => $username,
             '_csrftoken' => 'missing',
         ]);
 
@@ -95,16 +95,17 @@ class InstagramRegistration
     /**
      * Checks if the email is already used (exists).
      *
-     * @param  string $email
+     * @param string $email
+     *
      * @return CheckEmailResponse
      */
     public function checkEmail($email)
     {
         $data = json_encode([
-            'qe_id' => SignatureUtils::generateUUID(true),
+            'qe_id'        => SignatureUtils::generateUUID(true),
             'waterfall_id' => SignatureUtils::generateUUID(true),
-            'email' => $email,
-            '_csrftoken' => 'missing',
+            'email'        => $email,
+            '_csrftoken'   => 'missing',
         ]);
 
         return new CheckEmailResponse($this->request('users/check_email/', SignatureUtils::generateSignature($data))[1]);
@@ -113,40 +114,40 @@ class InstagramRegistration
     public function usernameSuggestions($email, $name)
     {
         $data = json_encode([
-            'name' => SignatureUtils::generateUUID(true),
+            'name'         => SignatureUtils::generateUUID(true),
             'waterfall_id' => SignatureUtils::generateUUID(true),
-            'email' => $email,
-            '_csrftoken' => 'missing',
+            'email'        => $email,
+            '_csrftoken'   => 'missing',
         ]);
 
         return new UsernameSuggestionsResponse($this->request('accounts/username_suggestions/', SignatureUtils::generateSignature($data))[1]);
     }
 
     /**
-    * Register account.
-    *
-    * @param string $username
-    * @param string $password
-    * @param string $email
-    *
-    * @return array AccountCreationResponse
-    */
+     * Register account.
+     *
+     * @param string $username
+     * @param string $password
+     * @param string $email
+     *
+     * @return array AccountCreationResponse
+     */
     public function createAccount($username, $password, $email, $name = '')
     {
         $token = $this->getCsfrtoken();
         $data = json_encode([
             'allow_contacts_sync' => 'true',
-            'phone_id' => $this->uuid,
-            '_csrftoken' => $token,
-            'username' => $username,
-            'first_name' => $name,
-            'guid' => $this->uuid,
-            'device_id' => SignatureUtils::generateDeviceId(md5($username.$password)),
-            'email' => $email,
-            'force_sign_up_code' => '',
-            'waterfall_id' => $this->waterfall_id,
-            'qs_stamp' => '',
-            'password' => $password,
+            'phone_id'            => $this->uuid,
+            '_csrftoken'          => $token,
+            'username'            => $username,
+            'first_name'          => $name,
+            'guid'                => $this->uuid,
+            'device_id'           => SignatureUtils::generateDeviceId(md5($username.$password)),
+            'email'               => $email,
+            'force_sign_up_code'  => '',
+            'waterfall_id'        => $this->waterfall_id,
+            'qs_stamp'            => '',
+            'password'            => $password,
         ]);
 
         $result = $this->request('accounts/create/', SignatureUtils::generateSignature($data));
