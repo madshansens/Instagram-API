@@ -5,7 +5,6 @@ require_once __DIR__.'/../src/Checkpoint.php';
 
 $debug = true;
 
-
 echo "####################\n";
 echo "#                  #\n";
 echo "#    CHECKPOINT    #\n";
