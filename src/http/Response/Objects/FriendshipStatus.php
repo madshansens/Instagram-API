@@ -13,7 +13,6 @@ class FriendshipStatus
     protected $is_muting_reel;
     protected $blocking;
 
-
     public function __construct($data)
     {
         $this->following = $data['following'];
