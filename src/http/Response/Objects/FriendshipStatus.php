@@ -16,10 +16,18 @@ class FriendshipStatus
     public function __construct($data)
     {
         $this->following = $data['following'];
-        $this->followed_by = $data['followed_by'];
-        $this->is_blocking_reel = $data['is_blocking_reel'];
-        $this->$is_muting_reel = $data['$is_muting_reel'];
-        $this->$blocking = $data['$blocking'];
+        if (isset($data['followed_by'])) {
+            $this->followed_by = $data['followed_by'];
+        }
+        if (isset($data['is_blocking_reel'])) {
+            $this->is_blocking_reel = $data['is_blocking_reel'];
+        }
+        if (isset($data['$is_muting_reel'])) {
+            $this->is_muting_reel = $data['is_muting_reel'];
+        }
+        if (isset($data['$blocking'])) {
+            $this->blocking = $data['blocking'];
+        }
         if (array_key_exists('source_token', $data)) {
             $this->incoming_request = $data['incoming_request'];
         }
@@ -58,17 +66,17 @@ class FriendshipStatus
     
     public function isBlockingReel()
     {
-        return $this->$is_blocking_reel;
+        return $this->is_blocking_reel;
     }
     
     public function isMutingReel()
     {
-        return $this->$is_muting_reel;
+        return $this->is_muting_reel;
     }
     
     public function getBlocking()
     {
-        return $this->$blocking;
+        return $this->blocking;
     }
 
 }
