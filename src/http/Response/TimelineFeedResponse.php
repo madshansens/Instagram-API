@@ -31,7 +31,7 @@ class TimelineFeedResponse extends Response
             $items = [];
             if ((isset($response['feed_items'])) && (!empty($response['feed_items']))) {
                 foreach ($response['feed_items'] as $item) {
-                    if ((isset($item['media_or_ad']))) {
+                    if ((isset($item['media_or_ad'])) && (!isset($item['media_or_ad']['injected']))) {
                         $items[] = new Item($item['media_or_ad']);
                     }
                 }
