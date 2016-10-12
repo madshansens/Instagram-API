@@ -290,9 +290,9 @@ class Instagram
     /**
      * @return TimelineFeedResponse
      */
-    public function timelineFeed()
+    public function timelineFeed($maxid = null)
     {
-        return new TimelineFeedResponse($this->http->request('feed/timeline/')[1]);
+        return new TimelineFeedResponse($this->getTimeline($maxid));
     }
 
     /**
