@@ -174,7 +174,7 @@ class User
     {
         return $this->social_context;
     }
-    
+
     public function getMediaCount()
     {
         return $this->media_count;
