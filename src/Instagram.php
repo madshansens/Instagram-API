@@ -288,11 +288,26 @@ class Instagram
     }
 
     /**
+     * Get timeline feed.
+     *
+     * @param $maxid
+     *
+     * @throws InstagramException
+     *
      * @return TimelineFeedResponse
      */
     public function timelineFeed($maxid = null)
     {
-        return new TimelineFeedResponse($this->getTimeline($maxid));
+        $timeline = new TimelineFeedResponse($this->http->request(
+            "feed/timeline/?rank_token=$this->rank_token&ranked_content=true"
+            .(!is_null($maxid) ? '&max_id='.$maxid : '')
+        )[1]);
+
+        if (!$timeline->isOk()) {
+            throw new InstagramException($timeline->getMessage()."\n");
+        }
+
+        return $timeline;
     }
 
     /**
@@ -1286,28 +1301,6 @@ class Instagram
         return $query;
     }
 
-    /**
-     * Get timeline data.
-     *
-     * @param $maxid
-     *
-     * @throws InstagramException
-     *
-     * @return array timeline data
-     */
-    public function getTimeline($maxid = null)
-    {
-        $timeline = $this->http->request(
-            "feed/timeline/?rank_token=$this->rank_token&ranked_content=true"
-            .(!is_null($maxid) ? '&max_id='.$maxid : '')
-        )[1];
-
-        if ($timeline['status'] != 'ok') {
-            throw new InstagramException($timeline['message']."\n");
-        }
-
-        return $timeline;
-    }
 
     /**
      * @throws InstagramException
