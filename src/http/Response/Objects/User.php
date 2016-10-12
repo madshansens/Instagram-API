@@ -21,6 +21,13 @@ class User
     protected $mutual_followers_count;
     protected $follower_count;
     protected $social_context;
+    protected $media_count;
+    protected $following_count;
+    protected $is_business;
+    protected $usertags_count;
+    protected $profile_context;
+    protected $biography;
+    protected $geo_media_count;
 
     public function __construct($userData)
     {
@@ -61,6 +68,27 @@ class User
         }
         if (isset($userData['social_context'])) {
             $this->social_context = $userData['social_context'];
+        }
+        if (isset($userData['media_count'])) {
+            $this->media_count = $userData['media_count'];
+        }
+        if (isset($userData['following_count'])) {
+            $this->following_count = $userData['following_count'];
+        }
+        if (isset($userData['is_business'])) {
+            $this->is_business = $userData['is_business'];
+        }
+        if (isset($userData['usertags_count'])) {
+            $this->usertags_count = $userData['usertags_count'];
+        }
+        if (isset($userData['profile_context'])) {
+            $this->profile_context = $userData['profile_context'];
+        }
+        if (isset($userData['biography'])) {
+            $this->biography = $userData['biography'];
+        }
+        if (isset($userData['geo_media_count'])) {
+            $this->geo_media_count = $userData['geo_media_count'];
         }
     }
 
@@ -145,5 +173,40 @@ class User
     public function getSocialContext()
     {
         return $this->social_context;
+    }
+    
+    public function getMediaCount()
+    {
+        return $this->media_count;
+    }
+
+    public function getFollowingCount()
+    {
+        return $this->following_count;
+    }
+
+    public function isBusiness()
+    {
+        return $this->is_business;
+    }
+
+    public function getUsertagsCount()
+    {
+        return $this->usertags_count;
+    }
+
+    public function getProfileContext()
+    {
+        return $this->profile_context;
+    }
+
+    public function getBiography()
+    {
+        return $this->biography;
+    }
+
+    public function getGeoMediaCount()
+    {
+        return $this->geo_media_count;
     }
 }
