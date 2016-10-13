@@ -13,9 +13,7 @@ class UserFeedResponse extends Response
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
-            if (array_key_exists('next_max_id', $response)) {
-                $this->next_max_id = $response['next_max_id'];
-            }
+            $this->next_max_id = isset($response['next_max_id']) ? $response['next_max_id'] : null;
             $this->num_results = $response['num_results'];
             $this->auto_load_more_enabled = $response['auto_load_more_enabled'];
             $items = [];

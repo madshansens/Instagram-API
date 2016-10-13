@@ -24,7 +24,7 @@ class UsertagsResponse extends Response
             }
             $this->items = $items;
             $this->more_available = $response['more_available'];
-            $this->next_max_id = $response['next_max_id'];
+            $this->next_max_id = isset($response['next_max_id']) ? $response['next_max_id'] : null;
             $this->total_count = $response['total_count'];
             $this->requires_review = $response['requires_review'];
             $this->new_photos = $response['new_photos'];
