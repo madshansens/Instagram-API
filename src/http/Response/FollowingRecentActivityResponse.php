@@ -16,7 +16,6 @@ class FollowingRecentActivityResponse extends Response
             }
 
             $this->next_max_id = isset($response['next_max_id']) ? $response['next_max_id'] : null;
-
         } else {
             $this->setMessage($response['message']);
         }
