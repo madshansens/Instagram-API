@@ -20,7 +20,7 @@ class TimelineFeedResponse extends Response
             $this->is_direct_v2_enabled = $response['is_direct_v2_enabled'];
             $this->auto_load_more_enabled = $response['auto_load_more_enabled'];
             $this->more_available = $response['more_available'];
-            $this->next_max_id = $response['next_max_id'];
+            $this->next_max_id = isset($response['next_max_id']) ? $response['next_max_id'] : null;
             $messages = [];
             if ((isset($response['_messages'])) && (!empty($response['_messages']))) {
                 foreach ($response['_messages'] as $message) {

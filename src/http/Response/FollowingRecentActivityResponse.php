@@ -14,9 +14,8 @@ class FollowingRecentActivityResponse extends Response
             foreach ($response['stories'] as $story) {
                 $this->stories[] = new Story($story);
             }
-            if (isset($response['next_max_id'])) {
-                $this->next_max_id = $response['next_max_id'];
-            }
+
+            $this->next_max_id = isset($response['next_max_id']) ? $response['next_max_id'] : null;
         } else {
             $this->setMessage($response['message']);
         }
