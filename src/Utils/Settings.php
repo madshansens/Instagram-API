@@ -51,9 +51,6 @@ class Settings
         if (file_exists($this->path)) {
             unlink($this->path);
         }
-        if (!is_writable($this->path)) {
-            throw new InstagramException("path : \"" . $this->path . "\" not writable. ");
-        }
         $fp = fopen($this->path, 'wb');
         fseek($fp, 0);
         foreach ($this->sets as $key => $value) {
