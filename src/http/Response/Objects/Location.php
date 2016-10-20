@@ -22,7 +22,7 @@ class Location
         }
         if (array_key_exists('external_source', $location)) {
             $this->external_source = $location['external_source'];
-        }        
+        }
         if ((isset($location['address'])) && (!empty($location['address']))) {
             $this->address = $location['address'];
         }
@@ -74,7 +74,8 @@ class Location
         return $this->external_id;
     }
 
-    public function getFacebookPlacesId(){
+    public function getFacebookPlacesId()
+    {
         return $this->facebook_places_id;
     }
 
