@@ -20,6 +20,11 @@ class LocationFeedResponse extends Response
                     $this->ranked_items[] = new Item($ranked_item);
                 }
             }
+            if (array_key_exists('items', $response)) {
+                foreach ($response['items'] as $item) {
+                    $this->items[] = new Item($item);
+                }
+            }
             $this->media_count = $response['media_count'];
             $this->num_results = $response['num_results'];
             $this->auto_load_more_enabled = $response['auto_load_more_enabled'];
