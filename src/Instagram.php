@@ -1301,13 +1301,13 @@ class Instagram
     }
 
     /**
-     * Get related tags
+     * Get tag info: media_count
      *
      * @param string $tag
      *
      * @throws InstagramException
      *
-     * @return array query data
+     * @return string media_count
      */
     public function getTagInfo($tag)
     {
@@ -1317,7 +1317,7 @@ class Instagram
             throw new InstagramException($query['message']."\n");
         }
 
-        return $query;
+        return $query['media_count'];
     }
 
 
@@ -1708,11 +1708,41 @@ class Instagram
      *
      * @param string $userId
      *
-     * @return array Friendship relationship data
+     * @return FriendshipStatus relationship data
      */
     public function userFriendship($userId)
     {
-        return $this->http->request("friendships/show/$userId/")[1];
+        $data = $this->http->request("friendships/show/$userId/")[1];
+        $request = new Response($data);
+
+        if (!$request->isOk()) {
+            throw new InstagramException($request->getMessage()."\n");
+        }
+
+        print_r($data);
+        return new FriendshipStatus($data);
+    }
+
+    /**
+     * Show Multiple Users Friendship.
+     *
+     * @param string $userId
+     *
+     * @return FriendshipsShowManyResponse
+     */
+    public function usersFriendship($userList)
+    {
+        $data = http_build_query([
+            '_csrftoken' => $this->token,
+            'user_ids'   => implode(',', $userList),
+            '_uuid'      => $this->uuid,
+        ]);
+        $request = new FriendshipsShowManyResponse($this->http->request("friendships/show_many/", $data)[1]);
+
+        if (!$request->isOk()) {
+            throw new InstagramException($request->getMessage()."\n");
+        }
+        return $request;
     }
 
     /**
