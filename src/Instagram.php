@@ -195,34 +195,13 @@ class Instagram
             $this->token = $match[1];
             $this->settings->set('token', $this->token);
 
-            $this->syncFeatures();
-            $this->autoCompleteUserList();
-            $this->timelineFeed();
-            $this->getRankedRecipients();
-            $this->getRecentRecipients();
-            $this->megaphoneLog();
-            $this->getv2Inbox();
-            $this->getRecentActivity();
-            $this->getReelsTrayFeed();
-            $this->explore();
-
             return $response;
         }
 
-        $check = $this->timelineFeed();
+        $check = $this->getv2Inbox();
         if ($check->getMessage() == 'login_required') {
             $this->login(true);
         }
-        $this->autoCompleteUserList();
-        $this->getReelsTrayFeed();
-        $this->getRankedRecipients();
-        //push register
-        $this->getRecentRecipients();
-        //push register
-        $this->megaphoneLog();
-        $this->getv2Inbox();
-        $this->getRecentActivity();
-        $this->explore();
     }
 
     /**
@@ -1293,6 +1272,46 @@ class Instagram
     public function searchTags($query)
     {
         $query = $this->http->request("tags/search/?is_typeahead=true&q=$query&rank_token=$this->rank_token")[1];
+
+        if ($query['status'] != 'ok') {
+            throw new InstagramException($query['message']."\n");
+        }
+
+        return $query;
+    }
+
+    /**
+     * Get related tags
+     *
+     * @param string $tag
+     *
+     * @throws InstagramException
+     *
+     * @return array query data
+     */
+    public function getTagRelated($tag)
+    {
+        $tags = new TagRelatedResponse($this->http->request("tags/$tag/related?visited=".urlencode('[{"id":"'.$tag.'","type":"hashtag"}]').'&related_types='.urlencode('["hashtag"]'))[1]);
+
+        if (!$tags->isOk()) {
+            throw new InstagramException($tags->getMessage()."\n");
+        }
+
+        return $tags;
+    }
+
+    /**
+     * Get related tags
+     *
+     * @param string $tag
+     *
+     * @throws InstagramException
+     *
+     * @return array query data
+     */
+    public function getTagInfo($tag)
+    {
+        $query = $this->http->request("tags/$tag/info")[1];
 
         if ($query['status'] != 'ok') {
             throw new InstagramException($query['message']."\n");
