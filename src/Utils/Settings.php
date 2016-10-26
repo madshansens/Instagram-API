@@ -10,6 +10,7 @@ class Settings
     public function __construct($path)
     {
         $this->path = $path;
+		$this->checkPermissions();
         $this->sets = [];
         if (file_exists($path)) {
             $fp = fopen($path, 'rb');
@@ -68,4 +69,12 @@ class Settings
     {
         return $this->get($prop);
     }
+
+	protected function checkPermissions()
+	{
+		if(is_writable(dirname($this->path))){
+			return true;
+		}
+		throw new InstagramException('The setting file is not writable');
+	}
 }
