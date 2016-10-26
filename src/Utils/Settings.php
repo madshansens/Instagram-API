@@ -10,7 +10,7 @@ class Settings
     public function __construct($path)
     {
         $this->path = $path;
-		$this->checkPermissions();
+        $this->checkPermissions();
         $this->sets = [];
         if (file_exists($path)) {
             $fp = fopen($path, 'rb');
