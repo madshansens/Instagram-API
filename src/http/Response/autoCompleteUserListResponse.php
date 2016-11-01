@@ -6,7 +6,7 @@ class autoCompleteUserListResponse extends Response
 {
     protected $expires;
     protected $users;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -22,15 +22,15 @@ class autoCompleteUserListResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     public function getExpires()
     {
         return $this->expires;
     }
-    
+
     /**
-    * @return User[]
-    */
+     * @return User[]
+     */
     public function getUsers()
     {
         return $this->users;

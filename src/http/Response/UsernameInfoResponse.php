@@ -30,7 +30,7 @@ class UsernameInfoResponse extends Response
     protected $external_url;
     protected $is_favorite;
     protected $is_verified;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -90,138 +90,138 @@ class UsernameInfoResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     public function getUsertagCount()
     {
         return $this->usertags_count;
     }
-    
+
     public function getHasAnonymousProfilePicture()
     {
         return $this->has_anonymous_profile_picture;
     }
-    
+
     public function getFullName()
     {
         return $this->full_name;
     }
-    
+
     public function getFollowingCount()
     {
         return $this->following_count;
     }
-    
+
     public function autoExpandChaining()
     {
         return $this->auto_expand_chaining;
     }
-    
+
     public function getExternalLynxUrl()
     {
         return $this->external_lynx_url;
     }
-    
+
     public function canBoostPost()
     {
         return $this->can_boost_post;
     }
-    
+
     /**
-    * @return HdProfilePicUrlInfo[]
-    */
+     * @return HdProfilePicUrlInfo[]
+     */
     public function getProfilePicVersions()
     {
         return $this->hd_profile_pic_versions;
     }
-    
+
     public function getBiography()
     {
         return $this->biography;
     }
-    
+
     public function hasChaining()
     {
         return $this->has_chaining;
     }
-    
+
     public function getMediaCount()
     {
         return $this->media_count;
     }
-    
+
     public function getFollowerCount()
     {
         return $this->follower_count;
     }
-    
+
     public function getUsernameId()
     {
         return $this->pk;
     }
-    
+
     public function getUsername()
     {
         return $this->username;
     }
-    
+
     public function getGeoMediaCount()
     {
         return $this->geo_media_count;
     }
-    
+
     public function getProfilePicUrl()
     {
         return $this->profile_pic_url;
     }
-    
+
     public function canSeeOrganicInsights()
     {
         return $this->can_see_organic_insights;
     }
-    
+
     public function isPrivate()
     {
         return $this->is_private;
     }
-    
+
     public function isFavorite()
     {
         return $this->is_favorite;
     }
-    
+
     public function isVerified()
     {
         return $this->is_verified;
     }
-    
+
     public function canConvertToBusiness()
     {
         return $this->can_convert_to_business;
     }
-    
+
     public function isBusiness()
     {
         return $this->is_business;
     }
-    
+
     public function showInsightsTerms()
     {
         return $this->show_insights_terms;
     }
-    
+
     /**
-    * @return HdProfilePicUrlInfo
-    */
+     * @return HdProfilePicUrlInfo
+     */
     public function getHdProfilePicUrlInfo()
     {
         return $this->hd_profile_pic_url_info;
     }
-    
+
     public function getUsertagReviewEnabled()
     {
         return $this->usertag_review_enabled;
     }
-    
+
     public function getExternalUrl()
     {
         return $this->external_url;

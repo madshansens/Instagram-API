@@ -10,7 +10,7 @@ class ExploreResponse extends Response
     protected $more_available;
     protected $next_max_id;
     protected $max_id;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -32,20 +32,20 @@ class ExploreResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     public function getExpires()
     {
         return $this->expires;
     }
-    
+
     public function getUsers()
     {
         return $this->users;
     }
-    
+
     /**
-    * @return Item[]
-    */
+     * @return Item[]
+     */
     public function getItems()
     {
         return $this->items;

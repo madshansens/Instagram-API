@@ -1301,7 +1301,6 @@ class Instagram
         return $query;
     }
 
-
     /**
      * @throws InstagramException
      *

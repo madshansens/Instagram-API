@@ -11,7 +11,7 @@ class LoginResponse extends Response
     protected $full_name;
     protected $pk;
     protected $is_private;
-    
+
     public function __construct($response)
     {
         if (isset($response['logged_in_user']['username'])) {
@@ -27,37 +27,37 @@ class LoginResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     public function getUsername()
     {
         return $this->username;
     }
-    
+
     public function getHasAnonymousProfilePicture()
     {
         return $this->has_anonymous_profile_picture;
     }
-    
+
     public function getProfilePicUrl()
     {
         return $this->profile_pic_url;
     }
-    
+
     public function getProfilePicId()
     {
         return $this->profile_pic_id;
     }
-    
+
     public function getFullName()
     {
         return $this->full_name;
     }
-    
+
     public function getUsernameId()
     {
         return $this->pk;
     }
-    
+
     public function getIsPrivate()
     {
         return $this->is_private;

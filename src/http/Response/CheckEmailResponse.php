@@ -9,7 +9,7 @@ class CheckEmailResponse extends Response
     protected $status;
     protected $valid;
     protected $username_suggestions = null;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -25,22 +25,22 @@ class CheckEmailResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     public function isConfirmed()
     {
         return $this->confirmed;
     }
-    
+
     public function isAvailable()
     {
         return $this->available;
     }
-    
+
     public function isValid()
     {
         return $this->valid;
     }
-    
+
     public function getUsernameSuggestions()
     {
         return $this->username_suggestions;

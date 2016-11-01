@@ -9,7 +9,7 @@ class MediaInfoResponse extends Response
     protected $like_count;
     protected $likers;
     protected $comments;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -35,35 +35,34 @@ class MediaInfoResponse extends Response
             $this->setMessage($response['message']);
         }
         $this->setStatus($response['status']);
-        
     }
-    
+
     public function getTakenTime()
     {
         return $this->taken_at;
     }
-    
+
     public function getImageUrl()
     {
         return $this->image_url;
     }
-    
+
     public function getLikeCount()
     {
         return $this->like_count;
     }
-    
+
     /**
-    * @return User[]
-    */
+     * @return User[]
+     */
     public function getLikers()
     {
         return $this->likers;
     }
-    
+
     /**
-    * @return Comment
-    */
+     * @return Comment
+     */
     public function getComments()
     {
         return $this->comments;

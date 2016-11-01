@@ -6,7 +6,7 @@ class FBLocationResponse extends Response
 {
     protected $has_more;
     protected $items;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -21,12 +21,12 @@ class FBLocationResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     public function hasMore()
     {
         return $this->has_more;
     }
-    
+
     public function getItems()
     {
         return $this->items;

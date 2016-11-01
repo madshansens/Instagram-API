@@ -6,7 +6,7 @@ class RankedRecipientsResponse extends Response
 {
     protected $expires;
     protected $ranked_recipients;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -18,12 +18,12 @@ class RankedRecipientsResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     public function getExpires()
     {
         return $this->expires;
     }
-    
+
     public function getRankedRecipients()
     {
         return $this->ranked_recipients;

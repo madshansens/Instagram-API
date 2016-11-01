@@ -5,7 +5,7 @@ namespace InstagramAPI;
 class MediaDeleteResponse extends Response
 {
     protected $did_delete;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -16,7 +16,7 @@ class MediaDeleteResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     public function didDelete()
     {
         return $this->did_delete;

@@ -5,7 +5,7 @@ namespace InstagramAPI;
 class MegaphoneLogResponse extends Response
 {
     protected $success;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -16,7 +16,7 @@ class MegaphoneLogResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     public function isSuccess()
     {
         return $this->success;

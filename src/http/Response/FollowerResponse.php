@@ -6,7 +6,7 @@ class FollowerResponse extends Response
 {
     protected $followers;
     protected $next_max_id;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -22,15 +22,15 @@ class FollowerResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     /**
-    * @return User
-    */
+     * @return User
+     */
     public function getFollowers()
     {
         return $this->followers;
     }
-    
+
     public function getNextMaxId()
     {
         return $this->next_max_id;
