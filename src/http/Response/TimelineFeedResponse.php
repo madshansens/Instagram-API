@@ -12,7 +12,7 @@ class TimelineFeedResponse extends Response
     protected $_messages;
     protected $feed_items;
     protected $megaphone;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -44,56 +44,56 @@ class TimelineFeedResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     public function getNumResults()
     {
         return $this->num_results;
     }
-    
+
     public function isDirectV2Enabled()
     {
         return $this->is_direct_v2_enabled;
     }
-    
+
     public function autoLoadMoreEnabled()
     {
         return $this->auto_load_more_enabled;
     }
-    
+
     public function moreAvailable()
     {
         return $this->more_available;
     }
-    
+
     public function getNextMaxId()
     {
         return $this->next_max_id;
     }
-    
+
     public function getExternalId()
     {
         return $this->external_id;
     }
-    
+
     /**
-    * @return _Message[]
-    */
+     * @return _Message[]
+     */
     public function getMessages()
     {
         return $this->_messages;
     }
-    
+
     /**
-    * @return Item[]
-    */
+     * @return Item[]
+     */
     public function getFeedItems()
     {
         return $this->feed_items;
     }
-    
+
     /**
-    * @return FeedAysf|null
-    */
+     * @return FeedAysf|null
+     */
     public function getMegaphone()
     {
         return $this->megaphone;

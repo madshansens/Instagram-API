@@ -70,11 +70,11 @@ class Settings
         return $this->get($prop);
     }
 
-	protected function checkPermissions()
-	{
-		if(is_writable(dirname($this->path))){
-			return true;
-		}
-		throw new InstagramException('The setting file is not writable');
-	}
+    protected function checkPermissions()
+    {
+        if (is_writable(dirname($this->path))) {
+            return true;
+        }
+        throw new InstagramException('The setting file is not writable');
+    }
 }

@@ -5,7 +5,7 @@ namespace InstagramAPI;
 class SyncResponse extends Response
 {
     protected $experiments;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -20,10 +20,10 @@ class SyncResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     /**
-    * @return Experiment[]
-    */
+     * @return Experiment[]
+     */
     public function getExperiments()
     {
         return $this->experiments;

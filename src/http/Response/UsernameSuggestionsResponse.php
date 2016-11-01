@@ -5,7 +5,7 @@ namespace InstagramAPI;
 class UsernameSuggestionsResponse extends Response
 {
     protected $username_suggestions = null;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -18,7 +18,7 @@ class UsernameSuggestionsResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     public function getUsernameSuggestions()
     {
         return $this->username_suggestions;

@@ -8,7 +8,7 @@ class DiscoverChannelsResponse extends Response
     protected $items;
     protected $more_available;
     protected $next_max_id;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -33,20 +33,20 @@ class DiscoverChannelsResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     /**
-    * @return Item[]
-    */
+     * @return Item[]
+     */
     public function getItems()
     {
         return $this->items;
     }
-    
+
     public function moreAvailable()
     {
         return $this->more_available;
     }
-    
+
     public function autoLoadMoreEnabled()
     {
         return $this->auto_load_more_enabled;

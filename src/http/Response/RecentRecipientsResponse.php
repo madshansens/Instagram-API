@@ -6,7 +6,7 @@ class RecentRecipientsResponse extends Response
 {
     protected $expiration_interval;
     protected $recent_recipients;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -18,12 +18,12 @@ class RecentRecipientsResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     public function getExpirationInterval()
     {
         return $this->expiration_interval;
     }
-    
+
     public function getRecentRecipients()
     {
         return $this->recent_recipients;

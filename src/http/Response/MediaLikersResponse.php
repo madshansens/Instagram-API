@@ -6,7 +6,7 @@ class MediaLikersResponse extends Response
 {
     protected $user_count;
     protected $likers;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -22,15 +22,15 @@ class MediaLikersResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     /**
-    * @return User
-    */
+     * @return User
+     */
     public function getLikers()
     {
         return $this->likers;
     }
-    
+
     public function getLikeCounter()
     {
         return $this->user_count;

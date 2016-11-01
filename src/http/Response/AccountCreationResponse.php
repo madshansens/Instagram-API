@@ -21,7 +21,7 @@ class AccountCreationResponse extends Response
     protected $feedback_action = '';
     protected $feedback_url = '';
     protected $errors = null;
-    
+
     public function __construct($response)
     {
         if ((self::STATUS_OK == $response['status']) && (is_null($response['errors']))) {
@@ -54,85 +54,85 @@ class AccountCreationResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     public function hasAnonymousProfilePicture()
     {
         return $this->has_anonymous_profile_picture;
     }
-    
+
     public function allowContactsSync()
     {
         return $this->allow_contacts_sync;
     }
-    
+
     public function nuxPrivateFirstPage()
     {
         return $this->nux_private_first_page;
     }
-    
+
     public function getProfilePicUrl()
     {
         return $this->profile_pic_url;
     }
-    
+
     public function getFullName()
     {
         return $this->full_name;
     }
-    
+
     public function getUsernameId()
     {
         return $this->pk;
     }
-    
+
     /**
-    * @return HdProfilePicUrlInfo
-    */
+     * @return HdProfilePicUrlInfo
+     */
     public function getHdProfilePicUrlInfo()
     {
         return $this->hd_profile_pic_url_info;
     }
-    
+
     public function isNuxPrivateEnabled()
     {
         return $this->nux_private_enabled;
     }
-    
+
     public function isPrivate()
     {
         return $this->is_private;
     }
-    
+
     public function isAccountCreated()
     {
         return $this->account_created;
     }
-    
+
     public function getFeedbackTitle()
     {
         return $this->feedback_title;
     }
-    
+
     public function getFeedbackMessage()
     {
         return $this->feedback_message;
     }
-    
+
     public function isSpam()
     {
         return $this->spam;
     }
-    
+
     public function getFeedbackAction()
     {
         return $this->feedback_action;
     }
-    
+
     public function getFeedbackUrl()
     {
         return $this->feedback_url;
     }
-    
+
     public function getErrors()
     {
         return $this->errors;

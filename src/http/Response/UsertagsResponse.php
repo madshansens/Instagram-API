@@ -12,7 +12,7 @@ class UsertagsResponse extends Response
     protected $total_count;
     protected $requires_review;
     protected $new_photos;
-    
+
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -34,66 +34,66 @@ class UsertagsResponse extends Response
         }
         $this->setStatus($response['status']);
     }
-    
+
     /**
-    * @return mixed
-    */
+     * @return mixed
+     */
     public function getNumResults()
     {
         return $this->num_results;
     }
-    
+
     /**
-    * @return mixed
-    */
+     * @return mixed
+     */
     public function getAutoLoadMoreEnabled()
     {
         return $this->auto_load_more_enabled;
     }
-    
+
     /**
-    * @return mixed
-    */
+     * @return mixed
+     */
     public function getMoreAvailable()
     {
         return $this->more_available;
     }
-    
+
     /**
-    * @return mixed
-    */
+     * @return mixed
+     */
     public function getNextMaxId()
     {
         return $this->next_max_id;
     }
-    
+
     /**
-    * @return mixed
-    */
+     * @return mixed
+     */
     public function getTotalCount()
     {
         return $this->total_count;
     }
-    
+
     /**
-    * @return mixed
-    */
+     * @return mixed
+     */
     public function getRequiresReview()
     {
         return $this->requires_review;
     }
-    
+
     /**
-    * @return mixed
-    */
+     * @return mixed
+     */
     public function getNewPhotos()
     {
         return $this->new_photos;
     }
-    
+
     /**
-    * @return Item
-    */
+     * @return Item
+     */
     public function getItems()
     {
         return $this->items;
