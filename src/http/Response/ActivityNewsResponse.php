@@ -10,7 +10,7 @@ class ActivityNewsResponse extends Response
     protected $friend_request_stories;
     protected $counts;
     protected $subscription;
-
+    
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -28,37 +28,38 @@ class ActivityNewsResponse extends Response
             $this->friend_request_stories = $response['friend_request_stories'];
             $this->counts = new Counts($response['counts']);
             $this->subscription = $response['subscription'];
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }
         $this->setStatus($response['status']);
     }
-
+    
     public function getNewStories()
     {
         return $this->new_stories;
     }
-
+    
     public function getOldStories()
     {
         return $this->old_stories;
     }
-
+    
     public function getContinuation()
     {
         return $this->continuation;
     }
-
+    
     public function getFriendRequestStories()
     {
         return $this->friend_request_stories;
     }
-
+    
     public function getCounts()
     {
         return $this->counts;
     }
-
+    
     public function getSubscription()
     {
         return $this->subscription;
