@@ -8,7 +8,7 @@ class CheckUsernameResponse extends Response
     protected $available;
     protected $status;
     protected $error = false;
-
+    
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -17,22 +17,23 @@ class CheckUsernameResponse extends Response
             if (array_key_exists('error', $response)) {
                 $this->error = $response['error'];
             }
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }
         $this->setStatus($response['status']);
     }
-
+    
     public function getUsername()
     {
         return $this->username;
     }
-
+    
     public function isAvailable()
     {
         return $this->available;
     }
-
+    
     public function getError()
     {
         return $this->error;

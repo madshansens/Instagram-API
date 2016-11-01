@@ -8,7 +8,7 @@ class FBSearchResponse extends Response
     protected $hashtags;
     protected $users;
     protected $places;
-
+    
     public function __construct($response)
     {
         if (self::STATUS_OK == $response['status']) {
@@ -25,27 +25,28 @@ class FBSearchResponse extends Response
             foreach ($response['places'] as $places) {
                 $this->places[] = new Place($places);
             }
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }
         $this->setStatus($response['status']);
     }
-
+    
     public function hasMore()
     {
         return $this->has_more;
     }
-
+    
     public function getHashtags()
     {
         return $this->hashtags;
     }
-
+    
     public function getUsers()
     {
         return $this->users;
     }
-
+    
     public function getPlaces()
     {
         return $this->places;
