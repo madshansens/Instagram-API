@@ -15,7 +15,6 @@ class FriendshipStatus
 
     public function __construct($data)
     {
-
         $this->following = $data['following'];
         if (isset($data['followed_by'])) {
             $this->followed_by = $data['followed_by'];

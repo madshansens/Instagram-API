@@ -18,9 +18,9 @@ class FriendshipsShowManyResponse extends Response
     }
 
     /**
-     * Lists Array of Friendships
+     * Lists Array of Friendships.
      *
-     * @return Array of Username => FriendshipStatus
+     * @return array of Username => FriendshipStatus
      */
     public function getFriendships()
     {

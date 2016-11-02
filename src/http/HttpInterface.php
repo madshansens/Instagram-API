@@ -86,6 +86,7 @@ class HttpInterface
                 echo "Too many requests! Sleeping 40s\n";
             }
             sleep(40);
+
             return $this->request($endpoint, $post, $login);
         } else {
             return [$header, json_decode($body, true)];
