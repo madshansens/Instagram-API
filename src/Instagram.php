@@ -4,24 +4,24 @@ namespace InstagramAPI;
 
 class Instagram
 {
-    public $username;            // Instagram username
-    public $password;            // Instagram password
-    public $debug;               // Debug
+    public $username; // Instagram username
+    public $password; // Instagram password
+    public $debug;    // Debug
     public $truncatedDebug;
 
-    public $uuid;                // UUID
-    public $device_id;           // Device ID
-    public $username_id;         // Username ID
-    public $token;               // _csrftoken
-    public $isLoggedIn = false;  // Session status
-    public $rank_token;          // Rank token
-    public $IGDataPath;          // Data storage path
+    public $uuid;               // UUID
+    public $device_id;          // Device ID
+    public $username_id;        // Username ID
+    public $token;              // _csrftoken
+    public $isLoggedIn = false; // Session status
+    public $rank_token;         // Rank token
+    public $IGDataPath;         // Data storage path
     public $customPath = false;
     public $http;
     public $settings;
-    public $proxy = null;           // Full Proxy
-    public $proxyHost = null;       // Proxy Host and Port
-    public $proxyAuth = null;       // Proxy User and Pass
+    public $proxy = null;     // Full Proxy
+    public $proxyHost = null; // Proxy Host and Port
+    public $proxyAuth = null; // Proxy User and Pass
 
     /**
      * Default class constructor.
@@ -590,20 +590,20 @@ class Instagram
                 'source_type'     => '3',
                 'camera_position' => 'back',
             ],
-            'extra' => [
+            'extra'              => [
                 'source_width'  => 960,
                 'source_height' => 1280,
             ],
-            'device' => [
+            'device'             => [
                 'manufacturer'    => $this->settings->get('manufacturer'),
                 'model'           => $this->settings->get('model'),
                 'android_version' => Constants::ANDROID_VERSION,
                 'android_release' => Constants::ANDROID_RELEASE,
             ],
-            '_csrftoken' => $this->token,
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            'caption'    => $caption,
+            '_csrftoken'         => $this->token,
+            '_uuid'              => $this->uuid,
+            '_uid'               => $this->username_id,
+            'caption'            => $caption,
         ]);
 
         $post = str_replace('"length":0', '"length":0.00', $post);
@@ -641,12 +641,12 @@ class Instagram
                 'android_version' => Constants::ANDROID_VERSION,
                 'android_release' => Constants::ANDROID_RELEASE,
             ],
-            'edits' => [
+            'edits'        => [
                 'crop_original_size' => [$size, $size],
                 'crop_center'        => [0, 0],
                 'crop_zoom'          => 1,
             ],
-            'extra' => [
+            'extra'        => [
                 'source_width'  => $size,
                 'source_height' => $size,
             ],
@@ -655,11 +655,11 @@ class Instagram
         if (!is_null($location)) {
             $loc = [
                 $location->getExternalIdSource().'_id' => $location->getExternalId(),
-                'name'                                 => $location->getName(),
-                'lat'                                  => $location->getLatitude(),
-                'lng'                                  => $location->getLongitude(),
-                'address'                              => $location->getAddress(),
-                'external_source'                      => $location->getExternalIdSource(),
+                'name'                                   => $location->getName(),
+                'lat'                                    => $location->getLatitude(),
+                'lng'                                    => $location->getLongitude(),
+                'address'                                => $location->getAddress(),
+                'external_source'                        => $location->getExternalIdSource(),
             ];
 
             $post['location'] = json_encode($loc);
@@ -702,19 +702,19 @@ class Instagram
                 'crop_zoom'          => 1.3333334,
                 'crop_center'        => [0.0, 0.0],
             ],
-            'extra' => [
+            'extra'       => [
                 'source_width'  => $size,
                 'source_height' => $size,
             ],
-            'device' => [
+            'device'      => [
                 'manufacturer'    => $this->settings->get('manufacturer'),
                 'model'           => $this->settings->get('model'),
                 'android_version' => Constants::ANDROID_VERSION,
                 'android_release' => Constants::ANDROID_RELEASE,
             ],
-            '_csrftoken' => $this->token,
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
+            '_csrftoken'  => $this->token,
+            '_uuid'       => $this->uuid,
+            '_uid'        => $this->username_id,
         ]);
 
         $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,0.0]', $post);
@@ -1302,6 +1302,46 @@ class Instagram
     }
 
     /**
+     * Get related tags.
+     *
+     * @param string $tag
+     *
+     * @throws InstagramException
+     *
+     * @return array query data
+     */
+    public function getTagRelated($tag)
+    {
+        $tags = new TagRelatedResponse($this->http->request("tags/$tag/related?visited=".urlencode('[{"id":"'.$tag.'","type":"hashtag"}]').'&related_types='.urlencode('["hashtag"]'))[1]);
+
+        if (!$tags->isOk()) {
+            throw new InstagramException($tags->getMessage()."\n");
+        }
+
+        return $tags;
+    }
+
+    /**
+     * Get tag info: media_count.
+     *
+     * @param string $tag
+     *
+     * @throws InstagramException
+     *
+     * @return string media_count
+     */
+    public function getTagInfo($tag)
+    {
+        $query = $this->http->request("tags/$tag/info")[1];
+
+        if ($query['status'] != 'ok') {
+            throw new InstagramException($query['message']."\n");
+        }
+
+        return $query['media_count'];
+    }
+
+    /**
      * @throws InstagramException
      *
      * @return ReelsTrayFeedResponse|void
@@ -1688,11 +1728,40 @@ class Instagram
      *
      * @param string $userId
      *
-     * @return array Friendship relationship data
+     * @return FriendshipStatus relationship data
      */
     public function userFriendship($userId)
     {
-        return $this->http->request("friendships/show/$userId/")[1];
+        $data = $this->http->request("friendships/show/$userId/")[1];
+        $request = new Response($data);
+
+        if (!$request->isOk()) {
+            throw new InstagramException($request->getMessage()."\n");
+        }
+
+        return new FriendshipStatus($data);
+    }
+
+    /**
+     * Show Multiple Users Friendship.
+     *
+     * @param string $userId
+     *
+     * @return FriendshipsShowManyResponse
+     */
+    public function usersFriendship($userList)
+    {
+        $data = http_build_query([
+            '_csrftoken' => $this->token,
+            'user_ids'   => implode(',', $userList),
+            '_uuid'      => $this->uuid,
+        ]);
+        $request = new FriendshipsShowManyResponse($this->http->request("friendships/show_many/", $data)[1]);
+
+        if (!$request->isOk()) {
+            throw new InstagramException($request->getMessage()."\n");
+        }
+        return $request;
     }
 
     /**

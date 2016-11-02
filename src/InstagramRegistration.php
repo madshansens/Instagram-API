@@ -12,9 +12,9 @@ class InstagramRegistration
     protected $token;
     protected $userAgent;
     protected $settings;
-    protected $proxy = null;           // Full Proxy
-    protected $proxyHost = null;       // Proxy Host and Port
-    protected $proxyAuth = null;       // Proxy User and Pass
+    protected $proxy = null;     // Full Proxy
+    protected $proxyHost = null; // Proxy Host and Port
+    protected $proxyAuth = null; // Proxy User and Pass
 
     public function __construct($debug = false, $IGDataPath = null)
     {
@@ -191,6 +191,8 @@ class InstagramRegistration
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_VERBOSE, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath.$this->username.DIRECTORY_SEPARATOR."$this->username-cookies.dat");
         curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath.$this->username.DIRECTORY_SEPARATOR."$this->username-cookies.dat");
 

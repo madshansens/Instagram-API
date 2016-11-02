@@ -15,6 +15,7 @@ class FriendshipStatus
 
     public function __construct($data)
     {
+
         $this->following = $data['following'];
         if (isset($data['followed_by'])) {
             $this->followed_by = $data['followed_by'];
@@ -22,16 +23,19 @@ class FriendshipStatus
         if (isset($data['is_blocking_reel'])) {
             $this->is_blocking_reel = $data['is_blocking_reel'];
         }
-        if (isset($data['$is_muting_reel'])) {
+        if (isset($data['is_muting_reel'])) {
             $this->is_muting_reel = $data['is_muting_reel'];
         }
-        if (isset($data['$blocking'])) {
+        if (isset($data['blocking'])) {
             $this->blocking = $data['blocking'];
         }
-        if (array_key_exists('source_token', $data)) {
+        if (array_key_exists('incoming_request', $data)) {
             $this->incoming_request = $data['incoming_request'];
+            if ($this->incoming_request == 'followed_by') {
+                $this->followed_by = true;
+            }
         }
-        if (array_key_exists('source_token', $data)) {
+        if (array_key_exists('outgoing_request', $data)) {
             $this->outgoing_request = $data['outgoing_request'];
         }
         if (array_key_exists('is_private', $data)) {
@@ -57,6 +61,11 @@ class FriendshipStatus
     public function getOutgoingRequest()
     {
         return $this->outgoing_request;
+    }
+
+    public function isPending()
+    {
+        return $this->outgoing_request == 'requested';
     }
 
     public function isPrivate()

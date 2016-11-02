@@ -145,6 +145,14 @@ class User
         return $this->friendship_status;
     }
 
+    /**
+     * @param FriendshipStatus
+     */
+    public function setFriendshipStatus($friendship)
+    {
+        $this->friendship_status = $friendship;
+    }
+
     public function getByline()
     {
         return $this->byline;

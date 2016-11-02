@@ -15,7 +15,7 @@ class HttpInterface
         $this->userAgent = $this->parent->settings->get('user_agent');
     }
 
-    public function request($endpoint, $post = null, $login = false)
+    public function request($endpoint, $post = null, $login = false, $flood_wait = true)
     {
         if (!$this->parent->isLoggedIn && !$login) {
             throw new InstagramException("Not logged in\n");
@@ -62,6 +62,7 @@ class HttpInterface
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
         $body = substr($resp, $header_len);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         if ($this->parent->debug) {
             if ($post) {
@@ -73,7 +74,6 @@ class HttpInterface
                 Debug::printPostData($post);
             }
             $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
             Debug::printHttpCode($httpCode, $bytes);
             Debug::printResponse($body, $this->parent->truncatedDebug);
@@ -81,7 +81,15 @@ class HttpInterface
 
         curl_close($ch);
 
-        return [$header, json_decode($body, true)];
+        if ($httpCode == 429 && $flood_wait) {
+            if ($this->parent->debug) {
+                echo "Too many requests! Sleeping 40s\n";
+            }
+            sleep(40);
+            return $this->request($endpoint, $post, $login);
+        } else {
+            return [$header, json_decode($body, true)];
+        }
     }
 
     /**
@@ -145,13 +153,13 @@ class HttpInterface
 
         $data = $this->buildBody($bodies, $boundary);
         $headers = [
-                'X-IG-Capabilities: '.Constants::X_IG_Capabilities,
-                'X-IG-Connection-Type: WIFI',
-                'Content-Type: multipart/form-data; boundary='.$boundary,
-                'Content-Length: '.strlen($data),
-                'Accept-Language: en-US',
-                'Accept-Encoding: gzip, deflate',
-                'Connection: close',
+            'X-IG-Capabilities: '.Constants::X_IG_Capabilities,
+            'X-IG-Connection-Type: WIFI',
+            'Content-Type: multipart/form-data; boundary='.$boundary,
+            'Content-Length: '.strlen($data),
+            'Accept-Language: en-US',
+            'Accept-Encoding: gzip, deflate',
+            'Connection: close',
         ];
 
         $ch = curl_init();
