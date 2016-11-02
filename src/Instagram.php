@@ -213,6 +213,16 @@ class Instagram
         if ($check->getMessage() == 'login_required') {
             $this->login(true);
         }
+        $this->autoCompleteUserList();
+        $this->getReelsTrayFeed();
+        $this->getRankedRecipients();
+        //push register
+        $this->getRecentRecipients();
+        //push register
+        $this->megaphoneLog();
+        $this->getv2Inbox();
+        $this->getRecentActivity();
+        $this->explore();
     }
 
     /**
