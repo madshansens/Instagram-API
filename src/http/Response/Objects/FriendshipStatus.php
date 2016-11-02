@@ -2,8 +2,7 @@
 
 namespace InstagramAPI;
 
-class FriendshipStatus
-{
+class FriendshipStatus {
     protected $following;
     protected $followed_by;
     protected $incoming_request;
@@ -13,8 +12,8 @@ class FriendshipStatus
     protected $is_muting_reel;
     protected $blocking;
 
-    public function __construct($data)
-    {
+    public function __construct($data) {
+
         $this->following = $data['following'];
         if (isset($data['followed_by'])) {
             $this->followed_by = $data['followed_by'];
@@ -30,6 +29,9 @@ class FriendshipStatus
         }
         if (array_key_exists('incoming_request', $data)) {
             $this->incoming_request = $data['incoming_request'];
+            if ($this->incoming_request == 'followed_by') {
+                $this->followed_by = true;
+            }
         }
         if (array_key_exists('outgoing_request', $data)) {
             $this->outgoing_request = $data['outgoing_request'];
@@ -39,43 +41,39 @@ class FriendshipStatus
         }
     }
 
-    public function getFollowing()
-    {
+    public function getFollowing() {
         return $this->following;
     }
 
-    public function getFollowedBy()
-    {
+    public function getFollowedBy() {
         return $this->followed_by;
     }
 
-    public function getIncomingRequest()
-    {
+    public function getIncomingRequest() {
         return $this->incoming_request;
     }
 
-    public function getOutgoingRequest()
-    {
+    public function getOutgoingRequest() {
         return $this->outgoing_request;
     }
 
-    public function isPrivate()
-    {
+    public function isPending() {
+        return $this->outgoing_request == 'requested';
+    }
+
+    public function isPrivate() {
         return $this->is_private;
     }
-    
-    public function isBlockingReel()
-    {
+
+    public function isBlockingReel() {
         return $this->is_blocking_reel;
     }
-    
-    public function isMutingReel()
-    {
+
+    public function isMutingReel() {
         return $this->is_muting_reel;
     }
-    
-    public function getBlocking()
-    {
+
+    public function getBlocking() {
         return $this->blocking;
     }
 

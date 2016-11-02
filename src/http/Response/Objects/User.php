@@ -2,8 +2,7 @@
 
 namespace InstagramAPI;
 
-class User
-{
+class User {
     protected $username;
     protected $has_anonymous_profile_picture = false;
     protected $is_favorite = false;
@@ -29,8 +28,7 @@ class User
     protected $biography;
     protected $geo_media_count;
 
-    public function __construct($userData)
-    {
+    public function __construct($userData) {
         $this->username = $userData['username'];
         $this->profile_pic_url = $userData['profile_pic_url'];
         $this->full_name = $userData['full_name'];
@@ -92,121 +90,104 @@ class User
         }
     }
 
-    public function getUsername()
-    {
+    public function getUsername() {
         return $this->username;
     }
 
-    public function getProfilePicUrl()
-    {
+    public function getProfilePicUrl() {
         return $this->profile_pic_url;
     }
 
-    public function getFullName()
-    {
+    public function getFullName() {
         return $this->full_name;
     }
 
-    public function getUsernameId()
-    {
+    public function getUsernameId() {
         return $this->pk;
     }
 
-    public function isVerified()
-    {
+    public function isVerified() {
         return $this->is_verified;
     }
 
-    public function isPrivate()
-    {
+    public function isPrivate() {
         return $this->is_private;
     }
 
-    public function hasAnonymousProfilePicture()
-    {
+    public function hasAnonymousProfilePicture() {
         return $this->has_anonymous_profile_picture;
     }
 
-    public function isFavorite()
-    {
+    public function isFavorite() {
         return $this->is_favorite;
     }
 
-    public function getCoeffWeight()
-    {
+    public function getCoeffWeight() {
         return $this->coeff_weight;
     }
 
     /**
      * @return FriendshipStatus|null
      */
-    public function getFriendshipStatus()
-    {
+    public function getFriendshipStatus() {
         return $this->friendship_status;
     }
 
-    public function getByline()
-    {
+    /**
+     * @param FriendshipStatus
+     */
+    public function setFriendshipStatus($friendship) {
+        $this->friendship_status = $friendship;
+    }
+    public function getByline() {
         return $this->byline;
     }
 
-    public function searchSocialContext()
-    {
+    public function searchSocialContext() {
         return $this->search_social_context;
     }
 
-    public function getUnseenCount()
-    {
+    public function getUnseenCount() {
         return $this->unseen_count;
     }
 
-    public function getMutualFollowersCount()
-    {
+    public function getMutualFollowersCount() {
         return $this->mutual_followers_count;
     }
 
-    public function getFollowerCount()
-    {
+    public function getFollowerCount() {
         return $this->follower_count;
     }
 
-    public function getSocialContext()
-    {
+    public function getSocialContext() {
         return $this->social_context;
     }
 
-    public function getMediaCount()
-    {
+    public function getMediaCount() {
         return $this->media_count;
     }
 
-    public function getFollowingCount()
-    {
+    public function getFollowingCount() {
         return $this->following_count;
     }
 
-    public function isBusiness()
-    {
+    public function isBusiness() {
         return $this->is_business;
     }
 
-    public function getUsertagsCount()
-    {
+    public function getUsertagsCount() {
         return $this->usertags_count;
     }
 
-    public function getProfileContext()
-    {
+    public function getProfileContext() {
         return $this->profile_context;
     }
 
-    public function getBiography()
-    {
+    public function getBiography() {
         return $this->biography;
     }
 
-    public function getGeoMediaCount()
-    {
+    public function getGeoMediaCount() {
         return $this->geo_media_count;
     }
 }
