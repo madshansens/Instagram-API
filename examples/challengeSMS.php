@@ -15,7 +15,7 @@ echo "\n\nYour username: ";
 $username = trim(fgets(STDIN));
 echo $username."\n";
 
-if ('' == $username) {
+if ($username == '') {
     echo "\n\nYou have to set your username\n";
     exit();
 }
@@ -23,7 +23,7 @@ if ('' == $username) {
 echo "\n\nYour settings path folder ([ENTER] if dedault): ";
 $settingsPath = trim(fgets(STDIN));
 
-if ('' == $settingsPath) {
+if ($settingsPath == '') {
     $settingsPath = null;
 }
 
@@ -52,7 +52,7 @@ while ($c->getStep() < 3) {
         default:
             echo "No function for this! Press Y to reset, enter to retry\n";
             $code = trim(fgets(STDIN));
-            if ('Y' == $code) {
+            if ($code == 'Y') {
                 $c->reset();
             } else {
                 $c->startChallenge();

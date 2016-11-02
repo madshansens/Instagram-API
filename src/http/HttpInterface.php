@@ -81,7 +81,7 @@ class HttpInterface
 
         curl_close($ch);
 
-        if (429 == $httpCode && $flood_wait) {
+        if ($httpCode == 429 && $flood_wait) {
             if ($this->parent->debug) {
                 echo "Too many requests! Sleeping 40s\n";
             }
@@ -140,11 +140,11 @@ class HttpInterface
                 'data' => '{"lib_name":"jt","lib_version":"1.3.0","quality":"87"}',
             ],
             [
-                'type' => 'form-data',
-                'name' => 'photo',
-                'data' => $fileToUpload,
+                'type'     => 'form-data',
+                'name'     => 'photo',
+                'data'     => $fileToUpload,
                 'filename' => 'pending_media_'.number_format(round(microtime(true) * 1000), 0, '', '').'.jpg',
-                'headers' => [
+                'headers'  => [
                     'Content-Transfer-Encoding: binary',
                     'Content-Type: application/octet-stream',
                 ],
@@ -308,7 +308,7 @@ class HttpInterface
 
         for ($a = 0; $a <= 3; ++$a) {
             $start = ($a * $request_size);
-            $end = ($a + 1) * $request_size + (3 == $a ? $lastRequestExtra : 0);
+            $end = ($a + 1) * $request_size + ($a == 3 ? $lastRequestExtra : 0);
 
             $headers = [
                 'Connection: keep-alive',
@@ -401,8 +401,8 @@ class HttpInterface
 
         $uData = json_encode([
             '_csrftoken' => $this->parent->token,
-            '_uuid' => $this->parent->uuid,
-            '_uid' => $this->parent->username_id,
+            '_uuid'      => $this->parent->uuid,
+            '_uid'       => $this->parent->username_id,
         ]);
 
         $endpoint = 'accounts/change_profile_picture/';
@@ -419,11 +419,11 @@ class HttpInterface
                 'data' => hash_hmac('sha256', $uData, Constants::IG_SIG_KEY).$uData,
             ],
             [
-                'type' => 'form-data',
-                'name' => 'profile_pic',
-                'data' => file_get_contents($photo),
+                'type'     => 'form-data',
+                'name'     => 'profile_pic',
+                'data'     => file_get_contents($photo),
                 'filename' => 'profile_pic',
-                'headers' => [
+                'headers'  => [
                     'Content-Type: application/octet-stream',
                     'Content-Transfer-Encoding: binary',
                 ],

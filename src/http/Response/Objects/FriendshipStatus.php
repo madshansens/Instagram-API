@@ -31,7 +31,7 @@ class FriendshipStatus
         }
         if (array_key_exists('incoming_request', $data)) {
             $this->incoming_request = $data['incoming_request'];
-            if ('followed_by' == $this->incoming_request) {
+            if ($this->incoming_request == 'followed_by') {
                 $this->followed_by = true;
             }
         }

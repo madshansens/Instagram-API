@@ -14,7 +14,7 @@ echo "####################\n";
 echo "\n\nYour username: ";
 $username = trim(fgets(STDIN));
 
-if ('' == $username) {
+if ($username == '') {
     echo "\n\nYou have to set your username\n";
     exit();
 }
@@ -22,7 +22,7 @@ if ('' == $username) {
 echo "\n\nYour settings path folder ([ENTER] if dedault): ";
 $settingsPath = trim(fgets(STDIN));
 
-if ('' == $settingsPath) {
+if ($settingsPath == '') {
     $settingsPath = null;
 }
 

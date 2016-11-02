@@ -119,7 +119,7 @@ class Instagram
     {
         $this->proxy = $proxy;
 
-        if ('' == $proxy) {
+        if ($proxy == '') {
             return;
         }
 
@@ -525,7 +525,7 @@ class Instagram
     {
         $directThread = $this->http->request("direct_v2/threads/$threadId/?")[1];
 
-        if ('ok' != $directThread['status']) {
+        if ($directThread['status'] != 'ok') {
             throw new InstagramException($directThread['message']."\n");
 
             return;
@@ -1284,7 +1284,7 @@ class Instagram
     {
         $query = $this->http->request("tags/search/?is_typeahead=true&q=$query&rank_token=$this->rank_token")[1];
 
-        if ('ok' != $query['status']) {
+        if ($query['status'] != 'ok') {
             throw new InstagramException($query['message']."\n");
         }
 
@@ -1324,7 +1324,7 @@ class Instagram
     {
         $query = $this->http->request("tags/$tag/info")[1];
 
-        if ('ok' != $query['status']) {
+        if ($query['status'] != 'ok') {
             throw new InstagramException($query['message']."\n");
         }
 
@@ -1470,7 +1470,7 @@ class Instagram
     {
         $popularFeed = $this->http->request("feed/popular/?people_teaser_supported=1&rank_token=$this->rank_token&ranked_content=true&")[1];
 
-        if ('ok' != $popularFeed['status']) {
+        if ($popularFeed['status'] != 'ok') {
             throw new InstagramException($popularFeed['message']."\n");
         }
 
