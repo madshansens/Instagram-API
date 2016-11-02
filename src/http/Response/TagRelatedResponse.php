@@ -21,7 +21,7 @@ class TagRelatedResponse extends Response
     }
 
     /**
-     * @return String[]
+     * @return string[]
      */
     public function getTags()
     {

@@ -195,10 +195,21 @@ class Instagram
             $this->token = $match[1];
             $this->settings->set('token', $this->token);
 
+            $this->syncFeatures();
+            $this->autoCompleteUserList();
+            $this->timelineFeed();
+            $this->getRankedRecipients();
+            $this->getRecentRecipients();
+            $this->megaphoneLog();
+            $this->getv2Inbox();
+            $this->getRecentActivity();
+            $this->getReelsTrayFeed();
+            $this->explore();
+
             return $response;
         }
 
-        $check = $this->getv2Inbox();
+        $check = $this->timelineFeed();
         if ($check->getMessage() == 'login_required') {
             $this->login(true);
         }
@@ -1281,7 +1292,7 @@ class Instagram
     }
 
     /**
-     * Get related tags
+     * Get related tags.
      *
      * @param string $tag
      *
@@ -1301,7 +1312,7 @@ class Instagram
     }
 
     /**
-     * Get tag info: media_count
+     * Get tag info: media_count.
      *
      * @param string $tag
      *
