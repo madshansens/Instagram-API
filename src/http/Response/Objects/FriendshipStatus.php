@@ -65,7 +65,7 @@ class FriendshipStatus
 
     public function isPending()
     {
-        return 'requested' == $this->outgoing_request;
+        return $this->outgoing_request == 'requested';
     }
 
     public function isPrivate()
