@@ -81,15 +81,15 @@ class ChallengeSMS
 
         if ($response[2] == 302 || preg_match('/^Location: https/m', $response[0]) > 0) {
             $this->step = 3;
-        } else if (preg_match('/id="id_phone_number"/', $response[1]) > 0) {
+        } elseif (preg_match('/id="id_phone_number"/', $response[1]) > 0) {
             $this->step = 1;
-        } else if (preg_match('/>Security code</', $response[1]) > 0) {
+        } elseif (preg_match('/>Security code</', $response[1]) > 0) {
             $this->step = 2;
         } else {
             $this->step = 0;
         }
 
-        echo "Step: ".$this->step."\n";
+        echo 'Step: '.$this->step."\n";
     }
 
     public function request($endpoint, $headers = null, $post = null, $first = true)

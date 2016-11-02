@@ -11,7 +11,8 @@ class Response
     protected $message;
     protected $fullResponse;
 
-    public function __construct($data) {
+    public function __construct($data)
+    {
         $this->setStatus($data['status']);
         if (isset($data['message'])) {
             $this->setMessage($data['message']);

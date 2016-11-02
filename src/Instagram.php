@@ -654,7 +654,7 @@ class Instagram
 
         if (!is_null($location)) {
             $loc = [
-                $location->getExternalIdSource().'_id' => $location->getExternalId(),
+                $location->getExternalIdSource().'_id'   => $location->getExternalId(),
                 'name'                                   => $location->getName(),
                 'lat'                                    => $location->getLatitude(),
                 'lng'                                    => $location->getLongitude(),
@@ -1756,11 +1756,12 @@ class Instagram
             'user_ids'   => implode(',', $userList),
             '_uuid'      => $this->uuid,
         ]);
-        $request = new FriendshipsShowManyResponse($this->http->request("friendships/show_many/", $data)[1]);
+        $request = new FriendshipsShowManyResponse($this->http->request('friendships/show_many/', $data)[1]);
 
         if (!$request->isOk()) {
             throw new InstagramException($request->getMessage()."\n");
         }
+
         return $request;
     }
 
