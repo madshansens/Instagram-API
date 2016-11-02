@@ -6,13 +6,14 @@ class FriendshipsShowManyResponse extends Response
 {
     protected $friendships = [];
 
-    public function __construct($response) {
+    public function __construct($response)
+    {
         parent::__construct($response);
 
         if (isset($response['friendship_statuses'])) {
-          foreach ($response['friendship_statuses'] as $user => $relationship) {
-            $this->friendships[$user] = new FriendshipStatus($relationship);
-          }
+            foreach ($response['friendship_statuses'] as $user => $relationship) {
+                $this->friendships[$user] = new FriendshipStatus($relationship);
+            }
         }
     }
 
@@ -21,7 +22,8 @@ class FriendshipsShowManyResponse extends Response
      *
      * @return Array of Username => FriendshipStatus
      */
-    public function getFriendships() {
-      return $this->friendships;
+    public function getFriendships()
+    {
+        return $this->friendships;
     }
 }

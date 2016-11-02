@@ -4,24 +4,24 @@ namespace InstagramAPI;
 
 class Instagram
 {
-    public $username;            // Instagram username
-    public $password;            // Instagram password
-    public $debug;               // Debug
+    public $username; // Instagram username
+    public $password; // Instagram password
+    public $debug;    // Debug
     public $truncatedDebug;
 
-    public $uuid;                // UUID
-    public $device_id;           // Device ID
-    public $username_id;         // Username ID
-    public $token;               // _csrftoken
-    public $isLoggedIn = false;  // Session status
-    public $rank_token;          // Rank token
-    public $IGDataPath;          // Data storage path
+    public $uuid;               // UUID
+    public $device_id;          // Device ID
+    public $username_id;        // Username ID
+    public $token;              // _csrftoken
+    public $isLoggedIn = false; // Session status
+    public $rank_token;         // Rank token
+    public $IGDataPath;         // Data storage path
     public $customPath = false;
     public $http;
     public $settings;
-    public $proxy = null;           // Full Proxy
-    public $proxyHost = null;       // Proxy Host and Port
-    public $proxyAuth = null;       // Proxy User and Pass
+    public $proxy = null;     // Full Proxy
+    public $proxyHost = null; // Proxy Host and Port
+    public $proxyAuth = null; // Proxy User and Pass
 
     /**
      * Default class constructor.
@@ -119,7 +119,7 @@ class Instagram
     {
         $this->proxy = $proxy;
 
-        if ($proxy == '') {
+        if ('' == $proxy) {
             return;
         }
 
@@ -514,7 +514,7 @@ class Instagram
     {
         $directThread = $this->http->request("direct_v2/threads/$threadId/?")[1];
 
-        if ($directThread['status'] != 'ok') {
+        if ('ok' != $directThread['status']) {
             throw new InstagramException($directThread['message']."\n");
 
             return;
@@ -569,20 +569,20 @@ class Instagram
                 'source_type'     => '3',
                 'camera_position' => 'back',
             ],
-            'extra' => [
+            'extra'              => [
                 'source_width'  => 960,
                 'source_height' => 1280,
             ],
-            'device' => [
+            'device'             => [
                 'manufacturer'    => $this->settings->get('manufacturer'),
                 'model'           => $this->settings->get('model'),
                 'android_version' => Constants::ANDROID_VERSION,
                 'android_release' => Constants::ANDROID_RELEASE,
             ],
-            '_csrftoken' => $this->token,
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            'caption'    => $caption,
+            '_csrftoken'         => $this->token,
+            '_uuid'              => $this->uuid,
+            '_uid'               => $this->username_id,
+            'caption'            => $caption,
         ]);
 
         $post = str_replace('"length":0', '"length":0.00', $post);
@@ -620,12 +620,12 @@ class Instagram
                 'android_version' => Constants::ANDROID_VERSION,
                 'android_release' => Constants::ANDROID_RELEASE,
             ],
-            'edits' => [
+            'edits'        => [
                 'crop_original_size' => [$size, $size],
                 'crop_center'        => [0, 0],
                 'crop_zoom'          => 1,
             ],
-            'extra' => [
+            'extra'        => [
                 'source_width'  => $size,
                 'source_height' => $size,
             ],
@@ -634,11 +634,11 @@ class Instagram
         if (!is_null($location)) {
             $loc = [
                 $location->getExternalIdSource().'_id' => $location->getExternalId(),
-                'name'                                 => $location->getName(),
-                'lat'                                  => $location->getLatitude(),
-                'lng'                                  => $location->getLongitude(),
-                'address'                              => $location->getAddress(),
-                'external_source'                      => $location->getExternalIdSource(),
+                'name'                                   => $location->getName(),
+                'lat'                                    => $location->getLatitude(),
+                'lng'                                    => $location->getLongitude(),
+                'address'                                => $location->getAddress(),
+                'external_source'                        => $location->getExternalIdSource(),
             ];
 
             $post['location'] = json_encode($loc);
@@ -681,19 +681,19 @@ class Instagram
                 'crop_zoom'          => 1.3333334,
                 'crop_center'        => [0.0, 0.0],
             ],
-            'extra' => [
+            'extra'       => [
                 'source_width'  => $size,
                 'source_height' => $size,
             ],
-            'device' => [
+            'device'      => [
                 'manufacturer'    => $this->settings->get('manufacturer'),
                 'model'           => $this->settings->get('model'),
                 'android_version' => Constants::ANDROID_VERSION,
                 'android_release' => Constants::ANDROID_RELEASE,
             ],
-            '_csrftoken' => $this->token,
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
+            '_csrftoken'  => $this->token,
+            '_uuid'       => $this->uuid,
+            '_uid'        => $this->username_id,
         ]);
 
         $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,0.0]', $post);
@@ -1273,7 +1273,7 @@ class Instagram
     {
         $query = $this->http->request("tags/search/?is_typeahead=true&q=$query&rank_token=$this->rank_token")[1];
 
-        if ($query['status'] != 'ok') {
+        if ('ok' != $query['status']) {
             throw new InstagramException($query['message']."\n");
         }
 
@@ -1313,7 +1313,7 @@ class Instagram
     {
         $query = $this->http->request("tags/$tag/info")[1];
 
-        if ($query['status'] != 'ok') {
+        if ('ok' != $query['status']) {
             throw new InstagramException($query['message']."\n");
         }
 
@@ -1459,7 +1459,7 @@ class Instagram
     {
         $popularFeed = $this->http->request("feed/popular/?people_teaser_supported=1&rank_token=$this->rank_token&ranked_content=true&")[1];
 
-        if ($popularFeed['status'] != 'ok') {
+        if ('ok' != $popularFeed['status']) {
             throw new InstagramException($popularFeed['message']."\n");
         }
 

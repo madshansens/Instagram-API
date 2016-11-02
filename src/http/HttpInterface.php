@@ -2,18 +2,21 @@
 
 namespace InstagramAPI;
 
-class HttpInterface {
+class HttpInterface
+{
     protected $parent;
     protected $userAgent;
     protected $verifyPeer = false;
     protected $verifyHost = false;
 
-    public function __construct($parent) {
+    public function __construct($parent)
+    {
         $this->parent = $parent;
         $this->userAgent = $this->parent->settings->get('user_agent');
     }
 
-    public function request($endpoint, $post = null, $login = false, $flood_wait = true) {
+    public function request($endpoint, $post = null, $login = false, $flood_wait = true)
+    {
         if (!$this->parent->isLoggedIn && !$login) {
             throw new InstagramException("Not logged in\n");
 
@@ -23,7 +26,7 @@ class HttpInterface {
         $headers = [
             'Connection: close',
             'Accept: */*',
-            'X-IG-Capabilities: ' . Constants::X_IG_Capabilities,
+            'X-IG-Capabilities: '.Constants::X_IG_Capabilities,
             'X-IG-Connection-Type: WIFI',
             'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
             'Accept-Language: en-US',
@@ -31,7 +34,7 @@ class HttpInterface {
 
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, Constants::API_URL . $endpoint);
+        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -40,8 +43,8 @@ class HttpInterface {
         curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath . $this->parent->username . '-cookies.dat');
-        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath . $this->parent->username . '-cookies.dat');
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
+        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
 
         if ($post) {
             curl_setopt($ch, CURLOPT_POST, true);
@@ -78,7 +81,7 @@ class HttpInterface {
 
         curl_close($ch);
 
-        if ($httpCode == 429 && $flood_wait) {
+        if (429 == $httpCode && $flood_wait) {
             if ($this->parent->debug) {
                 echo "Too many requests! Sleeping 40s\n";
             }
@@ -87,7 +90,6 @@ class HttpInterface {
         } else {
             return [$header, json_decode($body, true)];
         }
-
     }
 
     /**
@@ -101,7 +103,8 @@ class HttpInterface {
      *
      * @throws InstagramException
      */
-    public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null, $location = null, $filter = null, $reel_flag = false) {
+    public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null, $location = null, $filter = null, $reel_flag = false)
+    {
         $endpoint = 'upload/photo/';
         $boundary = $this->parent->uuid;
         $helper = new AdaptImage();
@@ -140,7 +143,7 @@ class HttpInterface {
                 'type' => 'form-data',
                 'name' => 'photo',
                 'data' => $fileToUpload,
-                'filename' => 'pending_media_' . number_format(round(microtime(true) * 1000), 0, '', '') . '.jpg',
+                'filename' => 'pending_media_'.number_format(round(microtime(true) * 1000), 0, '', '').'.jpg',
                 'headers' => [
                     'Content-Transfer-Encoding: binary',
                     'Content-Type: application/octet-stream',
@@ -150,17 +153,17 @@ class HttpInterface {
 
         $data = $this->buildBody($bodies, $boundary);
         $headers = [
-            'X-IG-Capabilities: ' . Constants::X_IG_Capabilities,
+            'X-IG-Capabilities: '.Constants::X_IG_Capabilities,
             'X-IG-Connection-Type: WIFI',
-            'Content-Type: multipart/form-data; boundary=' . $boundary,
-            'Content-Length: ' . strlen($data),
+            'Content-Type: multipart/form-data; boundary='.$boundary,
+            'Content-Length: '.strlen($data),
             'Accept-Language: en-US',
             'Accept-Encoding: gzip, deflate',
             'Connection: close',
         ];
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, Constants::API_URL . $endpoint);
+        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -169,8 +172,8 @@ class HttpInterface {
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath . $this->parent->username . '-cookies.dat');
-        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath . $this->parent->username . '-cookies.dat');
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
+        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
@@ -221,7 +224,8 @@ class HttpInterface {
         return $configure;
     }
 
-    public function uploadVideo($video, $caption = null, $customPreview = null) {
+    public function uploadVideo($video, $caption = null, $customPreview = null)
+    {
         $videoData = file_get_contents($video);
 
         $endpoint = 'upload/video/';
@@ -255,20 +259,20 @@ class HttpInterface {
             'Connection: keep-alive',
             'Accept: */*',
             'Host: i.instagram.com',
-            'Content-Type: multipart/form-data; boundary=' . $boundary,
+            'Content-Type: multipart/form-data; boundary='.$boundary,
             'Accept-Language: en-en',
         ];
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, Constants::API_URL . $endpoint);
+        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath . $this->parent->username . '-cookies.dat');
-        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath . $this->parent->username . '-cookies.dat');
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
+        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
@@ -304,7 +308,7 @@ class HttpInterface {
 
         for ($a = 0; $a <= 3; ++$a) {
             $start = ($a * $request_size);
-            $end = ($a + 1) * $request_size + ($a == 3 ? $lastRequestExtra : 0);
+            $end = ($a + 1) * $request_size + (3 == $a ? $lastRequestExtra : 0);
 
             $headers = [
                 'Connection: keep-alive',
@@ -313,12 +317,12 @@ class HttpInterface {
                 'Cookie2: $Version=1',
                 'Accept-Encoding: gzip, deflate',
                 'Content-Type: application/octet-stream',
-                'Session-ID: ' . $upload_id,
+                'Session-ID: '.$upload_id,
                 'Accept-Language: en-en',
                 'Content-Disposition: attachment; filename="video.mov"',
-                'Content-Length: ' . ($end - $start),
-                'Content-Range: ' . 'bytes ' . $start . '-' . ($end - 1) . '/' . strlen($videoData),
-                'job: ' . $job,
+                'Content-Length: '.($end - $start),
+                'Content-Range: '.'bytes '.$start.'-'.($end - 1).'/'.strlen($videoData),
+                'job: '.$job,
             ];
 
             $ch = curl_init();
@@ -330,8 +334,8 @@ class HttpInterface {
             curl_setopt($ch, CURLOPT_HEADER, true);
             curl_setopt($ch, CURLOPT_VERBOSE, false);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath . $this->parent->username . '-cookies.dat');
-            curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath . $this->parent->username . '-cookies.dat');
+            curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
+            curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, substr($videoData, $start, $end));
 
@@ -365,7 +369,7 @@ class HttpInterface {
         $upload = new UploadVideoResponse(json_decode(substr($resp, $header_len), true));
 
         if (!is_null($upload->getMessage())) {
-            throw new InstagramException($upload->getMessage() . "\n");
+            throw new InstagramException($upload->getMessage()."\n");
 
             return;
         }
@@ -387,7 +391,8 @@ class HttpInterface {
         return $configure;
     }
 
-    public function changeProfilePicture($photo) {
+    public function changeProfilePicture($photo)
+    {
         if (is_null($photo)) {
             echo "Photo not valid\n\n";
 
@@ -411,7 +416,7 @@ class HttpInterface {
             [
                 'type' => 'form-data',
                 'name' => 'signed_body',
-                'data' => hash_hmac('sha256', $uData, Constants::IG_SIG_KEY) . $uData,
+                'data' => hash_hmac('sha256', $uData, Constants::IG_SIG_KEY).$uData,
             ],
             [
                 'type' => 'form-data',
@@ -430,12 +435,12 @@ class HttpInterface {
             'Proxy-Connection: keep-alive',
             'Connection: keep-alive',
             'Accept: */*',
-            'Content-Type: multipart/form-data; boundary=' . $boundary,
+            'Content-Type: multipart/form-data; boundary='.$boundary,
             'Accept-Language: en-en',
         ];
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, Constants::API_URL . $endpoint);
+        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -444,8 +449,8 @@ class HttpInterface {
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath . $this->parent->username . '-cookies.dat');
-        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath . $this->parent->username . '-cookies.dat');
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
+        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
@@ -476,7 +481,8 @@ class HttpInterface {
         curl_close($ch);
     }
 
-    public function direct_share($media_id, $recipients, $text = null) {
+    public function direct_share($media_id, $recipients, $text = null)
+    {
         if (!is_array($recipients)) {
             $recipients = [$recipients];
         }
@@ -523,12 +529,12 @@ class HttpInterface {
             'Proxy-Connection: keep-alive',
             'Connection: keep-alive',
             'Accept: */*',
-            'Content-Type: multipart/form-data; boundary=' . $boundary,
+            'Content-Type: multipart/form-data; boundary='.$boundary,
             'Accept-Language: en-en',
         ];
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, Constants::API_URL . $endpoint);
+        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -537,8 +543,8 @@ class HttpInterface {
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath . $this->parent->username . '-cookies.dat');
-        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath . $this->parent->username . '-cookies.dat');
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
+        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
@@ -569,7 +575,8 @@ class HttpInterface {
         curl_close($ch);
     }
 
-    public function direct_message($recipients, $text) {
+    public function direct_message($recipients, $text)
+    {
         if (!is_array($recipients)) {
             $recipients = [$recipients];
         }
@@ -611,12 +618,12 @@ class HttpInterface {
             'Proxy-Connection: keep-alive',
             'Connection: keep-alive',
             'Accept: */*',
-            'Content-Type: multipart/form-data; boundary=' . $boundary,
+            'Content-Type: multipart/form-data; boundary='.$boundary,
             'Accept-Language: en-en',
         ];
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, Constants::API_URL . $endpoint);
+        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
         curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -625,8 +632,8 @@ class HttpInterface {
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath . $this->parent->username . '-cookies.dat');
-        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath . $this->parent->username . '-cookies.dat');
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
+        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->IGDataPath.$this->parent->username.'-cookies.dat');
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
@@ -657,33 +664,36 @@ class HttpInterface {
         curl_close($ch);
     }
 
-    protected function buildBody($bodies, $boundary) {
+    protected function buildBody($bodies, $boundary)
+    {
         $body = '';
         foreach ($bodies as $b) {
-            $body .= '--' . $boundary . "\r\n";
-            $body .= 'Content-Disposition: ' . $b['type'] . '; name="' . $b['name'] . '"';
+            $body .= '--'.$boundary."\r\n";
+            $body .= 'Content-Disposition: '.$b['type'].'; name="'.$b['name'].'"';
             if (isset($b['filename'])) {
                 $ext = pathinfo($b['filename'], PATHINFO_EXTENSION);
-                $body .= '; filename="' . 'pending_media_' . number_format(round(microtime(true) * 1000), 0, '', '') . '.' . $ext . '"';
+                $body .= '; filename="'.'pending_media_'.number_format(round(microtime(true) * 1000), 0, '', '').'.'.$ext.'"';
             }
             if (isset($b['headers']) && is_array($b['headers'])) {
                 foreach ($b['headers'] as $header) {
-                    $body .= "\r\n" . $header;
+                    $body .= "\r\n".$header;
                 }
             }
 
-            $body .= "\r\n\r\n" . $b['data'] . "\r\n";
+            $body .= "\r\n\r\n".$b['data']."\r\n";
         }
-        $body .= '--' . $boundary . '--';
+        $body .= '--'.$boundary.'--';
 
         return $body;
     }
 
-    public function verifyPeer($enable) {
+    public function verifyPeer($enable)
+    {
         $this->verifyPeer = $enable;
     }
 
-    public function verifyHost($enable) {
+    public function verifyHost($enable)
+    {
         $this->verifyHost = $enable;
     }
 }
