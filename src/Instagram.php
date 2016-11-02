@@ -1739,7 +1739,6 @@ class Instagram
             throw new InstagramException($request->getMessage()."\n");
         }
 
-        print_r($data);
         return new FriendshipStatus($data);
     }
 

@@ -79,7 +79,7 @@ class ChallengeSMS
             $this->token = $token[1];
         }
 
-        if (302 == $response[2] || preg_match('/^Location: https/m', $response[0]) > 0) {
+        if ($response[2] == 302 || preg_match('/^Location: https/m', $response[0]) > 0) {
             $this->step = 3;
         } else if (preg_match('/id="id_phone_number"/', $response[1]) > 0) {
             $this->step = 1;
