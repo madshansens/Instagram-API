@@ -25,6 +25,7 @@ class FBSearchResponse extends Response
             foreach ($response['places'] as $places) {
                 $this->places[] = new Place($places);
             }
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

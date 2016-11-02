@@ -30,6 +30,7 @@ class LocationFeedResponse extends Response
             $this->auto_load_more_enabled = $response['auto_load_more_enabled'];
             $this->more_available = $response['more_available'];
             $this->next_max_id = isset($response['next_max_id']) ? $response['next_max_id'] : null;
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

@@ -12,6 +12,7 @@ class UsernameSuggestionsResponse extends Response
             if (array_key_exists('username_suggestions', $response)) {
                 $this->username_suggestions = $response['username_suggestions'];
             }
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

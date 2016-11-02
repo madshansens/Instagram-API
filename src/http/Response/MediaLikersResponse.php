@@ -16,6 +16,7 @@ class MediaLikersResponse extends Response
             }
             $this->likers = $users;
             $this->user_count = $response['user_count'];
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

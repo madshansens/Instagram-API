@@ -27,6 +27,7 @@ class DiscoverChannelsResponse extends Response
                     $this->items[$key] = $response['items'][$key]['title'];
                 }
             }
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

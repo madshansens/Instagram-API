@@ -12,6 +12,7 @@ class RecentRecipientsResponse extends Response
         if (self::STATUS_OK == $response['status']) {
             $this->expiration_interval = $response['expiration_interval'];
             $this->recent_recipients = $response['recent_recipients'];
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

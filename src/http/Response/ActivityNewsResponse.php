@@ -28,6 +28,7 @@ class ActivityNewsResponse extends Response
             $this->friend_request_stories = $response['friend_request_stories'];
             $this->counts = new Counts($response['counts']);
             $this->subscription = $response['subscription'];
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

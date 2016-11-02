@@ -30,11 +30,11 @@ class MediaInfoResponse extends Response
                 }
                 $this->comments = $comments;
             }
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }
         $this->setStatus($response['status']);
-        $this->setFullResponse($response);
     }
 
     public function getTakenTime()

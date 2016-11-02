@@ -84,6 +84,7 @@ class UsernameInfoResponse extends Response
                 $this->usertag_review_enabled = $response['user']['usertag_review_enabled'];
             }
             $this->external_url = $response['user']['external_url'];
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

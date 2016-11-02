@@ -65,16 +65,18 @@ class FriendshipStatus {
         return $this->is_private;
     }
 
-    public function isBlockingReel() {
+    public function isBlockingReel()
+    {
         return $this->is_blocking_reel;
     }
 
-    public function isMutingReel() {
+    public function isMutingReel()
+    {
         return $this->is_muting_reel;
     }
 
-    public function getBlocking() {
+    public function getBlocking()
+    {
         return $this->blocking;
     }
-
 }

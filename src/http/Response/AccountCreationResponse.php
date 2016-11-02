@@ -36,6 +36,7 @@ class AccountCreationResponse extends Response
             $this->nux_private_enabled = $response['created_user']['nux_private_enabled'];
             $this->is_private = $response['created_user']['is_private'];
             $this->account_created = $response['account_created'];
+            $this->setFullResponse($response);
         } else {
             if (array_key_exists('message', $response)) {
                 $this->setMessage($response['message']);

@@ -1320,7 +1320,6 @@ class Instagram
         return $query['media_count'];
     }
 
-
     /**
      * @throws InstagramException
      *

@@ -13,6 +13,7 @@ class GeoMediaResponse extends Response
             foreach ($response['geo_media'] as $geoMedia) {
                 $this->geo_media[] = new GeoMedia($geoMedia);
             }
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

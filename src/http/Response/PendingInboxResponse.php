@@ -14,6 +14,7 @@ class PendingInboxResponse extends Response
             $this->seq_id = $response['seq_id'];
             $this->pending_requests_total = $response['pending_requests_total'];
             $this->inbox = new Inbox($response['inbox']);
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

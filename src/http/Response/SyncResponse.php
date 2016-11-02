@@ -14,6 +14,7 @@ class SyncResponse extends Response
                 $experiments[] = new Experiment($experiment);
             }
             $this->experiments = $experiments;
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

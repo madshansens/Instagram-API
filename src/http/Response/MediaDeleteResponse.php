@@ -10,6 +10,7 @@ class MediaDeleteResponse extends Response
     {
         if (self::STATUS_OK == $response['status']) {
             $this->did_delete = $response['did_delete'];
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

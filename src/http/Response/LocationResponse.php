@@ -15,6 +15,7 @@ class LocationResponse extends Response
                 $locations[] = new Location($location);
             }
             $this->venues = $locations;
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

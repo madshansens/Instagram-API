@@ -26,6 +26,7 @@ class ExploreResponse extends Response
                 }
             }
             $this->items = $items;
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

@@ -16,6 +16,7 @@ class autoCompleteUserListResponse extends Response
                 $users[] = new User($user);
             }
             $this->users = $users;
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

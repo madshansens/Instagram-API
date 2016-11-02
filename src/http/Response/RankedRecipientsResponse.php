@@ -12,6 +12,7 @@ class RankedRecipientsResponse extends Response
         if (self::STATUS_OK == $response['status']) {
             $this->expires = $response['expires'];
             $this->ranked_recipients = $response['ranked_recipients'];
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

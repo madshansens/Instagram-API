@@ -21,6 +21,7 @@ class LoginResponse extends Response
             $this->full_name = $response['logged_in_user']['full_name'];
             $this->pk = $response['logged_in_user']['pk'];
             $this->is_private = $response['logged_in_user']['is_private'];
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

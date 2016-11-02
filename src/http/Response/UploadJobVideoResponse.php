@@ -12,6 +12,7 @@ class UploadJobVideoResponse extends Response
         if (self::STATUS_OK == $response['status']) {
             $this->upload_id = $response['upload_id'];
             $this->video_upload_urls = $response['video_upload_urls'];
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

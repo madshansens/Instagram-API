@@ -30,6 +30,7 @@ class TagFeedResponse extends Response
             $this->items = $items;
             $this->more_available = $response['more_available'];
             $this->next_max_id = isset($response['next_max_id']) ? $response['next_max_id'] : null;
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

@@ -18,6 +18,7 @@ class V2InboxResponse extends Response
             $this->pending_requests_users = $response['pending_requests_users'];
             $this->inbox = new Inbox($response['inbox']);
             $this->subscription = $response['subscription'];
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

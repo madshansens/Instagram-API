@@ -17,6 +17,7 @@ class CheckUsernameResponse extends Response
             if (array_key_exists('error', $response)) {
                 $this->error = $response['error'];
             }
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

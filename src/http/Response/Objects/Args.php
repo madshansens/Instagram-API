@@ -20,8 +20,10 @@ class Args
             }
         }
         $this->links = [];
-        foreach ($args['links'] as $link) {
-            $this->links[] = new Link($link);
+        if (is_array($args['links'])) {
+            foreach ($args['links'] as $link) {
+                $this->links[] = new Link($link);
+            }
         }
         $this->text = $args['text'];
         $this->profile_id = $args['profile_id'];

@@ -16,6 +16,7 @@ class ConfigureResponse extends Response
             $this->media_id = $response['media']['id'];
             $this->image_url = $response['media']['image_versions2']['candidates']['0']['url'];
             $this->media_code = $response['media']['code'];
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

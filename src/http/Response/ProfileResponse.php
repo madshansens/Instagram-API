@@ -37,6 +37,7 @@ class ProfileResponse extends Response
                 }
                 $this->hd_profile_pic_versions = $profile_pics_vers;
             }
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

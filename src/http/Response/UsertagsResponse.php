@@ -28,6 +28,7 @@ class UsertagsResponse extends Response
             $this->total_count = $response['total_count'];
             $this->requires_review = $response['requires_review'];
             $this->new_photos = $response['new_photos'];
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

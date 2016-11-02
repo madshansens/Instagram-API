@@ -11,6 +11,7 @@ class UploadVideoResponse extends Response
     {
         if (self::STATUS_OK == $response['status']) {
             $this->upload_id = $response['upload_id'];
+            $this->setFullResponse($response);
             if (isset($response['message'])) {
                 $this->setMessage($response['message']);
             }

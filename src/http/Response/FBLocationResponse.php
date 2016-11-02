@@ -15,6 +15,7 @@ class FBLocationResponse extends Response
             foreach ($response['items'] as $item) {
                 $this->items[] = new LocationItem($item);
             }
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }

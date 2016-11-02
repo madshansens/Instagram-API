@@ -23,6 +23,7 @@ class ReelsTrayFeedResponse extends Response
                 }
             }
             $this->trays = $trays;
+            $this->setFullResponse($response);
         } else {
             $this->setMessage($response['message']);
         }
