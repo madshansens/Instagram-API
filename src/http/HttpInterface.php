@@ -15,7 +15,7 @@ class HttpInterface
         $this->userAgent = $this->parent->settings->get('user_agent');
     }
 
-    public function request($endpoint, $post = null, $login = false, $flood_wait = true)
+    public function request($endpoint, $post = null, $login = false, $flood_wait = false)
     {
         if (!$this->parent->isLoggedIn && !$login) {
             throw new InstagramException("Not logged in\n");
@@ -83,9 +83,9 @@ class HttpInterface
 
         if ($httpCode == 429 && $flood_wait) {
             if ($this->parent->debug) {
-                echo "Too many requests! Sleeping 40s\n";
+                echo "Too many requests! Sleeping 2s\n";
             }
-            sleep(40);
+            sleep(2);
 
             return $this->request($endpoint, $post, $login);
         } else {
