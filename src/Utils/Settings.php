@@ -74,7 +74,12 @@ class Settings
     {
         if (is_writable(dirname($this->path))) {
             return true;
+        } else if(mkdir(dirname($this->path), 777)) {
+                    return true;
+        } else if(chmod(dirname($this->path), 777)) {
+            return true;
         }
+        
         throw new InstagramException('The setting file is not writable');
     }
 }
