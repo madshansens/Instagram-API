@@ -38,7 +38,9 @@ class UsernameInfoResponse extends Response
             $this->has_anonymous_profile_picture = $response['user']['has_anonymous_profile_picture'];
             $this->full_name = $response['user']['full_name'];
             $this->following_count = $response['user']['following_count'];
-            $this->auto_expand_chaining = $response['user']['auto_expand_chaining'];
+            if (array_key_exists('auto_expand_chaining', $response['user'])) {
+                $this->auto_expand_chaining = $response['user']['auto_expand_chaining'];
+            }
             if (array_key_exists('external_lynx_url', $response['user'])) {
                 $this->external_lynx_url = $response['user']['external_lynx_url'];
             }
