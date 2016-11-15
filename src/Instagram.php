@@ -15,37 +15,47 @@ class Instagram
     public $token;              // _csrftoken
     public $isLoggedIn = false; // Session status
     public $rank_token;         // Rank token
-    public $IGDataPath;         // Data storage path
-    public $customPath = false;
+
+
     public $http;
     public $settings;
+
+    public $settingsAdopter         = ["type" => "file",
+        "path" =>  __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR]; // File | Mysql
+
+
+    /*    
+    // Settings for mysql storage
+    public $settingsAdopter         = array(
+    "type"       => "",
+    "username"   => "",
+    "password"   => "",
+    "host"       => "",
+    "database"   => "");
+    */    
+
+
+
+
     public $proxy = null;     // Full Proxy
     public $proxyHost = null; // Proxy Host and Port
     public $proxyAuth = null; // Proxy User and Pass
 
     /**
-     * Default class constructor.
-     *
-     * @param string $username Your Instagram username
-     * @param string $password Your Instagram password
-     * @param $debug Debug on or off, false by default
-     * @param $IGDataPath Default folder to store data, you can change it
-     */
+    * Default class constructor.
+    *
+    * @param string $username Your Instagram username
+    * @param string $password Your Instagram password
+    * @param $debug Debug on or off, false by default
+    * @param $IGDataPath Default folder to store data, you can change it
+    */
     public function __construct($username, $password, $debug = false, $IGDataPath = null, $truncatedDebug = false)
     {
         $this->debug = $debug;
         $this->truncatedDebug = $truncatedDebug;
         $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
 
-        if (!is_null($IGDataPath)) {
-            $this->IGDataPath = $IGDataPath;
-            $this->customPath = true;
-        } else {
-            $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
-            if (!file_exists($this->IGDataPath)) {
-                mkdir($this->IGDataPath, 0777, true);
-            }
-        }
+
 
         $this->checkSettings($username);
 
@@ -55,11 +65,11 @@ class Instagram
     }
 
     /**
-     * Set the user. Manage multiple accounts.
-     *
-     * @param string $username Your Instagram username
-     * @param string $password Your Instagram password
-     */
+    * Set the user. Manage multiple accounts.
+    *
+    * @param string $username Your Instagram username
+    * @param string $password Your Instagram password
+    */
     public function setUser($username, $password)
     {
         $this->username = $username;
@@ -69,9 +79,8 @@ class Instagram
 
         $this->uuid = SignatureUtils::generateUUID(true);
 
-        if ((file_exists($this->IGDataPath."$this->username-cookies.dat")) && ($this->settings->get('username_id') != null)
-            && ($this->settings->get('token') != null)
-        ) {
+
+        if ($this->settings->isLogged()) {
             $this->isLoggedIn = true;
             $this->username_id = $this->settings->get('username_id');
             $this->rank_token = $this->username_id.'_'.$this->uuid;
@@ -83,15 +92,9 @@ class Instagram
 
     protected function checkSettings($username)
     {
-        if (!$this->customPath) {
-            $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
-        }
 
-        if (!file_exists($this->IGDataPath)) {
-            mkdir($this->IGDataPath, 0777, true);
-        }
 
-        $this->settings = new Settings($this->IGDataPath.'settings-'.$username.'.dat');
+        $this->settings = new SettingsAdapter($this->settingsAdopter,$username);
 
         if ($this->settings->get('version') == null) {
             $this->settings->set('version', Constants::VERSION);
@@ -106,15 +109,15 @@ class Instagram
     }
 
     /**
-     * Set the proxy.
-     *
-     * @param string $proxy    Full proxy string. Ex: user:pass@192.168.0.0:8080 Use $proxy = "" to clear proxy
-     * @param int    $port     Port of proxy
-     * @param string $username Username for proxy
-     * @param string $password Password for proxy
-     *
-     * @throws InstagramException
-     */
+    * Set the proxy.
+    *
+    * @param string $proxy    Full proxy string. Ex: user:pass@192.168.0.0:8080 Use $proxy = "" to clear proxy
+    * @param int    $port     Port of proxy
+    * @param string $username Username for proxy
+    * @param string $password Password for proxy
+    *
+    * @throws InstagramException
+    */
     public function setProxy($proxy, $port = null, $username = null, $password = null)
     {
         $this->proxy = $proxy;
@@ -146,14 +149,14 @@ class Instagram
     }
 
     /**
-     * Login to Instagram.
-     *
-     * @param bool $force Force login to Instagram, this will create a new session
-     *
-     * @throws InstagramException
-     *
-     * @return ChallengeResponse|LoginResponse
-     */
+    * Login to Instagram.
+    *
+    * @param bool $force Force login to Instagram, this will create a new session
+    *
+    * @throws InstagramException
+    *
+    * @return ChallengeResponse|LoginResponse
+    */
     public function login($force = false)
     {
         if (!$this->isLoggedIn || $force) {
@@ -226,10 +229,10 @@ class Instagram
     }
 
     /**
-     * @param bool $prelogin
-     *
-     * @return SyncResponse
-     */
+    * @param bool $prelogin
+    *
+    * @return SyncResponse
+    */
     public function syncFeatures($prelogin = false)
     {
         if ($prelogin) {
@@ -253,18 +256,18 @@ class Instagram
     }
 
     /**
-     * @return autoCompleteUserListResponse
-     */
+    * @return autoCompleteUserListResponse
+    */
     public function autoCompleteUserList()
     {
         return new autoCompleteUserListResponse($this->http->request('friendships/autocomplete_user_list/?version=2')[1]);
     }
 
     /**
-     * @param $gcmToken
-     *
-     * @return mixed
-     */
+    * @param $gcmToken
+    *
+    * @return mixed
+    */
     public function pushRegister($gcmToken)
     {
         $deviceToken = json_encode([
@@ -288,20 +291,20 @@ class Instagram
     }
 
     /**
-     * Get timeline feed.
-     *
-     * @param $maxid
-     *
-     * @throws InstagramException
-     *
-     * @return TimelineFeedResponse
-     */
+    * Get timeline feed.
+    *
+    * @param $maxid
+    *
+    * @throws InstagramException
+    *
+    * @return TimelineFeedResponse
+    */
     public function timelineFeed($maxid = null)
     {
         $timeline = new TimelineFeedResponse($this->http->request(
             "feed/timeline/?rank_token=$this->rank_token&ranked_content=true"
             .(!is_null($maxid) ? '&max_id='.$maxid : '')
-        )[1]);
+            )[1]);
 
         if (!$timeline->isOk()) {
             throw new InstagramException($timeline->getMessage()."\n");
@@ -311,8 +314,8 @@ class Instagram
     }
 
     /**
-     * @return MegaphoneLogResponse
-     */
+    * @return MegaphoneLogResponse
+    */
     protected function megaphoneLog()
     {
         $data = [
@@ -329,12 +332,12 @@ class Instagram
     }
 
     /**
-     * Pending Inbox.
-     *
-     * @throws InstagramException Pending Inbox Data
-     *
-     * @return PendingInboxResponse|void
-     */
+    * Pending Inbox.
+    *
+    * @throws InstagramException Pending Inbox Data
+    *
+    * @return PendingInboxResponse|void
+    */
     public function getPendingInbox()
     {
         $pendingInbox = new PendingInboxResponse($this->http->request('direct_v2/pending_inbox/?')[1]);
@@ -349,12 +352,12 @@ class Instagram
     }
 
     /**
-     * Ranked recipients.
-     *
-     * @throws InstagramException Ranked recipients Data
-     *
-     * @return RankedRecipientsResponse|void
-     */
+    * Ranked recipients.
+    *
+    * @throws InstagramException Ranked recipients Data
+    *
+    * @return RankedRecipientsResponse|void
+    */
     public function getRankedRecipients()
     {
         $ranked_recipients = new RankedRecipientsResponse($this->http->request('direct_v2/ranked_recipients/?show_threads=true')[1]);
@@ -369,12 +372,12 @@ class Instagram
     }
 
     /**
-     * Recent recipients.
-     *
-     * @throws InstagramException Ranked recipients Data
-     *
-     * @return RecentRecipientsResponse|void
-     */
+    * Recent recipients.
+    *
+    * @throws InstagramException Ranked recipients Data
+    *
+    * @return RecentRecipientsResponse|void
+    */
     public function getRecentRecipients()
     {
         $recent_recipients = new RecentRecipientsResponse($this->http->request('direct_share/recent_recipients/')[1]);
@@ -389,12 +392,12 @@ class Instagram
     }
 
     /**
-     * Explore Tab.
-     *
-     * @throws InstagramException Explore data
-     *
-     * @return ExploreResponse|void
-     */
+    * Explore Tab.
+    *
+    * @throws InstagramException Explore data
+    *
+    * @return ExploreResponse|void
+    */
     public function explore()
     {
         $explore = new ExploreResponse($this->http->request('discover/explore/')[1]);
@@ -409,12 +412,12 @@ class Instagram
     }
 
     /**
-     * Home Channel.
-     *
-     * @throws InstagramException discoverChannel data
-     *
-     * @return DiscoverChannelResponse
-     */
+    * Home Channel.
+    *
+    * @throws InstagramException discoverChannel data
+    *
+    * @return DiscoverChannelResponse
+    */
     public function discoverChannels()
     {
         $discoverChannels = new DiscoverChannelsResponse($this->http->request('discover/channels_home/')[1]);
@@ -427,8 +430,8 @@ class Instagram
     }
 
     /**
-     * @return ExposeResponse
-     */
+    * @return ExposeResponse
+    */
     public function expose()
     {
         $data = json_encode([
@@ -443,11 +446,11 @@ class Instagram
     }
 
     /**
-     * Logout of Instagram.
-     *
-     * @return bool
-     *              Returns true if logged out correctly
-     */
+    * Logout of Instagram.
+    *
+    * @return bool
+    *              Returns true if logged out correctly
+    */
     public function logout()
     {
         $logout = new LogoutResponse($this->http->request('accounts/logout/')[1]);
@@ -460,77 +463,77 @@ class Instagram
     }
 
     /**
-     * Upload photo to Instagram.
-     *
-     * @param string $photo         Path to your photo
-     * @param string $caption       Caption to be included in your photo
-     * @param null   $upload_id
-     * @param null   $customPreview
-     * @param null   $location
-     * @param null   $filter
-     *
-     * @return Upload data
-     */
+    * Upload photo to Instagram.
+    *
+    * @param string $photo         Path to your photo
+    * @param string $caption       Caption to be included in your photo
+    * @param null   $upload_id
+    * @param null   $customPreview
+    * @param null   $location
+    * @param null   $filter
+    *
+    * @return Upload data
+    */
     public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null, $location = null, $filter = null)
     {
         return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, $location, $filter);
     }
 
     /**
-     * @param $photo
-     * @param null $caption
-     * @param null $upload_id
-     * @param null $customPreview
-     */
+    * @param $photo
+    * @param null $caption
+    * @param null $upload_id
+    * @param null $customPreview
+    */
     public function uploadPhotoStory($photo, $caption = null, $upload_id = null, $customPreview = null)
     {
         return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, null, null, true);
     }
 
     /**
-     * Upload video to Instagram.
-     *
-     * @param $video Path to your video
-     * @param null $caption       Caption to be included in your video
-     * @param null $customPreview
-     *
-     * @return mixed
-     */
+    * Upload video to Instagram.
+    *
+    * @param $video Path to your video
+    * @param null $caption       Caption to be included in your video
+    * @param null $customPreview
+    *
+    * @return mixed
+    */
     public function uploadVideo($video, $caption = null, $customPreview = null)
     {
         return $this->http->uploadVideo($video, $caption, $customPreview);
     }
 
     /**
-     * @param $media_id
-     * @param $recipients
-     * @param null $text
-     */
+    * @param $media_id
+    * @param $recipients
+    * @param null $text
+    */
     public function direct_share($media_id, $recipients, $text = null)
     {
         $this->http->direct_share($media_id, $recipients, $text);
     }
 
     /**
-     * Send direct message to user by inbox.
-     *
-     * @param array|int $recipients Users id
-     * @param string    $text       Text message
-     */
+    * Send direct message to user by inbox.
+    *
+    * @param array|int $recipients Users id
+    * @param string    $text       Text message
+    */
     public function direct_message($recipients, $text)
     {
         $this->http->direct_message($recipients, $text);
     }
 
     /**
-     * Direct Thread Data.
-     *
-     * @param $threadId Thread Id
-     *
-     * @throws InstagramException Direct Thread Data
-     *
-     * @return array Direct Thread Data
-     */
+    * Direct Thread Data.
+    *
+    * @param $threadId Thread Id
+    *
+    * @throws InstagramException Direct Thread Data
+    *
+    * @return array Direct Thread Data
+    */
     public function directThread($threadId)
     {
         $directThread = $this->http->request("direct_v2/threads/$threadId/?")[1];
@@ -545,13 +548,13 @@ class Instagram
     }
 
     /**
-     * Direct Thread Action.
-     *
-     * @param string $threadId     Thread Id
-     * @param string $threadAction Thread Action 'approve' OR 'decline' OR 'block'
-     *
-     * @return array Direct Thread Action Data
-     */
+    * Direct Thread Action.
+    *
+    * @param string $threadId     Thread Id
+    * @param string $threadAction Thread Action 'approve' OR 'decline' OR 'block'
+    *
+    * @return array Direct Thread Action Data
+    */
     public function directThreadAction($threadId, $threadAction)
     {
         $data = json_encode([
@@ -564,13 +567,13 @@ class Instagram
     }
 
     /**
-     * @param $upload_id
-     * @param $video
-     * @param string $caption
-     * @param null   $customPreview
-     *
-     * @return ConfigureVideoResponse
-     */
+    * @param $upload_id
+    * @param $video
+    * @param string $caption
+    * @param null   $customPreview
+    *
+    * @return ConfigureVideoResponse
+    */
     public function configureVideo($upload_id, $video, $caption = '', $customPreview = null)
     {
         $this->uploadPhoto($video, $caption, $upload_id, $customPreview);
@@ -612,14 +615,14 @@ class Instagram
     }
 
     /**
-     * @param $upload_id
-     * @param $photo
-     * @param string $caption
-     * @param null   $location
-     * @param null   $filter
-     *
-     * @return ConfigureResponse
-     */
+    * @param $upload_id
+    * @param $photo
+    * @param string $caption
+    * @param null   $location
+    * @param null   $filter
+    *
+    * @return ConfigureResponse
+    */
     public function configure($upload_id, $photo, $caption = '', $location = null, $filter = null)
     {
         $size = getimagesize($photo)[0];
@@ -685,11 +688,11 @@ class Instagram
     }
 
     /**
-     * @param $upload_id
-     * @param $photo
-     *
-     * @return ConfigureResponse
-     */
+    * @param $upload_id
+    * @param $photo
+    *
+    * @return ConfigureResponse
+    */
     public function configureToReel($upload_id, $photo)
     {
         $size = getimagesize($photo)[0];
@@ -723,13 +726,13 @@ class Instagram
     }
 
     /**
-     *  Edit media.
-     *
-     * @param $mediaId  Media id
-     * @param string $captionText Caption text
-     *
-     * @return MediaResponse
-     */
+    *  Edit media.
+    *
+    * @param $mediaId  Media id
+    * @param string $captionText Caption text
+    *
+    * @return MediaResponse
+    */
     public function editMedia($mediaId, $captionText = '')
     {
         $data = json_encode([
@@ -743,12 +746,12 @@ class Instagram
     }
 
     /**
-     * Remove yourself from a tagged media.
-     *
-     * @param $mediaId
-     *
-     * @return MediaResponse
-     */
+    * Remove yourself from a tagged media.
+    *
+    * @param $mediaId
+    *
+    * @return MediaResponse
+    */
     public function removeSelftag($mediaId)
     {
         $data = json_encode([
@@ -761,14 +764,15 @@ class Instagram
     }
 
     /**
-     * Get media info.
-     *
-     * @param $mediaId
-     *
-     * @return MediaInfoResponse
-     */
+    * Get media info.
+    *
+    * @param $mediaId
+    *
+    * @return MediaInfoResponse
+    */
     public function mediaInfo($mediaId)
     {
+
         $data = json_encode([
             '_uuid'      => $this->uuid,
             '_uid'       => $this->username_id,
@@ -780,12 +784,12 @@ class Instagram
     }
 
     /**
-     * Delete photo or video.
-     *
-     * @param $mediaId
-     *
-     * @return mixed
-     */
+    * Delete photo or video.
+    *
+    * @param $mediaId
+    *
+    * @return mixed
+    */
     public function deleteMedia($mediaId)
     {
         $data = json_encode([
@@ -799,13 +803,13 @@ class Instagram
     }
 
     /**
-     * Comment media.
-     *
-     * @param $mediaId
-     * @param $commentText
-     *
-     * @return CommentResponse
-     */
+    * Comment media.
+    *
+    * @param $mediaId
+    * @param $commentText
+    *
+    * @return CommentResponse
+    */
     public function comment($mediaId, $commentText)
     {
         $data = json_encode([
@@ -819,16 +823,16 @@ class Instagram
     }
 
     /**
-     * Delete Comment.
-     *
-     * @param string $mediaId
-     *                          Media ID
-     * @param string $commentId
-     *                          Comment ID
-     *
-     * @return array
-     *               Delete comment data
-     */
+    * Delete Comment.
+    *
+    * @param string $mediaId
+    *                          Media ID
+    * @param string $commentId
+    *                          Comment ID
+    *
+    * @return array
+    *               Delete comment data
+    */
     public function deleteComment($mediaId, $commentId)
     {
         $data = json_encode([
@@ -841,16 +845,16 @@ class Instagram
     }
 
     /**
-     * Delete Comment Bulk.
-     *
-     * @param string $mediaId
-     *                           Media id
-     * @param string $commentIds
-     *                           List of comments to delete
-     *
-     * @return array
-     *               Delete Comment Bulk Data
-     */
+    * Delete Comment Bulk.
+    *
+    * @param string $mediaId
+    *                           Media id
+    * @param string $commentIds
+    *                           List of comments to delete
+    *
+    * @return array
+    *               Delete Comment Bulk Data
+    */
     public function deleteCommentsBulk($mediaId, $commentIds)
     {
         if (!is_array($commentIds)) {
@@ -875,22 +879,22 @@ class Instagram
     }
 
     /**
-     * Sets account to public.
-     *
-     * @param string $photo
-     *                      Path to photo
-     */
+    * Sets account to public.
+    *
+    * @param string $photo
+    *                      Path to photo
+    */
     public function changeProfilePicture($photo)
     {
         return new ProfileResponse($this->http->changeProfilePicture($photo));
     }
 
     /**
-     * Remove profile picture.
-     *
-     * @return array
-     *               status request data
-     */
+    * Remove profile picture.
+    *
+    * @return array
+    *               status request data
+    */
     public function removeProfilePicture()
     {
         $data = json_encode([
@@ -903,11 +907,11 @@ class Instagram
     }
 
     /**
-     * Sets account to private.
-     *
-     * @return array
-     *               status request data
-     */
+    * Sets account to private.
+    *
+    * @return array
+    *               status request data
+    */
     public function setPrivateAccount()
     {
         $data = json_encode([
@@ -920,11 +924,11 @@ class Instagram
     }
 
     /**
-     * Sets account to public.
-     *
-     * @return array
-     *               status request data
-     */
+    * Sets account to public.
+    *
+    * @return array
+    *               status request data
+    */
     public function setPublicAccount()
     {
         $data = json_encode([
@@ -937,10 +941,10 @@ class Instagram
     }
 
     /**
-     * Get personal profile data.
-     *
-     * @return ProfileResponse
-     */
+    * Get personal profile data.
+    *
+    * @return ProfileResponse
+    */
     public function getProfileData()
     {
         $data = json_encode([
@@ -953,16 +957,16 @@ class Instagram
     }
 
     /**
-     * Edit profile.
-     *
-     * @param string $url        Url - website. "" for nothing
-     * @param string $phone      Phone number. "" for nothing
-     * @param string $first_name Name. "" for nothing
-     * @param string $email      Email. Required
-     * @param int    $gender     Gender. male = 1 , female = 0
-     *
-     * @return ProfileResponse edit profile data
-     */
+    * Edit profile.
+    *
+    * @param string $url        Url - website. "" for nothing
+    * @param string $phone      Phone number. "" for nothing
+    * @param string $first_name Name. "" for nothing
+    * @param string $email      Email. Required
+    * @param int    $gender     Gender. male = 1 , female = 0
+    *
+    * @return ProfileResponse edit profile data
+    */
     public function editProfile($url, $phone, $first_name, $biography, $email, $gender)
     {
         $data = json_encode([
@@ -982,13 +986,13 @@ class Instagram
     }
 
     /**
-     * Change Password.
-     *
-     * @param string $oldPassword Old Password
-     * @param string $newPassword New Password
-     *
-     * @return array Change Password Data
-     */
+    * Change Password.
+    *
+    * @param string $oldPassword Old Password
+    * @param string $newPassword New Password
+    *
+    * @return array Change Password Data
+    */
     public function changePassword($oldPassword, $newPassword)
     {
         $data = json_encode([
@@ -1010,34 +1014,34 @@ class Instagram
     }
 
     /**
-     * Get username info.
-     *
-     * @param string $usernameId Username id
-     *
-     * @return UsernameInfoResponse Username data
-     */
+    * Get username info.
+    *
+    * @param string $usernameId Username id
+    *
+    * @return UsernameInfoResponse Username data
+    */
     public function getUsernameInfo($usernameId)
     {
         return new UsernameInfoResponse($this->http->request("users/$usernameId/info/")[1]);
     }
 
     /**
-     * Get self username info.
-     *
-     * @return UsernameInfoResponse Username data
-     */
+    * Get self username info.
+    *
+    * @return UsernameInfoResponse Username data
+    */
     public function getSelfUsernameInfo()
     {
         return $this->getUsernameInfo($this->username_id);
     }
 
     /**
-     * Get recent activity.
-     *
-     * @throws InstagramException
-     *
-     * @return mixed Recent activity data
-     */
+    * Get recent activity.
+    *
+    * @throws InstagramException
+    *
+    * @return mixed Recent activity data
+    */
     public function getRecentActivity()
     {
         $activity = new ActivityNewsResponse($this->http->request('news/inbox/?activity_module=all')[1]);
@@ -1050,12 +1054,12 @@ class Instagram
     }
 
     /**
-     * Get recent activity from accounts followed.
-     *
-     * @throws InstagramException
-     *
-     * @return mixed Recent activity data of follows
-     */
+    * Get recent activity from accounts followed.
+    *
+    * @throws InstagramException
+    *
+    * @return mixed Recent activity data of follows
+    */
     public function getFollowingRecentActivity($maxid = null)
     {
         $activity = new FollowingRecentActivityResponse($this->http->request('news/?'.(!is_null($maxid) ? '&max_id='.$maxid : ''))[1]);
@@ -1068,12 +1072,12 @@ class Instagram
     }
 
     /**
-     * I dont know this yet.
-     *
-     * @throws InstagramException
-     *
-     * @return V2InboxResponse v2 inbox data
-     */
+    * I dont know this yet.
+    *
+    * @throws InstagramException
+    *
+    * @return V2InboxResponse v2 inbox data
+    */
     public function getv2Inbox()
     {
         $inbox = new V2InboxResponse($this->http->request('direct_v2/inbox/?')[1]);
@@ -1086,14 +1090,14 @@ class Instagram
     }
 
     /**
-     * Get user tags.
-     *
-     * @param string $usernameId
-     *
-     * @throws InstagramException
-     *
-     * @return UsertagsResponse user tags data
-     */
+    * Get user tags.
+    *
+    * @param string $usernameId
+    *
+    * @throws InstagramException
+    *
+    * @return UsertagsResponse user tags data
+    */
     public function getUserTags($usernameId)
     {
         $tags = new UsertagsResponse($this->http->request("usertags/$usernameId/feed/?rank_token=$this->rank_token&ranked_content=true&")[1]);
@@ -1106,24 +1110,24 @@ class Instagram
     }
 
     /**
-     * Get self user tags.
-     *
-     * @return UsertagsResponse self user tags data
-     */
+    * Get self user tags.
+    *
+    * @return UsertagsResponse self user tags data
+    */
     public function getSelfUserTags()
     {
         return $this->getUserTags($this->username_id);
     }
 
     /**
-     * Get media likers.
-     *
-     * @param string $mediaId
-     *
-     * @throws InstagramException
-     *
-     * @return MediaLikersResponse
-     */
+    * Get media likers.
+    *
+    * @param string $mediaId
+    *
+    * @throws InstagramException
+    *
+    * @return MediaLikersResponse
+    */
     public function getMediaLikers($mediaId)
     {
         $likers = new MediaLikersResponse($this->http->request("media/$mediaId/likers/")[1]);
@@ -1135,14 +1139,14 @@ class Instagram
     }
 
     /**
-     * Get user locations media.
-     *
-     * @param string $usernameId Username id
-     *
-     * @throws InstagramException
-     *
-     * @return array Geo Media data
-     */
+    * Get user locations media.
+    *
+    * @param string $usernameId Username id
+    *
+    * @throws InstagramException
+    *
+    * @return array Geo Media data
+    */
     public function getGeoMedia($usernameId)
     {
         $locations = new GeoMediaResponse($this->http->request("maps/user/$usernameId/")[1]);
@@ -1155,24 +1159,24 @@ class Instagram
     }
 
     /**
-     * Get self user locations media.
-     *
-     * @return array Geo Media data
-     */
+    * Get self user locations media.
+    *
+    * @return array Geo Media data
+    */
     public function getSelfGeoMedia()
     {
         return $this->getGeoMedia($this->username_id);
     }
 
     /**
-     * @param $latitude
-     * @param $longitude
-     * @param null $query
-     *
-     * @throws InstagramException
-     *
-     * @return LocationResponse|void
-     */
+    * @param $latitude
+    * @param $longitude
+    * @param null $query
+    *
+    * @throws InstagramException
+    *
+    * @return LocationResponse|void
+    */
     public function searchLocation($latitude, $longitude, $query = null)
     {
         $locationQuery = [
@@ -1196,14 +1200,14 @@ class Instagram
     }
 
     /**
-     * facebook user search.
-     *
-     * @param string $query
-     *
-     * @throws InstagramException
-     *
-     * @return array query data
-     */
+    * facebook user search.
+    *
+    * @param string $query
+    *
+    * @throws InstagramException
+    *
+    * @return array query data
+    */
     public function fbUserSearch($query)
     {
         $query = rawurlencode($query);
@@ -1217,14 +1221,14 @@ class Instagram
     }
 
     /**
-     * Search users.
-     *
-     * @param string $query
-     *
-     * @throws InstagramException
-     *
-     * @return array query data
-     */
+    * Search users.
+    *
+    * @param string $query
+    *
+    * @throws InstagramException
+    *
+    * @return array query data
+    */
     public function searchUsers($query)
     {
         $query = new SearchUserResponse($this->http->request('users/search/?ig_sig_key_version='.Constants::SIG_KEY_VERSION."&is_typeahead=true&query=$query&rank_token=$this->rank_token")[1]);
@@ -1237,14 +1241,14 @@ class Instagram
     }
 
     /**
-     * Search exact username.
-     *
-     * @param string usernameName username as STRING not an id
-     *
-     * @throws InstagramException
-     *
-     * @return UsernameInfoResponse query data
-     */
+    * Search exact username.
+    *
+    * @param string usernameName username as STRING not an id
+    *
+    * @throws InstagramException
+    *
+    * @return UsernameInfoResponse query data
+    */
     public function searchUsername($usernameName)
     {
         $query = new UsernameInfoResponse($this->http->request("users/$usernameName/usernameinfo/")[1]);
@@ -1257,23 +1261,23 @@ class Instagram
     }
 
     /**
-     * @param $username
-     *
-     * @return mixed
-     */
+    * @param $username
+    *
+    * @return mixed
+    */
     public function getUsernameId($username)
     {
         return $this->searchUsername($username)->getUsernameId();
     }
 
     /**
-     * Search users using addres book.
-     *
-     * @param array $contacts
-     *
-     * @return array
-     *               query data
-     */
+    * Search users using addres book.
+    *
+    * @param array $contacts
+    *
+    * @return array
+    *               query data
+    */
     public function syncFromAdressBook($contacts)
     {
         $data = 'contacts='.json_encode($contacts, true);
@@ -1282,14 +1286,14 @@ class Instagram
     }
 
     /**
-     * Search tags.
-     *
-     * @param string $query
-     *
-     * @throws InstagramException
-     *
-     * @return array query data
-     */
+    * Search tags.
+    *
+    * @param string $query
+    *
+    * @throws InstagramException
+    *
+    * @return array query data
+    */
     public function searchTags($query)
     {
         $query = $this->http->request("tags/search/?is_typeahead=true&q=$query&rank_token=$this->rank_token")[1];
@@ -1302,14 +1306,14 @@ class Instagram
     }
 
     /**
-     * Get related tags.
-     *
-     * @param string $tag
-     *
-     * @throws InstagramException
-     *
-     * @return array query data
-     */
+    * Get related tags.
+    *
+    * @param string $tag
+    *
+    * @throws InstagramException
+    *
+    * @return array query data
+    */
     public function getTagRelated($tag)
     {
         $tags = new TagRelatedResponse($this->http->request("tags/$tag/related?visited=".urlencode('[{"id":"'.$tag.'","type":"hashtag"}]').'&related_types='.urlencode('["hashtag"]'))[1]);
@@ -1322,14 +1326,14 @@ class Instagram
     }
 
     /**
-     * Get tag info: media_count.
-     *
-     * @param string $tag
-     *
-     * @throws InstagramException
-     *
-     * @return string media_count
-     */
+    * Get tag info: media_count.
+    *
+    * @param string $tag
+    *
+    * @throws InstagramException
+    *
+    * @return string media_count
+    */
     public function getTagInfo($tag)
     {
         $query = $this->http->request("tags/$tag/info")[1];
@@ -1342,10 +1346,10 @@ class Instagram
     }
 
     /**
-     * @throws InstagramException
-     *
-     * @return ReelsTrayFeedResponse|void
-     */
+    * @throws InstagramException
+    *
+    * @return ReelsTrayFeedResponse|void
+    */
     public function getReelsTrayFeed()
     {
         $feed = new ReelsTrayFeedResponse($this->http->request('feed/reels_tray/')[1]);
@@ -1358,16 +1362,16 @@ class Instagram
     }
 
     /**
-     * Get user feed.
-     *
-     * @param string $usernameId   Username id
-     * @param null   $maxid        Max Id
-     * @param null   $minTimestamp Min timestamp
-     *
-     * @throws InstagramException
-     *
-     * @return UserFeedResponse User feed data
-     */
+    * Get user feed.
+    *
+    * @param string $usernameId   Username id
+    * @param null   $maxid        Max Id
+    * @param null   $minTimestamp Min timestamp
+    *
+    * @throws InstagramException
+    *
+    * @return UserFeedResponse User feed data
+    */
     public function getUserFeed($usernameId, $maxid = null, $minTimestamp = null)
     {
         $userFeed = new UserFeedResponse($this->http->request(
@@ -1375,9 +1379,10 @@ class Instagram
             .(!is_null($maxid) ? '&max_id='.$maxid : '')
             .(!is_null($minTimestamp) ? '&min_timestamp='.$minTimestamp : '')
             .'&ranked_content=true'
-        )[1]);
+            )[1]);
 
         if (!$userFeed->isOk()) {
+
             throw new InstagramException($userFeed->getMessage()."\n");
         }
 
@@ -1385,14 +1390,14 @@ class Instagram
     }
 
     /**
-     * Get hashtag feed.
-     *
-     * @param string $hashtagString Hashtag string, not including the #
-     *
-     * @throws InstagramException
-     *
-     * @return array Hashtag feed data
-     */
+    * Get hashtag feed.
+    *
+    * @param string $hashtagString Hashtag string, not including the #
+    *
+    * @throws InstagramException
+    *
+    * @return array Hashtag feed data
+    */
     public function getHashtagFeed($hashtagString, $maxid = null)
     {
         if (is_null($maxid)) {
@@ -1411,14 +1416,14 @@ class Instagram
     }
 
     /**
-     * Get locations.
-     *
-     * @param string $query search query
-     *
-     * @throws InstagramException
-     *
-     * @return array Location location data
-     */
+    * Get locations.
+    *
+    * @param string $query search query
+    *
+    * @throws InstagramException
+    *
+    * @return array Location location data
+    */
     public function searchFBLocation($query)
     {
         $query = rawurlencode($query);
@@ -1434,14 +1439,14 @@ class Instagram
     }
 
     /**
-     * Get location feed.
-     *
-     * @param string $locationId location id
-     *
-     * @throws InstagramException
-     *
-     * @return array Location feed data
-     */
+    * Get location feed.
+    *
+    * @param string $locationId location id
+    *
+    * @throws InstagramException
+    *
+    * @return array Location feed data
+    */
     public function getLocationFeed($locationId, $maxid = null)
     {
         if (is_null($maxid)) {
@@ -1460,22 +1465,22 @@ class Instagram
     }
 
     /**
-     * Get self user feed.
-     *
-     * @return UserFeedResponse User feed data
-     */
+    * Get self user feed.
+    *
+    * @return UserFeedResponse User feed data
+    */
     public function getSelfUserFeed($max_id = null, $minTimestamp = null)
     {
         return $this->getUserFeed($this->username_id, $max_id, $minTimestamp);
     }
 
     /**
-     * Get popular feed.
-     *
-     * @throws InstagramException
-     *
-     * @return array popular feed data
-     */
+    * Get popular feed.
+    *
+    * @throws InstagramException
+    *
+    * @return array popular feed data
+    */
     public function getPopularFeed()
     {
         $popularFeed = $this->http->request("feed/popular/?people_teaser_supported=1&rank_token=$this->rank_token&ranked_content=true&")[1];
@@ -1488,56 +1493,56 @@ class Instagram
     }
 
     /**
-     * Get user followings.
-     *
-     * @param string $usernameId Username id
-     *
-     * @return FollowingResponse followers data
-     */
+    * Get user followings.
+    *
+    * @param string $usernameId Username id
+    *
+    * @return FollowingResponse followers data
+    */
     public function getUserFollowings($usernameId, $maxid = null)
     {
         return new FollowingResponse($this->http->request("friendships/$usernameId/following/?rank_token=$this->rank_token".(!is_null($maxid) ? '&max_id='.$maxid : ''))[1]);
     }
 
     /**
-     * Get user followers.
-     *
-     * @param string $usernameId Username id
-     *
-     * @return FollowerResponse followers data
-     */
+    * Get user followers.
+    *
+    * @param string $usernameId Username id
+    *
+    * @return FollowerResponse followers data
+    */
     public function getUserFollowers($usernameId, $maxid = null)
     {
         return new FollowerResponse($this->http->request("friendships/$usernameId/followers/?rank_token=$this->rank_token".(!is_null($maxid) ? '&max_id='.$maxid : ''))[1]);
     }
 
     /**
-     * Get self user followers.
-     *
-     * @return FollowerResponse followers data
-     */
+    * Get self user followers.
+    *
+    * @return FollowerResponse followers data
+    */
     public function getSelfUserFollowers($max_id = null)
     {
         return $this->getUserFollowers($this->username_id, $max_id);
     }
 
     /**
-     * Get self users we are following.
-     *
-     * @return FollowingResponse users we are following data
-     */
+    * Get self users we are following.
+    *
+    * @return FollowingResponse users we are following data
+    */
     public function getSelfUsersFollowing($max_id = null)
     {
         return $this->getUserFollowings($this->username_id, $max_id);
     }
 
     /**
-     * Like photo or video.
-     *
-     * @param string $mediaId Media id
-     *
-     * @return array status request
-     */
+    * Like photo or video.
+    *
+    * @param string $mediaId Media id
+    *
+    * @return array status request
+    */
     public function like($mediaId)
     {
         $data = json_encode([
@@ -1551,12 +1556,12 @@ class Instagram
     }
 
     /**
-     * Unlike photo or video.
-     *
-     * @param string $mediaId Media id
-     *
-     * @return array status request
-     */
+    * Unlike photo or video.
+    *
+    * @param string $mediaId Media id
+    *
+    * @return array status request
+    */
     public function unlike($mediaId)
     {
         $data = json_encode([
@@ -1570,25 +1575,25 @@ class Instagram
     }
 
     /**
-     * Get media comments.
-     *
-     * @param string $mediaId Media id
-     *
-     * @return MediaCommentsResponse Media comments data
-     */
+    * Get media comments.
+    *
+    * @param string $mediaId Media id
+    *
+    * @return MediaCommentsResponse Media comments data
+    */
     public function getMediaComments($mediaId, $maxid = null)
     {
         return new MediaCommentsResponse($this->http->request("media/$mediaId/comments/?max_id=$maxid&ig_sig_key_version=".Constants::SIG_KEY_VERSION)[1]);
     }
 
     /**
-     * Set name and phone (Optional).
-     *
-     * @param string $name
-     * @param string $phone
-     *
-     * @return array Set status data
-     */
+    * Set name and phone (Optional).
+    *
+    * @param string $name
+    * @param string $phone
+    *
+    * @return array Set status data
+    */
     public function setNameAndPhone($name = '', $phone = '')
     {
         $data = json_encode([
@@ -1603,18 +1608,18 @@ class Instagram
     }
 
     /**
-     * Get direct share.
-     *
-     * @return array Direct share data
-     */
+    * Get direct share.
+    *
+    * @return array Direct share data
+    */
     public function getDirectShare()
     {
         return $this->http->request('direct_share/inbox/?')[1];
     }
 
     /**
-     * Backups all your uploaded photos :).
-     */
+    * Backups all your uploaded photos :).
+    */
     public function backup()
     {
         $go = false;
@@ -1648,12 +1653,12 @@ class Instagram
     }
 
     /**
-     * Follow.
-     *
-     * @param string $userId
-     *
-     * @return array Friendship status data
-     */
+    * Follow.
+    *
+    * @param string $userId
+    *
+    * @return array Friendship status data
+    */
     public function follow($userId)
     {
         $data = json_encode([
@@ -1667,12 +1672,12 @@ class Instagram
     }
 
     /**
-     * Unfollow.
-     *
-     * @param string $userId
-     *
-     * @return array Friendship status data
-     */
+    * Unfollow.
+    *
+    * @param string $userId
+    *
+    * @return array Friendship status data
+    */
     public function unfollow($userId)
     {
         $data = json_encode([
@@ -1686,12 +1691,12 @@ class Instagram
     }
 
     /**
-     * Block.
-     *
-     * @param string $userId
-     *
-     * @return array Friendship status data
-     */
+    * Block.
+    *
+    * @param string $userId
+    *
+    * @return array Friendship status data
+    */
     public function block($userId)
     {
         $data = json_encode([
@@ -1705,12 +1710,12 @@ class Instagram
     }
 
     /**
-     * Unblock.
-     *
-     * @param string $userId
-     *
-     * @return array Friendship status data
-     */
+    * Unblock.
+    *
+    * @param string $userId
+    *
+    * @return array Friendship status data
+    */
     public function unblock($userId)
     {
         $data = json_encode([
@@ -1724,12 +1729,12 @@ class Instagram
     }
 
     /**
-     * Show User Friendship.
-     *
-     * @param string $userId
-     *
-     * @return FriendshipStatus relationship data
-     */
+    * Show User Friendship.
+    *
+    * @param string $userId
+    *
+    * @return FriendshipStatus relationship data
+    */
     public function userFriendship($userId)
     {
         $data = $this->http->request("friendships/show/$userId/")[1];
@@ -1743,12 +1748,12 @@ class Instagram
     }
 
     /**
-     * Show Multiple Users Friendship.
-     *
-     * @param string $userId
-     *
-     * @return FriendshipsShowManyResponse
-     */
+    * Show Multiple Users Friendship.
+    *
+    * @param string $userId
+    *
+    * @return FriendshipsShowManyResponse
+    */
     public function usersFriendship($userList)
     {
         $data = http_build_query([
@@ -1766,10 +1771,10 @@ class Instagram
     }
 
     /**
-     * Get liked media.
-     *
-     * @return array Liked media data
-     */
+    * Get liked media.
+    *
+    * @return array Liked media data
+    */
     public function getLikedMedia($maxid = null)
     {
         $endpoint = 'feed/liked/?'.(!is_null($maxid) ? 'max_id='.$maxid.'&' : '');

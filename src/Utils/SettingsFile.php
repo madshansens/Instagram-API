@@ -2,18 +2,30 @@
 
 namespace InstagramAPI;
 
-class Settings
+class SettingsFile
 {
-    private $path;
+    public $cookiesPath; // public becouse used by HttpInterface
     private $sets;
+    private $folderPath;
 
-    public function __construct($path)
+    function isLogged() {
+        if ((file_exists($this->cookiesPath)) && ($this->get('username_id') != null) && ($this->get('token') != null)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function __construct($username,$path)
     {
-        $this->path = $path;
+        $this->cookiesPath = $path . $username .DIRECTORY_SEPARATOR . $username . "-cookies.dat";
+        $this->settingsPath = $path . $username .DIRECTORY_SEPARATOR . "settings-" . $username . ".dat";
+
         $this->checkPermissions();
+
         $this->sets = [];
-        if (file_exists($path)) {
-            $fp = fopen($path, 'rb');
+        if (file_exists($this->settingsPath)) {
+            $fp = fopen($this->settingsPath, 'rb');
             while ($line = fgets($fp, 2048)) {
                 $line = trim($line, ' ');
                 if ($line[0] == '#') {
@@ -31,6 +43,7 @@ class Settings
         if ($key == 'sets') {
             return $this->sets;
         }
+
         if (isset($this->sets[$key])) {
             return $this->sets[$key];
         }
@@ -40,7 +53,7 @@ class Settings
 
     public function set($key, $value)
     {
-        if ($key == 'sets') {
+        if ($key == 'sets' or $key == 'path' or $key == 'username' or $key == 'folderPath') {
             return;
         }
         $this->sets[$key] = $value;
@@ -49,10 +62,10 @@ class Settings
 
     public function Save()
     {
-        if (file_exists($this->path)) {
-            unlink($this->path);
+        if (file_exists($this->settingsPath)) {
+            unlink($this->settingsPath);
         }
-        $fp = fopen($this->path, 'wb');
+        $fp = fopen($this->settingsPath, 'wb');
         fseek($fp, 0);
         foreach ($this->sets as $key => $value) {
             fwrite($fp, $key.'='.$value."\n");
@@ -60,23 +73,13 @@ class Settings
         fclose($fp);
     }
 
-    public function __set($prop, $value)
-    {
-        $this->set($prop, $value);
-    }
-
-    public function __get($prop)
-    {
-        return $this->get($prop);
-    }
-
     protected function checkPermissions()
     {
-        if (is_writable(dirname($this->path))) {
+        if (is_writable(dirname($this->settingsPath))) {
             return true;
-        } else if(mkdir(dirname($this->path), 0777)) {
-                    return true;
-        } else if(chmod(dirname($this->path), 0777)) {
+        } else if(mkdir(dirname($this->settingsPath), 0777)) {
+            return true;
+        } else if(chmod(dirname($this->settingsPath), 0777)) {
             return true;
         }
 
