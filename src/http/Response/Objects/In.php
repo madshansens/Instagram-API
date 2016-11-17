@@ -2,30 +2,14 @@
 
 namespace InstagramAPI;
 
-class In
+class In extends Response
 {
-    protected $position;
-    protected $user;
-
-    public function __construct($data)
-    {
-        $this->position = new Position($data['position']);
-        $this->user = new User($data['user']);
-    }
-
-    /**
-     * @return Position
+    /*
+     * @var Position
      */
-    public function getPosition()
-    {
-        return $this->position;
-    }
-
-    /**
-     * @return User
+    public $position;
+    /*
+     * @var User
      */
-    public function getUser()
-    {
-        return $this->user;
-    }
+    public $user;
 }

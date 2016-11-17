@@ -25,6 +25,7 @@
         ]
     },
     "require": {
+        "netresearch/jsonmapper": "^1.0",
         "php": ">=5.4",
         "ext-curl": "*",
         "ext-gd" : "*"

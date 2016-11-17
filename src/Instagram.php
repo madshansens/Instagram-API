@@ -4,6 +4,7 @@ namespace InstagramAPI;
 
 class Instagram
 {
+    public static $instance;
     public $username; // Instagram username
     public $password; // Instagram password
     public $debug;    // Debug
@@ -20,21 +21,19 @@ class Instagram
     public $http;
     public $settings;
 
-    public $settingsAdapter = ['type' => 'file',
+    public $settingsAdopter = ['type' => 'file',
     'path'                            => __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR, ]; // File | Mysql
+
 
     /*
     // Settings for mysql storage
-    public $settingsAdapter         = array(
-    "type"       => "mysql",
-    "username"   => "",
-    "password"   => "",
-    "host"       => "",
-    "database"   => "");
+    public $settingsAdopter         = array(
+        "type"       => "mysql",
+        "username"   => "",
+        "password"   => "",
+        "host"       => "",
+        "database"   => "");
     */
-
-
-
 
     public $proxy = null;     // Full Proxy
     public $proxyHost = null; // Proxy Host and Port
@@ -48,19 +47,12 @@ class Instagram
      * @param $debug Debug on or off, false by default
      * @param $IGDataPath Default folder to store data, you can change it
      */
-    public function __construct($username, $password, $debug = false, $truncatedDebug = false)
+    public function __construct($debug = false, $truncatedDebug = false)
     {
+        self::$instance = $this;
+        $this->mapper = new \JsonMapper();
         $this->debug = $debug;
         $this->truncatedDebug = $truncatedDebug;
-        $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
-
-
-
-        $this->checkSettings($username);
-
-        $this->http = new HttpInterface($this);
-
-        $this->setUser($username, $password);
     }
 
     /**
@@ -71,14 +63,15 @@ class Instagram
      */
     public function setUser($username, $password)
     {
+        $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
+        $this->settings = new SettingsAdapter($this->settingsAdopter, $username);
+        $this->checkSettings($username);
+        $this->http = new HttpInterface($this);
+
         $this->username = $username;
         $this->password = $password;
 
-        $this->checkSettings($username);
-
         $this->uuid = SignatureUtils::generateUUID(true);
-
-
         if ($this->settings->isLogged()) {
             $this->isLoggedIn = true;
             $this->username_id = $this->settings->get('username_id');
@@ -91,8 +84,6 @@ class Instagram
 
     protected function checkSettings($username)
     {
-        $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
-
         if ($this->settings->get('version') == null) {
             $this->settings->set('version', Constants::VERSION);
         }
@@ -108,41 +99,21 @@ class Instagram
     /**
      * Set the proxy.
      *
-     * @param string $proxy    Full proxy string. Ex: user:pass@192.168.0.0:8080 Use $proxy = "" to clear proxy
+     * @param string $ip       Ip/hostname of proxy
      * @param int    $port     Port of proxy
      * @param string $username Username for proxy
      * @param string $password Password for proxy
      *
      * @throws InstagramException
      */
-    public function setProxy($proxy, $port = null, $username = null, $password = null)
+    public function setProxy($host, $port = null, $username = null, $password = null)
     {
-        $this->proxy = $proxy;
-
-        if ($proxy == '') {
-            return;
-        }
-
-        $proxy = parse_url($proxy);
-
-        if (!is_null($port) && is_int($port)) {
-            $proxy['port'] = $port;
-        }
-
-        if (!is_null($username) && !is_null($password)) {
-            $proxy['user'] = $username;
-            $proxy['pass'] = $password;
-        }
-
-        if (!empty($proxy['host']) && isset($proxy['port']) && is_int($proxy['port'])) {
-            $this->proxyHost = $proxy['host'].':'.$proxy['port'];
-        } else {
-            throw new InstagramException('Proxy host error. Please check ip address and port of proxy.');
-        }
-
-        if (isset($proxy['user']) && isset($proxy['pass'])) {
-            $this->proxyAuth = $proxy['user'].':'.$proxy['pass'];
-        }
+        // no check needed we will give exception on curl if any data wrong / lastwisher
+        // data assigned to http for easier use
+        $this->http->proxy['host'] = $host;
+        $this->http->proxy['port'] = $port;
+        $this->http->proxy['username'] = $username;
+        $this->http->proxy['password'] = $password;
     }
 
     /**
@@ -152,50 +123,50 @@ class Instagram
      *
      * @throws InstagramException
      *
-     * @return ChallengeResponse|LoginResponse
+     * @return ChallengeResponse|LoginResponse|ExploreResponse
      */
     public function login($force = false)
     {
         if (!$this->isLoggedIn || $force) {
             $this->syncFeatures(true);
-            $fetch = $this->http->request('si/fetch_headers/?challenge_type=signup&guid='.SignatureUtils::generateUUID(false), null, true);
-            $header = $fetch[0];
-            $response = new ChallengeResponse($fetch[1]);
 
-            if (!isset($header) || (!$response->isOk())) {
-                throw new InstagramException("Couldn't get challenge, check your connection");
-            }
 
-            if (!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token)) {
+            $response = $this->request('si/fetch_headers')
+            ->requireLogin(true)
+            ->addParams('challenge_type', 'signup')
+            ->addParams('guid', SignatureUtils::generateUUID(false))
+            ->getResponse(new ChallengeResponse(), true);
+
+
+
+            if (!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $response->getFullResponse()[0], $token)) {
                 throw new InstagramException('Missing csfrtoken');
             }
 
-            $data = [
-                'phone_id'            => SignatureUtils::generateUUID(true),
-                '_csrftoken'          => $token[0],
-                'username'            => $this->username,
-                'guid'                => $this->uuid,
-                'device_id'           => $this->device_id,
-                'password'            => $this->password,
-                'login_attempt_count' => '0',
-            ];
 
-            $login = $this->http->request('accounts/login/', SignatureUtils::generateSignature(json_encode($data)), true);
-            $response = new LoginResponse($login[1]);
 
-            if (!$response->isOk()) {
-                throw new InstagramException($response->getMessage());
-            }
+
+            $response = $this->request('accounts/login/')
+            ->requireLogin(true)
+            ->addPost('phone_id', SignatureUtils::generateUUID(true))
+            ->addPost('_csrftoken', $token[0])
+            ->addPost('username', $this->username)
+            ->addPost('guid', $this->uuid)
+            ->addPost('device_id', $this->device_id)
+            ->addPost('password', $this->password)
+            ->addPost('login_attempt_count', 0)
+            ->getResponse(new LoginResponse(), true);
+
 
             $this->isLoggedIn = true;
-            $this->username_id = $response->getUsernameId();
+            $this->username_id = $response->getLoggedInUser()->getPk();
             $this->settings->set('username_id', $this->username_id);
             $this->rank_token = $this->username_id.'_'.$this->uuid;
-            preg_match('#Set-Cookie: csrftoken=([^;]+)#', $login[0], $match);
+            preg_match('#Set-Cookie: csrftoken=([^;]+)#', $response->getFullResponse()[0], $match);
             $this->token = $match[1];
             $this->settings->set('token', $this->token);
 
-            $this->syncFeatures();
+            $test = $this->syncFeatures();
             $this->autoCompleteUserList();
             $this->timelineFeed();
             $this->getRankedRecipients();
@@ -204,9 +175,8 @@ class Instagram
             $this->getv2Inbox();
             $this->getRecentActivity();
             $this->getReelsTrayFeed();
-            $this->explore();
 
-            return $response;
+            return $this->explore();
         }
 
         $check = $this->timelineFeed();
@@ -222,7 +192,8 @@ class Instagram
         $this->megaphoneLog();
         $this->getv2Inbox();
         $this->getRecentActivity();
-        $this->explore();
+
+        return $this->explore();
     }
 
     /**
@@ -233,22 +204,19 @@ class Instagram
     public function syncFeatures($prelogin = false)
     {
         if ($prelogin) {
-            $data = json_encode([
-                'id'          => SignatureUtils::generateUUID(true),
-                'experiments' => Constants::LOGIN_EXPERIMENTS,
-            ]);
-
-            return new SyncResponse($this->http->request('qe/sync/', SignatureUtils::generateSignature($data), true)[1]);
+            return $this->request('qe/sync/')
+            ->requireLogin(true)
+            ->addPost('id', SignatureUtils::generateUUID(true))
+            ->addPost('experiments', Constants::LOGIN_EXPERIMENTS)
+            ->getResponse(new SyncResponse());
         } else {
-            $data = json_encode([
-                '_uuid'       => $this->uuid,
-                '_uid'        => $this->username_id,
-                '_csrftoken'  => $this->token,
-                'id'          => $this->username_id,
-                'experiments' => Constants::EXPERIMENTS,
-            ]);
-
-            return new SyncResponse($this->http->request('qe/sync/', SignatureUtils::generateSignature($data))[1]);
+            return $this->request('qe/sync/')
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->username_id)
+            ->addPost('_csrftoken', $this->token)
+            ->addPost('id', $this->username_id)
+            ->addPost('experiments', Constants::EXPERIMENTS)
+            ->getResponse(new SyncResponse());
         }
     }
 
@@ -257,7 +225,10 @@ class Instagram
      */
     public function autoCompleteUserList()
     {
-        return new autoCompleteUserListResponse($this->http->request('friendships/autocomplete_user_list/?version=2')[1]);
+        $this->request('friendships/autocomplete_user_list/')
+        ->setCheckStatus(false)
+        ->addParams('version', '2')
+        ->getResponse(new autoCompleteUserListResponse());
     }
 
     /**
@@ -265,6 +236,7 @@ class Instagram
      *
      * @return mixed
      */
+    // TODO : Missing Response
     public function pushRegister($gcmToken)
     {
         $deviceToken = json_encode([
@@ -296,18 +268,16 @@ class Instagram
      *
      * @return TimelineFeedResponse
      */
-    public function timelineFeed($maxid = null)
+    public function timelineFeed($maxId = null)
     {
-        $timeline = new TimelineFeedResponse($this->http->request(
-            "feed/timeline/?rank_token=$this->rank_token&ranked_content=true"
-            .(!is_null($maxid) ? '&max_id='.$maxid : '')
-            )[1]);
-
-        if (!$timeline->isOk()) {
-            throw new InstagramException($timeline->getMessage()."\n");
+        $request = $this->request('feed/timeline')
+        ->addParams('rank_token', $this->rank_token)
+        ->addParams('ranked_content', true);
+        if ($maxId) {
+            $request->addParams('max_id', $maxId);
         }
 
-        return $timeline;
+        return $request->getResponse(new TimelineFeedResponse());
     }
 
     /**
@@ -315,17 +285,16 @@ class Instagram
      */
     protected function megaphoneLog()
     {
-        $data = [
-            'type'       => 'feed_aysf',
-            'action'     => 'seen',
-            'reason'     => '',
-            '_uuid'      => $this->uuid,
-            'device_id'  => $this->device_id,
-            '_csrftoken' => $this->token,
-            'uuid'       => md5(time()),
-        ];
-
-        return new MegaphoneLogResponse($this->http->request('megaphone/log/', http_build_query($data))[1]);
+        return $this->request('megaphone/log/')
+        ->setSignedPost(false)
+        ->addPost('type', 'feed_aysf')
+        ->addPost('action', 'seen')
+        ->addPost('reason', '')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('device_id', $this->device_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('uuid', md5(time()))
+        ->getResponse(new MegaphoneLogResponse());
     }
 
     /**
@@ -337,15 +306,7 @@ class Instagram
      */
     public function getPendingInbox()
     {
-        $pendingInbox = new PendingInboxResponse($this->http->request('direct_v2/pending_inbox/?')[1]);
-
-        if (!$pendingInbox->isOk()) {
-            throw new InstagramException($pendingInbox->getMessage()."\n");
-
-            return;
-        }
-
-        return $pendingInbox;
+        return $this->request('direct_v2/pending_inbox')->getResponse(new PendingInboxResponse());
     }
 
     /**
@@ -357,15 +318,9 @@ class Instagram
      */
     public function getRankedRecipients()
     {
-        $ranked_recipients = new RankedRecipientsResponse($this->http->request('direct_v2/ranked_recipients/?show_threads=true')[1]);
-
-        if (!$ranked_recipients->isOk()) {
-            throw new InstagramException($ranked_recipients->getMessage()."\n");
-
-            return;
-        }
-
-        return $ranked_recipients;
+        return $this->request('direct_v2/ranked_recipients')
+        ->addParams('show_threads', true)
+        ->getResponse(new RankedRecipientsResponse());
     }
 
     /**
@@ -377,15 +332,8 @@ class Instagram
      */
     public function getRecentRecipients()
     {
-        $recent_recipients = new RecentRecipientsResponse($this->http->request('direct_share/recent_recipients/')[1]);
-
-        if (!$recent_recipients->isOk()) {
-            throw new InstagramException($recent_recipients->getMessage()."\n");
-
-            return;
-        }
-
-        return $recent_recipients;
+        return $this->request('direct_share/recent_recipients/')
+        ->getResponse(new RecentRecipientsResponse());
     }
 
     /**
@@ -397,15 +345,7 @@ class Instagram
      */
     public function explore()
     {
-        $explore = new ExploreResponse($this->http->request('discover/explore/')[1]);
-
-        if (!$explore->isOk()) {
-            throw new InstagramException($explore->getMessage()."\n");
-
-            return;
-        }
-
-        return $explore;
+        return $this->request('discover/explore/')->getResponse(new ExploreResponse());
     }
 
     /**
@@ -417,13 +357,7 @@ class Instagram
      */
     public function discoverChannels()
     {
-        $discoverChannels = new DiscoverChannelsResponse($this->http->request('discover/channels_home/')[1]);
-
-        if (!$discoverChannels->isOk()) {
-            throw new InstagramException($discoverChannels->getMessage()."\n");
-        }
-
-        return $discoverChannels;
+        return $this->request('discover/channels_home/')->getResponse(new DiscoverChannelsResponse());
     }
 
     /**
@@ -431,15 +365,13 @@ class Instagram
      */
     public function expose()
     {
-        $data = json_encode([
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            'id'         => $this->username_id,
-            '_csrftoken' => $this->token,
-            'experiment' => 'ig_android_profile_contextual_feed',
-        ]);
-
-        return new ExposeResponse($this->http->request('qe/expose/', SignatureUtils::generateSignature($data))[1]);
+        return $this->request('qe/expose/')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('id', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('experiment', 'ig_android_profile_contextual_feed')
+        ->getResponse(new ExposeResponse());
     }
 
     /**
@@ -450,13 +382,7 @@ class Instagram
      */
     public function logout()
     {
-        $logout = new LogoutResponse($this->http->request('accounts/logout/')[1]);
-
-        if ($logout->isOk()) {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->request('accounts/logout/')->getResponse(new LogoutResponse());
     }
 
     /**
@@ -531,6 +457,7 @@ class Instagram
      *
      * @return array Direct Thread Data
      */
+    // TODO : Missing Response
     public function directThread($threadId)
     {
         $directThread = $this->http->request("direct_v2/threads/$threadId/?")[1];
@@ -552,6 +479,7 @@ class Instagram
      *
      * @return array Direct Thread Action Data
      */
+    // TODO : Missing Response
     public function directThreadAction($threadId, $threadAction)
     {
         $data = json_encode([
@@ -577,38 +505,36 @@ class Instagram
 
         $size = getimagesize($video)[0];
 
-        $post = json_encode([
-            'upload_id'          => $upload_id,
-            'source_type'        => '3',
-            'poster_frame_index' => 0,
-            'length'             => 0.00,
-            'audio_muted'        => false,
-            'filter_type'        => '0',
-            'video_result'       => 'deprecated',
-            'clips'              => [
-                'length'          => Utils::getSeconds($video),
-                'source_type'     => '3',
-                'camera_position' => 'back',
-            ],
-            'extra'              => [
-                'source_width'  => 960,
-                'source_height' => 1280,
-            ],
-            'device'             => [
-                'manufacturer'    => $this->settings->get('manufacturer'),
-                'model'           => $this->settings->get('model'),
-                'android_version' => Constants::ANDROID_VERSION,
-                'android_release' => Constants::ANDROID_RELEASE,
-            ],
-            '_csrftoken'         => $this->token,
-            '_uuid'              => $this->uuid,
-            '_uid'               => $this->username_id,
-            'caption'            => $caption,
-        ]);
-
-        $post = str_replace('"length":0', '"length":0.00', $post);
-
-        return new ConfigureVideoResponse($this->http->request('media/configure/?video=1', SignatureUtils::generateSignature($post))[1]);
+        return $this->request('media/configure/')
+        ->addParams('video', 1)
+        ->addPost('upload_id', $upload_id)
+        ->addPost('source_type', '3')
+        ->addPost('poster_frame_index', 0)
+        ->addPost('length', 0.00)
+        ->addPost('audio_muted', false)
+        ->addPost('filter_type', '0')
+        ->addPost('video_result', 'deprecated')
+        ->addPost('clips', [
+            'length'          => Utils::getSeconds($video),
+            'source_type'     => '3',
+            'camera_position' => 'back',
+        ])
+        ->addPost('extra', [
+            'source_width'  => 960,
+            'source_height' => 1280,
+        ])
+        ->addPost('device', [
+            'manufacturer'    => $this->settings->get('manufacturer'),
+            'model'           => $this->settings->get('model'),
+            'android_version' => Constants::ANDROID_VERSION,
+            'android_release' => Constants::ANDROID_RELEASE,
+        ])
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('caption', $caption)
+        ->setReplacePost(['"length":0' => '"length":0.00'])
+        ->getResponse(new ConfigureVideoResponse());
     }
 
     /**
@@ -627,30 +553,29 @@ class Instagram
             $caption = '';
         }
 
-        $post = [
-            '_csrftoken'   => $this->token,
-            'media_folder' => 'Instagram',
-            'source_type'  => 4,
-            '_uid'         => $this->username_id,
-            '_uuid'        => $this->uuid,
-            'caption'      => $caption,
-            'upload_id'    => $upload_id,
-            'device'       => [
-                'manufacturer'    => $this->settings->get('manufacturer'),
-                'model'           => $this->settings->get('model'),
-                'android_version' => Constants::ANDROID_VERSION,
-                'android_release' => Constants::ANDROID_RELEASE,
-            ],
-            'edits'        => [
-                'crop_original_size' => [$size, $size],
-                'crop_center'        => [0, 0],
-                'crop_zoom'          => 1,
-            ],
-            'extra'        => [
-                'source_width'  => $size,
-                'source_height' => $size,
-            ],
-        ];
+        $requestData = $this->request('media/configure/')
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('media_folder', 'Instagram')
+        ->addPost('source_type', 4)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('caption', $caption)
+        ->addPost('upload_id', $upload_id)
+        ->addPost('device', [
+            'manufacturer'    => $this->settings->get('manufacturer'),
+            'model'           => $this->settings->get('model'),
+            'android_version' => Constants::ANDROID_VERSION,
+            'android_release' => Constants::ANDROID_RELEASE,
+        ])
+        ->addPost('edits', [
+            'crop_original_size' => [$size, $size],
+            'crop_center'        => [0, 0],
+            'crop_zoom'          => 1,
+        ])
+        ->addPost('extra', [
+            'source_width'  => $size,
+            'source_height' => $size,
+        ]);
 
         if (!is_null($location)) {
             $loc = [
@@ -662,26 +587,25 @@ class Instagram
                 'external_source'                        => $location->getExternalIdSource(),
             ];
 
-            $post['location'] = json_encode($loc);
-            $post['geotag_enabled'] = true;
-            $post['media_latitude'] = $location->getLatitude();
-            $post['posting_latitude'] = $location->getLatitude();
-            $post['media_longitude'] = $location->getLongitude();
-            $post['posting_longitude'] = $location->getLongitude();
-            $post['altitude'] = mt_rand(10, 800);
+            $requestData->addPost('location', json_encode($loc))
+            ->addPost('geotag_enabled', true)
+            ->addPost('media_latitude', $location->getLatitude())
+            ->addPost('posting_latitude', $location->getLatitude())
+            ->addPost('media_longitude', $location->getLongitude())
+            ->addPost('posting_longitude', $location->getLongitude())
+            ->addPost('altitude', mt_rand(10, 800));
         }
 
         if (!is_null($filter)) {
-            $post['edits']['filter_type'] = Utils::getFilterCode($filter);
+            $requestData->addPost('edits', ['filter_type' => Utils::getFilterCode($filter)]);
         }
 
-        $post = json_encode($post);
-
-        $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,-0.0]', $post);
-        $post = str_replace('"crop_zoom":1', '"crop_zoom":1.0', $post);
-        $post = str_replace('"crop_original_size":'."[$size,$size]", '"crop_original_size":'."[$size.0,$size.0]", $post);
-
-        return new ConfigureResponse($this->http->request('media/configure/?', SignatureUtils::generateSignature($post))[1]);
+        return $requestData->setReplacePost([
+            '"crop_center":[0,0]'                   => '"crop_center":[0.0,-0.0]',
+            '"crop_zoom":1'                         => '"crop_zoom":1.0',
+            '"crop_original_size":'."[$size,$size]" => '"crop_original_size":'."[$size.0,$size.0]",
+        ])
+        ->getResponse(new ConfigureResponse());
     }
 
     /**
@@ -694,32 +618,31 @@ class Instagram
     {
         $size = getimagesize($photo)[0];
 
-        $post = json_encode([
-            'upload_id'   => $upload_id,
-            'source_type' => 3,
-            'edits'       => [
-                'crop_original_size' => [$size, $size],
-                'crop_zoom'          => 1.3333334,
-                'crop_center'        => [0.0, 0.0],
-            ],
-            'extra'       => [
-                'source_width'  => $size,
-                'source_height' => $size,
-            ],
-            'device'      => [
-                'manufacturer'    => $this->settings->get('manufacturer'),
-                'model'           => $this->settings->get('model'),
-                'android_version' => Constants::ANDROID_VERSION,
-                'android_release' => Constants::ANDROID_RELEASE,
-            ],
-            '_csrftoken'  => $this->token,
-            '_uuid'       => $this->uuid,
-            '_uid'        => $this->username_id,
-        ]);
-
-        $post = str_replace('"crop_center":[0,0]', '"crop_center":[0.0,0.0]', $post);
-
-        return new ConfigureResponse($this->http->request('media/configure_to_reel/', SignatureUtils::generateSignature($post))[1]);
+        return $this->request('media/configure_to_reel/')
+        ->addPost('upload_id', $upload_id)
+        ->addPost('source_type', 3)
+        ->addPost('edits', [
+            'crop_original_size' => [$size, $size],
+            'crop_zoom'          => 1.3333334,
+            'crop_center'        => [0.0, 0.0],
+        ])
+        ->addPost('extra', [
+            'source_width'  => $size,
+            'source_height' => $size,
+        ])
+        ->addPost('device', [
+            'manufacturer'    => $this->settings->get('manufacturer'),
+            'model'           => $this->settings->get('model'),
+            'android_version' => Constants::ANDROID_VERSION,
+            'android_release' => Constants::ANDROID_RELEASE,
+        ])
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->setReplacePost([
+            '"crop_center":[0,0]' => '"crop_center":[0.0,0.0]',
+        ])
+        ->getResponse(new ConfigureResponse());
     }
 
     /**
@@ -732,14 +655,12 @@ class Instagram
      */
     public function editMedia($mediaId, $captionText = '')
     {
-        $data = json_encode([
-            '_uuid'        => $this->uuid,
-            '_uid'         => $this->username_id,
-            '_csrftoken'   => $this->token,
-            'caption_text' => $captionText,
-        ]);
-
-        return new EditMediaResponse($this->http->request("media/$mediaId/edit_media/", SignatureUtils::generateSignature($data))[1]);
+        return $this->request("media/$mediaId/edit_media/")
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('caption_text', $captionText)
+        ->getResponse(new EditMediaResponse());
     }
 
     /**
@@ -751,13 +672,11 @@ class Instagram
      */
     public function removeSelftag($mediaId)
     {
-        $data = json_encode([
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            '_csrftoken' => $this->token,
-        ]);
-
-        return new MediaResponse($this->http->request("usertags/$mediaId/remove/", SignatureUtils::generateSignature($data))[1]);
+        return $this->request("usertags/$mediaId/remove/")
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new MediaResponse());
     }
 
     /**
@@ -769,14 +688,12 @@ class Instagram
      */
     public function mediaInfo($mediaId)
     {
-        $data = json_encode([
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            '_csrftoken' => $this->token,
-            'media_id'   => $mediaId,
-        ]);
-
-        return new MediaInfoResponse($this->http->request("media/$mediaId/info/", SignatureUtils::generateSignature($data))[1]);
+        return $this->request("media/$mediaId/info/")
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('media_id', $mediaId)
+        ->getResponse(new MediaInfoResponse());
     }
 
     /**
@@ -788,14 +705,12 @@ class Instagram
      */
     public function deleteMedia($mediaId)
     {
-        $data = json_encode([
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            '_csrftoken' => $this->token,
-            'media_id'   => $mediaId,
-        ]);
-
-        return new MediaDeleteResponse($this->http->request("media/$mediaId/delete/", SignatureUtils::generateSignature($data))[1]);
+        return $this->request("media/$mediaId/delete/")
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('media_id', $mediaId)
+        ->getResponse(new MediaDeleteResponse());
     }
 
     /**
@@ -808,14 +723,12 @@ class Instagram
      */
     public function comment($mediaId, $commentText)
     {
-        $data = json_encode([
-            '_uuid'        => $this->uuid,
-            '_uid'         => $this->username_id,
-            '_csrftoken'   => $this->token,
-            'comment_text' => $commentText,
-        ]);
-
-        return new CommentResponse($this->http->request("media/$mediaId/comment/", SignatureUtils::generateSignature($data))[1]);
+        return $this->request("media/$mediaId/comment/")
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('comment_text', $commentText)
+        ->getResponse(new CommentResponse());
     }
 
     /**
@@ -831,13 +744,11 @@ class Instagram
      */
     public function deleteComment($mediaId, $commentId)
     {
-        $data = json_encode([
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            '_csrftoken' => $this->token,
-        ]);
-
-        return new DeleteCommentResponse($this->http->request("media/$mediaId/comment/$commentId/delete/", SignatureUtils::generateSignature($data))[1]);
+        return $this->request("media/$mediaId/comment/$commentId/delete/")
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new DeleteCommentResponse());
     }
 
     /**
@@ -864,14 +775,12 @@ class Instagram
 
         $comment_ids_to_delete = implode(',', $string);
 
-        $data = json_encode([
-            '_uuid'                 => $this->uuid,
-            '_uid'                  => $this->username_id,
-            '_csrftoken'            => $this->token,
-            'comment_ids_to_delete' => $comment_ids_to_delete,
-        ]);
-
-        return new DeleteCommentResponse($this->http->request("media/$mediaId/comment/bulk_delete/", SignatureUtils::generateSignature($data))[1]);
+        return $this->request("media/$mediaId/comment/bulk_delete/")
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('comment_ids_to_delete', $comment_ids_to_delete)
+        ->getResponse(new DeleteCommentResponse());
     }
 
     /**
@@ -893,13 +802,11 @@ class Instagram
      */
     public function removeProfilePicture()
     {
-        $data = json_encode([
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            '_csrftoken' => $this->token,
-        ]);
-
-        return new ProfileResponse($this->http->request('accounts/remove_profile_picture/', SignatureUtils::generateSignature($data))[1]);
+        return $this->request('accounts/remove_profile_picture/')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new ProfileResponse());
     }
 
     /**
@@ -910,13 +817,11 @@ class Instagram
      */
     public function setPrivateAccount()
     {
-        $data = json_encode([
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            '_csrftoken' => $this->token,
-        ]);
-
-        return new ProfileResponse($this->http->request('accounts/set_private/', SignatureUtils::generateSignature($data))[1]);
+        return $this->request('accounts/set_private/')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new ProfileResponse());
     }
 
     /**
@@ -927,13 +832,11 @@ class Instagram
      */
     public function setPublicAccount()
     {
-        $data = json_encode([
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            '_csrftoken' => $this->token,
-        ]);
-
-        return new ProfileResponse($this->http->request('accounts/set_public/', SignatureUtils::generateSignature($data))[1]);
+        return $this->request('accounts/set_public/')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new ProfileResponse());
     }
 
     /**
@@ -943,13 +846,12 @@ class Instagram
      */
     public function getProfileData()
     {
-        $data = json_encode([
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            '_csrftoken' => $this->token,
-        ]);
-
-        return new ProfileResponse($this->http->request('accounts/current_user/?edit=true', SignatureUtils::generateSignature($data))[1]);
+        return $this->request('accounts/current_user/')
+        ->addParams('edit', true)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new ProfileResponse());
     }
 
     /**
@@ -965,20 +867,18 @@ class Instagram
      */
     public function editProfile($url, $phone, $first_name, $biography, $email, $gender)
     {
-        $data = json_encode([
-            '_uuid'        => $this->uuid,
-            '_uid'         => $this->username_id,
-            '_csrftoken'   => $this->token,
-            'external_url' => $url,
-            'phone_number' => $phone,
-            'username'     => $this->username,
-            'first_name'   => $first_name,
-            'biography'    => $biography,
-            'email'        => $email,
-            'gender'       => $gender,
-        ]);
-
-        return new ProfileResponse($this->http->request('accounts/edit_profile/', SignatureUtils::generateSignature($data))[1]);
+        return $this->request('accounts/edit_profile/')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('external_url', $url)
+        ->addPost('phone_number', $phone)
+        ->addPost('username', $this->username)
+        ->addPost('first_name', $first_name)
+        ->addPost('biography', $biography)
+        ->addPost('email', $email)
+        ->addPost('gender', $gender)
+        ->getResponse(new ProfileResponse());
     }
 
     /**
@@ -991,22 +891,14 @@ class Instagram
      */
     public function changePassword($oldPassword, $newPassword)
     {
-        $data = json_encode([
-            '_uuid'         => $this->uuid,
-            '_uid'          => $this->username_id,
-            '_csrftoken'    => $this->token,
-            'old_password'  => $oldPassword,
-            'new_password1' => $newPassword,
-            'new_password2' => $newPassword,
-        ]);
-
-        $pw = new ChangePasswordResponse($this->http->request('accounts/change_password/', SignatureUtils::generateSignature($data))[1]);
-
-        if (!$pw->isOk()) {
-            throw new InstagramException($pw->getMessage()."\n");
-        }
-
-        return $pw;
+        return $this->request('accounts/change_password/')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('old_password', $oldPassword)
+        ->addPost('new_password1', $newPassword)
+        ->addPost('new_password2', $newPassword)
+        ->getResponse(new ChangePasswordResponse());
     }
 
     /**
@@ -1018,7 +910,7 @@ class Instagram
      */
     public function getUsernameInfo($usernameId)
     {
-        return new UsernameInfoResponse($this->http->request("users/$usernameId/info/")[1]);
+        return $this->request("users/$usernameId/info/")->getResponse(new UsernameInfoResponse());
     }
 
     /**
@@ -1040,13 +932,7 @@ class Instagram
      */
     public function getRecentActivity()
     {
-        $activity = new ActivityNewsResponse($this->http->request('news/inbox/?activity_module=all')[1]);
-
-        if (!$activity->isOk()) {
-            throw new InstagramException($activity->getMessage()."\n");
-        }
-
-        return $activity;
+        return $this->request('news/inbox/')->addParams('activity_module', 'all')->getResponse(new ActivityNewsResponse());
     }
 
     /**
@@ -1058,13 +944,12 @@ class Instagram
      */
     public function getFollowingRecentActivity($maxid = null)
     {
-        $activity = new FollowingRecentActivityResponse($this->http->request('news/?'.(!is_null($maxid) ? '&max_id='.$maxid : ''))[1]);
-
-        if (!$activity->isOk()) {
-            throw new InstagramException($activity->getMessage()."\n");
+        $activity = $this->request('news/');
+        if (!is_null($maxid)) {
+            $activity->addParams('max_id', $maxid);
         }
 
-        return $activity;
+        return $activity->getResponse(new FollowingRecentActivityResponse());
     }
 
     /**
@@ -1076,13 +961,7 @@ class Instagram
      */
     public function getv2Inbox()
     {
-        $inbox = new V2InboxResponse($this->http->request('direct_v2/inbox/?')[1]);
-
-        if (!$inbox->isOk()) {
-            throw new InstagramException($inbox->getMessage()."\n");
-        }
-
-        return $inbox;
+        return $this->request('direct_v2/inbox/')->getResponse(new V2InboxResponse());
     }
 
     /**
@@ -1096,13 +975,10 @@ class Instagram
      */
     public function getUserTags($usernameId)
     {
-        $tags = new UsertagsResponse($this->http->request("usertags/$usernameId/feed/?rank_token=$this->rank_token&ranked_content=true&")[1]);
-
-        if (!$tags->isOk()) {
-            throw new InstagramException($tags->getMessage()."\n");
-        }
-
-        return $tags;
+        return $this->request("usertags/$usernameId/feed/")
+        ->addParams('rank_token', $this->rank_token)
+        ->addParams('ranked_content', 'true')
+        ->getResponse(new UsertagsResponse());
     }
 
     /**
@@ -1126,12 +1002,7 @@ class Instagram
      */
     public function getMediaLikers($mediaId)
     {
-        $likers = new MediaLikersResponse($this->http->request("media/$mediaId/likers/")[1]);
-        if (!$likers->isOk()) {
-            throw new InstagramException($likers->getMessage()."\n");
-        }
-
-        return $likers;
+        return $this->request("media/$mediaId/likers/")->getResponse(new MediaLikersResponse());
     }
 
     /**
@@ -1145,13 +1016,7 @@ class Instagram
      */
     public function getGeoMedia($usernameId)
     {
-        $locations = new GeoMediaResponse($this->http->request("maps/user/$usernameId/")[1]);
-
-        if (!$locations->isOk()) {
-            throw new InstagramException($locations->getMessage()."\n");
-        }
-
-        return $locations;
+        return $this->request("maps/user/$usernameId/")->getResponse(new GeoMediaResponse());
     }
 
     /**
@@ -1175,24 +1040,18 @@ class Instagram
      */
     public function searchLocation($latitude, $longitude, $query = null)
     {
-        $locationQuery = [
-            'rank_token' => $this->rank_token,
-            'latitude'   => $latitude,
-            'longitude'  => $longitude,
-        ];
+        $locations = $this->request('location_search/')
+        ->addParams('rank_token', $this->rank_token)
+        ->addParams('latitude', $latitude)
+        ->addParams('longitude', $longitude);
 
         if (!is_null($query)) {
-            $locationQuery['timestamp'] = time();
+            $locations->addParams('timestamp', time());
         } else {
-            $locationQuery['search_query'] = $query;
-        }
-        $locations = new LocationResponse($this->http->request('location_search/?'.http_build_query($locationQuery))[1]);
-
-        if (!$locations->isOk()) {
-            throw new InstagramException($locations->getMessage()."\n");
+            $locations->addParams('search_query', $query);
         }
 
-        return $locations;
+        return $locations->getResponse(new LocationResponse());
     }
 
     /**
@@ -1207,13 +1066,12 @@ class Instagram
     public function fbUserSearch($query)
     {
         $query = rawurlencode($query);
-        $query = new FBSearchResponse($this->http->request("fbsearch/topsearch/?context=blended&query=$query&rank_token=$this->rank_token")[1]);
 
-        if (!$query->isOk()) {
-            throw new InstagramException($query->getMessage()."\n");
-        }
-
-        return $query;
+        return $this->request('fbsearch/topsearch/')
+        ->addParams('context', 'blended')
+        ->addParams('query', $query)
+        ->addParams('rank_token', $this->rank_token)
+        ->getResponse(new FBSearchResponse());
     }
 
     /**
@@ -1227,13 +1085,12 @@ class Instagram
      */
     public function searchUsers($query)
     {
-        $query = new SearchUserResponse($this->http->request('users/search/?ig_sig_key_version='.Constants::SIG_KEY_VERSION."&is_typeahead=true&query=$query&rank_token=$this->rank_token")[1]);
-
-        if (!$query->isOk()) {
-            throw new InstagramException($query->getMessage()."\n");
-        }
-
-        return $query;
+        return $this->request('users/search/')
+        ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
+        ->addParams('is_typeahead', true)
+        ->addParams('query', $query)
+        ->addParams('rank_token', $this->rank_token)
+        ->getResponse(new SearchUserResponse());
     }
 
     /**
@@ -1247,13 +1104,7 @@ class Instagram
      */
     public function searchUsername($usernameName)
     {
-        $query = new UsernameInfoResponse($this->http->request("users/$usernameName/usernameinfo/")[1]);
-
-        if (!$query->isOk()) {
-            throw new InstagramException($query->getMessage()."\n");
-        }
-
-        return $query;
+        return $this->request("users/$usernameName/usernameinfo/")->getResponse(new UsernameInfoResponse());
     }
 
     /**
@@ -1274,31 +1125,12 @@ class Instagram
      * @return array
      *               query data
      */
+    //TODO : Missing Response
     public function syncFromAdressBook($contacts)
     {
         $data = 'contacts='.json_encode($contacts, true);
 
         return $this->http->request('address_book/link/?include=extra_display_name,thumbnails', $data)[1];
-    }
-
-    /**
-     * Search tags.
-     *
-     * @param string $query
-     *
-     * @throws InstagramException
-     *
-     * @return array query data
-     */
-    public function searchTags($query)
-    {
-        $query = $this->http->request("tags/search/?is_typeahead=true&q=$query&rank_token=$this->rank_token")[1];
-
-        if ($query['status'] != 'ok') {
-            throw new InstagramException($query['message']."\n");
-        }
-
-        return $query;
     }
 
     /**
@@ -1312,13 +1144,10 @@ class Instagram
      */
     public function getTagRelated($tag)
     {
-        $tags = new TagRelatedResponse($this->http->request("tags/$tag/related?visited=".urlencode('[{"id":"'.$tag.'","type":"hashtag"}]').'&related_types='.urlencode('["hashtag"]'))[1]);
-
-        if (!$tags->isOk()) {
-            throw new InstagramException($tags->getMessage()."\n");
-        }
-
-        return $tags;
+        return $this->request("tags/$tag/related")
+        ->addParams('visited', urlencode('[{"id":"'.$tag.'","type":"hashtag"}]'))
+        ->addParams('related_types', urlencode('["hashtag"]'))
+        ->getResponse(new TagRelatedResponse());
     }
 
     /**
@@ -1330,6 +1159,7 @@ class Instagram
      *
      * @return string media_count
      */
+    //TODO : Missing Response
     public function getTagInfo($tag)
     {
         $query = $this->http->request("tags/$tag/info")[1];
@@ -1348,13 +1178,7 @@ class Instagram
      */
     public function getReelsTrayFeed()
     {
-        $feed = new ReelsTrayFeedResponse($this->http->request('feed/reels_tray/')[1]);
-
-        if (!$feed->isOk()) {
-            throw new InstagramException($feed->getMessage()."\n");
-        }
-
-        return $feed;
+        return $this->request('feed/reels_tray/')->getResponse(new ReelsTrayFeedResponse());
     }
 
     /**
@@ -1370,18 +1194,12 @@ class Instagram
      */
     public function getUserFeed($usernameId, $maxid = null, $minTimestamp = null)
     {
-        $userFeed = new UserFeedResponse($this->http->request(
-            "feed/user/$usernameId/?rank_token=$this->rank_token"
-            .(!is_null($maxid) ? '&max_id='.$maxid : '')
-            .(!is_null($minTimestamp) ? '&min_timestamp='.$minTimestamp : '')
-            .'&ranked_content=true'
-            )[1]);
-
-        if (!$userFeed->isOk()) {
-            throw new InstagramException($userFeed->getMessage()."\n");
-        }
-
-        return $userFeed;
+        return $this->request("feed/user/$usernameId/")
+        ->addParams('rank_token', $this->rank_token)
+        ->addParams('ranked_content', 'true')
+        ->addParams('max_id', (!is_null($maxid) ? $maxid : ''))
+        ->addParams('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
+        ->getResponse(new UserFeedResponse());
     }
 
     /**
@@ -1395,19 +1213,12 @@ class Instagram
      */
     public function getHashtagFeed($hashtagString, $maxid = null)
     {
-        if (is_null($maxid)) {
-            $endpoint = "feed/tag/$hashtagString/";
-        } else {
-            $endpoint = "feed/tag/$hashtagString/?max_id=".$maxid;
+        $hashtagFeed = $this->request("feed/tag/$hashtagString/");
+        if (!is_null($maxid)) {
+            $hashtagFeed->addParams('max_id', $maxid);
         }
 
-        $hashtagFeed = new TagFeedResponse($this->http->request($endpoint)[1]);
-
-        if (!$hashtagFeed->isOk()) {
-            throw new InstagramException($hashtagFeed->getMessage()."\n");
-        }
-
-        return $hashtagFeed;
+        return $hashtagFeed->getResponse(new TagFeedResponse());
     }
 
     /**
@@ -1422,15 +1233,11 @@ class Instagram
     public function searchFBLocation($query)
     {
         $query = rawurlencode($query);
-        $endpoint = "fbsearch/places/?rank_token=$this->rank_token&query=".$query;
 
-        $locationFeed = new FBLocationResponse($this->http->request($endpoint)[1]);
-
-        if (!$locationFeed->isOk()) {
-            throw new InstagramException($locationFeed->getMessage()."\n");
-        }
-
-        return $locationFeed;
+        return $this->request('fbsearch/places/')
+        ->addParams('rank_token', $this->rank_token)
+        ->addParams('query', $query)
+        ->getResponse(new FBLocationResponse());
     }
 
     /**
@@ -1444,19 +1251,12 @@ class Instagram
      */
     public function getLocationFeed($locationId, $maxid = null)
     {
-        if (is_null($maxid)) {
-            $endpoint = "feed/location/$locationId/";
-        } else {
-            $endpoint = "feed/location/$locationId/?max_id=".$maxid;
+        $locationFeed = $this->request("feed/location/$locationId/");
+        if (!is_null($maxid)) {
+            $locationFeed->addParams('max_id', $maxid);
         }
 
-        $locationFeed = new LocationFeedResponse($this->http->request($endpoint)[1]);
-
-        if (!$locationFeed->isOk()) {
-            throw new InstagramException($locationFeed->getMessage()."\n");
-        }
-
-        return $locationFeed;
+        return $locationFeed->getResponse(new LocationFeedResponse());
     }
 
     /**
@@ -1476,6 +1276,7 @@ class Instagram
      *
      * @return array popular feed data
      */
+    //TODO : Missing Response
     public function getPopularFeed()
     {
         $popularFeed = $this->http->request("feed/popular/?people_teaser_supported=1&rank_token=$this->rank_token&ranked_content=true&")[1];
@@ -1496,7 +1297,13 @@ class Instagram
      */
     public function getUserFollowings($usernameId, $maxid = null)
     {
-        return new FollowingResponse($this->http->request("friendships/$usernameId/following/?rank_token=$this->rank_token".(!is_null($maxid) ? '&max_id='.$maxid : ''))[1]);
+        $requestData = $this->request("friendships/$usernameId/following/")
+        ->addParams('rank_token', $this->rank_token);
+        if (!is_null($maxid)) {
+            $requestData->addParams('max_id', $maxid);
+        }
+
+        return $requestData->getResponse(new SearchUserResponse());
     }
 
     /**
@@ -1508,7 +1315,13 @@ class Instagram
      */
     public function getUserFollowers($usernameId, $maxid = null)
     {
-        return new FollowerResponse($this->http->request("friendships/$usernameId/followers/?rank_token=$this->rank_token".(!is_null($maxid) ? '&max_id='.$maxid : ''))[1]);
+        $requestData = $this->request("friendships/$usernameId/followers/")
+        ->addParams('rank_token', $this->rank_token);
+        if (!is_null($maxid)) {
+            $requestData->addParams('max_id', $maxid);
+        }
+
+        return $requestData->getResponse(new SearchUserResponse());
     }
 
     /**
@@ -1538,6 +1351,7 @@ class Instagram
      *
      * @return array status request
      */
+    //TODO : Missing Response
     public function like($mediaId)
     {
         $data = json_encode([
@@ -1557,8 +1371,15 @@ class Instagram
      *
      * @return array status request
      */
+    //TODO : Missing Response
     public function unlike($mediaId)
     {
+        // return $this->request("media/$mediaId/unlike/")
+        //     ->addPost("_uuid",$this->uuid)
+        //     ->addPost("_uid",$this->username_id)
+        //     ->addPost("_csrftoken",$this->token)
+        //     ->addPost("media_id",$mediaId)
+        //     ->getResponse(new Response());
         $data = json_encode([
             '_uuid'      => $this->uuid,
             '_uid'       => $this->username_id,
@@ -1578,7 +1399,10 @@ class Instagram
      */
     public function getMediaComments($mediaId, $maxid = null)
     {
-        return new MediaCommentsResponse($this->http->request("media/$mediaId/comments/?max_id=$maxid&ig_sig_key_version=".Constants::SIG_KEY_VERSION)[1]);
+        return $this->request("media/$mediaId/comments/")
+        ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
+        ->addParams('max_id', $maxid)
+        ->getResponse(new MediaCommentsResponse());
     }
 
     /**
@@ -1589,8 +1413,16 @@ class Instagram
      *
      * @return array Set status data
      */
+    //TODO : Missing Response
     public function setNameAndPhone($name = '', $phone = '')
     {
+        // return $this->request('accounts/set_phone_and_name/')
+        //     ->addPost("_uuid",$this->uuid)
+        //     ->addPost("_uid",$this->username_id)
+        //     ->addPost("_csrftoken",$this->token)
+        //     ->addPost("first_name",$name)
+        //     ->addPost("phone_number",$phone)
+        //     ->getResponse(new Response());
         $data = json_encode([
             '_uuid'        => $this->uuid,
             '_uid'         => $this->username_id,
@@ -1607,6 +1439,7 @@ class Instagram
      *
      * @return array Direct share data
      */
+    //TODO : Missing Response
     public function getDirectShare()
     {
         return $this->http->request('direct_share/inbox/?')[1];
@@ -1654,8 +1487,16 @@ class Instagram
      *
      * @return array Friendship status data
      */
+    //TODO : Missing Response
     public function follow($userId)
     {
+        // return $this->request("friendships/create/$userId/")
+        //     ->addPost("_uuid",$this->uuid)
+        //     ->addPost("_uid",$this->username_id)
+        //     ->addPost("_csrftoken",$this->token)
+        //     ->addPost("user_id",$userId)
+        //     ->getResponse(new Response());
+
         $data = json_encode([
             '_uuid'      => $this->uuid,
             '_uid'       => $this->username_id,
@@ -1673,8 +1514,15 @@ class Instagram
      *
      * @return array Friendship status data
      */
+    //TODO : Missing Response
     public function unfollow($userId)
     {
+        // return $this->request("friendships/destroy/$userId/")
+        //     ->addPost("_uuid",$this->uuid)
+        //     ->addPost("_uid",$this->username_id)
+        //     ->addPost("_csrftoken",$this->token)
+        //     ->addPost("user_id",$userId)
+        //     ->getResponse(new Response());
         $data = json_encode([
             '_uuid'      => $this->uuid,
             '_uid'       => $this->username_id,
@@ -1692,8 +1540,15 @@ class Instagram
      *
      * @return array Friendship status data
      */
+    //TODO : Missing Response
     public function block($userId)
     {
+        // return $this->request("friendships/block/$userId/")
+        //     ->addPost("_uuid",$this->uuid)
+        //     ->addPost("_uid",$this->username_id)
+        //     ->addPost("_csrftoken",$this->token)
+        //     ->addPost("user_id",$userId)
+        //     ->getResponse(new Response());
         $data = json_encode([
             '_uuid'      => $this->uuid,
             '_uid'       => $this->username_id,
@@ -1711,8 +1566,15 @@ class Instagram
      *
      * @return array Friendship status data
      */
+    //TODO : Missing Response
     public function unblock($userId)
     {
+        // return $this->request("friendships/unblock/$userId/")
+        //     ->addPost("_uuid",$this->uuid)
+        //     ->addPost("_uid",$this->username_id)
+        //     ->addPost("_csrftoken",$this->token)
+        //     ->addPost("user_id",$userId)
+        //     ->getResponse(new Response());
         $data = json_encode([
             '_uuid'      => $this->uuid,
             '_uid'       => $this->username_id,
@@ -1732,14 +1594,7 @@ class Instagram
      */
     public function userFriendship($userId)
     {
-        $data = $this->http->request("friendships/show/$userId/")[1];
-        $request = new Response($data);
-
-        if (!$request->isOk()) {
-            throw new InstagramException($request->getMessage()."\n");
-        }
-
-        return new FriendshipStatus($data);
+        return $this->request("friendships/show/$userId/")->getResponse(new FriendshipStatus());
     }
 
     /**
@@ -1751,18 +1606,12 @@ class Instagram
      */
     public function usersFriendship($userList)
     {
-        $data = http_build_query([
-            '_csrftoken' => $this->token,
-            'user_ids'   => implode(',', $userList),
-            '_uuid'      => $this->uuid,
-        ]);
-        $request = new FriendshipsShowManyResponse($this->http->request('friendships/show_many/', $data)[1]);
-
-        if (!$request->isOk()) {
-            throw new InstagramException($request->getMessage()."\n");
-        }
-
-        return $request;
+        return $this->request('friendships/show_many/')
+        ->setSignedPost(false)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('user_ids', implode(',', $userList))
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new FriendshipsShowManyResponse());
     }
 
     /**
@@ -1770,6 +1619,7 @@ class Instagram
      *
      * @return array Liked media data
      */
+    //TODO : Missing Response
     public function getLikedMedia($maxid = null)
     {
         $endpoint = 'feed/liked/?'.(!is_null($maxid) ? 'max_id='.$maxid.'&' : '');
@@ -1785,5 +1635,155 @@ class Instagram
     public function verifyHost($enable)
     {
         $this->http->verifyHost($enable);
+    }
+
+    /**
+     * Search tags.
+     *
+     * @param string $query
+     *
+     * @throws InstagramException
+     *
+     * @return array query data
+     */
+    public function searchTags($query)
+    {
+        return $this->request('tags/search/')
+        ->addParams('is_typeahead', true)
+        ->addParams('q', $query)
+        ->addParams('rank_token', $this->rank_token)
+        ->getResponse(new SearchTagResponse());
+    }
+
+    // just for easy typing for earlier php versions
+    public function request($url)
+    {
+        return new Request($url);
+    }
+
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+}
+
+
+/**
+ * Bridge between http object & mapper & response.
+ */
+class Request
+{
+    protected $params = [];
+    protected $posts = [];
+    protected $requireLogin = false;
+    protected $floodWait = false;
+    protected $checkStatus = true;
+    protected $signedPost = true;
+    protected $replacePost = [];
+
+    public function __construct($url)
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    public function addParams($key, $value)
+    {
+        if ($value === true) {
+            $value = 'true';
+        }
+        $this->params[$key] = $value;
+
+        return $this;
+    }
+
+    public function addPost($key, $value)
+    {
+        $this->posts[$key] = $value;
+
+        return $this;
+    }
+
+    public function requireLogin($requireLogin = false)
+    {
+        $this->requireLogin = $requireLogin;
+
+        return $this;
+    }
+
+    public function setFloodWait($floodWait = false)
+    {
+        $this->floodWait = $floodWait;
+
+        return $this;
+    }
+
+    public function setCheckStatus($checkStatus = true)
+    {
+        $this->checkStatus = $checkStatus;
+
+        return $this;
+    }
+
+    public function setSignedPost($signedPost = true)
+    {
+        $this->signedPost = $signedPost;
+
+        return $this;
+    }
+
+    public function setReplacePost($replace = [])
+    {
+        $this->replacePost = $replace;
+
+        return $this;
+    }
+
+    public function getResponse($obj, $includeHeader = false)
+    {
+        $instagramObj = Instagram::getInstance();
+
+        if ($this->params) {
+            $endPoint = $this->url.'?'.http_build_query($this->params);
+        } else {
+            $endPoint = $this->url;
+        }
+        if ($this->posts) {
+            if ($this->signedPost) {
+                $post = SignatureUtils::generateSignature(json_encode($this->posts));
+            } else {
+                $post = http_build_query($this->posts);
+            }
+        } else {
+            $post = null;
+        }
+        if ($this->replacePost) {
+            $post = str_replace(array_keys($this->replacePost), array_values($this->replacePost), $post);
+        }
+
+        $response = $instagramObj->http->request($endPoint, $post, $this->requireLogin, $this->floodWait, false);
+
+        $mapper = new \JsonMapper();
+        if (isset($_GET['debug'])) {
+            $mapper->bExceptionOnUndefinedProperty = true;
+        }
+        $responseObject = $mapper->map($response[1], $obj);
+
+
+        if ($this->checkStatus && !$responseObject->isOk()) {
+            throw new InstagramException(get_class($obj).' : '.$responseObject->getMessage());
+        }
+        if ($includeHeader) {
+            $responseObject->setFullResponse($response);
+        } else {
+            $responseObject->setFullResponse($response[1]);
+        }
+
+        return $responseObject;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace InstagramAPI;
 
-class Hashtag extends Response
+class Tag extends Response
 {
     public $media_count;
     public $name;

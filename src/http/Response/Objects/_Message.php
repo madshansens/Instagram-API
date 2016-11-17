@@ -2,24 +2,8 @@
 
 namespace InstagramAPI;
 
-class _Message
+class _Message extends Response
 {
-    protected $key;
-    protected $time;
-
-    public function __construct($data)
-    {
-        $this->key = $data['key'];
-        $this->time = $data['time'];
-    }
-
-    public function getKey()
-    {
-        return $this->key;
-    }
-
-    public function getTime()
-    {
-        return $this->time;
-    }
+    public $key;
+    public $time;
 }

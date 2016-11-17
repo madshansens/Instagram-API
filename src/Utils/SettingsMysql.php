@@ -10,7 +10,7 @@ class SettingsMysql
     private $pdo;
     private $instagramUsername;
 
-    public $tableName = '_instagram_settings';
+    public $tableName = 'user_settings';
 
     public function __construct($instagramUsername, $username, $password, $host, $database)
     {
@@ -45,7 +45,7 @@ class SettingsMysql
 
     public function autoInstall()
     {
-
+        // 69
         // is settings table set
         $std = $this->pdo->prepare('show tables where tables_in_'.$this->database.' = :tableName');
         $std->execute([':tableName' => $this->tableName]);
@@ -113,8 +113,9 @@ class SettingsMysql
         }
 
         $sql = $sql.implode(',', $fieldList).(isset($this->sets['id']) ? ' where id=:id' : '');
-
         $std = $this->pdo->prepare($sql);
+
+
         $std->execute($bindList);
 
         if (!isset($this->sets['id'])) {
