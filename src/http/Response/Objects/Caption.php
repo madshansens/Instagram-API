@@ -4,20 +4,19 @@ namespace InstagramAPI;
 
 class Caption extends Response
 {
-    var $status;
-    var $user_id;
-    var $created_at_utc;
-    var $created_at;
-    var $bit_flags;
-    /**
+    public $status;
+    public $user_id;
+    public $created_at_utc;
+    public $created_at;
+    public $bit_flags;
+    /*
     * @var User
     */
-    var $user;
-    var $content_type;
-    var $text;
-    var $media_id;
-    var $pk;
-    var $type;
-    var $has_translation;
-
+    public $user;
+    public $content_type;
+    public $text;
+    public $media_id;
+    public $pk;
+    public $type;
+    public $has_translation;
 }

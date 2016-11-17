@@ -4,8 +4,7 @@ namespace InstagramAPI;
 
 class Hashtag extends Response
 {
-    var $media_count;
-    var $name;
-    var $id;
-
+    public $media_count;
+    public $name;
+    public $id;
 }

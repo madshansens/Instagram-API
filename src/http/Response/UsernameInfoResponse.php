@@ -4,10 +4,9 @@ namespace InstagramAPI;
 
 class UsernameInfoResponse extends Response
 {
-
-    var $megaphone;
-    /** 
+    public $megaphone;
+    /*
     * @var User
     */
-    var $user;
+    public $user;
 }

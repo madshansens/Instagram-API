@@ -4,15 +4,14 @@ namespace InstagramAPI;
 
 class Location extends Response
 {
-    var $name;
-    var $external_id_source = null;
-    var $external_source = null;
-    var $address;
-    var $lat;
-    var $lng;
-    var $external_id = null;
-    var $facebook_places_id = null;
-    var $city = null;
-    var $pk;
-
+    public $name;
+    public $external_id_source = null;
+    public $external_source = null;
+    public $address;
+    public $lat;
+    public $lng;
+    public $external_id = null;
+    public $facebook_places_id = null;
+    public $city = null;
+    public $pk;
 }

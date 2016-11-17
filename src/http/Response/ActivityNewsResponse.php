@@ -4,17 +4,17 @@ namespace InstagramAPI;
 
 class ActivityNewsResponse extends Response
 {
-    var $new_stories;
-    /**
+    public $new_stories;
+    /*
     * @var Story[]
     */
-    var $old_stories;
-    var $continuation;
-    var $friend_request_stories;
-    var $counts;
-    /**
+    public $old_stories;
+    public $continuation;
+    public $friend_request_stories;
+    public $counts;
+    /*
     * @var mixed|null
     */
-    var $subscription;
-    var $continuation_token;
+    public $subscription;
+    public $continuation_token;
 }

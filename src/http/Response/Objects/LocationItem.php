@@ -4,12 +4,11 @@ namespace InstagramAPI;
 
 class LocationItem extends Response
 {
-    var $media_bundles;
-    var $subtitle;
-    /**
+    public $media_bundles;
+    public $subtitle;
+    /*
     * @var Location
     */
-    var $location;
-    var $title;
-
+    public $location;
+    public $title;
 }

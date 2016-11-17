@@ -4,5 +4,5 @@ namespace InstagramAPI;
 
 class CommentResponse extends Response
 {
-    var $comment = null;
+    public $comment = null;
 }

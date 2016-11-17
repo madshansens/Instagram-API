@@ -4,7 +4,6 @@ namespace InstagramAPI;
 
 class Media extends Response
 {
-    var $image;
-    var $id;
-
+    public $image;
+    public $id;
 }

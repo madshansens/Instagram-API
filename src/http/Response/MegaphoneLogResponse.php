@@ -4,6 +4,5 @@ namespace InstagramAPI;
 
 class MegaphoneLogResponse extends Response
 {
-    var $success;
-
+    public $success;
 }

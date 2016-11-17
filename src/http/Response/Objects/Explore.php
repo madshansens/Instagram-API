@@ -4,8 +4,7 @@ namespace InstagramAPI;
 
 class Explore extends Response
 {
-    var $explanation;
-    var $actor_id;
-    var $source_token;
-
+    public $explanation;
+    public $actor_id;
+    public $source_token;
 }

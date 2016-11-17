@@ -4,6 +4,5 @@ namespace InstagramAPI;
 
 class GeoMediaResponse extends Response
 {
-    var $geo_media;
-
+    public $geo_media;
 }

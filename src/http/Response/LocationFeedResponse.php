@@ -4,11 +4,11 @@ namespace InstagramAPI;
 
 class LocationFeedResponse extends Response
 {
-    var $ranked_items = null;
-    var $media_count;
-    var $num_results;
-    var $auto_load_more_enabled;
-    var $items;
-    var $more_available;
-    var $next_max_id;
+    public $ranked_items = null;
+    public $media_count;
+    public $num_results;
+    public $auto_load_more_enabled;
+    public $items;
+    public $more_available;
+    public $next_max_id;
 }

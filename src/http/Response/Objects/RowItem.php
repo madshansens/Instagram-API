@@ -4,11 +4,10 @@ namespace InstagramAPI;
 
 class RowItem extends Response
 {
-    var $media_count;
-    var $header;
-    var $title;
-    var $channel_type;
-    var $channel_id;
-    var $media;
-
+    public $media_count;
+    public $header;
+    public $title;
+    public $channel_type;
+    public $channel_id;
+    public $media;
 }

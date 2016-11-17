@@ -4,11 +4,10 @@ namespace InstagramAPI;
 
 class GeoMedia extends Response
 {
-    var $media_id;
-    var $display_url;
-    var $low_res_url;
-    var $lat;
-    var $lng;
-    var $thumbnail;
-
+    public $media_id;
+    public $display_url;
+    public $low_res_url;
+    public $lat;
+    public $lng;
+    public $thumbnail;
 }
