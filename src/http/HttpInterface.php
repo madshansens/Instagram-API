@@ -43,13 +43,12 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
-        if ($this->parent->settingsAdopter["type"] == "file") {
+        if ($this->parent->settingsAdopter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
             curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
         } else {
-
-            $cookieJar = $this->parent->settings->get("cookies");
-            $cookieJarFile = tempnam(sys_get_temp_dir(),uniqid("_instagram_cookie"));
+            $cookieJar = $this->parent->settings->get('cookies');
+            $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
 
             file_put_contents($cookieJarFile, $cookieJar);
 
@@ -92,9 +91,9 @@ class HttpInterface
 
         curl_close($ch);
 
-        if ($this->parent->settingsAdopter["type"] == "mysql") {
+        if ($this->parent->settingsAdopter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set("cookies",$newCookies);
+            $this->parent->settings->set('cookies', $newCookies);
         }
 
 
@@ -111,16 +110,16 @@ class HttpInterface
     }
 
     /**
-    * @param $photo
-    * @param null $caption
-    * @param null $upload_id
-    * @param null $customPreview
-    * @param null $location
-    * @param null $filter
-    * @param bool $reel_flag
-    *
-    * @throws InstagramException
-    */
+     * @param $photo
+     * @param null $caption
+     * @param null $upload_id
+     * @param null $customPreview
+     * @param null $location
+     * @param null $filter
+     * @param bool $reel_flag
+     *
+     * @throws InstagramException
+     */
     public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null, $location = null, $filter = null, $reel_flag = false)
     {
         $endpoint = 'upload/photo/';
@@ -190,13 +189,12 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        if ($this->parent->settingsAdopter["type"] == "file") {
+        if ($this->parent->settingsAdopter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
             curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
         } else {
-
-            $cookieJar = $this->parent->settings->get("cookies");
-            $cookieJarFile = tempnam(sys_get_temp_dir(),uniqid("_instagram_cookie"));
+            $cookieJar = $this->parent->settings->get('cookies');
+            $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
 
             file_put_contents($cookieJarFile, $cookieJar);
 
@@ -231,9 +229,9 @@ class HttpInterface
         }
 
         curl_close($ch);
-        if ($this->parent->settingsAdopter["type"] == "mysql") {
+        if ($this->parent->settingsAdopter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set("cookies",$newCookies);
+            $this->parent->settings->set('cookies', $newCookies);
         }
         if (!$upload->isOk()) {
             throw new InstagramException($upload->getMessage());
@@ -303,13 +301,12 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        if ($this->parent->settingsAdopter["type"] == "file") {
+        if ($this->parent->settingsAdopter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
             curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
         } else {
-
-            $cookieJar = $this->parent->settings->get("cookies");
-            $cookieJarFile = tempnam(sys_get_temp_dir(),uniqid("_instagram_cookie"));
+            $cookieJar = $this->parent->settings->get('cookies');
+            $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
 
             file_put_contents($cookieJarFile, $cookieJar);
 
@@ -377,13 +374,12 @@ class HttpInterface
             curl_setopt($ch, CURLOPT_HEADER, true);
             curl_setopt($ch, CURLOPT_VERBOSE, false);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            if ($this->parent->settingsAdopter["type"] == "file") {
+            if ($this->parent->settingsAdopter['type'] == 'file') {
                 curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
                 curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
             } else {
-
-                $cookieJar = $this->parent->settings->get("cookies");
-                $cookieJarFile = tempnam(sys_get_temp_dir(),uniqid("_instagram_cookie"));
+                $cookieJar = $this->parent->settings->get('cookies');
+                $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
 
                 file_put_contents($cookieJarFile, $cookieJar);
 
@@ -438,9 +434,9 @@ class HttpInterface
         }
 
         curl_close($ch);
-        if ($this->parent->settingsAdopter["type"] == "mysql") {
+        if ($this->parent->settingsAdopter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set("cookies",$newCookies);
+            $this->parent->settings->set('cookies', $newCookies);
         }
         $configure = $this->parent->configureVideo($upload_id, $video, $caption, $customPreview);
         //$this->parent->expose();
@@ -506,13 +502,12 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        if ($this->parent->settingsAdopter["type"] == "file") {
+        if ($this->parent->settingsAdopter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
             curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
         } else {
-
-            $cookieJar = $this->parent->settings->get("cookies");
-            $cookieJarFile = tempnam(sys_get_temp_dir(),uniqid("_instagram_cookie"));
+            $cookieJar = $this->parent->settings->get('cookies');
+            $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
 
             file_put_contents($cookieJarFile, $cookieJar);
 
@@ -547,9 +542,9 @@ class HttpInterface
         }
 
         curl_close($ch);
-        if ($this->parent->settingsAdopter["type"] == "mysql") {
+        if ($this->parent->settingsAdopter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set("cookies",$newCookies);
+            $this->parent->settings->set('cookies', $newCookies);
         }
     }
 
@@ -615,13 +610,12 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        if ($this->parent->settingsAdopter["type"] == "file") {
+        if ($this->parent->settingsAdopter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
             curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
         } else {
-
-            $cookieJar = $this->parent->settings->get("cookies");
-            $cookieJarFile = tempnam(sys_get_temp_dir(),uniqid("_instagram_cookie"));
+            $cookieJar = $this->parent->settings->get('cookies');
+            $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
 
             file_put_contents($cookieJarFile, $cookieJar);
 
@@ -656,9 +650,9 @@ class HttpInterface
         }
 
         curl_close($ch);
-        if ($this->parent->settingsAdopter["type"] == "mysql") {
+        if ($this->parent->settingsAdopter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set("cookies",$newCookies);
+            $this->parent->settings->set('cookies', $newCookies);
         }
     }
 
@@ -719,13 +713,12 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        if ($this->parent->settingsAdopter["type"] == "file") {
+        if ($this->parent->settingsAdopter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
             curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
         } else {
-
-            $cookieJar = $this->parent->settings->get("cookies");
-            $cookieJarFile = tempnam(sys_get_temp_dir(),uniqid("_instagram_cookie"));
+            $cookieJar = $this->parent->settings->get('cookies');
+            $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
 
             file_put_contents($cookieJarFile, $cookieJar);
 
@@ -760,9 +753,9 @@ class HttpInterface
         }
 
         curl_close($ch);
-        if ($this->parent->settingsAdopter["type"] == "mysql") {
+        if ($this->parent->settingsAdopter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set("cookies",$newCookies);
+            $this->parent->settings->set('cookies', $newCookies);
         }
     }
 
