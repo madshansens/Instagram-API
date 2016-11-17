@@ -13,7 +13,9 @@ $debug = false;
 // IN THIS EXAMPLE, WE ARE RETRIEVING SELF FOLLOWERS
 // BUT THE PROCESS IS SIMILAR IN OTHER REQUESTS
 
-$i = new \InstagramAPI\Instagram($username, $password, $debug);
+$i = new \InstagramAPI\Instagram($debug);
+
+$i->setUser($username, $password);
 
 try {
     $i->login();

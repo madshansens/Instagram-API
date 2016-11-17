@@ -12,7 +12,9 @@ $video = '';     // path to the video
 $caption = '';     // caption
 //////////////////////
 
-$i = new \InstagramAPI\Instagram($username, $password, $debug);
+$i = new \InstagramAPI\Instagram($debug);
+
+$i->setUser($username, $password);
 
 try {
     $i->login();
