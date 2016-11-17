@@ -2,38 +2,24 @@
 
 namespace InstagramAPI;
 
-class Tray
+class Tray extends Response
 {
-    protected $items;
-    protected $user;
-    protected $can_reply;
-    protected $expiring_at;
+    
+    var $id;
+    /**
+    * @var Item[]
+    */
+    var $items;
+    
+    var $user;
+    var $can_reply;
+    var $expiring_at;
+    var $seen_ranked_position;
+    var $seen;
+    var $latest_reel_media;
+    var $ranked_position;
+    var $is_nux;
+    var $muted;
+    
 
-    public function __construct($items, $user, $can_reply, $expiring_at)
-    {
-        $this->items = $items;
-        $this->user = $user;
-        $this->can_reply = $can_reply;
-        $this->expiring_at = $expiring_at;
-    }
-
-    public function getItems()
-    {
-        return $this->items;
-    }
-
-    public function getUsers()
-    {
-        return $this->users;
-    }
-
-    public function canReply()
-    {
-        return $this->can_reply;
-    }
-
-    public function getExpiringAt()
-    {
-        return $this->expiring_at;
-    }
 }

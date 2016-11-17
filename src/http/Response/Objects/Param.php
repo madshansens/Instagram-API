@@ -2,24 +2,10 @@
 
 namespace InstagramAPI;
 
-class Param
+class Param extends Response
 {
-    protected $name;
-    protected $value;
+    var $name;
+    var $value;
 
-    public function __construct($data)
-    {
-        $this->name = $data['name'];
-        $this->value = $data['value'];
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function getValue()
-    {
-        return $this->value;
-    }
+   
 }

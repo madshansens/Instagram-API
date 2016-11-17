@@ -2,24 +2,9 @@
 
 namespace InstagramAPI;
 
-class Hashtags
+class Hashtags extends Response
 {
-    protected $position;
-    protected $hashtag;
+    var $position;
+    var $hashtag;
 
-    public function __construct($hashtags)
-    {
-        $this->position = $hashtags['position'];
-        $this->hashtag = new Hashtag($hashtags['hashtag']);
-    }
-
-    public function getPosition()
-    {
-        return $this->position;
-    }
-
-    public function getHashtag()
-    {
-        return $this->hashtag;
-    }
 }

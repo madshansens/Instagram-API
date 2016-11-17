@@ -2,24 +2,9 @@
 
 namespace InstagramAPI;
 
-class Media
+class Media extends Response
 {
-    protected $image;
-    protected $id;
+    var $image;
+    var $id;
 
-    public function __construct($media)
-    {
-        $this->image = $media['image'];
-        $this->id = $media['id'];
-    }
-
-    public function getMediaUrl()
-    {
-        return $this->image;
-    }
-
-    public function getMediaId()
-    {
-        return $this->id;
-    }
 }

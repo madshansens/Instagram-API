@@ -2,38 +2,14 @@
 
 namespace InstagramAPI;
 
-class Experiment
+class Experiment extends Response
 {
-    protected $params;
-    protected $group;
-    protected $name;
-
-    public function __construct($data)
-    {
-        $params = [];
-        foreach ($data['params'] as $param) {
-            $params[] = new Param($param);
-        }
-        $this->params = $params;
-        $this->group = $data['group'];
-        $this->name = $data['name'];
-    }
-
     /**
-     * @return Param[]
-     */
-    public function getParams()
-    {
-        return $this->params;
-    }
+    * @var Param[]
+    */
+    var $params;
+    var $group;
+    var $name;
 
-    public function getGroup()
-    {
-        return $this->group;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
+   
 }

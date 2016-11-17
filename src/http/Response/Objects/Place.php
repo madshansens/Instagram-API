@@ -2,24 +2,12 @@
 
 namespace InstagramAPI;
 
-class Place
+class Place extends Response
 {
-    protected $position;
-    protected $place;
+    var $position;
+    /**
+    * @var LocationItem
+    */
+    var $place;
 
-    public function __construct($places)
-    {
-        $this->position = $places['position'];
-        $this->place = new LocationItem($places['place']);
-    }
-
-    public function getPosition()
-    {
-        return $this->position;
-    }
-
-    public function getPlace()
-    {
-        return $this->place;
-    }
 }

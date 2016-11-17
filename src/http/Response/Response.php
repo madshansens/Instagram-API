@@ -2,21 +2,17 @@
 
 namespace InstagramAPI;
 
-class Response
+class Response extends AutoResponseFunctionSetter
 {
     const STATUS_OK = 'ok';
     const STATUS_FAIL = 'fail';
 
-    protected $status;
-    protected $message;
-    protected $fullResponse;
+    var $status;
+    var $message;
+    var $fullResponse;
 
-    public function __construct($data)
+    public function __construct()
     {
-        $this->setStatus($data['status']);
-        if (isset($data['message'])) {
-            $this->setMessage($data['message']);
-        }
     }
 
     public function setStatus($status)
