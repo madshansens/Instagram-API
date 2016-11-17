@@ -19,20 +19,20 @@ class Instagram
 
     public $http;
     public $settings;
-
-    public $settingsAdopter = ['type' => 'file',
+/*
+    public $settingsAdapter = ['type' => 'file',
         'path'                        => __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR, ]; // File | Mysql
+*/
 
-
-    /*
+    
     // Settings for mysql storage
-    public $settingsAdopter         = array(
-    "type"       => "",
-    "username"   => "",
+    public $settingsAdapter         = array(
+    "type"       => "mysql",
+    "username"   => "root",
     "password"   => "",
-    "host"       => "",
-    "database"   => "");
-    */
+    "host"       => "192.168.1.100",
+    "database"   => "test");
+    
 
 
 
@@ -49,7 +49,7 @@ class Instagram
      * @param $debug Debug on or off, false by default
      * @param $IGDataPath Default folder to store data, you can change it
      */
-    public function __construct($username, $password, $debug = false, $IGDataPath = null, $truncatedDebug = false)
+    public function __construct($username, $password, $debug = false, $truncatedDebug = false)
     {
         $this->debug = $debug;
         $this->truncatedDebug = $truncatedDebug;
@@ -92,7 +92,7 @@ class Instagram
 
     protected function checkSettings($username)
     {
-        $this->settings = new SettingsAdapter($this->settingsAdopter, $username);
+        $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
 
         if ($this->settings->get('version') == null) {
             $this->settings->set('version', Constants::VERSION);

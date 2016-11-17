@@ -122,31 +122,9 @@ class SettingsMysql
         }
     }
 
-    public function __set($prop, $value)
-    {
-        $this->set($prop, $value);
-    }
-
-    public function __get($prop)
-    {
-        return $this->get($prop);
-    }
-
-    protected function checkPermissions()
-    {
-        if (is_writable(dirname($this->path))) {
-            return true;
-        } elseif (mkdir(dirname($this->path), 0777)) {
-            return true;
-        } elseif (chmod(dirname($this->path), 0777)) {
-            return true;
-        }
-
-        throw new InstagramException('The setting file is not writable');
-    }
-
     private function connect($username, $password, $host, $database)
     {
+        
         try {
             $pdo = new \PDO("mysql:host={$host};dbname={$database}", $username, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
             $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
