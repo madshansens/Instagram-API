@@ -15,10 +15,27 @@ class Instagram
     public $token;              // _csrftoken
     public $isLoggedIn = false; // Session status
     public $rank_token;         // Rank token
-    public $IGDataPath;         // Data storage path
-    public $customPath = false;
+
+
     public $http;
     public $settings;
+
+    public $settingsAdapter = ['type' => 'file',
+    'path'                            => __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR, ]; // File | Mysql
+
+    /*
+    // Settings for mysql storage
+    public $settingsAdapter         = array(
+    "type"       => "mysql",
+    "username"   => "",
+    "password"   => "",
+    "host"       => "",
+    "database"   => "");
+    */
+
+
+
+
     public $proxy = null;     // Full Proxy
     public $proxyHost = null; // Proxy Host and Port
     public $proxyAuth = null; // Proxy User and Pass
@@ -31,21 +48,13 @@ class Instagram
      * @param $debug Debug on or off, false by default
      * @param $IGDataPath Default folder to store data, you can change it
      */
-    public function __construct($username, $password, $debug = false, $IGDataPath = null, $truncatedDebug = false)
+    public function __construct($username, $password, $debug = false, $truncatedDebug = false)
     {
         $this->debug = $debug;
         $this->truncatedDebug = $truncatedDebug;
         $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
 
-        if (!is_null($IGDataPath)) {
-            $this->IGDataPath = $IGDataPath;
-            $this->customPath = true;
-        } else {
-            $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
-            if (!file_exists($this->IGDataPath)) {
-                mkdir($this->IGDataPath, 0777, true);
-            }
-        }
+
 
         $this->checkSettings($username);
 
@@ -69,9 +78,8 @@ class Instagram
 
         $this->uuid = SignatureUtils::generateUUID(true);
 
-        if ((file_exists($this->IGDataPath."$this->username-cookies.dat")) && ($this->settings->get('username_id') != null)
-            && ($this->settings->get('token') != null)
-        ) {
+
+        if ($this->settings->isLogged()) {
             $this->isLoggedIn = true;
             $this->username_id = $this->settings->get('username_id');
             $this->rank_token = $this->username_id.'_'.$this->uuid;
@@ -83,15 +91,7 @@ class Instagram
 
     protected function checkSettings($username)
     {
-        if (!$this->customPath) {
-            $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
-        }
-
-        if (!file_exists($this->IGDataPath)) {
-            mkdir($this->IGDataPath, 0777, true);
-        }
-
-        $this->settings = new Settings($this->IGDataPath.'settings-'.$username.'.dat');
+        $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
 
         if ($this->settings->get('version') == null) {
             $this->settings->set('version', Constants::VERSION);
@@ -301,7 +301,7 @@ class Instagram
         $timeline = new TimelineFeedResponse($this->http->request(
             "feed/timeline/?rank_token=$this->rank_token&ranked_content=true"
             .(!is_null($maxid) ? '&max_id='.$maxid : '')
-        )[1]);
+            )[1]);
 
         if (!$timeline->isOk()) {
             throw new InstagramException($timeline->getMessage()."\n");
@@ -1375,7 +1375,7 @@ class Instagram
             .(!is_null($maxid) ? '&max_id='.$maxid : '')
             .(!is_null($minTimestamp) ? '&min_timestamp='.$minTimestamp : '')
             .'&ranked_content=true'
-        )[1]);
+            )[1]);
 
         if (!$userFeed->isOk()) {
             throw new InstagramException($userFeed->getMessage()."\n");
