@@ -8,7 +8,8 @@ class SettingsFile
     private $sets;
     private $folderPath;
 
-    function isLogged() {
+    public function isLogged()
+    {
         if ((file_exists($this->cookiesPath)) && ($this->get('username_id') != null) && ($this->get('token') != null)) {
             return true;
         } else {
@@ -16,10 +17,10 @@ class SettingsFile
         }
     }
 
-    public function __construct($username,$path)
+    public function __construct($username, $path)
     {
-        $this->cookiesPath = $path . $username .DIRECTORY_SEPARATOR . $username . "-cookies.dat";
-        $this->settingsPath = $path . $username .DIRECTORY_SEPARATOR . "settings-" . $username . ".dat";
+        $this->cookiesPath = $path.$username.DIRECTORY_SEPARATOR.$username.'-cookies.dat';
+        $this->settingsPath = $path.$username.DIRECTORY_SEPARATOR.'settings-'.$username.'.dat';
 
         $this->checkPermissions();
 
@@ -77,9 +78,9 @@ class SettingsFile
     {
         if (is_writable(dirname($this->settingsPath))) {
             return true;
-        } else if(mkdir(dirname($this->settingsPath), 0777)) {
+        } elseif (mkdir(dirname($this->settingsPath), 0777)) {
             return true;
-        } else if(chmod(dirname($this->settingsPath), 0777)) {
+        } elseif (chmod(dirname($this->settingsPath), 0777)) {
             return true;
         }
 
