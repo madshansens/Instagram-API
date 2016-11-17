@@ -124,7 +124,6 @@ class SettingsMysql
 
     private function connect($username, $password, $host, $database)
     {
-        
         try {
             $pdo = new \PDO("mysql:host={$host};dbname={$database}", $username, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
             $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
