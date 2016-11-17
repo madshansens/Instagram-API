@@ -4,8 +4,6 @@ namespace InstagramAPI;
 
 class UploadVideoResponse extends Response
 {
-    var $upload_id;
-    var $message = null;
-
-
+    public $upload_id;
+    public $message = null;
 }

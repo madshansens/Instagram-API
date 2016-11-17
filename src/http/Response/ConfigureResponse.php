@@ -4,11 +4,11 @@ namespace InstagramAPI;
 
 class ConfigureResponse extends Response
 {
-    var $upload_id;
-    var $media_id;
-    var $image_url;
-    var $media_code;
-    
+    public $upload_id;
+    public $media_id;
+    public $image_url;
+    public $media_code;
+
     public function getMediaUrl()
     {
         return 'https://www.instagram.com/p/'.$this->getMediaCode().'/';

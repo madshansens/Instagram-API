@@ -4,6 +4,6 @@ namespace InstagramAPI;
 
 class FollowingRecentActivityResponse extends Response
 {
-    var $stories;
-    var $next_max_id;
+    public $stories;
+    public $next_max_id;
 }

@@ -4,10 +4,9 @@ namespace InstagramAPI;
 
 class autoCompleteUserListResponse extends Response
 {
-    var $expires;
-    /**
+    public $expires;
+    /*
     * @var User[]
     */
-    var $users;
-
+    public $users;
 }

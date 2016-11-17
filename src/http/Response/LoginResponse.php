@@ -4,20 +4,19 @@ namespace InstagramAPI;
 
 class LoginResponse extends Response
 {
-    var $username;
-    var $has_anonymous_profile_picture;
-    var $profile_pic_url;
-    var $profile_pic_id;
-    var $full_name;
-    var $pk;
-    var $is_private;
-    var $error_title; // on wrong pass
-    var $error_type; // on wrong pass
-    var $buttons; // on wrong pass
-    var $invalid_credentials; // on wrong pass
-    /**
+    public $username;
+    public $has_anonymous_profile_picture;
+    public $profile_pic_url;
+    public $profile_pic_id;
+    public $full_name;
+    public $pk;
+    public $is_private;
+    public $error_title; // on wrong pass
+    public $error_type; // on wrong pass
+    public $buttons; // on wrong pass
+    public $invalid_credentials; // on wrong pass
+    /*
     * @var User
     */
-    var $logged_in_user;
-
+    public $logged_in_user;
 }

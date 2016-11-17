@@ -4,9 +4,9 @@ namespace InstagramAPI;
 
 class EditMediaResponse extends Response
 {
-    var $taken_at;
-    var $image_url;
-    var $like_count;
-    var $likers;
-    var $comments;
+    public $taken_at;
+    public $image_url;
+    public $like_count;
+    public $likers;
+    public $comments;
 }

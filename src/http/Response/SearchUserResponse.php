@@ -4,10 +4,10 @@ namespace InstagramAPI;
 
 class SearchUserResponse extends Response
 {
-    var $has_more;
-    var $num_results;
-    /**
+    public $has_more;
+    public $num_results;
+    /*
     * @var User[]
     */
-    var $users;
+    public $users;
 }

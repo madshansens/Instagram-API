@@ -4,8 +4,7 @@ namespace InstagramAPI;
 
 class HdProfilePicUrlInfo extends Response
 {
-    var $url;
-    var $width;
-    var $height;
-
+    public $url;
+    public $width;
+    public $height;
 }

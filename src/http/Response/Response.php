@@ -7,9 +7,9 @@ class Response extends AutoResponseFunctionSetter
     const STATUS_OK = 'ok';
     const STATUS_FAIL = 'fail';
 
-    var $status;
-    var $message;
-    var $fullResponse;
+    public $status;
+    public $message;
+    public $fullResponse;
 
     public function __construct()
     {

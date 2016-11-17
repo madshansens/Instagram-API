@@ -4,22 +4,22 @@ namespace InstagramAPI;
 
 class ProfileResponse extends Response
 {
-    var $username;
-    var $phone_number;
-    var $has_anonymous_profile_picture;
-    var $hd_profile_pic_versions;
-    var $gender;
-    var $birthday;
-    var $needs_email_confirm;
-    var $national_number;
-    var $profile_pic_url;
-    var $profile_pic_id;
-    var $biography;
-    var $full_name;
-    var $pk;
-    var $country_code;
-    var $hd_profile_pic_url_info;
-    var $email;
-    var $is_private;
-    var $external_url;
+    public $username;
+    public $phone_number;
+    public $has_anonymous_profile_picture;
+    public $hd_profile_pic_versions;
+    public $gender;
+    public $birthday;
+    public $needs_email_confirm;
+    public $national_number;
+    public $profile_pic_url;
+    public $profile_pic_id;
+    public $biography;
+    public $full_name;
+    public $pk;
+    public $country_code;
+    public $hd_profile_pic_url_info;
+    public $email;
+    public $is_private;
+    public $external_url;
 }

@@ -4,8 +4,8 @@ namespace InstagramAPI;
 
 class ConfigureVideoResponse extends Response
 {
-    var $upload_id;
-    var $media_id;
-    var $image_url;
-    var $video_version;
+    public $upload_id;
+    public $media_id;
+    public $image_url;
+    public $video_version;
 }

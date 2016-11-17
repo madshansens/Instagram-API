@@ -4,10 +4,9 @@ namespace InstagramAPI;
 
 class Users extends Response
 {
-    var $position;
-    /**
+    public $position;
+    /*
     * @var User
     */
-    var $user;
-
+    public $user;
 }

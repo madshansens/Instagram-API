@@ -4,14 +4,12 @@ namespace InstagramAPI;
 
 class MediaInfoResponse extends Response
 {
-    var $auto_load_more_enabled;
-    var $status;
-    var $num_results;
-    var $more_available;
-    /** 
+    public $auto_load_more_enabled;
+    public $status;
+    public $num_results;
+    public $more_available;
+    /*
     * @var Item[]
     */
-    var $items;
-
-
+    public $items;
 }

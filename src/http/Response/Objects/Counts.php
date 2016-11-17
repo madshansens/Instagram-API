@@ -4,9 +4,7 @@ namespace InstagramAPI;
 
 class Counts extends Response
 {
-    var $relationships;
-    var $requests;
-    var $photos_of_you;
-
-    
+    public $relationships;
+    public $requests;
+    public $photos_of_you;
 }

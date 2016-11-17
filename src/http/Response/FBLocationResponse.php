@@ -4,9 +4,9 @@ namespace InstagramAPI;
 
 class FBLocationResponse extends Response
 {
-    var $has_more;
-    /** 
+    public $has_more;
+    /*
     * @var LocationItem[]
     */
-    var $items;
+    public $items;
 }

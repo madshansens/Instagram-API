@@ -4,8 +4,6 @@ namespace InstagramAPI;
 
 class _Message extends Response
 {
-    var $key;
-    var $time;
-
-
+    public $key;
+    public $time;
 }

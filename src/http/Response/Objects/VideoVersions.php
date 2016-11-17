@@ -4,9 +4,8 @@ namespace InstagramAPI;
 
 class VideoVersions extends Response
 {
-    var $url;
-    var $type;
-    var $width;
-    var $height;
-
+    public $url;
+    public $type;
+    public $width;
+    public $height;
 }

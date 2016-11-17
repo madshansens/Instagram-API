@@ -4,24 +4,24 @@ namespace InstagramAPI;
 
 class AccountCreationResponse extends Response
 {
-    var $username;
-    var $has_anonymous_profile_picture;
-    var $allow_contacts_sync;
-    var $nux_private_first_page;
-    var $profile_pic_url;
-    var $full_name;
-    var $pk;
-    /**
+    public $username;
+    public $has_anonymous_profile_picture;
+    public $allow_contacts_sync;
+    public $nux_private_first_page;
+    public $profile_pic_url;
+    public $full_name;
+    public $pk;
+    /*
      * @var HdProfilePicUrlInfo
      */
-    var $hd_profile_pic_url_info;
-    var $nux_private_enabled;
-    var $is_private;
-    var $account_created = false;
-    var $feedback_title = '';
-    var $feedback_message = '';
-    var $spam = false;
-    var $feedback_action = '';
-    var $feedback_url = '';
-    var $errors = null;
+    public $hd_profile_pic_url_info;
+    public $nux_private_enabled;
+    public $is_private;
+    public $account_created = false;
+    public $feedback_title = '';
+    public $feedback_message = '';
+    public $spam = false;
+    public $feedback_action = '';
+    public $feedback_url = '';
+    public $errors = null;
 }

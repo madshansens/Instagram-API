@@ -4,20 +4,18 @@ namespace InstagramAPI;
 
 class FeedAysf extends Response
 {
-    var $landing_site_type;
-    var $uuid;
-    var $view_all_text;
-    var $feed_position;
-    var $landing_site_title;
-    var $is_dismissable;
-    /**
+    public $landing_site_type;
+    public $uuid;
+    public $view_all_text;
+    public $feed_position;
+    public $landing_site_title;
+    public $is_dismissable;
+    /*
      * @var Suggestion[]
      */
-    var $suggestions;
-    var $should_refill;
-    var $display_new_unit;
-    var $fetch_user_details;
-    var $title;
-
-  
+    public $suggestions;
+    public $should_refill;
+    public $display_new_unit;
+    public $fetch_user_details;
+    public $title;
 }

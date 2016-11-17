@@ -4,11 +4,10 @@ namespace InstagramAPI;
 
 class Args extends Response
 {
-    var $media;
-    var $links;
-    var $text;
-    var $profile_id;
-    var $profile_image;
-    var $timestamp;
-
+    public $media;
+    public $links;
+    public $text;
+    public $profile_id;
+    public $profile_image;
+    public $timestamp;
 }

@@ -1,8 +1,10 @@
 <?php
-  namespace InstagramAPI;
-  class Tag extends Response  {
-      var $media_count;
-      var $name;
-      var $id;
-  }
-  ?>
+
+namespace InstagramAPI;
+
+class Tag extends Response
+{
+    public $media_count;
+    public $name;
+    public $id;
+}

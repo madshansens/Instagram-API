@@ -4,10 +4,9 @@ namespace InstagramAPI;
 
 class UploadJobVideoResponse extends Response
 {
-    var $upload_id;
-    var $video_upload_urls;
+    public $upload_id;
+    public $video_upload_urls;
 
-   
     public function getVideoUploadUrl()
     {
         return $this->getVideoUploadUrls()[3]['url'];

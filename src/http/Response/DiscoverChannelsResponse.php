@@ -4,9 +4,8 @@ namespace InstagramAPI;
 
 class DiscoverChannelsResponse extends Response
 {
-    var $auto_load_more_enabled;
-    var $items;
-    var $more_available;
-    var $next_max_id;
-
+    public $auto_load_more_enabled;
+    public $items;
+    public $more_available;
+    public $next_max_id;
 }

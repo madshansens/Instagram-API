@@ -4,10 +4,9 @@ namespace InstagramAPI;
 
 class Place extends Response
 {
-    var $position;
-    /**
+    public $position;
+    /*
     * @var LocationItem
     */
-    var $place;
-
+    public $place;
 }
