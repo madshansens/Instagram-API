@@ -1769,6 +1769,7 @@ class Request
         $response = $instagramObj->http->request($endPoint, $post, $this->requireLogin, $this->floodWait, false);
 
         $mapper = new \JsonMapper();
+        $mapper->bStrictNullTypes = false;
         if (isset($_GET['debug'])) {
             $mapper->bExceptionOnUndefinedProperty = true;
         }
