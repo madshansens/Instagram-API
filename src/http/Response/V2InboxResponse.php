@@ -8,8 +8,8 @@ class V2InboxResponse extends Response
     public $seq_id;
     public $pending_requests_users;
     /**
-    * @var Inbox
-    */
+     * @var Inbox
+     */
     public $inbox;
     public $subscription;
 }

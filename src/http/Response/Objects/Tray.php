@@ -6,8 +6,8 @@ class Tray extends Response
 {
     public $id;
     /**
-    * @var Item[]
-    */
+     * @var Item[]
+     */
     public $items;
 
     public $user;

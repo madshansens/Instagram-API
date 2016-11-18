@@ -5,7 +5,7 @@ namespace InstagramAPI;
 class ReelsTrayFeedResponse extends Response
 {
     /**
-    * @var Tray[]
-    */
+     * @var Tray[]
+     */
     public $tray;
 }

@@ -16,8 +16,8 @@ class Item extends Response
     public $client_cache_key;
     public $filter_type;
     /**
-    * @var Image_Versions2
-    */
+     * @var Image_Versions2
+     */
     public $image_versions2;
     public $original_width;
     public $original_height;
@@ -34,29 +34,29 @@ class Item extends Response
     public $next_max_id = null;
 
     /**
-    * @var Comment[]
-    */
+     * @var Comment[]
+     */
     public $comments;
     public $comment_count = 0;
     /**
-    * @var Caption|null
-    */
+     * @var Caption|null
+     */
     public $caption = null;
     public $caption_is_edited;
     public $photo_of_you;
     /**
-    * @var VideoVersions[]|null
-    */
+     * @var VideoVersions[]|null
+     */
     public $video_versions = null;
     public $has_audio = false;
     public $video_duration = '';
     /**
-    * @var User
-    */
+     * @var User
+     */
     public $user;
     /**
-    * @var User[]
-    */
+     * @var User[]
+     */
     public $likers = '';
     public $like_count = 0;
     public $preview = '';
@@ -64,13 +64,13 @@ class Item extends Response
     public $explore_context = '';
     public $explore_source_token = '';
     /**
-    * @var Explore|string
-    */
+     * @var Explore|string
+     */
     public $explore = '';
     public $impression_token = '';
     /**
-    * @var Usertag|null
-    */
+     * @var Usertag|null
+     */
     public $usertags = null;
     public $media_or_ad;
 
@@ -90,7 +90,7 @@ class Item extends Response
 class Image_Versions2 extends Response
 {
     /**
-    * @var HdProfilePicUrlInfo[]
-    */
+     * @var HdProfilePicUrlInfo[]
+     */
     public $candidates;
 }

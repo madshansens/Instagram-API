@@ -10,8 +10,8 @@ class Comment extends Response
     public $created_at;
     public $bit_flags = null;
     /**
-    * @var User
-    */
+     * @var User
+     */
     public $user;
     public $pk;
     public $text;

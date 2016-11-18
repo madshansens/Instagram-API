@@ -5,7 +5,7 @@ namespace InstagramAPI;
 class MediaCommentsResponse extends Response
 {
     /**
-    * @var Comment[]
-    */
+     * @var Comment[]
+     */
     public $comments = [];
 }

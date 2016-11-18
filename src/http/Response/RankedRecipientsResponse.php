@@ -6,9 +6,8 @@ class RankedRecipientsResponse extends Response
 {
     public $expires;
     /**
-    *
-    * @var RankedRecipientsUserList[]
-    */
+     * @var RankedRecipientsUserList[]
+     */
     public $ranked_recipients;
     public $filtered;
 }
@@ -17,8 +16,7 @@ class RankedRecipientsResponse extends Response
 class RankedRecipientsUserList extends Response
 {
     /**
-    *
-    * @var User
-    */
+     * @var User
+     */
     public $user;
 }
