@@ -8,7 +8,7 @@ class MediaInfoResponse extends Response
     public $status;
     public $num_results;
     public $more_available;
-    /*
+    /**
     * @var Item[]
     */
     public $items;

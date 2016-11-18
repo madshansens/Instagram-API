@@ -5,7 +5,7 @@ namespace InstagramAPI;
 class Tray extends Response
 {
     public $id;
-    /*
+    /**
     * @var Item[]
     */
     public $items;

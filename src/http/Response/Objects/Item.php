@@ -15,7 +15,7 @@ class Item extends Response
     public $code;
     public $client_cache_key;
     public $filter_type;
-    /*
+    /**
     * @var Image_Versions2
     */
     public $image_versions2;
@@ -33,28 +33,28 @@ class Item extends Response
     public $is_reel_media;
     public $next_max_id = null;
 
-    /*
+    /**
     * @var Comment[]
     */
     public $comments;
     public $comment_count = 0;
-    /*
+    /**
     * @var Caption|null
     */
     public $caption = null;
     public $caption_is_edited;
     public $photo_of_you;
-    /*
+    /**
     * @var VideoVersions[]|null
     */
     public $video_versions = null;
     public $has_audio = false;
     public $video_duration = '';
-    /*
+    /**
     * @var User
     */
     public $user;
-    /*
+    /**
     * @var User[]
     */
     public $likers = '';
@@ -63,12 +63,12 @@ class Item extends Response
     public $has_liked = false;
     public $explore_context = '';
     public $explore_source_token = '';
-    /*
+    /**
     * @var Explore|string
     */
     public $explore = '';
     public $impression_token = '';
-    /*
+    /**
     * @var Usertag|null
     */
     public $usertags = null;
@@ -89,7 +89,7 @@ class Item extends Response
 
 class Image_Versions2 extends Response
 {
-    /*
+    /**
     * @var HdProfilePicUrlInfo[]
     */
     public $candidates;

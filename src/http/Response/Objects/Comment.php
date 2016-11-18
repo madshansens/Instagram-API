@@ -9,7 +9,7 @@ class Comment extends Response
     public $created_at_utc;
     public $created_at;
     public $bit_flags = null;
-    /*
+    /**
     * @var User
     */
     public $user;

@@ -8,7 +8,7 @@ class SearchTagResponse extends Response
     public $status;
 
 
-    /*
+    /**
     * @var Tag[] $results
     */
     public $results;

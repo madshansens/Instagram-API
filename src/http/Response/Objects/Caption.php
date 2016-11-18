@@ -9,7 +9,7 @@ class Caption extends Response
     public $created_at_utc;
     public $created_at;
     public $bit_flags;
-    /*
+    /**
     * @var User
     */
     public $user;

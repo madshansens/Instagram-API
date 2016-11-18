@@ -4,7 +4,7 @@ namespace InstagramAPI;
 
 class Experiment extends Response
 {
-    /*
+    /**
     * @var Param[]
     */
     public $params;

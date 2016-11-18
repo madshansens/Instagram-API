@@ -5,7 +5,7 @@ namespace InstagramAPI;
 class RankedRecipientsResponse extends Response
 {
     public $expires;
-    /*
+    /**
     *
     * @var RankedRecipientsUserList[]
     */
@@ -16,7 +16,7 @@ class RankedRecipientsResponse extends Response
 
 class RankedRecipientsUserList extends Response
 {
-    /*
+    /**
     *
     * @var User
     */

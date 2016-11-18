@@ -15,7 +15,7 @@ class LoginResponse extends Response
     public $error_type; // on wrong pass
     public $buttons; // on wrong pass
     public $invalid_credentials; // on wrong pass
-    /*
+    /**
     * @var User
     */
     public $logged_in_user;

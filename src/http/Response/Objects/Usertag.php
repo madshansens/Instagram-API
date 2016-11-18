@@ -4,7 +4,7 @@ namespace InstagramAPI;
 
 class Usertag extends Response
 {
-    /*
+    /**
     * @var In[]
     */
     public $in;
