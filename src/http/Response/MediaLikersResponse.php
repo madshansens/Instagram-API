@@ -6,7 +6,7 @@ class MediaLikersResponse extends Response
 {
     public $user_count;
     /**
-    * @var User[]
-    */
+     * @var User[]
+     */
     public $users;
 }
