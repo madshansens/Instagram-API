@@ -13,7 +13,7 @@ class User extends Response
     public $is_verified = false;
     public $is_private = false;
     public $coeff_weight = 0;
-    /*
+    /**
     * @var FriendshipStatus
     */
     public $friendship_status = null;
