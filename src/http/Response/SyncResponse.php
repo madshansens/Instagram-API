@@ -5,7 +5,7 @@ namespace InstagramAPI;
 class SyncResponse extends Response
 {
     /**
-    * @var Experiment[]
-    */
+     * @var Experiment[]
+     */
     public $experiments;
 }

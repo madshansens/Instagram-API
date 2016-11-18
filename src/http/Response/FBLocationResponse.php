@@ -6,7 +6,7 @@ class FBLocationResponse extends Response
 {
     public $has_more;
     /**
-    * @var LocationItem[]
-    */
+     * @var LocationItem[]
+     */
     public $items;
 }

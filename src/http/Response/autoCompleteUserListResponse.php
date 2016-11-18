@@ -6,7 +6,7 @@ class autoCompleteUserListResponse extends Response
 {
     public $expires;
     /**
-    * @var User[]
-    */
+     * @var User[]
+     */
     public $users;
 }

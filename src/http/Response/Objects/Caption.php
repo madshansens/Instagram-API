@@ -10,8 +10,8 @@ class Caption extends Response
     public $created_at;
     public $bit_flags;
     /**
-    * @var User
-    */
+     * @var User
+     */
     public $user;
     public $content_type;
     public $text;

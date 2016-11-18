@@ -5,8 +5,8 @@ namespace InstagramAPI;
 class Usertag extends Response
 {
     /**
-    * @var In[]
-    */
+     * @var In[]
+     */
     public $in;
     public $photo_of_you;
 }

@@ -6,7 +6,7 @@ class UsernameInfoResponse extends Response
 {
     public $megaphone;
     /**
-    * @var User
-    */
+     * @var User
+     */
     public $user;
 }

@@ -9,7 +9,7 @@ class SearchTagResponse extends Response
 
 
     /**
-    * @var Tag[] $results
-    */
+     * @var Tag[]
+     */
     public $results;
 }

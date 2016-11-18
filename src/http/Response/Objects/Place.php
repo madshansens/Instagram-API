@@ -6,7 +6,7 @@ class Place extends Response
 {
     public $position;
     /**
-    * @var LocationItem
-    */
+     * @var LocationItem
+     */
     public $place;
 }

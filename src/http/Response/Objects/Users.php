@@ -6,7 +6,7 @@ class Users extends Response
 {
     public $position;
     /**
-    * @var User
-    */
+     * @var User
+     */
     public $user;
 }

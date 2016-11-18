@@ -9,7 +9,7 @@ class MediaInfoResponse extends Response
     public $num_results;
     public $more_available;
     /**
-    * @var Item[]
-    */
+     * @var Item[]
+     */
     public $items;
 }
