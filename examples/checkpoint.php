@@ -1,6 +1,6 @@
 <?php
 
-include __DIR__.'/../vendor/autoload.php';
+include __DIR__.'/../../../../vendor/autoload.php';
 require_once __DIR__.'/../src/Checkpoint.php';
 
 $debug = true;

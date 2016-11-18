@@ -12,15 +12,13 @@ class Checkpoint
 
     public function __construct($username, $settingsPath = null, $debug = false)
     {
+        $path = ($settingsPath) ? $settingsPath :  __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR;
+
+        $settingsAdopter = ['type' => 'file','path' => $path]; // File | Mysql
+
         $this->username = $username;
         $this->debug = $debug;
-        if (is_null($settingsPath)) {
-            $this->settingsPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
-            if (!file_exists($this->settingsPath)) {
-                mkdir($this->settingsPath, 0777, true);
-            }
-        }
-        $this->settings = new Settings($this->settingsPath.'settings-'.$username.'.dat');
+        $this->settings = new SettingsAdapter($settingsAdopter, $username);
         $this->userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_3_3 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Mobile/13G34 Instagram 8.5.2 (iPhone5,2; iPhone OS 9_3_3; es_ES; es-ES; scale=2.00; 640x1136)';
     }
 
@@ -93,8 +91,8 @@ class Checkpoint
         if (!is_null($headers)) {
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
-        
-        
+
+
         curl_setopt($ch, CURLOPT_VERBOSE, $this->debug);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
