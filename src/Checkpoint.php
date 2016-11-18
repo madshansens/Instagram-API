@@ -12,9 +12,9 @@ class Checkpoint
 
     public function __construct($username, $settingsPath = null, $debug = false)
     {
-        $path = ($settingsPath) ? $settingsPath :  __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR;
+        $path = ($settingsPath) ? $settingsPath : __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR;
 
-        $settingsAdopter = ['type' => 'file','path' => $path]; // File | Mysql
+        $settingsAdopter = ['type' => 'file', 'path' => $path]; // File | Mysql
 
         $this->username = $username;
         $this->debug = $debug;

@@ -14,8 +14,8 @@ class User extends Response
     public $is_private = false;
     public $coeff_weight = 0;
     /**
-    * @var FriendshipStatus
-    */
+     * @var FriendshipStatus
+     */
     public $friendship_status = null;
     public $hd_profile_pic_versions;
     public $byline;
