@@ -22,7 +22,7 @@ class Instagram
     public $settings;
 
     public $settingsAdopter = ['type' => 'file',
-    'path'                            => __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR, ]; // File | Mysql
+    'path'                            => __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR]; // File | Mysql
 
 
     /*

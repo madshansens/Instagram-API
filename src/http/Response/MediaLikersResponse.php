@@ -5,5 +5,8 @@ namespace InstagramAPI;
 class MediaLikersResponse extends Response
 {
     public $user_count;
-    public $likers;
+    /**
+    * @var User[]
+    */
+    public $users;
 }

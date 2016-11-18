@@ -73,7 +73,9 @@ class Item extends Response
      */
     public $usertags = null;
     public $media_or_ad;
-
+    /**
+     * @var Media
+     */
     public $media;
     public $stories;
     public $top_likers;
@@ -83,6 +85,11 @@ class Item extends Response
         foreach ($params as $k => $v) {
             $this->$k = $v;
         }
+    }
+
+    public function getItemUrl()
+    {
+        return 'https://www.instagram.com/p/'.$this->getCode().'/';
     }
 }
 

@@ -110,6 +110,25 @@ class HttpInterface
         }
     }
 
+    public function getResponseWithResult($obj,$response){
+
+        $mapper = new \JsonMapper();
+
+        $mapper->bStrictNullTypes = false;
+        if (isset($_GET['debug'])) {
+            $mapper->bExceptionOnUndefinedProperty = true;
+        }
+        
+        $responseObject = $mapper->map($response, $obj);
+
+        if (!$responseObject->isOk()) {
+            throw new InstagramException(get_class($obj).' : '.$responseObject->getMessage());
+        }
+        $responseObject->setFullResponse($response);
+
+        return $responseObject;
+    }
+
     /**
      * @param $photo
      * @param null $caption
@@ -215,8 +234,9 @@ class HttpInterface
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
-        $upload = new UploadPhotoResponse(json_decode(substr($resp, $header_len), true));
 
+        $upload = $this->getResponseWithResult(new UploadPhotoResponse(),json_decode(substr($resp, $header_len)));
+        
         if ($this->parent->debug) {
             Debug::printRequest('POST', $endpoint);
 
@@ -327,7 +347,7 @@ class HttpInterface
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 
-        $body = new UploadJobVideoResponse(json_decode(substr($resp, $header_len), true));
+        $body = $this->getResponseWithResult(new UploadJobVideoResponse(),json_decode(substr($resp, $header_len)));
 
         $uploadUrl = $body->getVideoUploadUrl();
         $job = $body->getVideoUploadJob();
@@ -417,7 +437,7 @@ class HttpInterface
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
-        $upload = new UploadVideoResponse(json_decode(substr($resp, $header_len), true));
+        $upload = $this->getResponseWithResult(new UploadVideoResponse(),json_decode(substr($resp, $header_len)));
 
         if (!is_null($upload->getMessage())) {
             throw new InstagramException($upload->getMessage()."\n");
