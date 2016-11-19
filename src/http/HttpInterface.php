@@ -144,15 +144,15 @@ class HttpInterface
     {
         $endpoint = 'upload/photo/';
         $boundary = $this->parent->uuid;
-        $helper = new AdaptImage();
+        //$helper = new AdaptImage();
 
         if (!is_null($upload_id) && is_null($customPreview)) {
-            $fileToUpload = $helper->checkAndProcess(Utils::createVideoIcon($photo));
+            $fileToUpload = Utils::createVideoIcon($photo);
         } elseif (!is_null($customPreview)) {
-            $fileToUpload = $helper->checkAndProcess(file_get_contents($customPreview));
+            $fileToUpload = file_get_contents($customPreview);
         } else {
             $upload_id = number_format(round(microtime(true) * 1000), 0, '', '');
-            $fileToUpload = $helper->checkAndProcess(file_get_contents($photo));
+            $fileToUpload = file_get_contents($photo);
         }
 
         $bodies = [

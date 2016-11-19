@@ -33,7 +33,7 @@ try {
         } else {
             $helper = $i->getSelfUserFollowers($helper->getNextMaxId());
         }
-        
+
         $followers = array_merge($followers, $helper->getUsers());
     } while (!is_null($helper->getNextMaxId()));
 
