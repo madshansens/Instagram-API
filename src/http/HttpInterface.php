@@ -110,15 +110,15 @@ class HttpInterface
         }
     }
 
-    public function getResponseWithResult($obj,$response){
-
+    public function getResponseWithResult($obj, $response)
+    {
         $mapper = new \JsonMapper();
 
         $mapper->bStrictNullTypes = false;
         if (isset($_GET['debug'])) {
             $mapper->bExceptionOnUndefinedProperty = true;
         }
-        
+
         $responseObject = $mapper->map($response, $obj);
 
         if (!$responseObject->isOk()) {
@@ -235,8 +235,8 @@ class HttpInterface
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
 
-        $upload = $this->getResponseWithResult(new UploadPhotoResponse(),json_decode(substr($resp, $header_len)));
-        
+        $upload = $this->getResponseWithResult(new UploadPhotoResponse(), json_decode(substr($resp, $header_len)));
+
         if ($this->parent->debug) {
             Debug::printRequest('POST', $endpoint);
 
@@ -347,7 +347,7 @@ class HttpInterface
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 
-        $body = $this->getResponseWithResult(new UploadJobVideoResponse(),json_decode(substr($resp, $header_len)));
+        $body = $this->getResponseWithResult(new UploadJobVideoResponse(), json_decode(substr($resp, $header_len)));
 
         $uploadUrl = $body->getVideoUploadUrl();
         $job = $body->getVideoUploadJob();
@@ -437,7 +437,7 @@ class HttpInterface
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
-        $upload = $this->getResponseWithResult(new UploadVideoResponse(),json_decode(substr($resp, $header_len)));
+        $upload = $this->getResponseWithResult(new UploadVideoResponse(), json_decode(substr($resp, $header_len)));
 
         if (!is_null($upload->getMessage())) {
             throw new InstagramException($upload->getMessage()."\n");
