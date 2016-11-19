@@ -1,11 +1,11 @@
 <?php
 
-include __DIR__.'/../vendor/autoload.php';
+include '../../../../vendor/autoload.php';
 require '../src/Instagram.php';
 
 /////// CONFIG ///////
-$username = '';
-$password = '';
+$username = 'hasantehesap';
+$password = 'r7OkA6dEAf';
 $debug = false;
 //////////////////////
 
@@ -33,7 +33,8 @@ try {
         } else {
             $helper = $i->getSelfUserFollowers($helper->getNextMaxId());
         }
-        $followers = array_merge($followers, $helper->getFollowers());
+        
+        $followers = array_merge($followers, $helper->getUsers());
     } while (!is_null($helper->getNextMaxId()));
 
     echo "My followers: \n";
