@@ -1461,17 +1461,17 @@ class Instagram
                 mkdir($this->settingsAdopter['path'].'backup/');
             }
             foreach ($myUploads->getItems() as $item) {
-                if (!is_dir($this->settingsAdopter['path'].'backup/'."$this->username-".date('Y-m-d'))) {
-                    mkdir($this->settingsAdopter['path'].'backup/'."$this->username-".date('Y-m-d'));
+                if (!is_dir($this->settingsAdopter['path'].'backup/'.$this->username."-".date('Y-m-d'))) {
+                    mkdir($this->settingsAdopter['path'].'backup/'.$this->username."-".date('Y-m-d'));
                 }
                 if (!is_null($item->getVideoVersions())) {
                     file_put_contents(
-                        $this->settingsAdopter['path'].'backup/'."$this->username-".date('Y-m-d').'/'.$item->getId().'.mp4',
+                        $this->settingsAdopter['path'].'backup/'.$this->username."-".date('Y-m-d').'/'.$item->getId().'.mp4',
                         file_get_contents($item->getVideoVersions()[0]->getUrl())
                     );
                 } else {
                     file_put_contents(
-                        $this->settingsAdopter['path'].'backup/'."$this->username-".date('Y-m-d').'/'.$item->getId().'.jpg',
+                        $this->settingsAdopter['path'].'backup/'.$this->username."-".date('Y-m-d').'/'.$item->getId().'.jpg',
                         file_get_contents($item->getImageVersions2()->candidates[0]->getUrl())
                     );
                 }
