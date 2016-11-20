@@ -1446,38 +1446,37 @@ class Instagram
     }
 
     /**
-     * Backups all your uploaded photos :).
+     * Backups all your uploaded photos and videos :).
      */
     public function backup()
     {
-        $go = false;
+        $nextUploadMaxId = null;
         do {
-            if (!$go) {
-                $myUploads = $this->getSelfUserFeed();
-            } else {
-                $myUploads = $this->getSelfUserFeed(!is_null($myUploads->getNextMaxId()) ? $myUploads->getNextMaxId() : null);
+            $myUploads = $this->getSelfUserFeed($nextUploadMaxId);
+            
+            $backupMainFolder = $this->settingsAdopter['path']. $this->username.'/backup/';
+            $backupFolder = $backupMainFolder . "/" . date("Y-m-d") ."/";
+            
+            if (!is_dir($backupMainFolder)) {
+                mkdir($backupMainFolder);
             }
-            if (!is_dir($this->settingsAdopter['path'].'backup/')) {
-                mkdir($this->settingsAdopter['path'].'backup/');
+            if (!is_dir($backupFolder)) {
+                mkdir($backupFolder);
             }
+            
+            
             foreach ($myUploads->getItems() as $item) {
-                if (!is_dir($this->settingsAdopter['path'].'backup/'.$this->username."-".date('Y-m-d'))) {
-                    mkdir($this->settingsAdopter['path'].'backup/'.$this->username."-".date('Y-m-d'));
-                }
-                if (!is_null($item->getVideoVersions())) {
-                    file_put_contents(
-                        $this->settingsAdopter['path'].'backup/'.$this->username."-".date('Y-m-d').'/'.$item->getId().'.mp4',
-                        file_get_contents($item->getVideoVersions()[0]->getUrl())
-                    );
+                if ($item->media_type == Item::PHOTO) {
+                    $itemUrl = $item->getImageVersions2()->candidates[0]->getUrl();
                 } else {
-                    file_put_contents(
-                        $this->settingsAdopter['path'].'backup/'.$this->username."-".date('Y-m-d').'/'.$item->getId().'.jpg',
-                        file_get_contents($item->getImageVersions2()->candidates[0]->getUrl())
-                    );
+                    $itemUrl = $item->getVideoVersions()[0]->getUrl();
                 }
+                $fileExtension = pathinfo(parse_url($itemUrl,PHP_URL_PATH),PATHINFO_EXTENSION);
+                copy($itemUrl,$backupFolder.$item->getId() . ".".$fileExtension);
+                
             }
-            $go = true;
-        } while (!is_null($myUploads->getNextMaxId()));
+            
+        } while (!is_null($nextUploadMaxId = $myUploads->getNextMaxId()));
     }
 
     /**
