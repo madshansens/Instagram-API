@@ -348,9 +348,8 @@ class HttpInterface
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 
         $body = $this->getResponseWithResult(new UploadJobVideoResponse(), json_decode(substr($resp, $header_len)));
-
-        $uploadUrl = $body->getVideoUploadUrl();
-        $job = $body->getVideoUploadJob();
+        $uploadUrl = $body->getVideoUploadUrls()[3]->url;
+        $job = $body->getVideoUploadUrls()[3]->job;
 
         $request_size = floor(strlen($videoData) / 4);
         $lastRequestExtra = (strlen($videoData) - ($request_size * 4));
@@ -437,6 +436,8 @@ class HttpInterface
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
+
+        /*
         $upload = $this->getResponseWithResult(new UploadVideoResponse(), json_decode(substr($resp, $header_len)));
 
         if (!is_null($upload->getMessage())) {
@@ -444,6 +445,7 @@ class HttpInterface
 
             return;
         }
+        */
 
         if ($this->parent->debug) {
             Debug::printRequest('POST', $endpoint);

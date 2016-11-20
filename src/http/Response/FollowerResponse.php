@@ -4,6 +4,9 @@ namespace InstagramAPI;
 
 class FollowerResponse extends Response
 {
-    public $followers;
+    /**
+     * @var User[]
+     */
+    public $users;
     public $next_max_id;
 }

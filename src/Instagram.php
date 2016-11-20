@@ -1303,7 +1303,7 @@ class Instagram
             $requestData->addParams('max_id', $maxid);
         }
 
-        return $requestData->getResponse(new SearchUserResponse());
+        return $requestData->getResponse(new FollowingResponse());
     }
 
     /**
@@ -1321,7 +1321,7 @@ class Instagram
             $requestData->addParams('max_id', $maxid);
         }
 
-        return $requestData->getResponse(new SearchUserResponse());
+        return $requestData->getResponse(new FollowerResponse());
     }
 
     /**
