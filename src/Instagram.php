@@ -1114,7 +1114,7 @@ class Instagram
      */
     public function getUsernameId($username)
     {
-        return $this->searchUsername($username)->getUsernameId();
+        return $this->searchUsername($username)->getUser()->getPk();
     }
 
     /**
