@@ -2,7 +2,7 @@
 
 namespace InstagramAPI;
 
-class FollowerResponse extends Response
+class FollowerAndFollowingResponse extends Response
 {
     /**
      * @var User[]

@@ -4,5 +4,8 @@ namespace InstagramAPI;
 
 class FriendshipsShowManyResponse extends Response
 {
-    public $friendships = [];
+    /**
+    * @var FriendshipStatus[]
+    */
+    public $friendship_statuses = [];
 }
