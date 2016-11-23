@@ -12,8 +12,8 @@ class MediaCommentsResponse extends Response
     public $comment_likes_enabled;
     public $next_max_id;
     /**
-    * @var Caption
-    */
+     * @var Caption
+     */
     public $caption;
     public $has_more_comments;
     public $caption_is_edited;
