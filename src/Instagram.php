@@ -1770,6 +1770,10 @@ class Request
         if (isset($_GET['debug'])) {
             $mapper->bExceptionOnUndefinedProperty = true;
         }
+        if ($response[1] == null) {
+            echo "<h1>Response is null</h1>";
+            var_dump($response);
+        }
         $responseObject = $mapper->map($response[1], $obj);
 
 
