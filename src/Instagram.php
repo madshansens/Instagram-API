@@ -42,10 +42,7 @@ class Instagram
     /**
      * Default class constructor.
      *
-     * @param string $username Your Instagram username
-     * @param string $password Your Instagram password
      * @param $debug Debug on or off, false by default
-     * @param $IGDataPath Default folder to store data, you can change it
      */
     public function __construct($debug = false, $truncatedDebug = false)
     {
