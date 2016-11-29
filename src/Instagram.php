@@ -1478,24 +1478,14 @@ class Instagram
      *
      * @return array Friendship status data
      */
-    //TODO : Missing Response
     public function follow($userId)
     {
-        // return $this->request("friendships/create/$userId/")
-        //     ->addPost("_uuid",$this->uuid)
-        //     ->addPost("_uid",$this->username_id)
-        //     ->addPost("_csrftoken",$this->token)
-        //     ->addPost("user_id",$userId)
-        //     ->getResponse(new Response());
-
-        $data = json_encode([
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            'user_id'    => $userId,
-            '_csrftoken' => $this->token,
-        ]);
-
-        return $this->http->request("friendships/create/$userId/", SignatureUtils::generateSignature($data))[1];
+        return $this->request("friendships/create/$userId/")
+        ->addPost("_uuid",$this->uuid)
+        ->addPost("_uid",$this->username_id)
+        ->addPost("_csrftoken",$this->token)
+        ->addPost("user_id",$userId)
+        ->getResponse(new FriendshipResponse());
     }
 
     /**
@@ -1505,23 +1495,14 @@ class Instagram
      *
      * @return array Friendship status data
      */
-    //TODO : Missing Response
     public function unfollow($userId)
     {
-        // return $this->request("friendships/destroy/$userId/")
-        //     ->addPost("_uuid",$this->uuid)
-        //     ->addPost("_uid",$this->username_id)
-        //     ->addPost("_csrftoken",$this->token)
-        //     ->addPost("user_id",$userId)
-        //     ->getResponse(new Response());
-        $data = json_encode([
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            'user_id'    => $userId,
-            '_csrftoken' => $this->token,
-        ]);
-
-        return $this->http->request("friendships/destroy/$userId/", SignatureUtils::generateSignature($data))[1];
+        return $this->request("friendships/destroy/$userId/")
+        ->addPost("_uuid",$this->uuid)
+        ->addPost("_uid",$this->username_id)
+        ->addPost("_csrftoken",$this->token)
+        ->addPost("user_id",$userId)
+        ->getResponse(new FriendshipResponse());
     }
 
     /**
@@ -1531,23 +1512,14 @@ class Instagram
      *
      * @return array Friendship status data
      */
-    //TODO : Missing Response
     public function block($userId)
     {
-        // return $this->request("friendships/block/$userId/")
-        //     ->addPost("_uuid",$this->uuid)
-        //     ->addPost("_uid",$this->username_id)
-        //     ->addPost("_csrftoken",$this->token)
-        //     ->addPost("user_id",$userId)
-        //     ->getResponse(new Response());
-        $data = json_encode([
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            'user_id'    => $userId,
-            '_csrftoken' => $this->token,
-        ]);
-
-        return $this->http->request("friendships/block/$userId/", SignatureUtils::generateSignature($data))[1];
+        return $this->request("friendships/block/$userId/")
+        ->addPost("_uuid",$this->uuid)
+        ->addPost("_uid",$this->username_id)
+        ->addPost("_csrftoken",$this->token)
+        ->addPost("user_id",$userId)
+        ->getResponse(new FriendshipResponse());
     }
 
     /**
@@ -1557,23 +1529,14 @@ class Instagram
      *
      * @return array Friendship status data
      */
-    //TODO : Missing Response
     public function unblock($userId)
     {
-        // return $this->request("friendships/unblock/$userId/")
-        //     ->addPost("_uuid",$this->uuid)
-        //     ->addPost("_uid",$this->username_id)
-        //     ->addPost("_csrftoken",$this->token)
-        //     ->addPost("user_id",$userId)
-        //     ->getResponse(new Response());
-        $data = json_encode([
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            'user_id'    => $userId,
-            '_csrftoken' => $this->token,
-        ]);
-
-        return $this->http->request("friendships/unblock/$userId/", SignatureUtils::generateSignature($data))[1];
+        return $this->request("friendships/unblock/$userId/")
+        ->addPost("_uuid",$this->uuid)
+        ->addPost("_uid",$this->username_id)
+        ->addPost("_csrftoken",$this->token)
+        ->addPost("user_id",$userId)
+        ->getResponse(new FriendshipResponse());
     }
 
     /**
