@@ -15,6 +15,8 @@ class InstagramRegistration
     protected $proxy = null;     // Full Proxy
     protected $proxyHost = null; // Proxy Host and Port
     protected $proxyAuth = null; // Proxy User and Pass
+    protected $settingsAdopter = ['type'     => 'file',
+        'path'                            => __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR, ]; // File | Mysql
 
     public function __construct($debug = false, $IGDataPath = null)
     {
@@ -80,16 +82,15 @@ class InstagramRegistration
      */
     public function checkUsername($username)
     {
-        $data = json_encode([
-            '_uuid'      => $this->uuid,
-            'username'   => $username,
-            '_csrftoken' => 'missing',
-        ]);
-
         $this->username = $username;
-        $this->settings = new Settings($this->IGDataPath.$username.DIRECTORY_SEPARATOR.'settings-'.$username.'.dat');
+        $this->settings = new SettingsAdapter($this->settingsAdopter, $username);
 
-        return new CheckUsernameResponse($this->request('users/check_username/', SignatureUtils::generateSignature($data))[1]);
+        return $this->request('users/check_username/')
+        ->setSignedPost(true)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('username', $username)
+        ->addPost('_csrftoken', 'missing')
+        ->getResponse(new CheckUsernameResponse());
     }
 
     /**
