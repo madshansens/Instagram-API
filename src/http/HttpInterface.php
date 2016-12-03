@@ -151,7 +151,7 @@ class HttpInterface
         } elseif (!is_null($customPreview)) {
             $fileToUpload = file_get_contents($customPreview);
         } else {
-            $upload_id = number_format(round(microtime(true) * 1000), 0, '', '');
+            $upload_id = Utils::generateUploadId();
             $fileToUpload = file_get_contents($photo);
         }
 
@@ -180,7 +180,7 @@ class HttpInterface
                 'type'     => 'form-data',
                 'name'     => 'photo',
                 'data'     => $fileToUpload,
-                'filename' => 'pending_media_'.number_format(round(microtime(true) * 1000), 0, '', '').'.jpg',
+                'filename' => 'pending_media_'.Utils::generateUploadId().'.jpg',
                 'headers'  => [
                     'Content-Transfer-Encoding: binary',
                     'Content-Type: application/octet-stream',
@@ -281,7 +281,7 @@ class HttpInterface
 
         $endpoint = 'upload/video/';
         $boundary = $this->parent->uuid;
-        $upload_id = round(microtime(true) * 1000);
+        $upload_id = Utils::generateUploadId();
         $bodies = [
             [
                 'type' => 'form-data',
@@ -790,7 +790,7 @@ class HttpInterface
             $body .= 'Content-Disposition: '.$b['type'].'; name="'.$b['name'].'"';
             if (isset($b['filename'])) {
                 $ext = pathinfo($b['filename'], PATHINFO_EXTENSION);
-                $body .= '; filename="'.'pending_media_'.number_format(round(microtime(true) * 1000), 0, '', '').'.'.$ext.'"';
+                $body .= '; filename="'.'pending_media_'.Utils::generateUploadId().'.'.$ext.'"';
             }
             if (isset($b['headers']) && is_array($b['headers'])) {
                 foreach ($b['headers'] as $header) {

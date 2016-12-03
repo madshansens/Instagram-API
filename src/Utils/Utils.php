@@ -5,6 +5,14 @@ namespace InstagramAPI;
 class Utils
 {
     /**
+     * @return string
+     */
+    public static function generateUploadId()
+    {
+        return number_format(round(microtime(true) * 1000), 0, '', '');
+    }
+
+    /**
      * Length of the file in Seconds.
      *
      * @param string $file
