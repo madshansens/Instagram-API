@@ -1506,6 +1506,20 @@ class Instagram
     }
 
     /**
+     * Get suggested users.
+     *
+     * @param string $userId
+     *
+     * @return SuggestedUsersResponse
+     */
+    public function getSuggestedUsers($userId)
+    {
+        return $this->request("discover/chaining/")
+        ->addParams("target_id",$userId)
+        ->getResponse(new SuggestedUsersResponse());
+    }
+    
+    /**
      * Block.
      *
      * @param string $userId
