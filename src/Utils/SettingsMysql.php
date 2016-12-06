@@ -115,7 +115,6 @@ class SettingsMysql
         $sql = $sql.implode(',', $fieldList).(isset($this->sets['id']) ? ' where id=:id' : '');
         $std = $this->pdo->prepare($sql);
 
-
         $std->execute($bindList);
 
         if (!isset($this->sets['id'])) {

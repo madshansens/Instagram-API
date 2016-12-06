@@ -8,7 +8,7 @@ class Inbox extends Response
     public $has_older;
     public $unseen_count_ts;
     /**
-    * @var Thread[]
-    */
+     * @var Thread[]
+     */
     public $threads;
 }

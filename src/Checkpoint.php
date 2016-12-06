@@ -92,7 +92,6 @@ class Checkpoint
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
 
-
         curl_setopt($ch, CURLOPT_VERBOSE, $this->debug);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);

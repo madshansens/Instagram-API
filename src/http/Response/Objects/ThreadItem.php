@@ -10,5 +10,3 @@ class ThreadItem extends Response
     public $user_id;
     public $timestamp;
 }
-
-?>

@@ -20,7 +20,6 @@ class HttpInterface
     {
         if (!$this->parent->isLoggedIn && !$login) {
             throw new InstagramException("Not logged in\n");
-
             return;
         }
 
@@ -96,7 +95,6 @@ class HttpInterface
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
         }
-
 
         if ($httpCode == 429 && $flood_wait) {
             if ($this->parent->debug) {
@@ -256,7 +254,6 @@ class HttpInterface
         }
         if (!$upload->isOk()) {
             throw new InstagramException($upload->getMessage());
-
             return;
         }
 

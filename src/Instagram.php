@@ -17,13 +17,11 @@ class Instagram
     public $isLoggedIn = false; // Session status
     public $rank_token;         // Rank token
 
-
     public $http;
     public $settings;
 
     public $settingsAdopter = ['type'     => 'file',
         'path'                            => __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR, ]; // File | Mysql
-
 
     /*
     // Settings for mysql storage
@@ -127,21 +125,15 @@ class Instagram
         if (!$this->isLoggedIn || $force) {
             $this->syncFeatures(true);
 
-
             $response = $this->request('si/fetch_headers')
             ->requireLogin(true)
             ->addParams('challenge_type', 'signup')
             ->addParams('guid', SignatureUtils::generateUUID(false))
             ->getResponse(new ChallengeResponse(), true);
 
-
-
             if (!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $response->getFullResponse()[0], $token)) {
                 throw new InstagramException('Missing csfrtoken');
             }
-
-
-
 
             $response = $this->request('accounts/login/')
             ->requireLogin(true)
@@ -153,7 +145,6 @@ class Instagram
             ->addPost('password', $this->password)
             ->addPost('login_attempt_count', 0)
             ->getResponse(new LoginResponse(), true);
-
 
             $this->isLoggedIn = true;
             $this->username_id = $response->getLoggedInUser()->getPk();
@@ -461,7 +452,6 @@ class Instagram
 
         if ($directThread['status'] != 'ok') {
             throw new InstagramException($directThread['message']."\n");
-
             return;
         }
 
@@ -1458,7 +1448,6 @@ class Instagram
                 mkdir($backupFolder);
             }
 
-
             foreach ($myUploads->getItems() as $item) {
                 if ($item->media_type == Item::PHOTO) {
                     $itemUrl = $item->getImageVersions2()->candidates[0]->getUrl();
@@ -1481,10 +1470,10 @@ class Instagram
     public function follow($userId)
     {
         return $this->request("friendships/create/$userId/")
-        ->addPost("_uuid",$this->uuid)
-        ->addPost("_uid",$this->username_id)
-        ->addPost("_csrftoken",$this->token)
-        ->addPost("user_id",$userId)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('user_id', $userId)
         ->getResponse(new FriendshipResponse());
     }
 
@@ -1498,10 +1487,10 @@ class Instagram
     public function unfollow($userId)
     {
         return $this->request("friendships/destroy/$userId/")
-        ->addPost("_uuid",$this->uuid)
-        ->addPost("_uid",$this->username_id)
-        ->addPost("_csrftoken",$this->token)
-        ->addPost("user_id",$userId)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('user_id', $userId)
         ->getResponse(new FriendshipResponse());
     }
 
@@ -1514,11 +1503,11 @@ class Instagram
      */
     public function getSuggestedUsers($userId)
     {
-        return $this->request("discover/chaining/")
-        ->addParams("target_id",$userId)
+        return $this->request('discover/chaining/')
+        ->addParams('target_id', $userId)
         ->getResponse(new SuggestedUsersResponse());
     }
-    
+
     /**
      * Block.
      *
@@ -1529,10 +1518,10 @@ class Instagram
     public function block($userId)
     {
         return $this->request("friendships/block/$userId/")
-        ->addPost("_uuid",$this->uuid)
-        ->addPost("_uid",$this->username_id)
-        ->addPost("_csrftoken",$this->token)
-        ->addPost("user_id",$userId)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('user_id', $userId)
         ->getResponse(new FriendshipResponse());
     }
 
@@ -1546,10 +1535,10 @@ class Instagram
     public function unblock($userId)
     {
         return $this->request("friendships/unblock/$userId/")
-        ->addPost("_uuid",$this->uuid)
-        ->addPost("_uid",$this->username_id)
-        ->addPost("_csrftoken",$this->token)
-        ->addPost("user_id",$userId)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('user_id', $userId)
         ->getResponse(new FriendshipResponse());
     }
 
@@ -1638,7 +1627,6 @@ class Instagram
         return self::$instance;
     }
 }
-
 
 /**
  * Bridge between http object & mapper & response.
@@ -1741,9 +1729,8 @@ class Request
         if (isset($_GET['debug'])) {
             $mapper->bExceptionOnUndefinedProperty = true;
         }
-        
-        $responseObject = $mapper->map($response[1], $obj);
 
+        $responseObject = $mapper->map($response[1], $obj);
 
         if ($this->checkStatus && !$responseObject->isOk()) {
             throw new InstagramException(get_class($obj).' : '.$responseObject->getMessage());
