@@ -6,8 +6,8 @@ class Thread extends Response
 {
     public $named;
     /**
-    * @var User[]
-    */
+     * @var User[]
+     */
     public $users;
     public $has_newer;
     public $viewer_id;
@@ -18,20 +18,20 @@ class Thread extends Response
     public $has_older;
     public $oldest_cursor;
     /**
-    * @var User[]
-    */
+     * @var User[]
+     */
     public $left_users;
     public $muted;
     /**
-    * @var ThreadItem[]
-    */
+     * @var ThreadItem[]
+     */
     public $items;
     public $thread_type;
     public $thread_title;
     public $canonical;
     /**
-    * var User
-    */
+     * var User.
+     */
     public $inviter;
     public $pending;
 }

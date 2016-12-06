@@ -12,7 +12,6 @@ class AutoResponseFunctionSetter
         }
         list($functionType, $propName) = explode('_', $underScoreNames, 2);
 
-
         switch ($functionType) {
             case 'get':
                 if (!property_exists($this, $propName)) {

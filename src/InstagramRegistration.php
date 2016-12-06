@@ -16,7 +16,7 @@ class InstagramRegistration
     protected $proxyHost = null; // Proxy Host and Port
     protected $proxyAuth = null; // Proxy User and Pass
     protected $settingsAdopter = ['type'     => 'file',
-        'path'                            => __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR, ]; // File | Mysql
+        'path'                               => __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR, ]; // File | Mysql
 
     public function __construct($debug = false, $IGDataPath = null)
     {

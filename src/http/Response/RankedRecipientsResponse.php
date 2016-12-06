@@ -12,7 +12,6 @@ class RankedRecipientsResponse extends Response
     public $filtered;
 }
 
-
 class RankedRecipientsUserList extends Response
 {
     /**
