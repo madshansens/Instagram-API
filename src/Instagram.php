@@ -1219,7 +1219,7 @@ class Instagram
      */
     public function searchFBLocation($query)
     {
-        $query = rawurlencode($query);
+        $query = urlencode($query);
 
         return $this->request('fbsearch/places/')
         ->addParams('rank_token', $this->rank_token)
