@@ -1134,7 +1134,7 @@ class Instagram
      */
     public function syncFromAdressBook($contacts)
     {
-        return $this->request("address_book/link/?include=extra_display_name,thumbnails")
+        return $this->request('address_book/link/?include=extra_display_name,thumbnails')
         ->setSignedPost(false)
         ->addPost('contacts', json_encode($contacts, true))
         ->getResponse(new AddressBookResponse());
