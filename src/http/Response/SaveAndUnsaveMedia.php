@@ -4,5 +4,4 @@ namespace InstagramAPI;
 
 class SaveAndUnsaveMedia extends Response
 {
-
 }
