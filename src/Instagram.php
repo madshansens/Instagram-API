@@ -650,6 +650,26 @@ class Instagram
         ->getResponse(new EditMediaResponse());
     }
 
+    public function saveMedia($mediaId)
+    {
+        return $this->request("media/$mediaId/save/")
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->setSignedPost(true)
+        ->getResponse(new SaveAndUnsaveMedia());
+    }
+
+    public function unsaveMedia($mediaId)
+    {
+        return $this->request("media/$mediaId/unsave/")
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->setSignedPost(true)
+        ->getResponse(new SaveAndUnsaveMedia());
+    }
+
     /**
      * Remove yourself from a tagged media.
      *
