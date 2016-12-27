@@ -1112,12 +1112,12 @@ class Instagram
      * @return array
      *               query data
      */
-    //TODO : Missing Response
     public function syncFromAdressBook($contacts)
     {
-        $data = 'contacts='.json_encode($contacts, true);
-
-        return $this->http->request('address_book/link/?include=extra_display_name,thumbnails', $data)[1];
+        return $this->request("address_book/link/?include=extra_display_name,thumbnails")
+        ->setSignedPost(false)
+        ->addPost('contacts', json_encode($contacts, true))
+        ->getResponse(new AddressBookResponse());
     }
 
     /**
