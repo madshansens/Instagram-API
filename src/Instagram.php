@@ -1749,6 +1749,9 @@ class Request
         if (isset($_GET['debug'])) {
             $mapper->bExceptionOnUndefinedProperty = true;
         }
+        if (is_null($response[1])) {
+            throw new InstagramException('No response from server, connection or configure error');
+        }
 
         $responseObject = $mapper->map($response[1], $obj);
 
