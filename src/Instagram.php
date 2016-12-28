@@ -640,14 +640,57 @@ class Instagram
      *
      * @return MediaResponse
      */
-    public function editMedia($mediaId, $captionText = '')
+    public function editMedia($mediaId, $captionText = '', $usertags = null)
     {
-        return $this->request("media/$mediaId/edit_media/")
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
-        ->addPost('_csrftoken', $this->token)
-        ->addPost('caption_text', $captionText)
-        ->getResponse(new EditMediaResponse());
+        if (is_null($usertags)) {
+            return $this->request("media/$mediaId/edit_media/")
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->username_id)
+            ->addPost('_csrftoken', $this->token)
+            ->addPost('caption_text', $captionText)
+            ->getResponse(new EditMediaResponse());
+        } else {
+            return $this->request("media/$mediaId/edit_media/")
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->username_id)
+            ->addPost('_csrftoken', $this->token)
+            ->addPost('caption_text', $captionText)
+            ->addPost('usertags', $usertags)
+            ->getResponse(new EditMediaResponse());
+        }
+    }
+
+    /**
+     *  Tag User
+     *
+     * @param string $mediaId  Media id
+     * @param string $usernameId Username id
+     * @param array float $position position relative to image where is placed the tag. Example: [0.4890625,0.6140625]
+     * @param string $captionText Caption text
+     *
+     * @return MediaResponse
+     */
+    public function tagUser($mediaId, $usernameId, $position, $captionText = '')
+    {
+        $usertag = '{"removed":[],"in":[{"position":['.$position[0].','.$position[1].'],"user_id":"'.$usernameId.'"}]}';
+
+        return $this->editMedia($mediaId, $captionText, $usertag);
+    }
+
+    /**
+     *  Untag User
+     *
+     * @param string $mediaId  Media id
+     * @param string $usernameId Username id
+     * @param string $captionText Caption text
+     *
+     * @return MediaResponse
+     */
+    public function untagUser($mediaId, $usernameId, $captionText = '')
+    {
+        $usertag = '{"removed":["'.$usernameId.'"],"in":[]}';
+
+        return $this->editMedia($mediaId, $captionText, $usertag);
     }
 
     public function saveMedia($mediaId)
