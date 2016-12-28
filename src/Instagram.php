@@ -1326,16 +1326,13 @@ class Instagram
      *
      * @return array popular feed data
      */
-    //TODO : Missing Response
     public function getPopularFeed()
     {
-        $popularFeed = $this->http->request("feed/popular/?people_teaser_supported=1&rank_token=$this->rank_token&ranked_content=true&")[1];
-
-        if ($popularFeed['status'] != 'ok') {
-            throw new InstagramException($popularFeed['message']."\n");
-        }
-
-        return $popularFeed;
+        return $this->request("feed/popular/")
+        ->addParams('people_teaser_supported', '1')
+        ->addParams('rank_token', $this->rank_token)
+        ->addParams('ranked_content', 'true')
+        ->getResponse(new PopularFeedResponse());
     }
 
     /**

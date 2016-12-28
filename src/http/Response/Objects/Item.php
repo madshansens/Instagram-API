@@ -64,7 +64,7 @@ class Item extends Response
     public $explore_context = '';
     public $explore_source_token = '';
     /**
-     * @var Explore|string
+     * @var Explore|null
      */
     public $explore = '';
     public $impression_token = '';
