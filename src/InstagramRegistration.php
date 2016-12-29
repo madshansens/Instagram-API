@@ -85,12 +85,13 @@ class InstagramRegistration
         $this->username = $username;
         $this->settings = new SettingsAdapter($this->settingsAdopter, $username);
 
-        return $this->request('users/check_username/')
-        ->setSignedPost(true)
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('username', $username)
-        ->addPost('_csrftoken', 'missing')
-        ->getResponse(new CheckUsernameResponse());
+        $data = json_encode([
+            'username'        => $username,
+            '__uuid' => $this->uuid,
+            '_csrftoken'   => 'missing',
+        ]);
+
+        return new CheckUsernameResponse($this->request('users/check_username/', SignatureUtils::generateSignature($data))[1]);
     }
 
     /**

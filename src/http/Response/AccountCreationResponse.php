@@ -24,4 +24,22 @@ class AccountCreationResponse extends Response
     public $feedback_action = '';
     public $feedback_url = '';
     public $errors = null;
+
+    public function __construct($response) {
+        if (isset($response['spam'])) {
+            $this->spam = $response['spam'];
+            $this->feedback_message = $response['feedback_message'];
+        } else {
+            $this->account_created = $response['account_created'];
+            $this->pk = $response['pk'];
+        }
+    }
+
+    public function isAccountCreated() {
+        return $this->account_created;
+    }
+
+    public function getUsernameId() {
+        return $this->pk;
+    }
 }
