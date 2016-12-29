@@ -1636,12 +1636,10 @@ class Instagram
      *
      * @return array Liked media data
      */
-    //TODO : Missing Response
     public function getLikedMedia($maxid = null)
     {
-        $endpoint = 'feed/liked/?'.(!is_null($maxid) ? 'max_id='.$maxid.'&' : '');
-
-        return $this->http->request($endpoint)[1];
+        return $this->request('feed/liked/?'.(!is_null($maxid) ? 'max_id='.$maxid.'&' : ''))
+        ->getResponse(new LikeFeedResponse());
     }
 
     public function verifyPeer($enable)
