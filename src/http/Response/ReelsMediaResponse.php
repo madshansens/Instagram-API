@@ -9,5 +9,8 @@ class ReelsMediaResponse extends Response
      */
     public $reels_media;
 
+    /**
+     * @var Reel[]
+     */
     public $reels;
 }
