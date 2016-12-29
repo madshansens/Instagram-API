@@ -1207,18 +1207,12 @@ class Instagram
      *
      * @throws InstagramException
      *
-     * @return string media_count
+     * @return TagInfoResponse
      */
-    //TODO : Missing Response
     public function getTagInfo($tag)
     {
-        $query = $this->http->request("tags/$tag/info")[1];
-
-        if ($query['status'] != 'ok') {
-            throw new InstagramException($query['message']."\n");
-        }
-
-        return $query['media_count'];
+        return $this->request("tags/$tag/info")
+        ->getResponse(new TagInfoResponse());
     }
 
     /**
