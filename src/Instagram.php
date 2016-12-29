@@ -1409,23 +1409,14 @@ class Instagram
      *
      * @return array status request
      */
-    //TODO : Missing Response
     public function unlike($mediaId)
     {
-        // return $this->request("media/$mediaId/unlike/")
-        //     ->addPost("_uuid",$this->uuid)
-        //     ->addPost("_uid",$this->username_id)
-        //     ->addPost("_csrftoken",$this->token)
-        //     ->addPost("media_id",$mediaId)
-        //     ->getResponse(new Response());
-        $data = json_encode([
-            '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
-            '_csrftoken' => $this->token,
-            'media_id'   => $mediaId,
-        ]);
-
-        return $this->http->request("media/$mediaId/unlike/", SignatureUtils::generateSignature($data))[1];
+        return $this->request("media/$mediaId/unlike/")
+         ->addPost("_uuid",$this->uuid)
+         ->addPost("_uid",$this->username_id)
+         ->addPost("_csrftoken",$this->token)
+         ->addPost("media_id",$mediaId)
+         ->getResponse(new Response());
     }
 
     /**
