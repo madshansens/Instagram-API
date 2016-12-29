@@ -1283,6 +1283,30 @@ class Instagram
     }
 
     /**
+     * Get multiple users' story reels.
+     *
+     * @param array $userList List of User IDs
+     *
+     * @return ReelsMediaResponse
+     */
+    public function getReelsMediaFeed($userList)
+    {
+        if (!is_array($userList)) {
+            $userList = [$userList];
+        }
+
+        $userIDs = [];
+        foreach ($userList as $userId) {
+            $userIDs[] = "$userId";
+        }
+
+        return $this->request('feed/reels_media/')
+        ->setSignedPost(true)
+        ->addPost('user_ids', $userIDs)
+        ->getResponse(new ReelsMediaResponse());
+    }
+
+    /**
      * Get user feed.
      *
      * @param string $usernameId   Username id
