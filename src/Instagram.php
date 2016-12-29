@@ -224,7 +224,6 @@ class Instagram
      *
      * @return mixed
      */
-    // TODO : Missing Response
     public function pushRegister($gcmToken)
     {
         $deviceToken = json_encode([
