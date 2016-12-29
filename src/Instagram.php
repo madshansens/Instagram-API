@@ -1225,7 +1225,7 @@ class Instagram
     }
 
     /**
-     * Get a user's Story Feed
+     * Get a user's Story Feed.
      *
      * @return UserStoryFeedResponse
      */
