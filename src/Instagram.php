@@ -717,7 +717,7 @@ class Instagram
      *
      * @return SavedFeedResponse
      */
-    public function savedFeed()
+    public function getSavedFeed()
     {
         return $this->request("feed/saved/")
         ->addPost('_uuid', $this->uuid)
