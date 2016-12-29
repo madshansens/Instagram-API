@@ -660,12 +660,12 @@ class Instagram
     }
 
     /**
-     *  Tag User
+     *  Tag User.
      *
-     * @param string $mediaId  Media id
-     * @param string $usernameId Username id
-     * @param array float $position position relative to image where is placed the tag. Example: [0.4890625,0.6140625]
-     * @param string $captionText Caption text
+     * @param string      $mediaId     Media id
+     * @param string      $usernameId  Username id
+     * @param array float $position    position relative to image where is placed the tag. Example: [0.4890625,0.6140625]
+     * @param string      $captionText Caption text
      *
      * @return MediaResponse
      */
@@ -677,10 +677,10 @@ class Instagram
     }
 
     /**
-     *  Untag User
+     *  Untag User.
      *
-     * @param string $mediaId  Media id
-     * @param string $usernameId Username id
+     * @param string $mediaId     Media id
+     * @param string $usernameId  Username id
      * @param string $captionText Caption text
      *
      * @return MediaResponse
@@ -1321,7 +1321,7 @@ class Instagram
      */
     public function getPopularFeed()
     {
-        return $this->request("feed/popular/")
+        return $this->request('feed/popular/')
         ->addParams('people_teaser_supported', '1')
         ->addParams('rank_token', $this->rank_token)
         ->addParams('ranked_content', 'true')
@@ -1411,10 +1411,10 @@ class Instagram
     public function unlike($mediaId)
     {
         return $this->request("media/$mediaId/unlike/")
-         ->addPost("_uuid",$this->uuid)
-         ->addPost("_uid",$this->username_id)
-         ->addPost("_csrftoken",$this->token)
-         ->addPost("media_id",$mediaId)
+         ->addPost('_uuid', $this->uuid)
+         ->addPost('_uid', $this->username_id)
+         ->addPost('_csrftoken', $this->token)
+         ->addPost('media_id', $mediaId)
          ->getResponse(new Response());
     }
 
@@ -1445,11 +1445,11 @@ class Instagram
     {
         return $this->request('accounts/set_phone_and_name/')
         ->setSignedPost(true)
-        ->addPost("_uuid",$this->uuid)
-        ->addPost("_uid",$this->username_id)
-        ->addPost("_csrftoken",$this->token)
-        ->addPost("first_name",$name)
-        ->addPost("phone_number",$phone)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('first_name', $name)
+        ->addPost('phone_number', $phone)
         ->getResponse(new Response());
     }
 
