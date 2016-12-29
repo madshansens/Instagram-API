@@ -833,6 +833,38 @@ class Instagram
     }
 
     /**
+     * Like Comment.
+     *
+     * @param string $commentId
+     *
+     * @return CommentLikeUnlikeResponse
+     */
+    public function likeComment($commentId)
+    {
+        return $this->request("media/$commentId/comment_like/")
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new CommentLikeUnlikeResponse());
+    }
+
+    /**
+     * Unlike Comment.
+     *
+     * @param string $commentId
+     *
+     * @return CommentLikeUnlikeResponse
+     */
+    public function unlikeComment($commentId)
+    {
+        return $this->request("media/$commentId/comment_unlike/")
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new CommentLikeUnlikeResponse());
+    }
+
+    /**
      * Sets account to public.
      *
      * @param string $photo
