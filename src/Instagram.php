@@ -713,13 +713,13 @@ class Instagram
     }
 
     /**
-     *  Get Saved Feed
+     *  Get Saved Feed.
      *
      * @return SavedFeedResponse
      */
     public function getSavedFeed()
     {
-        return $this->request("feed/saved/")
+        return $this->request('feed/saved/')
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
