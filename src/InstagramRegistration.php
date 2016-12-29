@@ -87,8 +87,8 @@ class InstagramRegistration
 
         $data = json_encode([
             'username'        => $username,
-            '__uuid' => $this->uuid,
-            '_csrftoken'   => 'missing',
+            '__uuid'          => $this->uuid,
+            '_csrftoken'      => 'missing',
         ]);
 
         return new CheckUsernameResponse($this->request('users/check_username/', SignatureUtils::generateSignature($data))[1]);

@@ -10,7 +10,8 @@ class CheckEmailResponse extends Response
     public $valid;
     public $username_suggestions = null;
 
-    public function __construct($response) {
+    public function __construct($response)
+    {
         $this->valid = $response['valid'];
     }
 

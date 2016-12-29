@@ -10,7 +10,8 @@ class CheckUsernameResponse extends Response
     public $error_type;
     public $error = false;
 
-    public function __construct($response) {
+    public function __construct($response)
+    {
         $this->username = $response['username'];
         $this->available = $response['available'];
         $this->status = $response['status'];
