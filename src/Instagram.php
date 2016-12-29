@@ -1483,10 +1483,10 @@ class Instagram
      *
      * @return array Direct share data
      */
-    //TODO : Missing Response
     public function getDirectShare()
     {
-        return $this->http->request('direct_share/inbox/?')[1];
+        return $this->request('direct_share/inbox/?')
+        ->getResponse(new DirectShareInboxResponse());
     }
 
     /**
