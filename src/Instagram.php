@@ -1442,25 +1442,16 @@ class Instagram
      *
      * @return array Set status data
      */
-    //TODO : Missing Response
     public function setNameAndPhone($name = '', $phone = '')
     {
-        // return $this->request('accounts/set_phone_and_name/')
-        //     ->addPost("_uuid",$this->uuid)
-        //     ->addPost("_uid",$this->username_id)
-        //     ->addPost("_csrftoken",$this->token)
-        //     ->addPost("first_name",$name)
-        //     ->addPost("phone_number",$phone)
-        //     ->getResponse(new Response());
-        $data = json_encode([
-            '_uuid'        => $this->uuid,
-            '_uid'         => $this->username_id,
-            'first_name'   => $name,
-            'phone_number' => $phone,
-            '_csrftoken'   => $this->token,
-        ]);
-
-        return $this->http->request('accounts/set_phone_and_name/', SignatureUtils::generateSignature($data))[1];
+        return $this->request('accounts/set_phone_and_name/')
+        ->setSignedPost(true)
+        ->addPost("_uuid",$this->uuid)
+        ->addPost("_uid",$this->username_id)
+        ->addPost("_csrftoken",$this->token)
+        ->addPost("first_name",$name)
+        ->addPost("phone_number",$phone)
+        ->getResponse(new Response());
     }
 
     /**
