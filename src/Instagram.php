@@ -1225,6 +1225,17 @@ class Instagram
     }
 
     /**
+     * Get a user's Story Feed
+     *
+     * @return UserStoryFeedResponse
+     */
+    public function getUserStoryFeed($userId)
+    {
+        return $this->request("feed/user/$userId/story/")
+        ->getResponse(new UserStoryFeedResponse());
+    }
+
+    /**
      * Get user feed.
      *
      * @param string $usernameId   Username id
