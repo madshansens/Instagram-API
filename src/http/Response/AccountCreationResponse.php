@@ -32,7 +32,7 @@ class AccountCreationResponse extends Response
             $this->feedback_message = $response['feedback_message'];
         } else {
             $this->account_created = $response['account_created'];
-            $this->pk = $response['pk'];
+            $this->pk = $response['created_user']['pk'];
         }
     }
 
