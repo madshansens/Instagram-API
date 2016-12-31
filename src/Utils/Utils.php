@@ -12,7 +12,7 @@ class Utils
         return number_format(round(microtime(true) * 1000), 0, '', '');
     }
 
-    public function generateUserBreadcrumb($size)
+    public static function generateUserBreadcrumb($size)
     {
         $key = 'iN4$aGr0m';
         $date = new DateTime ();
