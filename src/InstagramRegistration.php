@@ -170,7 +170,11 @@ class InstagramRegistration
     {
         $fetch = $this->request('si/fetch_headers/', null, true);
         $header = $fetch[0];
-        $response = new ChallengeResponse($fetch[1]);
+
+        $mapper = new \JsonMapper();
+        $mapper->bStrictNullTypes = false;
+        $mapper->bEnforceMapType = false;
+        $response = $mapper->map($fetch[1], new ChallengeResponse());
 
         if (!isset($header) || (!$response->isOk())) {
             throw new InstagramException("Couldn't get challenge, check your connection");
