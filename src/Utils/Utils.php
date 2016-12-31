@@ -12,6 +12,26 @@ class Utils
         return number_format(round(microtime(true) * 1000), 0, '', '');
     }
 
+    public function generateUserBreadcrumb($size)
+    {
+        $key = 'iN4$aGr0m';
+        $date = new DateTime ();
+
+        // typing time
+        $term = 3000 + $size * 2000;
+
+        // android EditText change event ouccr count
+        $text_change_event_count = $size / 3;
+        if ($text_change_event_count == 0)
+        $text_change_event_count = 1;
+
+        // generate typing data
+        $data = $size . " " . $term . " " . $text_change_event_count . " " . $date->getTimestamp () . "\n";
+
+        // echo $data;
+        return base64_encode ( hash_hmac ( "sha256", $data, $key, true ) ) . base64_encode ( $data ) . "\n";
+    }
+
     /**
      * Length of the file in Seconds.
      *
