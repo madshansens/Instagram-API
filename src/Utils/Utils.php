@@ -13,6 +13,31 @@ class Utils
     }
 
     /**
+     * Generates user breadcrumb for use in posting a comment.
+     *
+     * @return string
+     */
+    public static function generateUserBreadcrumb($size)
+    {
+        $key = 'iN4$aGr0m';
+        $date = (int) (microtime(true) * 1000);
+
+        // typing time
+        $term = rand(2, 3) * 1000 + $size * rand(15, 20) * 100;
+
+        // android EditText change event occur count
+        $text_change_event_count = round($size / rand(2, 3));
+        if ($text_change_event_count == 0) {
+            $text_change_event_count = 1;
+        }
+
+        // generate typing data
+        $data = $size.' '.$term.' '.$text_change_event_count.' '.$date;
+
+        return base64_encode(hash_hmac('sha256', $data, $key, true))."\n".base64_encode($data)."\n";
+    }
+
+    /**
      * Length of the file in Seconds.
      *
      * @param string $file
