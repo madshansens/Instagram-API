@@ -788,13 +788,10 @@ class Instagram
     public function comment($mediaId, $commentText)
     {
         return $this->request("media/$mediaId/comment/")
-        ->addPost('user_breadcrumb', Utils::generateUserBreadcrumb(strlen($commentText)))
-        ->addPost('idempotence_token', SignatureUtils::generateUUID(true))
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('comment_text', $commentText)
-        ->addPost('containermodule', "comments_feed_timeline")
         ->getResponse(new CommentResponse());
     }
 
