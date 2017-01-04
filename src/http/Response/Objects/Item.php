@@ -62,7 +62,6 @@ class Item extends Response
     /**
      * @var string[]
      */
-    public $top_likers;
     public $preview = '';
     public $has_liked = false;
     public $explore_context = '';
