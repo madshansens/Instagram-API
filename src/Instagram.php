@@ -436,6 +436,18 @@ class Instagram
     }
 
     /**
+     * Send photo via direct message to user by inbox.
+     *
+     * @param array|int $recipients Users id
+     * @param string    $filepath   Location of photo to upload
+     * @param string    $text       Text message
+     */
+    public function direct_photo($recipients, $filepath, $text)
+    {
+        $this->http->direct_photo($recipients, $filepath, $text);
+    }
+
+    /**
      * Direct Thread Data.
      *
      * @param $threadId Thread Id
