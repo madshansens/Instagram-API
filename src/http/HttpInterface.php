@@ -827,9 +827,7 @@ class HttpInterface
                 'name' => 'text',
                 'data' => is_null($text) ? '' : $text,
             ],
-		];
-
-		echo mime_content_type($filepath);
+        ];
 
         $data = $this->buildBody($bodies, $boundary);
         $headers = [
