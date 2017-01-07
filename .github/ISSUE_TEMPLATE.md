@@ -7,7 +7,7 @@
 ---
 
 ### Before submitting an issue make sure you have:
-- [ ] [Searched](https://github.com/mgp/Instagram-API/search?type=Issues) the bugtracker for similar issues including **closed** ones
+- [ ] [Searched](https://github.com/mgp25/Instagram-API/search?type=Issues) the bugtracker for similar issues including **closed** ones
 - [ ] [Read the FAQ](https://github.com/mgp25/Instagram-API/wiki/FAQ)
 - [ ] [Read the wiki](https://github.com/mgp25/Instagram-API/wiki)
 - [ ] [Reviewed the examples](https://github.com/mgp25/Instagram-API/tree/master/examples)
