@@ -579,18 +579,18 @@ class Instagram
             $loc = [
                 $location->getExternalIdSource().'_id'   => $location->getExternalId(),
                 'name'                                   => $location->getName(),
-                'lat'                                    => $location->getLatitude(),
-                'lng'                                    => $location->getLongitude(),
+                'lat'                                    => $location->getLat(),
+                'lng'                                    => $location->getLng(),
                 'address'                                => $location->getAddress(),
                 'external_source'                        => $location->getExternalIdSource(),
             ];
 
             $requestData->addPost('location', json_encode($loc))
             ->addPost('geotag_enabled', true)
-            ->addPost('media_latitude', $location->getLatitude())
-            ->addPost('posting_latitude', $location->getLatitude())
-            ->addPost('media_longitude', $location->getLongitude())
-            ->addPost('posting_longitude', $location->getLongitude())
+            ->addPost('media_latitude', $location->getLat())
+            ->addPost('posting_latitude', $location->getLat())
+            ->addPost('media_longitude', $location->getLng())
+            ->addPost('posting_longitude', $location->getLng())
             ->addPost('altitude', mt_rand(10, 800));
         }
 
