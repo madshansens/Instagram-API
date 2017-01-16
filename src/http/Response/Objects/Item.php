@@ -95,4 +95,3 @@ class Item extends Response
         return 'https://www.instagram.com/p/'.$this->getCode().'/';
     }
 }
-
