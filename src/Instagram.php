@@ -268,6 +268,24 @@ class Instagram
     }
 
     /**
+     * Get insights
+     * @param $day
+     * @return InsightsResponse
+     */
+    public function insights($day = null)
+    {
+        if (empty($day)) {
+            $day = date('d');
+        }
+        $request = $this->request('insights/account_organic_insights')
+        ->addParams('show_promotions_in_landing_page', 'true')
+        ->addParams('first', $day)
+        ->addParams('timezone_name', 'Asia/Jakarta');
+
+        return $request->getResponse(new InsightsResponse());
+    }
+
+    /**
      * @return MegaphoneLogResponse
      */
     protected function megaphoneLog()
