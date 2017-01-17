@@ -279,8 +279,7 @@ class Instagram
         }
         $request = $this->request('insights/account_organic_insights')
         ->addParams('show_promotions_in_landing_page', 'true')
-        ->addParams('first', $day)
-        ->addParams('timezone_name', 'Asia/Jakarta');
+        ->addParams('first', $day);
 
         return $request->getResponse(new InsightsResponse());
     }
