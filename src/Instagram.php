@@ -269,7 +269,9 @@ class Instagram
 
     /**
      * Get insights
+     *
      * @param $day
+     *
      * @return InsightsResponse
      */
     public function insights($day = null)
@@ -282,6 +284,22 @@ class Instagram
         ->addParams('first', $day);
 
         return $request->getResponse(new InsightsResponse());
+    }
+
+    /**
+     * Get media insights
+     *
+     * @param $media_id
+     *
+     * @return MediaInsightsResponse
+     */
+    public function mediaInsights($media_id)
+    {
+        $request = $this->request("insights/media_organic_insights/$media_id")
+        ->setSignedPost(true)
+        ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION);
+
+        return $request->getResponse(new MediaInsightsResponse());
     }
 
     /**
