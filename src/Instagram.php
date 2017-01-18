@@ -825,6 +825,38 @@ class Instagram
     }
 
     /**
+     * Disable comments for a media.
+     *
+     * @param $mediaId
+     *
+     * @return Response
+     */
+    public function disableMediaComments($mediaId)
+    {
+        return $this->request("media/$mediaId/disable_comments/")
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_csrftoken', $this->token)
+        ->setSignedPost(false)
+        ->getResponse(new Response());
+    }
+
+    /**
+     * Enable comments for a media.
+     *
+     * @param $mediaId
+     *
+     * @return Response
+     */
+    public function enableMediaComments($mediaId)
+    {
+        return $this->request("media/$mediaId/enable_comments/")
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_csrftoken', $this->token)
+        ->setSignedPost(false)
+        ->getResponse(new Response());
+    }
+
+    /**
      * Comment media.
      *
      * @param $mediaId
