@@ -94,7 +94,7 @@ class Instagram
     /**
      * Set the proxy.
      *
-     * @param string $ip       Ip/hostname of proxy
+     * @param string $host     Ip/hostname of proxy
      * @param int    $port     Port of proxy
      * @param string $username Username for proxy
      * @param string $password Password for proxy
@@ -1038,8 +1038,9 @@ class Instagram
      * @param string $url        Url - website. "" for nothing
      * @param string $phone      Phone number. "" for nothing
      * @param string $first_name Name. "" for nothing
+     * @param string $biography  Biography text
      * @param string $email      Email. Required
-     * @param int    $gender     Gender. male = 1 , female = 0
+     * @param int    $gender     Gender. male = 1 , female = 2, unknown = 3
      *
      * @return ProfileResponse edit profile data
      */
