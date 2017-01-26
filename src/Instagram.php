@@ -20,12 +20,12 @@ class Instagram
     public $http;
     public $settings;
 
-    public $settingsAdopter = ['type'     => 'file',
+    public $settingsAdapter = ['type'     => 'file',
         'path'                            => __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR, ]; // File | Mysql
 
     /*
     // Settings for mysql storage
-    public $settingsAdopter         = array(
+    public $settingsAdapter         = array(
     "type"       => "mysql",
     "username"   => "",
     "password"   => "",
@@ -59,7 +59,7 @@ class Instagram
     public function setUser($username, $password)
     {
         $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
-        $this->settings = new SettingsAdapter($this->settingsAdopter, $username);
+        $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
         $this->checkSettings($username);
         $this->http = new HttpInterface($this);
 
@@ -132,7 +132,7 @@ class Instagram
             ->getResponse(new ChallengeResponse(), true);
 
             if (!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $response->getFullResponse()[0], $token)) {
-                throw new InstagramException('Missing csfrtoken');
+                throw new InstagramException('Missing csrftoken');
             }
 
             $response = $this->request('accounts/login/')
@@ -1638,7 +1638,7 @@ class Instagram
         do {
             $myUploads = $this->getSelfUserFeed($nextUploadMaxId);
 
-            $backupMainFolder = $this->settingsAdopter['path'].$this->username.'/backup/';
+            $backupMainFolder = $this->settingsAdapter['path'].$this->username.'/backup/';
             $backupFolder = $backupMainFolder.'/'.date('Y-m-d').'/';
 
             if (!is_dir($backupMainFolder)) {

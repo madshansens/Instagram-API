@@ -15,7 +15,7 @@ class InstagramRegistration
     protected $proxy = null;     // Full Proxy
     protected $proxyHost = null; // Proxy Host and Port
     protected $proxyAuth = null; // Proxy User and Pass
-    protected $settingsAdopter = ['type'     => 'file',
+    protected $settingsAdapter = ['type'     => 'file',
         'path'                               => __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR, ]; // File | Mysql
 
     public function __construct($debug = false, $IGDataPath = null)
@@ -83,7 +83,7 @@ class InstagramRegistration
     public function checkUsername($username)
     {
         $this->username = $username;
-        $this->settings = new SettingsAdapter($this->settingsAdopter, $username);
+        $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
 
         $data = json_encode([
             'username'        => $username,
@@ -181,7 +181,7 @@ class InstagramRegistration
         }
 
         if (!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token)) {
-            throw new InstagramException('Missing csfrtoken');
+            throw new InstagramException('Missing csrftoken');
         }
 
         return substr($token[0], 22);
