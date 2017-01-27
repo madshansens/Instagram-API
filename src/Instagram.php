@@ -125,7 +125,7 @@ class Instagram
         if (!$this->isLoggedIn || $force) {
             $this->syncFeatures(true);
 
-            $response = $this->request('si/fetch_headers')
+            $response = $this->request('si/fetch_headers/')
             ->requireLogin(true)
             ->addParams('challenge_type', 'signup')
             ->addParams('guid', SignatureUtils::generateUUID(false))
