@@ -758,7 +758,12 @@ class HttpInterface
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
-        $upload = json_decode(substr($resp, $header_len), true);
+        $upload = $this->getResponseWithResult(new Response(), json_decode(substr($resp, $header_len)));
+
+        if (!$upload->isOk()) {
+            throw new InstagramException($upload->getMessage());
+            return;
+        }
 
         if ($this->parent->debug) {
             Debug::printRequest('POST', $endpoint);
@@ -875,7 +880,12 @@ class HttpInterface
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($resp, 0, $header_len);
-        $upload = json_decode(substr($resp, $header_len), true);
+        $upload = $this->getResponseWithResult(new Response(), json_decode(substr($resp, $header_len)));
+
+        if (!$upload->isOk()) {
+            throw new InstagramException($upload->getMessage());
+            return;
+        }
 
         if ($this->parent->debug) {
             Debug::printRequest('POST', $endpoint);
