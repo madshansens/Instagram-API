@@ -2,6 +2,16 @@
 
 namespace InstagramAPI;
 
+/**
+ * Instagram API-related errors
+ *
+ * Parses a regex from Instagram response to set error code.
+ * When throwing a new Instagram-related error, make sure to
+ * include the "message" field as a part of the string argument
+ * used for the InstagramException's constructor.
+ *
+ */
+
 // Error codes:
 // 0: Unrecognized by parser
 const UNKNOWN = 0;
@@ -36,6 +46,15 @@ const IG_SENTRY_BLOCK_REGEX = "/sentry_block/";
 // 8: On Instagram "invalid_user" response (?)
 const IG_INVALID_USER = 8;
 const IG_INVALID_USER_REGEX = "/invalid_user/";
+
+/**
+ * 1XX: Internal Errors
+ *
+ */
+const INTERNAL_LOGIN_REQUIRED = 101;
+const INTERNAL_PROXY_ERROR = 102;
+const INTERNAL_CSRF_TOKEN_ERROR = 103;
+const INTERNAL_SETTINGS_ERROR = 104;
 
 class InstagramException extends \Exception
 {
