@@ -19,14 +19,7 @@ if ($username == '') {
     exit();
 }
 
-echo "\n\nYour settings path folder ([ENTER] if dedault): ";
-$settingsPath = trim(fgets(STDIN));
-
-if ($settingsPath == '') {
-    $settingsPath = null;
-}
-
-$c = new \InstagramAPI\Checkpoint($username, $settingsPath, $debug);
+$c = new \InstagramAPI\Checkpoint($username, $debug);
 
 $token = $c->doCheckpoint();
 

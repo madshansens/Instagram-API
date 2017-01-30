@@ -10,8 +10,8 @@ class InstagramRegistration
     protected $waterfall_id;
     protected $token;
     protected $userAgent;
+    protected $adapterType;
     protected $settings;
-    protected $settingsAdapterConfig;
     protected $proxy = null;     // Full Proxy
     protected $proxyHost = null; // Proxy Host and Port
     protected $proxyAuth = null; // Proxy User and Pass
@@ -23,25 +23,18 @@ class InstagramRegistration
         $this->waterfall_id = SignatureUtils::generateUUID(true);
         $this->userAgent = 'Instagram '.Constants::VERSION.' Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)';
 
-        switch (getenv('SETTINGS_ADAPTER')) {
-        case null:
-        case 'file':
-            $this->settingsAdapterConfig = [
-                'type' => 'file',
-                'path' => Constants::DATA_DIR,
-            ];
-            break;
-        case 'mysql':
-            $this->settingsAdapterConfig = [
-                'type'       => 'mysql',
-                'username'   => getenv('USERNAME'),
-                'password'   => getenv('PASSWORD'),
-                'host'       => getenv('HOST'),
-                'database'   => getenv('DB'),
-            ];
-            break;
-        default:
-            throw new InstagramException('Unrecognized settings type', 104);
+        $adapterType = 'file';
+        $longOpts = ['settings_adapter::'];
+        $options = getopt('', $longOpts);
+
+        if (!is_null($adapterType)) {
+            $this->adapterType = $adapterType;
+        } else if (array_key_exists('settings_adapter', $options)) {
+            $this->adapterType = $options[$settings_adapter];
+        } else if (getenv('SETTINGS_ADAPTER') !== false) {
+            $this->adapterType = getenv('SETTINGS_ADAPTER');
+        } else {
+            $this->adapterType = 'file';
         }
     }
 
@@ -95,7 +88,7 @@ class InstagramRegistration
     public function checkUsername($username)
     {
         $this->username = $username;
-        $this->settings = new SettingsAdapter($this->settingsAdapterConfig, $username);
+        $this->settings = new SettingsAdapter($this->adapterType, $username);
 
         $data = json_encode([
             'username'        => $username,
@@ -211,7 +204,7 @@ class InstagramRegistration
         curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        if ($this->settingsAdapterConfig['type'] == 'file') {
+        if ($this->adapterType == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->settings->cookiesPath);
             curl_setopt($ch, CURLOPT_COOKIEJAR, $this->settings->cookiesPath);
         } else {
@@ -243,7 +236,7 @@ class InstagramRegistration
 
         curl_close($ch);
 
-        if ($this->settingsAdapterConfig['type'] == 'mysql') {
+        if ($this->adapterType == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->settings->set('cookies', $newCookies);
         }

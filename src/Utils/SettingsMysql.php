@@ -4,11 +4,6 @@ namespace InstagramAPI;
 
 use PDO;
 
-define('DEFAULT_USERNAME', 'root');
-define('DEFAULT_PASSWORD', '');
-define('DEFAULT_HOST', 'localhost');
-define('DEFAULT_DATABASE', 'instagram');
-
 class SettingsMysql
 {
     private $sets;
@@ -17,19 +12,12 @@ class SettingsMysql
 
     public $tableName = 'user_settings';
 
-    public function __construct($instagramUsername, $username, $password, $host, $database)
+    public function __construct($instagramUsername, $username = 'root', $password = '', $host = 'localhost', $dbName = 'instagram')
     {
-        if (is_null($username) || $username == '') {
-            $username = DEFAULT_USERNAME;
-            $password = DEFAULT_PASSWORD;
-            $host = DEFAULT_HOST;
-            $database = DEFAULT_DATABASE;
-        }
-
-        $this->database = $database;
+        $this->dbName = $dbName;
         $this->instagramUsername = $instagramUsername;
 
-        $this->connect($username, $password, $host, $database);
+        $this->connect($username, $password, $host, $dbName);
         $this->autoInstall();
         $this->populateObject();
     }
@@ -94,10 +82,10 @@ class SettingsMysql
         }
     }
 
-    private function connect($username, $password, $host, $database)
+    private function connect($username, $password, $host, $dbName)
     {
         try {
-            $pdo = new \PDO("mysql:host={$host};dbname={$database}", $username, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+            $pdo = new \PDO("mysql:host={$host};dbname={$dbName}", $username, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
             $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $pdo->query('SET NAMES UTF8');
             $pdo->setAttribute(PDO::ERRMODE_WARNING, PDO::ERRMODE_EXCEPTION);
@@ -109,7 +97,7 @@ class SettingsMysql
 
     private function autoInstall()
     {
-        $std = $this->pdo->prepare('SHOW TABLES WHERE tables_in_'.$this->database.' = :tableName');
+        $std = $this->pdo->prepare('SHOW TABLES WHERE tables_in_'.$this->dbName.' = :tableName');
         $std->execute([':tableName' => $this->tableName]);
         if ($std->rowCount()) {
             return true;

@@ -18,8 +18,8 @@ class Instagram
     public $rank_token;         // Rank token
 
     public $http;
+    public $adapterType;
     public $settings;
-    public $settingsAdapterConfig;
 
     public $proxy = null;     // Full Proxy
     public $proxyHost = null; // Proxy Host and Port
@@ -30,32 +30,25 @@ class Instagram
      *
      * @param $debug Debug on or off, false by default
      */
-    public function __construct($debug = false, $truncatedDebug = false)
+    public function __construct($debug = false, $truncatedDebug = false, $adapterType = null)
     {
         self::$instance = $this;
         $this->mapper = new \JsonMapper();
         $this->debug = $debug;
         $this->truncatedDebug = $truncatedDebug;
 
-        switch (getenv('SETTINGS_ADAPTER')) {
-        case null:
-        case 'file':
-            $this->settingsAdapterConfig = [
-                'type' => 'file',
-                'path' => Constants::DATA_DIR,
-            ];
-            break;
-        case 'mysql':
-            $this->settingsAdapterConfig = [
-                'type'       => 'mysql',
-                'username'   => getenv('USERNAME'),
-                'password'   => getenv('PASSWORD'),
-                'host'       => getenv('HOST'),
-                'database'   => getenv('DB'),
-            ];
-            break;
-        default:
-            throw new InstagramException('Unrecognized settings type', 104);
+        $adapterType = 'file';
+        $longOpts = ['settings_adapter::'];
+        $options = getopt('', $longOpts);
+
+        if (!is_null($adapterType)) {
+            $this->adapterType = $adapterType;
+        } else if (array_key_exists('settings_adapter', $options)) {
+            $this->adapterType = $options[$settings_adapter];
+        } else if (getenv('SETTINGS_ADAPTER') !== false) {
+            $this->adapterType = getenv('SETTINGS_ADAPTER');
+        } else {
+            $this->adapterType = 'file';
         }
     }
 
@@ -68,7 +61,7 @@ class Instagram
     public function setUser($username, $password)
     {
         $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
-        $this->settings = new SettingsAdapter($this->settingsAdapterConfig, $username);
+        $this->settings = new SettingsAdapter($this->adapterType, $username);
         $this->checkSettings($username);
         $this->http = new HttpInterface($this);
 
