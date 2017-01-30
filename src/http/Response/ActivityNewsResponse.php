@@ -4,6 +4,9 @@ namespace InstagramAPI;
 
 class ActivityNewsResponse extends Response
 {
+    /**
+     * @var Story[]
+     */
     public $new_stories;
     /**
      * @var Story[]
