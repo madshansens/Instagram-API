@@ -23,25 +23,25 @@ class InstagramRegistration
         $this->waterfall_id = SignatureUtils::generateUUID(true);
         $this->userAgent = 'Instagram '.Constants::VERSION.' Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)';
 
-        switch(getEnv('SETTINGS_ADAPTER')) {
+        switch(getenv('SETTINGS_ADAPTER')) {
         case null:
         case 'file':
             $this->settingsAdapterConfig = [
                 'type' => 'file',
-                'path' => Constants::DATA_DIR
+                'path' => Constants::DATA_DIR,
             ];
             break;
         case 'mysql':
             $this->settingsAdapterConfig = [
-                "type"       => "mysql",
-                "username"   => getEnv('USERNAME'),
-                "password"   => getEnv('PASSWORD'),
-                "host"       => getEnv('HOST'),
-                "database"   => getEnv('DB')
+                'type'       => 'mysql',
+                'username'   => getEnv('USERNAME'),
+                'password'   => getEnv('PASSWORD'),
+                'host'       => getEnv('HOST'),
+                'database'   => getEnv('DB'),
             ];
             break;
         default:
-            throw new InstagramException("Unrecognized settings type", 104);
+            throw new InstagramException('Unrecognized settings type', 104);
         }
     }
 

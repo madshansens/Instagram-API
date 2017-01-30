@@ -61,7 +61,6 @@ class SettingsFile
         $this->save();
     }
 
-
     private function save()
     {
         if (file_exists($this->settingsPath)) {

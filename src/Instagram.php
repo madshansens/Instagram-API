@@ -37,25 +37,25 @@ class Instagram
         $this->debug = $debug;
         $this->truncatedDebug = $truncatedDebug;
 
-        switch(getEnv('SETTINGS_ADAPTER')) {
+        switch(getenv('SETTINGS_ADAPTER')) {
         case null:
         case 'file':
             $this->settingsAdapterConfig = [
                 'type' => 'file',
-                'path' => Constants::DATA_DIR
+                'path' => Constants::DATA_DIR,
             ];
             break;
         case 'mysql':
             $this->settingsAdapterConfig = [
-                "type"       => "mysql",
-                "username"   => getEnv('USERNAME'),
-                "password"   => getEnv('PASSWORD'),
-                "host"       => getEnv('HOST'),
-                "database"   => getEnv('DB')
+                'type'       => 'mysql',
+                'username'   => getEnv('USERNAME'),
+                'password'   => getEnv('PASSWORD'),
+                'host'       => getEnv('HOST'),
+                'database'   => getEnv('DB'),
             ];
             break;
         default:
-            throw new InstagramException("Unrecognized settings type", 104);
+            throw new InstagramException('Unrecognized settings type', 104);
         }
     }
 
