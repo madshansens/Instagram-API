@@ -19,19 +19,7 @@ class Instagram
 
     public $http;
     public $settings;
-
-    public $settingsAdapter = ['type'     => 'file',
-        'path'                            => __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR, ]; // File | Mysql
-
-    /*
-    // Settings for mysql storage
-    public $settingsAdapter         = array(
-    "type"       => "mysql",
-    "username"   => "",
-    "password"   => "",
-    "host"       => "",
-    "database"   => "");
-    */
+    public $settingsAdapterConfig;
 
     public $proxy = null;     // Full Proxy
     public $proxyHost = null; // Proxy Host and Port
@@ -48,6 +36,27 @@ class Instagram
         $this->mapper = new \JsonMapper();
         $this->debug = $debug;
         $this->truncatedDebug = $truncatedDebug;
+
+        switch(getEnv('SETTINGS_ADAPTER')) {
+        case null:
+        case 'file':
+            $this->settingsAdapterConfig = [
+                'type' => 'file',
+                'path' => Constants::DATA_DIR
+            ];
+            break;
+        case 'mysql':
+            $this->settingsAdapterConfig = [
+                "type"       => "mysql",
+                "username"   => getEnv('USERNAME'),
+                "password"   => getEnv('PASSWORD'),
+                "host"       => getEnv('HOST'),
+                "database"   => getEnv('DB')
+            ];
+            break;
+        default:
+            throw new InstagramException("Unrecognized settings type", 104);
+        }
     }
 
     /**
@@ -59,7 +68,7 @@ class Instagram
     public function setUser($username, $password)
     {
         $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
-        $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
+        $this->settings = new SettingsAdapter($this->settingsAdapterConfig, $username);
         $this->checkSettings($username);
         $this->http = new HttpInterface($this);
 
@@ -1631,6 +1640,8 @@ class Instagram
 
     /**
      * Backups all your uploaded photos and videos :).
+     *
+     * @throws InstagramException
      */
     public function backup()
     {
@@ -1638,7 +1649,7 @@ class Instagram
         do {
             $myUploads = $this->getSelfUserFeed($nextUploadMaxId);
 
-            $backupMainFolder = $this->settingsAdapter['path'].$this->username.'/backup/';
+            $backupMainFolder = Constants::DATA_DIR.$this->username.'/backup/';
             $backupFolder = $backupMainFolder.'/'.date('Y-m-d').'/';
 
             if (!is_dir($backupMainFolder)) {

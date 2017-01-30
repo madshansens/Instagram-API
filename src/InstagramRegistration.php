@@ -5,32 +5,44 @@ namespace InstagramAPI;
 class InstagramRegistration
 {
     protected $debug;
-    protected $IGDataPath;
     protected $username;
     protected $uuid;
     protected $waterfall_id;
     protected $token;
     protected $userAgent;
     protected $settings;
+    protected $settingsAdapterConfig;
     protected $proxy = null;     // Full Proxy
     protected $proxyHost = null; // Proxy Host and Port
     protected $proxyAuth = null; // Proxy User and Pass
-    protected $settingsAdapter = ['type'     => 'file',
-        'path'                               => __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR, ]; // File | Mysql
 
-    public function __construct($debug = false, $IGDataPath = null)
+    public function __construct($debug = false)
     {
         $this->debug = $debug;
         $this->uuid = SignatureUtils::generateUUID(true);
         $this->waterfall_id = SignatureUtils::generateUUID(true);
-
-        if (!is_null($IGDataPath)) {
-            $this->IGDataPath = $IGDataPath;
-        } else {
-            $this->IGDataPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR;
-        }
-
         $this->userAgent = 'Instagram '.Constants::VERSION.' Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)';
+
+        switch(getEnv('SETTINGS_ADAPTER')) {
+        case null:
+        case 'file':
+            $this->settingsAdapterConfig = [
+                'type' => 'file',
+                'path' => Constants::DATA_DIR
+            ];
+            break;
+        case 'mysql':
+            $this->settingsAdapterConfig = [
+                "type"       => "mysql",
+                "username"   => getEnv('USERNAME'),
+                "password"   => getEnv('PASSWORD'),
+                "host"       => getEnv('HOST'),
+                "database"   => getEnv('DB')
+            ];
+            break;
+        default:
+            throw new InstagramException("Unrecognized settings type", 104);
+        }
     }
 
     /**
@@ -83,7 +95,7 @@ class InstagramRegistration
     public function checkUsername($username)
     {
         $this->username = $username;
-        $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
+        $this->settings = new SettingsAdapter($this->settingsAdapterConfig, $username);
 
         $data = json_encode([
             'username'        => $username,
@@ -199,8 +211,18 @@ class InstagramRegistration
         curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->IGDataPath.$this->username.DIRECTORY_SEPARATOR."$this->username-cookies.dat");
-        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->IGDataPath.$this->username.DIRECTORY_SEPARATOR."$this->username-cookies.dat");
+        if ($this->settingsAdapterConfig['type'] == 'file') {
+            curl_setopt($ch, CURLOPT_COOKIEFILE, $this->settings->cookiesPath);
+            curl_setopt($ch, CURLOPT_COOKIEJAR, $this->settings->cookiesPath);
+        } else {
+            $cookieJar = $this->settings->get('cookies');
+            $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
+
+            file_put_contents($cookieJarFile, $cookieJar);
+
+            curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieJarFile);
+            curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieJarFile);
+        }
 
         if ($post) {
             curl_setopt($ch, CURLOPT_POST, true);
@@ -220,6 +242,11 @@ class InstagramRegistration
         $body = substr($resp, $header_len);
 
         curl_close($ch);
+
+        if ($this->settingsAdapterConfig['type'] == 'mysql') {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->settings->set('cookies', $newCookies);
+        }
 
         if ($this->debug) {
             echo "REQUEST: $endpoint\n";
