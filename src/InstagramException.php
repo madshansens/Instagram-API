@@ -2,6 +2,16 @@
 
 namespace InstagramAPI;
 
+/**
+ * Instagram API-related errors
+ *
+ * Parses a regex from Instagram response to set error code.
+ * When throwing a new Instagram-related error, make sure to
+ * include the "message" field as a part of the string argument
+ * used for the InstagramException's constructor.
+ *
+ */
+
 // Error codes:
 // 0: Unrecognized by parser
 const UNKNOWN = 0;
@@ -25,6 +35,27 @@ const IG_INCORRECT_PASSWORD_REGEX = "/password(.*)incorrect/";
 // 5: On empty response from IG
 const EMPTY_RESPONSE = 5;
 
+// 6: On Instagram "Your account has been disabled for violating our terms" response
+const IG_ACCOUNT_DISABLED = 6;
+const IG_ACCOUNT_DISABLED_REGEX = "/account(.*)disabled(.*)violating/";
+
+// 7: On Instagram "sentry_block" response (?)
+const IG_SENTRY_BLOCK = 7;
+const IG_SENTRY_BLOCK_REGEX = "/sentry_block/";
+
+// 8: On Instagram "invalid_user" response (?)
+const IG_INVALID_USER = 8;
+const IG_INVALID_USER_REGEX = "/invalid_user/";
+
+/**
+ * 1XX: Internal Errors
+ *
+ */
+const INTERNAL_LOGIN_REQUIRED = 101;
+const INTERNAL_PROXY_ERROR = 102;
+const INTERNAL_CSRF_TOKEN_ERROR = 103;
+const INTERNAL_SETTINGS_ERROR = 104;
+
 class InstagramException extends \Exception
 {
     public function __construct($message, $code = null, Exception $previous = null) {
@@ -37,6 +68,12 @@ class InstagramException extends \Exception
                 $code = IG_CHECKPOINT_REQUIRED;
             } else if (preg_match(IG_INCORRECT_PASSWORD_REGEX, $message) === 1) {
                 $code = IG_INCORRECT_PASSWORD;
+            } else if (preg_match(IG_ACCOUNT_DISABLED_REGEX, $message) === 1) {
+                $code = IG_ACCOUNT_DISABLED;
+            } else if (preg_match(IG_SENTRY_BLOCK_REGEX, $message) === 1) {
+                $code = IG_SENTRY_BLOCK;
+            } else if (preg_match(IG_INVALID_USER_REGEX, $message) === 1) {
+                $code = IG_INVALID_USER;
             } else {
                 $code = 0;
             }
