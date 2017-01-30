@@ -268,7 +268,7 @@ class Instagram
     }
 
     /**
-     * Get insights
+     * Get insights.
      *
      * @param $day
      *
@@ -287,7 +287,7 @@ class Instagram
     }
 
     /**
-     * Get media insights
+     * Get media insights.
      *
      * @param $media_id
      *
