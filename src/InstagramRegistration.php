@@ -29,9 +29,9 @@ class InstagramRegistration
 
         if (!is_null($adapterType)) {
             $this->adapterType = $adapterType;
-        } else if (array_key_exists('settings_adapter', $options)) {
+        } elseif (array_key_exists('settings_adapter', $options)) {
             $this->adapterType = $options[$settings_adapter];
-        } else if (getenv('SETTINGS_ADAPTER') !== false) {
+        } elseif (getenv('SETTINGS_ADAPTER') !== false) {
             $this->adapterType = getenv('SETTINGS_ADAPTER');
         } else {
             $this->adapterType = 'file';

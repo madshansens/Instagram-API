@@ -6,7 +6,7 @@ class SettingsAdapter
 {
     public function __construct($adapterType, $username)
     {
-        switch($adapterType) {
+        switch ($adapterType) {
         case 'mysql':
             $longOpts = [
                 'db_username::',
@@ -24,7 +24,6 @@ class SettingsAdapter
             $password = array_key_exists('db_password', $options) ? options['db_password'] : $env_password !== false ? $env_password : null;
             $host = array_key_exists('db_host', $options) ? options['db_host'] : $env_host !== false ? $env_host : null;
             $name = array_key_exists('db_name', $options) ? options['db_name'] : $env_name !== false ? $env_name : null;
-
 
             $this->setting = new SettingsMysql($username, $dbUsername, $password, $host, $name);
             break;
