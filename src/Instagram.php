@@ -37,7 +37,7 @@ class Instagram
         $this->debug = $debug;
         $this->truncatedDebug = $truncatedDebug;
 
-        switch(getenv('SETTINGS_ADAPTER')) {
+        switch (getenv('SETTINGS_ADAPTER')) {
         case null:
         case 'file':
             $this->settingsAdapterConfig = [
@@ -48,10 +48,10 @@ class Instagram
         case 'mysql':
             $this->settingsAdapterConfig = [
                 'type'       => 'mysql',
-                'username'   => getEnv('USERNAME'),
-                'password'   => getEnv('PASSWORD'),
-                'host'       => getEnv('HOST'),
-                'database'   => getEnv('DB'),
+                'username'   => getenv('USERNAME'),
+                'password'   => getenv('PASSWORD'),
+                'host'       => getenv('HOST'),
+                'database'   => getenv('DB'),
             ];
             break;
         default:
