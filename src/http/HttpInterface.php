@@ -104,7 +104,7 @@ class HttpInterface
 
             return $this->request($endpoint, $post, $login, false, $assoc);
         } else {
-            return [$header, json_decode($body, $assoc)];
+            return [$header, json_decode($body, $assoc, 512, JSON_BIGINT_AS_STRING)];
         }
     }
 
