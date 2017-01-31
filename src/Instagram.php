@@ -133,7 +133,7 @@ class Instagram
             ->getResponse(new ChallengeResponse(), true);
 
             if (!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $response->getFullResponse()[0], $token)) {
-                throw new InstagramException('Missing csrftoken', 103);
+                throw new InstagramException('Missing csrftoken', ErrorCode::INTERNAL_CSRF_TOKEN_ERROR);
             }
 
             $response = $this->request('accounts/login/')
@@ -1931,7 +1931,7 @@ class Request
             $mapper->bExceptionOnUndefinedProperty = true;
         }
         if (is_null($response[1])) {
-            throw new InstagramException('No response from server, connection or configure error', 5);
+            throw new InstagramException('No response from server, connection or configure error', ErrorCode::EMPTY_RESPONSE);
         }
 
         $responseObject = $mapper->map($response[1], $obj);

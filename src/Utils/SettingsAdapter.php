@@ -31,7 +31,7 @@ class SettingsAdapter
             $this->setting = new SettingsFile($username, Constants::DATA_DIR);
             break;
         default:
-            throw new InstagramException('Unrecognized settings type', 104);
+            throw new InstagramException('Unrecognized settings type', ErrorCode::INTERNAL_SETTINGS_ERROR);
         }
     }
 

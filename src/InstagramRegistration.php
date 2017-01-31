@@ -70,7 +70,7 @@ class InstagramRegistration
         if (!empty($proxy['host']) && isset($proxy['port']) && is_int($proxy['port'])) {
             $this->proxyHost = $proxy['host'].':'.$proxy['port'];
         } else {
-            throw new InstagramException('Proxy host error. Please check ip address and port of proxy.', 102);
+            throw new InstagramException('Proxy host error. Please check ip address and port of proxy.', ErrorCode::INTERNAL_PROXY_ERROR);
         }
 
         if (isset($proxy['user']) && isset($proxy['pass'])) {
@@ -182,11 +182,11 @@ class InstagramRegistration
         $response = $mapper->map($fetch[1], new ChallengeResponse());
 
         if (!isset($header) || (!$response->isOk())) {
-            throw new InstagramException("Couldn't get challenge, check your connection", 103);
+            throw new InstagramException("Couldn't get challenge, check your connection", ErrorCode::INTERNAL_CSRF_TOKEN_ERROR);
         }
 
         if (!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $fetch[0], $token)) {
-            throw new InstagramException('Missing csrftoken', 103);
+            throw new InstagramException('Missing csrftoken', ErrorCode::INTERNAL_CSRF_TOKEN_ERROR);
         }
 
         return substr($token[0], 22);

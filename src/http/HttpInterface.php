@@ -19,7 +19,7 @@ class HttpInterface
     public function request($endpoint, $post = null, $login = false, $flood_wait = false, $assoc = true)
     {
         if (!$this->parent->isLoggedIn && !$login) {
-            throw new InstagramException("User is not logged in - login() must be called before making login-enforced requests.\n", 101);
+            throw new InstagramException("User is not logged in - login() must be called before making login-enforced requests.\n", ErrorCode::INTERNAL_LOGIN_REQUIRED);
             return;
         }
 
