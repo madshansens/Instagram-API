@@ -60,19 +60,19 @@ class InstagramException extends \Exception
     public function __construct($message, $code = null, Exception $previous = null)
     {
         if (is_null($code)) {
-            if (preg_match(IG_LOGIN_REQUIRED_REGEX, $message) === 1) {
+            if (preg_match(ErrorCode::IG_LOGIN_REQUIRED_REGEX, $message) === 1) {
                 $code = ErrorCode::IG_LOGIN_REQUIRED;
-            } elseif (preg_match(IG_FEEDBACK_REQUIRED_REGEX, $message) === 1) {
+            } elseif (preg_match(ErrorCode::IG_FEEDBACK_REQUIRED_REGEX, $message) === 1) {
                 $code = ErrorCode::IG_FEEDBACK_REQUIRED;
-            } elseif (preg_match(IG_CHECKPOINT_REQUIRED_REGEX, $message) === 1) {
+            } elseif (preg_match(ErrorCode::IG_CHECKPOINT_REQUIRED_REGEX, $message) === 1) {
                 $code = ErrorCode::IG_CHECKPOINT_REQUIRED;
-            } elseif (preg_match(IG_INCORRECT_PASSWORD_REGEX, $message) === 1) {
+            } elseif (preg_match(ErrorCode::IG_INCORRECT_PASSWORD_REGEX, $message) === 1) {
                 $code = ErrorCode::IG_INCORRECT_PASSWORD;
-            } elseif (preg_match(IG_ACCOUNT_DISABLED_REGEX, $message) === 1) {
+            } elseif (preg_match(ErrorCode::IG_ACCOUNT_DISABLED_REGEX, $message) === 1) {
                 $code = ErrorCode::IG_ACCOUNT_DISABLED;
-            } elseif (preg_match(IG_SENTRY_BLOCK_REGEX, $message) === 1) {
+            } elseif (preg_match(ErrorCode::IG_SENTRY_BLOCK_REGEX, $message) === 1) {
                 $code = ErrorCode::IG_SENTRY_BLOCK;
-            } elseif (preg_match(IG_INVALID_USER_REGEX, $message) === 1) {
+            } elseif (preg_match(ErrorCode::IG_INVALID_USER_REGEX, $message) === 1) {
                 $code = ErrorCode::IG_INVALID_USER;
             } else {
                 $code = 0;
