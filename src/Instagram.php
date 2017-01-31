@@ -1157,8 +1157,8 @@ class Instagram
         return $this->request("usertags/$usernameId/feed/")
         ->addParams('rank_token', $this->rank_token)
         ->addParams('ranked_content', 'true')
-		->addParams('max_id', (!is_null($maxid) ? $maxid : ''))
-		->addParams('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
+	->addParams('max_id', (!is_null($maxid) ? $maxid : ''))
+	->addParams('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
         ->getResponse(new UsertagsResponse());
     }
 
