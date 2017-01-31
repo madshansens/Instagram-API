@@ -37,7 +37,6 @@ class Instagram
         $this->debug = $debug;
         $this->truncatedDebug = $truncatedDebug;
 
-        $adapterType = 'file';
         $longOpts = ['settings_adapter::'];
         $options = getopt('', $longOpts);
 

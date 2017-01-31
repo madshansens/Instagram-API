@@ -12,8 +12,13 @@ class SettingsMysql
 
     public $tableName = 'user_settings';
 
-    public function __construct($instagramUsername, $username = 'root', $password = '', $host = 'localhost', $dbName = 'instagram')
+    public function __construct($instagramUsername, $username, $password, $host, $dbName)
     {
+        $username = is_null($username) ? 'root' : $username;
+        $password = is_null($password) ? '' : $password;
+        $host = is_null($host) ? 'localhost' : $host;
+        $dbName = is_null($dbName) ? 'instagram' : $dbName;
+
         $this->dbName = $dbName;
         $this->instagramUsername = $instagramUsername;
 
