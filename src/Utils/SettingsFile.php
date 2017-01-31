@@ -8,15 +8,6 @@ class SettingsFile
     private $sets;
     private $folderPath;
 
-    public function isLogged()
-    {
-        if ((file_exists($this->cookiesPath)) && ($this->get('username_id') != null) && ($this->get('token') != null)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public function __construct($username, $path)
     {
         $this->cookiesPath = $path.$username.DIRECTORY_SEPARATOR.$username.'-cookies.dat';
@@ -39,6 +30,15 @@ class SettingsFile
         }
     }
 
+    public function isLogged()
+    {
+        if ((file_exists($this->cookiesPath)) && ($this->get('username_id') != null) && ($this->get('token') != null)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function get($key, $default = null)
     {
         if ($key == 'sets') {
@@ -58,10 +58,10 @@ class SettingsFile
             return;
         }
         $this->sets[$key] = $value;
-        $this->Save();
+        $this->save();
     }
 
-    public function Save()
+    private function save()
     {
         if (file_exists($this->settingsPath)) {
             unlink($this->settingsPath);
@@ -74,7 +74,7 @@ class SettingsFile
         fclose($fp);
     }
 
-    protected function checkPermissions()
+    private function checkPermissions()
     {
         if (is_writable(dirname($this->settingsPath))) {
             return true;
@@ -84,6 +84,6 @@ class SettingsFile
             return true;
         }
 
-        throw new InstagramException('The setting file is not writable', 104);
+        throw new InstagramException('The setting file is not writable', ErrorCode::INTERNAL_SETTINGS_ERROR);
     }
 }
