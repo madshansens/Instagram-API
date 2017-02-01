@@ -1777,6 +1777,9 @@ class Instagram
      */
     public function usersFriendship($userList)
     {
+        if (!is_array($userList)) {
+            $userList = [$userList];
+        }
         return $this->request('friendships/show_many/')
         ->setSignedPost(false)
         ->addPost('_uuid', $this->uuid)
