@@ -168,21 +168,30 @@ class Instagram
             return $this->explore();
         }
 
+        if (is_null($this->settings->get('last_login'))) {
+            $this->settings->set('last_login', time());
+        }
+
         $check = $this->timelineFeed();
         if ($check->getMessage() == 'login_required') {
             $this->login(true);
         }
-        $this->autoCompleteUserList();
-        $this->getReelsTrayFeed();
-        $this->getRankedRecipients();
-        //push register
-        $this->getRecentRecipients();
-        //push register
-        $this->megaphoneLog();
-        $this->getv2Inbox();
-        $this->getRecentActivity();
+        if (time() - $this->settings->get('last_login') > 1800) {
+            $this->autoCompleteUserList();
+            $this->getReelsTrayFeed();
+            $this->getRankedRecipients();
+            //push register
+            $this->getRecentRecipients();
+            //push register
+            $this->megaphoneLog();
+            $this->getv2Inbox();
+            $this->getRecentActivity();
 
-        return $this->explore();
+            return $this->explore();
+        } else {
+            $this->settings->set('last_login', time());
+            return true;
+        }
     }
 
     /**
