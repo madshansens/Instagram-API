@@ -187,10 +187,9 @@ class Instagram
             $this->getv2Inbox();
             $this->getRecentActivity();
 
-            return $this->explore();
-        } else {
             $this->settings->set('last_login', time());
-            return true;
+
+            return $this->explore();
         }
     }
 
