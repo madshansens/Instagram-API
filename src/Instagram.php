@@ -132,7 +132,7 @@ class Instagram
             ->getResponse(new ChallengeResponse(), true);
 
             if (!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $response->getFullResponse()[0], $token)) {
-                throw new InstagramException('Missing csrftoken', 103);
+                throw new InstagramException('Missing csrftoken', ErrorCode::INTERNAL_CSRF_TOKEN_ERROR);
             }
 
             $response = $this->request('accounts/login/')
@@ -153,8 +153,9 @@ class Instagram
             preg_match('#Set-Cookie: csrftoken=([^;]+)#', $response->getFullResponse()[0], $match);
             $this->token = $match[1];
             $this->settings->set('token', $this->token);
+            $this->settings->set('last_login', time());
 
-            $test = $this->syncFeatures();
+            $this->syncFeatures();
             $this->autoCompleteUserList();
             $this->timelineFeed();
             $this->getRankedRecipients();
@@ -167,21 +168,29 @@ class Instagram
             return $this->explore();
         }
 
+        if (is_null($this->settings->get('last_login'))) {
+            $this->settings->set('last_login', time());
+        }
+
         $check = $this->timelineFeed();
         if ($check->getMessage() == 'login_required') {
             $this->login(true);
         }
-        $this->autoCompleteUserList();
-        $this->getReelsTrayFeed();
-        $this->getRankedRecipients();
-        //push register
-        $this->getRecentRecipients();
-        //push register
-        $this->megaphoneLog();
-        $this->getv2Inbox();
-        $this->getRecentActivity();
+        if (time() - $this->settings->get('last_login') > 1800) {
+            $this->settings->set('last_login', time());
 
-        return $this->explore();
+            $this->autoCompleteUserList();
+            $this->getReelsTrayFeed();
+            $this->getRankedRecipients();
+            //push register
+            $this->getRecentRecipients();
+            //push register
+            $this->megaphoneLog();
+            $this->getv2Inbox();
+            $this->getRecentActivity();
+
+            return $this->explore();
+        }
     }
 
     /**
@@ -1152,11 +1161,13 @@ class Instagram
      *
      * @return UsertagsResponse user tags data
      */
-    public function getUserTags($usernameId)
+    public function getUserTags($usernameId, $maxid = null, $minTimestamp = null)
     {
         return $this->request("usertags/$usernameId/feed/")
         ->addParams('rank_token', $this->rank_token)
         ->addParams('ranked_content', 'true')
+        ->addParams('max_id', (!is_null($maxid) ? $maxid : ''))
+        ->addParams('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
         ->getResponse(new UsertagsResponse());
     }
 
@@ -1763,6 +1774,9 @@ class Instagram
      */
     public function usersFriendship($userList)
     {
+        if (!is_array($userList)) {
+            $userList = [$userList];
+        }
         return $this->request('friendships/show_many/')
         ->setSignedPost(false)
         ->addPost('_uuid', $this->uuid)
@@ -1928,7 +1942,7 @@ class Request
             $mapper->bExceptionOnUndefinedProperty = true;
         }
         if (is_null($response[1])) {
-            throw new InstagramException('No response from server, connection or configure error', 5);
+            throw new InstagramException('No response from server, connection or configure error', ErrorCode::EMPTY_RESPONSE);
         }
 
         $responseObject = $mapper->map($response[1], $obj);

@@ -84,6 +84,6 @@ class SettingsFile
             return true;
         }
 
-        throw new InstagramException('The setting file is not writable', 104);
+        throw new InstagramException('The setting file is not writable', ErrorCode::INTERNAL_SETTINGS_ERROR);
     }
 }

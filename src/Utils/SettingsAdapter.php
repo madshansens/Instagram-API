@@ -16,7 +16,7 @@ class SettingsAdapter
 
             return;
         }
-        throw new Exception('Invalid settings adapter type.');
+        throw new InstagramException('Unrecognized settings type', ErrorCode::INTERNAL_SETTINGS_ERROR);
     }
 
     public function __call($func, $args)
