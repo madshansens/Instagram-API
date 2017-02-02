@@ -19,7 +19,7 @@ class HttpInterface
     public function request($endpoint, $post = null, $login = false, $flood_wait = false, $assoc = true)
     {
         if (!$this->parent->isLoggedIn && !$login) {
-            throw new InstagramException("User is not logged in - login() must be called before making login-enforced requests.\n", ErrorCode::INTERNAL_LOGIN_REQUIRED);
+            throw new InstagramException("User is not logged in - login() must be called before making login-enforced requests.\n", 101);
             return;
         }
 
@@ -43,7 +43,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
-        if ($this->parent->adapterType == 'file') {
+        if ($this->parent->settingsAdapter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
             curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
         } else {
@@ -91,7 +91,7 @@ class HttpInterface
 
         curl_close($ch);
 
-        if ($this->parent->adapterType == 'mysql') {
+        if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
         }
@@ -104,7 +104,7 @@ class HttpInterface
 
             return $this->request($endpoint, $post, $login, false, $assoc);
         } else {
-            return [$header, json_decode($body, $assoc, 512, JSON_BIGINT_AS_STRING)];
+            return [$header, json_decode($body, $assoc)];
         }
     }
 
@@ -207,7 +207,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        if ($this->parent->adapterType == 'file') {
+        if ($this->parent->settingsAdapter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
             curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
         } else {
@@ -248,7 +248,7 @@ class HttpInterface
         }
 
         curl_close($ch);
-        if ($this->parent->adapterType == 'mysql') {
+        if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
         }
@@ -319,7 +319,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        if ($this->parent->adapterType == 'file') {
+        if ($this->parent->settingsAdapter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
             curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
         } else {
@@ -391,7 +391,7 @@ class HttpInterface
             curl_setopt($ch, CURLOPT_HEADER, true);
             curl_setopt($ch, CURLOPT_VERBOSE, false);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            if ($this->parent->adapterType == 'file') {
+            if ($this->parent->settingsAdapter['type'] == 'file') {
                 curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
                 curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
             } else {
@@ -454,7 +454,7 @@ class HttpInterface
         }
 
         curl_close($ch);
-        if ($this->parent->adapterType == 'mysql') {
+        if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
         }
@@ -522,7 +522,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        if ($this->parent->adapterType == 'file') {
+        if ($this->parent->settingsAdapter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
             curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
         } else {
@@ -562,7 +562,7 @@ class HttpInterface
         }
 
         curl_close($ch);
-        if ($this->parent->adapterType == 'mysql') {
+        if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
         }
@@ -630,7 +630,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        if ($this->parent->adapterType == 'file') {
+        if ($this->parent->settingsAdapter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
             curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
         } else {
@@ -670,7 +670,7 @@ class HttpInterface
         }
 
         curl_close($ch);
-        if ($this->parent->adapterType == 'mysql') {
+        if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
         }
@@ -733,7 +733,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        if ($this->parent->adapterType == 'file') {
+        if ($this->parent->settingsAdapter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
             curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
         } else {
@@ -778,7 +778,7 @@ class HttpInterface
         }
 
         curl_close($ch);
-        if ($this->parent->adapterType == 'mysql') {
+        if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
         }
@@ -855,7 +855,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        if ($this->parent->adapterType == 'file') {
+        if ($this->parent->settingsAdapter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
             curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
         } else {
@@ -900,7 +900,7 @@ class HttpInterface
         }
 
         curl_close($ch);
-        if ($this->parent->adapterType == 'mysql') {
+        if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
         }

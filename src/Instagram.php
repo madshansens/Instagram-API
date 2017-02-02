@@ -18,8 +18,20 @@ class Instagram
     public $rank_token;         // Rank token
 
     public $http;
-    public $adapterType;
     public $settings;
+
+    public $settingsAdapter = ['type'     => 'file',
+        'path'                            => __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR, ]; // File | Mysql
+
+    /*
+    // Settings for mysql storage
+    public $settingsAdapter         = array(
+    "type"       => "mysql",
+    "username"   => "",
+    "password"   => "",
+    "host"       => "",
+    "database"   => "");
+    */
 
     public $proxy = null;     // Full Proxy
     public $proxyHost = null; // Proxy Host and Port
@@ -30,29 +42,12 @@ class Instagram
      *
      * @param $debug Debug on or off, false by default
      */
-    public function __construct($debug = false, $truncatedDebug = false, $adapterType = null)
+    public function __construct($debug = false, $truncatedDebug = false)
     {
         self::$instance = $this;
         $this->mapper = new \JsonMapper();
         $this->debug = $debug;
         $this->truncatedDebug = $truncatedDebug;
-
-        $longOpts = ['settings_adapter::'];
-        $options = getopt('', $longOpts);
-
-        if (!$options) {
-            $options = [];
-        }
-
-        if (!is_null($adapterType)) {
-            $this->adapterType = $adapterType;
-        } elseif (array_key_exists('settings_adapter', $options)) {
-            $this->adapterType = $options[$settings_adapter];
-        } elseif (getenv('SETTINGS_ADAPTER') !== false) {
-            $this->adapterType = getenv('SETTINGS_ADAPTER');
-        } else {
-            $this->adapterType = 'file';
-        }
     }
 
     /**
@@ -64,7 +59,7 @@ class Instagram
     public function setUser($username, $password)
     {
         $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
-        $this->settings = new SettingsAdapter($this->adapterType, $username);
+        $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
         $this->checkSettings($username);
         $this->http = new HttpInterface($this);
 
@@ -130,14 +125,14 @@ class Instagram
         if (!$this->isLoggedIn || $force) {
             $this->syncFeatures(true);
 
-            $response = $this->request('si/fetch_headers/')
+            $response = $this->request('si/fetch_headers')
             ->requireLogin(true)
             ->addParams('challenge_type', 'signup')
             ->addParams('guid', SignatureUtils::generateUUID(false))
             ->getResponse(new ChallengeResponse(), true);
 
             if (!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $response->getFullResponse()[0], $token)) {
-                throw new InstagramException('Missing csrftoken', ErrorCode::INTERNAL_CSRF_TOKEN_ERROR);
+                throw new InstagramException('Missing csrftoken', 103);
             }
 
             $response = $this->request('accounts/login/')
@@ -172,29 +167,21 @@ class Instagram
             return $this->explore();
         }
 
-        if (is_null($this->settings->get('last_login'))) {
-            $this->settings->set('last_login', time());
-        }
-
         $check = $this->timelineFeed();
         if ($check->getMessage() == 'login_required') {
             $this->login(true);
         }
-        if (time() - $this->settings->get('last_login') > 1800) {
-            $this->autoCompleteUserList();
-            $this->getReelsTrayFeed();
-            $this->getRankedRecipients();
-            //push register
-            $this->getRecentRecipients();
-            //push register
-            $this->megaphoneLog();
-            $this->getv2Inbox();
-            $this->getRecentActivity();
+        $this->autoCompleteUserList();
+        $this->getReelsTrayFeed();
+        $this->getRankedRecipients();
+        //push register
+        $this->getRecentRecipients();
+        //push register
+        $this->megaphoneLog();
+        $this->getv2Inbox();
+        $this->getRecentActivity();
 
-            $this->settings->set('last_login', time());
-
-            return $this->explore();
-        }
+        return $this->explore();
     }
 
     /**
@@ -1165,13 +1152,11 @@ class Instagram
      *
      * @return UsertagsResponse user tags data
      */
-    public function getUserTags($usernameId, $maxid = null, $minTimestamp = null)
+    public function getUserTags($usernameId)
     {
         return $this->request("usertags/$usernameId/feed/")
         ->addParams('rank_token', $this->rank_token)
         ->addParams('ranked_content', 'true')
-    ->addParams('max_id', (!is_null($maxid) ? $maxid : ''))
-    ->addParams('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
         ->getResponse(new UsertagsResponse());
     }
 
@@ -1646,8 +1631,6 @@ class Instagram
 
     /**
      * Backups all your uploaded photos and videos :).
-     *
-     * @throws InstagramException
      */
     public function backup()
     {
@@ -1655,7 +1638,7 @@ class Instagram
         do {
             $myUploads = $this->getSelfUserFeed($nextUploadMaxId);
 
-            $backupMainFolder = Constants::DATA_DIR.$this->username.'/backup/';
+            $backupMainFolder = $this->settingsAdapter['path'].$this->username.'/backup/';
             $backupFolder = $backupMainFolder.'/'.date('Y-m-d').'/';
 
             if (!is_dir($backupMainFolder)) {
@@ -1780,9 +1763,6 @@ class Instagram
      */
     public function usersFriendship($userList)
     {
-        if (!is_array($userList)) {
-            $userList = [$userList];
-        }
         return $this->request('friendships/show_many/')
         ->setSignedPost(false)
         ->addPost('_uuid', $this->uuid)
@@ -1948,7 +1928,7 @@ class Request
             $mapper->bExceptionOnUndefinedProperty = true;
         }
         if (is_null($response[1])) {
-            throw new InstagramException('No response from server, connection or configure error', ErrorCode::EMPTY_RESPONSE);
+            throw new InstagramException('No response from server, connection or configure error', 5);
         }
 
         $responseObject = $mapper->map($response[1], $obj);
