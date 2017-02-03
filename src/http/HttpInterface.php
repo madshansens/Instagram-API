@@ -41,6 +41,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_VERBOSE, false);
+        curl_setopt($ch, CURLOPT_ENCODING,  '');
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         if ($this->parent->settingsAdapter['type'] == 'file') {
@@ -204,6 +205,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_VERBOSE, false);
+        curl_setopt($ch, CURLOPT_ENCODING,  '');
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -318,6 +320,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_VERBOSE, false);
+        curl_setopt($ch, CURLOPT_ENCODING,  '');
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         if ($this->parent->settingsAdapter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
@@ -390,6 +393,7 @@ class HttpInterface
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($ch, CURLOPT_HEADER, true);
             curl_setopt($ch, CURLOPT_VERBOSE, false);
+            curl_setopt($ch, CURLOPT_ENCODING,  '');
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             if ($this->parent->settingsAdapter['type'] == 'file') {
                 curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
