@@ -12,13 +12,11 @@ class Checkpoint
 
     public function __construct($username, $settingsPath = null, $debug = false)
     {
-        $path = ($settingsPath) ? $settingsPath : __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR;
-
-        $settingsAdapter = ['type' => 'file', 'path' => $path]; // File | Mysql
+        $path = ($settingsPath) ? $settingsPath : Constants::DATA_DIR;
+        $this->settings = new SettingsAdapter(['type' => 'file', 'path' => $path], $username);
 
         $this->username = $username;
         $this->debug = $debug;
-        $this->settings = new SettingsAdapter($settingsAdapter, $username);
         $this->userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_3_3 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Mobile/13G34 Instagram 8.5.2 (iPhone5,2; iPhone OS 9_3_3; es_ES; es-ES; scale=2.00; 640x1136)';
     }
 

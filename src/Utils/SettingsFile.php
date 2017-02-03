@@ -8,17 +8,11 @@ class SettingsFile
     private $sets;
     private $folderPath;
 
-    public function isLogged()
-    {
-        if ((file_exists($this->cookiesPath)) && ($this->get('username_id') != null) && ($this->get('token') != null)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public function __construct($username, $path)
     {
+        if (!$path) {
+            $path = Constants::DATA_DIR;
+        }
         $this->cookiesPath = $path.$username.DIRECTORY_SEPARATOR.$username.'-cookies.dat';
         $this->settingsPath = $path.$username.DIRECTORY_SEPARATOR.'settings-'.$username.'.dat';
 
@@ -36,6 +30,15 @@ class SettingsFile
                 $this->sets[$kv[0]] = trim($kv[1], "\r\n ");
             }
             fclose($fp);
+        }
+    }
+
+    public function isLogged()
+    {
+        if ((file_exists($this->cookiesPath)) && ($this->get('username_id') != null) && ($this->get('token') != null)) {
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -74,7 +77,7 @@ class SettingsFile
         fclose($fp);
     }
 
-    protected function checkPermissions()
+    private function checkPermissions()
     {
         if (is_writable(dirname($this->settingsPath))) {
             return true;

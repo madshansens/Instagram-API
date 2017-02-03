@@ -18,4 +18,5 @@ class Constants
 
     const ANDROID_VERSION = 18;
     const ANDROID_RELEASE = '4.3';
+    const DATA_DIR = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR;
 }
