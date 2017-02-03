@@ -111,6 +111,10 @@ class HttpInterface
 
     public function getResponseWithResult($obj, $response)
     {
+        if (is_null($response)) {
+            throw new InstagramException('No response from server, connection or configure error', ErrorCode::EMPTY_RESPONSE);
+        }
+
         $mapper = new \JsonMapper();
 
         $mapper->bStrictNullTypes = false;

@@ -178,6 +178,9 @@ class InstagramRegistration
         $mapper = new \JsonMapper();
         $mapper->bStrictNullTypes = false;
         $mapper->bEnforceMapType = false;
+        if (is_null($fetch[1])) {
+            throw new InstagramException('No response from server, connection or configure error', ErrorCode::EMPTY_RESPONSE);
+        }
         $response = $mapper->map($fetch[1], new ChallengeResponse());
 
         if (!isset($header) || (!$response->isOk())) {

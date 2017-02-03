@@ -33,7 +33,6 @@ class Instagram
     public function __construct($debug = false, $truncatedDebug = false, $settingsAdapter = null)
     {
         self::$instance = $this;
-        $this->mapper = new \JsonMapper();
         $this->debug = $debug;
         $this->truncatedDebug = $truncatedDebug;
 
