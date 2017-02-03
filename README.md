@@ -39,6 +39,11 @@ You can download it here: [https://getcomposer.org/](https://getcomposer.org/)
 
 All examples can be found [here](https://github.com/mgp25/Instagram-API/tree/master/examples)
 
+## Contributing
+
+If you would like to contribute to this project, please feel free to submit a pull request.
+
+Before you do, take a look at the [contributing guide](https://github.com/mgp25/Instagram-API/blob/master/CONTRIBUTING.md)
 
 ## Why did i do the API?
 
