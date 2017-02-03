@@ -120,6 +120,7 @@ class SettingsMysql
             `model` VARCHAR(255) NULL DEFAULT NULL,
             `cookies` TEXT NULL,
             `date` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+            `last_login` BIGINT NULL DEFAULT 0,
             PRIMARY KEY (`id`)
             )
             COLLATE='utf8_general_ci'
