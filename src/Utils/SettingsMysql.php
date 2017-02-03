@@ -56,7 +56,7 @@ class SettingsMysql
         }
 
         $this->sets[$key] = $value;
-        $this->save();
+        $this->Save();
     }
 
     public function Save()

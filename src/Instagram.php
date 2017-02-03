@@ -18,7 +18,7 @@ class Instagram
     public $rank_token;         // Rank token
 
     public $http;
-    public $adapterType;
+    public $settingsAdapter;
     public $settings;
 
     public $proxy = null;     // Full Proxy
@@ -30,7 +30,7 @@ class Instagram
      *
      * @param $debug Debug on or off, false by default
      */
-    public function __construct($debug = false, $truncatedDebug = false, $adapterType = null)
+    public function __construct($debug = false, $truncatedDebug = false, $settingsAdapter = null)
     {
         self::$instance = $this;
         $this->mapper = new \JsonMapper();
@@ -40,14 +40,14 @@ class Instagram
         $longOpts = ['settings_adapter::'];
         $options = getopt('', $longOpts);
 
-        if (!is_null($adapterType)) {
-            $this->adapterType = $adapterType;
+        if (!is_null($settingsAdapter)) {
+            $this->settingsAdapter = $settingsAdapter;
         } elseif (array_key_exists('settings_adapter', $options)) {
-            $this->adapterType = $options[$settings_adapter];
+            $this->settingsAdapter = ['type' => $options[$settings_adapter]];
         } elseif (getenv('SETTINGS_ADAPTER') !== false) {
-            $this->adapterType = getenv('SETTINGS_ADAPTER');
+            $this->settingsAdapter = ['type' => getenv('SETTINGS_ADAPTER')];
         } else {
-            $this->adapterType = 'file';
+            $this->settingsAdapter = ['type' => 'file'];
         }
     }
 
@@ -60,7 +60,7 @@ class Instagram
     public function setUser($username, $password)
     {
         $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
-        $this->settings = new SettingsAdapter($this->adapterType, $username);
+        $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
         $this->checkSettings($username);
         $this->http = new HttpInterface($this);
 
@@ -1652,7 +1652,8 @@ class Instagram
         do {
             $myUploads = $this->getSelfUserFeed($nextUploadMaxId);
 
-            $backupMainFolder = Constants::DATA_DIR.$this->username.'/backup/';
+            $dataDirectory = array_key_exists('path', $this->settingsAdapter) ? $this->settingsAdapter['path'] : Constants::DATA_DIR;
+            $backupMainFolder = $dataDirectory.$this->username.'/backup/';
             $backupFolder = $backupMainFolder.'/'.date('Y-m-d').'/';
 
             if (!is_dir($backupMainFolder)) {

@@ -10,6 +10,9 @@ class SettingsFile
 
     public function __construct($username, $path)
     {
+        if (!$path) {
+            $path = Constants::DATA_DIR;
+        }
         $this->cookiesPath = $path.$username.DIRECTORY_SEPARATOR.$username.'-cookies.dat';
         $this->settingsPath = $path.$username.DIRECTORY_SEPARATOR.'settings-'.$username.'.dat';
 

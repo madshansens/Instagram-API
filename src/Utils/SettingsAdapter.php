@@ -4,9 +4,9 @@ namespace InstagramAPI;
 
 class SettingsAdapter
 {
-    public function __construct($adapterType, $username)
+    public function __construct($config, $username)
     {
-        switch ($adapterType) {
+        switch ($config['type']) {
         case 'mysql':
             $longOpts = [
                 'db_username::',
@@ -20,15 +20,21 @@ class SettingsAdapter
             $env_host = getenv('DB_HOST');
             $env_name = getenv('DB_NAME');
 
-            $dbUsername = array_key_exists('db_username', $options) ? options['db_username'] : $env_username !== false ? $env_username : null;
-            $password = array_key_exists('db_password', $options) ? options['db_password'] : $env_password !== false ? $env_password : null;
-            $host = array_key_exists('db_host', $options) ? options['db_host'] : $env_host !== false ? $env_host : null;
-            $name = array_key_exists('db_name', $options) ? options['db_name'] : $env_name !== false ? $env_name : null;
+            $dbUsername = array_key_exists('username', $config) ? $config['username'] : array_key_exists('db_username', $options) ? options['db_username'] : $env_username !== false ? $env_username : null;
+            $password = array_key_exists('password', $config) ? $config['password'] : array_key_exists('db_password', $options) ? options['db_password'] : $env_password !== false ? $env_password : null;
+            $host = array_key_exists('host', $config) ? $config['host'] : array_key_exists('db_host', $options) ? options['db_host'] : $env_host !== false ? $env_host : null;
+            $name = array_key_exists('name', $config) ? $config['name'] : array_key_exists('db_name', $options) ? options['db_name'] : $env_name !== false ? $env_name : null;
 
             $this->setting = new SettingsMysql($username, $dbUsername, $password, $host, $name);
             break;
         case 'file':
-            $this->setting = new SettingsFile($username, Constants::DATA_DIR);
+            $longOpts = [
+                'settings_path::',
+            ];
+            $options = getopt('', $longOpts);
+            $env_settings_path = getenv('SETTINGS_PATH');
+            $settings_path = array_key_exists('path', $config) ? $config['path'] : array_key_exists('settings_path', $options) ? options['settings_path'] : $env_settings_path !== false ? $env_settings_path : null;
+            $this->setting = new SettingsFile($username, $settings_path);
             break;
         default:
             throw new InstagramException('Unrecognized settings type', ErrorCode::INTERNAL_SETTINGS_ERROR);

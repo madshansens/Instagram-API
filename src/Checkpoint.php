@@ -10,11 +10,13 @@ class Checkpoint
     protected $userAgent;
     protected $debug;
 
-    public function __construct($username, $debug = false)
+    public function __construct($username, $settingsPath = null, $debug = false)
     {
+        $path = ($settingsPath) ? $settingsPath : Constants::DATA_DIR;
+        $this->settings = new SettingsAdapter(['type' => 'file', 'path' => $path], $username);
+
         $this->username = $username;
         $this->debug = $debug;
-        $this->settings = new SettingsAdapter('file', $username);
         $this->userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_3_3 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Mobile/13G34 Instagram 8.5.2 (iPhone5,2; iPhone OS 9_3_3; es_ES; es-ES; scale=2.00; 640x1136)';
     }
 

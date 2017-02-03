@@ -10,31 +10,30 @@ class InstagramRegistration
     protected $waterfall_id;
     protected $token;
     protected $userAgent;
-    protected $adapterType;
+    protected $settingsAdapter;
     protected $settings;
     protected $proxy = null;     // Full Proxy
     protected $proxyHost = null; // Proxy Host and Port
     protected $proxyAuth = null; // Proxy User and Pass
 
-    public function __construct($debug = false)
+    public function __construct($debug = false, $dataPath = null)
     {
         $this->debug = $debug;
         $this->uuid = SignatureUtils::generateUUID(true);
         $this->waterfall_id = SignatureUtils::generateUUID(true);
         $this->userAgent = 'Instagram '.Constants::VERSION.' Android (18/4.3; 320dpi; 720x1280; Xiaomi; HM 1SW; armani; qcom; en_US)';
 
-        $adapterType = 'file';
         $longOpts = ['settings_adapter::'];
         $options = getopt('', $longOpts);
 
-        if (!is_null($adapterType)) {
-            $this->adapterType = $adapterType;
+        if (!is_null($dataPath)) {
+            $this->settingsAdapter = ['type' => 'file', 'path' => $dataPath];
         } elseif (array_key_exists('settings_adapter', $options)) {
-            $this->adapterType = $options[$settings_adapter];
+            $this->settingsAdapter = ['type' => $options[$settings_adapter]];
         } elseif (getenv('SETTINGS_ADAPTER') !== false) {
-            $this->adapterType = getenv('SETTINGS_ADAPTER');
+            $this->settingsAdapter = ['type' => getenv('SETTINGS_ADAPTER')];
         } else {
-            $this->adapterType = 'file';
+            $this->settingsAdapter = ['type' => 'file'];
         }
     }
 
@@ -88,7 +87,7 @@ class InstagramRegistration
     public function checkUsername($username)
     {
         $this->username = $username;
-        $this->settings = new SettingsAdapter($this->adapterType, $username);
+        $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
 
         $data = json_encode([
             'username'        => $username,
@@ -204,7 +203,7 @@ class InstagramRegistration
         curl_setopt($ch, CURLOPT_VERBOSE, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        if ($this->adapterType == 'file') {
+        if ($this->settingsAdapter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->settings->cookiesPath);
             curl_setopt($ch, CURLOPT_COOKIEJAR, $this->settings->cookiesPath);
         } else {
@@ -236,7 +235,7 @@ class InstagramRegistration
 
         curl_close($ch);
 
-        if ($this->adapterType == 'mysql') {
+        if ($this->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->settings->set('cookies', $newCookies);
         }
