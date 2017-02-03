@@ -460,6 +460,12 @@ class HttpInterface
         }
         $configure = $this->parent->configureVideo($upload_id, $video, $caption, $customPreview);
         //$this->parent->expose();
+        $attemps = 0;
+        while ($configure->getMessage() == 'Transcode timeout' && $attemps < 3) {
+            sleep(1);
+            $configure = $this->parent->configureVideo($upload_id, $video, $caption, $customPreview);
+            $attemps++;
+        }
 
         return $configure;
     }
