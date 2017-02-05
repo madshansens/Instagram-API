@@ -46,6 +46,10 @@ class ErrorCode {
     const IG_INVALID_USER = 8;
     const IG_INVALID_USER_REGEX = '/invalid_user/';
 
+    // 9: On Instagram forced password reset response
+    const IG_RESET_PASSWORD = 9;
+    const IG_RESET_PASSWORD_REGEX = '/reset(.*)password/';
+
     /**
      * 1XX: Internal Errors.
      */
@@ -74,6 +78,8 @@ class InstagramException extends \Exception
                 $code = ErrorCode::IG_SENTRY_BLOCK;
             } elseif (preg_match(ErrorCode::IG_INVALID_USER_REGEX, $message) === 1) {
                 $code = ErrorCode::IG_INVALID_USER;
+            } elseif (preg_match(ErrorCode::IG_RESET_PASSWORD_REGEX, $message) === 1) {
+                $code = ErrorCode::IG_RESET_PASSWORD;
             } else {
                 $code = 0;
             }
