@@ -105,7 +105,7 @@ class AdaptImage
                 imagecopyresized($im, $this->images, $this->x, 0, 0, 0, $this->newWidth, 799, $this->width, $this->height);
             }
             ob_start();
-            imagejpeg($im);
+            imagejpeg($im, null, 100);
             $data = ob_get_contents();
             ob_end_clean();
 
