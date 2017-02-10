@@ -15,6 +15,11 @@ class SettingsAdapter
                 'db_name::',
             ];
             $options = getopt('', $longOpts);
+                
+            if (!$options) {
+                $options = [];
+            }
+                
             $env_username = getenv('DB_USERNAME');
             $env_password = getenv('DB_PASSWORD');
             $env_host = getenv('DB_HOST');
