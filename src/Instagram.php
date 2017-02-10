@@ -39,6 +39,10 @@ class Instagram
         $longOpts = ['settings_adapter::'];
         $options = getopt('', $longOpts);
 
+        if (!$options) {
+            $options = [];
+        }
+
         if (!is_null($settingsAdapter)) {
             $this->settingsAdapter = $settingsAdapter;
         } elseif (array_key_exists('settings_adapter', $options)) {
