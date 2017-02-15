@@ -121,7 +121,8 @@ class SettingsMysql
             `cookies` TEXT NULL,
             `date` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
             `last_login` BIGINT NULL DEFAULT 0,
-            PRIMARY KEY (`id`)
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `idx_username` (`username`)
             )
             COLLATE='utf8_general_ci'
             ENGINE=InnoDB;
