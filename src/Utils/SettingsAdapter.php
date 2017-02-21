@@ -43,7 +43,15 @@ class SettingsAdapter
             }
                 
             $env_settings_path = getenv('SETTINGS_PATH');
-            $settings_path = array_key_exists('path', $config) ? $config['path'] : array_key_exists('settings_path', $options) ? options['settings_path'] : $env_settings_path !== false ? $env_settings_path : null;
+            if (array_key_exists('path', $config)) {
+                $settings_path = $config['path'];
+            } elseif (array_key_exists('settings_path', $options)) {
+                $settings_path = $options['settings_path'];
+            } elseif ($env_settings_path !== false) {
+                $settings_path = $env_settings_path;
+            } else {
+                $settings_path = null;
+            }
             $this->setting = new SettingsFile($username, $settings_path);
             break;
         default:
