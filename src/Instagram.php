@@ -1464,7 +1464,7 @@ class Instagram
     }
 
     /**
-     * Get locations by geo point
+     * Get locations by geo point.
      *
      * @param string $lat Latitude
      * @param string $lng Longitude
@@ -1803,6 +1803,7 @@ class Instagram
         if (!is_array($userList)) {
             $userList = [$userList];
         }
+
         return $this->request('friendships/show_many/')
         ->setSignedPost(false)
         ->addPost('_uuid', $this->uuid)
