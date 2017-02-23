@@ -1464,6 +1464,25 @@ class Instagram
     }
 
     /**
+     * Get locations by geo point.
+     *
+     * @param string $lat Latitude
+     * @param string $lng Longitude
+     *
+     * @throws InstagramException
+     *
+     * @return array Location location data
+     */
+    public function searchFBLocationByPoint($lat, $lng)
+    {
+        return $this->request('fbsearch/places/')
+        ->addParams('rank_token', $this->rank_token)
+        ->addParams('lat', $lat)
+        ->addParams('lng', $lng)
+        ->getResponse(new FBLocationResponse());
+    }
+
+    /**
      * Get location feed.
      *
      * @param string $locationId location id
@@ -1784,6 +1803,7 @@ class Instagram
         if (!is_array($userList)) {
             $userList = [$userList];
         }
+
         return $this->request('friendships/show_many/')
         ->setSignedPost(false)
         ->addPost('_uuid', $this->uuid)
