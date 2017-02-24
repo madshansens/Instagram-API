@@ -54,6 +54,17 @@ class SettingsAdapter
             }
             $this->setting = new SettingsFile($username, $settings_path);
             break;
+        case 'custom':
+            if (!isset($config['class']) || !class_exists($config['class']) || !in_array(SettingsAdapter\SettingsInterface::class, class_implements($config['class']))) {
+                throw new InstagramException('Unknown custom settings class specified', ErrorCode::INTERNAL_SETTINGS_ERROR);
+            }
+
+            $customClass = $config['class'];
+            /** @var SettingsAdapter\SettingsInterface $settings */
+            $settings    = new $customClass($username, $config);
+
+            $this->setting = $settings;
+            break;
         default:
             throw new InstagramException('Unrecognized settings type', ErrorCode::INTERNAL_SETTINGS_ERROR);
         }

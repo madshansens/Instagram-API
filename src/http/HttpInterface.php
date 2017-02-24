@@ -20,7 +20,6 @@ class HttpInterface
     {
         if (!$this->parent->isLoggedIn && !$login) {
             throw new InstagramException("User is not logged in - login() must be called before making login-enforced requests.\n", ErrorCode::INTERNAL_LOGIN_REQUIRED);
-            return;
         }
 
         $headers = [
@@ -93,6 +92,9 @@ class HttpInterface
         curl_close($ch);
 
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->parent->settings->set('cookies', $newCookies);
+        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
         }
@@ -257,10 +259,12 @@ class HttpInterface
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
+        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->parent->settings->set('cookies', $newCookies);
         }
         if (!$upload->isOk()) {
             throw new InstagramException($upload->getMessage());
-            return;
         }
 
         if ($reel_flag) {
@@ -465,6 +469,9 @@ class HttpInterface
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
+        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->parent->settings->set('cookies', $newCookies);
         }
         $configure = $this->parent->configureVideo($upload_id, $video, $caption, $customPreview);
         //$this->parent->expose();
@@ -579,6 +586,9 @@ class HttpInterface
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
+        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->parent->settings->set('cookies', $newCookies);
         }
     }
 
@@ -685,6 +695,9 @@ class HttpInterface
 
         curl_close($ch);
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->parent->settings->set('cookies', $newCookies);
+        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
         }
@@ -795,6 +808,9 @@ class HttpInterface
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
+        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->parent->settings->set('cookies', $newCookies);
         }
     }
 
@@ -898,7 +914,6 @@ class HttpInterface
 
         if (!$upload->isOk()) {
             throw new InstagramException($upload->getMessage());
-            return;
         }
 
         if ($this->parent->debug) {
@@ -915,6 +930,9 @@ class HttpInterface
 
         curl_close($ch);
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->parent->settings->set('cookies', $newCookies);
+        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
         }
