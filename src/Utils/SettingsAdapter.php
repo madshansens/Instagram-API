@@ -15,11 +15,11 @@ class SettingsAdapter
                 'db_name::',
             ];
             $options = getopt('', $longOpts);
-                
+
             if (!$options) {
                 $options = [];
             }
-                
+
             $env_username = getenv('DB_USERNAME');
             $env_password = getenv('DB_PASSWORD');
             $env_host = getenv('DB_HOST');
@@ -37,11 +37,11 @@ class SettingsAdapter
                 'settings_path::',
             ];
             $options = getopt('', $longOpts);
-                
+
             if (!$options) {
                 $options = [];
             }
-                
+
             $env_settings_path = getenv('SETTINGS_PATH');
             if (array_key_exists('path', $config)) {
                 $settings_path = $config['path'];

@@ -10,7 +10,8 @@ namespace InstagramAPI;
  * include the "message" field as a part of the string argument
  * used for the InstagramException's constructor.
  */
-class ErrorCode {
+class ErrorCode
+{
     // Error codes:
     // 0: Unrecognized by parser
     const UNKNOWN = 0;
