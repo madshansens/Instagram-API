@@ -61,6 +61,7 @@ class Memcached implements SettingsInterface
     public function get($key, $default = null)
     {
         $result = $this->memcached->get($key);
+
         return \Memcached::RES_NOTFOUND === $this->memcached->getResultCode() ? $default : $result;
     }
 
