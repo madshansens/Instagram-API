@@ -3,7 +3,7 @@
 namespace InstagramAPI\SettingsAdapter;
 
 /**
- * Interface SettingsInterface
+ * Interface SettingsInterface.
  *
  * @author ilyk <ilyk@ilyk.im>
  */
