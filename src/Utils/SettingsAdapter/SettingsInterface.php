@@ -4,7 +4,6 @@ namespace InstagramAPI\SettingsAdapter;
 
 /**
  * Interface SettingsInterface
- * @package InstagramAPI\SettingsAdapter
  *
  * @author ilyk <ilyk@ilyk.im>
  */
@@ -14,13 +13,13 @@ interface SettingsInterface
      * SettingsInterface constructor.
      *
      * @param string $instagramUsername
-     * @param array $config
+     * @param array  $config
      */
     public function __construct($instagramUsername, $config);
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      *
      * @return void
      */
@@ -28,7 +27,7 @@ interface SettingsInterface
 
     /**
      * @param string $key
-     * @param mixed $default
+     * @param mixed  $default
      *
      * @return mixed
      */

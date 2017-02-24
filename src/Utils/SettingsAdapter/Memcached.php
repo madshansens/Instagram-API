@@ -4,7 +4,6 @@ namespace InstagramAPI\SettingsAdapter;
 
 /**
  * Class Memcached
- * @package InstagramAPI\SettingsAdapter
  *
  * @author ilyk <ilyk@ilyk.im>
  */
@@ -21,7 +20,8 @@ class Memcached implements SettingsInterface
      * @param string $instagramUsername
      * @param array  $config
      */
-    public function __construct($instagramUsername, $config) {
+    public function __construct($instagramUsername, $config)
+    {
         $this->memcached = $memcached= new \Memcached(isset($config['persistent_id']) ? $config['persistent_id'] : 'instagram');
 
         if (isset($config['init_callback']) && is_callable($config['init_callback'])) {
@@ -29,7 +29,7 @@ class Memcached implements SettingsInterface
         }
 
         if (isset($config['memcache_options'])) {
-            $memcached->setOptions((array)$config['memcache_options']);
+            $memcached->setOptions((array) $config['memcache_options']);
         }
 
         if (isset($config['servers'])) {
@@ -77,6 +77,5 @@ class Memcached implements SettingsInterface
      */
     public function Save()
     {
-        return;
     }
 }
