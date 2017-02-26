@@ -1239,7 +1239,7 @@ class Instagram
         ->addParams('latitude', $latitude)
         ->addParams('longitude', $longitude);
 
-        if (!is_null($query)) {
+        if (is_null($query)) {
             $locations->addParams('timestamp', time());
         } else {
             $locations->addParams('search_query', $query);
