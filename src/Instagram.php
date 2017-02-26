@@ -499,7 +499,7 @@ class Instagram
      * Direct Thread Data.
      *
      * @param $threadId Thread Id
-	 *
+     *
      * @param $cursorId Cursor Id
      *
      * @throws InstagramException Direct Thread Data
@@ -509,8 +509,8 @@ class Instagram
     // TODO : Missing Response
     public function directThread($threadId, $cursorId = false)
     {
-		$threadUrl = "direct_v2/threads/$threadId/?";
-		if ($cursorId) $threadUrl = "direct_v2/threads/$threadId/?cursor=$cursorId";
+	$threadUrl = "direct_v2/threads/$threadId/?";
+	if ($cursorId) $threadUrl = "direct_v2/threads/$threadId/?cursor=$cursorId";
         $directThread = $this->http->request($threadUrl)[1];
 
         if ($directThread['status'] != 'ok') {
