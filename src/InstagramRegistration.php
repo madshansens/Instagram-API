@@ -241,6 +241,9 @@ class InstagramRegistration
         if ($this->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->settings->set('cookies', $newCookies);
+        } elseif ($this->settings->setting instanceof SettingsAdapter\SettingsInterface) {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->settings->set('cookies', $newCookies);
         }
 
         if ($this->debug) {
