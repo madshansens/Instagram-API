@@ -16,9 +16,14 @@ class Instagram
     public $token;              // _csrftoken
     public $isLoggedIn = false; // Session status
     public $rank_token;         // Rank token
-
+    /**
+     * @var HttpInterface $http
+     */
     public $http;
     public $settingsAdapter;
+    /**
+     * @var SettingsFile $settings
+     */
     public $settings;
 
     public $proxy = null;     // Full Proxy
