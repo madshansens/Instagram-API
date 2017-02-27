@@ -17,12 +17,12 @@ class Instagram
     public $isLoggedIn = false; // Session status
     public $rank_token;         // Rank token
     /**
-     * @var HttpInterface $http
+     * @var HttpInterface
      */
     public $http;
     public $settingsAdapter;
     /**
-     * @var SettingsFile $settings
+     * @var SettingsFile
      */
     public $settings;
 
@@ -514,8 +514,8 @@ class Instagram
     // TODO : Missing Response
     public function directThread($threadId, $cursorId = false)
     {
-	$threadUrl = "direct_v2/threads/$threadId/?";
-	if ($cursorId) $threadUrl = "direct_v2/threads/$threadId/?cursor=$cursorId";
+	    $threadUrl = "direct_v2/threads/$threadId/?";
+	    if ($cursorId) $threadUrl = "direct_v2/threads/$threadId/?cursor=$cursorId";
         $directThread = $this->http->request($threadUrl)[1];
 
         if ($directThread['status'] != 'ok') {
