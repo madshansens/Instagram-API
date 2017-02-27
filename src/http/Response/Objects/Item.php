@@ -6,6 +6,7 @@ class Item extends Response
 {
     const PHOTO = 1;
     const VIDEO = 2;
+    const ALBUM = 8;
 
     public $taken_at;
     public $pk;

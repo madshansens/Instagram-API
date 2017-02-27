@@ -4,6 +4,9 @@ namespace InstagramAPI;
 
 class CarouselMedia extends Response
 {
+    const PHOTO = 1;
+    const VIDEO = 2;
+
     public $pk;
     public $id;
     public $carousel_parent_id;
