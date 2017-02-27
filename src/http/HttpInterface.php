@@ -20,7 +20,6 @@ class HttpInterface
     {
         if (!$this->parent->isLoggedIn && !$login) {
             throw new InstagramException("User is not logged in - login() must be called before making login-enforced requests.\n", ErrorCode::INTERNAL_LOGIN_REQUIRED);
-            return;
         }
 
         $headers = [
@@ -28,6 +27,8 @@ class HttpInterface
             'Accept: */*',
             'X-IG-Capabilities: '.Constants::X_IG_Capabilities,
             'X-IG-Connection-Type: WIFI',
+            'X-IG-Connection-Speed: '.mt_rand(1000, 3700).'kbps',
+            'X-FB-HTTP-Engine: Liger',
             'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
             'Accept-Language: en-US',
         ];
@@ -93,6 +94,9 @@ class HttpInterface
         curl_close($ch);
 
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->parent->settings->set('cookies', $newCookies);
+        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
         }
@@ -195,6 +199,8 @@ class HttpInterface
         $headers = [
             'X-IG-Capabilities: '.Constants::X_IG_Capabilities,
             'X-IG-Connection-Type: WIFI',
+            'X-IG-Connection-Speed: '.mt_rand(1000, 3700).'kbps',
+            'X-FB-HTTP-Engine: Liger',
             'Content-Type: multipart/form-data; boundary='.$boundary,
             'Content-Length: '.strlen($data),
             'Accept-Language: en-US',
@@ -257,10 +263,12 @@ class HttpInterface
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
+        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->parent->settings->set('cookies', $newCookies);
         }
         if (!$upload->isOk()) {
             throw new InstagramException($upload->getMessage());
-            return;
         }
 
         if ($reel_flag) {
@@ -465,6 +473,9 @@ class HttpInterface
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
+        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->parent->settings->set('cookies', $newCookies);
         }
         $configure = $this->parent->configureVideo($upload_id, $video, $caption, $customPreview);
         //$this->parent->expose();
@@ -579,6 +590,9 @@ class HttpInterface
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
+        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->parent->settings->set('cookies', $newCookies);
         }
     }
 
@@ -685,6 +699,9 @@ class HttpInterface
 
         curl_close($ch);
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->parent->settings->set('cookies', $newCookies);
+        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
         }
@@ -795,6 +812,9 @@ class HttpInterface
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
+        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->parent->settings->set('cookies', $newCookies);
         }
     }
 
@@ -898,7 +918,6 @@ class HttpInterface
 
         if (!$upload->isOk()) {
             throw new InstagramException($upload->getMessage());
-            return;
         }
 
         if ($this->parent->debug) {
@@ -915,6 +934,9 @@ class HttpInterface
 
         curl_close($ch);
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->parent->settings->set('cookies', $newCookies);
+        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
         }
