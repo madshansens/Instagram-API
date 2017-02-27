@@ -32,7 +32,10 @@ class Item extends Response
     public $expiring_at;
     public $is_reel_media;
     public $next_max_id = null;
-
+    /**
+     * @var CarouselMedia[]|null
+     */
+    public $carousel_media = null;
     /**
      * @var Comment[]
      */
