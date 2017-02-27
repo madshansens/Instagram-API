@@ -28,7 +28,7 @@ class HttpInterface
             'Accept: */*',
             'X-IG-Capabilities: '.Constants::X_IG_Capabilities,
             'X-IG-Connection-Type: WIFI',
-            'X-IG-Connection-Speed: ' .  mt_rand(1000, 3700) . 'kbps',
+            'X-IG-Connection-Speed: '.mt_rand(1000, 3700).'kbps',
             'X-FB-HTTP-Engine: Liger',
             'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
             'Accept-Language: en-US',
@@ -197,7 +197,7 @@ class HttpInterface
         $headers = [
             'X-IG-Capabilities: '.Constants::X_IG_Capabilities,
             'X-IG-Connection-Type: WIFI',
-            'X-IG-Connection-Speed: ' .  mt_rand(1000, 3700) . 'kbps',
+            'X-IG-Connection-Speed: '.mt_rand(1000, 3700).'kbps',
             'X-FB-HTTP-Engine: Liger',
             'Content-Type: multipart/form-data; boundary='.$boundary,
             'Content-Length: '.strlen($data),
