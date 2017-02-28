@@ -2,13 +2,20 @@
 
 namespace InstagramAPI;
 
+use \Curl\Curl;
+
 class HttpInterface
 {
     protected $parent;
     protected $userAgent;
-    protected $verifyPeer = false;
-    protected $verifyHost = false;
+    protected $verifyPeer = true;
+    protected $verifyHost = 2;
     public $proxy = [];
+
+    /**
+     * @var Curl Curl Object
+     */
+    private $curl;
 
     public function __construct($parent)
     {
@@ -18,63 +25,60 @@ class HttpInterface
 
     public function request($endpoint, $post = null, $login = false, $flood_wait = false, $assoc = true)
     {
+        $this->curl = new Curl();
+
         if (!$this->parent->isLoggedIn && !$login) {
             throw new InstagramException("User is not logged in - login() must be called before making login-enforced requests.\n", ErrorCode::INTERNAL_LOGIN_REQUIRED);
         }
 
-        $headers = [
-            'Connection: close',
-            'Accept: */*',
-            'X-IG-Capabilities: '.Constants::X_IG_Capabilities,
-            'X-IG-Connection-Type: WIFI',
-            'X-IG-Connection-Speed: '.mt_rand(1000, 3700).'kbps',
-            'X-FB-HTTP-Engine: Liger',
-            'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
-            'Accept-Language: en-US',
-        ];
+        $this->curl->setUserAgent($this->userAgent);
+        $this->curl->setHeader('Connection', 'close');
+        $this->curl->setHeader('Accept', '*/*');
+        $this->curl->setHeader('Accept-Encoding', Constants::ACCEPT_ENCODING);
+        $this->curl->setHeader('X-IG-Capabilities', Constants::X_IG_Capabilities);
+        $this->curl->setHeader('X-IG-Connection-Type', Constants::X_IG_Connection_Type);
+        $this->curl->setHeader('X-IG-Connection-Speed', mt_rand(1000, 3700).'kbps');
+        $this->curl->setHeader('X-FB-HTTP-Engine', Constants::X_FB_HTTP_Engine);
+        $this->curl->setHeader('Content-Type', Constants::CONTENT_TYPE);
+        $this->curl->setHeader('Accept-Language', Constants::ACCEPT_LANGUAGE);
+        $this->curl->setOpt(CURLOPT_FOLLOWLOCATION, true);
+        $this->curl->setOpt(CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
+        $this->curl->setOpt(CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
 
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
-        curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_VERBOSE, false);
-        curl_setopt($ch, CURLOPT_ENCODING, '');
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
         if ($this->parent->settingsAdapter['type'] == 'file') {
-            curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
-            curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
+            $this->curl->setCookieFile($this->parent->settings->cookiesPath);
+            $this->curl->setCookieJar($this->parent->settings->cookiesPath);
         } else {
             $cookieJar = $this->parent->settings->get('cookies');
             $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
 
             file_put_contents($cookieJarFile, $cookieJar);
 
-            curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieJarFile);
-            curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieJarFile);
-        }
-
-        if ($post) {
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+            $this->curl->setCookieFile($cookieJarFile);
+            $this->curl->setCookieJar($cookieJar);
         }
 
         if ($this->proxy) {
-            curl_setopt($ch, CURLOPT_PROXY, $this->proxy['host'].':'.$this->proxy['port']);
+            $this->curl->setOpt(CURLOPT_HTTPPROXYTUNNEL, 1);
+            $this->curl->setOpt(CURLOPT_PROXY, $this->proxy['host'].':'.$this->proxy['port']);
             if ($this->proxy['username']) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxy['username'].':'.$this->proxy['password']);
+                $this->curl->setOpt(CURLOPT_PROXYUSERPWD, $this->proxy['username'].':'.$this->proxy['password']);
             }
         }
 
-        $resp = curl_exec($ch);
-        $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $header = substr($resp, 0, $header_len);
-        $body = substr($resp, $header_len);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($post) {
+            $this->curl->post(Constants::API_URL.$endpoint, $post);
+        } else {
+            $this->curl->get(Constants::API_URL.$endpoint);
+        }
+
+        $header = $this->curl->head;
+        if (is_object($this->curl->response)) {
+            $body = $this->curl->response;
+        } else {
+            $body = json_decode(gzdecode($this->curl->response));
+        }
+        $httpCode = $this->curl->getInfo(CURLINFO_HTTP_CODE);
 
         if ($this->parent->debug) {
             if ($post) {
@@ -85,13 +89,13 @@ class HttpInterface
             if ((!is_null($post) && (!is_array($post)))) {
                 Debug::printPostData($post);
             }
-            $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
+            $bytes = Utils::formatBytes($this->curl->getInfo(CURLINFO_SIZE_DOWNLOAD));
 
             Debug::printHttpCode($httpCode, $bytes);
-            Debug::printResponse($body, $this->parent->truncatedDebug);
+            Debug::printResponse(json_encode($body), $this->parent->truncatedDebug);
         }
 
-        curl_close($ch);
+        $this->curl->close();
 
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
@@ -109,7 +113,7 @@ class HttpInterface
 
             return $this->request($endpoint, $post, $login, false, $assoc);
         } else {
-            return [$header, json_decode($body, $assoc, 512, JSON_BIGINT_AS_STRING)];
+            return [$header, $body];
         }
     }
 

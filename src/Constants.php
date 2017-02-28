@@ -14,6 +14,11 @@ class Constants
     const LOGIN_EXPERIMENTS = 'ig_android_reg_login_btn_active_state,ig_android_ci_opt_in_at_reg,ig_android_one_click_in_old_flow,ig_android_merge_fb_and_ci_friends_page,ig_android_non_fb_sso,ig_android_mandatory_full_name,ig_android_reg_enable_login_password_btn,ig_android_reg_phone_email_active_state,ig_android_analytics_data_loss,ig_fbns_blocked,ig_android_contact_point_triage,ig_android_reg_next_btn_active_state,ig_android_prefill_phone_number,ig_android_show_fb_social_context_in_nux,ig_android_one_tap_login_upsell,ig_fbns_push,ig_android_phoneid_sync_interval';
     const SIG_KEY_VERSION = '4';
 
+    const ACCEPT_LANGUAGE = 'en-US';
+    const ACCEPT_ENCODING = 'gzip, deflate, sdch';
+    const CONTENT_TYPE = 'application/x-www-form-urlencoded; charset=UTF-8';
+    const X_FB_HTTP_Engine = 'Liger';
+    const X_IG_Connection_Type = 'WIFI';
     const X_IG_Capabilities = '3ToAAA==';
 
     const ANDROID_VERSION = 18;
