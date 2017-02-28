@@ -16,9 +16,14 @@ class Instagram
     public $token;              // _csrftoken
     public $isLoggedIn = false; // Session status
     public $rank_token;         // Rank token
-
+    /**
+     * @var HttpInterface
+     */
     public $http;
     public $settingsAdapter;
+    /**
+     * @var SettingsFile
+     */
     public $settings;
 
     public $proxy = null;     // Full Proxy
@@ -499,16 +504,20 @@ class Instagram
      * Direct Thread Data.
      *
      * @param $threadId Thread Id
+     * @param $cursorId
      *
      * @throws InstagramException Direct Thread Data
      *
      * @return array Direct Thread Data
      */
     // TODO : Missing Response
-    public function directThread($threadId)
+    public function directThread($threadId, $cursorId = false)
     {
-        $directThread = $this->http->request("direct_v2/threads/$threadId/?")[1];
-
+        $threadUrl = "direct_v2/threads/$threadId/?";
+        if ($cursorId) {
+            $threadUrl = "direct_v2/threads/$threadId/?cursor=$cursorId";
+        }
+        $directThread = $this->http->request($threadUrl)[1];
         if ($directThread['status'] != 'ok') {
             throw new InstagramException($directThread['message']."\n");
             return;
