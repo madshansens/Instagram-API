@@ -448,7 +448,7 @@ class Instagram
         if ($story) {
             $configure = $this->configureToReel($upload->getUploadId(), $photo);
         } else {
-            $configure = $this->configure($upload->getUploadId(), $photo, $caption, $location, false, $filter);
+            $configure = $this->configure($upload->getUploadId(), $photo, $caption, $location, false, false, $filter);
         }
 
         if (!$configure->isOk()) {
@@ -492,7 +492,7 @@ class Instagram
             ];
         }
 
-        $configure = $this->configure($uploadRequests, $photo, $caption, $location, true, $filter);
+        $configure = $this->configure($uploadRequests, $photo, $caption, $location, true, false, $filter);
 
         if (!$configure->isOk()) {
             throw new InstagramException($configure->getMessage());
@@ -504,12 +504,23 @@ class Instagram
     /**
      * @param $photo
      * @param null $caption
-     * @param null $upload_id
      * @param null $customPreview
      */
-    public function uploadPhotoStory($photo, $caption = null, $upload_id = null, $customPreview = null)
+    public function uploadPhotoStory($photo, $caption = null, $location = null, $filter = null)
     {
-        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, null, null, true);
+        $upload = $this->http->uploadPhoto($photo, null, false);
+
+        if (!$upload->isOk()) {
+            throw new InstagramException($upload->getMessage());
+        }
+
+        $configure = $this->configure($upload->getUploadId(), $photo, $caption, $location, false, true, $filter);
+
+        if (!$configure->isOk()) {
+            throw new InstagramException($configure->getMessage());
+        }
+
+        return $configure;
     }
 
     /**
@@ -660,7 +671,7 @@ class Instagram
      *
      * @return ConfigureResponse
      */
-    public function configure($upload_id, $photo, $caption = '', $location = null, $album = false, $filter = null)
+    public function configure($upload_id, $photo, $caption = '', $location = null, $album = false, $story = false, $filter = null)
     {
         $size = getimagesize($photo)[0];
         if (is_null($caption)) {
@@ -669,6 +680,8 @@ class Instagram
 
         if ($album) {
             $endpoint = 'media/configure_sidecar/?';
+        } elseif ($story) {
+            $endpoint = 'media/configure_to_reel/';
         } else {
             $endpoint = 'media/configure/';
         }
@@ -730,43 +743,6 @@ class Instagram
             '"crop_center":[0,0]'                   => '"crop_center":[0.0,-0.0]',
             '"crop_zoom":1'                         => '"crop_zoom":1.0',
             '"crop_original_size":'."[$size,$size]" => '"crop_original_size":'."[$size.0,$size.0]",
-        ])
-        ->getResponse(new ConfigureResponse());
-    }
-
-    /**
-     * @param $upload_id
-     * @param $photo
-     *
-     * @return ConfigureResponse
-     */
-    public function configureToReel($upload_id, $photo)
-    {
-        $size = getimagesize($photo)[0];
-
-        return $this->request('media/configure_to_reel/')
-        ->addPost('upload_id', $upload_id)
-        ->addPost('source_type', 3)
-        ->addPost('edits', [
-            'crop_original_size' => [$size, $size],
-            'crop_zoom'          => 1.3333334,
-            'crop_center'        => [0.0, 0.0],
-        ])
-        ->addPost('extra', [
-            'source_width'  => $size,
-            'source_height' => $size,
-        ])
-        ->addPost('device', [
-            'manufacturer'    => $this->settings->get('manufacturer'),
-            'model'           => $this->settings->get('model'),
-            'android_version' => Constants::ANDROID_VERSION,
-            'android_release' => Constants::ANDROID_RELEASE,
-        ])
-        ->addPost('_csrftoken', $this->token)
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
-        ->setReplacePost([
-            '"crop_center":[0,0]' => '"crop_center":[0.0,0.0]',
         ])
         ->getResponse(new ConfigureResponse());
     }
