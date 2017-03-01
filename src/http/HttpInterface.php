@@ -2,7 +2,7 @@
 
 namespace InstagramAPI;
 
-use \Curl\Curl;
+use Curl\Curl;
 
 class HttpInterface
 {
