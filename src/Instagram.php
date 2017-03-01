@@ -16,9 +16,14 @@ class Instagram
     public $token;              // _csrftoken
     public $isLoggedIn = false; // Session status
     public $rank_token;         // Rank token
-
+    /**
+     * @var HttpInterface
+     */
     public $http;
     public $settingsAdapter;
+    /**
+     * @var SettingsFile
+     */
     public $settings;
 
     public $proxy = null;     // Full Proxy
@@ -432,20 +437,90 @@ class Instagram
      *
      * @return Upload data
      */
-    public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null, $location = null, $filter = null)
+    public function uploadPhoto($photo, $story = false, $caption = null, $location = null, $upload_id = null, $filter = null)
     {
-        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, $location, $filter);
+        $upload = $this->http->uploadPhoto($photo, $upload_id);
+
+        if (!$upload->isOk()) {
+            throw new InstagramException($upload->getMessage());
+        }
+
+        if ($story) {
+            $configure = $this->configureToReel($upload->getUploadId(), $photo);
+        } else {
+            $configure = $this->configure($upload->getUploadId(), $photo, $caption, $location, false, false, $filter);
+        }
+
+        if (!$configure->isOk()) {
+            throw new InstagramException($configure->getMessage());
+        }
+
+        return $configure;
+    }
+
+    public function uploadPhotoAlbum($photos, $caption = null, $location = null, $filter = null)
+    {
+        $responses = [];
+        foreach ($photos as $photo) {
+            $upload = $this->http->uploadPhoto($photo, null, true);
+
+            if (!$upload->isOk()) {
+                throw new InstagramException($upload->getMessage());
+                return;
+            }
+            $responses[] = $upload;
+        }
+
+        $date = date('Y:m:d H:i:s');
+
+        foreach ($responses as $response) {
+            $uploadRequests[] =
+                ['date_time_original' => $date,
+                'scene_type'          => 1,
+                'disable_comments'    => false,
+                'upload_id'           => $response->getUploadId(),
+                'source_type'         => 0,
+                'scene_capture_type'  => 'standard',
+                'date_time_digitized' => $date,
+                'software'            => '10.2',
+                'geotag_enabled'      => false,
+                'camera_position'     => 'back',
+                'edits', [
+                    'filter_strength' => 1,
+                    'filter_name'     => 'IGNormalFilter',
+                ],
+            ];
+        }
+
+        $configure = $this->configure($uploadRequests, $photo, $caption, $location, true, false, $filter);
+
+        if (!$configure->isOk()) {
+            throw new InstagramException($configure->getMessage());
+        }
+
+        return $configure;
     }
 
     /**
      * @param $photo
      * @param null $caption
-     * @param null $upload_id
      * @param null $customPreview
      */
-    public function uploadPhotoStory($photo, $caption = null, $upload_id = null, $customPreview = null)
+    public function uploadPhotoStory($photo, $caption = null, $location = null, $filter = null)
     {
-        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, null, null, true);
+        $upload = $this->http->uploadPhoto($photo, null, false);
+
+        if (!$upload->isOk()) {
+            throw new InstagramException($upload->getMessage());
+        }
+
+        $configure = $this->configure($upload->getUploadId(), $photo, $caption, $location, false, true, $filter);
+
+        if (!$configure->isOk()) {
+            throw new InstagramException($configure->getMessage());
+        }
+
+        return $configure;
     }
 
     /**
@@ -499,16 +574,20 @@ class Instagram
      * Direct Thread Data.
      *
      * @param $threadId Thread Id
+     * @param $cursorId
      *
      * @throws InstagramException Direct Thread Data
      *
      * @return array Direct Thread Data
      */
     // TODO : Missing Response
-    public function directThread($threadId)
+    public function directThread($threadId, $cursorId = false)
     {
-        $directThread = $this->http->request("direct_v2/threads/$threadId/?")[1];
-
+        $threadUrl = "direct_v2/threads/$threadId/?";
+        if ($cursorId) {
+            $threadUrl = "direct_v2/threads/$threadId/?cursor=$cursorId";
+        }
+        $directThread = $this->http->request($threadUrl)[1];
         if ($directThread['status'] != 'ok') {
             throw new InstagramException($directThread['message']."\n");
             return;
@@ -592,21 +671,28 @@ class Instagram
      *
      * @return ConfigureResponse
      */
-    public function configure($upload_id, $photo, $caption = '', $location = null, $filter = null)
+    public function configure($upload_id, $photo, $caption = '', $location = null, $album = false, $story = false, $filter = null)
     {
         $size = getimagesize($photo)[0];
         if (is_null($caption)) {
             $caption = '';
         }
 
-        $requestData = $this->request('media/configure/')
+        if ($album) {
+            $endpoint = 'media/configure_sidecar/?';
+        } elseif ($story) {
+            $endpoint = 'media/configure_to_reel/';
+        } else {
+            $endpoint = 'media/configure/';
+        }
+
+        $requestData = $this->request($endpoint)
         ->addPost('_csrftoken', $this->token)
         ->addPost('media_folder', 'Instagram')
         ->addPost('source_type', 4)
         ->addPost('_uid', $this->username_id)
         ->addPost('_uuid', $this->uuid)
         ->addPost('caption', $caption)
-        ->addPost('upload_id', $upload_id)
         ->addPost('device', [
             'manufacturer'    => $this->settings->get('manufacturer'),
             'model'           => $this->settings->get('model'),
@@ -622,6 +708,13 @@ class Instagram
             'source_width'  => $size,
             'source_height' => $size,
         ]);
+
+        if ($album) {
+            $requestData->addPost('client_sidecar_id', Utils::generateUploadId())
+            ->addPost('children_metadata', $upload_id);
+        } else {
+            $requestData->addPost('upload_id', $upload_id);
+        }
 
         if (!is_null($location)) {
             $loc = [
@@ -650,43 +743,6 @@ class Instagram
             '"crop_center":[0,0]'                   => '"crop_center":[0.0,-0.0]',
             '"crop_zoom":1'                         => '"crop_zoom":1.0',
             '"crop_original_size":'."[$size,$size]" => '"crop_original_size":'."[$size.0,$size.0]",
-        ])
-        ->getResponse(new ConfigureResponse());
-    }
-
-    /**
-     * @param $upload_id
-     * @param $photo
-     *
-     * @return ConfigureResponse
-     */
-    public function configureToReel($upload_id, $photo)
-    {
-        $size = getimagesize($photo)[0];
-
-        return $this->request('media/configure_to_reel/')
-        ->addPost('upload_id', $upload_id)
-        ->addPost('source_type', 3)
-        ->addPost('edits', [
-            'crop_original_size' => [$size, $size],
-            'crop_zoom'          => 1.3333334,
-            'crop_center'        => [0.0, 0.0],
-        ])
-        ->addPost('extra', [
-            'source_width'  => $size,
-            'source_height' => $size,
-        ])
-        ->addPost('device', [
-            'manufacturer'    => $this->settings->get('manufacturer'),
-            'model'           => $this->settings->get('model'),
-            'android_version' => Constants::ANDROID_VERSION,
-            'android_release' => Constants::ANDROID_RELEASE,
-        ])
-        ->addPost('_csrftoken', $this->token)
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
-        ->setReplacePost([
-            '"crop_center":[0,0]' => '"crop_center":[0.0,0.0]',
         ])
         ->getResponse(new ConfigureResponse());
     }

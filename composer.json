@@ -27,6 +27,7 @@
     "require": {
         "netresearch/jsonmapper": "^1.0",
         "php": ">=5.6",
+        "php-curl-class/php-curl-class": "^4.11",
         "ext-curl": "*",
         "ext-gd" : "*"
     }
