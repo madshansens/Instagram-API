@@ -77,7 +77,7 @@ class HttpInterface
             $this->curl->get(Constants::API_URL.$endpoint);
         }
 
-        $header = $this->curl->head;
+        $header = $this->curl->responseHeaders;
         if (is_object($this->curl->response)) {
             $body = $this->curl->response;
         } else {
