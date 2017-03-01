@@ -471,24 +471,24 @@ class Instagram
             $responses[] = $upload;
         }
 
-        $date = date("Y:m:d H:i:s");
+        $date = date('Y:m:d H:i:s');
 
-        foreach($responses as $response) {
+        foreach ($responses as $response) {
             $uploadRequests[] =
                 ['date_time_original' => $date,
-                'scene_type' => 1,
-                'disable_comments' => false,
-                'upload_id' => $response->getUploadId(),
-                'source_type' => 0,
-                'scene_capture_type' => 'standard',
+                'scene_type'          => 1,
+                'disable_comments'    => false,
+                'upload_id'           => $response->getUploadId(),
+                'source_type'         => 0,
+                'scene_capture_type'  => 'standard',
                 'date_time_digitized' => $date,
-                'software' => '10.2',
-                'geotag_enabled' => false,
-                'camera_position' => 'back',
+                'software'            => '10.2',
+                'geotag_enabled'      => false,
+                'camera_position'     => 'back',
                 'edits', [
                     'filter_strength' => 1,
                     'filter_name'     => 'IGNormalFilter',
-                ]
+                ],
             ];
         }
 
