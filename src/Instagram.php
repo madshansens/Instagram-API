@@ -101,6 +101,26 @@ class Instagram
     }
 
     /**
+     * Set output network interface.
+     *
+     * @param string $interface
+     */
+    public function setOutputInterface($interface)
+    {
+        $this->http->outputInterface = $interface;
+    }
+
+    /**
+     * Get output network interface.
+     *
+     * @return string|null
+     */
+    public function getOutputInterface()
+    {
+        return $this->http->outputInterface;
+    }
+
+    /**
      * Set the proxy.
      *
      * @param string $host     Ip/hostname of proxy

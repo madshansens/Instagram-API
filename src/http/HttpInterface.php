@@ -11,6 +11,7 @@ class HttpInterface
     protected $verifyPeer = true;
     protected $verifyHost = 2;
     public $proxy = [];
+    public $outputInterface;
 
     /**
      * @var Curl Curl Object
@@ -64,6 +65,10 @@ class HttpInterface
             if ($this->proxy['username']) {
                 $this->curl->setOpt(CURLOPT_PROXYUSERPWD, $this->proxy['username'].':'.$this->proxy['password']);
             }
+        }
+
+        if ($this->outputInterface) {
+            $this->curl->setOpt(CURLOPT_INTERFACE, $this->outputInterface);
         }
 
         if ($post) {
