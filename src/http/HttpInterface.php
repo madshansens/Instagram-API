@@ -204,7 +204,9 @@ class HttpInterface
         // Build request options.
         $headers = [
             'User-Agent'            => $this->userAgent,
-            'Connection'            => 'close',
+            // Keep the API's HTTPS connection alive in Guzzle for future
+            // re-use, to greatly speed up all further queries after this.
+            'Connection'            => 'keep-alive',
             'Accept'                => '*/*',
             'Accept-Encoding'       => Constants::ACCEPT_ENCODING,
             'X-IG-Capabilities'     => Constants::X_IG_Capabilities,
