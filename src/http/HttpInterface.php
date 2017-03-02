@@ -19,6 +19,7 @@ class HttpInterface
      * @var GuzzleHttp\Client
      */
     private $client;
+
     /**
      * @var GuzzleHttp\Cookie\FileCookieJar
      */
@@ -44,7 +45,7 @@ class HttpInterface
             'Accept-Encoding' => Constants::ACCEPT_ENCODING,
             'X-IG-Capabilities' => Constants::X_IG_Capabilities,
             'X-IG-Connection-Type' => Constants::X_IG_Connection_Type,
-            'X-IG-Connection-Speed' =>  mt_rand(1000, 3700).'kbps',
+            'X-IG-Connection-Speed' => mt_rand(1000, 3700).'kbps',
             'X-FB-HTTP-Engine' => Constants::X_FB_HTTP_Engine,
             'Content-Type' => Constants::CONTENT_TYPE,
             'Accept-Language' => Constants::ACCEPT_LANGUAGE,
@@ -56,35 +57,23 @@ class HttpInterface
             $cookieJar = new FileCookieJar(tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie')));
         }
 
+        $method = 'GET';
+        $options = [
+            'cookies' => $cookieJar,
+            'headers' => $headers,
+        ];
         if ($post) {
-            $options = [
-                'cookies' => $cookieJar,
-                'body' => $post,
-                'headers' => $headers,
-            ];
-
-            if ($this->proxy) {
-                $options['proxy'] = $this->proxy['host'].':'.$this->proxy['port'];
-                if ($this->proxy['username']) {
-                    $options['auth'] = $this->proxy['username'].':'.$this->proxy['password'];
-                }
-            }
-
-            $response = $this->client->request('POST', Constants::API_URL.$endpoint, $options);
-        } else {
-            $options = [
-                'cookies' => $cookieJar,
-                'headers' => $headers,
-            ];
-
-            if ($this->proxy) {
-                $options['proxy'] = $this->proxy['host'].':'.$this->proxy['port'];
-                if ($this->proxy['username']) {
-                    $options['auth'] = $this->proxy['username'].':'.$this->proxy['password'];
-                }
-            }
-            $response = $this->client->request('GET', Constants::API_URL.$endpoint, $options);
+            $method = 'POST';
+            $options['body'] = $post;
         }
+        if ($this->proxy) {
+            $options['proxy'] = $this->proxy['host'].':'.$this->proxy['port'];
+            if ($this->proxy['username']) {
+                $options['auth'] = $this->proxy['username'].':'.$this->proxy['password'];
+            }
+        }
+
+        $response = $this->client->request($method, Constants::API_URL.$endpoint, $options);
         $cookies = $cookieJar->getIterator();
         foreach ($cookies as $cookie) {
             if ($cookie->getName() == 'csrftoken') {
@@ -96,12 +85,8 @@ class HttpInterface
         $httpCode = $response->getStatusCode();
 
         if ($this->parent->debug) {
-            if ($post) {
-                Debug::printRequest('POST', $endpoint);
-            } else {
-                Debug::printRequest('GET', $endpoint);
-            }
-            if ((!is_null($post) && (!is_array($post)))) {
+            Debug::printRequest($method, $endpoint);
+            if (!is_null($post) && (!is_array($post))) {
                 Debug::printPostData($post);
             }
 
