@@ -25,14 +25,20 @@ class HttpInterface
     /**
      * The SSL certificate verification behavior of requests.
      *
+     * @see http://docs.guzzlephp.org/en/latest/request-options.html#verify
+     *
      * @var bool|string
      */
     protected $verifySSL;
 
     /**
-     * @var array
+     * Proxy to use for all requests. Optional.
+     *
+     * @see http://docs.guzzlephp.org/en/latest/request-options.html#proxy
+     *
+     * @var string|array|null
      */
-    public $proxy;
+    protected $proxy;
 
     /**
      * Network interface to use.
@@ -77,7 +83,7 @@ class HttpInterface
         $this->parent = $parent;
         $this->userAgent = $this->parent->settings->get('user_agent');
         $this->verifySSL = true;
-        $this->proxy = [];
+        $this->proxy = null; // TODO: verify and proxy should probably not be reset
         $this->jar = null;
         $this->loadCookieJar();
     }
@@ -162,6 +168,29 @@ class HttpInterface
     }
 
     /**
+     * Set the proxy to use for requests.
+     *
+     * @see http://docs.guzzlephp.org/en/latest/request-options.html#proxy
+     *
+     * @param string|array|null $value String or Array specifying a proxy in
+     *                                 Guzzle format, or NULL to disable proxying.
+     */
+    public function setProxy($value)
+    {
+        $this->proxy = $value;
+    }
+
+    /**
+     * Gets the current proxy used for requests.
+     *
+     * @return string|array|null
+     */
+    public function getProxy()
+    {
+        return $this->proxy;
+    }
+
+    /**
      * Perform an Instagram API request.
      */
     public function request($endpoint, $post = null, $login = false, $flood_wait = false, $assoc = true)
@@ -193,15 +222,8 @@ class HttpInterface
             $method = 'POST';
             $options['body'] = $post;
         }
-        // TODO: This seems bugged. I think auth relates to the destination
-        // domain, not the proxy. Proxy auth is done via setting a proxy URL
-        // such as "https://user:pass@proxyhost". We should probably force the
-        // user to provide their proxy string in Guzzle format (as a simple string)!
-        if ($this->proxy) {
-            $options['proxy'] = $this->proxy['host'].':'.$this->proxy['port'];
-            if ($this->proxy['username']) {
-                $options['auth'] = $this->proxy['username'].':'.$this->proxy['password'];
-            }
+        if (!is_null($this->proxy)) {
+            $options['proxy'] = $this->proxy;
         }
 
         // Perform the API request.
@@ -382,10 +404,7 @@ class HttpInterface
         ];
 
         if ($this->proxy) {
-            $options['proxy'] = $this->proxy['host'].':'.$this->proxy['port'];
-            if ($this->proxy['username']) {
-                $options['auth'] = $this->proxy['username'].':'.$this->proxy['password'];
-            }
+            // TODO: rewrite to properly read proxy just like in request()
         }
 
         $response = $this->client->request('POST', Constants::API_URL.$endpoint, $options);
@@ -492,10 +511,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
         if ($this->proxy) {
-            curl_setopt($ch, CURLOPT_PROXY, $this->proxy['host'].':'.$this->proxy['port']);
-            if ($this->proxy['username']) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxy['username'].':'.$this->proxy['password']);
-            }
+            // TODO: rewrite to properly read proxy just like in request()
         }
 
         $resp = curl_exec($ch);
@@ -565,10 +581,7 @@ class HttpInterface
             curl_setopt($ch, CURLOPT_POSTFIELDS, substr($videoData, $start, $end));
 
             if ($this->proxy) {
-                curl_setopt($ch, CURLOPT_PROXY, $this->proxy['host'].':'.$this->proxy['port']);
-                if ($this->proxy['username']) {
-                    curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxy['username'].':'.$this->proxy['password']);
-                }
+                // TODO: rewrite to properly read proxy just like in request()
             }
 
             $result = curl_exec($ch);
@@ -705,10 +718,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
         if ($this->proxy) {
-            curl_setopt($ch, CURLOPT_PROXY, $this->proxy['host'].':'.$this->proxy['port']);
-            if ($this->proxy['username']) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxy['username'].':'.$this->proxy['password']);
-            }
+            // TODO: rewrite to properly read proxy just like in request()
         }
 
         $resp = curl_exec($ch);
@@ -816,10 +826,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
         if ($this->proxy) {
-            curl_setopt($ch, CURLOPT_PROXY, $this->proxy['host'].':'.$this->proxy['port']);
-            if ($this->proxy['username']) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxy['username'].':'.$this->proxy['password']);
-            }
+            // TODO: rewrite to properly read proxy just like in request()
         }
 
         $resp = curl_exec($ch);
@@ -922,10 +929,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
         if ($this->proxy) {
-            curl_setopt($ch, CURLOPT_PROXY, $this->proxy['host'].':'.$this->proxy['port']);
-            if ($this->proxy['username']) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxy['username'].':'.$this->proxy['password']);
-            }
+            // TODO: rewrite to properly read proxy just like in request()
         }
 
         $resp = curl_exec($ch);
@@ -1047,10 +1051,7 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
         if ($this->proxy) {
-            curl_setopt($ch, CURLOPT_PROXY, $this->proxy['host'].':'.$this->proxy['port']);
-            if ($this->proxy['username']) {
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxy['username'].':'.$this->proxy['password']);
-            }
+            // TODO: rewrite to properly read proxy just like in request()
         }
 
         $resp = curl_exec($ch);

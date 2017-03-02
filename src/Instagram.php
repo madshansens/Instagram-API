@@ -26,10 +26,6 @@ class Instagram
      */
     public $settings;
 
-    public $proxy = null;     // Full Proxy
-    public $proxyHost = null; // Proxy Host and Port
-    public $proxyAuth = null; // Proxy User and Pass
-
     /**
      * Default class constructor.
      *
@@ -122,26 +118,6 @@ class Instagram
     public function getOutputInterface()
     {
         return $this->http->outputInterface;
-    }
-
-    /**
-     * Set the proxy.
-     *
-     * @param string $host     Ip/hostname of proxy
-     * @param int    $port     Port of proxy
-     * @param string $username Username for proxy
-     * @param string $password Password for proxy
-     *
-     * @throws InstagramException
-     */
-    public function setProxy($host, $port = null, $username = null, $password = null)
-    {
-        // no check needed we will give exception on curl if any data wrong / lastwisher
-        // data assigned to http for easier use
-        $this->http->proxy['host'] = $host;
-        $this->http->proxy['port'] = $port;
-        $this->http->proxy['username'] = $username;
-        $this->http->proxy['password'] = $password;
     }
 
     /**
@@ -1921,6 +1897,29 @@ class Instagram
     public function getVerifySSL()
     {
         return $this->http->getVerifySSL();
+    }
+
+    /**
+     * Set the proxy to use for requests.
+     *
+     * @see http://docs.guzzlephp.org/en/latest/request-options.html#proxy
+     *
+     * @param string|array|null $value String or Array specifying a proxy in
+     *                                 Guzzle format, or NULL to disable proxying.
+     */
+    public function setProxy($value)
+    {
+        $this->http->setProxy($value);
+    }
+
+    /**
+     * Gets the current proxy used for requests.
+     *
+     * @return string|array|null
+     */
+    public function getProxy()
+    {
+        return $this->http->getProxy();
     }
 
     /**
