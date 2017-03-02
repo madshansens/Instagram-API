@@ -105,7 +105,7 @@ class HttpInterface
                 Debug::printPostData($post);
             }
 
-            if ($response->getHeader('x-encoded-content-length')) {
+            if ($response->hasHeader('x-encoded-content-length')) {
                 $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
             }
             else {
@@ -280,7 +280,7 @@ class HttpInterface
             $uploadBytes = Utils::formatBytes(strlen($data));
             Debug::printUpload($uploadBytes);
 
-            if ($response->getHeader('x-encoded-content-length')) {
+            if ($response->hasHeader('x-encoded-content-length')) {
                 $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
             }
             else {
