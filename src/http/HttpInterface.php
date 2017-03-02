@@ -8,27 +8,140 @@ use GuzzleHttp\Cookie\FileCookieJar;
 
 class HttpInterface
 {
+    /**
+     * The Instagram class instance we belong to.
+     *
+     * @var \InstagramAPI\Instagram
+     */
     protected $parent;
+
+    /**
+     * What user agent to identify our client as.
+     *
+     * @var string
+     */
     protected $userAgent;
-    protected $verifyPeer = true;
-    protected $verifyHost = 2;
-    public $proxy = [];
+
+    /**
+     * @TODO MIGRATE TO GUZZLE 'verify'.
+     *
+     * @var bool
+     */
+    protected $verifyPeer;
+
+    /**
+     * @TODO MIGRATE TO GUZZLE 'verify'.
+     *
+     * @var int
+     */
+    protected $verifyHost;
+
+    /**
+     * @var array
+     */
+    public $proxy;
+
+    /**
+     * Network interface to use.
+     *
+     * @TODO NOT IMPLEMENTED! Does nothing.
+     *
+     * @var string
+     */
     public $outputInterface;
 
     /**
-     * @var GuzzleHttp\Client
+     * @var \GuzzleHttp\Client
      */
     private $client;
+
     /**
-     * @var GuzzleHttp\Cookie\FileCookieJar
+     * @var \GuzzleHttp\Cookie\FileCookieJar|\GuzzleHttp\Cookie\CookieJar
      */
     private $jar;
 
+    /**
+     * Constructor.
+     *
+     * @param \InstagramAPI\Instagram $parent
+     */
     public function __construct($parent)
+    {
+        // TODO: Consider whether we should throw exceptions on non-200 OK replies.
+        $this->client = new Client(['http_errors' => false]);
+        $this->resetInterface($parent);
+    }
+
+    /**
+     * Resets ALL HttpInterface settings and loads new settings.
+     *
+     * Used during initial construction and when the user switches setUser().
+     *
+     * @param \InstagramAPI\Instagram $parent
+     */
+    public function resetInterface($parent)
     {
         $this->parent = $parent;
         $this->userAgent = $this->parent->settings->get('user_agent');
-        $this->client = new Client(['http_errors' => false]);
+        $this->verifyPeer = true; // TODO: Replace this old cURL code.
+        $this->verifyHost = 2; // TODO: Replace this old cURL code.
+        $this->proxy = [];
+        $this->jar = null;
+        $this->loadCookieJar();
+    }
+
+    /**
+     * Loads all cookies via the current SettingsAdapter.
+     */
+    public function loadCookieJar()
+    {
+        if ($this->parent->settingsAdapter['type'] == 'file') {
+            // File-based cookie jar, which also persists temporary session cookies.
+            // The FileCookieJar saves to disk whenever its object is destroyed,
+            // such as at the end of script or when calling resetInterface().
+            $this->jar = new FileCookieJar($this->parent->settings->cookiesPath, true);
+
+            // TODO: What to do when the user tries to restore from an old cURL
+            // cookie jar created before we moved to Guzzle? We can't even
+            // detect that old format without tediously trying to decode it first!
+        } else {
+            // TODO: What to do when the jar couldn't be decoded from JSON. Force login?
+            $restoredCookies = @json_decode($this->parent->settings->get('cookies'), true);
+            if (!is_array($restoredCookies)) {
+                $restoredCookies = [];
+            }
+
+            // TODO: What to do when the jar is in the old cURL format instead of Guzzle format?
+            // Perhaps: Check 1st cookie in the loaded jar and be sure it has
+            // Guzzle-style cookie array keys.
+            // var_dump($restoredCookies);
+
+            $this->jar = new CookieJar(false, $restoredCookies);
+        }
+    }
+
+    /**
+     * Gives you all cookies in the Jar encoded as a JSON string.
+     *
+     * This allows custom SettingsAdapters to retrieve all cookies for saving.
+     *
+     * @throws \InvalidArgumentException if the JSON cannot be encoded.
+     *
+     * @return string
+     */
+    public function getCookieJarAsJSON()
+    {
+        if (!$this->jar instanceof CookieJar) {
+            return '[]';
+        }
+
+        // Gets ALL cookies from the jar, even temporary session-based cookies.
+        $cookies = $this->jar->toArray();
+
+        // Throws if data can't be encoded as JSON (will never happen).
+        $jsonStr = \GuzzleHttp\json_encode($cookies);
+
+        return $jsonStr;
     }
 
     public function request($endpoint, $post = null, $login = false, $flood_wait = false, $assoc = true)
@@ -37,78 +150,70 @@ class HttpInterface
             throw new InstagramException("User is not logged in - login() must be called before making login-enforced requests.\n", ErrorCode::INTERNAL_LOGIN_REQUIRED);
         }
 
+        // Build request options.
         $headers = [
-            'User-Agent' => $this->userAgent,
-            'Connection' => 'close',
-            'Accept' => '*/*',
-            'Accept-Encoding' => Constants::ACCEPT_ENCODING,
-            'X-IG-Capabilities' => Constants::X_IG_Capabilities,
-            'X-IG-Connection-Type' => Constants::X_IG_Connection_Type,
-            'X-IG-Connection-Speed' =>  mt_rand(1000, 3700).'kbps',
-            'X-FB-HTTP-Engine' => Constants::X_FB_HTTP_Engine,
-            'Content-Type' => Constants::CONTENT_TYPE,
-            'Accept-Language' => Constants::ACCEPT_LANGUAGE,
+            'User-Agent'            => $this->userAgent,
+            'Connection'            => 'close',
+            'Accept'                => '*/*',
+            'Accept-Encoding'       => Constants::ACCEPT_ENCODING,
+            'X-IG-Capabilities'     => Constants::X_IG_Capabilities,
+            'X-IG-Connection-Type'  => Constants::X_IG_Connection_Type,
+            'X-IG-Connection-Speed' => mt_rand(1000, 3700).'kbps',
+            'X-FB-HTTP-Engine'      => Constants::X_FB_HTTP_Engine,
+            'Content-Type'          => Constants::CONTENT_TYPE,
+            'Accept-Language'       => Constants::ACCEPT_LANGUAGE,
         ];
-
-        if ($this->parent->settingsAdapter['type'] == 'file') {
-            $cookieJar = new FileCookieJar($this->parent->settings->cookiesPath);
-        } else {
-            $cookieJar = new FileCookieJar(tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie')));
-        }
-
+        $options = [
+            'cookies' => ($this->jar instanceof CookieJar ? $this->jar : false),
+            'headers' => $headers,
+        ];
+        $method = 'GET';
         if ($post) {
-            $options = [
-                'cookies' => $cookieJar,
-                'body' => $post,
-                'headers' => $headers,
-            ];
-
-            if ($this->proxy) {
-                $options['proxy'] = $this->proxy['host'].':'.$this->proxy['port'];
-                if ($this->proxy['username']) {
-                    $options['auth'] = $this->proxy['username'].':'.$this->proxy['password'];
-                }
-            }
-
-            $response = $this->client->request('POST', Constants::API_URL.$endpoint, $options);
-        } else {
-            $options = [
-                'cookies' => $cookieJar,
-                'headers' => $headers,
-            ];
-
-            if ($this->proxy) {
-                $options['proxy'] = $this->proxy['host'].':'.$this->proxy['port'];
-                if ($this->proxy['username']) {
-                    $options['auth'] = $this->proxy['username'].':'.$this->proxy['password'];
-                }
-            }
-            $response = $this->client->request('GET', Constants::API_URL.$endpoint, $options);
+            $method = 'POST';
+            $options['body'] = $post;
         }
-        $cookies = $cookieJar->getIterator();
+        // TODO: This seems bugged. I think auth relates to the destination
+        // domain, not the proxy. Proxy auth is done via setting a proxy URL
+        // such as "https://user:pass@proxyhost". We should probably force the
+        // user to provide their proxy string in Guzzle format (as a simple string)!
+        if ($this->proxy) {
+            $options['proxy'] = $this->proxy['host'].':'.$this->proxy['port'];
+            if ($this->proxy['username']) {
+                $options['auth'] = $this->proxy['username'].':'.$this->proxy['password'];
+            }
+        }
+
+        // Perform the API request.
+        $response = $this->client->request($method, Constants::API_URL.$endpoint, $options);
+
+        // TODO: Check HTTP status code here before trying to use the response.
+        // But preferably, we should enable http_errors in Guzzle so that the
+        // request above throws exceptions instead. And then use try{} catch{}
+        // in our API and in any user code, to precisely control retry-behavior,
+        // and to avoid muddying return values by including errors in return values.
+        $httpCode = $response->getStatusCode();
+
+        // Process the response.
+        $csrftoken = null;
+        $cookies = $this->jar->getIterator();
         foreach ($cookies as $cookie) {
             if ($cookie->getName() == 'csrftoken') {
                 $csrftoken = $cookie->getValue();
+                break;
             }
         }
-        $header = $csrftoken;
         $body = json_decode($response->getBody()->getContents());
-        $httpCode = $response->getStatusCode();
 
+        // Debugging.
         if ($this->parent->debug) {
-            if ($post) {
-                Debug::printRequest('POST', $endpoint);
-            } else {
-                Debug::printRequest('GET', $endpoint);
-            }
-            if ((!is_null($post) && (!is_array($post)))) {
+            Debug::printRequest($method, $endpoint);
+            if (!is_null($post) && (!is_array($post))) {
                 Debug::printPostData($post);
             }
 
-            if ($response->getHeader('x-encoded-content-length')) {
+            if ($response->hasHeader('x-encoded-content-length')) {
                 $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
-            }
-            else {
+            } else {
                 $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
             }
 
@@ -116,14 +221,16 @@ class HttpInterface
             Debug::printResponse(json_encode($body), $this->parent->truncatedDebug);
         }
 
-        if ($this->parent->settingsAdapter['type'] == 'mysql') {
-            $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set('cookies', $newCookies);
-        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
-            $newCookies = file_get_contents($cookieJarFile);
+        // Tell any custom settings adapters to persist the current cookies.
+        if ($this->parent->settingsAdapter['type'] == 'mysql'
+            || $this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
+            $newCookies = $this->getCookieJarAsJSON();
             $this->parent->settings->set('cookies', $newCookies);
         }
 
+        // TODO: Make this cleaner... It's far better and cleaner to let the
+        // caller handle API retries instead, via exceptions and try{} catch{}
+        // instead of this hardcoded blob. ;-)
         if ($httpCode == 429 && $flood_wait) {
             if ($this->parent->debug) {
                 echo "Too many requests! Sleeping 2s\n";
@@ -132,7 +239,7 @@ class HttpInterface
 
             return $this->request($endpoint, $post, $login, false, $assoc);
         } else {
-            return [$header, $body];
+            return [$csrftoken, $body];
         }
     }
 
@@ -227,18 +334,18 @@ class HttpInterface
         $data = $this->buildBody($bodies, $boundary);
 
         $headers = [
-            'User-Agent' => $this->userAgent,
-            'Connection' => 'close',
-            'Accept' => '*/*',
-            'Accept-Encoding' => Constants::ACCEPT_ENCODING,
-            'X-IG-Capabilities' => Constants::X_IG_Capabilities,
-            'X-IG-Connection-Type' => Constants::X_IG_Connection_Type,
-            'X-IG-Connection-Speed' =>  mt_rand(1000, 3700).'kbps',
-            'X-FB-HTTP-Engine' => Constants::X_FB_HTTP_Engine,
-            'Content-Type' => Constants::CONTENT_TYPE,
-            'Accept-Language' => Constants::ACCEPT_LANGUAGE,
-            'Content-Length' => strlen($data),
-            'Content-Type' => 'multipart/form-data; boundary='.$boundary
+            'User-Agent'            => $this->userAgent,
+            'Connection'            => 'close',
+            'Accept'                => '*/*',
+            'Accept-Encoding'       => Constants::ACCEPT_ENCODING,
+            'X-IG-Capabilities'     => Constants::X_IG_Capabilities,
+            'X-IG-Connection-Type'  => Constants::X_IG_Connection_Type,
+            'X-IG-Connection-Speed' => mt_rand(1000, 3700).'kbps',
+            'X-FB-HTTP-Engine'      => Constants::X_FB_HTTP_Engine,
+            'Content-Type'          => Constants::CONTENT_TYPE,
+            'Accept-Language'       => Constants::ACCEPT_LANGUAGE,
+            'Content-Length'        => strlen($data),
+            'Content-Type'          => 'multipart/form-data; boundary='.$boundary,
         ];
 
         if ($this->parent->settingsAdapter['type'] == 'file') {
@@ -249,7 +356,7 @@ class HttpInterface
 
         $options = [
             'cookies' => $cookieJar,
-            'body' => $data,
+            'body'    => $data,
             'headers' => $headers,
         ];
 
@@ -280,10 +387,9 @@ class HttpInterface
             $uploadBytes = Utils::formatBytes(strlen($data));
             Debug::printUpload($uploadBytes);
 
-            if ($response->getHeader('x-encoded-content-length')) {
+            if ($response->hasHeader('x-encoded-content-length')) {
                 $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
-            }
-            else {
+            } else {
                 $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
             }
             Debug::printHttpCode($httpCode, $bytes);

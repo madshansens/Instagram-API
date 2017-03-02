@@ -70,7 +70,11 @@ class Instagram
         $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
         $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
         $this->checkSettings($username);
-        $this->http = new HttpInterface($this);
+        if (!$this->http instanceof HttpInterface) {
+            $this->http = new HttpInterface($this);
+        } else {
+            $this->http->resetInterface($this);
+        }
 
         $this->username = $username;
         $this->password = $password;
