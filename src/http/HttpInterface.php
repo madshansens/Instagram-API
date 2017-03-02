@@ -481,41 +481,31 @@ class HttpInterface
 
         $data = $this->buildBody($bodies, $boundary);
         $headers = [
-            'Connection: keep-alive',
-            'Accept: */*',
-            'Host: i.instagram.com',
-            'Content-Type: multipart/form-data; boundary='.$boundary,
-            'Accept-Language: en-en',
+            'Connection' => 'keep-alive',
+            'Accept' => '*/*',
+            'Host' => 'i.instagram.com',
+            'Content-Type' => 'multipart/form-data; boundary='.$boundary,
+            'Accept-Language' => 'en-en',
+            'User-Agent'    => ''
         ];
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
-        curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_VERBOSE, false);
-        curl_setopt($ch, CURLOPT_ENCODING, '');
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        if ($this->parent->settingsAdapter['type'] == 'file') {
-            curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
-            curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
-        } else {
-            $cookieJar = $this->parent->settings->get('cookies');
-            $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
+        $options = [
+            'cookies' => ($this->jar instanceof CookieJar ? $this->jar : false),
+            'headers' => $headers,
+            'verify'  => $this->verifySSL,
+            'body'    => $data,
+            'debug'   => true
+        ];
 
-            file_put_contents($cookieJarFile, $cookieJar);
-
-            curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieJarFile);
-            curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieJarFile);
-        }
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-
-        if ($this->proxy) {
-            // TODO: rewrite to properly read proxy just like in request()
+        if (!is_null($this->proxy)) {
+            $options['proxy'] = $this->proxy;
         }
 
+        // Perform the API request.
+        $response = $this->client->request('POST', Constants::API_URL.$endpoint, $options);
+
+        echo $response->getBody()->getContents();
+        exit();
         $resp = curl_exec($ch);
         $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 
