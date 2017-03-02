@@ -66,25 +66,25 @@ class HttpInterface
      */
     public function __construct($parent)
     {
+        $this->parent = $parent;
+
+        // Defaults.
+        $this->verifySSL = true;
+        $this->proxy = null;
+
         // TODO: Consider whether we should throw exceptions on non-200 OK replies.
         $this->client = new Client(['http_errors' => false]);
-        $this->resetInterface($parent);
     }
 
     /**
-     * Resets ALL HttpInterface settings and loads new settings.
+     * Resets certain HttpInterface settings via the current SettingsAdapter.
      *
-     * Used during initial construction and when the user switches setUser().
-     *
-     * @param \InstagramAPI\Instagram $parent
+     * Used whenever the user switches setUser(), to configure our internal state.
      */
-    public function resetInterface($parent)
+    public function updateFromSettingsAdapter()
     {
-        $this->parent = $parent;
         $this->userAgent = $this->parent->settings->get('user_agent');
-        $this->verifySSL = true;
-        $this->proxy = null; // TODO: verify and proxy should probably not be reset
-        $this->jar = null;
+        $this->jar = null; // Mark old jar for garbage collection.
         $this->loadCookieJar();
     }
 
@@ -96,26 +96,19 @@ class HttpInterface
         if ($this->parent->settingsAdapter['type'] == 'file') {
             // File-based cookie jar, which also persists temporary session cookies.
             // The FileCookieJar saves to disk whenever its object is destroyed,
-            // such as at the end of script or when calling resetInterface().
+            // such as at the end of script or when calling updateFromSettingsAdapter().
             $this->jar = new FileCookieJar($this->parent->settings->cookiesPath, true);
-
-            // TODO: What to do when the user tries to restore from an old cURL
-            // cookie jar created before we moved to Guzzle? We can't even
-            // detect that old format without tediously trying to decode it first!
         } else {
-            // TODO: What to do when the jar couldn't be decoded from JSON. Force login?
             $restoredCookies = @json_decode($this->parent->settings->get('cookies'), true);
             if (!is_array($restoredCookies)) {
-                $restoredCookies = [];
+                $restoredCookies = []; // Create new, empty jar if restore failed.
             }
-
-            // TODO: What to do when the jar is in the old cURL format instead of Guzzle format?
-            // Perhaps: Check 1st cookie in the loaded jar and be sure it has
-            // Guzzle-style cookie array keys.
-            // var_dump($restoredCookies);
-
             $this->jar = new CookieJar(false, $restoredCookies);
         }
+
+        // TODO: Perhaps force login via $this->parent->login(true) here or somewhere
+        // else, if we don't have any session. Such as if we couldn't load the
+        // session cookies from disk/decode them from memory above.
     }
 
     /**
