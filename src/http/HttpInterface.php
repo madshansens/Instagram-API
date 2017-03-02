@@ -23,18 +23,11 @@ class HttpInterface
     protected $userAgent;
 
     /**
-     * @TODO MIGRATE TO GUZZLE 'verify'.
+     * The SSL certificate verification behavior of requests.
      *
-     * @var bool
+     * @var bool|string
      */
-    protected $verifyPeer;
-
-    /**
-     * @TODO MIGRATE TO GUZZLE 'verify'.
-     *
-     * @var int
-     */
-    protected $verifyHost;
+    protected $verifySSL;
 
     /**
      * @var array
@@ -83,8 +76,7 @@ class HttpInterface
     {
         $this->parent = $parent;
         $this->userAgent = $this->parent->settings->get('user_agent');
-        $this->verifyPeer = true; // TODO: Replace this old cURL code.
-        $this->verifyHost = 2; // TODO: Replace this old cURL code.
+        $this->verifySSL = true;
         $this->proxy = [];
         $this->jar = null;
         $this->loadCookieJar();
@@ -144,6 +136,34 @@ class HttpInterface
         return $jsonStr;
     }
 
+    /**
+     * Controls the SSL verification behavior of the HttpInterface.
+     *
+     * @see http://docs.guzzlephp.org/en/latest/request-options.html#verify
+     *
+     * @param bool|string $state TRUE to verify using PHP's default CA bundle,
+     *                           FALSE to disable SSL verification (this is
+     *                           insecure!), String to verify using this path to
+     *                           a custom CA bundle file.
+     */
+    public function setVerifySSL($state)
+    {
+        $this->verifySSL = $state;
+    }
+
+    /**
+     * Gets the current SSL verification behavior of the HttpInterface.
+     *
+     * @return bool|string
+     */
+    public function getVerifySSL()
+    {
+        return $this->verifySSL;
+    }
+
+    /**
+     * Perform an Instagram API request.
+     */
     public function request($endpoint, $post = null, $login = false, $flood_wait = false, $assoc = true)
     {
         if (!$this->parent->isLoggedIn && !$login) {
@@ -166,6 +186,7 @@ class HttpInterface
         $options = [
             'cookies' => ($this->jar instanceof CookieJar ? $this->jar : false),
             'headers' => $headers,
+            'verify'  => $this->verifySSL,
         ];
         $method = 'GET';
         if ($post) {
@@ -665,8 +686,8 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_VERBOSE, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         if ($this->parent->settingsAdapter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
@@ -776,8 +797,8 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_VERBOSE, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         if ($this->parent->settingsAdapter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
@@ -882,8 +903,8 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_VERBOSE, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         if ($this->parent->settingsAdapter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
@@ -1007,8 +1028,8 @@ class HttpInterface
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_VERBOSE, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         if ($this->parent->settingsAdapter['type'] == 'file') {
             curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
@@ -1084,15 +1105,5 @@ class HttpInterface
         $body .= '--'.$boundary.'--';
 
         return $body;
-    }
-
-    public function verifyPeer($enable)
-    {
-        $this->verifyPeer = $enable;
-    }
-
-    public function verifyHost($enable)
-    {
-        $this->verifyHost = $enable;
     }
 }

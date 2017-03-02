@@ -1898,14 +1898,29 @@ class Instagram
         ->getResponse(new LikeFeedResponse());
     }
 
-    public function verifyPeer($enable)
+    /**
+     * Controls the SSL verification behavior of the HttpInterface.
+     *
+     * @see http://docs.guzzlephp.org/en/latest/request-options.html#verify
+     *
+     * @param bool|string $state TRUE to verify using PHP's default CA bundle,
+     *                           FALSE to disable SSL verification (this is
+     *                           insecure!), String to verify using this path to
+     *                           a custom CA bundle file.
+     */
+    public function setVerifySSL($state)
     {
-        $this->http->verifyPeer($enable);
+        $this->http->setVerifySSL($state);
     }
 
-    public function verifyHost($enable)
+    /**
+     * Gets the current SSL verification behavior of the HttpInterface.
+     *
+     * @return bool|string
+     */
+    public function getVerifySSL()
     {
-        $this->http->verifyHost($enable);
+        return $this->http->getVerifySSL();
     }
 
     /**
