@@ -53,6 +53,8 @@ class Instagram
         } else {
             $this->settingsAdapter = ['type' => 'file'];
         }
+
+        $this->http = new HttpInterface($this);
     }
 
     /**
@@ -66,11 +68,7 @@ class Instagram
         $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
         $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
         $this->checkSettings($username);
-        if (!$this->http instanceof HttpInterface) {
-            $this->http = new HttpInterface($this);
-        } else {
-            $this->http->resetInterface($this);
-        }
+        $this->http->updateFromSettingsAdapter();
 
         $this->username = $username;
         $this->password = $password;
