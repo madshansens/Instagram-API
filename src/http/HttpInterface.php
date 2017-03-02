@@ -72,8 +72,17 @@ class HttpInterface
         $this->verifySSL = true;
         $this->proxy = null;
 
-        // TODO: Consider whether we should throw exceptions on non-200 OK replies.
-        $this->client = new Client(['http_errors' => false]);
+        // Default request options (immutable after client creation).
+        $this->client = new Client([
+            'allow_redirects' => [
+                'max' => 8, // Allow up to eight redirects (that's plenty).
+            ],
+            'connect_timeout' => 30.0, // Give up trying to connect after 30s.
+            'decode_content'  => true, // Decode gzip/deflate/etc HTTP responses.
+            'timeout'         => 240.0, // Maximum per-request time (seconds).
+            // TODO: Consider whether we should throw exceptions on non-200 OK replies:
+            'http_errors'     => false,
+        ]);
     }
 
     /**
