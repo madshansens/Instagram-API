@@ -2,7 +2,9 @@
 
 namespace InstagramAPI;
 
-use Curl\Curl;
+use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\FileCookieJar;
 
 class HttpInterface
 {
@@ -14,76 +16,84 @@ class HttpInterface
     public $outputInterface;
 
     /**
-     * @var Curl Curl Object
+     * @var GuzzleHttp\Client
      */
-    private $curl;
+    private $client;
+    /**
+     * @var GuzzleHttp\Cookie\FileCookieJar
+     */
+    private $jar;
 
     public function __construct($parent)
     {
         $this->parent = $parent;
         $this->userAgent = $this->parent->settings->get('user_agent');
+        $this->client = new Client(['http_errors' => false]);
     }
 
     public function request($endpoint, $post = null, $login = false, $flood_wait = false, $assoc = true)
     {
-        $this->curl = new Curl();
-
         if (!$this->parent->isLoggedIn && !$login) {
             throw new InstagramException("User is not logged in - login() must be called before making login-enforced requests.\n", ErrorCode::INTERNAL_LOGIN_REQUIRED);
         }
 
-        $this->curl->setUserAgent($this->userAgent);
-        $this->curl->setHeader('Connection', 'close');
-        $this->curl->setHeader('Accept', '*/*');
-        $this->curl->setHeader('Accept-Encoding', Constants::ACCEPT_ENCODING);
-        $this->curl->setHeader('X-IG-Capabilities', Constants::X_IG_Capabilities);
-        $this->curl->setHeader('X-IG-Connection-Type', Constants::X_IG_Connection_Type);
-        $this->curl->setHeader('X-IG-Connection-Speed', mt_rand(1000, 3700).'kbps');
-        $this->curl->setHeader('X-FB-HTTP-Engine', Constants::X_FB_HTTP_Engine);
-        $this->curl->setHeader('Content-Type', Constants::CONTENT_TYPE);
-        $this->curl->setHeader('Accept-Language', Constants::ACCEPT_LANGUAGE);
-        $this->curl->setOpt(CURLOPT_FOLLOWLOCATION, true);
-        $this->curl->setOpt(CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
-        $this->curl->setOpt(CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
+        $headers = [
+            'User-Agent' => $this->userAgent,
+            'Connection' => 'close',
+            'Accept' => '*/*',
+            'Accept-Encoding' => Constants::ACCEPT_ENCODING,
+            'X-IG-Capabilities' => Constants::X_IG_Capabilities,
+            'X-IG-Connection-Type' => Constants::X_IG_Connection_Type,
+            'X-IG-Connection-Speed' =>  mt_rand(1000, 3700).'kbps',
+            'X-FB-HTTP-Engine' => Constants::X_FB_HTTP_Engine,
+            'Content-Type' => Constants::CONTENT_TYPE,
+            'Accept-Language' => Constants::ACCEPT_LANGUAGE,
+        ];
 
         if ($this->parent->settingsAdapter['type'] == 'file') {
-            $this->curl->setCookieFile($this->parent->settings->cookiesPath);
-            $this->curl->setCookieJar($this->parent->settings->cookiesPath);
+            $cookieJar = new FileCookieJar($this->parent->settings->cookiesPath);
         } else {
-            $cookieJar = $this->parent->settings->get('cookies');
-            $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
-
-            file_put_contents($cookieJarFile, $cookieJar);
-
-            $this->curl->setCookieFile($cookieJarFile);
-            $this->curl->setCookieJar($cookieJar);
-        }
-
-        if ($this->proxy) {
-            $this->curl->setOpt(CURLOPT_HTTPPROXYTUNNEL, 1);
-            $this->curl->setOpt(CURLOPT_PROXY, $this->proxy['host'].':'.$this->proxy['port']);
-            if ($this->proxy['username']) {
-                $this->curl->setOpt(CURLOPT_PROXYUSERPWD, $this->proxy['username'].':'.$this->proxy['password']);
-            }
-        }
-
-        if ($this->outputInterface) {
-            $this->curl->setOpt(CURLOPT_INTERFACE, $this->outputInterface);
+            $cookieJar = new FileCookieJar(tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie')));
         }
 
         if ($post) {
-            $this->curl->post(Constants::API_URL.$endpoint, $post);
-        } else {
-            $this->curl->get(Constants::API_URL.$endpoint);
-        }
+            $options = [
+                'cookies' => $cookieJar,
+                'body' => $post,
+                'headers' => $headers,
+            ];
 
-        $header = $this->curl->responseHeaders;
-        if (is_object($this->curl->response)) {
-            $body = $this->curl->response;
+            if ($this->proxy) {
+                $options['proxy'] = $this->proxy['host'].':'.$this->proxy['port'];
+                if ($this->proxy['username']) {
+                    $options['auth'] = $this->proxy['username'].':'.$this->proxy['password'];
+                }
+            }
+
+            $response = $this->client->request('POST', Constants::API_URL.$endpoint, $options);
         } else {
-            $body = json_decode(gzdecode($this->curl->response));
+            $options = [
+                'cookies' => $cookieJar,
+                'headers' => $headers,
+            ];
+
+            if ($this->proxy) {
+                $options['proxy'] = $this->proxy['host'].':'.$this->proxy['port'];
+                if ($this->proxy['username']) {
+                    $options['auth'] = $this->proxy['username'].':'.$this->proxy['password'];
+                }
+            }
+            $response = $this->client->request('GET', Constants::API_URL.$endpoint, $options);
         }
-        $httpCode = $this->curl->getInfo(CURLINFO_HTTP_CODE);
+        $cookies = $cookieJar->getIterator();
+        foreach ($cookies as $cookie) {
+            if ($cookie->getName() == 'csrftoken') {
+                $csrftoken = $cookie->getValue();
+            }
+        }
+        $header = $csrftoken;
+        $body = json_decode($response->getBody()->getContents());
+        $httpCode = $response->getStatusCode();
 
         if ($this->parent->debug) {
             if ($post) {
@@ -94,13 +104,17 @@ class HttpInterface
             if ((!is_null($post) && (!is_array($post)))) {
                 Debug::printPostData($post);
             }
-            $bytes = Utils::formatBytes($this->curl->getInfo(CURLINFO_SIZE_DOWNLOAD));
+
+            if ($response->getHeader('x-encoded-content-length')) {
+                $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
+            }
+            else {
+                $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
+            }
 
             Debug::printHttpCode($httpCode, $bytes);
             Debug::printResponse(json_encode($body), $this->parent->truncatedDebug);
         }
-
-        $this->curl->close();
 
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
@@ -158,8 +172,6 @@ class HttpInterface
      */
     public function uploadPhoto($photo, $upload_id = null, $album = false)
     {
-        $this->curl = new Curl();
-
         $endpoint = 'upload/photo/';
         $boundary = $this->parent->uuid;
         //$helper = new AdaptImage();
@@ -214,66 +226,69 @@ class HttpInterface
 
         $data = $this->buildBody($bodies, $boundary);
 
-        $this->curl->setUserAgent($this->userAgent);
-        $this->curl->setHeader('Connection', 'close');
-        $this->curl->setHeader('Accept-Encoding', Constants::ACCEPT_ENCODING);
-        $this->curl->setHeader('X-IG-Capabilities', Constants::X_IG_Capabilities);
-        $this->curl->setHeader('X-IG-Connection-Type', Constants::X_IG_Connection_Type);
-        $this->curl->setHeader('X-IG-Connection-Speed', mt_rand(1000, 3700).'kbps');
-        $this->curl->setHeader('X-FB-HTTP-Engine', Constants::X_FB_HTTP_Engine);
-        $this->curl->setHeader('Content-Type', Constants::CONTENT_TYPE);
-        $this->curl->setHeader('Content-Length', strlen($data));
-        $this->curl->setHeader('Content-Type', 'multipart/form-data; boundary='.$boundary);
-        $this->curl->setHeader('Accept-Language', Constants::ACCEPT_LANGUAGE);
-        $this->curl->setOpt(CURLOPT_FOLLOWLOCATION, true);
-        $this->curl->setOpt(CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
-        $this->curl->setOpt(CURLOPT_SSL_VERIFYHOST, $this->verifyHost);
+        $headers = [
+            'User-Agent' => $this->userAgent,
+            'Connection' => 'close',
+            'Accept' => '*/*',
+            'Accept-Encoding' => Constants::ACCEPT_ENCODING,
+            'X-IG-Capabilities' => Constants::X_IG_Capabilities,
+            'X-IG-Connection-Type' => Constants::X_IG_Connection_Type,
+            'X-IG-Connection-Speed' =>  mt_rand(1000, 3700).'kbps',
+            'X-FB-HTTP-Engine' => Constants::X_FB_HTTP_Engine,
+            'Content-Type' => Constants::CONTENT_TYPE,
+            'Accept-Language' => Constants::ACCEPT_LANGUAGE,
+            'Content-Length' => strlen($data),
+            'Content-Type' => 'multipart/form-data; boundary='.$boundary
+        ];
 
         if ($this->parent->settingsAdapter['type'] == 'file') {
-            $this->curl->setCookieFile($this->parent->settings->cookiesPath);
-            $this->curl->setCookieJar($this->parent->settings->cookiesPath);
+            $cookieJar = new FileCookieJar($this->parent->settings->cookiesPath);
         } else {
-            $cookieJar = $this->parent->settings->get('cookies');
-            $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
-
-            file_put_contents($cookieJarFile, $cookieJar);
-
-            $this->curl->setCookieFile($cookieJarFile);
-            $this->curl->setCookieJar($cookieJar);
+            $cookieJar = new FileCookieJar(tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie')));
         }
 
+        $options = [
+            'cookies' => $cookieJar,
+            'body' => $data,
+            'headers' => $headers,
+        ];
+
         if ($this->proxy) {
-            $this->curl->setOpt(CURLOPT_HTTPPROXYTUNNEL, 1);
-            $this->curl->setOpt(CURLOPT_PROXY, $this->proxy['host'].':'.$this->proxy['port']);
+            $options['proxy'] = $this->proxy['host'].':'.$this->proxy['port'];
             if ($this->proxy['username']) {
-                $this->curl->setOpt(CURLOPT_PROXYUSERPWD, $this->proxy['username'].':'.$this->proxy['password']);
+                $options['auth'] = $this->proxy['username'].':'.$this->proxy['password'];
             }
         }
 
-        $this->curl->post(Constants::API_URL.$endpoint, $data);
+        $response = $this->client->request('POST', Constants::API_URL.$endpoint, $options);
 
-        $header = $this->curl->head;
-        if (is_object($this->curl->response)) {
-            $body = $this->curl->response;
-        } else {
-            $body = json_decode(gzdecode($this->curl->response));
+        $cookies = $cookieJar->getIterator();
+        foreach ($cookies as $cookie) {
+            if ($cookie->getName() == 'csrftoken') {
+                $csrftoken = $cookie->getValue();
+            }
         }
-        $httpCode = $this->curl->getInfo(CURLINFO_HTTP_CODE);
+        $header = $csrftoken;
+        $body = json_decode($response->getBody()->getContents());
+        $httpCode = $response->getStatusCode();
 
         $upload = $this->getResponseWithResult(new UploadPhotoResponse(), $body);
 
         if ($this->parent->debug) {
             Debug::printRequest('POST', $endpoint);
 
-            $uploadBytes = Utils::formatBytes($this->curl->getInfo(CURLINFO_SIZE_UPLOAD));
+            $uploadBytes = Utils::formatBytes(strlen($data));
             Debug::printUpload($uploadBytes);
 
-            $bytes = Utils::formatBytes($this->curl->getInfo(CURLINFO_SIZE_DOWNLOAD));
+            if ($response->getHeader('x-encoded-content-length')) {
+                $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
+            }
+            else {
+                $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
+            }
             Debug::printHttpCode($httpCode, $bytes);
             Debug::printResponse(json_encode($body));
         }
-
-        $this->curl->close();
 
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);

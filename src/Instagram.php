@@ -160,14 +160,10 @@ class Instagram
             ->addParams('guid', SignatureUtils::generateUUID(false))
             ->getResponse(new ChallengeResponse(), true);
 
-            if (!preg_match('#csrftoken=([^;]+)#', $response->getFullResponse()[0]['set-cookie'], $token)) {
-                throw new InstagramException('Missing csrftoken', ErrorCode::INTERNAL_CSRF_TOKEN_ERROR);
-            }
-
             $response = $this->request('accounts/login/')
             ->requireLogin(true)
             ->addPost('phone_id', SignatureUtils::generateUUID(true))
-            ->addPost('_csrftoken', $token[0])
+            ->addPost('_csrftoken', $response->getFullResponse()[0])
             ->addPost('username', $this->username)
             ->addPost('guid', $this->uuid)
             ->addPost('device_id', $this->device_id)
@@ -179,8 +175,7 @@ class Instagram
             $this->username_id = $response->getLoggedInUser()->getPk();
             $this->settings->set('username_id', $this->username_id);
             $this->rank_token = $this->username_id.'_'.$this->uuid;
-            preg_match('#csrftoken=([^;]+)#', $response->getFullResponse()[0]['set-cookie'], $match);
-            $this->token = $match[1];
+            $this->token = $response->getFullResponse()[0];
             $this->settings->set('token', $this->token);
             $this->settings->set('last_login', time());
 
