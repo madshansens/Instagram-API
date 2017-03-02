@@ -16,6 +16,9 @@ class Caption extends Response
     public $content_type;
     public $text;
     public $media_id;
+    /**
+    * @var string
+    */
     public $pk;
     public $type;
     public $has_translation;

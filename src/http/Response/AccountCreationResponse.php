@@ -10,6 +10,9 @@ class AccountCreationResponse extends Response
     public $nux_private_first_page;
     public $profile_pic_url;
     public $full_name;
+    /**
+    * @var string
+    */
     public $pk;
     /*
      * @var HdProfilePicUrlInfo

@@ -9,6 +9,9 @@ class User extends Response
     public $is_favorite = false;
     public $profile_pic_url;
     public $full_name;
+    /**
+    * @var string
+    */
     public $pk;
     public $is_verified = false;
     public $is_private = false;

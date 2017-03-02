@@ -13,5 +13,8 @@ class Location extends Response
     public $external_id = null;
     public $facebook_places_id = null;
     public $city = null;
+    /**
+    * @var string
+    */
     public $pk;
 }

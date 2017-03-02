@@ -13,6 +13,9 @@ class Comment extends Response
      * @var User
      */
     public $user;
+    /**
+    * @var string
+    */
     public $pk;
     public $text;
 }

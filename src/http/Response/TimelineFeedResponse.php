@@ -8,6 +8,9 @@ class TimelineFeedResponse extends Response
     public $is_direct_v2_enabled;
     public $auto_load_more_enabled;
     public $more_available;
+    /**
+    * @var string
+    */
     public $next_max_id;
       /*
      * @var _Message[]

@@ -9,6 +9,9 @@ class LoginResponse extends Response
     public $profile_pic_url;
     public $profile_pic_id;
     public $full_name;
+    /**
+    * @var string
+    */
     public $pk;
     public $is_private;
     public $error_title; // on wrong pass

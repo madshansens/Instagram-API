@@ -9,6 +9,12 @@ class ExploreResponse extends Response
 
     public $items;
     public $more_available;
+    /**
+    * @var string
+    */
     public $next_max_id;
+    /**
+    * @var string
+    */
     public $max_id;
 }

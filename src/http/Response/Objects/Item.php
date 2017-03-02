@@ -9,6 +9,9 @@ class Item extends Response
     const ALBUM = 8;
 
     public $taken_at;
+    /**
+    * @var string
+    */
     public $pk;
     public $id;
     public $device_timestamp;
@@ -32,6 +35,9 @@ class Item extends Response
     public $caption_position;
     public $expiring_at;
     public $is_reel_media;
+    /**
+    * @var string
+    */
     public $next_max_id = null;
     /**
      * @var CarouselMedia[]|null
