@@ -233,14 +233,27 @@ class Instagram
     }
 
     /**
-     * @return autoCompleteUserListResponse
+     * @return autoCompleteUserListResponse|null Will be NULL if throttled by Instagram.
      */
     public function autoCompleteUserList()
     {
-        $this->request('friendships/autocomplete_user_list/')
-        ->setCheckStatus(false)
-        ->addParams('version', '2')
-        ->getResponse(new autoCompleteUserListResponse());
+        // NOTE: This is a special, very heavily throttled API endpoint.
+        // Instagram REQUIRES that you wait several minutes between calls to it.
+        try {
+            $request = $this->request('friendships/autocomplete_user_list/')
+            ->setCheckStatus(false)
+            ->addParams('version', '2');
+
+            return $request->getResponse(new autoCompleteUserListResponse());
+        } catch (InstagramException $e) {
+            // Throttling is so common that we'll simply return NULL in that case.
+            if ($e->getCode() == ErrorCode::INTERNAL_API_THROTTLED) {
+                return;
+            }
+
+            // Simply re-throw the original exception in all other cases.
+            throw $e;
+        }
     }
 
     /**
