@@ -30,6 +30,6 @@ try {
     // or...
     // Example of using 8 retries instead of the default amount:
     // $i->uploadVideo($video, $caption, null, 8);
-} catch (InstagramException $e) {
+} catch (Exception $e) {
     echo $e->getMessage();
 }
