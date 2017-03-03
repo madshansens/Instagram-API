@@ -543,17 +543,19 @@ class Instagram
     }
 
     /**
-     * Upload video to Instagram.
+     * Uploads a video to Instagram.
      *
-     * @param $video Path to your video
-     * @param null $caption       Caption to be included in your video
-     * @param null $customPreview
+     * @param string $videoFilename The video filename.
+     * @param string $caption       Caption to use for the video.
+     * @param string $customPreview Optional path to custom video thumbnail.
+     *                              If nothing provided, we generate from video.
+     * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
      *
      * @return mixed
      */
-    public function uploadVideo($video, $caption = null, $customPreview = null)
+    public function uploadVideo($videoFilename, $caption = null, $customPreview = null, $maxAttempts = 4)
     {
-        return $this->http->uploadVideo($video, $caption, $customPreview);
+        return $this->http->uploadVideo($videoFilename, $caption, $customPreview, $maxAttempts);
     }
 
     /**

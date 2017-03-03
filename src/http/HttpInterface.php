@@ -537,16 +537,13 @@ class HttpInterface
     }
 
     /**
-     * Uploads a video to Instagram.
+     * Asks Instagram for parameters for uploading a new video.
      *
-     * @param string $video         The video filename.
-     * @param string $caption       Caption to use for the video.
-     * @param string $customPreview Optional path to custom video thumbnail.
-     *                              If nothing provided, we generate from video.
+     * @param string $upload_id ID to use, or NULL to generate a brand new ID.
      *
-     * @throws InstagramException
+     * @return array
      */
-    public function uploadVideo($video, $caption = null, $customPreview = null)
+    public function requestVideoUploadURL($upload_id = null)
     {
         $this->throwIfNotLoggedIn();
 
@@ -554,7 +551,9 @@ class HttpInterface
 
         // Prepare payload for the "pre-upload" request.
         $boundary = $this->parent->uuid;
-        $upload_id = Utils::generateUploadId();
+        if (is_null($upload_id)) {
+            $upload_id = Utils::generateUploadId();
+        }
         $bodies = [
             [
                 'type' => 'form-data',
@@ -612,14 +611,35 @@ class HttpInterface
             $this->printDebug($method, $endpoint, $payload, null, $response, $body);
         }
 
+        return [
+            'upload_id'  => $upload_id,
+            'upload_url' => $uploadUrl,
+            'job'        => $job,
+        ];
+    }
+
+    /**
+     * Performs a chunked upload of a video file.
+     *
+     * @param string $videoFilename The file to upload.
+     * @param array  $uploadParams  Array in requestVideoUploadURL() format.
+     *
+     * @throws InstagramException if the upload fails.
+     *
+     * @return UploadVideoResponse
+     */
+    public function uploadVideoChunks($videoFilename, array $uploadParams)
+    {
+        $this->throwIfNotLoggedIn();
+
         // Video upload must be done in exactly 4 chunks; determine chunk size!
         $numChunks = 4;
-        $videoSize = filesize($video);
+        $videoSize = filesize($videoFilename);
         $maxChunkSize = ceil($videoSize / $numChunks);
 
         // Read and upload each individual chunk.
         $rangeStart = 0;
-        $handle = fopen($video, 'r');
+        $handle = fopen($videoFilename, 'r');
         try {
             for ($chunkIdx = 1; $chunkIdx <= $numChunks; ++$chunkIdx) {
                 // Extract the chunk.
@@ -641,11 +661,11 @@ class HttpInterface
                     'Cookie2'             => '$Version=1',
                     'Accept-Encoding'     => 'gzip, deflate',
                     'Content-Type'        => 'application/octet-stream',
-                    'Session-ID'          => $upload_id,
+                    'Session-ID'          => $uploadParams['upload_id'],
                     'Accept-Language'     => 'en-en',
                     'Content-Disposition' => 'attachment; filename="video.mov"',
                     'Content-Range'       => 'bytes '.$rangeStart.'-'.$rangeEnd.'/'.$videoSize,
-                    'job'                 => $job,
+                    'job'                 => $uploadParams['job'],
                 ];
                 $options = [
                     'cookies' => ($this->jar instanceof CookieJar ? $this->jar : false),
@@ -658,12 +678,12 @@ class HttpInterface
                 }
 
                 // Perform the upload of the current chunk.
-                $response = $this->guzzleRequest($method, $uploadUrl, $options);
+                $response = $this->guzzleRequest($method, $uploadParams['upload_url'], $options);
                 $body = $response->getBody()->getContents();
 
                 // Debugging.
                 if ($this->parent->debug) {
-                    $this->printDebug($method, $uploadUrl, null, $chunkSize, $response, $body);
+                    $this->printDebug($method, $uploadParams['upload_url'], null, $chunkSize, $response, $body);
                 }
 
                 // Check if Instagram's server has bugged out.
@@ -695,7 +715,7 @@ class HttpInterface
         // instead of a "{...}" JSON object. Because their server will have
         // dropped all earlier chunks when they bug out (due to overload or w/e).
         if (substr($body, 0, 1) !== '{') {
-            throw new InstagramException("Upload of \"{$video}\" failed. Instagram's server returned an unexpected reply.", ErrorCode::INTERNAL_UPLOAD_FAILED);
+            throw new InstagramException("Upload of \"{$videoFilename}\" failed. Instagram's server returned an unexpected reply.", ErrorCode::INTERNAL_UPLOAD_FAILED);
         }
 
         // Verify that the chunked upload was successful.
@@ -704,14 +724,52 @@ class HttpInterface
             throw new InstagramException($upload->getMessage()."\n");
         }
 
+        return $upload;
+    }
+
+    /**
+     * Uploads a video to Instagram.
+     *
+     * @param string $videoFilename The video filename.
+     * @param string $caption       Caption to use for the video.
+     * @param string $customPreview Optional path to custom video thumbnail.
+     *                              If nothing provided, we generate from video.
+     * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
+     *
+     * @throws InstagramException
+     */
+    public function uploadVideo($videoFilename, $caption = null, $customPreview = null, $maxAttempts = 4)
+    {
+        $this->throwIfNotLoggedIn();
+
+        $endpoint = 'upload/video/';
+
+        // Request parameters for uploading a new video.
+        $uploadParams = $this->requestVideoUploadURL();
+
+        // Upload the entire video file, with retries in case of chunk upload errors.
+        for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
+            try {
+                $upload = $this->uploadVideoChunks($videoFilename, $uploadParams);
+                break;
+            } catch (InstagramException $e) {
+                if ($attempt != $maxAttempts && $e->getCode() == ErrorCode::INTERNAL_UPLOAD_FAILED) {
+                    // Do nothing, since we'll be retrying the failed upload...
+                } else {
+                    // Re-throw all unhandled exceptions.
+                    throw $e;
+                }
+            }
+        }
+
         // Configure the uploaded video and attach it to our timeline.
         // TODO: Rewrite this old, unfinished code! It causes "Call to undefined method InstagramAPI\Instagram::configureToReel()"!
-        $configure = $this->parent->configureVideo($upload_id, $video, $caption, $customPreview);
+        $configure = $this->parent->configureVideo($uploadParams['upload_id'], $videoFilename, $caption, $customPreview);
         //$this->parent->expose();
         $attempts = 0;
         while ($configure->getMessage() == 'Transcode timeout' && $attempts < 3) {
             sleep(1);
-            $configure = $this->parent->configureVideo($upload_id, $video, $caption, $customPreview);
+            $configure = $this->parent->configureVideo($uploadParams['upload_id'], $videoFilename, $caption, $customPreview);
             $attempts++;
         }
 
