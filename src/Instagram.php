@@ -1968,14 +1968,13 @@ class Instagram
 }
 
 /**
- * Bridge between http object & mapper & response.
+ * Bridge between HttpInterface object & mapper & response.
  */
 class Request
 {
     protected $params = [];
     protected $posts = [];
     protected $requireLogin = false;
-    protected $floodWait = false;
     protected $checkStatus = true;
     protected $signedPost = true;
     protected $replacePost = [];
@@ -2007,13 +2006,6 @@ class Request
     public function requireLogin($requireLogin = false)
     {
         $this->requireLogin = $requireLogin;
-
-        return $this;
-    }
-
-    public function setFloodWait($floodWait = false)
-    {
-        $this->floodWait = $floodWait;
 
         return $this;
     }
@@ -2061,7 +2053,7 @@ class Request
             $post = str_replace(array_keys($this->replacePost), array_values($this->replacePost), $post);
         }
 
-        $response = $instagramObj->http->request($endPoint, $post, $this->requireLogin, $this->floodWait, false);
+        $response = $instagramObj->http->request($endPoint, $post, $this->requireLogin, false);
 
         $mapper = new \JsonMapper();
         $mapper->bStrictNullTypes = false;

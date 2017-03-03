@@ -80,8 +80,8 @@ class HttpInterface
             'connect_timeout' => 30.0, // Give up trying to connect after 30s.
             'decode_content'  => true, // Decode gzip/deflate/etc HTTP responses.
             'timeout'         => 240.0, // Maximum per-request time (seconds).
-            // TODO: Consider whether we should throw exceptions on non-200 OK replies:
-            'http_errors'     => false,
+            // Tells Guzzle to throw exceptions on non-"200 OK" replies!
+            'http_errors'     => true,
         ]);
     }
 
@@ -340,14 +340,7 @@ class HttpInterface
         }
 
         // Perform the API request.
-        $response = $this->client->request($method, Constants::API_URL.$endpoint, $options);
-
-        // TODO: Check HTTP status code here before trying to use the response.
-        // But preferably, we should enable http_errors in Guzzle so that the
-        // request above throws exceptions instead. And then use try{} catch{}
-        // in our API and in any user code, to precisely control retry-behavior,
-        // and to avoid muddying return values by including errors in return values.
-        $httpCode = $response->getStatusCode();
+        $response = $this->guzzleRequest($method, Constants::API_URL.$endpoint, $options);
 
         // Process the response.
         $csrftoken = null;
@@ -369,19 +362,7 @@ class HttpInterface
         // Save current cookies.
         $this->saveCookieJar();
 
-        // TODO: Make this cleaner... It's far better and cleaner to let the
-        // caller handle API retries instead, via exceptions and try{} catch{}
-        // instead of this hardcoded blob. ;-)
-        if ($httpCode == 429 && $flood_wait) {
-            if ($this->parent->debug) {
-                echo "Too many requests! Sleeping 2s\n";
-            }
-            sleep(2);
-
-            return $this->request($endpoint, $post, $login, false, $assoc);
-        } else {
-            return [$csrftoken, $result];
-        }
+        return [$csrftoken, $result];
     }
 
     public function getResponseWithResult($obj, $response)
@@ -505,7 +486,7 @@ class HttpInterface
             // TODO: rewrite to properly read proxy just like in request()
         }
 
-        $response = $this->client->request('POST', Constants::API_URL.$endpoint, $options);
+        $response = $this->guzzleRequest('POST', Constants::API_URL.$endpoint, $options);
 
         $cookies = $cookieJar->getIterator();
         foreach ($cookies as $cookie) {
@@ -608,7 +589,7 @@ class HttpInterface
         }
 
         // Perform the "pre-upload" API request.
-        $response = $this->client->request($method, Constants::API_URL.$endpoint, $options);
+        $response = $this->guzzleRequest($method, Constants::API_URL.$endpoint, $options);
 
         // Determine where their API wants us to upload the video file.
         $body = $response->getBody()->getContents();
@@ -667,7 +648,7 @@ class HttpInterface
                 }
 
                 // Perform the upload of the current chunk.
-                $response = $this->client->request($method, $uploadUrl, $options);
+                $response = $this->guzzleRequest($method, $uploadUrl, $options);
                 $body = $response->getBody()->getContents();
 
                 // Debugging.
