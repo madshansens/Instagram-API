@@ -753,7 +753,7 @@ class HttpInterface
                 $upload = $this->uploadVideoChunks($videoFilename, $uploadParams);
                 break;
             } catch (InstagramException $e) {
-                if ($attempt != $maxAttempts && $e->getCode() == ErrorCode::INTERNAL_UPLOAD_FAILED) {
+                if ($attempt < $maxAttempts && $e->getCode() == ErrorCode::INTERNAL_UPLOAD_FAILED) {
                     // Do nothing, since we'll be retrying the failed upload...
                 } else {
                     // Re-throw all unhandled exceptions.
