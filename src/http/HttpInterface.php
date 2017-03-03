@@ -771,14 +771,14 @@ class HttpInterface
         }
 
         // Configure the uploaded video and attach it to our timeline.
-        // TODO: Rewrite this old, unfinished code! It causes "Call to undefined method InstagramAPI\Instagram::configureToReel()"!
-        $configure = $this->parent->configureVideo($uploadParams['upload_id'], $videoFilename, $caption, $story, $customPreview);
-        //$this->parent->expose();
-        $attempts = 0;
-        while ($configure->getMessage() == 'Transcode timeout' && $attempts < 3) {
-            sleep(1);
+        for ($attempt = 1; $attempt <= 4; ++$attempt) {
             $configure = $this->parent->configureVideo($uploadParams['upload_id'], $videoFilename, $caption, $story, $customPreview);
-            $attempts++;
+            //$this->parent->expose();
+            if ($configure->getMessage() != 'Transcode timeout') {
+                break; // Success. Exit loop.
+            } elseif ($attempt < 4) {
+                sleep(1); // Wait a little before the next retry.
+            }
         }
 
         // Save current cookies.
