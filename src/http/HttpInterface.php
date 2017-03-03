@@ -192,6 +192,23 @@ class HttpInterface
         return $this->proxy;
     }
 
+    protected function printDebug($method, $endpoint, $post, $response, $body)
+    {
+        Debug::printRequest($method, $endpoint);
+        if (!is_null($post) && (!is_array($post))) {
+            Debug::printPostData($post);
+        }
+
+        if ($response->hasHeader('x-encoded-content-length')) {
+            $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
+        } else {
+            $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
+        }
+
+        Debug::printHttpCode($response->getStatusCode(), $bytes);
+        Debug::printResponse($body, $this->parent->truncatedDebug);
+    }
+
     /**
      * Perform an Instagram API request.
      */
@@ -249,23 +266,12 @@ class HttpInterface
                 break;
             }
         }
-        $body = json_decode($response->getBody()->getContents());
+        $body = $response->getBody()->getContents();
+        $result = json_decode($body);
 
         // Debugging.
         if ($this->parent->debug) {
-            Debug::printRequest($method, $endpoint);
-            if (!is_null($post) && (!is_array($post))) {
-                Debug::printPostData($post);
-            }
-
-            if ($response->hasHeader('x-encoded-content-length')) {
-                $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
-            } else {
-                $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
-            }
-
-            Debug::printHttpCode($httpCode, $bytes);
-            Debug::printResponse(json_encode($body), $this->parent->truncatedDebug);
+            $this->printDebug($method, $endpoint, $post, $response, $body);
         }
 
         // Tell any custom settings adapters to persist the current cookies.
@@ -286,7 +292,7 @@ class HttpInterface
 
             return $this->request($endpoint, $post, $login, false, $assoc);
         } else {
-            return [$csrftoken, $body];
+            return [$csrftoken, $result];
         }
     }
 
