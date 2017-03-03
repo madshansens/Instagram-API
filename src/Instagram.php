@@ -77,8 +77,9 @@ class Instagram
         $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
         $this->checkSettings($username);
 
-        if (is_null($this->settings->get('uuid'))) {
+        if (is_null($this->settings->get('uuid')) || is_null($this->settings->get('device_id')) || is_null($this->settings->get('phone_id'))) {
             $this->settings->set('uuid', SignatureUtils::generateUUID(true));
+            $this->settings->set('phone_id', SignatureUtils::generateUUID(true));
             $this->settings->set('device_id', SignatureUtils::generateDeviceId(md5($username.$password)));
         }
 
@@ -154,12 +155,12 @@ class Instagram
             $response = $this->request('si/fetch_headers')
             ->requireLogin(true)
             ->addParams('challenge_type', 'signup')
-            ->addParams('guid', SignatureUtils::generateUUID(false))
+            ->addParams('guid', $this->uuid)
             ->getResponse(new ChallengeResponse(), true);
 
             $response = $this->request('accounts/login/')
             ->requireLogin(true)
-            ->addPost('phone_id', SignatureUtils::generateUUID(true))
+            ->addPost('phone_id', $this->settings->get('phone_id'))
             ->addPost('_csrftoken', $response->getFullResponse()[0])
             ->addPost('username', $this->username)
             ->addPost('guid', $this->uuid)
