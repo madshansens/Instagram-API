@@ -9,18 +9,18 @@ class TimelineFeedResponse extends Response
     public $auto_load_more_enabled;
     public $more_available;
     /**
-    * @var string
-    */
+     * @var string
+     */
     public $next_max_id;
-      /*
+    /**
      * @var _Message[]
      */
     public $_messages;
-    /*
+    /**
      * @var Item[]
      */
     public $feed_items;
-    /*
+    /**
      * @var FeedAysf|null
      */
     public $megaphone;

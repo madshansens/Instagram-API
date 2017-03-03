@@ -5,8 +5,8 @@ namespace InstagramAPI;
 class PopularFeedResponse extends Response
 {
     /**
-    * @var string
-    */
+     * @var string
+     */
     public $next_max_id;
     public $more_available;
     public $auto_load_more_enabled;
@@ -16,7 +16,7 @@ class PopularFeedResponse extends Response
     public $items;
     public $num_results;
     /**
-    * @var string
-    */
+     * @var string
+     */
     public $max_id;
 }

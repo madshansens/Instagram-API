@@ -5,6 +5,9 @@ namespace InstagramAPI;
 class DirectShareInboxResponse extends Response
 {
     public $shares;
+    /**
+     * @var string
+     */
     public $max_id;
     public $new_shares;
     public $patches;

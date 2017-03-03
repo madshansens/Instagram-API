@@ -8,6 +8,9 @@ class RowItem extends Response
     public $header;
     public $title;
     public $channel_type;
+    /**
+     * @var string
+     */
     public $channel_id;
     public $media;
 }

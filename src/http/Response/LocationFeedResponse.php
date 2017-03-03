@@ -17,7 +17,7 @@ class LocationFeedResponse extends Response
     public $ranked_items = null;
     public $more_available;
     /**
-    * @var string
-    */
+     * @var string
+     */
     public $next_max_id;
 }

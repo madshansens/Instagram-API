@@ -11,8 +11,8 @@ class AccountCreationResponse extends Response
     public $profile_pic_url;
     public $full_name;
     /**
-    * @var string
-    */
+     * @var string
+     */
     public $pk;
     /*
      * @var HdProfilePicUrlInfo

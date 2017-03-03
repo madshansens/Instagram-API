@@ -10,9 +10,12 @@ class Item extends Response
 
     public $taken_at;
     /**
-    * @var string
-    */
+     * @var string
+     */
     public $pk;
+    /**
+     * @var string
+     */
     public $id;
     public $device_timestamp;
     public $media_type;
@@ -36,8 +39,8 @@ class Item extends Response
     public $expiring_at;
     public $is_reel_media;
     /**
-    * @var string
-    */
+     * @var string
+     */
     public $next_max_id = null;
     /**
      * @var CarouselMedia[]|null
