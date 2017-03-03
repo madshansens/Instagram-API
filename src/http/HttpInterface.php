@@ -254,12 +254,27 @@ class HttpInterface
     }
 
     /**
+     * Helper which throws an error if not logged in.
+     *
+     * Remember to ALWAYS call this function at the top of any API request that
+     * requires the user to be logged in!
+     */
+    protected function throwIfNotLoggedIn()
+    {
+        // Check the cached login state. May not reflect what will happen on the
+        // server. But it's the best we can check without trying the actual request!
+        if (!$this->parent->isLoggedIn) {
+            throw new InstagramException('User not logged in. Please call login() and then try again.', ErrorCode::INTERNAL_LOGIN_REQUIRED);
+        }
+    }
+
+    /**
      * Perform an Instagram API request.
      */
     public function request($endpoint, $post = null, $login = false, $flood_wait = false, $assoc = true)
     {
-        if (!$this->parent->isLoggedIn && !$login) {
-            throw new InstagramException("User is not logged in - login() must be called before making login-enforced requests.\n", ErrorCode::INTERNAL_LOGIN_REQUIRED);
+        if (!$login) { // Only allow login-requests until logged in.
+            $this->throwIfNotLoggedIn();
         }
 
         // Build request options.
@@ -509,6 +524,8 @@ class HttpInterface
      */
     public function uploadVideo($video, $caption = null, $customPreview = null)
     {
+        $this->throwIfNotLoggedIn();
+
         $endpoint = 'upload/video/';
 
         // Prepare payload for the "pre-upload" request.
