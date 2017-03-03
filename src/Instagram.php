@@ -74,14 +74,20 @@ class Instagram
      */
     public function setUser($username, $password)
     {
-        $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
         $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
         $this->checkSettings($username);
+
+        if (is_null($this->settings->get('uuid'))) {
+            $this->settings->set('uuid', SignatureUtils::generateUUID(true));
+            $this->settings->set('device_id', SignatureUtils::generateDeviceId(md5($username.$password)));
+        }
 
         $this->username = $username;
         $this->password = $password;
 
-        $this->uuid = SignatureUtils::generateUUID(true);
+        $this->uuid = $this->settings->get('uuid');
+        $this->device_id = $this->settings->get('device_id');
+
         if ($this->settings->isLogged()) {
             $this->isLoggedIn = true;
             $this->username_id = $this->settings->get('username_id');
