@@ -483,6 +483,16 @@ class HttpInterface
         return $upload;
     }
 
+    /**
+     * Uploads a video to Instagram.
+     *
+     * @param string $video         The video filename.
+     * @param string $caption       Caption to use for the video.
+     * @param string $customPreview Optional path to custom video thumbnail.
+     *                              If nothing provided, we generate from video.
+     *
+     * @throws InstagramException
+     */
     public function uploadVideo($video, $caption = null, $customPreview = null)
     {
         $endpoint = 'upload/video/';
