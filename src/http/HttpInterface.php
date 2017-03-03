@@ -485,9 +485,9 @@ class HttpInterface
 
     public function uploadVideo($video, $caption = null, $customPreview = null)
     {
-        $videoData = file_get_contents($video);
-
         $endpoint = 'upload/video/';
+
+        // Prepare payload for the "pre-upload" request.
         $boundary = $this->parent->uuid;
         $upload_id = Utils::generateUploadId();
         $bodies = [
@@ -512,150 +512,125 @@ class HttpInterface
                 'data' => $this->parent->uuid,
             ],
         ];
+        $payload = $this->buildBody($bodies, $boundary);
 
-        $data = $this->buildBody($bodies, $boundary);
+        // Build the "pre-upload" request's options.
+        $method = 'POST';
         $headers = [
-            'Connection' => 'keep-alive',
-            'Accept' => '*/*',
-            'Host' => 'i.instagram.com',
-            'Content-Type' => 'multipart/form-data; boundary='.$boundary,
+            'User-Agent'      => $this->userAgent,
+            'Connection'      => 'keep-alive',
+            'Accept'          => '*/*',
+            'Content-Type'    => 'multipart/form-data; boundary='.$boundary,
             'Accept-Language' => 'en-en',
-            'User-Agent'            => $this->userAgent,
         ];
-
         $options = [
             'cookies' => ($this->jar instanceof CookieJar ? $this->jar : false),
             'headers' => $headers,
             'verify'  => $this->verifySSL,
-            'body'    => $data,
+            'body'    => $payload,
         ];
-
         if (!is_null($this->proxy)) {
             $options['proxy'] = $this->proxy;
         }
 
-        // Perform the API request.
-        $response = $this->client->request('POST', Constants::API_URL.$endpoint, $options);
-        $json = $response->getBody()->getContents();
+        // Perform the "pre-upload" API request.
+        $response = $this->client->request($method, Constants::API_URL.$endpoint, $options);
 
-        $body = $this->getResponseWithResult(new UploadJobVideoResponse(), json_decode($json));
-        $uploadUrl = $body->getVideoUploadUrls()[3]->url;
-        $job = $body->getVideoUploadUrls()[3]->job;
-
-        $request_size = floor(strlen($videoData) / 4);
-        $lastRequestExtra = (strlen($videoData) - ($request_size * 4));
-
-        if ($this->parent->debug) {
-            Debug::printRequest('POST', $endpoint);
-
-            $uploadBytes = Utils::formatBytes(strlen($data));
-            Debug::printUpload($uploadBytes);
-
-            if ($response->hasHeader('x-encoded-content-length')) {
-                $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
-            } else {
-                $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
-            }
-            $httpCode = $response->getStatusCode();
-            Debug::printHttpCode($httpCode, $bytes);
-            Debug::printResponse($json, $this->parent->truncatedDebug);
-        }
-
-        for ($a = 0; $a <= 3; ++$a) {
-            $start = ($a * $request_size);
-            $end = ($a + 1) * $request_size + ($a == 3 ? $lastRequestExtra : 0);
-
-            $headers = [
-                'User-Agent'            => $this->userAgent,
-                'Connection' => 'keep-alive',
-                'Accept' => '*/*',
-                'Host' => 'upload.instagram.com',
-                'Cookie2' => '$Version=1',
-                'Accept-Encoding' => 'gzip, deflate',
-                'Content-Type' => 'application/octet-stream',
-                'Session-ID' => $upload_id,
-                'Accept-Language' => 'en-en',
-                'Content-Disposition' => 'attachment; filename="video.mov"',
-                'Content-Length' => ($end - $start),
-                'Content-Range' => 'bytes '.$start.'-'.($end - 1).'/'.strlen($videoData),
-                'job' => $job,
-            ];
-
-            $options = [
-                'cookies' => ($this->jar instanceof CookieJar ? $this->jar : false),
-                'headers' => $headers,
-                'verify'  => $this->verifySSL,
-                'body'    => substr($videoData, $start, $end),
-                'debug'   => true
-            ];
-
-            if (!is_null($this->proxy)) {
-                $options['proxy'] = $this->proxy;
-            }
-
-            // Perform the API request.
-            $response = $this->client->request('POST', $uploadUrl, $options);
-            $body = $response->getBody()->getContents();
-
-            if ($this->parent->debug) {
-                Debug::printRequest('POST', $uploadUrl);
-
-                $uploadBytes = Utils::formatBytes(strlen(substr($videoData, $start, $end)));
-                Debug::printUpload($uploadBytes);
-
-                if ($response->hasHeader('x-encoded-content-length')) {
-                    $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
-                } else {
-                    $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
-                }
-                $httpCode = $response->getStatusCode();
-                Debug::printHttpCode($httpCode, $bytes);
-                Debug::printResponse($body, $this->parent->truncatedDebug);
-            }
-        }
-        $response = $this->client->request('POST', $uploadUrl, $options);
+        // Determine where their API wants us to upload the video file.
         $body = $response->getBody()->getContents();
+        $result = $this->getResponseWithResult(new UploadJobVideoResponse(), json_decode($body));
+        $uploadUrl = $result->getVideoUploadUrls()[3]->url;
+        $job = $result->getVideoUploadUrls()[3]->job;
 
+        // Debugging.
+        if ($this->parent->debug) {
+            $this->printDebug($method, $endpoint, $payload, null, $response, $body);
+        }
 
-        /*
-        $upload = $this->getResponseWithResult(new UploadVideoResponse(), json_decode(substr($resp, $header_len)));
+        // Video upload must be done in exactly 4 chunks; determine chunk size!
+        $numChunks = 4;
+        $videoSize = filesize($video);
+        $maxChunkSize = ceil($videoSize / $numChunks);
 
+        // Read and upload each individual chunk.
+        $rangeStart = 0;
+        $handle = fopen($video, 'r');
+        try {
+            for ($chunkIdx = 1; $chunkIdx <= $numChunks; ++$chunkIdx) {
+                // Extract the chunk.
+                $chunkData = fread($handle, $maxChunkSize);
+                $chunkSize = strlen($chunkData);
+
+                // Calculate where the current byte range will end.
+                // NOTE: Range is 0-indexed, and Start is the first byte of the
+                // new chunk we're uploading, hence we MUST subtract 1 from End.
+                // And our FINAL chunk's End must be 1 less than the filesize!
+                $rangeEnd = $rangeStart + ($chunkSize - 1);
+
+                // Build the current chunk's request options.
+                $method = 'POST';
+                $headers = [
+                    'User-Agent'          => $this->userAgent,
+                    'Connection'          => 'keep-alive',
+                    'Accept'              => '*/*',
+                    'Cookie2'             => '$Version=1',
+                    'Accept-Encoding'     => 'gzip, deflate',
+                    'Content-Type'        => 'application/octet-stream',
+                    'Session-ID'          => $upload_id,
+                    'Accept-Language'     => 'en-en',
+                    'Content-Disposition' => 'attachment; filename="video.mov"',
+                    'Content-Range'       => 'bytes '.$rangeStart.'-'.$rangeEnd.'/'.$videoSize,
+                    'job'                 => $job,
+                ];
+                $options = [
+                    'cookies' => ($this->jar instanceof CookieJar ? $this->jar : false),
+                    'headers' => $headers,
+                    'verify'  => $this->verifySSL,
+                    'body'    => $chunkData,
+                ];
+                if (!is_null($this->proxy)) {
+                    $options['proxy'] = $this->proxy;
+                }
+
+                // Perform the upload of the current chunk.
+                $response = $this->client->request($method, $uploadUrl, $options);
+                $body = $response->getBody()->getContents();
+
+                // Debugging.
+                if ($this->parent->debug) {
+                    $this->printDebug($method, $uploadUrl, null, $chunkSize, $response, $body);
+                }
+
+                // Update the range's Start for the next iteration.
+                // NOTE: It's the End-byte of the previous range, plus one.
+                $rangeStart = $rangeEnd + 1;
+            }
+        } finally {
+            // Guaranteed to release handle even if something bad happens above!
+            fclose($handle);
+        }
+
+        // NOTE: $response and $body below refer to the final chunk's result!
+
+        // Verify that the chunked upload was successful.
+        $upload = $this->getResponseWithResult(new UploadVideoResponse(), json_decode($body));
         if (!is_null($upload->getMessage())) {
             throw new InstagramException($upload->getMessage()."\n");
-
-            return;
         }
-        */
 
-        if ($this->parent->debug) {
-            Debug::printRequest('POST', $uploadUrl);
-
-            if ($response->hasHeader('x-encoded-content-length')) {
-                $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
-            } else {
-                $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
-            }
-            $httpCode = $response->getStatusCode();
-            Debug::printHttpCode($httpCode, $bytes);
-            Debug::printResponse($body, $this->parent->truncatedDebug);
-        }
-        exit();
-
-        if ($this->parent->settingsAdapter['type'] == 'mysql') {
-            $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set('cookies', $newCookies);
-        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
-            $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set('cookies', $newCookies);
-        }
+        // Configure the uploaded video and attach it to our timeline.
+        // TODO: Rewrite this old, unfinished code! It causes "Call to undefined method InstagramAPI\Instagram::configureToReel()"!
         $configure = $this->parent->configureVideo($upload_id, $video, $caption, $customPreview);
         //$this->parent->expose();
-        $attemps = 0;
-        while ($configure->getMessage() == 'Transcode timeout' && $attemps < 3) {
+        $attempts = 0;
+        while ($configure->getMessage() == 'Transcode timeout' && $attempts < 3) {
             sleep(1);
             $configure = $this->parent->configureVideo($upload_id, $video, $caption, $customPreview);
-            $attemps++;
+            $attempts++;
         }
+
+        // Save current cookies.
+        $this->saveCookieJar();
 
         return $configure;
     }
