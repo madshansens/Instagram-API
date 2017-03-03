@@ -634,6 +634,12 @@ class HttpInterface
     {
         $this->throwIfNotLoggedIn();
 
+        // Determine correct file extension for video format.
+        $videoExt = pathinfo($videoFilename, PATHINFO_EXTENSION);
+        if (strlen($videoExt) == 0) {
+            $videoExt = 'mp4'; // Fallback.
+        }
+
         // Video upload must be done in exactly 4 chunks; determine chunk size!
         $numChunks = 4;
         $videoSize = filesize($videoFilename);
@@ -665,7 +671,7 @@ class HttpInterface
                     'Content-Type'        => 'application/octet-stream',
                     'Session-ID'          => $uploadParams['upload_id'],
                     'Accept-Language'     => 'en-en',
-                    'Content-Disposition' => 'attachment; filename="video.mp4"',
+                    'Content-Disposition' => "attachment; filename=\"video.{$videoExt}\"",
                     'Content-Range'       => 'bytes '.$rangeStart.'-'.$rangeEnd.'/'.$videoSize,
                     'job'                 => $uploadParams['job'],
                 ];
