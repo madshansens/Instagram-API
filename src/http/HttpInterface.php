@@ -488,7 +488,7 @@ class HttpInterface
             'Host' => 'i.instagram.com',
             'Content-Type' => 'multipart/form-data; boundary='.$boundary,
             'Accept-Language' => 'en-en',
-            'User-Agent'    => ''
+            'User-Agent'            => $this->userAgent,
         ];
 
         $options = [
@@ -496,7 +496,6 @@ class HttpInterface
             'headers' => $headers,
             'verify'  => $this->verifySSL,
             'body'    => $data,
-            'debug'   => true
         ];
 
         if (!is_null($this->proxy)) {
@@ -505,13 +504,9 @@ class HttpInterface
 
         // Perform the API request.
         $response = $this->client->request('POST', Constants::API_URL.$endpoint, $options);
+        $json = $response->getBody()->getContents();
 
-        echo $response->getBody()->getContents();
-        exit();
-        $resp = curl_exec($ch);
-        $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-
-        $body = $this->getResponseWithResult(new UploadJobVideoResponse(), json_decode(substr($resp, $header_len)));
+        $body = $this->getResponseWithResult(new UploadJobVideoResponse(), json_decode($json));
         $uploadUrl = $body->getVideoUploadUrls()[3]->url;
         $job = $body->getVideoUploadUrls()[3]->job;
 
@@ -521,13 +516,17 @@ class HttpInterface
         if ($this->parent->debug) {
             Debug::printRequest('POST', $endpoint);
 
-            $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
+            $uploadBytes = Utils::formatBytes(strlen($data));
             Debug::printUpload($uploadBytes);
 
-            $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            if ($response->hasHeader('x-encoded-content-length')) {
+                $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
+            } else {
+                $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
+            }
+            $httpCode = $response->getStatusCode();
             Debug::printHttpCode($httpCode, $bytes);
-            Debug::printResponse(substr($resp, $header_len));
+            Debug::printResponse($json, $this->parent->truncatedDebug);
         }
 
         for ($a = 0; $a <= 3; ++$a) {
@@ -535,69 +534,56 @@ class HttpInterface
             $end = ($a + 1) * $request_size + ($a == 3 ? $lastRequestExtra : 0);
 
             $headers = [
-                'Connection: keep-alive',
-                'Accept: */*',
-                'Host: upload.instagram.com',
-                'Cookie2: $Version=1',
-                'Accept-Encoding: gzip, deflate',
-                'Content-Type: application/octet-stream',
-                'Session-ID: '.$upload_id,
-                'Accept-Language: en-en',
-                'Content-Disposition: attachment; filename="video.mov"',
-                'Content-Length: '.($end - $start),
-                'Content-Range: '.'bytes '.$start.'-'.($end - 1).'/'.strlen($videoData),
-                'job: '.$job,
+                'User-Agent'            => $this->userAgent,
+                'Connection' => 'keep-alive',
+                'Accept' => '*/*',
+                'Host' => 'upload.instagram.com',
+                'Cookie2' => '$Version=1',
+                'Accept-Encoding' => 'gzip, deflate',
+                'Content-Type' => 'application/octet-stream',
+                'Session-ID' => $upload_id,
+                'Accept-Language' => 'en-en',
+                'Content-Disposition' => 'attachment; filename="video.mov"',
+                'Content-Length' => ($end - $start),
+                'Content-Range' => 'bytes '.$start.'-'.($end - 1).'/'.strlen($videoData),
+                'job' => $job,
             ];
 
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $uploadUrl);
-            curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_HEADER, true);
-            curl_setopt($ch, CURLOPT_VERBOSE, false);
-            curl_setopt($ch, CURLOPT_ENCODING, '');
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            if ($this->parent->settingsAdapter['type'] == 'file') {
-                curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
-                curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
-            } else {
-                $cookieJar = $this->parent->settings->get('cookies');
-                $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
+            $options = [
+                'cookies' => ($this->jar instanceof CookieJar ? $this->jar : false),
+                'headers' => $headers,
+                'verify'  => $this->verifySSL,
+                'body'    => substr($videoData, $start, $end),
+                'debug'   => true
+            ];
 
-                file_put_contents($cookieJarFile, $cookieJar);
-
-                curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieJarFile);
-                curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieJarFile);
-            }
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, substr($videoData, $start, $end));
-
-            if ($this->proxy) {
-                // TODO: rewrite to properly read proxy just like in request()
+            if (!is_null($this->proxy)) {
+                $options['proxy'] = $this->proxy;
             }
 
-            $result = curl_exec($ch);
-            $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-            $body = substr($result, $header_len);
-            $array[] = [$body];
+            // Perform the API request.
+            $response = $this->client->request('POST', $uploadUrl, $options);
+            $body = $response->getBody()->getContents();
 
             if ($this->parent->debug) {
                 Debug::printRequest('POST', $uploadUrl);
 
-                $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
+                $uploadBytes = Utils::formatBytes(strlen(substr($videoData, $start, $end)));
                 Debug::printUpload($uploadBytes);
 
-                $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
-                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                if ($response->hasHeader('x-encoded-content-length')) {
+                    $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
+                } else {
+                    $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
+                }
+                $httpCode = $response->getStatusCode();
                 Debug::printHttpCode($httpCode, $bytes);
-                Debug::printResponse($body);
+                Debug::printResponse($body, $this->parent->truncatedDebug);
             }
         }
-        $resp = curl_exec($ch);
-        $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $header = substr($resp, 0, $header_len);
+        $response = $this->client->request('POST', $uploadUrl, $options);
+        $body = $response->getBody()->getContents();
+
 
         /*
         $upload = $this->getResponseWithResult(new UploadVideoResponse(), json_decode(substr($resp, $header_len)));
@@ -610,15 +596,19 @@ class HttpInterface
         */
 
         if ($this->parent->debug) {
-            Debug::printRequest('POST', $endpoint);
+            Debug::printRequest('POST', $uploadUrl);
 
-            $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            if ($response->hasHeader('x-encoded-content-length')) {
+                $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
+            } else {
+                $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
+            }
+            $httpCode = $response->getStatusCode();
             Debug::printHttpCode($httpCode, $bytes);
-            Debug::printResponse(substr($resp, $header_len), $this->parent->truncatedDebug);
+            Debug::printResponse($body, $this->parent->truncatedDebug);
         }
+        exit();
 
-        curl_close($ch);
         if ($this->parent->settingsAdapter['type'] == 'mysql') {
             $newCookies = file_get_contents($cookieJarFile);
             $this->parent->settings->set('cookies', $newCookies);
