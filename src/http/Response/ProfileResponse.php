@@ -13,12 +13,15 @@ class ProfileResponse extends Response
     public $needs_email_confirm;
     public $national_number;
     public $profile_pic_url;
+    /**
+     * @var string
+     */
     public $profile_pic_id;
     public $biography;
     public $full_name;
     /**
-    * @var string
-    */
+     * @var string
+     */
     public $pk;
     public $country_code;
     public $hd_profile_pic_url_info;

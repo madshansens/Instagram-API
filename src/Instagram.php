@@ -10,8 +10,17 @@ class Instagram
     public $debug;    // Debug
     public $truncatedDebug;
 
+    /**
+     * @var string
+     */
     public $uuid;               // UUID
+    /**
+     * @var string
+     */
     public $device_id;          // Device ID
+    /**
+     * @var string
+     */
     public $username_id;        // Username ID
     public $token;              // _csrftoken
     public $isLoggedIn = false; // Session status

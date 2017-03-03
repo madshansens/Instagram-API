@@ -9,7 +9,7 @@ class FollowerAndFollowingResponse extends Response
      */
     public $users;
     /**
-    * @var string
-    */
+     * @var string
+     */
     public $next_max_id;
 }

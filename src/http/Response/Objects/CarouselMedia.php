@@ -8,10 +8,16 @@ class CarouselMedia extends Response
     const VIDEO = 2;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     public $pk;
+    /**
+     * @var string
+     */
     public $id;
+    /**
+     * @var string
+     */
     public $carousel_parent_id;
     /**
      * @var Image_Versions2

@@ -6,7 +6,13 @@ class InstagramRegistration
 {
     protected $debug;
     protected $username;
+    /**
+     * @var string
+     */
     protected $uuid;
+    /**
+     * @var string
+     */
     protected $waterfall_id;
     protected $token;
     protected $userAgent;

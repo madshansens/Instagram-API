@@ -10,8 +10,8 @@ class User extends Response
     public $profile_pic_url;
     public $full_name;
     /**
-    * @var string
-    */
+     * @var string
+     */
     public $pk;
     public $is_verified = false;
     public $is_private = false;
@@ -37,6 +37,9 @@ class User extends Response
     public $is_unpublished;
     public $allow_contacts_sync; // login prop
     public $show_feed_biz_conversion_icon; // login prop
+    /**
+     * @var string
+     */
     public $profile_pic_id; // Ranked recipents response prop
     public $auto_expand_chaining; // getUsernameInfo prop
     public $can_boost_post; // getUsernameInfo prop

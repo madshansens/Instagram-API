@@ -9,8 +9,8 @@ class UsertagsResponse extends Response
     public $items;
     public $more_available;
     /**
-    * @var string
-    */
+     * @var string
+     */
     public $next_max_id;
     public $total_count;
     public $requires_review;

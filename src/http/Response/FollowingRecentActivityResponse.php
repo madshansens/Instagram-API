@@ -6,7 +6,7 @@ class FollowingRecentActivityResponse extends Response
 {
     public $stories;
     /**
-    * @var string
-    */
+     * @var string
+     */
     public $next_max_id;
 }

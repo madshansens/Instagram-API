@@ -4,12 +4,14 @@ namespace InstagramAPI;
 
 class Tray extends Response
 {
+    /**
+     * @var string
+     */
     public $id;
     /**
      * @var Item[]
      */
     public $items;
-
     public $user;
     public $can_reply;
     public $expiring_at;

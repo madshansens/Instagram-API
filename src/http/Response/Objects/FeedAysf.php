@@ -5,6 +5,9 @@ namespace InstagramAPI;
 class FeedAysf extends Response
 {
     public $landing_site_type;
+    /**
+     * @var string
+     */
     public $uuid;
     public $view_all_text;
     public $feed_position;

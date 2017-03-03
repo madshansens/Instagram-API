@@ -5,8 +5,8 @@ namespace InstagramAPI;
 class Story extends Response
 {
     /**
-    * @var string
-    */
+     * @var string
+     */
     public $pk;
     public $counts;
     public $args;
