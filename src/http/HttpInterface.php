@@ -665,7 +665,7 @@ class HttpInterface
                     'Content-Type'        => 'application/octet-stream',
                     'Session-ID'          => $uploadParams['upload_id'],
                     'Accept-Language'     => 'en-en',
-                    'Content-Disposition' => 'attachment; filename="video.mov"',
+                    'Content-Disposition' => 'attachment; filename="video.mp4"',
                     'Content-Range'       => 'bytes '.$rangeStart.'-'.$rangeEnd.'/'.$videoSize,
                     'job'                 => $uploadParams['job'],
                 ];
