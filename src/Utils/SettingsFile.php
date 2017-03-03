@@ -14,7 +14,7 @@ class SettingsFile
             $path = Constants::DATA_DIR;
         }
         $this->cookiesPath = $path.$username.DIRECTORY_SEPARATOR.$username.'-cookies.dat';
-        $this->settingsPath = $path.$username.DIRECTORY_SEPARATOR.'settings-'.$username.'.dat';
+        $this->settingsPath = $path.$username.DIRECTORY_SEPARATOR.$username.'-settings.dat';
 
         $this->checkPermissions();
 
