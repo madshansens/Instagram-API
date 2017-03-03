@@ -192,21 +192,32 @@ class HttpInterface
         return $this->proxy;
     }
 
-    protected function printDebug($method, $endpoint, $post, $response, $body)
+    protected function printDebug($method, $url, $postBody, $uploadBytes, $response, $responseBody)
     {
-        Debug::printRequest($method, $endpoint);
-        if (!is_null($post) && (!is_array($post))) {
-            Debug::printPostData($post);
+        Debug::printRequest($method, $url);
+
+        // Display the data that was sent via POST, if provided.
+        // NOTE: Only provide this from functions that submit meaningful POST data!
+        if (!is_null($postBody) && (!is_array($postBody))) {
+            Debug::printPostData($postBody);
         }
 
+        // Display the number of bytes uploaded, if provided.
+        // NOTE: Only provide this from functions that actually upload files!
+        if (!is_null($uploadBytes)) {
+            Debug::printUpload(Utils::formatBytes($uploadBytes));
+        }
+
+        // Display the number of bytes received from the response, and status code.
         if ($response->hasHeader('x-encoded-content-length')) {
             $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
         } else {
             $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
         }
-
         Debug::printHttpCode($response->getStatusCode(), $bytes);
-        Debug::printResponse($body, $this->parent->truncatedDebug);
+
+        // Display the actual API response body.
+        Debug::printResponse($responseBody, $this->parent->truncatedDebug);
     }
 
     /**
@@ -271,7 +282,7 @@ class HttpInterface
 
         // Debugging.
         if ($this->parent->debug) {
-            $this->printDebug($method, $endpoint, $post, $response, $body);
+            $this->printDebug($method, $endpoint, $post, null, $response, $body);
         }
 
         // Tell any custom settings adapters to persist the current cookies.
