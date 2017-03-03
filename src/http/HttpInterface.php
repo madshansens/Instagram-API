@@ -409,7 +409,7 @@ class HttpInterface
      *
      * @throws InstagramException
      */
-    public function uploadPhoto($photo, $upload_id = null, $album = false)
+    public function uploadPhoto($photo, $upload_id = null, $album = false, $customPreview = null)
     {
         $endpoint = 'upload/photo/';
         $boundary = $this->parent->uuid;
@@ -417,6 +417,8 @@ class HttpInterface
 
         if (!is_null($upload_id)) {
             $fileToUpload = Utils::createVideoIcon($photo);
+        } elseif ($customPreview) {
+            $fileToUpload = file_get_contents($customPreview);
         } else {
             $upload_id = Utils::generateUploadId();
             $fileToUpload = file_get_contents($photo);
@@ -738,7 +740,7 @@ class HttpInterface
      *
      * @throws InstagramException
      */
-    public function uploadVideo($videoFilename, $caption = null, $customPreview = null, $maxAttempts = 4)
+    public function uploadVideo($videoFilename, $caption = null, $story = false, $customPreview = null, $maxAttempts = 4)
     {
         $this->throwIfNotLoggedIn();
 
@@ -764,12 +766,12 @@ class HttpInterface
 
         // Configure the uploaded video and attach it to our timeline.
         // TODO: Rewrite this old, unfinished code! It causes "Call to undefined method InstagramAPI\Instagram::configureToReel()"!
-        $configure = $this->parent->configureVideo($uploadParams['upload_id'], $videoFilename, $caption, $customPreview);
+        $configure = $this->parent->configureVideo($uploadParams['upload_id'], $videoFilename, $caption, $story, $customPreview);
         //$this->parent->expose();
         $attempts = 0;
         while ($configure->getMessage() == 'Transcode timeout' && $attempts < 3) {
             sleep(1);
-            $configure = $this->parent->configureVideo($uploadParams['upload_id'], $videoFilename, $caption, $customPreview);
+            $configure = $this->parent->configureVideo($uploadParams['upload_id'], $videoFilename, $caption, $story, $customPreview);
             $attempts++;
         }
 

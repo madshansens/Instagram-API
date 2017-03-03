@@ -472,7 +472,7 @@ class Instagram
         }
 
         if ($story) {
-            $configure = $this->configureToReel($upload->getUploadId(), $photo);
+            $configure = $this->configure($upload->getUploadId(), $photo, $caption, $location, false, true, $filter);
         } else {
             $configure = $this->configure($upload->getUploadId(), $photo, $caption, $location, false, false, $filter);
         }
@@ -560,9 +560,9 @@ class Instagram
      *
      * @return mixed
      */
-    public function uploadVideo($videoFilename, $caption = null, $customPreview = null, $maxAttempts = 4)
+    public function uploadVideo($videoFilename, $caption = null, $story = false, $customPreview = null, $maxAttempts = 4)
     {
-        return $this->http->uploadVideo($videoFilename, $caption, $customPreview, $maxAttempts);
+        return $this->http->uploadVideo($videoFilename, $caption, $story, $customPreview, $maxAttempts);
     }
 
     /**
@@ -652,35 +652,33 @@ class Instagram
      *
      * @return ConfigureVideoResponse
      */
-    public function configureVideo($upload_id, $video, $caption = '', $customPreview = null)
+    public function configureVideo($upload_id, $video, $caption = '', $story = false, $customPreview = null)
     {
-        $this->uploadPhoto($video, $caption, $upload_id, $customPreview);
+        $this->http->uploadPhoto($video, $upload_id, false, false, $customPreview);
 
-        $size = getimagesize($video)[0];
+        if ($story) {
+            $endpoint = 'media/configure_to_reel/';
+        } else {
+            $endpoint = 'media/configure/';
+        }
 
-        return $this->request('media/configure/')
+        return $this->request($endpoint)
         ->addParams('video', 1)
-        ->addPost('upload_id', $upload_id)
-        ->addPost('source_type', '3')
-        ->addPost('poster_frame_index', 0)
-        ->addPost('length', 0.00)
+        ->addPost('video_result', 'deprecated')
         ->addPost('audio_muted', false)
+        ->addPost('trim_type', 0)
+        ->addPost('client_timestamp', time())
+        ->addPost('camera_position', 'unknown')
+        ->addPost('upload_id', $upload_id)
+        ->addPost('source_type', 'library')
+        ->addPost('poster_frame_index', 0)
+        ->addPost('length',0.00)
+        ->addPost('audio_muted', false)
+        ->addPost('geotag_enabled', false)
         ->addPost('filter_type', '0')
         ->addPost('video_result', 'deprecated')
-        ->addPost('clips', [
-            'length'          => Utils::getSeconds($video),
-            'source_type'     => '3',
-            'camera_position' => 'back',
-        ])
-        ->addPost('extra', [
-            'source_width'  => 960,
-            'source_height' => 1280,
-        ])
-        ->addPost('device', [
-            'manufacturer'    => $this->settings->get('manufacturer'),
-            'model'           => $this->settings->get('model'),
-            'android_version' => Constants::ANDROID_VERSION,
-            'android_release' => Constants::ANDROID_RELEASE,
+        ->addPost('edits', [
+            'filter_strength'   => 1,
         ])
         ->addPost('_csrftoken', $this->token)
         ->addPost('_uuid', $this->uuid)
