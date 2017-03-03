@@ -77,7 +77,6 @@ class Instagram
         $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
         $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
         $this->checkSettings($username);
-        $this->http->updateFromSettingsAdapter();
 
         $this->username = $username;
         $this->password = $password;
@@ -91,6 +90,11 @@ class Instagram
         } else {
             $this->isLoggedIn = false;
         }
+
+        // Configures HttpInterface for current user AND updates isLoggedIn
+        // state if it fails to load the expected cookies from the user's jar.
+        // Must be done last here, so that isLoggedIn is properly updated!
+        $this->http->updateFromSettingsAdapter();
     }
 
     protected function checkSettings($username)

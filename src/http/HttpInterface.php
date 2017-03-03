@@ -115,9 +115,23 @@ class HttpInterface
             $this->jar = new CookieJar(false, $restoredCookies);
         }
 
-        // TODO: Perhaps force login via $this->parent->login(true) here or somewhere
-        // else, if we don't have any session. Such as if we couldn't load the
-        // session cookies from disk/decode them from memory above.
+        // Verify that the jar contains a non-expired csrftoken for the API
+        // domain. Instagram gives us a 1-year csrftoken whenever we log in.
+        // If it's missing, we're definitely NOT logged in! But even if all of
+        // these checks succeed, the cookie may still not be valid. It's just a
+        // preliminary check to detect definitely-invalid session cookies!
+        $foundCSRFToken = false;
+        foreach ($this->jar->getIterator() as $cookie) {
+            if ($cookie->getName() == 'csrftoken'
+                && $cookie->getDomain() == 'i.instagram.com'
+                && $cookie->getExpires() > time()) {
+                $foundCSRFToken = true;
+                break;
+            }
+        }
+        if (!$foundCSRFToken) {
+            $this->parent->isLoggedIn = false;
+        }
     }
 
     /**
