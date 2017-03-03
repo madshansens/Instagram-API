@@ -77,7 +77,9 @@ class Instagram
         $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
         $this->checkSettings($username);
 
-        if (is_null($this->settings->get('uuid')) || is_null($this->settings->get('device_id')) || is_null($this->settings->get('phone_id'))) {
+        if (is_null($this->settings->get('uuid'))
+            || is_null($this->settings->get('phone_id'))
+            || is_null($this->settings->get('device_id'))) {
             $this->settings->set('uuid', SignatureUtils::generateUUID(true));
             $this->settings->set('phone_id', SignatureUtils::generateUUID(true));
             $this->settings->set('device_id', SignatureUtils::generateDeviceId(md5($username.$password)));
@@ -279,7 +281,7 @@ class Instagram
         $data = json_encode([
             '_uuid'                => $this->uuid,
             'guid'                 => $this->uuid,
-            'phone_id'             => SignatureUtils::generateUUID(true),
+            'phone_id'             => $this->settings->get('phone_id'),
             'device_type'          => 'android_mqtt',
             'device_token'         => $deviceToken,
             'is_main_push_channel' => true,
@@ -672,7 +674,7 @@ class Instagram
         ->addPost('upload_id', $upload_id)
         ->addPost('source_type', 'library')
         ->addPost('poster_frame_index', 0)
-        ->addPost('length',0.00)
+        ->addPost('length', 0.00)
         ->addPost('audio_muted', false)
         ->addPost('geotag_enabled', false)
         ->addPost('filter_type', '0')
