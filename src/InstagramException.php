@@ -63,7 +63,7 @@ class ErrorCode
 
 class InstagramException extends \Exception
 {
-    public function __construct($message, $code = null, Exception $previous = null)
+    public function __construct($message, $code = null, \Exception $previous = null)
     {
         if (is_null($code)) {
             if (preg_match(ErrorCode::IG_LOGIN_REQUIRED_REGEX, $message) === 1) {
@@ -92,6 +92,6 @@ class InstagramException extends \Exception
 
     public function __toString()
     {
-        return 'Code '.$this->code.': '.$this->getMessage();
+        return 'Code '.$this->getCode().': '.$this->getMessage().PHP_EOL.'Stack trace:'.PHP_EOL.$this->getTraceAsString();
     }
 }

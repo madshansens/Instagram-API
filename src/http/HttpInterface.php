@@ -291,7 +291,7 @@ class HttpInterface
             if (is_object($response)) {
                 $httpCode = $response->getStatusCode();
                 if ($httpCode == 429) { // "429 Too Many Requests"
-                    throw new InstagramException('Throttled by Instagram because of too many API requests.', ErrorCode::INTERNAL_API_THROTTLED);
+                    throw new InstagramException('Throttled by Instagram because of too many API requests.', ErrorCode::INTERNAL_API_THROTTLED, $e);
                 }
             }
 
