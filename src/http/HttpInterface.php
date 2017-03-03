@@ -304,9 +304,9 @@ class HttpInterface
     /**
      * Perform an Instagram API request.
      */
-    public function request($endpoint, $post = null, $login = false, $flood_wait = false, $assoc = true)
+    public function request($endpoint, $postData = null, $requireLogin = false, $assoc = true)
     {
-        if (!$login) { // Only allow login-requests until logged in.
+        if (!$requireLogin) { // Only allow login-requests until logged in.
             $this->throwIfNotLoggedIn();
         }
 
@@ -331,9 +331,9 @@ class HttpInterface
             'verify'  => $this->verifySSL,
         ];
         $method = 'GET';
-        if ($post) {
+        if ($postData) {
             $method = 'POST';
-            $options['body'] = $post;
+            $options['body'] = $postData;
         }
         if (!is_null($this->proxy)) {
             $options['proxy'] = $this->proxy;
@@ -359,11 +359,11 @@ class HttpInterface
             }
         }
         $body = $response->getBody()->getContents();
-        $result = json_decode($body);
+        $result = json_decode($body, $assoc, 512, JSON_BIGINT_AS_STRING);
 
         // Debugging.
         if ($this->parent->debug) {
-            $this->printDebug($method, $endpoint, $post, null, $response, $body);
+            $this->printDebug($method, $endpoint, $postData, null, $response, $body);
         }
 
         // Save current cookies.
