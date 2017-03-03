@@ -11,7 +11,13 @@ class Location extends Response
     public $external_id_source = null;
     public $external_source = null;
     public $address;
+    /**
+     * @var float
+     */
     public $lat;
+    /**
+     * @var float
+     */
     public $lng;
     /**
      * @var string
