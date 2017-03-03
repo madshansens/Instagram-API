@@ -677,6 +677,15 @@ class HttpInterface
 
         // NOTE: $response and $body below refer to the final chunk's result!
 
+        // Protection against Instagram's upload server being bugged out!
+        // NOTE: When their server is bugging out, the final chunk result will
+        // just be yet another range specifier such as "328600-657199/657200",
+        // instead of a "{...}" JSON object. Because their server will have
+        // dropped all earlier chunks when they bug out (due to overload or w/e).
+        if (substr($body, 0, 1) !== '{') {
+            throw new InstagramException("Upload of \"{$video}\" failed. Instagram's server returned an unexpected reply.", ErrorCode::INTERNAL_UPLOAD_FAILED);
+        }
+
         // Verify that the chunked upload was successful.
         $upload = $this->getResponseWithResult(new UploadVideoResponse(), json_decode($body));
         if (!is_null($upload->getMessage())) {

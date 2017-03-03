@@ -60,6 +60,7 @@ class ErrorCode
     const INTERNAL_SETTINGS_ERROR = 104;
     const INTERNAL_API_THROTTLED = 105;
     const INTERNAL_HTTP_NOTFOUND = 106;
+    const INTERNAL_UPLOAD_FAILED = 107;
 }
 
 class InstagramException extends \Exception
