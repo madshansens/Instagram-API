@@ -59,6 +59,7 @@ class ErrorCode
     const INTERNAL_CSRF_TOKEN_ERROR = 103;
     const INTERNAL_SETTINGS_ERROR = 104;
     const INTERNAL_API_THROTTLED = 105;
+    const INTERNAL_HTTP_NOTFOUND = 106;
 }
 
 class InstagramException extends \Exception

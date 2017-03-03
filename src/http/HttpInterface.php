@@ -80,8 +80,10 @@ class HttpInterface
             'connect_timeout' => 30.0, // Give up trying to connect after 30s.
             'decode_content'  => true, // Decode gzip/deflate/etc HTTP responses.
             'timeout'         => 240.0, // Maximum per-request time (seconds).
-            // Tells Guzzle to throw exceptions on non-"200 OK" replies!
-            'http_errors'     => true,
+            // Tells Guzzle to stop throwing exceptions on non-"2xx" HTTP codes,
+            // thus ensuring that it only triggers exceptions on socket errors!
+            // We'll instead MANUALLY be throwing on certain other HTTP codes.
+            'http_errors'     => false,
         ]);
     }
 
@@ -269,36 +271,44 @@ class HttpInterface
     }
 
     /**
-     * Wraps Guzzle's request and adds special exception handling.
+     * Wraps Guzzle's request and adds special error handling.
      *
-     * You must ALWAYS use this instead of the raw Guzzle Client!
+     * Automatically throws exceptions on certain very serious HTTP errors.
+     * You must ALWAYS use this instead of the raw Guzzle Client! However,
+     * you can never assume that its response contains what you wanted. Be sure
+     * to validate the API reply too, since Instagram's API calls themselves may
+     * fail with a JSON message explaining what went wrong.
      *
      * @param string $method  HTTP method.
      * @param string $uri     URI string.
      * @param array  $options Request options to apply.
      *
+     * @throws InstagramException                    with code INTERNAL_API_THROTTLED
+     *                                               when throttled, or INTERNAL_HTTP_NOTFOUND
+     *                                               if the requested URI was not found.
+     * @throws \GuzzleHttp\Exception\GuzzleException for any socket related errors.
+     *
      * @return \Psr\Http\Message\ResponseInterface
-     * @throws InstagramException with code INTERNAL_API_THROTTLED when throttled.
-     * @throws \GuzzleHttp\Exception\GuzzleException for any HTTP related errors.
      */
     protected function guzzleRequest($method, $uri, array $options = [])
     {
-        try {
-            return $this->client->request($method, $uri, $options);
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            // Detect Instagram API throttling.
-            $response = $e->getResponse();
-            if (is_object($response)) {
-                $httpCode = $response->getStatusCode();
-                if ($httpCode == 429) { // "429 Too Many Requests"
-                    throw new InstagramException('Throttled by Instagram because of too many API requests.', ErrorCode::INTERNAL_API_THROTTLED, $e);
-                }
-            }
+        // Attempt the request. Will throw in case of socket errors!
+        $response = $this->client->request($method, $uri, $options);
 
-            // Simply re-throw the original exception in all other cases.
-            // This will be serious errors such as 404, socket errors, etc!
-            throw $e;
+        // Detect very serious HTTP status codes in the response.
+        $httpCode = $response->getStatusCode();
+        switch ($httpCode) {
+        case 429: // "429 Too Many Requests"
+            throw new InstagramException('Throttled by Instagram because of too many API requests.', ErrorCode::INTERNAL_API_THROTTLED);
+            break;
+        case 404: // "404 Not Found"
+            throw new InstagramException("The requested URL was not found (\"{$uri}\").", ErrorCode::INTERNAL_HTTP_NOTFOUND);
+            break;
         }
+
+        // The response may still have serious but "valid response" errors, such
+        // as "400 Bad Request". But it's up to the CALLER to handle those!
+        return $response;
     }
 
     /**
