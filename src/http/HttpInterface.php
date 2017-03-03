@@ -666,6 +666,18 @@ class HttpInterface
                     $this->printDebug($method, $uploadUrl, null, $chunkSize, $response, $body);
                 }
 
+                // Check if Instagram's server has bugged out.
+                // NOTE: On everything except the final chunk, they MUST respond
+                // with "0-BYTESTHEYHAVESOFAR/TOTALBYTESTHEYEXPECT". The "0-" is
+                // what matters. When they bug out, they drop chunks and the
+                // start range on the server-side won't be at zero anymore.
+                if ($chunkIdx != $numChunks) {
+                    if (strncmp($body, '0-', 2) !== 0) {
+                        // Their range doesn't start with "0-". Abort!
+                        break; // Don't waste time uploading further chunks!
+                    }
+                }
+
                 // Update the range's Start for the next iteration.
                 // NOTE: It's the End-byte of the previous range, plus one.
                 $rangeStart = $rangeEnd + 1;
