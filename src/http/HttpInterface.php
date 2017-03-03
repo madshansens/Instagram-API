@@ -145,6 +145,25 @@ class HttpInterface
     }
 
     /**
+     * Tells current settings adapter to store cookies if necessary.
+     */
+    public function saveCookieJar()
+    {
+        // If it's a FileCookieJar, we don't have to do anything. They are saved
+        // automatically to disk when that object is destroyed/garbage collected.
+        if ($this->jar instanceof FileCookieJar) {
+            return;
+        }
+
+        // Tell any custom settings adapters to persist the current cookies.
+        if ($this->parent->settingsAdapter['type'] == 'mysql'
+            || $this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
+            $newCookies = $this->getCookieJarAsJSON();
+            $this->parent->settings->set('cookies', $newCookies);
+        }
+    }
+
+    /**
      * Controls the SSL verification behavior of the HttpInterface.
      *
      * @see http://docs.guzzlephp.org/en/latest/request-options.html#verify
@@ -285,12 +304,8 @@ class HttpInterface
             $this->printDebug($method, $endpoint, $post, null, $response, $body);
         }
 
-        // Tell any custom settings adapters to persist the current cookies.
-        if ($this->parent->settingsAdapter['type'] == 'mysql'
-            || $this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
-            $newCookies = $this->getCookieJarAsJSON();
-            $this->parent->settings->set('cookies', $newCookies);
-        }
+        // Save current cookies.
+        $this->saveCookieJar();
 
         // TODO: Make this cleaner... It's far better and cleaner to let the
         // caller handle API retries instead, via exceptions and try{} catch{}
