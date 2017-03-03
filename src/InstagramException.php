@@ -58,6 +58,7 @@ class ErrorCode
     const INTERNAL_PROXY_ERROR = 102;
     const INTERNAL_CSRF_TOKEN_ERROR = 103;
     const INTERNAL_SETTINGS_ERROR = 104;
+    const INTERNAL_API_THROTTLED = 105;
 }
 
 class InstagramException extends \Exception
