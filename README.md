@@ -45,7 +45,7 @@ If you would like to contribute to this project, please feel free to submit a pu
 
 Before you do, take a look at the [contributing guide](https://github.com/mgp25/Instagram-API/blob/master/CONTRIBUTING.md)
 
-## Why did i do the API?
+## Motivations
 
 After legal measures, Facebook, WhatsApp and Instagram blocked my accounts. In order to use Instagram
  on my phone i needed a new phone, as they banned my UDID, so that is basically why i made this API.
