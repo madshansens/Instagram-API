@@ -1,10 +1,23 @@
-*.dat
+# miscellaneous
 sigs/sigs
 sigs/sigKeys
+
+# runtime files
+*.dat
 *.jpg
-*.DS_Store
-vendor
 *.lock
 backup/
+
+# third party libraries
+vendor/
+
+# temporary editor files
+*.swp
+.\#*
 *.sublime-project
 *.sublime-workspace
+
+# operating system cache files
+.DS_Store
+Desktop.ini
+Thumbs.db
