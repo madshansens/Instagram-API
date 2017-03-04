@@ -11,5 +11,8 @@ class UserFeedResponse extends Response
      */
     public $items;
     public $more_available;
+    /**
+     * @var string
+     */
     public $next_max_id = null;
 }

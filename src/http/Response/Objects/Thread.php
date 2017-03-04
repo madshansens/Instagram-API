@@ -10,7 +10,13 @@ class Thread extends Response
      */
     public $users;
     public $has_newer;
+    /**
+     * @var string
+     */
     public $viewer_id;
+    /**
+     * @var string
+     */
     public $thread_id;
     public $last_activity_at;
     public $newest_cursor;
@@ -30,7 +36,7 @@ class Thread extends Response
     public $thread_title;
     public $canonical;
     /**
-     * var User.
+     * @var User
      */
     public $inviter;
     public $pending;

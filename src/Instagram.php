@@ -10,20 +10,30 @@ class Instagram
     public $debug;    // Debug
     public $truncatedDebug;
 
+    /**
+     * @var string
+     */
     public $uuid;               // UUID
+    /**
+     * @var string
+     */
     public $device_id;          // Device ID
+    /**
+     * @var string
+     */
     public $username_id;        // Username ID
     public $token;              // _csrftoken
     public $isLoggedIn = false; // Session status
     public $rank_token;         // Rank token
-
+    /**
+     * @var HttpInterface
+     */
     public $http;
     public $settingsAdapter;
+    /**
+     * @var SettingsFile
+     */
     public $settings;
-
-    public $proxy = null;     // Full Proxy
-    public $proxyHost = null; // Proxy Host and Port
-    public $proxyAuth = null; // Proxy User and Pass
 
     /**
      * Default class constructor.
@@ -39,6 +49,10 @@ class Instagram
         $longOpts = ['settings_adapter::'];
         $options = getopt('', $longOpts);
 
+        if (!$options) {
+            $options = [];
+        }
+
         if (!is_null($settingsAdapter)) {
             $this->settingsAdapter = $settingsAdapter;
         } elseif (array_key_exists('settings_adapter', $options)) {
@@ -48,6 +62,8 @@ class Instagram
         } else {
             $this->settingsAdapter = ['type' => 'file'];
         }
+
+        $this->http = new HttpInterface($this);
     }
 
     /**
@@ -58,15 +74,23 @@ class Instagram
      */
     public function setUser($username, $password)
     {
-        $this->device_id = SignatureUtils::generateDeviceId(md5($username.$password));
         $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
         $this->checkSettings($username);
-        $this->http = new HttpInterface($this);
+
+        if (is_null($this->settings->get('uuid'))
+            || is_null($this->settings->get('phone_id'))
+            || is_null($this->settings->get('device_id'))) {
+            $this->settings->set('uuid', SignatureUtils::generateUUID(true));
+            $this->settings->set('phone_id', SignatureUtils::generateUUID(true));
+            $this->settings->set('device_id', SignatureUtils::generateDeviceId(md5($username.$password)));
+        }
 
         $this->username = $username;
         $this->password = $password;
 
-        $this->uuid = SignatureUtils::generateUUID(true);
+        $this->uuid = $this->settings->get('uuid');
+        $this->device_id = $this->settings->get('device_id');
+
         if ($this->settings->isLogged()) {
             $this->isLoggedIn = true;
             $this->username_id = $this->settings->get('username_id');
@@ -75,6 +99,11 @@ class Instagram
         } else {
             $this->isLoggedIn = false;
         }
+
+        // Configures HttpInterface for current user AND updates isLoggedIn
+        // state if it fails to load the expected cookies from the user's jar.
+        // Must be done last here, so that isLoggedIn is properly updated!
+        $this->http->updateFromSettingsAdapter();
     }
 
     protected function checkSettings($username)
@@ -92,23 +121,23 @@ class Instagram
     }
 
     /**
-     * Set the proxy.
+     * Set output network interface.
      *
-     * @param string $host     Ip/hostname of proxy
-     * @param int    $port     Port of proxy
-     * @param string $username Username for proxy
-     * @param string $password Password for proxy
-     *
-     * @throws InstagramException
+     * @param string $interface
      */
-    public function setProxy($host, $port = null, $username = null, $password = null)
+    public function setOutputInterface($interface)
     {
-        // no check needed we will give exception on curl if any data wrong / lastwisher
-        // data assigned to http for easier use
-        $this->http->proxy['host'] = $host;
-        $this->http->proxy['port'] = $port;
-        $this->http->proxy['username'] = $username;
-        $this->http->proxy['password'] = $password;
+        $this->http->outputInterface = $interface;
+    }
+
+    /**
+     * Get output network interface.
+     *
+     * @return string|null
+     */
+    public function getOutputInterface()
+    {
+        return $this->http->outputInterface;
     }
 
     /**
@@ -128,17 +157,13 @@ class Instagram
             $response = $this->request('si/fetch_headers')
             ->requireLogin(true)
             ->addParams('challenge_type', 'signup')
-            ->addParams('guid', SignatureUtils::generateUUID(false))
+            ->addParams('guid', $this->uuid)
             ->getResponse(new ChallengeResponse(), true);
-
-            if (!preg_match('#Set-Cookie: csrftoken=([^;]+)#', $response->getFullResponse()[0], $token)) {
-                throw new InstagramException('Missing csrftoken', ErrorCode::INTERNAL_CSRF_TOKEN_ERROR);
-            }
 
             $response = $this->request('accounts/login/')
             ->requireLogin(true)
-            ->addPost('phone_id', SignatureUtils::generateUUID(true))
-            ->addPost('_csrftoken', $token[0])
+            ->addPost('phone_id', $this->settings->get('phone_id'))
+            ->addPost('_csrftoken', $response->getFullResponse()[0])
             ->addPost('username', $this->username)
             ->addPost('guid', $this->uuid)
             ->addPost('device_id', $this->device_id)
@@ -150,8 +175,7 @@ class Instagram
             $this->username_id = $response->getLoggedInUser()->getPk();
             $this->settings->set('username_id', $this->username_id);
             $this->rank_token = $this->username_id.'_'.$this->uuid;
-            preg_match('#Set-Cookie: csrftoken=([^;]+)#', $response->getFullResponse()[0], $match);
-            $this->token = $match[1];
+            $this->token = $response->getFullResponse()[0];
             $this->settings->set('token', $this->token);
             $this->settings->set('last_login', time());
 
@@ -218,14 +242,27 @@ class Instagram
     }
 
     /**
-     * @return autoCompleteUserListResponse
+     * @return autoCompleteUserListResponse|null Will be NULL if throttled by Instagram.
      */
     public function autoCompleteUserList()
     {
-        $this->request('friendships/autocomplete_user_list/')
-        ->setCheckStatus(false)
-        ->addParams('version', '2')
-        ->getResponse(new autoCompleteUserListResponse());
+        // NOTE: This is a special, very heavily throttled API endpoint.
+        // Instagram REQUIRES that you wait several minutes between calls to it.
+        try {
+            $request = $this->request('friendships/autocomplete_user_list/')
+            ->setCheckStatus(false)
+            ->addParams('version', '2');
+
+            return $request->getResponse(new autoCompleteUserListResponse());
+        } catch (InstagramException $e) {
+            // Throttling is so common that we'll simply return NULL in that case.
+            if ($e->getCode() == ErrorCode::INTERNAL_API_THROTTLED) {
+                return;
+            }
+
+            // Simply re-throw the original exception in all other cases.
+            throw $e;
+        }
     }
 
     /**
@@ -244,7 +281,7 @@ class Instagram
         $data = json_encode([
             '_uuid'                => $this->uuid,
             'guid'                 => $this->uuid,
-            'phone_id'             => SignatureUtils::generateUUID(true),
+            'phone_id'             => $this->settings->get('phone_id'),
             'device_type'          => 'android_mqtt',
             'device_token'         => $deviceToken,
             'is_main_push_channel' => true,
@@ -428,34 +465,106 @@ class Instagram
      *
      * @return Upload data
      */
-    public function uploadPhoto($photo, $caption = null, $upload_id = null, $customPreview = null, $location = null, $filter = null)
+    public function uploadPhoto($photo, $story = false, $caption = null, $location = null, $upload_id = null, $filter = null)
     {
-        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, $location, $filter);
+        $upload = $this->http->uploadPhoto($photo, $upload_id);
+
+        if (!$upload->isOk()) {
+            throw new InstagramException($upload->getMessage());
+        }
+
+        if ($story) {
+            $configure = $this->configure($upload->getUploadId(), $photo, $caption, $location, false, true, $filter);
+        } else {
+            $configure = $this->configure($upload->getUploadId(), $photo, $caption, $location, false, false, $filter);
+        }
+
+        if (!$configure->isOk()) {
+            throw new InstagramException($configure->getMessage());
+        }
+
+        return $configure;
+    }
+
+    public function uploadPhotoAlbum($photos, $caption = null, $location = null, $filter = null)
+    {
+        $responses = [];
+        foreach ($photos as $photo) {
+            $upload = $this->http->uploadPhoto($photo, null, true);
+
+            if (!$upload->isOk()) {
+                throw new InstagramException($upload->getMessage());
+                return;
+            }
+            $responses[] = $upload;
+        }
+
+        $date = date('Y:m:d H:i:s');
+
+        foreach ($responses as $response) {
+            $uploadRequests[] =
+                ['date_time_original' => $date,
+                'scene_type'          => 1,
+                'disable_comments'    => false,
+                'upload_id'           => $response->getUploadId(),
+                'source_type'         => 0,
+                'scene_capture_type'  => 'standard',
+                'date_time_digitized' => $date,
+                'software'            => '10.2',
+                'geotag_enabled'      => false,
+                'camera_position'     => 'back',
+                'edits', [
+                    'filter_strength' => 1,
+                    'filter_name'     => 'IGNormalFilter',
+                ],
+            ];
+        }
+
+        $configure = $this->configure($uploadRequests, $photo, $caption, $location, true, false, $filter);
+
+        if (!$configure->isOk()) {
+            throw new InstagramException($configure->getMessage());
+        }
+
+        return $configure;
     }
 
     /**
      * @param $photo
      * @param null $caption
-     * @param null $upload_id
      * @param null $customPreview
      */
-    public function uploadPhotoStory($photo, $caption = null, $upload_id = null, $customPreview = null)
+    public function uploadPhotoStory($photo, $caption = null, $location = null, $filter = null)
     {
-        return $this->http->uploadPhoto($photo, $caption, $upload_id, $customPreview, null, null, true);
+        $upload = $this->http->uploadPhoto($photo, null, false);
+
+        if (!$upload->isOk()) {
+            throw new InstagramException($upload->getMessage());
+        }
+
+        $configure = $this->configure($upload->getUploadId(), $photo, $caption, $location, false, true, $filter);
+
+        if (!$configure->isOk()) {
+            throw new InstagramException($configure->getMessage());
+        }
+
+        return $configure;
     }
 
     /**
-     * Upload video to Instagram.
+     * Uploads a video to Instagram.
      *
-     * @param $video Path to your video
-     * @param null $caption       Caption to be included in your video
-     * @param null $customPreview
+     * @param string $videoFilename The video filename.
+     * @param string $caption       Caption to use for the video.
+     * @param string $customPreview Optional path to custom video thumbnail.
+     *                              If nothing provided, we generate from video.
+     * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
      *
      * @return mixed
      */
-    public function uploadVideo($video, $caption = null, $customPreview = null)
+    public function uploadVideo($videoFilename, $caption = null, $story = false, $customPreview = null, $maxAttempts = 4)
     {
-        return $this->http->uploadVideo($video, $caption, $customPreview);
+        return $this->http->uploadVideo($videoFilename, $caption, $story, $customPreview, $maxAttempts);
     }
 
     /**
@@ -495,16 +604,20 @@ class Instagram
      * Direct Thread Data.
      *
      * @param $threadId Thread Id
+     * @param $cursorId
      *
      * @throws InstagramException Direct Thread Data
      *
      * @return array Direct Thread Data
      */
     // TODO : Missing Response
-    public function directThread($threadId)
+    public function directThread($threadId, $cursorId = false)
     {
-        $directThread = $this->http->request("direct_v2/threads/$threadId/?")[1];
-
+        $threadUrl = "direct_v2/threads/$threadId/?";
+        if ($cursorId) {
+            $threadUrl = "direct_v2/threads/$threadId/?cursor=$cursorId";
+        }
+        $directThread = $this->http->request($threadUrl)[1];
         if ($directThread['status'] != 'ok') {
             throw new InstagramException($directThread['message']."\n");
             return;
@@ -541,35 +654,33 @@ class Instagram
      *
      * @return ConfigureVideoResponse
      */
-    public function configureVideo($upload_id, $video, $caption = '', $customPreview = null)
+    public function configureVideo($upload_id, $video, $caption = '', $story = false, $customPreview = null)
     {
-        $this->uploadPhoto($video, $caption, $upload_id, $customPreview);
+        $this->http->uploadPhoto($video, $upload_id, false, false, $customPreview);
 
-        $size = getimagesize($video)[0];
+        if ($story) {
+            $endpoint = 'media/configure_to_reel/';
+        } else {
+            $endpoint = 'media/configure/';
+        }
 
-        return $this->request('media/configure/')
+        return $this->request($endpoint)
         ->addParams('video', 1)
+        ->addPost('video_result', 'deprecated')
+        ->addPost('audio_muted', false)
+        ->addPost('trim_type', 0)
+        ->addPost('client_timestamp', time())
+        ->addPost('camera_position', 'unknown')
         ->addPost('upload_id', $upload_id)
-        ->addPost('source_type', '3')
+        ->addPost('source_type', 'library')
         ->addPost('poster_frame_index', 0)
         ->addPost('length', 0.00)
         ->addPost('audio_muted', false)
+        ->addPost('geotag_enabled', false)
         ->addPost('filter_type', '0')
         ->addPost('video_result', 'deprecated')
-        ->addPost('clips', [
-            'length'          => Utils::getSeconds($video),
-            'source_type'     => '3',
-            'camera_position' => 'back',
-        ])
-        ->addPost('extra', [
-            'source_width'  => 960,
-            'source_height' => 1280,
-        ])
-        ->addPost('device', [
-            'manufacturer'    => $this->settings->get('manufacturer'),
-            'model'           => $this->settings->get('model'),
-            'android_version' => Constants::ANDROID_VERSION,
-            'android_release' => Constants::ANDROID_RELEASE,
+        ->addPost('edits', [
+            'filter_strength'   => 1,
         ])
         ->addPost('_csrftoken', $this->token)
         ->addPost('_uuid', $this->uuid)
@@ -588,21 +699,28 @@ class Instagram
      *
      * @return ConfigureResponse
      */
-    public function configure($upload_id, $photo, $caption = '', $location = null, $filter = null)
+    public function configure($upload_id, $photo, $caption = '', $location = null, $album = false, $story = false, $filter = null)
     {
         $size = getimagesize($photo)[0];
         if (is_null($caption)) {
             $caption = '';
         }
 
-        $requestData = $this->request('media/configure/')
+        if ($album) {
+            $endpoint = 'media/configure_sidecar/?';
+        } elseif ($story) {
+            $endpoint = 'media/configure_to_reel/';
+        } else {
+            $endpoint = 'media/configure/';
+        }
+
+        $requestData = $this->request($endpoint)
         ->addPost('_csrftoken', $this->token)
         ->addPost('media_folder', 'Instagram')
         ->addPost('source_type', 4)
         ->addPost('_uid', $this->username_id)
         ->addPost('_uuid', $this->uuid)
         ->addPost('caption', $caption)
-        ->addPost('upload_id', $upload_id)
         ->addPost('device', [
             'manufacturer'    => $this->settings->get('manufacturer'),
             'model'           => $this->settings->get('model'),
@@ -618,6 +736,13 @@ class Instagram
             'source_width'  => $size,
             'source_height' => $size,
         ]);
+
+        if ($album) {
+            $requestData->addPost('client_sidecar_id', Utils::generateUploadId())
+            ->addPost('children_metadata', $upload_id);
+        } else {
+            $requestData->addPost('upload_id', $upload_id);
+        }
 
         if (!is_null($location)) {
             $loc = [
@@ -646,43 +771,6 @@ class Instagram
             '"crop_center":[0,0]'                   => '"crop_center":[0.0,-0.0]',
             '"crop_zoom":1'                         => '"crop_zoom":1.0',
             '"crop_original_size":'."[$size,$size]" => '"crop_original_size":'."[$size.0,$size.0]",
-        ])
-        ->getResponse(new ConfigureResponse());
-    }
-
-    /**
-     * @param $upload_id
-     * @param $photo
-     *
-     * @return ConfigureResponse
-     */
-    public function configureToReel($upload_id, $photo)
-    {
-        $size = getimagesize($photo)[0];
-
-        return $this->request('media/configure_to_reel/')
-        ->addPost('upload_id', $upload_id)
-        ->addPost('source_type', 3)
-        ->addPost('edits', [
-            'crop_original_size' => [$size, $size],
-            'crop_zoom'          => 1.3333334,
-            'crop_center'        => [0.0, 0.0],
-        ])
-        ->addPost('extra', [
-            'source_width'  => $size,
-            'source_height' => $size,
-        ])
-        ->addPost('device', [
-            'manufacturer'    => $this->settings->get('manufacturer'),
-            'model'           => $this->settings->get('model'),
-            'android_version' => Constants::ANDROID_VERSION,
-            'android_release' => Constants::ANDROID_RELEASE,
-        ])
-        ->addPost('_csrftoken', $this->token)
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
-        ->setReplacePost([
-            '"crop_center":[0,0]' => '"crop_center":[0.0,0.0]',
         ])
         ->getResponse(new ConfigureResponse());
     }
@@ -1235,7 +1323,7 @@ class Instagram
         ->addParams('latitude', $latitude)
         ->addParams('longitude', $longitude);
 
-        if (!is_null($query)) {
+        if (is_null($query)) {
             $locations->addParams('timestamp', time());
         } else {
             $locations->addParams('search_query', $query);
@@ -1456,6 +1544,25 @@ class Instagram
         return $this->request('fbsearch/places/')
         ->addParams('rank_token', $this->rank_token)
         ->addParams('query', $query)
+        ->getResponse(new FBLocationResponse());
+    }
+
+    /**
+     * Get locations by geo point.
+     *
+     * @param string $lat Latitude
+     * @param string $lng Longitude
+     *
+     * @throws InstagramException
+     *
+     * @return array Location location data
+     */
+    public function searchFBLocationByPoint($lat, $lng)
+    {
+        return $this->request('fbsearch/places/')
+        ->addParams('rank_token', $this->rank_token)
+        ->addParams('lat', $lat)
+        ->addParams('lng', $lng)
         ->getResponse(new FBLocationResponse());
     }
 
@@ -1780,6 +1887,7 @@ class Instagram
         if (!is_array($userList)) {
             $userList = [$userList];
         }
+
         return $this->request('friendships/show_many/')
         ->setSignedPost(false)
         ->addPost('_uuid', $this->uuid)
@@ -1799,14 +1907,52 @@ class Instagram
         ->getResponse(new LikeFeedResponse());
     }
 
-    public function verifyPeer($enable)
+    /**
+     * Controls the SSL verification behavior of the HttpInterface.
+     *
+     * @see http://docs.guzzlephp.org/en/latest/request-options.html#verify
+     *
+     * @param bool|string $state TRUE to verify using PHP's default CA bundle,
+     *                           FALSE to disable SSL verification (this is
+     *                           insecure!), String to verify using this path to
+     *                           a custom CA bundle file.
+     */
+    public function setVerifySSL($state)
     {
-        $this->http->verifyPeer($enable);
+        $this->http->setVerifySSL($state);
     }
 
-    public function verifyHost($enable)
+    /**
+     * Gets the current SSL verification behavior of the HttpInterface.
+     *
+     * @return bool|string
+     */
+    public function getVerifySSL()
     {
-        $this->http->verifyHost($enable);
+        return $this->http->getVerifySSL();
+    }
+
+    /**
+     * Set the proxy to use for requests.
+     *
+     * @see http://docs.guzzlephp.org/en/latest/request-options.html#proxy
+     *
+     * @param string|array|null $value String or Array specifying a proxy in
+     *                                 Guzzle format, or NULL to disable proxying.
+     */
+    public function setProxy($value)
+    {
+        $this->http->setProxy($value);
+    }
+
+    /**
+     * Gets the current proxy used for requests.
+     *
+     * @return string|array|null
+     */
+    public function getProxy()
+    {
+        return $this->http->getProxy();
     }
 
     /**
@@ -1844,14 +1990,13 @@ class Instagram
 }
 
 /**
- * Bridge between http object & mapper & response.
+ * Bridge between HttpInterface object & mapper & response.
  */
 class Request
 {
     protected $params = [];
     protected $posts = [];
     protected $requireLogin = false;
-    protected $floodWait = false;
     protected $checkStatus = true;
     protected $signedPost = true;
     protected $replacePost = [];
@@ -1883,13 +2028,6 @@ class Request
     public function requireLogin($requireLogin = false)
     {
         $this->requireLogin = $requireLogin;
-
-        return $this;
-    }
-
-    public function setFloodWait($floodWait = false)
-    {
-        $this->floodWait = $floodWait;
 
         return $this;
     }
@@ -1937,7 +2075,7 @@ class Request
             $post = str_replace(array_keys($this->replacePost), array_values($this->replacePost), $post);
         }
 
-        $response = $instagramObj->http->request($endPoint, $post, $this->requireLogin, $this->floodWait, false);
+        $response = $instagramObj->http->request($endPoint, $post, $this->requireLogin, false);
 
         $mapper = new \JsonMapper();
         $mapper->bStrictNullTypes = false;

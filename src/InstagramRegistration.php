@@ -6,7 +6,13 @@ class InstagramRegistration
 {
     protected $debug;
     protected $username;
+    /**
+     * @var string
+     */
     protected $uuid;
+    /**
+     * @var string
+     */
     protected $waterfall_id;
     protected $token;
     protected $userAgent;
@@ -239,6 +245,9 @@ class InstagramRegistration
         curl_close($ch);
 
         if ($this->settingsAdapter['type'] == 'mysql') {
+            $newCookies = file_get_contents($cookieJarFile);
+            $this->settings->set('cookies', $newCookies);
+        } elseif ($this->settings->setting instanceof SettingsAdapter\SettingsInterface) {
             $newCookies = file_get_contents($cookieJarFile);
             $this->settings->set('cookies', $newCookies);
         }

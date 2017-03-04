@@ -27,7 +27,7 @@ class ChallengeSMS
                 mkdir($this->settingsPath, 0777, true);
             }
         }
-        $this->settings = new Settings($this->settingsPath.'settings-'.$username.'.dat');
+        $this->settings = new Settings($this->settingsPath.$username.'-settings.dat');
         $this->userAgent = 'Instagram 9.6.0 Android (21/5.0.1; 300dpi; 768x1190; LGE/google; Nexus 4; mako; mako; en_US)';
     }
 

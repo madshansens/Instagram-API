@@ -10,19 +10,28 @@ class SettingsMysql
     private $pdo;
     private $instagramUsername;
 
-    public $tableName = 'user_settings';
+    public $dbName = 'instagram';
+    public $dbTableName = 'user_settings';
 
-    public function __construct($instagramUsername, $username, $password, $host, $dbName)
+    public function __construct($mysqlOptions)
     {
-        $username = is_null($username) ? 'root' : $username;
-        $password = is_null($password) ? '' : $password;
-        $host = is_null($host) ? 'localhost' : $host;
-        $dbName = is_null($dbName) ? 'instagram' : $dbName;
+        $this->instagramUsername = $mysqlOptions['instagramUsername'];
+        if (isset($mysqlOptions['dbName'])) {
+            $this->dbName = $mysqlOptions['dbName'];
+        }
+        if (isset($mysqlOptions['dbTableName'])) {
+            $this->dbTableName = $mysqlOptions['dbTableName'];
+        }
 
-        $this->dbName = $dbName;
-        $this->instagramUsername = $instagramUsername;
+        if (isset($mysqlOptions['pdo'])) {
+            $this->pdo = $mysqlOptions['pdo'];
+        } else {
+            $username = is_null($mysqlOptions['dbUsername']) ? 'root' : $mysqlOptions['dbUsername'];
+            $password = is_null($mysqlOptions['dbPassword']) ? '' : $mysqlOptions['dbPassword'];
+            $host = is_null($mysqlOptions['dbHost']) ? 'localhost' : $mysqlOptions['dbHost'];
+            $this->connect($username, $password, $host, $this->dbName);
+        }
 
-        $this->connect($username, $password, $host, $dbName);
         $this->autoInstall();
         $this->populateObject();
     }
@@ -63,10 +72,10 @@ class SettingsMysql
     {
         $this->sets['username'] = $this->instagramUsername;
         if (isset($this->sets['id'])) {
-            $sql = "update {$this->tableName} set ";
+            $sql = "update {$this->dbTableName} set ";
             $bindList[':id'] = $this->sets['id'];
         } else {
-            $sql = "insert into {$this->tableName} set ";
+            $sql = "insert into {$this->dbTableName} set ";
         }
 
         foreach ($this->sets as $key => $value) {
@@ -95,7 +104,7 @@ class SettingsMysql
             $pdo->query('SET NAMES UTF8');
             $pdo->setAttribute(PDO::ERRMODE_WARNING, PDO::ERRMODE_EXCEPTION);
             $this->pdo = $pdo;
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             throw new InstagramException('Settings: cannot connect to mysql adapter', ErrorCode::INTERNAL_SETTINGS_ERROR);
         }
     }
@@ -103,12 +112,12 @@ class SettingsMysql
     private function autoInstall()
     {
         $std = $this->pdo->prepare('SHOW TABLES WHERE tables_in_'.$this->dbName.' = :tableName');
-        $std->execute([':tableName' => $this->tableName]);
+        $std->execute([':tableName' => $this->dbTableName]);
         if ($std->rowCount()) {
             return true;
         }
 
-        $this->pdo->exec('CREATE TABLE `'.$this->tableName."` (
+        $this->pdo->exec('CREATE TABLE `'.$this->dbTableName."` (
             `id` INT(10) NOT NULL AUTO_INCREMENT,
             `username` VARCHAR(50) NULL DEFAULT NULL,
             `version` VARCHAR(10) NULL DEFAULT NULL,
@@ -120,7 +129,9 @@ class SettingsMysql
             `model` VARCHAR(255) NULL DEFAULT NULL,
             `cookies` TEXT NULL,
             `date` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`)
+            `last_login` BIGINT NULL DEFAULT 0,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `idx_username` (`username`)
             )
             COLLATE='utf8_general_ci'
             ENGINE=InnoDB;
@@ -129,7 +140,7 @@ class SettingsMysql
 
     private function populateObject()
     {
-        $std = $this->pdo->prepare("select * from {$this->tableName} where username=:username");
+        $std = $this->pdo->prepare("select * from {$this->dbTableName} where username=:username");
         $std->execute([':username' => $this->instagramUsername]);
         $result = $std->fetch(PDO::FETCH_ASSOC);
         if ($result) {

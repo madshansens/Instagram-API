@@ -6,9 +6,16 @@ class Item extends Response
 {
     const PHOTO = 1;
     const VIDEO = 2;
+    const ALBUM = 8;
 
     public $taken_at;
+    /**
+     * @var string
+     */
     public $pk;
+    /**
+     * @var string
+     */
     public $id;
     public $device_timestamp;
     public $media_type;
@@ -31,8 +38,14 @@ class Item extends Response
     public $caption_position;
     public $expiring_at;
     public $is_reel_media;
+    /**
+     * @var string
+     */
     public $next_max_id = null;
-
+    /**
+     * @var CarouselMedia[]|null
+     */
+    public $carousel_media = null;
     /**
      * @var Comment[]
      */

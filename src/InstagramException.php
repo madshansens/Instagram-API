@@ -10,7 +10,8 @@ namespace InstagramAPI;
  * include the "message" field as a part of the string argument
  * used for the InstagramException's constructor.
  */
-class ErrorCode {
+class ErrorCode
+{
     // Error codes:
     // 0: Unrecognized by parser
     const UNKNOWN = 0;
@@ -46,6 +47,10 @@ class ErrorCode {
     const IG_INVALID_USER = 8;
     const IG_INVALID_USER_REGEX = '/invalid_user/';
 
+    // 9: On Instagram forced password reset response
+    const IG_RESET_PASSWORD = 9;
+    const IG_RESET_PASSWORD_REGEX = '/reset(.*)password/';
+
     /**
      * 1XX: Internal Errors.
      */
@@ -53,11 +58,14 @@ class ErrorCode {
     const INTERNAL_PROXY_ERROR = 102;
     const INTERNAL_CSRF_TOKEN_ERROR = 103;
     const INTERNAL_SETTINGS_ERROR = 104;
+    const INTERNAL_API_THROTTLED = 105;
+    const INTERNAL_HTTP_NOTFOUND = 106;
+    const INTERNAL_UPLOAD_FAILED = 107;
 }
 
 class InstagramException extends \Exception
 {
-    public function __construct($message, $code = null, Exception $previous = null)
+    public function __construct($message, $code = null, \Exception $previous = null)
     {
         if (is_null($code)) {
             if (preg_match(ErrorCode::IG_LOGIN_REQUIRED_REGEX, $message) === 1) {
@@ -74,6 +82,8 @@ class InstagramException extends \Exception
                 $code = ErrorCode::IG_SENTRY_BLOCK;
             } elseif (preg_match(ErrorCode::IG_INVALID_USER_REGEX, $message) === 1) {
                 $code = ErrorCode::IG_INVALID_USER;
+            } elseif (preg_match(ErrorCode::IG_RESET_PASSWORD_REGEX, $message) === 1) {
+                $code = ErrorCode::IG_RESET_PASSWORD;
             } else {
                 $code = 0;
             }
@@ -84,6 +94,6 @@ class InstagramException extends \Exception
 
     public function __toString()
     {
-        return 'Code '.$this->code.': '.$this->getMessage();
+        return 'Code '.$this->getCode().': '.$this->getMessage().PHP_EOL.'Stack trace:'.PHP_EOL.$this->getTraceAsString();
     }
 }
