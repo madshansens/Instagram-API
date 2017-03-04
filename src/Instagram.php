@@ -562,9 +562,9 @@ class Instagram
      *
      * @return mixed
      */
-    public function uploadVideo($videoFilename, $caption = null, $story = false, $customPreview = null, $maxAttempts = 4)
+    public function uploadVideo($videoFilename, $caption = null, $story = false, $reel_mentions = null, $customPreview = null, $maxAttempts = 4)
     {
-        return $this->http->uploadVideo($videoFilename, $caption, $story, $customPreview, $maxAttempts);
+        return $this->http->uploadVideo($videoFilename, $caption, $story, $reel_mentions, $customPreview, $maxAttempts);
     }
 
     /**
@@ -654,41 +654,55 @@ class Instagram
      *
      * @return ConfigureVideoResponse
      */
-    public function configureVideo($upload_id, $video, $caption = '', $story = false, $customPreview = null)
-    {
-        $this->http->uploadPhoto($video, $upload_id, false, false, $customPreview);
+     public function configureVideo($upload_id, $video, $caption = '', $story = false, $reel_mentions = null, $customPreview = null)
+     {
+         $this->http->uploadPhoto($video, $upload_id, false, false, $customPreview);
 
-        if ($story) {
-            $endpoint = 'media/configure_to_reel/';
-        } else {
-            $endpoint = 'media/configure/';
-        }
+         if ($story) {
+             $endpoint = 'media/configure_to_reel/';
+         } else {
+             $endpoint = 'media/configure/';
+         }
 
-        return $this->request($endpoint)
-        ->addParams('video', 1)
-        ->addPost('video_result', 'deprecated')
-        ->addPost('audio_muted', false)
-        ->addPost('trim_type', 0)
-        ->addPost('client_timestamp', time())
-        ->addPost('camera_position', 'unknown')
-        ->addPost('upload_id', $upload_id)
-        ->addPost('source_type', 'library')
-        ->addPost('poster_frame_index', 0)
-        ->addPost('length', 0.00)
-        ->addPost('audio_muted', false)
-        ->addPost('geotag_enabled', false)
-        ->addPost('filter_type', '0')
-        ->addPost('video_result', 'deprecated')
-        ->addPost('edits', [
-            'filter_strength'   => 1,
-        ])
-        ->addPost('_csrftoken', $this->token)
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
-        ->addPost('caption', $caption)
-        ->setReplacePost(['"length":0' => '"length":0.00'])
-        ->getResponse(new ConfigureVideoResponse());
-    }
+         $requestData = $this->request($endpoint)
+         ->addParams('video', 1)
+         ->addPost('video_result', 'deprecated')
+         ->addPost('audio_muted', false)
+         ->addPost('trim_type', 0)
+         ->addPost('client_timestamp', time())
+         ->addPost('camera_position', 'unknown')
+         ->addPost('upload_id', $upload_id)
+         ->addPost('source_type', 'library')
+         ->addPost('poster_frame_index', 0)
+         ->addPost('length',0.00)
+         ->addPost('audio_muted', false)
+         ->addPost('geotag_enabled', false)
+         ->addPost('filter_type', '0')
+         ->addPost('video_result', 'deprecated')
+         ->addPost('edits', [
+             'filter_strength'   => 1,
+         ])
+         ->addPost('_csrftoken', $this->token)
+         ->addPost('_uuid', $this->uuid)
+         ->addPost('_uid', $this->username_id)
+         ->setReplacePost(['"length":0' => '"length":0.00']);
+
+         if ($caption != '' && !is_null($caption) && $caption) {
+             $requestData->addPost('caption', $caption);
+         }
+
+         // TODO
+         // Reel Mention example --> build with user id
+         // [{\"y\":0.3407772676161919,\"rotation\":0,\"user_id\":\"USER_ID\",\"x\":0.39892578125,\"width\":0.5619921875,\"height\":0.06011525487256372}]
+         if ($story) {
+             $requestData->addPost('story_media_creation_date', time());
+             if (!is_null($reel_mentions)) {
+                 //$requestData->addPost('reel_mentions', $reel_mention)
+             }
+         }
+
+         $requestData->getResponse(new ConfigureVideoResponse());
+     }
 
     /**
      * @param $upload_id
