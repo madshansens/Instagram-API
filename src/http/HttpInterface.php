@@ -746,7 +746,7 @@ class HttpInterface
      *
      * @throws InstagramException
      */
-    public function uploadVideo($videoFilename, $caption = null, $story = false, $customPreview = null, $maxAttempts = 4)
+    public function uploadVideo($videoFilename, $caption = null, $story = false, $reel_mentions = null, $customPreview = null, $maxAttempts = 4)
     {
         $this->throwIfNotLoggedIn();
 
