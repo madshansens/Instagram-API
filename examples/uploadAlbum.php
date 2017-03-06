@@ -14,16 +14,10 @@ $truncatedDebug = false;
 
 $photos = [
     [
-        'file'     => '',
-        'usertags' => [
-            [
-                'position' => [0.5, 0.5],
-                'user_id'  => 0,
-            ],
-        ],
+        'file'     => '' // path to the photo file
     ], [
-        'file'     => '',
-        'usertags' => [
+        'file'     => '', // path to the photo file
+        'usertags' => [ // optional, lets you tag one or more users in the photo
             [
                 'position' => [0.5, 0.5],
                 'user_id'  => 0,
