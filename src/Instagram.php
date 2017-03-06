@@ -486,27 +486,45 @@ class Instagram
         return $configure;
     }
 
+    /**
+     * Uploads Album (aka Carousel aka Sidecar).
+     *
+     * @param array $photos   Array of image metadata (path, usertags etc)
+     * @param null  $caption  Text for album
+     * @param null  $location Geotag
+     * @param null  $filter
+     *
+     * @throws InstagramException
+     *
+     * @return ConfigureResponse
+     */
     public function uploadPhotoAlbum($photos, $caption = null, $location = null, $filter = null)
     {
-        $responses = [];
-        foreach ($photos as $photo) {
-            $upload = $this->http->uploadPhoto($photo, null, true);
+        if (empty($photos)) {
+            throw new InstagramException('List of photos to upload cant be empty');
+        }
 
-            if (!$upload->isOk()) {
-                throw new InstagramException($upload->getMessage());
-                return;
+        foreach ($photos as $key => $photo) {
+            if (!file_exists($photo['file'])) {
+                throw new InstagramException('File does not exist');
             }
-            $responses[] = $upload;
+
+            $photos[$key]['upload'] = $this->http->uploadPhoto($photo['file'], null, true);
+
+            if (!$photos[$key]['upload']->isOk()) {
+                throw new InstagramException($photos[$key]['upload']->getMessage());
+            }
         }
 
         $date = date('Y:m:d H:i:s');
 
-        foreach ($responses as $response) {
-            $uploadRequests[] =
-                ['date_time_original' => $date,
+        $uploadRequests = [];
+        foreach ($photos as $photo) {
+            $temp = [
+                'date_time_original'  => $date,
                 'scene_type'          => 1,
                 'disable_comments'    => false,
-                'upload_id'           => $response->getUploadId(),
+                'upload_id'           => $photo['upload']->getUploadId(),
                 'source_type'         => 0,
                 'scene_capture_type'  => 'standard',
                 'date_time_digitized' => $date,
@@ -518,9 +536,15 @@ class Instagram
                     'filter_name'     => 'IGNormalFilter',
                 ],
             ];
+
+            if (isset($photo['usertags'])) {
+                $temp['usertags'] = json_encode(['in' => $photo['usertags']]);
+            }
+
+            $uploadRequests[] = $temp;
         }
 
-        $configure = $this->configure($uploadRequests, $photo, $caption, $location, true, false, $filter);
+        $configure = $this->configure($uploadRequests, $photo['file'], $caption, $location, true, false, $filter);
 
         if (!$configure->isOk()) {
             throw new InstagramException($configure->getMessage());
@@ -674,7 +698,7 @@ class Instagram
          ->addPost('upload_id', $upload_id)
          ->addPost('source_type', 'library')
          ->addPost('poster_frame_index', 0)
-         ->addPost('length',0.00)
+         ->addPost('length', 0.00)
          ->addPost('audio_muted', false)
          ->addPost('geotag_enabled', false)
          ->addPost('filter_type', '0')
