@@ -489,7 +489,7 @@ class Instagram
     /**
      * Uploads Album (aka Carousel aka Sidecar).
      *
-     * @param array $photos   Array of image metadata (path, usertags etc)
+     * @param array $media    Array of image/video metadata (type, path, usertags etc)
      * @param null  $caption  Text for album
      * @param null  $location Geotag
      * @param null  $filter
@@ -498,53 +498,69 @@ class Instagram
      *
      * @return ConfigureResponse
      */
-    public function uploadPhotoAlbum($photos, $caption = null, $location = null, $filter = null)
+    public function uploadAlbum($media, $caption = null, $location = null, $filter = null)
     {
-        if (empty($photos)) {
-            throw new InstagramException("List of photos to upload can't be empty.");
+        if (empty($media)) {
+            throw new InstagramException("List of media to upload can't be empty.");
         }
 
-        foreach ($photos as $key => $photo) {
-            if (!file_exists($photo['file'])) {
-                throw new InstagramException(sprintf('File "%s" does not exist.', $photo['file']));
+        foreach ($media as $key => $item) {
+            if (!file_exists($item['file'])) {
+                throw new InstagramException(sprintf('File "%s" does not exist.', $item['file']));
             }
 
-            $photos[$key]['upload'] = $this->http->uploadPhoto($photo['file'], null, true);
+            switch($item['type']) {
+            case 'photo':
+                $media[$key]['upload'] = $this->http->uploadPhoto($item['file'], null, true);
+                break;
+            case 'video':
+                // TODO: IMPLEMENT VIDEO UPLOADS
+                break;
+            }
 
-            if (!$photos[$key]['upload']->isOk()) {
-                throw new InstagramException($photos[$key]['upload']->getMessage());
+            if (!$media[$key]['upload']->isOk()) {
+                throw new InstagramException($media[$key]['upload']->getMessage());
             }
         }
 
         $date = date('Y:m:d H:i:s');
 
         $uploadRequests = [];
-        foreach ($photos as $photo) {
-            $photoConfig = [
-                'date_time_original'  => $date,
-                'scene_type'          => 1,
-                'disable_comments'    => false,
-                'upload_id'           => $photo['upload']->getUploadId(),
-                'source_type'         => 0,
-                'scene_capture_type'  => 'standard',
-                'date_time_digitized' => $date,
-                'software'            => '10.2',
-                'geotag_enabled'      => false,
-                'camera_position'     => 'back',
-                'edits', [
-                    'filter_strength' => 1,
-                    'filter_name'     => 'IGNormalFilter',
-                ],
-            ];
+        foreach ($media as $item) {
+            switch($item['type']) {
+            case 'photo':
+                $photoConfig = [
+                    'date_time_original'  => $date,
+                    'scene_type'          => 1,
+                    'disable_comments'    => false,
+                    'upload_id'           => $item['upload']->getUploadId(),
+                    'source_type'         => 0,
+                    'scene_capture_type'  => 'standard',
+                    'date_time_digitized' => $date,
+                    'software'            => '10.2',
+                    'geotag_enabled'      => false,
+                    'camera_position'     => 'back',
+                    'edits', [
+                        'filter_strength' => 1,
+                        'filter_name'     => 'IGNormalFilter',
+                    ],
+                ];
 
-            if (isset($photo['usertags'])) {
-                $photoConfig['usertags'] = json_encode(['in' => $photo['usertags']]);
+                if (isset($item['usertags'])) {
+                    $photoConfig['usertags'] = json_encode(['in' => $item['usertags']]);
+                }
+
+                $uploadRequests[] = $photoConfig;
+                break;
+            case 'video':
+                // TODO: IMPLEMENT VIDEO CONFIG
+                break;
             }
-
-            $uploadRequests[] = $photoConfig;
         }
 
-        $configure = $this->configure($uploadRequests, $photo['file'], $caption, $location, true, false, $filter);
+        // TODO: THIS SEEMS BUGGED TO ME. Why is it only using the last item's
+        // "file" value when configuring a whole array of uploadRequests?
+        $configure = $this->configure($uploadRequests, $item['file'], $caption, $location, true, false, $filter);
 
         if (!$configure->isOk()) {
             throw new InstagramException($configure->getMessage());

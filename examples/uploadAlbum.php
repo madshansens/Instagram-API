@@ -14,8 +14,10 @@ $truncatedDebug = false;
 
 $photos = [
     [
+        'type'     => 'photo',
         'file'     => '' // path to the photo file
     ], [
+        'type'     => 'photo',
         'file'     => '', // path to the photo file
         'usertags' => [ // optional, lets you tag one or more users in the photo
             [
@@ -42,7 +44,7 @@ try {
 }
 
 try {
-    $i->uploadPhotoAlbum($photos, $caption);
+    $i->uploadAlbum($photos, $caption);
 } catch (Exception $e) {
     echo $e->getMessage();
 }
