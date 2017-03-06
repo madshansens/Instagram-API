@@ -6,13 +6,14 @@ require '../src/Instagram.php';
 /////// CONFIG ///////
 $username = '';
 $password = '';
-$debug = false;
+$debug = true;
+$truncatedDebug = false;
 
 $photo = '';     // path to the photo
 $caption = '';     // caption
 //////////////////////
 
-$i = new \InstagramAPI\Instagram($debug);
+$i = new \InstagramAPI\Instagram($debug, $truncatedDebug);
 
 $i->setUser($username, $password);
 

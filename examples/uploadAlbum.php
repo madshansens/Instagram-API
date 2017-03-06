@@ -10,6 +10,7 @@ require '../src/Instagram.php';
 $username = '';
 $password = '';
 $debug = true;
+$truncatedDebug = false;
 
 $photos = [
     [
@@ -35,7 +36,7 @@ $caption = '';
 
 //////////////////////
 
-$i = new \InstagramAPI\Instagram($debug);
+$i = new \InstagramAPI\Instagram($debug, $truncatedDebug);
 
 $i->setUser($username, $password);
 

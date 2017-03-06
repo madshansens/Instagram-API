@@ -2,8 +2,15 @@
 
 include __DIR__.'/../vendor/autoload.php';
 
+/////// CONFIG ///////
+$username = '';
+$password = '';
+$debug = true;
+$truncatedDebug = false;
+//////////////////////
+
 // Example using Memcached for storing settings and cookies
-$i = new \InstagramAPI\Instagram(true, false, [
+$i = new \InstagramAPI\Instagram($debug, $truncatedDebug, [
     'type'             => 'custom',
     'class'            => \InstagramAPI\SettingsAdapter\Memcached::class,
     'persistent_id'    => 'instagram',
@@ -20,6 +27,7 @@ $i = new \InstagramAPI\Instagram(true, false, [
         'weight' => 1,
     ]],
 ]);
+
 $i->setUser($username, $password);
 
 try {

@@ -6,14 +6,15 @@ require '../src/Instagram.php';
 /////// CONFIG ///////
 $username = '';
 $password = '';
-$debug = false;
+$debug = true;
+$truncatedDebug = false;
 //////////////////////
 
 // THIS IS AN EXAMPLE OF HOW TO USE NEXT_MAX_ID TO PAGINATE
 // IN THIS EXAMPLE, WE ARE RETRIEVING SELF FOLLOWERS
 // BUT THE PROCESS IS SIMILAR IN OTHER REQUESTS
 
-$i = new \InstagramAPI\Instagram($debug);
+$i = new \InstagramAPI\Instagram($debug, $truncatedDebug);
 
 $i->setUser($username, $password);
 

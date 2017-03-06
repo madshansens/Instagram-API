@@ -3,7 +3,15 @@
 include __DIR__.'/../vendor/autoload.php';
 require_once __DIR__.'/../src/InstagramRegistration.php';
 
-$i = new \InstagramAPI\Instagram(true, false);
+/////// CONFIG ///////
+$username = '';
+$password = '';
+$debug = true;
+$truncatedDebug = false;
+//////////////////////
+
+$i = new \InstagramAPI\Instagram($debug, $truncatedDebug);
+
 $i->setUser($username, $password);
 
 try {
