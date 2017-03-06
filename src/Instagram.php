@@ -520,7 +520,7 @@ class Instagram
 
         $uploadRequests = [];
         foreach ($photos as $photo) {
-            $temp = [
+            $photoConfig = [
                 'date_time_original'  => $date,
                 'scene_type'          => 1,
                 'disable_comments'    => false,
@@ -538,10 +538,10 @@ class Instagram
             ];
 
             if (isset($photo['usertags'])) {
-                $temp['usertags'] = json_encode(['in' => $photo['usertags']]);
+                $photoConfig['usertags'] = json_encode(['in' => $photo['usertags']]);
             }
 
-            $uploadRequests[] = $temp;
+            $uploadRequests[] = $photoConfig;
         }
 
         $configure = $this->configure($uploadRequests, $photo['file'], $caption, $location, true, false, $filter);
