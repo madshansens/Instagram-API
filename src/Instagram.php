@@ -501,12 +501,12 @@ class Instagram
     public function uploadPhotoAlbum($photos, $caption = null, $location = null, $filter = null)
     {
         if (empty($photos)) {
-            throw new InstagramException('List of photos to upload cant be empty');
+            throw new InstagramException("List of photos to upload can't be empty.");
         }
 
         foreach ($photos as $key => $photo) {
             if (!file_exists($photo['file'])) {
-                throw new InstagramException('File does not exist');
+                throw new InstagramException(sprintf('File "%s" does not exist.', $photo['file']));
             }
 
             $photos[$key]['upload'] = $this->http->uploadPhoto($photo['file'], null, true);
