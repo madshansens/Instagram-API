@@ -12,7 +12,7 @@ $password = '';
 $debug = true;
 $truncatedDebug = false;
 
-$photos = [
+$media = [
     [
         'type'     => 'photo',
         'file'     => '' // path to the photo file
@@ -44,7 +44,7 @@ try {
 }
 
 try {
-    $i->uploadAlbum($photos, $caption);
+    $i->uploadAlbum($media, $caption);
 } catch (Exception $e) {
     echo $e->getMessage();
 }
