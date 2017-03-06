@@ -516,6 +516,8 @@ class Instagram
             case 'video':
                 // TODO: IMPLEMENT VIDEO UPLOADS
                 break;
+            default:
+                throw new InstagramException(sprintf('Unsupported album media type "%s".', $item['type']));
             }
 
             if (!$media[$key]['upload']->isOk()) {
