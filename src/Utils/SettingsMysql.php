@@ -10,26 +10,25 @@ class SettingsMysql
     private $pdo;
     private $instagramUsername;
 
-    public $dbName = 'instagram';
     public $dbTableName = 'user_settings';
 
     public function __construct($mysqlOptions)
     {
         $this->instagramUsername = $mysqlOptions['instagramUsername'];
-        if (isset($mysqlOptions['dbName'])) {
-            $this->dbName = $mysqlOptions['dbName'];
-        }
         if (isset($mysqlOptions['dbTableName'])) {
             $this->dbTableName = $mysqlOptions['dbTableName'];
         }
 
         if (isset($mysqlOptions['pdo'])) {
+            // Pre-provided PDO object.
             $this->pdo = $mysqlOptions['pdo'];
         } else {
+            // We should connect for the user.
             $username = is_null($mysqlOptions['dbUsername']) ? 'root' : $mysqlOptions['dbUsername'];
             $password = is_null($mysqlOptions['dbPassword']) ? '' : $mysqlOptions['dbPassword'];
             $host = is_null($mysqlOptions['dbHost']) ? 'localhost' : $mysqlOptions['dbHost'];
-            $this->connect($username, $password, $host, $this->dbName);
+            $dbName = is_null($mysqlOptions['dbName']) ? 'instagram' : $mysqlOptions['dbName'];
+            $this->connect($username, $password, $host, $dbName);
         }
 
         $this->autoInstall();
@@ -111,7 +110,10 @@ class SettingsMysql
 
     private function autoInstall()
     {
-        $std = $this->pdo->prepare('SHOW TABLES WHERE tables_in_'.$this->dbName.' = :tableName');
+        // Detect the name of the MySQL database that PDO is connected to.
+        $dbName = $this->pdo->query('select database()')->fetchColumn();
+
+        $std = $this->pdo->prepare('SHOW TABLES WHERE tables_in_'.$dbName.' = :tableName');
         $std->execute([':tableName' => $this->dbTableName]);
         if ($std->rowCount()) {
             return true;
