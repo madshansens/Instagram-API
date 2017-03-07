@@ -4,20 +4,23 @@ namespace InstagramAPI;
 
 class SettingsFile
 {
-    public $cookiesPath; // public becouse used by HttpInterface
     private $sets;
-    private $folderPath;
+    public $cookiesPath; // Public because it's used by HttpInterface.
+    private $settingsPath;
 
-    public function __construct($username, $path)
+    public function __construct($username, $settingsPath)
     {
-        if (!$path) {
-            $path = Constants::DATA_DIR;
+        // Decide which settings-file paths to use.
+        if (empty($settingsPath)) {
+            $settingsPath = Constants::DATA_DIR;
         }
-        $this->cookiesPath = $path.$username.DIRECTORY_SEPARATOR.$username.'-cookies.dat';
-        $this->settingsPath = $path.$username.DIRECTORY_SEPARATOR.$username.'-settings.dat';
+        $this->cookiesPath = $settingsPath.$username.DIRECTORY_SEPARATOR.$username.'-cookies.dat';
+        $this->settingsPath = $settingsPath.$username.DIRECTORY_SEPARATOR.$username.'-settings.dat';
 
+        // Test write-permissions to the settings file and create if necessary.
         $this->checkPermissions();
 
+        // Read all existing settings.
         $this->sets = [];
         if (file_exists($this->settingsPath)) {
             $fp = fopen($this->settingsPath, 'rb');
@@ -35,7 +38,7 @@ class SettingsFile
 
     public function isLogged()
     {
-        if ((file_exists($this->cookiesPath)) && ($this->get('username_id') != null) && ($this->get('token') != null)) {
+        if ((file_exists($this->cookiesPath)) && ($this->get('username_id') !== null) && ($this->get('token') !== null)) {
             return true;
         } else {
             return false;
@@ -45,7 +48,7 @@ class SettingsFile
     public function get($key, $default = null)
     {
         if ($key == 'sets') {
-            return $this->sets;
+            return $this->sets; // Return 'sets' itself which contains all data.
         }
 
         if (isset($this->sets[$key])) {
@@ -57,9 +60,10 @@ class SettingsFile
 
     public function set($key, $value)
     {
-        if ($key == 'sets' or $key == 'path' or $key == 'username' or $key == 'folderPath') {
-            return;
+        if ($key == 'sets') {
+            return; // Don't allow writing to special 'sets' key.
         }
+
         $this->sets[$key] = $value;
         $this->Save();
     }
@@ -87,6 +91,6 @@ class SettingsFile
             return true;
         }
 
-        throw new InstagramException('The setting file is not writable', ErrorCode::INTERNAL_SETTINGS_ERROR);
+        throw new InstagramException('The settings file is not writable.', ErrorCode::INTERNAL_SETTINGS_ERROR);
     }
 }
