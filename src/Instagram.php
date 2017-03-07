@@ -1809,24 +1809,32 @@ class Instagram
     /**
      * Backups all your uploaded photos and videos :).
      *
+     * @param string|null $baseOutputPath (optional) Base-folder for output.
+     *                                    Uses standard data path if null.
+     *
      * @throws InstagramException
      */
-    public function backup()
+    public function backup($baseOutputPath = null)
     {
+        // Decide which path to use.
+        if ($baseOutputPath === null) {
+            $baseOutputPath = Constants::DATA_DIR;
+        }
+
+        // Recursively create output folders for the current backup.
+        $backupMainFolder = $baseOutputPath.$this->username.'/backup/';
+        $backupFolder = $backupMainFolder.'/'.date('Y-m-d').'/';
+        if (!is_dir($backupMainFolder)) {
+            mkdir($backupMainFolder, 0755, true);
+        }
+        if (!is_dir($backupFolder)) {
+            mkdir($backupFolder, 0755, true);
+        }
+
+        // Download all media to the output folders.
         $nextUploadMaxId = null;
         do {
             $myUploads = $this->getSelfUserFeed($nextUploadMaxId);
-
-            $dataDirectory = array_key_exists('path', $this->settingsAdapter) ? $this->settingsAdapter['path'] : Constants::DATA_DIR;
-            $backupMainFolder = $dataDirectory.$this->username.'/backup/';
-            $backupFolder = $backupMainFolder.'/'.date('Y-m-d').'/';
-
-            if (!is_dir($backupMainFolder)) {
-                mkdir($backupMainFolder);
-            }
-            if (!is_dir($backupFolder)) {
-                mkdir($backupFolder);
-            }
 
             foreach ($myUploads->getItems() as $item) {
                 if ($item->media_type == Item::PHOTO) {
