@@ -41,7 +41,7 @@ class SettingsAdapter
     {
         switch ($config['type']) {
         case 'mysql':
-            $cmdOptions = getCmdOptions([
+            $cmdOptions = $this->getCmdOptions([
                 'db_username::',
                 'db_password::',
                 'db_host::',
@@ -70,7 +70,7 @@ class SettingsAdapter
             $this->setting = new SettingsMysql($username, $mysqlOptions);
             break;
         case 'file':
-            $cmdOptions = getCmdOptions([
+            $cmdOptions = $this->getCmdOptions([
                 'settings_path::',
             ]);
 
