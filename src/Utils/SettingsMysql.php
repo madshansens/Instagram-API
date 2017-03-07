@@ -14,9 +14,9 @@ class SettingsMysql
 
     public function __construct($mysqlOptions)
     {
-        $this->instagramUsername = $mysqlOptions['instagramUsername'];
-        if (isset($mysqlOptions['dbTableName'])) {
-            $this->dbTableName = $mysqlOptions['dbTableName'];
+        $this->instagramUsername = $mysqlOptions['instagram_username'];
+        if (isset($mysqlOptions['db_tablename'])) {
+            $this->dbTableName = $mysqlOptions['db_tablename'];
         }
 
         if (isset($mysqlOptions['pdo'])) {
@@ -24,10 +24,10 @@ class SettingsMysql
             $this->pdo = $mysqlOptions['pdo'];
         } else {
             // We should connect for the user.
-            $username = is_null($mysqlOptions['dbUsername']) ? 'root' : $mysqlOptions['dbUsername'];
-            $password = is_null($mysqlOptions['dbPassword']) ? '' : $mysqlOptions['dbPassword'];
-            $host = is_null($mysqlOptions['dbHost']) ? 'localhost' : $mysqlOptions['dbHost'];
-            $dbName = is_null($mysqlOptions['dbName']) ? 'instagram' : $mysqlOptions['dbName'];
+            $username = (is_null($mysqlOptions['db_username']) ? 'root' : $mysqlOptions['db_username']);
+            $password = (is_null($mysqlOptions['db_password']) ? '' : $mysqlOptions['db_password']);
+            $host = (is_null($mysqlOptions['db_host']) ? 'localhost' : $mysqlOptions['db_host']);
+            $dbName = (is_null($mysqlOptions['db_name']) ? 'instagram' : $mysqlOptions['db_name']);
             $this->connect($username, $password, $host, $dbName);
         }
 

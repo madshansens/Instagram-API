@@ -4,78 +4,85 @@ namespace InstagramAPI;
 
 class SettingsAdapter
 {
+    protected function getCmdOptions(array $longOpts)
+    {
+        $cmdOptions = getopt(null, $longOpts);
+
+        if (!is_array($cmdOptions)) {
+            $cmdOptions = [];
+        }
+
+        return $cmdOptions;
+    }
+
+    protected function getUserConfig($settingName, array $config, array $cmdOptions)
+    {
+        // Look for a user-provided value for the setting.
+        if (array_key_exists($settingName, $config)) {
+            // Constructor config array has highest precedence.
+            return $config[$settingName];
+        } elseif (array_key_exists($settingName, $cmdOptions)) {
+            // Command line options have second highest precedence.
+            return $cmdOptions[$settingName];
+        } else {
+            // Environment variables have third highest precedence.
+            // All settings must be UPPERCASED when in environment.
+            $envValue = getenv(strtoupper($settingName));
+            if ($envValue !== false) {
+                return $envValue;
+            }
+        }
+
+        // Couldn't find any user-provided value.
+        return null;
+    }
+
     public function __construct($config, $username)
     {
         switch ($config['type']) {
         case 'mysql':
-            $longOpts = [
+            $cmdOptions = getCmdOptions([
                 'db_username::',
                 'db_password::',
                 'db_host::',
                 'db_name::',
                 'db_tablename::',
-            ];
-            $options = getopt('', $longOpts);
+            ]);
 
-            if (!$options) {
-                $options = [];
-            }
-
-            $env_username = getenv('DB_USERNAME');
-            $env_password = getenv('DB_PASSWORD');
-            $env_host = getenv('DB_HOST');
-            $env_name = getenv('DB_NAME');
-            $env_tablename = getenv('DB_TABLENAME');
-
-            $dbUsername = array_key_exists('username', $config) ? $config['username'] : array_key_exists('db_username', $options) ? $options['db_username'] : $env_username !== false ? $env_username : null;
-            $dbPassword = array_key_exists('password', $config) ? $config['password'] : array_key_exists('db_password', $options) ? $options['db_password'] : $env_password !== false ? $env_password : null;
-            $dbHost = array_key_exists('host', $config) ? $config['host'] : array_key_exists('db_host', $options) ? $options['db_host'] : $env_host !== false ? $env_host : null;
-            $dbName = array_key_exists('name', $config) ? $config['name'] : array_key_exists('db_name', $options) ? $options['db_name'] : $env_name !== false ? $env_name : null;
-            $dbTableName = array_key_exists('tablename', $config) ? $config['tablename'] : array_key_exists('db_tablename', $options) ? $options['db_tablename'] : $env_tablename !== false ? $env_tablename : null;
-
+            // Settings that can be used regardless of connection method.
             $mysqlOptions = [
-                'instagramUsername' => $username,
-                'dbName'            => $dbName,
-                'dbTableName'       => $dbTableName,
+                'instagram_username' => $username,
+                'db_tablename'       => $this->getUserConfig('db_tablename', $config, $cmdOptions),
             ];
+
             if (isset($config['pdo'])) {
-                // If the 'pdo' config property is set, assume the user wants
+                // If the 'pdo' is set in constructor configg, assume user wants
                 // to re-use an existing PDO connection. In that case we ignore
-                // the dbUsername/dbPassword/dbHost parameters and use the PDO.
+                // the username/password/host/name parameters and use the PDO.
                 $mysqlOptions['pdo'] = $config['pdo'];
             } else {
-                $mysqlOptions['dbUsername'] = $dbUsername;
-                $mysqlOptions['dbPassword'] = $dbPassword;
-                $mysqlOptions['dbHost'] = $dbHost;
+                // Settings that can be provided if a PDO object is not used.
+                $mysqlOptions['db_username'] = $this->getUserConfig('db_username', $config, $cmdOptions);
+                $mysqlOptions['db_password'] = $this->getUserConfig('db_password', $config, $cmdOptions);
+                $mysqlOptions['db_host'] = $this->getUserConfig('db_host', $config, $cmdOptions);
+                $mysqlOptions['db_name'] = $this->getUserConfig('db_name', $config, $cmdOptions);
             }
 
             $this->setting = new SettingsMysql($mysqlOptions);
             break;
         case 'file':
-            $longOpts = [
+            $cmdOptions = getCmdOptions([
                 'settings_path::',
-            ];
-            $options = getopt('', $longOpts);
+            ]);
 
-            if (!$options) {
-                $options = [];
-            }
+            // Settings that can optionally be provided.
+            $settingsPath = $this->getUserConfig('settings_path', $config, $cmdOptions);
 
-            $env_settings_path = getenv('SETTINGS_PATH');
-            if (array_key_exists('path', $config)) {
-                $settings_path = $config['path'];
-            } elseif (array_key_exists('settings_path', $options)) {
-                $settings_path = $options['settings_path'];
-            } elseif ($env_settings_path !== false) {
-                $settings_path = $env_settings_path;
-            } else {
-                $settings_path = null;
-            }
-            $this->setting = new SettingsFile($username, $settings_path);
+            $this->setting = new SettingsFile($username, $settingsPath);
             break;
         case 'custom':
             if (!isset($config['class']) || !class_exists($config['class']) || !in_array(SettingsAdapter\SettingsInterface::class, class_implements($config['class']))) {
-                throw new InstagramException('Unknown custom settings class specified', ErrorCode::INTERNAL_SETTINGS_ERROR);
+                throw new InstagramException('Unknown custom settings class specified.', ErrorCode::INTERNAL_SETTINGS_ERROR);
             }
 
             $customClass = $config['class'];
@@ -85,7 +92,7 @@ class SettingsAdapter
             $this->setting = $settings;
             break;
         default:
-            throw new InstagramException('Unrecognized settings type', ErrorCode::INTERNAL_SETTINGS_ERROR);
+            throw new InstagramException('Unrecognized settings type.', ErrorCode::INTERNAL_SETTINGS_ERROR);
         }
     }
 

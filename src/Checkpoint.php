@@ -13,7 +13,7 @@ class Checkpoint
     public function __construct($username, $settingsPath = null, $debug = false)
     {
         $path = ($settingsPath) ? $settingsPath : Constants::DATA_DIR;
-        $this->settings = new SettingsAdapter(['type' => 'file', 'path' => $path], $username);
+        $this->settings = new SettingsAdapter(['type' => 'file', 'settings_path' => $path], $username);
 
         $this->username = $username;
         $this->debug = $debug;

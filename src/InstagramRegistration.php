@@ -33,7 +33,7 @@ class InstagramRegistration
         $options = getopt('', $longOpts);
 
         if (!is_null($dataPath)) {
-            $this->settingsAdapter = ['type' => 'file', 'path' => $dataPath];
+            $this->settingsAdapter = ['type' => 'file', 'settings_path' => $dataPath];
         } elseif (array_key_exists('settings_adapter', $options)) {
             $this->settingsAdapter = ['type' => $options[$settings_adapter]];
         } elseif (getenv('SETTINGS_ADAPTER') !== false) {
