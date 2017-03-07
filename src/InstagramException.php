@@ -85,7 +85,7 @@ class InstagramException extends \Exception
             } elseif (preg_match(ErrorCode::IG_RESET_PASSWORD_REGEX, $message) === 1) {
                 $code = ErrorCode::IG_RESET_PASSWORD;
             } else {
-                $code = 0;
+                $code = ErrorCode::UNKNOWN;
             }
         }
 
