@@ -17,33 +17,37 @@ class AutoResponseFunctionSetter
 
         // Return the kind of response expected by their function.
         switch ($functionType) {
-            case 'get':
-                if (!property_exists($this, $propName)) {
-                    throw new \Exception("Unknown function {$function}.");
-                }
+        case 'get':
+            if (!property_exists($this, $propName)) {
+                throw new \Exception("Unknown function {$function}.");
+            }
 
-                return $this->$propName;
-                break;
-            case 'set':
-                if (!property_exists($this, $propName)) {
-                    throw new \Exception("Unknown function {$function}.");
-                }
+            return $this->$propName;
+            break;
+        case 'set':
+            if (!property_exists($this, $propName)) {
+                throw new \Exception("Unknown function {$function}.");
+            }
 
-                $this->$propName = $args[0];
-                break;
-            case 'is':
-                if (!property_exists($this, $propName)) {
-                    throw new \Exception("Unknown function {$function}.");
-                }
+            $this->$propName = $args[0];
+            break;
+        case 'is':
+            if (!property_exists($this, $propName)) {
+                throw new \Exception("Unknown function {$function}.");
+            }
 
-                return ($this->$propName ? true : false);
-                break;
+            return ($this->$propName ? true : false);
+            break;
+        default:
+            // Unknown camelcased function call...
+            throw new \Exception("Unknown function {$function}.");
         }
     }
 
     public function camelCaseToUnderScore($input)
     {
-        // This is a highly optimized regexp which achieves the matching in very few steps. Do not touch!
+        // This is a highly optimized regexp which achieves the matching in very
+        // few regex engine steps and with very high performance. Do not touch!
         preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
         $ret = $matches[0];
         foreach ($ret as &$match) {
