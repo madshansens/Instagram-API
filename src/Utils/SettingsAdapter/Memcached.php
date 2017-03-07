@@ -22,7 +22,7 @@ class Memcached implements SettingsInterface
      */
     public function __construct($instagramUsername, $config)
     {
-        $this->memcached = $memcached = new \Memcached(isset($config['persistent_id']) ? $config['persistent_id'] : 'instagram');
+        $this->memcached = $memcached = new \Memcached((isset($config['persistent_id']) ? $config['persistent_id'] : 'instagram'));
 
         if (isset($config['init_callback']) && is_callable($config['init_callback'])) {
             $config['init_callback']($memcached);
@@ -35,7 +35,11 @@ class Memcached implements SettingsInterface
         if (isset($config['servers'])) {
             $memcached->addServers($config['servers']);
         } elseif (isset($config['server'])) {
-            $memcached->addServer($config['server']['host'], isset($config['server']['port']) ? $config['server']['port'] : 11211, isset($config['server']['weight']) ? $config['server']['weight'] : 0);
+            $memcached->addServer(
+                $config['server']['host'],
+                (isset($config['server']['port']) ? $config['server']['port'] : 11211),
+                (isset($config['server']['weight']) ? $config['server']['weight'] : 0)
+            );
         } else {
             $memcached->addServer('localhost', 11211);
         }
@@ -62,7 +66,7 @@ class Memcached implements SettingsInterface
     {
         $result = $this->memcached->get($key);
 
-        return \Memcached::RES_NOTFOUND === $this->memcached->getResultCode() ? $default : $result;
+        return \Memcached::RES_NOTFOUND === ($this->memcached->getResultCode() ? $default : $result);
     }
 
     /**
