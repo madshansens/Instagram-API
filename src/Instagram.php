@@ -144,12 +144,15 @@ class Instagram
      * Login to Instagram.
      *
      * @param bool $force Force login to Instagram, this will create a new session
+     * @param int $refreshTime How frequently login() should act like an
+     * Instagram client that's "refreshing its state", by asking for extended
+     * account state details (default: after 1800 seconds, meaning 30 minutes).
      *
      * @throws InstagramException
      *
      * @return ChallengeResponse|LoginResponse|ExploreResponse
      */
-    public function login($force = false)
+    public function login($force = false, $refreshTime = 1800)
     {
         if (!$this->isLoggedIn || $force) {
             $this->syncFeatures(true);
@@ -198,9 +201,9 @@ class Instagram
 
         $check = $this->timelineFeed();
         if ($check->getMessage() == 'login_required') {
-            $this->login(true);
+            $this->login(true, $refreshTime);
         }
-        if (time() - $this->settings->get('last_login') > 1800) {
+        if (time() - $this->settings->get('last_login') > $refreshTime) {
             $this->settings->set('last_login', time());
 
             $this->autoCompleteUserList();
