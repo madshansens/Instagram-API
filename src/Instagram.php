@@ -38,7 +38,9 @@ class Instagram
     /**
      * Default class constructor.
      *
-     * @param $debug Debug on or off, false by default
+     * @param bool $debug           Debug on or off, false by default
+     * @param bool $truncatedDebug
+     * @param null $settingsAdapter
      */
     public function __construct($debug = false, $truncatedDebug = false, $settingsAdapter = null)
     {
@@ -299,7 +301,7 @@ class Instagram
     /**
      * Get timeline feed.
      *
-     * @param $maxid
+     * @param $maxId
      *
      * @throws InstagramException
      *
@@ -460,12 +462,14 @@ class Instagram
     /**
      * Upload photo to Instagram.
      *
-     * @param string $photo         Path to your photo
-     * @param string $caption       Caption to be included in your photo
-     * @param null   $upload_id
-     * @param null   $customPreview
+     * @param string $photo     Path to your photo
+     * @param bool   $story     Is the photo intended for a story?
+     * @param string $caption   Caption to be included in your photo
      * @param null   $location
+     * @param null   $upload_id
      * @param null   $filter
+     *
+     * @throws InstagramException
      *
      * @return Upload data
      */
@@ -578,7 +582,12 @@ class Instagram
     /**
      * @param $photo
      * @param null $caption
-     * @param null $customPreview
+     * @param null $location
+     * @param null $filter
+     *
+     * @throws InstagramException
+     *
+     * @return ConfigureResponse
      */
     public function uploadPhotoStory($photo, $caption = null, $location = null, $filter = null)
     {
@@ -602,6 +611,8 @@ class Instagram
      *
      * @param string $videoFilename The video filename.
      * @param string $caption       Caption to use for the video.
+     * @param bool   $story         Is the photo intended for a story?
+     * @param null   $reel_mentions
      * @param string $customPreview Optional path to custom video thumbnail.
      *                              If nothing provided, we generate from video.
      * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
@@ -696,6 +707,8 @@ class Instagram
      * @param $upload_id
      * @param $video
      * @param string $caption
+     * @param bool   $story
+     * @param null   $reel_mentions
      * @param null   $customPreview
      *
      * @return ConfigureVideoResponse
@@ -755,6 +768,8 @@ class Instagram
      * @param $photo
      * @param string $caption
      * @param null   $location
+     * @param bool   $album
+     * @param bool   $story
      * @param null   $filter
      *
      * @return ConfigureResponse
@@ -840,6 +855,7 @@ class Instagram
      *
      * @param $mediaId  Media id
      * @param string $captionText Caption text
+     * @param null   $usertags
      *
      * @return MediaResponse
      */
@@ -868,7 +884,7 @@ class Instagram
      *
      * @param string      $mediaId     Media id
      * @param string      $usernameId  Username id
-     * @param array float $position    position relative to image where is placed the tag. Example: [0.4890625,0.6140625]
+     * @param array|float $position    position relative to image where is placed the tag. Example: [0.4890625,0.6140625]
      * @param string      $captionText Caption text
      *
      * @return MediaResponse
@@ -1274,6 +1290,8 @@ class Instagram
     /**
      * Get recent activity from accounts followed.
      *
+     * @param null $maxid
+     *
      * @throws InstagramException
      *
      * @return mixed Recent activity data of follows
@@ -1304,6 +1322,8 @@ class Instagram
      * Get user tags.
      *
      * @param string $usernameId
+     * @param null   $maxid
+     * @param null   $minTimestamp
      *
      * @throws InstagramException
      *
@@ -1456,7 +1476,7 @@ class Instagram
     }
 
     /**
-     * Search users using addres book.
+     * Search users using address book.
      *
      * @param array $contacts
      *
@@ -1516,6 +1536,8 @@ class Instagram
     /**
      * Get a user's Story Feed.
      *
+     * @param $userId
+     *
      * @return UserStoryFeedResponse
      */
     public function getUserStoryFeed($userId)
@@ -1551,9 +1573,9 @@ class Instagram
     /**
      * Get user feed.
      *
-     * @param string $usernameId   Username id
-     * @param null   $maxid        Max Id
-     * @param null   $minTimestamp Min timestamp
+     * @param string   $usernameId   Username id
+     * @param null|int $maxid        Max Id
+     * @param null|int $minTimestamp Min timestamp
      *
      * @throws InstagramException
      *
@@ -1572,7 +1594,8 @@ class Instagram
     /**
      * Get hashtag feed.
      *
-     * @param string $hashtagString Hashtag string, not including the #
+     * @param string   $hashtagString Hashtag string, not including the #
+     * @param null|int $maxid
      *
      * @throws InstagramException
      *
@@ -1629,7 +1652,8 @@ class Instagram
     /**
      * Get location feed.
      *
-     * @param string $locationId location id
+     * @param string   $locationId location id
+     * @param null|int $maxid
      *
      * @throws InstagramException
      *
@@ -1647,6 +1671,9 @@ class Instagram
 
     /**
      * Get self user feed.
+     *
+     * @param null|int $max_id
+     * @param null|int $minTimestamp
      *
      * @return UserFeedResponse User feed data
      */
@@ -1674,7 +1701,8 @@ class Instagram
     /**
      * Get user followings.
      *
-     * @param string $usernameId Username id
+     * @param string   $usernameId Username id
+     * @param null|int $maxid
      *
      * @return FollowerAndFollowingResponse followers data
      */
@@ -1692,7 +1720,8 @@ class Instagram
     /**
      * Get user followers.
      *
-     * @param string $usernameId Username id
+     * @param string   $usernameId Username id
+     * @param null|int $maxid
      *
      * @return FollowerAndFollowingResponse followers data
      */
@@ -1710,6 +1739,8 @@ class Instagram
     /**
      * Get self user followers.
      *
+     * @param null|int $max_id
+     *
      * @return FollowerAndFollowingResponse followers data
      */
     public function getSelfUserFollowers($max_id = null)
@@ -1719,6 +1750,8 @@ class Instagram
 
     /**
      * Get self users we are following.
+     *
+     * @param null|int $max_id
      *
      * @return FollowerAndFollowingResponse users we are following data
      */
@@ -1764,7 +1797,8 @@ class Instagram
     /**
      * Get media comments.
      *
-     * @param string $mediaId Media id
+     * @param string   $mediaId Media id
+     * @param null|int $maxid
      *
      * @return MediaCommentsResponse Media comments data
      */
