@@ -790,9 +790,7 @@ class HttpInterface
     public function changeProfilePicture($photo)
     {
         if (is_null($photo)) {
-            echo "Photo not valid\n\n";
-
-            return;
+            throw new InstagramException('No photo was found');
         }
 
         $uData = json_encode([
@@ -826,69 +824,47 @@ class HttpInterface
             ],
         ];
 
-        $data = $this->buildBody($bodies, $boundary);
+        $payload = $this->buildBody($bodies, $boundary);
         $headers = [
-            'Proxy-Connection: keep-alive',
-            'Connection: keep-alive',
-            'Accept: */*',
-            'Content-Type: multipart/form-data; boundary='.$boundary,
-            'Accept-Language: en-en',
+            'User-Agent'          => $this->userAgent,
+            'Proxy-Connection' => 'keep-alive',
+            'Connection' => 'keep-alive',
+            'Accept' => '*/*',
+            'Content-Type' => 'multipart/form-data; boundary='.$boundary,
+            'Accept-Language' => 'en-en',
         ];
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
-        curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_VERBOSE, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        if ($this->parent->settingsAdapter['type'] == 'file') {
-            curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
-            curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
-        } else {
-            $cookieJar = $this->parent->settings->get('cookies');
-            $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
-
-            file_put_contents($cookieJarFile, $cookieJar);
-
-            curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieJarFile);
-            curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieJarFile);
-        }
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-
-        if ($this->proxy) {
-            // TODO: rewrite to properly read proxy just like in request()
+        $options = [
+            'cookies' => ($this->jar instanceof CookieJar ? $this->jar : false),
+            'headers' => $headers,
+            'verify'  => $this->verifySSL,
+            'body'    => $payload,
+        ];
+        if (!is_null($this->proxy)) {
+            $options['proxy'] = $this->proxy;
         }
 
-        $resp = curl_exec($ch);
-        $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $header = substr($resp, 0, $header_len);
-        $upload = json_decode(substr($resp, $header_len), true);
+        $response = $this->guzzleRequest('POST', Constants::API_URL.$endpoint, $options);
+
+        $resp = $response->getBody()->getContents();
 
         if ($this->parent->debug) {
             Debug::printRequest('POST', $endpoint);
 
-            $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
+            $uploadBytes = Utils::formatBytes(strlen($payload));
             Debug::printUpload($uploadBytes);
 
-            $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            if ($response->hasHeader('x-encoded-content-length')) {
+                $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
+            } else {
+                $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
+            }
+            $httpCode = $response->getStatusCode();
             Debug::printHttpCode($httpCode, $bytes);
-            Debug::printResponse(substr($resp, $header_len));
+            Debug::printResponse($resp);
         }
 
-        curl_close($ch);
-        if ($this->parent->settingsAdapter['type'] == 'mysql') {
-            $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set('cookies', $newCookies);
-        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
-            $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set('cookies', $newCookies);
-        }
+        return $this->getResponseWithResult(new User(), json_decode($resp));
     }
 
     public function direct_share($media_id, $recipients, $text = null)
