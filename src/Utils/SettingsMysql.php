@@ -38,8 +38,7 @@ class SettingsMysql
 
     public function isLogged()
     {
-        if (($this->get('id') != null) && ($this->get('username_id') != null) && ($this->get('token') != null)
-        ) {
+        if (($this->get('id') !== null) && ($this->get('username_id') !== null) && ($this->get('token') !== null)) {
             return true;
         } else {
             return false;
@@ -49,8 +48,9 @@ class SettingsMysql
     public function get($key, $default = null)
     {
         if ($key == 'sets') {
-            return $this->sets;
+            return $this->sets; // Return 'sets' itself which contains all data.
         }
+
         if (isset($this->sets[$key])) {
             return $this->sets[$key];
         }
@@ -60,8 +60,8 @@ class SettingsMysql
 
     public function set($key, $value)
     {
-        if ($key == 'sets' or $key == 'pdo' or $key == 'instagramUsername') {
-            return;
+        if ($key == 'sets' || $key == 'username') {
+            return; // Don't allow writing to special 'sets' or 'username' keys.
         }
 
         $this->sets[$key] = $value;
@@ -70,7 +70,10 @@ class SettingsMysql
 
     public function Save()
     {
+        // Special key where we store what username these settings belong to.
         $this->sets['username'] = $this->instagramUsername;
+
+        // Update if user already exists in db, otherwise insert.
         if (isset($this->sets['id'])) {
             $sql = "update {$this->dbTableName} set ";
             $bindList[':id'] = $this->sets['id'];
@@ -78,6 +81,7 @@ class SettingsMysql
             $sql = "insert into {$this->dbTableName} set ";
         }
 
+        // Add all settings to storage.
         foreach ($this->sets as $key => $value) {
             if ($key == 'id') {
                 continue;
@@ -91,6 +95,7 @@ class SettingsMysql
 
         $std->execute($bindList);
 
+        // Keep track of which database row id the user has been assigned as.
         if (!isset($this->sets['id'])) {
             $this->sets['id'] = $this->pdo->lastinsertid();
         }
