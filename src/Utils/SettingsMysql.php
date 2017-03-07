@@ -12,9 +12,10 @@ class SettingsMysql
 
     public $dbTableName = 'user_settings';
 
-    public function __construct($mysqlOptions)
+    public function __construct($username, $mysqlOptions)
     {
-        $this->instagramUsername = $mysqlOptions['instagram_username'];
+        $this->instagramUsername = $username;
+
         if (isset($mysqlOptions['db_tablename'])) {
             $this->dbTableName = $mysqlOptions['db_tablename'];
         }

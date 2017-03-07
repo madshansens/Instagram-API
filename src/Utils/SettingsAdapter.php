@@ -51,7 +51,6 @@ class SettingsAdapter
 
             // Settings that can be used regardless of connection method.
             $mysqlOptions = [
-                'instagram_username' => $username,
                 'db_tablename'       => $this->getUserConfig('db_tablename', $config, $cmdOptions),
             ];
 
@@ -68,7 +67,7 @@ class SettingsAdapter
                 $mysqlOptions['db_name'] = $this->getUserConfig('db_name', $config, $cmdOptions);
             }
 
-            $this->setting = new SettingsMysql($mysqlOptions);
+            $this->setting = new SettingsMysql($username, $mysqlOptions);
             break;
         case 'file':
             $cmdOptions = getCmdOptions([
