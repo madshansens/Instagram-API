@@ -24,7 +24,7 @@ class ChallengeSMS
         if (is_null($settingsPath)) {
             $this->settingsPath = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.$username.DIRECTORY_SEPARATOR;
             if (!file_exists($this->settingsPath)) {
-                mkdir($this->settingsPath, 0777, true);
+                mkdir($this->settingsPath, 0755, true);
             }
         }
         $this->settings = new Settings($this->settingsPath.$username.'-settings.dat');

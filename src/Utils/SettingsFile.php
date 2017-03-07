@@ -85,9 +85,9 @@ class SettingsFile
     {
         if (is_writable(dirname($this->settingsPath))) {
             return true;
-        } elseif (mkdir(dirname($this->settingsPath), 0777, true)) {
+        } elseif (mkdir(dirname($this->settingsPath), 0755, true)) {
             return true;
-        } elseif (chmod(dirname($this->settingsPath), 0777)) {
+        } elseif (chmod(dirname($this->settingsPath), 0755)) {
             return true;
         }
 
