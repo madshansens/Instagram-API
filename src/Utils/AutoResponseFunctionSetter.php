@@ -27,11 +27,11 @@ class AutoResponseFunctionSetter
                 $this->$propName = $args[0];
                 break;
             case 'is':
-                if (!property_exists($this, $underScoreNames)) {
+                if (!property_exists($this, $propName)) {
                     throw new \Exception("Wrong function $function");
                 }
 
-                return $this->$underScoreNames;
+                return $this->$propName;
                 break;
         }
     }
