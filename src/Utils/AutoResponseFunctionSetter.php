@@ -36,7 +36,7 @@ class AutoResponseFunctionSetter
                 throw new \Exception("Unknown function {$function}.");
             }
 
-            return ($this->$propName ? true : false);
+            return $this->$propName ? true : false;
             break;
         default:
             // Unknown camelcased function call...

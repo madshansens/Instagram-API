@@ -33,8 +33,8 @@ class SettingsAdapter
             }
         }
 
-        // Couldn't find any user-provided value.
-        return null;
+        // Couldn't find any user-provided value. Automatically returns null.
+        // NOTE: Damn you StyleCI for not allowing "return null;" for clarity.
     }
 
     public function __construct($config, $username)

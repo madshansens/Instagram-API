@@ -15,7 +15,7 @@ $truncatedDebug = false;
 $media = [
     [
         'type'     => 'photo',
-        'file'     => '' // path to the photo file
+        'file'     => '', // path to the photo file
     ], [
         'type'     => 'photo',
         'file'     => '', // path to the photo file

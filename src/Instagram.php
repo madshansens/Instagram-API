@@ -143,10 +143,11 @@ class Instagram
     /**
      * Login to Instagram.
      *
-     * @param bool $force Force login to Instagram, this will create a new session
-     * @param int $refreshTime How frequently login() should act like an
-     * Instagram client that's "refreshing its state", by asking for extended
-     * account state details (default: after 1800 seconds, meaning 30 minutes).
+     * @param bool $force       Force login to Instagram, this will create a new session.
+     * @param int  $refreshTime How frequently login() should act like an Instagram client
+     *                          that's "refreshing its state", by asking for extended
+     *                          account state details (default: after 1800 seconds, meaning
+     *                          30 minutes since the last state-refreshing login() call).
      *
      * @throws InstagramException
      *
@@ -512,7 +513,7 @@ class Instagram
                 throw new InstagramException(sprintf('File "%s" does not exist.', $item['file']));
             }
 
-            switch($item['type']) {
+            switch ($item['type']) {
             case 'photo':
                 $media[$key]['upload'] = $this->http->uploadPhoto($item['file'], null, true);
                 break;
@@ -532,7 +533,7 @@ class Instagram
 
         $uploadRequests = [];
         foreach ($media as $item) {
-            switch($item['type']) {
+            switch ($item['type']) {
             case 'photo':
                 $photoConfig = [
                     'date_time_original'  => $date,
@@ -699,55 +700,55 @@ class Instagram
      *
      * @return ConfigureVideoResponse
      */
-     public function configureVideo($upload_id, $video, $caption = '', $story = false, $reel_mentions = null, $customPreview = null)
-     {
-         $this->http->uploadPhoto($video, $upload_id, false, false, $customPreview);
+    public function configureVideo($upload_id, $video, $caption = '', $story = false, $reel_mentions = null, $customPreview = null)
+    {
+        $this->http->uploadPhoto($video, $upload_id, false, false, $customPreview);
 
-         if ($story) {
-             $endpoint = 'media/configure_to_reel/';
-         } else {
-             $endpoint = 'media/configure/';
-         }
+        if ($story) {
+            $endpoint = 'media/configure_to_reel/';
+        } else {
+            $endpoint = 'media/configure/';
+        }
 
-         $requestData = $this->request($endpoint)
-         ->addParams('video', 1)
-         ->addPost('video_result', 'deprecated')
-         ->addPost('audio_muted', false)
-         ->addPost('trim_type', 0)
-         ->addPost('client_timestamp', time())
-         ->addPost('camera_position', 'unknown')
-         ->addPost('upload_id', $upload_id)
-         ->addPost('source_type', 'library')
-         ->addPost('poster_frame_index', 0)
-         ->addPost('length', 0.00)
-         ->addPost('audio_muted', false)
-         ->addPost('geotag_enabled', false)
-         ->addPost('filter_type', '0')
-         ->addPost('video_result', 'deprecated')
-         ->addPost('edits', [
-             'filter_strength'   => 1,
-         ])
-         ->addPost('_csrftoken', $this->token)
-         ->addPost('_uuid', $this->uuid)
-         ->addPost('_uid', $this->username_id)
-         ->setReplacePost(['"length":0' => '"length":0.00']);
+        $requestData = $this->request($endpoint)
+        ->addParams('video', 1)
+        ->addPost('video_result', 'deprecated')
+        ->addPost('audio_muted', false)
+        ->addPost('trim_type', 0)
+        ->addPost('client_timestamp', time())
+        ->addPost('camera_position', 'unknown')
+        ->addPost('upload_id', $upload_id)
+        ->addPost('source_type', 'library')
+        ->addPost('poster_frame_index', 0)
+        ->addPost('length', 0.00)
+        ->addPost('audio_muted', false)
+        ->addPost('geotag_enabled', false)
+        ->addPost('filter_type', '0')
+        ->addPost('video_result', 'deprecated')
+        ->addPost('edits', [
+            'filter_strength'   => 1,
+        ])
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->setReplacePost(['"length":0' => '"length":0.00']);
 
-         if ($caption != '' && !is_null($caption) && $caption) {
-             $requestData->addPost('caption', $caption);
-         }
+        if ($caption != '' && !is_null($caption) && $caption) {
+            $requestData->addPost('caption', $caption);
+        }
 
-         // TODO
-         // Reel Mention example --> build with user id
-         // [{\"y\":0.3407772676161919,\"rotation\":0,\"user_id\":\"USER_ID\",\"x\":0.39892578125,\"width\":0.5619921875,\"height\":0.06011525487256372}]
-         if ($story) {
-             $requestData->addPost('story_media_creation_date', time());
-             if (!is_null($reel_mentions)) {
-                 //$requestData->addPost('reel_mentions', $reel_mention)
-             }
-         }
+        // TODO
+        // Reel Mention example --> build with user id
+        // [{\"y\":0.3407772676161919,\"rotation\":0,\"user_id\":\"USER_ID\",\"x\":0.39892578125,\"width\":0.5619921875,\"height\":0.06011525487256372}]
+        if ($story) {
+            $requestData->addPost('story_media_creation_date', time());
+            if (!is_null($reel_mentions)) {
+                //$requestData->addPost('reel_mentions', $reel_mention)
+            }
+        }
 
-         $requestData->getResponse(new ConfigureVideoResponse());
-     }
+        $requestData->getResponse(new ConfigureVideoResponse());
+    }
 
     /**
      * @param $upload_id
