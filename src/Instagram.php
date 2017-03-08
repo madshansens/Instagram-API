@@ -652,9 +652,9 @@ class Instagram
      * @param string    $filepath   Location of photo to upload
      * @param string    $text       Text message
      */
-    public function direct_photo($recipients, $filepath, $text)
+    public function direct_photo($recipients, $filepath, $text = null)
     {
-        $this->http->direct_photo($recipients, $text, null, $filepath);
+        $this->http->direct_share($recipients, $text, null, $filepath);
     }
 
     /**

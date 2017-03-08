@@ -961,8 +961,8 @@ class HttpInterface
             $this->printDebug($method, $endpoint, null, strlen($payload), $response, $body);
         }
 
-        return $this->getResponseWithResult(new User(), json_decode($body));
-    }    
+        return $this->getResponseWithResult(new Response(), json_decode($body));
+    }
 
     protected function buildBody($bodies, $boundary)
     {
