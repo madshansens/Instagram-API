@@ -571,7 +571,13 @@ class HttpInterface
             $this->printDebug($method, $endpoint, null, strlen($payload), $response, $body);
         }
 
-        return $this->getMappedResponseObject(new UploadPhotoResponse(), self::api_decode($body));
+        // Verify that the photo upload was successful.
+        $upload = $this->getMappedResponseObject(new UploadPhotoResponse(), self::api_decode($body));
+        if (!$upload->isOk()) {
+            throw new InstagramException($upload->getMessage());
+        }
+
+        return $upload;
     }
 
     /**
@@ -754,7 +760,7 @@ class HttpInterface
 
         // Verify that the chunked upload was successful.
         $upload = $this->getMappedResponseObject(new UploadVideoResponse(), self::api_decode($body));
-        if (!is_null($upload->getMessage())) {
+        if (!$upload->isOk()) {
             throw new InstagramException($upload->getMessage());
         }
 
@@ -774,9 +780,8 @@ class HttpInterface
      *
      * @throws InstagramException
      *
-     * @return ConfigureVideoResponse|UploadVideoResponse An upload response if
-     *                                                    type is album, otherwise
-     *                                                    configure response.
+     * @return ConfigureVideoResponse|string An upload id string if type is
+     *                                       album, otherwise configure response.
      */
     public function uploadVideo($videoFilename, $caption = null, $type = 'timeline', $reel_mentions = null, $customPreview = null, $maxAttempts = 4)
     {
@@ -804,14 +809,16 @@ class HttpInterface
 
         // Configure the uploaded video and attach it to our timeline/story.
         for ($attempt = 1; $attempt <= 4; ++$attempt) {
+            // Uploads thumbnail and configures video parameters.
             $configure = $this->parent->configureVideo($uploadParams['upload_id'], $videoFilename, $caption, $type, null, $customPreview);
 
             // No more work needed if this is an album video!
             if ($type == 'album') {
                 // NOTE: Videos in albums don't need per-video configuration, so
-                // the above call just took care of uploading our thumbnail. But
-                // we don't need to do anything more here if this is for an album!
-                return $upload; // UploadVideoResponse
+                // the above configureVideo() ONLY took care of uploading our
+                // thumbnail. But we don't need to do anything more here if this
+                // is for an album!
+                return $uploadParams['upload_id']; // We just need the ID.
             }
 
             //$this->parent->expose();

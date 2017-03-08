@@ -552,18 +552,16 @@ class Instagram
 
             switch ($item['type']) {
             case 'photo':
-                $media[$key]['upload'] = $this->http->uploadPhoto($item['file'], 'photofile', 'album');
+                $result = $this->http->uploadPhoto($item['file'], 'photofile', 'album');
+                $media[$key]['upload_id'] = $result->getUploadId();
                 break;
             case 'video':
-                $media[$key]['upload'] = $this->http->uploadVideo($item['file'], null, 'album');
+                $media[$key]['upload_id'] = $this->http->uploadVideo($item['file'], null, 'album');
                 break;
             default:
                 throw new InstagramException(sprintf('Unsupported album media type "%s".', $item['type']), ErrorCode::INTERNAL_INVALID_ARGUMENT);
             }
 
-            if (!$media[$key]['upload']->isOk()) {
-                throw new InstagramException($media[$key]['upload']->getMessage());
-            }
         }
 
         $date = date('Y:m:d H:i:s');
@@ -576,7 +574,7 @@ class Instagram
                     'date_time_original'  => $date,
                     'scene_type'          => 1,
                     'disable_comments'    => false,
-                    'upload_id'           => $item['upload']->getUploadId(),
+                    'upload_id'           => $item['upload_id'],
                     'source_type'         => 0,
                     'scene_capture_type'  => 'standard',
                     'date_time_digitized' => $date,
@@ -602,7 +600,7 @@ class Instagram
                     'poster_frame_index'  => 0,
                     'trim_type'           => 0,
                     'disable_comments'    => false,
-                    'upload_id'           => $item['upload']->getUploadId(),
+                    'upload_id'           => $item['upload_id'],
                     'source_type'         => 'library',
                     'geotag_enabled'      => false,
                     'edits', [
@@ -644,9 +642,8 @@ class Instagram
      *
      * @throws InstagramException
      *
-     * @return ConfigureVideoResponse|UploadVideoResponse An upload response if
-     *                                                    type is album, otherwise
-     *                                                    configure response.
+     * @return ConfigureVideoResponse|string An upload id string if type is
+     *                                       album, otherwise configure response.
      */
     public function uploadVideo($videoFilename, $caption = null, $type = 'timeline', $reel_mentions = null, $customPreview = null, $maxAttempts = 4)
     {
