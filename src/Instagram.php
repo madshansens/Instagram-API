@@ -1423,8 +1423,6 @@ class Instagram
      */
     public function fbUserSearch($query)
     {
-        $query = rawurlencode($query);
-
         return $this->request('fbsearch/topsearch/')
         ->addParams('context', 'blended')
         ->addParams('query', $query)
@@ -1622,8 +1620,6 @@ class Instagram
      */
     public function searchFBLocation($query)
     {
-        $query = urlencode($query);
-
         return $this->request('fbsearch/places/')
         ->addParams('rank_token', $this->rank_token)
         ->addParams('query', $query)
