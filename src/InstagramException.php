@@ -54,6 +54,7 @@ class ErrorCode
     /**
      * 1XX: Internal Errors.
      */
+    const INTERNAL_INVALID_ARGUMENT = 100; // Used for all bad user-provided args.
     const INTERNAL_LOGIN_REQUIRED = 101;
     const INTERNAL_PROXY_ERROR = 102;
     const INTERNAL_CSRF_TOKEN_ERROR = 103;
@@ -65,8 +66,36 @@ class ErrorCode
 
 class InstagramException extends \Exception
 {
+    /**
+     * Constructor.
+     *
+     * Always tag INTERNAL exceptions with a helpful code! It's the ONLY way
+     * that library users can identify what an exception is about! Messages are
+     * unreliable and subject to change, but error codes always stay the same.
+     *
+     * As for Instagram API exceptions coming from their server; always leave
+     * the $code empty and let this class figure it out based on the $message!
+     *
+     * Note that regardless of the message origin, this class always guarantees
+     * that the message ends in proper punctuation, for perfect consistency.
+     *
+     * @param string          $message  The message to display. Can come from
+     *                                  Instagram's server or from this library.
+     *                                  If from this library, you MUST write a
+     *                                  proper English sentence, ending in a period.
+     * @param int|null        $code     (optional) If the message comes from
+     *                                  Instagram's server, leave this at null.
+     *                                  If from this library, you MUST ALWAYS
+     *                                  use one of the INTERNAL_* error codes
+     *                                  above, otherwise your message could be
+     *                                  misidentified as coming from Instagram's
+     *                                  server due to typing a similar message!
+     * @param \Exception|null $previous (optional) Lets you chain exceptions.
+     */
     public function __construct($message, $code = null, \Exception $previous = null)
     {
+        // If no code was provided, this wasn't an internal exception,
+        // so attempt to detect Instagram's message and map it to an error code.
         if (is_null($code)) {
             if (preg_match(ErrorCode::IG_LOGIN_REQUIRED_REGEX, $message) === 1) {
                 $code = ErrorCode::IG_LOGIN_REQUIRED;
@@ -87,6 +116,14 @@ class InstagramException extends \Exception
             } else {
                 $code = ErrorCode::UNKNOWN;
             }
+        }
+
+        // Some Instagram messages already have punctuation, and others need it.
+        // Prettify the message by ensuring that it ALWAYS ends in punctuation,
+        // for consistency with all of our internal error messages.
+        $lastChar = substr($message, -1);
+        if ($lastChar !== '' && $lastChar !== '.' && $lastChar !== '!' && $lastChar !== '?') {
+            $message .= '.';
         }
 
         parent::__construct($message, $code, $previous);

@@ -436,7 +436,7 @@ class HttpInterface
     public function getResponseWithResult($obj, $response)
     {
         if (is_null($response)) {
-            throw new InstagramException('No response from server, connection or configure error', ErrorCode::EMPTY_RESPONSE);
+            throw new InstagramException('No response from server. Either a connection or configuration error.', ErrorCode::EMPTY_RESPONSE);
         }
 
         $mapper = new \JsonMapper();
@@ -449,7 +449,7 @@ class HttpInterface
         $responseObject = $mapper->map($response, $obj);
 
         if (!$responseObject->isOk()) {
-            throw new InstagramException(get_class($obj).' : '.$responseObject->getMessage());
+            throw new InstagramException(get_class($obj).': '.$responseObject->getMessage());
         }
         $responseObject->setFullResponse($response);
 
@@ -815,7 +815,7 @@ class HttpInterface
         $endpoint = 'accounts/change_profile_picture/';
 
         if (is_null($photoFilename)) {
-            throw new InstagramException('No photo path provided.');
+            throw new InstagramException('No photo path provided.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
         }
 
         // Prepare payload for the upload request.
@@ -900,19 +900,19 @@ class HttpInterface
             $endpoint = 'direct_v2/threads/broadcast/media_share/?media_type=photo';
             if ((!isset($shareData['text']) || is_null($shareData['text']))
                 && (!isset($shareData['media_id']) || is_null($shareData['media_id']))) {
-                throw new InstagramException('You must provide either a text message or a media id.');
+                throw new InstagramException('You must provide either a text message or a media id.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
             }
             break;
         case 'message':
             $endpoint = 'direct_v2/threads/broadcast/text/';
             if (!isset($shareData['text']) || is_null($shareData['text'])) {
-                throw new InstagramException('No text message provided.');
+                throw new InstagramException('No text message provided.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
             }
             break;
         case 'photo':
             $endpoint = 'direct_v2/threads/broadcast/upload_photo/';
             if (!isset($shareData['filepath']) || is_null($shareData['filepath'])) {
-                throw new InstagramException('No photo path provided.');
+                throw new InstagramException('No photo path provided.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
             }
             break;
         }

@@ -18,8 +18,7 @@ class AdaptImage
         try {
             //Get image size
             if ($photo == null) {
-                throw new Exception('Error: You did not specify image.');
-                exit;
+                throw new InstagramException('You must provide an image.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
             }
             $this->images = @imagecreatefromstring($photo);
             $this->width = imagesx($this->images);

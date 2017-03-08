@@ -509,12 +509,12 @@ class Instagram
     public function uploadAlbum($media, $caption = null, $location = null, $filter = null)
     {
         if (empty($media)) {
-            throw new InstagramException("List of media to upload can't be empty.");
+            throw new InstagramException("List of media to upload can't be empty.", ErrorCode::INTERNAL_INVALID_ARGUMENT);
         }
 
         foreach ($media as $key => $item) {
             if (!file_exists($item['file'])) {
-                throw new InstagramException(sprintf('File "%s" does not exist.', $item['file']));
+                throw new InstagramException(sprintf('File "%s" does not exist.', $item['file']), ErrorCode::INTERNAL_INVALID_ARGUMENT);
             }
 
             switch ($item['type']) {
@@ -525,7 +525,7 @@ class Instagram
                 // TODO: IMPLEMENT VIDEO UPLOADS
                 break;
             default:
-                throw new InstagramException(sprintf('Unsupported album media type "%s".', $item['type']));
+                throw new InstagramException(sprintf('Unsupported album media type "%s".', $item['type']), ErrorCode::INTERNAL_INVALID_ARGUMENT);
             }
 
             if (!$media[$key]['upload']->isOk()) {
@@ -696,8 +696,7 @@ class Instagram
         }
         $directThread = $this->http->request($threadUrl)[1];
         if ($directThread['status'] != 'ok') {
-            throw new InstagramException($directThread['message']."\n");
-            return;
+            throw new InstagramException($directThread['message']);
         }
 
         return $directThread;
@@ -2201,13 +2200,13 @@ class Request
             $mapper->bExceptionOnUndefinedProperty = true;
         }
         if (is_null($response[1])) {
-            throw new InstagramException('No response from server, connection or configure error', ErrorCode::EMPTY_RESPONSE);
+            throw new InstagramException('No response from server. Either a connection or configuration error.', ErrorCode::EMPTY_RESPONSE);
         }
 
         $responseObject = $mapper->map($response[1], $obj);
 
         if ($this->checkStatus && !$responseObject->isOk()) {
-            throw new InstagramException(get_class($obj).' : '.$responseObject->getMessage());
+            throw new InstagramException(get_class($obj).': '.$responseObject->getMessage());
         }
         if ($includeHeader) {
             $responseObject->setFullResponse($response);

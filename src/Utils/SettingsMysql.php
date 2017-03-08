@@ -110,7 +110,7 @@ class SettingsMysql
             $pdo->setAttribute(PDO::ERRMODE_WARNING, PDO::ERRMODE_EXCEPTION);
             $this->pdo = $pdo;
         } catch (\PDOException $e) {
-            throw new InstagramException('Settings: cannot connect to mysql adapter', ErrorCode::INTERNAL_SETTINGS_ERROR);
+            throw new InstagramException('Cannot connect to MySQL settings adapter.', ErrorCode::INTERNAL_SETTINGS_ERROR);
         }
     }
 
