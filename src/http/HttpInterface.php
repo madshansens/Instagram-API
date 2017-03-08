@@ -802,17 +802,20 @@ class HttpInterface
 
     public function changeProfilePicture($photo)
     {
+        $this->throwIfNotLoggedIn();
+
+        $endpoint = 'accounts/change_profile_picture/';
+
         if (is_null($photo)) {
-            throw new InstagramException('No photo was found');
+            throw new InstagramException('No photo path provided.');
         }
 
+        // Prepare payload for the upload request.
         $uData = json_encode([
             '_csrftoken' => $this->parent->token,
             '_uuid'      => $this->parent->uuid,
             '_uid'       => $this->parent->username_id,
         ]);
-
-        $endpoint = 'accounts/change_profile_picture/';
         $boundary = $this->parent->uuid;
         $bodies = [
             [
@@ -836,43 +839,33 @@ class HttpInterface
                 ],
             ],
         ];
-
         $payload = $this->buildBody($bodies, $boundary);
-        $headers = [
-            'User-Agent'          => $this->userAgent,
-            'Proxy-Connection' => 'keep-alive',
-            'Connection' => 'keep-alive',
-            'Accept' => '*/*',
-            'Content-Type' => 'multipart/form-data; boundary='.$boundary,
-            'Accept-Language' => 'en-en',
-        ];
 
+        // Build the request options.
+        $method = 'POST';
+        $headers = [
+            'User-Agent'       => $this->userAgent,
+            'Proxy-Connection' => 'keep-alive',
+            'Connection'       => 'keep-alive',
+            'Accept'           => '*/*',
+            'Content-Type'     => 'multipart/form-data; boundary='.$boundary,
+            'Accept-Language'  => 'en-en',
+        ];
         $options = [
             'headers' => $headers,
             'body'    => $payload,
         ];
 
-        $response = $this->guzzleRequest('POST', Constants::API_URL.$endpoint, $options);
+        // Peform the API request.
+        $response = $this->guzzleRequest($method, Constants::API_URL.$endpoint, $options);
+        $body = $response->getBody()->getContents();
 
-        $resp = $response->getBody()->getContents();
-
+        // Debugging.
         if ($this->parent->debug) {
-            Debug::printRequest('POST', $endpoint);
-
-            $uploadBytes = Utils::formatBytes(strlen($payload));
-            Debug::printUpload($uploadBytes);
-
-            if ($response->hasHeader('x-encoded-content-length')) {
-                $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
-            } else {
-                $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
-            }
-            $httpCode = $response->getStatusCode();
-            Debug::printHttpCode($httpCode, $bytes);
-            Debug::printResponse($resp);
+            $this->printDebug($method, $endpoint, null, strlen($payload), $response, $body);
         }
 
-        return $this->getResponseWithResult(new User(), json_decode($resp));
+        return $this->getResponseWithResult(new User(), json_decode($body));
     }
 
     public function direct_share($media_id, $recipients, $text = null)
