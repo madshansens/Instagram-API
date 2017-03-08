@@ -34,9 +34,13 @@ interface SettingsInterface
     public function get($key, $default = null);
 
     /**
+     * Does a preliminary guess about whether we're logged in.
+     *
+     * The session it looks for may be expired, so there's no guarantee.
+     *
      * @return bool
      */
-    public function isLogged();
+    public function maybeLoggedIn();
 
     /**
      * @return void

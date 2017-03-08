@@ -107,7 +107,7 @@ class Instagram
         $this->uuid = $this->settings->get('uuid');
         $this->device_id = $this->settings->get('device_id');
 
-        if ($this->settings->isLogged()) {
+        if ($this->settings->maybeLoggedIn()) {
             $this->isLoggedIn = true;
             $this->username_id = $this->settings->get('username_id');
             $this->rank_token = $this->username_id.'_'.$this->uuid;

@@ -36,7 +36,14 @@ class SettingsMysql
         $this->populateObject();
     }
 
-    public function isLogged()
+    /**
+     * Does a preliminary guess about whether we're logged in.
+     *
+     * The session it looks for may be expired, so there's no guarantee.
+     *
+     * @return bool
+     */
+    public function maybeLoggedIn()
     {
         if (($this->get('id') !== null) && ($this->get('username_id') !== null) && ($this->get('token') !== null)) {
             return true;

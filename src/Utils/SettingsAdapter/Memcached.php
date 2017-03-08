@@ -70,9 +70,13 @@ class Memcached implements SettingsInterface
     }
 
     /**
+     * Does a preliminary guess about whether we're logged in.
+     *
+     * The session it looks for may be expired, so there's no guarantee.
+     *
      * @return bool
      */
-    public function isLogged()
+    public function maybeLoggedIn()
     {
         return $this->get('id') !== null && $this->get('username_id') !== null && $this->get('token') !== null;
     }
