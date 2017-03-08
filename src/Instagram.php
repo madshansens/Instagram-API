@@ -635,7 +635,7 @@ class Instagram
             'share',
             $recipients,
             [
-                'text' => $text,
+                'text'     => $text,
                 'media_id' => $media_id,
             ]
         );
@@ -671,7 +671,7 @@ class Instagram
             'photo',
             $recipients,
             [
-                'text' => $text,
+                'text'     => $text,
                 'filepath' => $filepath,
             ]
         );

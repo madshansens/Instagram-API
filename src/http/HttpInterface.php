@@ -227,6 +227,18 @@ class HttpInterface
         return $this->proxy;
     }
 
+    /**
+     * Output debugging information.
+     *
+     * @param string      $method       "GET" or "POST".
+     * @param string      $url          The URL or endpoint used for the request.
+     * @param string|null $postBody     What was sent to the server. Use NULL to
+     *                                  avoid displaying it.
+     * @param int|null    $uploadBytes  How many bytes were uploaded. Use NULL to
+     *                                  avoid displaying it.
+     * @param object      $response     The Guzzle response object from the request.
+     * @param string      $responseBody The actual text-body reply from the server.
+     */
     protected function printDebug($method, $url, $postBody, $uploadBytes, $response, $responseBody)
     {
         Debug::printRequest($method, $url);
@@ -434,31 +446,36 @@ class HttpInterface
     }
 
     /**
-     * @param $photo
-     * @param null $caption
-     * @param null $upload_id
-     * @param null $customPreview
-     * @param null $location
-     * @param null $filter
-     * @param bool $reel_flag
+     * Uploads a photo to Instagram.
+     *
+     * @param string $photoFilename The photo filename.
+     * @param null   $upload_id     ? TODO: document this
+     * @param bool   $album         Whether this upload will be used in an album.
+     * @param null   $customPreview ? TODO: document this
      *
      * @throws InstagramException
+     *
+     * @return UploadPhotoResponse
      */
-    public function uploadPhoto($photo, $upload_id = null, $album = false, $customPreview = null)
+    public function uploadPhoto($photoFilename, $upload_id = null, $album = false, $customPreview = null)
     {
-        $endpoint = 'upload/photo/';
-        $boundary = $this->parent->uuid;
-        //$helper = new AdaptImage();
+        $this->throwIfNotLoggedIn();
 
+        $endpoint = 'upload/photo/';
+
+        // Determine which file to upload.
         if (!is_null($upload_id)) {
-            $fileToUpload = Utils::createVideoIcon($photo);
+            $fileToUpload = Utils::createVideoIcon($photoFilename);
         } elseif ($customPreview) {
             $fileToUpload = file_get_contents($customPreview);
         } else {
             $upload_id = Utils::generateUploadId();
-            $fileToUpload = file_get_contents($photo);
+            $fileToUpload = file_get_contents($photoFilename);
         }
 
+        // Prepare payload for the upload request.
+        $boundary = $this->parent->uuid;
+        //$helper = new AdaptImage(); // <-- WTF? Old leftover code.
         $bodies = [
             [
                 'type' => 'form-data',
@@ -468,7 +485,7 @@ class HttpInterface
             [
                 'type' => 'form-data',
                 'name' => '_uuid',
-                'data' => $this->parent->uuid,
+                'data' => $boundary,
             ],
             [
                 'type' => 'form-data',
@@ -491,7 +508,6 @@ class HttpInterface
                 ],
             ],
         ];
-
         if ($album) {
             $bodies[] = [
                 'type' => 'form-data',
@@ -499,77 +515,37 @@ class HttpInterface
                 'data' => '1',
             ];
         }
+        $payload = $this->buildBody($bodies, $boundary);
 
-        $data = $this->buildBody($bodies, $boundary);
-
+        // Build the request options.
+        $method = 'POST';
         $headers = [
             'User-Agent'            => $this->userAgent,
-            'Connection'            => 'close',
+            'Connection'            => 'keep-alive',
             'Accept'                => '*/*',
             'Accept-Encoding'       => Constants::ACCEPT_ENCODING,
             'X-IG-Capabilities'     => Constants::X_IG_Capabilities,
             'X-IG-Connection-Type'  => Constants::X_IG_Connection_Type,
             'X-IG-Connection-Speed' => mt_rand(1000, 3700).'kbps',
             'X-FB-HTTP-Engine'      => Constants::X_FB_HTTP_Engine,
-            'Content-Type'          => Constants::CONTENT_TYPE,
-            'Accept-Language'       => Constants::ACCEPT_LANGUAGE,
-            'Content-Length'        => strlen($data),
             'Content-Type'          => 'multipart/form-data; boundary='.$boundary,
+            'Accept-Language'       => Constants::ACCEPT_LANGUAGE,
         ];
-
-        if ($this->parent->settingsAdapter['type'] == 'file') {
-            $cookieJar = new FileCookieJar($this->parent->settings->cookiesPath);
-        } else {
-            $cookieJar = new FileCookieJar(tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie')));
-        }
-
         $options = [
-            'body'    => $data,
             'headers' => $headers,
+            'body'    => $payload,
         ];
 
-        if ($this->proxy) {
-            // TODO: rewrite to properly read proxy just like in request()
-        }
+        // Perform the API request.
+        $response = $this->guzzleRequest($method, Constants::API_URL.$endpoint, $options);
+        $body = $response->getBody()->getContents();
 
-        $response = $this->guzzleRequest('POST', Constants::API_URL.$endpoint, $options);
-
-        $cookies = $cookieJar->getIterator();
-        foreach ($cookies as $cookie) {
-            if ($cookie->getName() == 'csrftoken') {
-                $csrftoken = $cookie->getValue();
-            }
-        }
-        $header = $csrftoken;
-        $body = json_decode($response->getBody()->getContents());
-        $httpCode = $response->getStatusCode();
-
-        $upload = $this->getResponseWithResult(new UploadPhotoResponse(), $body);
-
+        // Debugging.
         if ($this->parent->debug) {
-            Debug::printRequest('POST', $endpoint);
-
-            $uploadBytes = Utils::formatBytes(strlen($data));
-            Debug::printUpload($uploadBytes);
-
-            if ($response->hasHeader('x-encoded-content-length')) {
-                $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
-            } else {
-                $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
-            }
-            Debug::printHttpCode($httpCode, $bytes);
-            Debug::printResponse(json_encode($body));
+            $this->printDebug($method, $endpoint, null, strlen($payload), $response, $body);
         }
 
-        if ($this->parent->settingsAdapter['type'] == 'mysql') {
-            $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set('cookies', $newCookies);
-        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
-            $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set('cookies', $newCookies);
-        }
-
-        return $upload;
+        return $this->getResponseWithResult(new UploadPhotoResponse(), json_decode($body));
     }
 
     /**
@@ -609,7 +585,7 @@ class HttpInterface
             [
                 'type' => 'form-data',
                 'name' => '_uuid',
-                'data' => $this->parent->uuid,
+                'data' => $boundary,
             ],
         ];
         $payload = $this->buildBody($bodies, $boundary);
@@ -818,29 +794,29 @@ class HttpInterface
     /**
      * Change your profile picture.
      *
-     * @param string $photoPath The path to a photo file.
+     * @param string $photoFilename The path to a photo file.
      *
      * @throws InstagramException
      *
      * @return User
      */
-    public function changeProfilePicture($photoPath)
+    public function changeProfilePicture($photoFilename)
     {
         $this->throwIfNotLoggedIn();
 
         $endpoint = 'accounts/change_profile_picture/';
 
-        if (is_null($photoPath)) {
+        if (is_null($photoFilename)) {
             throw new InstagramException('No photo path provided.');
         }
 
         // Prepare payload for the upload request.
+        $boundary = $this->parent->uuid;
         $uData = json_encode([
             '_csrftoken' => $this->parent->token,
-            '_uuid'      => $this->parent->uuid,
+            '_uuid'      => $boundary,
             '_uid'       => $this->parent->username_id,
         ]);
-        $boundary = $this->parent->uuid;
         $bodies = [
             [
                 'type' => 'form-data',
@@ -855,7 +831,7 @@ class HttpInterface
             [
                 'type'     => 'form-data',
                 'name'     => 'profile_pic',
-                'data'     => file_get_contents($photoPath),
+                'data'     => file_get_contents($photoFilename),
                 'filename' => 'profile_pic',
                 'headers'  => [
                     'Content-Type: application/octet-stream',
@@ -895,10 +871,10 @@ class HttpInterface
     /**
      * Perform a direct media share to specific users.
      *
-     * @param string $shareType           Either "share", "message" or "photo".
+     * @param string          $shareType  Either "share", "message" or "photo".
      * @param string[]|string $recipients Either a single recipient or an array
      *                                    of multiple recipient strings.
-     * @param array $shareData            Depends on shareType: "share" uses
+     * @param array           $shareData  Depends on shareType: "share" uses
      *                                    "text" and "media_id". "message" uses
      *                                    "text". "photo" uses "text" and "filepath".
      *
@@ -1024,7 +1000,7 @@ class HttpInterface
     /**
      * Internal helper for building a proper request body.
      *
-     * @param array $bodies
+     * @param array  $bodies
      * @param string $boundary
      *
      * @return string
