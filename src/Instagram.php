@@ -633,7 +633,7 @@ class Instagram
      *
      * @throws InstagramException
      *
-     * @return ConfigureVideoResponse
+     * @return ConfigureVideoResponse|null NULL if type is album, otherwise response.
      */
     public function uploadVideo($videoFilename, $caption = null, $type = 'timeline', $reel_mentions = null, $customPreview = null, $maxAttempts = 4)
     {
@@ -746,7 +746,7 @@ class Instagram
      * @param null   $reel_mentions
      * @param null   $customPreview
      *
-     * @return ConfigureVideoResponse
+     * @return ConfigureVideoResponse|null NULL if type is album, otherwise response.
      */
     public function configureVideo($upload_id, $videoFilename, $caption = '', $type = 'timeline', $reel_mentions = null, $customPreview = null)
     {
@@ -760,7 +760,11 @@ class Instagram
             $endpoint = 'media/configure_to_reel/';
             break;
         case 'album':
-            // TODO: IMPLEMENT VIDEO CONFIGURATION!
+            // NOTE: Albums are configured elsewhere (in uploadAlbum()) but we
+            // still needed to do the thumbnail upload above, which is why we use
+            // configureVideo() even for videos in albums. But we don't need to do
+            // any more configure-work here in the case of album videos!
+            return; // Don't do any more work!
             break;
         default:
             throw new InstagramException('Invalid video type.', ErrorCode::INTERNAL_INVALID_ARGUMENT);

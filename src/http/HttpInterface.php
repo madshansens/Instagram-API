@@ -771,7 +771,7 @@ class HttpInterface
      *
      * @throws InstagramException
      *
-     * @return ConfigureVideoResponse
+     * @return ConfigureVideoResponse|null NULL if type is album, otherwise response.
      */
     public function uploadVideo($videoFilename, $caption = null, $type = 'timeline', $reel_mentions = null, $customPreview = null, $maxAttempts = 4)
     {
@@ -797,9 +797,18 @@ class HttpInterface
             }
         }
 
-        // Configure the uploaded video and attach it to our timeline.
+        // Configure the uploaded video and attach it to our timeline/story.
         for ($attempt = 1; $attempt <= 4; ++$attempt) {
             $configure = $this->parent->configureVideo($uploadParams['upload_id'], $videoFilename, $caption, $type, null, $customPreview);
+
+            // No more work needed if this is an album video!
+            if ($type == 'album') {
+                // NOTE: Videos in albums don't need per-video configuration, so
+                // the above call just took care of uploading our thumbnail. But
+                // we don't need to do anything more here if this is for an album!
+                return;
+            }
+
             //$this->parent->expose();
             if ($configure->getMessage() != 'Transcode timeout') {
                 break; // Success. Exit loop.
