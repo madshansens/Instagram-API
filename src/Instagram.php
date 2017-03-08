@@ -1501,8 +1501,8 @@ class Instagram
     public function getTagRelated($tag)
     {
         return $this->request("tags/$tag/related")
-        ->addParams('visited', urlencode('[{"id":"'.$tag.'","type":"hashtag"}]'))
-        ->addParams('related_types', urlencode('["hashtag"]'))
+        ->addParams('visited', '[{"id":"'.$tag.'","type":"hashtag"}]')
+        ->addParams('related_types', '["hashtag"]')
         ->getResponse(new TagRelatedResponse());
     }
 
