@@ -13,4 +13,8 @@ class LikeFeedResponse extends Response
     public $patches;
     public $last_counted_at;
     public $num_results;
+    /**
+     * @var string
+     */
+    public $next_max_id;
 }

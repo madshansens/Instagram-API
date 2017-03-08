@@ -21,4 +21,5 @@ class FeedAysf extends Response
     public $display_new_unit;
     public $fetch_user_details;
     public $title;
+    public $activator;
 }
