@@ -536,7 +536,7 @@ class Instagram
                 $media[$key]['upload'] = $this->http->uploadPhoto($item['file'], null, true);
                 break;
             case 'video':
-                // TODO: IMPLEMENT VIDEO UPLOADS
+                $media[$key]['upload'] = $this->http->uploadVideo($item['file'], null, 'album');
                 break;
             default:
                 throw new InstagramException(sprintf('Unsupported album media type "%s".', $item['type']), ErrorCode::INTERNAL_INVALID_ARGUMENT);
@@ -625,17 +625,19 @@ class Instagram
      *
      * @param string $videoFilename The video filename.
      * @param string $caption       Caption to use for the video.
-     * @param bool   $story         Is the photo intended for a story?
-     * @param null   $reel_mentions
+     * @param string $type          What type of video ("timeline", "story" or "album").
+     * @param null   $reel_mentions ? TODO: document this
      * @param string $customPreview Optional path to custom video thumbnail.
      *                              If nothing provided, we generate from video.
      * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
      *
-     * @return mixed
+     * @throws InstagramException
+     *
+     * @return ConfigureVideoResponse
      */
-    public function uploadVideo($videoFilename, $caption = null, $story = false, $reel_mentions = null, $customPreview = null, $maxAttempts = 4)
+    public function uploadVideo($videoFilename, $caption = null, $type = 'timeline', $reel_mentions = null, $customPreview = null, $maxAttempts = 4)
     {
-        return $this->http->uploadVideo($videoFilename, $caption, $story, $reel_mentions, $customPreview, $maxAttempts);
+        return $this->http->uploadVideo($videoFilename, $caption, $type, $reel_mentions, $customPreview, $maxAttempts);
     }
 
     /**
@@ -738,22 +740,28 @@ class Instagram
 
     /**
      * @param $upload_id
-     * @param $video
+     * @param $videoFilename
      * @param string $caption
-     * @param bool   $story
+     * @param string $type          What type of video ("timeline", "story" or "album").
      * @param null   $reel_mentions
      * @param null   $customPreview
      *
      * @return ConfigureVideoResponse
      */
-    public function configureVideo($upload_id, $video, $caption = '', $story = false, $reel_mentions = null, $customPreview = null)
+    public function configureVideo($upload_id, $videoFilename, $caption = '', $type = 'timeline', $reel_mentions = null, $customPreview = null)
     {
-        $this->http->uploadPhoto($video, $upload_id, false, false, $customPreview);
+        $this->http->uploadPhoto($videoFilename, $upload_id, false, false, $customPreview);
 
-        if ($story) {
-            $endpoint = 'media/configure_to_reel/';
-        } else {
+        switch ($type) {
+        case 'timeline':
             $endpoint = 'media/configure/';
+            break;
+        case 'story':
+            $endpoint = 'media/configure_to_reel/';
+            break;
+        case 'album':
+            // TODO: IMPLEMENT VIDEO CONFIGURATION!
+            break;
         }
 
         $requestData = $this->request($endpoint)
@@ -786,7 +794,7 @@ class Instagram
         // TODO
         // Reel Mention example --> build with user id
         // [{\"y\":0.3407772676161919,\"rotation\":0,\"user_id\":\"USER_ID\",\"x\":0.39892578125,\"width\":0.5619921875,\"height\":0.06011525487256372}]
-        if ($story) {
+        if ($type == 'story') {
             $requestData->addPost('story_media_creation_date', time());
             if (!is_null($reel_mentions)) {
                 //$requestData->addPost('reel_mentions', $reel_mention)

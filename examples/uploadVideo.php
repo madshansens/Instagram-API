@@ -30,7 +30,7 @@ try {
     $i->uploadVideo($videoFilename, $caption);
     // or...
     // Example of using 8 retries instead of the default amount:
-    // $i->uploadVideo($video, $caption, null, 8);
+    // $i->uploadVideo($video, $caption, 'timeline', null, null, 8);
 } catch (Exception $e) {
     echo $e->getMessage();
 }

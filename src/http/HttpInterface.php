@@ -763,7 +763,7 @@ class HttpInterface
      *
      * @param string $videoFilename The video filename.
      * @param string $caption       Caption to use for the video.
-     * @param bool   $story         Whether this upload will be used in a story.
+     * @param string $type          What type of video ("timeline", "story" or "album").
      * @param null   $reel_mentions ? TODO: document this
      * @param string $customPreview Optional path to custom video thumbnail.
      *                              If nothing provided, we generate from video.
@@ -773,7 +773,7 @@ class HttpInterface
      *
      * @return ConfigureVideoResponse
      */
-    public function uploadVideo($videoFilename, $caption = null, $story = false, $reel_mentions = null, $customPreview = null, $maxAttempts = 4)
+    public function uploadVideo($videoFilename, $caption = null, $type = 'timeline', $reel_mentions = null, $customPreview = null, $maxAttempts = 4)
     {
         $this->throwIfNotLoggedIn();
 
@@ -799,7 +799,7 @@ class HttpInterface
 
         // Configure the uploaded video and attach it to our timeline.
         for ($attempt = 1; $attempt <= 4; ++$attempt) {
-            $configure = $this->parent->configureVideo($uploadParams['upload_id'], $videoFilename, $caption, $story, $customPreview);
+            $configure = $this->parent->configureVideo($uploadParams['upload_id'], $videoFilename, $caption, $type, null, $customPreview);
             //$this->parent->expose();
             if ($configure->getMessage() != 'Transcode timeout') {
                 break; // Success. Exit loop.
