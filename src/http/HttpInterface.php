@@ -426,14 +426,14 @@ class HttpInterface
      * Converts a server response to a specific kind of result object.
      *
      * @param mixed $baseClass    An instance of a class object whose properties
-     *                          you want to fill from the $response.
+     *                            you want to fill from the $response.
      * @param mixed $response     A decoded JSON response from Instagram's server.
      * @param bool  $checkOk      Whether to throw exceptions if the server's
-     *                          response wasn't marked as OK by Instagram.
+     *                            response wasn't marked as OK by Instagram.
      * @param mixed $fullResponse The raw response object to provide in the
-     *                          "getFullResponse()" property. Set this to
-     *                          NULL to automatically use $response. That's
-     *                          almost always what you want to do!
+     *                            "getFullResponse()" property. Set this to
+     *                            NULL to automatically use $response. That's
+     *                            almost always what you want to do!
      *
      * @throws InstagramException
      *
@@ -1059,7 +1059,7 @@ class HttpInterface
      * @param bool   $assoc When TRUE, decode to associative array instead of object.
      *
      * @return object|array|null Object if assoc false, Array if assoc true,
-     *                         or NULL if unable to decode JSON.
+     *                           or NULL if unable to decode JSON.
      */
     public static function api_decode($json, $assoc = false)
     {

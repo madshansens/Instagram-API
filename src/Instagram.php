@@ -10,7 +10,6 @@ class Instagram
     public $debug;    // Debug
     public $truncatedDebug;
 
-
     /**
      * For internal use by Instagram-API developers!
      *
