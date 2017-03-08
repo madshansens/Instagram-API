@@ -271,7 +271,33 @@ class HttpInterface
     }
 
     /**
-     * Wraps Guzzle's request and adds special error handling.
+     * Helper which builds in the most important Guzzle options.
+     *
+     * Takes care of adding all critical options that we need on every request.
+     * Such as cookies and the user's proxy. But don't call this function
+     * manually. It's automatically called by guzzleRequest()!
+     *
+     * @param array $options The options specific to the current request.
+     *
+     * @return array A guzzle options array.
+     */
+    protected function buildGuzzleOptions(array $options)
+    {
+        $criticalOptions = [
+            'cookies' => ($this->jar instanceof CookieJar ? $this->jar : false),
+            'verify'  => $this->verifySSL,
+            'proxy'   => (!is_null($this->proxy) ? $this->proxy : null),
+        ];
+
+        // Critical options always overwrite identical keys in regular opts.
+        // This ensures that we can't screw up the proxy/verify/cookies.
+        $finalOptions = array_merge($options, $criticalOptions);
+
+        return $finalOptions;
+    }
+
+    /**
+     * Wraps Guzzle's request and adds special error handling and options.
      *
      * Automatically throws exceptions on certain very serious HTTP errors.
      * You must ALWAYS use this instead of the raw Guzzle Client! However,
@@ -292,6 +318,9 @@ class HttpInterface
      */
     protected function guzzleRequest($method, $uri, array $options = [])
     {
+        // Add critically important options for authenticating the request.
+        $options = $this->buildGuzzleOptions($options);
+
         // Attempt the request. Will throw in case of socket errors!
         $response = $this->client->request($method, $uri, $options);
 
@@ -336,17 +365,12 @@ class HttpInterface
             'Accept-Language'       => Constants::ACCEPT_LANGUAGE,
         ];
         $options = [
-            'cookies' => ($this->jar instanceof CookieJar ? $this->jar : false),
             'headers' => $headers,
-            'verify'  => $this->verifySSL,
         ];
         $method = 'GET';
         if ($postData) {
             $method = 'POST';
             $options['body'] = $postData;
-        }
-        if (!is_null($this->proxy)) {
-            $options['proxy'] = $this->proxy;
         }
 
         // Perform the API request.
@@ -489,7 +513,6 @@ class HttpInterface
         }
 
         $options = [
-            'cookies' => $cookieJar,
             'body'    => $data,
             'headers' => $headers,
         ];
@@ -590,14 +613,9 @@ class HttpInterface
             'Accept-Language' => 'en-en',
         ];
         $options = [
-            'cookies' => ($this->jar instanceof CookieJar ? $this->jar : false),
             'headers' => $headers,
-            'verify'  => $this->verifySSL,
             'body'    => $payload,
         ];
-        if (!is_null($this->proxy)) {
-            $options['proxy'] = $this->proxy;
-        }
 
         // Perform the "pre-upload" API request.
         $response = $this->guzzleRequest($method, Constants::API_URL.$endpoint, $options);
@@ -676,14 +694,9 @@ class HttpInterface
                     'job'                 => $uploadParams['job'],
                 ];
                 $options = [
-                    'cookies' => ($this->jar instanceof CookieJar ? $this->jar : false),
                     'headers' => $headers,
-                    'verify'  => $this->verifySSL,
                     'body'    => $chunkData,
                 ];
-                if (!is_null($this->proxy)) {
-                    $options['proxy'] = $this->proxy;
-                }
 
                 // Perform the upload of the current chunk.
                 $response = $this->guzzleRequest($method, $uploadParams['upload_url'], $options);
@@ -835,14 +848,9 @@ class HttpInterface
         ];
 
         $options = [
-            'cookies' => ($this->jar instanceof CookieJar ? $this->jar : false),
             'headers' => $headers,
-            'verify'  => $this->verifySSL,
             'body'    => $payload,
         ];
-        if (!is_null($this->proxy)) {
-            $options['proxy'] = $this->proxy;
-        }
 
         $response = $this->guzzleRequest('POST', Constants::API_URL.$endpoint, $options);
 
