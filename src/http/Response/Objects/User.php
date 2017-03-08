@@ -56,4 +56,10 @@ class User extends Response
     public $is_needy; // getUsernameInfo prop
     public $external_url; // getUsernameInfo prop
     public $external_lynx_url; // getUsernameInfo prop
+    public $email; // getProfileData prop
+    public $country_code; // getProfileData prop
+    public $birthday; // getProfileData prop
+    public $national_number; // getProfileData prop
+    public $gender; // getProfileData prop
+    public $phone_number; // getProfileData prop
 }
