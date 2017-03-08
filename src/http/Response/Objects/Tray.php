@@ -21,4 +21,9 @@ class Tray extends Response
     public $ranked_position;
     public $is_nux;
     public $muted;
+    public $prefetch_count;
+    /**
+     * @var Location
+     */
+    public $location;
 }

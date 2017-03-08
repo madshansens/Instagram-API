@@ -95,7 +95,23 @@ class Item extends Response
     public $media;
     public $stories;
     public $top_likers;
-
+    /**
+     * @var SuggestedUsers
+     */
+    public $suggested_users;
+    public $comment_likes_enabled;
+    public $can_viewer_save;
+    public $has_viewer_saved;
+    /**
+     * @var Location
+     */
+    public $location;
+    public $lat;
+    public $lng;
+    /**
+     * @var Location[]
+     */
+    public $story_locations;
     public function setMediaOrAd($params)
     {
         foreach ($params as $k => $v) {

@@ -12,4 +12,5 @@ class In extends Response
      * @var User
      */
     public $user;
+    public $time_in_video;
 }
