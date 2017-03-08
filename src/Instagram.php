@@ -631,7 +631,7 @@ class Instagram
      */
     public function direct_share($recipients, $media_id, $text = null)
     {
-        $this->http->direct_share($recipients, $media_id, $text);
+        $this->http->direct_share($recipients, $text, $media_id);
     }
 
     /**
@@ -642,7 +642,7 @@ class Instagram
      */
     public function direct_message($recipients, $text)
     {
-        $this->http->direct_share($recipients, null, $text);
+        $this->http->direct_share($recipients, $text);
     }
 
     /**

@@ -953,12 +953,12 @@ class HttpInterface
         ];
 
         // Peform the API request.
-        $response = $this->guzzleRequest($method, Constants::API_URL.$endpoint, $options);
+        $response = $this->guzzleRequest('POST', Constants::API_URL.$endpoint, $options);
         $body = $response->getBody()->getContents();
 
         // Debugging.
         if ($this->parent->debug) {
-            $this->printDebug($method, $endpoint, null, strlen($payload), $response, $body);
+            $this->printDebug('POST', $endpoint, null, strlen($payload), $response, $body);
         }
 
         return $this->getResponseWithResult(new Response(), json_decode($body));
