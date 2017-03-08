@@ -762,6 +762,8 @@ class Instagram
         case 'album':
             // TODO: IMPLEMENT VIDEO CONFIGURATION!
             break;
+        default:
+            throw new InstagramException('Invalid video type.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
         }
 
         $requestData = $this->request($endpoint)
