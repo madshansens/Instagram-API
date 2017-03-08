@@ -633,7 +633,9 @@ class Instagram
      *
      * @throws InstagramException
      *
-     * @return ConfigureVideoResponse|null NULL if type is album, otherwise response.
+     * @return ConfigureVideoResponse|UploadVideoResponse An upload response if
+     *                                                    type is album, otherwise
+     *                                                    configure response.
      */
     public function uploadVideo($videoFilename, $caption = null, $type = 'timeline', $reel_mentions = null, $customPreview = null, $maxAttempts = 4)
     {

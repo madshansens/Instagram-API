@@ -771,7 +771,9 @@ class HttpInterface
      *
      * @throws InstagramException
      *
-     * @return ConfigureVideoResponse|null NULL if type is album, otherwise response.
+     * @return ConfigureVideoResponse|UploadVideoResponse An upload response if
+     *                                                    type is album, otherwise
+     *                                                    configure response.
      */
     public function uploadVideo($videoFilename, $caption = null, $type = 'timeline', $reel_mentions = null, $customPreview = null, $maxAttempts = 4)
     {
@@ -806,7 +808,7 @@ class HttpInterface
                 // NOTE: Videos in albums don't need per-video configuration, so
                 // the above call just took care of uploading our thumbnail. But
                 // we don't need to do anything more here if this is for an album!
-                return;
+                return $upload; // UploadVideoResponse
             }
 
             //$this->parent->expose();
@@ -817,7 +819,7 @@ class HttpInterface
             }
         }
 
-        return $configure;
+        return $configure; // ConfigureVideoResponse
     }
 
     /**
