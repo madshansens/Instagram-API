@@ -6,7 +6,7 @@ class SettingsAdapter
 {
     protected function getCmdOptions(array $longOpts)
     {
-        $cmdOptions = getopt(null, $longOpts);
+        $cmdOptions = getopt('', $longOpts);
 
         if (!is_array($cmdOptions)) {
             $cmdOptions = [];
