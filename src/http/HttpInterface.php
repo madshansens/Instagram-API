@@ -162,6 +162,9 @@ class HttpInterface
 
     /**
      * Tells current settings adapter to store cookies if necessary.
+     *
+     * There is no need to call this function manually. It's automatically
+     * called by guzzleRequest()!
      */
     public function saveCookieJar()
     {
@@ -347,6 +350,9 @@ class HttpInterface
             break;
         }
 
+        // Save the new, most up-to-date cookies.
+        $this->saveCookieJar();
+
         // The response may still have serious but "valid response" errors, such
         // as "400 Bad Request". But it's up to the CALLER to handle those!
         return $response;
@@ -404,9 +410,6 @@ class HttpInterface
         if ($this->parent->debug) {
             $this->printDebug($method, $endpoint, $postData, null, $response, $body);
         }
-
-        // Save current cookies.
-        $this->saveCookieJar();
 
         return [$csrftoken, $result];
     }
@@ -784,9 +787,6 @@ class HttpInterface
                 sleep(1); // Wait a little before the next retry.
             }
         }
-
-        // Save current cookies.
-        $this->saveCookieJar();
 
         return $configure;
     }
