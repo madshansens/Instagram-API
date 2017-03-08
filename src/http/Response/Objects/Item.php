@@ -112,6 +112,7 @@ class Item extends Response
      * @var Location[]
      */
     public $story_locations;
+
     public function setMediaOrAd($params)
     {
         foreach ($params as $k => $v) {
