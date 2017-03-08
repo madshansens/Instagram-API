@@ -59,7 +59,7 @@ class ErrorCode
     const INTERNAL_CSRF_TOKEN_ERROR = 103;
     const INTERNAL_SETTINGS_ERROR = 104;
     const INTERNAL_API_THROTTLED = 105;
-    const INTERNAL_HTTP_NOTFOUND = 106;
+    // const INTERNAL_HTTP_NOTFOUND = 106; // NOT USED! See HttpInterface for reason.
     const INTERNAL_UPLOAD_FAILED = 107;
 }
 

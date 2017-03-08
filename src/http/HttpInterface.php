@@ -325,8 +325,7 @@ class HttpInterface
      * @param array  $options Request options to apply.
      *
      * @throws InstagramException                    with code INTERNAL_API_THROTTLED
-     *                                               when throttled, or INTERNAL_HTTP_NOTFOUND
-     *                                               if the requested URI was not found.
+     *                                               when throttled by Instagram.
      * @throws \GuzzleHttp\Exception\GuzzleException for any socket related errors.
      *
      * @return \Psr\Http\Message\ResponseInterface
@@ -345,9 +344,18 @@ class HttpInterface
         case 429: // "429 Too Many Requests"
             throw new InstagramException('Throttled by Instagram because of too many API requests.', ErrorCode::INTERNAL_API_THROTTLED);
             break;
-        case 404: // "404 Not Found"
-            throw new InstagramException("The requested URL was not found (\"{$uri}\").", ErrorCode::INTERNAL_HTTP_NOTFOUND);
-            break;
+        // NOTE: Detecting "404" errors was intended to help us detect when API
+        // endpoints change. But it turns out that A) Instagram uses "valid" 404
+        // status codes in actual API replies to indicate "user not found" and
+        // similar states for various lookup functions. So we can't die on 404,
+        // since "404" API calls actually succeeded in most cases. And B) Their
+        // API doesn't 404 if you try an invalid endpoint URL. Instead, it just
+        // redirects you to their official homepage. So catching 404 is both
+        // pointless and harmful. This is a warning to future contributors!
+        // ---
+        // case 404: // "404 Not Found"
+        //     throw new InstagramException("The requested URL was not found (\"{$uri}\").", ErrorCode::INTERNAL_HTTP_NOTFOUND);
+        //     break;
         }
 
         // Save the new, most up-to-date cookies.
