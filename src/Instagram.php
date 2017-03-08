@@ -561,7 +561,6 @@ class Instagram
                     'source_type'         => 0,
                     'scene_capture_type'  => 'standard',
                     'date_time_digitized' => $date,
-                    'software'            => '10.2',
                     'geotag_enabled'      => false,
                     'camera_position'     => 'back',
                     'edits', [
@@ -577,7 +576,27 @@ class Instagram
                 $uploadRequests[] = $photoConfig;
                 break;
             case 'video':
-                // TODO: IMPLEMENT VIDEO CONFIG
+                $videoConfig = [
+                    //'length'              => 0.00,
+                    'date_time_original'  => $date,
+                    'scene_type'          => 1,
+                    'poster_frame_index'  => 0,
+                    'trim_type'           => 0,
+                    'disable_comments'    => false,
+                    'upload_id'           => $item['upload']->getUploadId(),
+                    'source_type'         => 'library',
+                    'geotag_enabled'      => false,
+                    'edits', [
+                        //'length'          => 0.00,
+                        'cinema'          => 'unsupported',
+                        'original_length' => 0.00,
+                        'source_type'     => 'library',
+                        'start_time'      => 0,
+                        'camera_position' => 'unknown',
+                        'trim_type'       => 0
+                    ],
+                ];
+                $uploadRequests[] = $videoConfig;
                 break;
             }
         }
@@ -844,22 +863,7 @@ class Instagram
         ->addPost('source_type', 4)
         ->addPost('_uid', $this->username_id)
         ->addPost('_uuid', $this->uuid)
-        ->addPost('caption', $caption)
-        ->addPost('device', [
-            'manufacturer'    => $this->settings->get('manufacturer'),
-            'model'           => $this->settings->get('model'),
-            'android_version' => Constants::ANDROID_VERSION,
-            'android_release' => Constants::ANDROID_RELEASE,
-        ])
-        ->addPost('edits', [
-            'crop_original_size' => [$size, $size],
-            'crop_center'        => [0, 0],
-            'crop_zoom'          => 1,
-        ])
-        ->addPost('extra', [
-            'source_width'  => $size,
-            'source_height' => $size,
-        ]);
+        ->addPost('caption', $caption);
 
         if ($album) {
             $requestData->addPost('client_sidecar_id', Utils::generateUploadId())
