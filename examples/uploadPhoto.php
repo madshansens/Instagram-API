@@ -25,7 +25,7 @@ try {
 }
 
 try {
-    $i->uploadPhoto($photo, $caption);
+    $i->uploadTimelinePhoto($photo, $caption);
 } catch (Exception $e) {
     echo $e->getMessage();
 }

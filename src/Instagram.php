@@ -474,38 +474,57 @@ class Instagram
     }
 
     /**
-     * Upload photo to Instagram.
-     *
-     * @param string $photo     Path to your photo
-     * @param bool   $story     Is the photo intended for a story?
-     * @param string $caption   Caption to be included in your photo
-     * @param null   $location
-     * @param null   $upload_id
-     * @param null   $filter
-     *
-     * @throws InstagramException
-     *
-     * @return Upload data
+     * INTERNAL.
      */
-    public function uploadPhoto($photo, $story = false, $caption = null, $location = null, $upload_id = null, $filter = null)
+    protected function _uploadPhoto($type, $photoFilename, $caption = null, $location = null, $filter = null)
     {
-        $upload = $this->http->uploadPhoto($photo, $upload_id);
+        $upload = $this->http->uploadPhoto($photoFilename, 'photofile', 'timeline');
 
         if (!$upload->isOk()) {
             throw new InstagramException($upload->getMessage());
         }
 
-        if ($story) {
-            $configure = $this->configure($upload->getUploadId(), $photo, $caption, $location, false, true, $filter);
-        } else {
-            $configure = $this->configure($upload->getUploadId(), $photo, $caption, $location, false, false, $filter);
-        }
+        $configure = $this->configure($upload->getUploadId(), $photoFilename, $caption, $location, false, ($type == 'story' ? true : false), $filter);
 
         if (!$configure->isOk()) {
             throw new InstagramException($configure->getMessage());
         }
 
         return $configure;
+    }
+
+    /**
+     * Uploads a photo to your Instagram timeline.
+
+     * @param string $photoFilename The photo filename.
+     * @param string $caption       Caption for your photo
+     * @param null   $location
+     * @param null   $filter
+     *
+     * @throws InstagramException
+     *
+     * @return ConfigureResponse
+     */
+    public function uploadTimelinePhoto($photoFilename, $caption = null, $location = null, $filter = null)
+    {
+        return $this->_uploadPhoto('timeline', $photoFilename, $caption, $location, $filter);
+    }
+
+    /**
+     * Uploads a photo to your Instagram story.
+     *
+     * @param $photoFilename
+     * @param null $caption
+     * @param null $location
+     * @param null $filter
+     *
+     * @throws InstagramException
+     *
+     * @return ConfigureResponse
+     */
+    public function uploadStoryPhoto($photoFilename, $caption = null, $location = null, $filter = null)
+    {
+        return $this->_uploadPhoto('story', $photoFilename, $caption, $location, $filter);
     }
 
     /**
@@ -533,7 +552,7 @@ class Instagram
 
             switch ($item['type']) {
             case 'photo':
-                $media[$key]['upload'] = $this->http->uploadPhoto($item['file'], null, true);
+                $media[$key]['upload'] = $this->http->uploadPhoto($item['file'], 'photofile', 'album');
                 break;
             case 'video':
                 $media[$key]['upload'] = $this->http->uploadVideo($item['file'], null, 'album');
@@ -604,33 +623,6 @@ class Instagram
         // TODO: THIS SEEMS BUGGED TO ME. Why is it only using the last item's
         // "file" value when configuring a whole array of uploadRequests?
         $configure = $this->configure($uploadRequests, $item['file'], $caption, $location, true, false, $filter);
-
-        if (!$configure->isOk()) {
-            throw new InstagramException($configure->getMessage());
-        }
-
-        return $configure;
-    }
-
-    /**
-     * @param $photo
-     * @param null $caption
-     * @param null $location
-     * @param null $filter
-     *
-     * @throws InstagramException
-     *
-     * @return ConfigureResponse
-     */
-    public function uploadPhotoStory($photo, $caption = null, $location = null, $filter = null)
-    {
-        $upload = $this->http->uploadPhoto($photo, null, false);
-
-        if (!$upload->isOk()) {
-            throw new InstagramException($upload->getMessage());
-        }
-
-        $configure = $this->configure($upload->getUploadId(), $photo, $caption, $location, false, true, $filter);
 
         if (!$configure->isOk()) {
             throw new InstagramException($configure->getMessage());
@@ -771,7 +763,7 @@ class Instagram
      */
     public function configureVideo($upload_id, $videoFilename, $caption = '', $type = 'timeline', $reel_mentions = null, $customPreview = null)
     {
-        $this->http->uploadPhoto($videoFilename, $upload_id, false, false, $customPreview);
+        $this->http->uploadPhoto($videoFilename, 'videofile', $type, $upload_id);
 
         switch ($type) {
         case 'timeline':
