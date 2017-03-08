@@ -58,9 +58,9 @@ class SettingsFile
      */
     public function maybeLoggedIn()
     {
-        return (file_exists($this->cookiesPath)
+        return file_exists($this->cookiesPath)
                 && $this->get('username_id') !== null
-                && $this->get('token') !== null);
+                && $this->get('token') !== null;
     }
 
     /**
@@ -77,16 +77,16 @@ class SettingsFile
             return $this->sets; // Return 'sets' itself which contains all data.
         }
 
-        return (isset($this->sets[$key])
+        return isset($this->sets[$key])
                 ? $this->sets[$key]
-                : $default);
+                : $default;
     }
 
     /**
      * Store a settings value.
      *
-     * @param string $key     Name of setting.
-     * @param string $value   The data to store. Must be castable to string.
+     * @param string $key   Name of setting.
+     * @param string $value The data to store. Must be castable to string.
      */
     public function set($key, $value)
     {
@@ -128,7 +128,7 @@ class SettingsFile
                     // stored in our internal "sets" array, so that it gets written
                     // back to disk and won't get discarded. But the leading "#"
                     // ensures that we won't use the setting-value internally!
-                    if( preg_match( '/^([^=]+)=(.*)$/', $line, $matches ) ) {
+                    if (preg_match('/^([^=]+)=(.*)$/', $line, $matches)) {
                         $key = $matches[1];
                         $value = $matches[2];
 
@@ -175,21 +175,21 @@ class SettingsFile
      *
      * @return mixed Number of bytes written on success, otherwise FALSE.
      */
-    private function atomicwrite($filename, $data, $atomicSuffix = 'atomictmp' )
+    private function atomicwrite($filename, $data, $atomicSuffix = 'atomictmp')
     {
         // Perform an exclusive (locked) overwrite to a temporary file.
-        $filenameTmp = sprintf( '%s.%s', $filename, $atomicSuffix );
-        $writeResult = @file_put_contents( $filenameTmp, $data, LOCK_EX );
-        if( $writeResult !== FALSE ) {
+        $filenameTmp = sprintf('%s.%s', $filename, $atomicSuffix);
+        $writeResult = @file_put_contents($filenameTmp, $data, LOCK_EX);
+        if ($writeResult !== false) {
             // Now move the file to its real destination (replaced if exists).
-            $moveResult = @rename( $filenameTmp, $filename );
-            if( $moveResult === TRUE ) {
+            $moveResult = @rename($filenameTmp, $filename);
+            if ($moveResult === true) {
                 // Successful write and move. Return number of bytes written.
                 return $writeResult;
             }
         }
 
-        return FALSE; // Failed.
+        return false; // Failed.
     }
 
     /**
