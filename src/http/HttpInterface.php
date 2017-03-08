@@ -399,6 +399,17 @@ class HttpInterface
         return [$csrftoken, $result];
     }
 
+    /**
+     * Converts a server response to a specific kind of result object.
+     *
+     * @param mixed $obj      An instance of a class object that you want to
+     *                        fill from the response.
+     * @param mixed $response The decoded JSON object from the server response.
+     *
+     * @throws InstagramException
+     *
+     * @return mixed
+     */
     public function getResponseWithResult($obj, $response)
     {
         if (is_null($response)) {
@@ -742,7 +753,7 @@ class HttpInterface
         // Verify that the chunked upload was successful.
         $upload = $this->getResponseWithResult(new UploadVideoResponse(), json_decode($body));
         if (!is_null($upload->getMessage())) {
-            throw new InstagramException($upload->getMessage()."\n");
+            throw new InstagramException($upload->getMessage());
         }
 
         return $upload;
@@ -753,11 +764,15 @@ class HttpInterface
      *
      * @param string $videoFilename The video filename.
      * @param string $caption       Caption to use for the video.
+     * @param bool   $story         Whether this upload will be used in a story.
+     * @param null   $reel_mentions ? TODO: document this
      * @param string $customPreview Optional path to custom video thumbnail.
      *                              If nothing provided, we generate from video.
      * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
      *
      * @throws InstagramException
+     *
+     * @return ConfigureVideoResponse
      */
     public function uploadVideo($videoFilename, $caption = null, $story = false, $reel_mentions = null, $customPreview = null, $maxAttempts = 4)
     {
@@ -800,13 +815,22 @@ class HttpInterface
         return $configure;
     }
 
-    public function changeProfilePicture($photo)
+    /**
+     * Change your profile picture.
+     *
+     * @param string $photoPath The path to a photo file.
+     *
+     * @throws InstagramException
+     *
+     * @return User
+     */
+    public function changeProfilePicture($photoPath)
     {
         $this->throwIfNotLoggedIn();
 
         $endpoint = 'accounts/change_profile_picture/';
 
-        if (is_null($photo)) {
+        if (is_null($photoPath)) {
             throw new InstagramException('No photo path provided.');
         }
 
@@ -831,7 +855,7 @@ class HttpInterface
             [
                 'type'     => 'form-data',
                 'name'     => 'profile_pic',
-                'data'     => file_get_contents($photo),
+                'data'     => file_get_contents($photoPath),
                 'filename' => 'profile_pic',
                 'headers'  => [
                     'Content-Type: application/octet-stream',
@@ -856,7 +880,7 @@ class HttpInterface
             'body'    => $payload,
         ];
 
-        // Peform the API request.
+        // Perform the API request.
         $response = $this->guzzleRequest($method, Constants::API_URL.$endpoint, $options);
         $body = $response->getBody()->getContents();
 
@@ -868,76 +892,104 @@ class HttpInterface
         return $this->getResponseWithResult(new User(), json_decode($body));
     }
 
-    public function direct_share($recipients, $text = null, $media_id = null, $photo = null)
+    /**
+     * Perform a direct media share to specific users.
+     *
+     * @param string $shareType           Either "share", "message" or "photo".
+     * @param string[]|string $recipients Either a single recipient or an array
+     *                                    of multiple recipient strings.
+     * @param array $shareData            Depends on shareType: "share" uses
+     *                                    "text" and "media_id". "message" uses
+     *                                    "text". "photo" uses "text" and "filepath".
+     *
+     * @throws InstagramException
+     *
+     * @return Response
+     */
+    public function directShare($shareType, $recipients, array $shareData)
     {
-        if (!is_null($media_id)) {
+        $this->throwIfNotLoggedIn();
+
+        // Determine which endpoint to use and validate input.
+        switch ($shareType) {
+        case 'share':
             $endpoint = 'direct_v2/threads/broadcast/media_share/?media_type=photo';
-        } elseif (!is_null($photo)) {
-            $endpoint = 'direct_v2/threads/broadcast/upload_photo/';
-            $photoData = file_get_contents($photo);
-        } else {
+            if ((!isset($shareData['text']) || is_null($shareData['text']))
+                && (!isset($shareData['media_id']) || is_null($shareData['media_id']))) {
+                throw new InstagramException('You must provide either a text message or a media id.');
+            }
+            break;
+        case 'message':
             $endpoint = 'direct_v2/threads/broadcast/text/';
+            if (!isset($shareData['text']) || is_null($shareData['text'])) {
+                throw new InstagramException('No text message provided.');
+            }
+            break;
+        case 'photo':
+            $endpoint = 'direct_v2/threads/broadcast/upload_photo/';
+            if (!isset($shareData['filepath']) || is_null($shareData['filepath'])) {
+                throw new InstagramException('No photo path provided.');
+            }
+            break;
         }
 
-        if (is_null($text) && is_null($media_id)) {
-            throw new InstagramException('No text or media was set.');
-        }
-
-
+        // Build the list of direct-share recipients.
         if (!is_array($recipients)) {
             $recipients = [$recipients];
         }
+        $recipient_users = '"'.implode('","', $recipients).'"';
 
-        $string = [];
-        foreach ($recipients as $recipient) {
-            $string[] = "\"$recipient\"";
-        }
-
-        $recipient_users = implode(',', $string);
-
+        // Prepare payload for the direct-share request.
+        // WARNING: EDIT THIS *VERY CAREFULLY* IN THE FUTURE!
+        // THE DIRECT-SHARE REQUESTS USE A LOT OF IDENTICAL DATA,
+        // SO WE CONSTRUCT THEIR FINAL $bodies STEP BY STEP TO AVOID
+        // CODE REPETITION. BUT RECKLESS FUTURE CHANGES BELOW COULD
+        // BREAK *ALL* REQUESTS IF YOU ARE NOT *VERY* CAREFUL!!!
         $boundary = $this->parent->uuid;
-        $bodies = [
-            [
+        $bodies = [];
+        if ($shareType == 'share') {
+            $bodies[] = [
                 'type' => 'form-data',
                 'name' => 'media_id',
-                'data' => $media_id,
-            ],
-            [
-                'type' => 'form-data',
-                'name' => 'recipient_users',
-                'data' => "[[$recipient_users]]",
-            ],
-            [
-                'type' => 'form-data',
-                'name' => 'client_context',
-                'data' => $this->parent->uuid,
-            ],
-            [
-                'type' => 'form-data',
-                'name' => 'thread_ids',
-                'data' => '["0"]',
-            ],
-            [
-                'type' => 'form-data',
-                'name' => 'text',
-                'data' => is_null($text) ? '' : $text,
-            ],
-        ];
-
-        if (!is_null($photo)) {
-            $bodies[] = [
-                            'type'     => 'form-data',
-                            'name'     => 'photo',
-                            'data'     => $photoData,
-                            'filename' => 'photo',
-                            'headers'  => [
-                                'Content-Type: '.mime_content_type($photo),
-                                'Content-Transfer-Encoding: binary',
-                            ],
-                        ];
+                'data' => $shareData['media_id'],
+            ];
         }
-
+        $bodies[] = [
+            'type' => 'form-data',
+            'name' => 'recipient_users',
+            'data' => "[[{$recipient_users}]]",
+        ];
+        $bodies[] = [
+            'type' => 'form-data',
+            'name' => 'client_context',
+            'data' => $boundary,
+        ];
+        $bodies[] = [
+            'type' => 'form-data',
+            'name' => 'thread_ids',
+            'data' => '["0"]',
+        ];
+        if ($shareType == 'photo') {
+            $bodies[] = [
+                'type'     => 'form-data',
+                'name'     => 'photo',
+                'data'     => file_get_contents($shareData['filepath']),
+                'filename' => 'photo',
+                'headers'  => [
+                    'Content-Type: '.mime_content_type($shareData['filepath']),
+                    'Content-Transfer-Encoding: binary',
+                ],
+            ];
+        }
+        $bodies[] = [
+            'type' => 'form-data',
+            'name' => 'text',
+            'data' => (!isset($shareData['text']) || is_null($shareData['text']) ? '' : $shareData['text']),
+        ];
         $payload = $this->buildBody($bodies, $boundary);
+
+        // Build the request options.
+        $method = 'POST';
         $headers = [
             'User-Agent'       => $this->userAgent,
             'Proxy-Connection' => 'keep-alive',
@@ -946,25 +998,38 @@ class HttpInterface
             'Content-Type'     => 'multipart/form-data; boundary='.$boundary,
             'Accept-Language'  => 'en-en',
         ];
-
         $options = [
             'headers' => $headers,
             'body'    => $payload,
         ];
 
-        // Peform the API request.
-        $response = $this->guzzleRequest('POST', Constants::API_URL.$endpoint, $options);
+        // Perform the API request.
+        $response = $this->guzzleRequest($method, Constants::API_URL.$endpoint, $options);
         $body = $response->getBody()->getContents();
 
         // Debugging.
         if ($this->parent->debug) {
-            $this->printDebug('POST', $endpoint, null, strlen($payload), $response, $body);
+            $this->printDebug($method, $endpoint, null, strlen($payload), $response, $body);
         }
 
-        return $this->getResponseWithResult(new Response(), json_decode($body));
+        // Verify that the direct-share upload was successful.
+        $upload = $this->getResponseWithResult(new Response(), json_decode($body));
+        if (!is_null($upload->getMessage())) {
+            throw new InstagramException($upload->getMessage());
+        }
+
+        return $upload;
     }
 
-    protected function buildBody($bodies, $boundary)
+    /**
+     * Internal helper for building a proper request body.
+     *
+     * @param array $bodies
+     * @param string $boundary
+     *
+     * @return string
+     */
+    protected function buildBody(array $bodies, $boundary)
     {
         $body = '';
         foreach ($bodies as $b) {

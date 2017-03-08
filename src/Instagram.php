@@ -629,9 +629,16 @@ class Instagram
      * @param $media_id
      * @param null $text
      */
-    public function direct_share($recipients, $media_id, $text = null)
+    public function directShare($recipients, $media_id, $text = null)
     {
-        $this->http->direct_share($recipients, $text, $media_id);
+        $this->http->directShare(
+            'share',
+            $recipients,
+            [
+                'text' => $text,
+                'media_id' => $media_id,
+            ]
+        );
     }
 
     /**
@@ -640,9 +647,15 @@ class Instagram
      * @param array|int $recipients Users id
      * @param string    $text       Text message
      */
-    public function direct_message($recipients, $text)
+    public function directMessage($recipients, $text)
     {
-        $this->http->direct_share($recipients, $text);
+        $this->http->directShare(
+            'message',
+            $recipients,
+            [
+                'text' => $text,
+            ]
+        );
     }
 
     /**
@@ -652,9 +665,16 @@ class Instagram
      * @param string    $filepath   Location of photo to upload
      * @param string    $text       Text message
      */
-    public function direct_photo($recipients, $filepath, $text = null)
+    public function directPhoto($recipients, $filepath, $text = null)
     {
-        $this->http->direct_share($recipients, $text, null, $filepath);
+        $this->http->directShare(
+            'photo',
+            $recipients,
+            [
+                'text' => $text,
+                'filepath' => $filepath,
+            ]
+        );
     }
 
     /**
