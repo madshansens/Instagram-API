@@ -868,8 +868,22 @@ class HttpInterface
         return $this->getResponseWithResult(new User(), json_decode($body));
     }
 
-    public function direct_share($media_id, $recipients, $text = null)
+    public function direct_share($recipients, $text = null, $media_id = null, $photo = null)
     {
+        if (!is_null($media_id)) {
+            $endpoint = 'direct_v2/threads/broadcast/media_share/?media_type=photo';
+        } elseif (!is_null($photo)) {
+            $endpoint = 'direct_v2/threads/broadcast/upload_photo/';
+            $photoData = file_get_contents($photo);
+        } else {
+            $endpoint = 'direct_v2/threads/broadcast/text/';
+        }
+
+        if (is_null($text) && is_null($media_id)) {
+            throw new InstagramException('No text or media was set.');
+        }
+
+
         if (!is_array($recipients)) {
             $recipients = [$recipients];
         }
@@ -881,7 +895,6 @@ class HttpInterface
 
         $recipient_users = implode(',', $string);
 
-        $endpoint = 'direct_v2/threads/broadcast/media_share/?media_type=photo';
         $boundary = $this->parent->uuid;
         $bodies = [
             [
@@ -911,299 +924,45 @@ class HttpInterface
             ],
         ];
 
-        $data = $this->buildBody($bodies, $boundary);
+        if (!is_null($photo)) {
+            $bodies[] = [
+                            'type'     => 'form-data',
+                            'name'     => 'photo',
+                            'data'     => $photoData,
+                            'filename' => 'photo',
+                            'headers'  => [
+                                'Content-Type: '.mime_content_type($photo),
+                                'Content-Transfer-Encoding: binary',
+                            ],
+                        ];
+        }
+
+        $payload = $this->buildBody($bodies, $boundary);
         $headers = [
-            'Proxy-Connection: keep-alive',
-            'Connection: keep-alive',
-            'Accept: */*',
-            'Content-Type: multipart/form-data; boundary='.$boundary,
-            'Accept-Language: en-en',
+            'User-Agent'       => $this->userAgent,
+            'Proxy-Connection' => 'keep-alive',
+            'Connection'       => 'keep-alive',
+            'Accept'           => '*/*',
+            'Content-Type'     => 'multipart/form-data; boundary='.$boundary,
+            'Accept-Language'  => 'en-en',
         ];
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
-        curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_VERBOSE, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        if ($this->parent->settingsAdapter['type'] == 'file') {
-            curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
-            curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
-        } else {
-            $cookieJar = $this->parent->settings->get('cookies');
-            $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
+        $options = [
+            'headers' => $headers,
+            'body'    => $payload,
+        ];
 
-            file_put_contents($cookieJarFile, $cookieJar);
+        // Peform the API request.
+        $response = $this->guzzleRequest($method, Constants::API_URL.$endpoint, $options);
+        $body = $response->getBody()->getContents();
 
-            curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieJarFile);
-            curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieJarFile);
-        }
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-
-        if ($this->proxy) {
-            // TODO: rewrite to properly read proxy just like in request()
-        }
-
-        $resp = curl_exec($ch);
-        $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $header = substr($resp, 0, $header_len);
-        $upload = json_decode(substr($resp, $header_len), true);
-
+        // Debugging.
         if ($this->parent->debug) {
-            Debug::printRequest('POST', $endpoint);
-
-            $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
-            Debug::printUpload($uploadBytes);
-
-            $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            Debug::printHttpCode($httpCode, $bytes);
-            Debug::printResponse(substr($resp, $header_len));
+            $this->printDebug($method, $endpoint, null, strlen($payload), $response, $body);
         }
 
-        curl_close($ch);
-        if ($this->parent->settingsAdapter['type'] == 'mysql') {
-            $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set('cookies', $newCookies);
-        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
-            $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set('cookies', $newCookies);
-        }
-    }
-
-    public function direct_message($recipients, $text)
-    {
-        if (!is_array($recipients)) {
-            $recipients = [$recipients];
-        }
-
-        $string = [];
-        foreach ($recipients as $recipient) {
-            $string[] = "\"$recipient\"";
-        }
-
-        $recipient_users = implode(',', $string);
-
-        $endpoint = 'direct_v2/threads/broadcast/text/';
-        $boundary = $this->parent->uuid;
-        $bodies = [
-            [
-                'type' => 'form-data',
-                'name' => 'recipient_users',
-                'data' => "[[$recipient_users]]",
-            ],
-            [
-                'type' => 'form-data',
-                'name' => 'client_context',
-                'data' => $this->parent->uuid,
-            ],
-            [
-                'type' => 'form-data',
-                'name' => 'thread_ids',
-                'data' => '["0"]',
-            ],
-            [
-                'type' => 'form-data',
-                'name' => 'text',
-                'data' => is_null($text) ? '' : $text,
-            ],
-        ];
-
-        $data = $this->buildBody($bodies, $boundary);
-        $headers = [
-            'Proxy-Connection: keep-alive',
-            'Connection: keep-alive',
-            'Accept: */*',
-            'Content-Type: multipart/form-data; boundary='.$boundary,
-            'Accept-Language: en-en',
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
-        curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_VERBOSE, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        if ($this->parent->settingsAdapter['type'] == 'file') {
-            curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
-            curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
-        } else {
-            $cookieJar = $this->parent->settings->get('cookies');
-            $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
-
-            file_put_contents($cookieJarFile, $cookieJar);
-
-            curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieJarFile);
-            curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieJarFile);
-        }
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-
-        if ($this->proxy) {
-            // TODO: rewrite to properly read proxy just like in request()
-        }
-
-        $resp = curl_exec($ch);
-        $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $header = substr($resp, 0, $header_len);
-        $upload = $this->getResponseWithResult(new Response(), json_decode(substr($resp, $header_len)));
-
-        if (!$upload->isOk()) {
-            throw new InstagramException($upload->getMessage());
-            return;
-        }
-
-        if ($this->parent->debug) {
-            Debug::printRequest('POST', $endpoint);
-
-            $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
-            Debug::printUpload($uploadBytes);
-
-            $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            Debug::printHttpCode($httpCode, $bytes);
-            Debug::printResponse(substr($resp, $header_len));
-        }
-
-        curl_close($ch);
-        if ($this->parent->settingsAdapter['type'] == 'mysql') {
-            $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set('cookies', $newCookies);
-        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
-            $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set('cookies', $newCookies);
-        }
-    }
-
-    public function direct_photo($recipients, $filepath, $text)
-    {
-        if (!is_array($recipients)) {
-            $recipients = [$recipients];
-        }
-
-        $string = [];
-        foreach ($recipients as $recipient) {
-            $string[] = "\"$recipient\"";
-        }
-
-        $recipient_users = implode(',', $string);
-
-        $endpoint = 'direct_v2/threads/broadcast/upload_photo/';
-        $boundary = $this->parent->uuid;
-        $photo = file_get_contents($filepath);
-
-        $bodies = [
-            [
-                'type' => 'form-data',
-                'name' => 'recipient_users',
-                'data' => "[[$recipient_users]]",
-            ],
-            [
-                'type' => 'form-data',
-                'name' => 'client_context',
-                'data' => $this->parent->uuid,
-            ],
-            [
-                'type' => 'form-data',
-                'name' => 'thread_ids',
-                'data' => '["0"]',
-            ],
-            [
-                'type'     => 'form-data',
-                'name'     => 'photo',
-                'data'     => $photo,
-                'filename' => 'photo',
-                'headers'  => [
-                    'Content-Type: '.mime_content_type($filepath),
-                    'Content-Transfer-Encoding: binary',
-                ],
-            ],
-            [
-                'type' => 'form-data',
-                'name' => 'text',
-                'data' => is_null($text) ? '' : $text,
-            ],
-        ];
-
-        $data = $this->buildBody($bodies, $boundary);
-        $headers = [
-            'Proxy-Connection: keep-alive',
-            'Connection: keep-alive',
-            'Accept: */*',
-            'Content-Type: multipart/form-data; boundary='.$boundary,
-            'Content-Length: '.strlen($data),
-            'Connection: keep-alive',
-            'Accept-Language: en-en',
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, Constants::API_URL.$endpoint);
-        curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_VERBOSE, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        if ($this->parent->settingsAdapter['type'] == 'file') {
-            curl_setopt($ch, CURLOPT_COOKIEFILE, $this->parent->settings->cookiesPath);
-            curl_setopt($ch, CURLOPT_COOKIEJAR, $this->parent->settings->cookiesPath);
-        } else {
-            $cookieJar = $this->parent->settings->get('cookies');
-            $cookieJarFile = tempnam(sys_get_temp_dir(), uniqid('_instagram_cookie'));
-
-            file_put_contents($cookieJarFile, $cookieJar);
-
-            curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieJarFile);
-            curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieJarFile);
-        }
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-
-        if ($this->proxy) {
-            // TODO: rewrite to properly read proxy just like in request()
-        }
-
-        $resp = curl_exec($ch);
-        $header_len = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $header = substr($resp, 0, $header_len);
-        $upload = $this->getResponseWithResult(new Response(), json_decode(substr($resp, $header_len)));
-
-        if (!$upload->isOk()) {
-            throw new InstagramException($upload->getMessage());
-        }
-
-        if ($this->parent->debug) {
-            Debug::printRequest('POST', $endpoint);
-
-            $uploadBytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_UPLOAD));
-            Debug::printUpload($uploadBytes);
-
-            $bytes = Utils::formatBytes(curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD));
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            Debug::printHttpCode($httpCode, $bytes);
-            Debug::printResponse(substr($resp, $header_len));
-        }
-
-        curl_close($ch);
-        if ($this->parent->settingsAdapter['type'] == 'mysql') {
-            $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set('cookies', $newCookies);
-        } elseif ($this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
-            $newCookies = file_get_contents($cookieJarFile);
-            $this->parent->settings->set('cookies', $newCookies);
-        }
-    }
+        return $this->getResponseWithResult(new User(), json_decode($body));
+    }    
 
     protected function buildBody($bodies, $boundary)
     {

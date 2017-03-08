@@ -625,13 +625,13 @@ class Instagram
     }
 
     /**
-     * @param $media_id
      * @param $recipients
+     * @param $media_id
      * @param null $text
      */
-    public function direct_share($media_id, $recipients, $text = null)
+    public function direct_share($recipients, $media_id, $text = null)
     {
-        $this->http->direct_share($media_id, $recipients, $text);
+        $this->http->direct_share($recipients, $media_id, $text);
     }
 
     /**
@@ -642,7 +642,7 @@ class Instagram
      */
     public function direct_message($recipients, $text)
     {
-        $this->http->direct_message($recipients, $text);
+        $this->http->direct_share($recipients, null, $text);
     }
 
     /**
@@ -654,7 +654,7 @@ class Instagram
      */
     public function direct_photo($recipients, $filepath, $text)
     {
-        $this->http->direct_photo($recipients, $filepath, $text);
+        $this->http->direct_photo($recipients, $text, null, $filepath);
     }
 
     /**
