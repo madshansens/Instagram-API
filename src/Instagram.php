@@ -1142,7 +1142,7 @@ class Instagram
      */
     public function changeProfilePicture($photo)
     {
-        return new ProfileResponse($this->http->changeProfilePicture($photo));
+        return $this->http->changeProfilePicture($photo);
     }
 
     /**
