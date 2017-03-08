@@ -1157,7 +1157,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new ProfileResponse());
+        ->getResponse(new UsernameInfoResponse());
     }
 
     /**
@@ -1172,7 +1172,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new ProfileResponse());
+        ->getResponse(new UsernameInfoResponse());
     }
 
     /**
@@ -1187,13 +1187,13 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new ProfileResponse());
+        ->getResponse(new UsernameInfoResponse());
     }
 
     /**
      * Get personal profile data.
      *
-     * @return ProfileResponse
+     * @return UsernameInfoResponse
      */
     public function getProfileData()
     {
@@ -1202,7 +1202,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new ProfileResponse());
+        ->getResponse(new UsernameInfoResponse());
     }
 
     /**
@@ -1215,7 +1215,7 @@ class Instagram
      * @param string $email      Email. Required
      * @param int    $gender     Gender. male = 1 , female = 2, unknown = 3
      *
-     * @return ProfileResponse edit profile data
+     * @return UsernameInfoResponse edit profile data
      */
     public function editProfile($url, $phone, $first_name, $biography, $email, $gender)
     {
@@ -1230,7 +1230,7 @@ class Instagram
         ->addPost('biography', $biography)
         ->addPost('email', $email)
         ->addPost('gender', $gender)
-        ->getResponse(new ProfileResponse());
+        ->getResponse(new UsernameInfoResponse());
     }
 
     /**
