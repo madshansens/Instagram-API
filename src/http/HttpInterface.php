@@ -412,7 +412,7 @@ class HttpInterface
             }
         }
         $body = $response->getBody()->getContents();
-        $result = json_decode($body, $assoc, 512, JSON_BIGINT_AS_STRING);
+        $result = self::api_decode($body, $assoc);
 
         // Debugging.
         if ($this->parent->debug) {
@@ -425,33 +425,45 @@ class HttpInterface
     /**
      * Converts a server response to a specific kind of result object.
      *
-     * @param mixed $obj      An instance of a class object that you want to
-     *                        fill from the response.
-     * @param mixed $response The decoded JSON object from the server response.
+     * @param mixed $baseClass    An instance of a class object whose properties
+     *                          you want to fill from the $response.
+     * @param mixed $response     A decoded JSON response from Instagram's server.
+     * @param bool  $checkOk      Whether to throw exceptions if the server's
+     *                          response wasn't marked as OK by Instagram.
+     * @param mixed $fullResponse The raw response object to provide in the
+     *                          "getFullResponse()" property. Set this to
+     *                          NULL to automatically use $response. That's
+     *                          almost always what you want to do!
      *
      * @throws InstagramException
      *
      * @return mixed
      */
-    public function getResponseWithResult($obj, $response)
+    public function getMappedResponseObject($baseClass, $response, $checkOk = true, $fullResponse = null)
     {
         if (is_null($response)) {
             throw new InstagramException('No response from server. Either a connection or configuration error.', ErrorCode::EMPTY_RESPONSE);
         }
 
+        // Perform mapping.
         $mapper = new \JsonMapper();
-
         $mapper->bStrictNullTypes = false;
-        if (isset($_GET['debug'])) {
+        if ($this->parent->apiDeveloperDebug) {
+            // API developer debugging? Throws error if class lacks properties.
             $mapper->bExceptionOnUndefinedProperty = true;
         }
+        $responseObject = $mapper->map($response, $baseClass);
 
-        $responseObject = $mapper->map($response, $obj);
-
-        if (!$responseObject->isOk()) {
-            throw new InstagramException(get_class($obj).': '.$responseObject->getMessage());
+        // Check if the API response was valid?
+        if ($checkOk && !$responseObject->isOk()) {
+            throw new InstagramException(get_class($baseClass).': '.$responseObject->getMessage());
         }
-        $responseObject->setFullResponse($response);
+
+        // Save the raw response object as the "getFullResponse()" value.
+        if (is_null($fullResponse)) {
+            $fullResponse = $response;
+        }
+        $responseObject->setFullResponse($fullResponse);
 
         return $responseObject;
     }
@@ -556,7 +568,7 @@ class HttpInterface
             $this->printDebug($method, $endpoint, null, strlen($payload), $response, $body);
         }
 
-        return $this->getResponseWithResult(new UploadPhotoResponse(), json_decode($body));
+        return $this->getMappedResponseObject(new UploadPhotoResponse(), self::api_decode($body));
     }
 
     /**
@@ -620,7 +632,7 @@ class HttpInterface
 
         // Determine where their API wants us to upload the video file.
         $body = $response->getBody()->getContents();
-        $result = $this->getResponseWithResult(new UploadJobVideoResponse(), json_decode($body));
+        $result = $this->getMappedResponseObject(new UploadJobVideoResponse(), self::api_decode($body));
         $uploadUrl = $result->getVideoUploadUrls()[3]->url;
         $job = $result->getVideoUploadUrls()[3]->job;
 
@@ -738,7 +750,7 @@ class HttpInterface
         }
 
         // Verify that the chunked upload was successful.
-        $upload = $this->getResponseWithResult(new UploadVideoResponse(), json_decode($body));
+        $upload = $this->getMappedResponseObject(new UploadVideoResponse(), self::api_decode($body));
         if (!is_null($upload->getMessage())) {
             throw new InstagramException($upload->getMessage());
         }
@@ -873,7 +885,7 @@ class HttpInterface
             $this->printDebug($method, $endpoint, null, strlen($payload), $response, $body);
         }
 
-        return $this->getResponseWithResult(new User(), json_decode($body));
+        return $this->getMappedResponseObject(new User(), self::api_decode($body));
     }
 
     /**
@@ -997,7 +1009,7 @@ class HttpInterface
         }
 
         // Verify that the direct-share upload was successful.
-        $upload = $this->getResponseWithResult(new Response(), json_decode($body));
+        $upload = $this->getMappedResponseObject(new Response(), self::api_decode($body));
         if (!is_null($upload->getMessage())) {
             throw new InstagramException($upload->getMessage());
         }
@@ -1034,5 +1046,23 @@ class HttpInterface
         $body .= '--'.$boundary.'--';
 
         return $body;
+    }
+
+    /**
+     * Decode a JSON reply from Instagram's API.
+     *
+     * WARNING: EXTREMELY IMPORTANT! NEVER, *EVER* USE THE BASIC "json_decode"
+     * ON API REPLIES! ALWAYS USE THIS METHOD INSTEAD, TO ENSURE PROPER DECODING
+     * OF BIG NUMBERS! OTHERWISE YOU'LL TRUNCATE VARIOUS INSTAGRAM API FIELDS!
+     *
+     * @param string $json  The body (JSON string) of the API response.
+     * @param bool   $assoc When TRUE, decode to associative array instead of object.
+     *
+     * @return object|array|null Object if assoc false, Array if assoc true,
+     *                         or NULL if unable to decode JSON.
+     */
+    public static function api_decode($json, $assoc = false)
+    {
+        return json_decode($json, $assoc, 512, JSON_BIGINT_AS_STRING);
     }
 }

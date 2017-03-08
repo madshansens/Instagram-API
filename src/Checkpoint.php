@@ -118,6 +118,6 @@ class Checkpoint
             echo "RESPONSE: $body\n\n";
         }
 
-        return [$header, json_decode($body, true)];
+        return [$header, json_decode($body, true, 512, JSON_BIGINT_AS_STRING)];
     }
 }

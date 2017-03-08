@@ -10,6 +10,21 @@ class Instagram
     public $debug;    // Debug
     public $truncatedDebug;
 
+
+    /**
+     * For internal use by Instagram-API developers!
+     *
+     * Toggles the throwing of exceptions whenever Instagram-API's "Response"
+     * classes lack fields that were provided by the server. Useful for
+     * discovering that our library classes need updating.
+     *
+     * This is only settable via this public property and is NOT meant for
+     * end-users of this library. It is for contributing developers!
+     *
+     * @var bool
+     */
+    public $apiDeveloperDebug = false;
+
     /**
      * @var string
      */
@@ -2170,7 +2185,7 @@ class Request
         return $this;
     }
 
-    public function getResponse($obj, $includeHeader = false)
+    public function getResponse($baseClass, $includeHeader = false)
     {
         $instagramObj = Instagram::getInstance();
 
@@ -2194,25 +2209,12 @@ class Request
 
         $response = $instagramObj->http->request($endPoint, $post, $this->requireLogin, false);
 
-        $mapper = new \JsonMapper();
-        $mapper->bStrictNullTypes = false;
-        if (isset($_GET['debug'])) {
-            $mapper->bExceptionOnUndefinedProperty = true;
-        }
-        if (is_null($response[1])) {
-            throw new InstagramException('No response from server. Either a connection or configuration error.', ErrorCode::EMPTY_RESPONSE);
-        }
-
-        $responseObject = $mapper->map($response[1], $obj);
-
-        if ($this->checkStatus && !$responseObject->isOk()) {
-            throw new InstagramException(get_class($obj).': '.$responseObject->getMessage());
-        }
-        if ($includeHeader) {
-            $responseObject->setFullResponse($response);
-        } else {
-            $responseObject->setFullResponse($response[1]);
-        }
+        $responseObject = $instagramObj->http->getMappedResponseObject(
+            $baseClass,
+            $response[1], // [0] = Token. [1] = The actual server response.
+            $this->checkStatus,
+            ($includeHeader ? $response : null) // null = reuse $response[1].
+        );
 
         return $responseObject;
     }
