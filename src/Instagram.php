@@ -631,6 +631,7 @@ class Instagram
             throw new InstagramException("List of media to upload can't be empty.", ErrorCode::INTERNAL_INVALID_ARGUMENT);
         }
 
+        $hasUploadedVideo = false;
         foreach ($media as $key => $item) {
             if (!file_exists($item['file'])) {
                 throw new InstagramException(sprintf('File "%s" does not exist.', $item['file']), ErrorCode::INTERNAL_INVALID_ARGUMENT);
@@ -642,11 +643,29 @@ class Instagram
                 $media[$key]['upload_id'] = $result->getUploadId();
                 break;
             case 'video':
-                $media[$key]['upload_id'] = $this->http->uploadVideo($item['file'], null, 'album');
+                $hasUploadedVideo = true;
+
+                // Request parameters for uploading a new video.
+                $uploadParams = $this->http->requestVideoUploadURL();
+                $media[$key]['upload_id'] = $uploadParams['upload_id'];
+
+                // Attempt to upload the video data.
+                $this->http->uploadVideoData('album', $item['file'], $uploadParams);
+
+                // Attempt to upload the thumbnail, associated with our video's ID.
+                $this->http->uploadPhotoData('album', $item['file'], 'videofile', $uploadParams['upload_id']);
+
+                // We don't call configure! Album videos are configured below instead.
                 break;
             default:
                 throw new InstagramException(sprintf('Unsupported album media type "%s".', $item['type']), ErrorCode::INTERNAL_INVALID_ARGUMENT);
             }
+        }
+
+        if ($hasUploadedVideo) {
+            // TODO: We could write this in a nicer way but this solves it for now.
+            // In the future we may want to act like configureVideoWithRetries().
+            sleep(5); // Super important to avoid configure-problems on new videos!
         }
 
         $date = date('Y:m:d H:i:s');
@@ -698,6 +717,7 @@ class Instagram
                         'trim_type'       => 0,
                     ],
                 ];
+
                 $uploadRequests[] = $videoConfig;
                 break;
             }
