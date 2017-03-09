@@ -735,10 +735,14 @@ class Instagram
      * @param $recipients
      * @param $media_id
      * @param null $text
+     *
+     * @throws InstagramException
+     *
+     * @return Response
      */
     public function directShare($recipients, $media_id, $text = null)
     {
-        $this->http->directShare(
+        return $this->http->directShare(
             'share',
             $recipients,
             [
@@ -753,10 +757,14 @@ class Instagram
      *
      * @param array|int $recipients Users id
      * @param string    $text       Text message
+     *
+     * @throws InstagramException
+     *
+     * @return Response
      */
     public function directMessage($recipients, $text)
     {
-        $this->http->directShare(
+        return $this->http->directShare(
             'message',
             $recipients,
             [
@@ -771,10 +779,14 @@ class Instagram
      * @param array|int $recipients Users id
      * @param string    $filepath   Location of photo to upload
      * @param string    $text       Text message
+     *
+     * @throws InstagramException
+     *
+     * @return Response
      */
     public function directPhoto($recipients, $filepath, $text = null)
     {
-        $this->http->directShare(
+        return $this->http->directShare(
             'photo',
             $recipients,
             [
