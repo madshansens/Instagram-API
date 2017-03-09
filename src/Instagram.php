@@ -836,12 +836,12 @@ class Instagram
      * useful since Instagram sometimes can't configure a newly uploaded video
      * file until a few seconds have passed.
      *
-     * @param string $type          What type of upload ("timeline" or "story",
-     *                              but not "album". They're handled elsewhere.)
-     * @param string $upload_id     The ID of the upload to configure.
-     * @param string $caption       Caption to use for the video.
-     * @param null   $userTags      Tagged people (only used for "story" videos!).
-     * @param int    $maxAttempts   Total attempts to configure video before throwing.
+     * @param string $type        What type of upload ("timeline" or "story",
+     *                            but not "album". They're handled elsewhere.)
+     * @param string $upload_id   The ID of the upload to configure.
+     * @param string $caption     Caption to use for the video.
+     * @param null   $userTags    Tagged people (only used for "story" videos!).
+     * @param int    $maxAttempts Total attempts to configure video before throwing.
      *
      * @throws InstagramException
      *
@@ -874,11 +874,11 @@ class Instagram
     /**
      * Configure video.
      *
-     * @param string $type          What type of upload ("timeline" or "story",
-     *                              but not "album". They're handled elsewhere.)
-     * @param string $upload_id     The ID of the upload to configure.
-     * @param string $caption       Caption to use for the video.
-     * @param null   $userTags      Tagged people (only used for "story" videos!).
+     * @param string $type      What type of upload ("timeline" or "story",
+     *                          but not "album". They're handled elsewhere.)
+     * @param string $upload_id The ID of the upload to configure.
+     * @param string $caption   Caption to use for the video.
+     * @param null   $userTags  Tagged people (only used for "story" videos!).
      *
      * @throws InstagramException
      *
