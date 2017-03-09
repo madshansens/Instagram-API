@@ -57,13 +57,16 @@ class HttpInterface
     protected $_proxy;
 
     /**
-     * Network interface to use.
+     * Network interface override to use.
      *
-     * @TODO NOT IMPLEMENTED! Does nothing.
+     * Only works if Guzzle is using the cURL backend. But that's
+     * almost always the case, on most PHP installations.
      *
-     * @var string
+     * @see CURLOPT_INTERFACE (http://php.net/curl_setopt)
+     *
+     * @var string|null
      */
-    public $outputInterface;
+    protected $_outputInterface;
 
     /**
      * @var \GuzzleHttp\Client
@@ -247,6 +250,32 @@ class HttpInterface
     }
 
     /**
+     * Sets the network interface override to use.
+     *
+     * Only works if Guzzle is using the cURL backend. But that's
+     * almost always the case, on most PHP installations.
+     *
+     * @see CURLOPT_INTERFACE (http://php.net/curl_setopt)
+     *
+     * @var string|null Interface name, IP address or hostname, or NULL to
+     *                  disable override and let Guzzle use any interface.
+     */
+    public function setOutputInterface($value)
+    {
+        $this->_outputInterface = $value;
+    }
+
+    /**
+     * Gets the current network interface override used for requests.
+     *
+     * @return string|null
+     */
+    public function getOutputInterface()
+    {
+        return $this->_outputInterface;
+    }
+
+    /**
      * Output debugging information.
      *
      * @param string      $method       "GET" or "POST".
@@ -323,6 +352,19 @@ class HttpInterface
         // Critical options always overwrite identical keys in regular opts.
         // This ensures that we can't screw up the proxy/verify/cookies.
         $finalOptions = array_merge($options, $criticalOptions);
+
+        // Now merge any specific Guzzle cURL-backend overrides. We must do this
+        // separately since it's in an associative array and we can't just
+        // overwrite that whole array in case the caller had curl options.
+        if (!array_key_exists('curl', $finalOptions)) {
+            $finalOptions['curl'] = [];
+        }
+
+        // Add their network interface override if they want it.
+        // This option MUST be non-empty if set, otherwise it breaks cURL.
+        if (is_string($this->_outputInterface) && $this->_outputInterface !== '') {
+            $finalOptions['curl'][CURLOPT_INTERFACE] = $this->_outputInterface;
+        }
 
         return $finalOptions;
     }

@@ -137,26 +137,6 @@ class Instagram
     }
 
     /**
-     * Set output network interface.
-     *
-     * @param string $interface
-     */
-    public function setOutputInterface($interface)
-    {
-        $this->http->outputInterface = $interface;
-    }
-
-    /**
-     * Get output network interface.
-     *
-     * @return string|null
-     */
-    public function getOutputInterface()
-    {
-        return $this->http->outputInterface;
-    }
-
-    /**
      * Login to Instagram.
      *
      * @param bool $force       Force login to Instagram, this will create a new session.
@@ -2238,6 +2218,32 @@ class Instagram
     public function getProxy()
     {
         return $this->http->getProxy();
+    }
+
+    /**
+     * Sets the network interface override to use.
+     *
+     * Only works if Guzzle is using the cURL backend. But that's
+     * almost always the case, on most PHP installations.
+     *
+     * @see CURLOPT_INTERFACE (http://php.net/curl_setopt)
+     *
+     * @var string|null Interface name, IP address or hostname, or NULL to
+     *                  disable override and let Guzzle use any interface.
+     */
+    public function setOutputInterface($value)
+    {
+        $this->http->setOutputInterface($value);
+    }
+
+    /**
+     * Gets the current network interface override used for requests.
+     *
+     * @return string|null
+     */
+    public function getOutputInterface()
+    {
+        return $this->http->getOutputInterface();
     }
 
     /**
