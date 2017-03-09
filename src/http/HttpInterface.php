@@ -495,7 +495,7 @@ class HttpInterface
      *
      * @return UploadPhotoResponse
      */
-    public function uploadPhotoData($type = 'timeline', $photoFilename, $fileType = 'photofile', $upload_id = null)
+    public function uploadPhotoData($type, $photoFilename, $fileType = 'photofile', $upload_id = null)
     {
         $this->throwIfNotLoggedIn();
 
@@ -798,7 +798,7 @@ class HttpInterface
      *
      * @return UploadVideoResponse
      */
-    public function uploadVideoData($type = 'timeline', $videoFilename, array $uploadParams, $maxAttempts = 4)
+    public function uploadVideoData($type, $videoFilename, array $uploadParams, $maxAttempts = 4)
     {
         $this->throwIfNotLoggedIn();
 

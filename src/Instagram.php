@@ -522,8 +522,8 @@ class Instagram
      * Uploads a photo to your Instagram story.
      *
      * @param $photoFilename
-     * @param string $caption       Caption to display over the story photo.
-     * @param null   $filter        Photo filter.
+     * @param string $caption Caption to display over the story photo.
+     * @param null   $filter  Photo filter.
      *
      * @throws InstagramException
      *
@@ -568,7 +568,6 @@ class Instagram
             default:
                 throw new InstagramException(sprintf('Unsupported album media type "%s".', $item['type']), ErrorCode::INTERNAL_INVALID_ARGUMENT);
             }
-
         }
 
         $date = date('Y:m:d H:i:s');
@@ -617,7 +616,7 @@ class Instagram
                         'source_type'     => 'library',
                         'start_time'      => 0,
                         'camera_position' => 'unknown',
-                        'trim_type'       => 0
+                        'trim_type'       => 0,
                     ],
                 ];
                 $uploadRequests[] = $videoConfig;
