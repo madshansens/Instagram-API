@@ -106,7 +106,13 @@ class Item extends Response
      * @var Location
      */
     public $location;
+    /**
+     * @var float
+     */
     public $lat;
+    /**
+     * @var float
+     */
     public $lng;
     /**
      * @var Location[]

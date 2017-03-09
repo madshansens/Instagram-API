@@ -13,6 +13,9 @@ class Broadcast extends Response
     public $published_time;
     public $broadcast_message;
     public $muted;
+    /**
+     * @var string
+     */
     public $media_id;
     /**
      * @var string
