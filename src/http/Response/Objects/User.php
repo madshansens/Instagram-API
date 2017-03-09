@@ -51,6 +51,7 @@ class User extends Response
     public $show_business_conversion_icon; // getUsernameInfo prop
     public $show_conversion_edit_entry; // getUsernameInfo prop
     public $show_insights_terms; // getUsernameInfo prop
+    public $can_create_sponsor_tags; // getUsernameInfo prop
     public $hd_profile_pic_url_info; // getUsernameInfo prop
     public $usertag_review_enabled; // getUsernameInfo prop
     public $is_needy; // getUsernameInfo prop
