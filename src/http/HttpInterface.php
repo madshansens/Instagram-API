@@ -372,11 +372,15 @@ class HttpInterface
     /**
      * Wraps Guzzle's request and adds special error handling and options.
      *
-     * Automatically throws exceptions on certain very serious HTTP errors.
-     * You must ALWAYS use this instead of the raw Guzzle Client! However,
-     * you can never assume that its response contains what you wanted. Be sure
-     * to validate the API reply too, since Instagram's API calls themselves may
-     * fail with a JSON message explaining what went wrong.
+     * Automatically throws exceptions on certain very serious HTTP errors. You
+     * must ALWAYS use this (or _apiRequest()) instead of the raw Guzzle Client!
+     * However, you can never assume the server response contains what you
+     * wanted. Be sure to validate the API reply too, since Instagram's API
+     * calls themselves may fail with a JSON message explaining what went wrong.
+     *
+     * WARNING: Most functions will want to call _apiRequest() instead. An even
+     * higher-level handler which takes care of debugging, server response
+     * checking and response decoding!
      *
      * @param string $method  HTTP method.
      * @param string $uri     URI string.
@@ -425,6 +429,39 @@ class HttpInterface
     }
 
     /**
+     * @TODO: DOCUMENT
+     *
+     * @param string $method         HTTP method ("GET" or "POST").
+     * @param string $endpoint       Relative API endpoint, such as "upload/photo/",
+     *                               but can also be a full URI starting with "http:"
+     *                               or "https:", which is then used as-provided.
+     * @param array  $guzzleOptions  Guzzle request() options to apply to the HTTP request.
+     * @param array  $libraryOptions Additional options for controlling Library features
+     *                               such as debugging output and response decoding.
+     *
+     * @throws InstagramException                    with code IG_API_THROTTLED
+     *                                               when throttled by Instagram.
+     * @throws \GuzzleHttp\Exception\GuzzleException for any socket related errors.
+     *
+     * @return TODO
+     */
+    protected function _apiRequest($method, $endpoint, array $guzzleOptions, array $libraryOptions = [])
+    {
+        // Determine the URI to use (it's either relative to API, or a full URI).
+        if (strncmp($endpoint, 'http:', 5) === 0 || strncmp($endpoint, 'https:', 6) === 0) {
+            $uri = $endpoint;
+        } else {
+            $uri = Constants::API_URL.$endpoint;
+        }
+
+        return $this->_guzzleRequest(
+            $method,
+            $uri,
+            $guzzleOptions
+        );
+    }
+
+    /**
      * Perform an Instagram API request.
      *
      * @param string     $endpoint  The relative API endpoint URL to call.
@@ -469,7 +506,7 @@ class HttpInterface
         }
 
         // Perform the API request.
-        $response = $this->_guzzleRequest($method, Constants::API_URL.$endpoint, $options);
+        $response = $this->_apiRequest($method, $endpoint, $options);
         $body = $response->getBody()->getContents();
 
         // Debugging (must be shown before possible decoding error).
@@ -633,7 +670,7 @@ class HttpInterface
         ];
 
         // Perform the API request.
-        $response = $this->_guzzleRequest($method, Constants::API_URL.$endpoint, $options);
+        $response = $this->_apiRequest($method, $endpoint, $options);
         $body = $response->getBody()->getContents();
 
         // Debugging (must be shown before possible decoding error).
@@ -709,7 +746,7 @@ class HttpInterface
         ];
 
         // Perform the "pre-upload" API request.
-        $response = $this->_guzzleRequest($method, Constants::API_URL.$endpoint, $options);
+        $response = $this->_apiRequest($method, $endpoint, $options);
         $body = $response->getBody()->getContents();
 
         // Debugging (must be shown before possible decoding error).
@@ -792,7 +829,7 @@ class HttpInterface
                 ];
 
                 // Perform the upload of the current chunk.
-                $response = $this->_guzzleRequest($method, $uploadParams['upload_url'], $options);
+                $response = $this->_apiRequest($method, $uploadParams['upload_url'], $options);
                 $body = $response->getBody()->getContents();
 
                 // Debugging (must be shown before possible decoding error).
@@ -939,7 +976,7 @@ class HttpInterface
         ];
 
         // Perform the API request.
-        $response = $this->_guzzleRequest($method, Constants::API_URL.$endpoint, $options);
+        $response = $this->_apiRequest($method, $endpoint, $options);
         $body = $response->getBody()->getContents();
 
         // Debugging (must be shown before possible decoding error).
@@ -1067,7 +1104,7 @@ class HttpInterface
         ];
 
         // Perform the API request.
-        $response = $this->_guzzleRequest($method, Constants::API_URL.$endpoint, $options);
+        $response = $this->_apiRequest($method, $endpoint, $options);
         $body = $response->getBody()->getContents();
 
         // Debugging (must be shown before possible decoding error).
