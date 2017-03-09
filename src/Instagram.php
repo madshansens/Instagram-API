@@ -2371,8 +2371,8 @@ class Request
         $responseObject = $instagramObj->http->getMappedResponseObject(
             $baseClass,
             $response[1], // [0] = Token. [1] = The actual server response.
-            $this->checkStatus,
-            ($includeHeader ? $response : null) // null = reuse $response[1].
+            $this->checkStatus, // Whether to validate that API response "status" MUST be Ok.
+            ($includeHeader ? $response : null) // null = Reuse $response[1].
         );
 
         return $responseObject;

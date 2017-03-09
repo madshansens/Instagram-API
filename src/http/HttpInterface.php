@@ -278,29 +278,29 @@ class HttpInterface
     /**
      * Output debugging information.
      *
-     * @param string      $method       "GET" or "POST".
-     * @param string      $url          The URL or endpoint used for the request.
-     * @param string|null $postBody     What was sent to the server. Use NULL to
-     *                                  avoid displaying it.
-     * @param int|null    $uploadBytes  How many bytes were uploaded. Use NULL to
-     *                                  avoid displaying it.
-     * @param object      $response     The Guzzle response object from the request.
-     * @param string      $responseBody The actual text-body reply from the server.
+     * @param string      $method        "GET" or "POST".
+     * @param string      $url           The URL or endpoint used for the request.
+     * @param string|null $uploadedBody  What was sent to the server. Use NULL to
+     *                                   avoid displaying it.
+     * @param int|null    $uploadedBytes How many bytes were uploaded. Use NULL to
+     *                                   avoid displaying it.
+     * @param object      $response      The Guzzle response object from the request.
+     * @param string      $responseBody  The actual text-body reply from the server.
      */
-    protected function _printDebug($method, $url, $postBody, $uploadBytes, $response, $responseBody)
+    protected function _printDebug($method, $url, $uploadedBody, $uploadedBytes, $response, $responseBody)
     {
         Debug::printRequest($method, $url);
 
-        // Display the data that was sent via POST, if provided.
-        // NOTE: Only provide this from functions that submit meaningful POST data!
-        if (!is_null($postBody) && (!is_array($postBody))) {
-            Debug::printPostData($postBody);
+        // Display the data body that was uploaded, if provided for debugging.
+        // NOTE: Only provide this from functions that submit meaningful BODY data!
+        if (is_string($uploadedBody)) {
+            Debug::printPostData($uploadedBody);
         }
 
-        // Display the number of bytes uploaded, if provided.
+        // Display the number of bytes uploaded in the data body, if provided for debugging.
         // NOTE: Only provide this from functions that actually upload files!
-        if (!is_null($uploadBytes)) {
-            Debug::printUpload(Utils::formatBytes($uploadBytes));
+        if (!is_null($uploadedBytes)) {
+            Debug::printUpload(Utils::formatBytes($uploadedBytes));
         }
 
         // Display the number of bytes received from the response, and status code.
@@ -331,17 +331,63 @@ class HttpInterface
     }
 
     /**
+     * Converts a server response to a specific kind of result object.
+     *
+     * @param mixed $baseClass    An instance of a class object whose properties
+     *                            you want to fill from the $response.
+     * @param mixed $response     A decoded JSON response from Instagram's server.
+     * @param bool  $checkOk      Whether to throw exceptions if the server's
+     *                            response wasn't marked as OK by Instagram.
+     * @param mixed $fullResponse The raw response object to provide in the
+     *                            "getFullResponse()" property. Set this to
+     *                            NULL to automatically use $response. That's
+     *                            almost always what you want to do!
+     *
+     * @throws InstagramException in case of invalid or failed API response.
+     *
+     * @return mixed
+     */
+    public function getMappedResponseObject($baseClass, $response, $checkOk = true, $fullResponse = null)
+    {
+        if (is_null($response)) {
+            throw new InstagramException('No response from server. Either a connection or configuration error.', ErrorCode::EMPTY_RESPONSE);
+        }
+
+        // Perform mapping.
+        $mapper = new \JsonMapper();
+        $mapper->bStrictNullTypes = false;
+        if ($this->_parent->apiDeveloperDebug) {
+            // API developer debugging? Throws error if class lacks properties.
+            $mapper->bExceptionOnUndefinedProperty = true;
+        }
+        $responseObject = $mapper->map($response, $baseClass);
+
+        // Check if the API response was successful.
+        if ($checkOk && !$responseObject->isOk()) {
+            throw new InstagramException(get_class($baseClass).': '.$responseObject->getMessage());
+        }
+
+        // Save the raw response object as the "getFullResponse()" value.
+        if (is_null($fullResponse)) {
+            $fullResponse = $response;
+        }
+        $responseObject->setFullResponse($fullResponse);
+
+        return $responseObject;
+    }
+
+    /**
      * Helper which builds in the most important Guzzle options.
      *
      * Takes care of adding all critical options that we need on every request.
      * Such as cookies and the user's proxy. But don't call this function
      * manually. It's automatically called by _guzzleRequest()!
      *
-     * @param array $options The options specific to the current request.
+     * @param array $guzzleOptions The options specific to the current request.
      *
      * @return array A guzzle options array.
      */
-    protected function _buildGuzzleOptions(array $options)
+    protected function _buildGuzzleOptions(array $guzzleOptions)
     {
         $criticalOptions = [
             'cookies' => ($this->_cookieJar instanceof CookieJar ? $this->_cookieJar : false),
@@ -351,7 +397,7 @@ class HttpInterface
 
         // Critical options always overwrite identical keys in regular opts.
         // This ensures that we can't screw up the proxy/verify/cookies.
-        $finalOptions = array_merge($options, $criticalOptions);
+        $finalOptions = array_merge($guzzleOptions, $criticalOptions);
 
         // Now merge any specific Guzzle cURL-backend overrides. We must do this
         // separately since it's in an associative array and we can't just
@@ -372,33 +418,35 @@ class HttpInterface
     /**
      * Wraps Guzzle's request and adds special error handling and options.
      *
+     *
      * Automatically throws exceptions on certain very serious HTTP errors. You
      * must ALWAYS use this (or _apiRequest()) instead of the raw Guzzle Client!
      * However, you can never assume the server response contains what you
      * wanted. Be sure to validate the API reply too, since Instagram's API
      * calls themselves may fail with a JSON message explaining what went wrong.
      *
-     * WARNING: Most functions will want to call _apiRequest() instead. An even
-     * higher-level handler which takes care of debugging, server response
-     * checking and response decoding!
+     * WARNING: This is a semi-lowlevel handler which only applies critical
+     * options and HTTP connection handling! Most functions will want to call
+     * _apiRequest() instead. An even higher-level handler which takes care of
+     * debugging, server response checking and response decoding!
      *
-     * @param string $method  HTTP method.
-     * @param string $uri     URI string.
-     * @param array  $options Request options to apply.
+     * @param string $method        HTTP method.
+     * @param string $uri           Full URI string.
+     * @param array  $guzzleOptions Request options to apply.
      *
+     * @throws \GuzzleHttp\Exception\GuzzleException for any socket related errors.
      * @throws InstagramException                    with code IG_API_THROTTLED
      *                                               when throttled by Instagram.
-     * @throws \GuzzleHttp\Exception\GuzzleException for any socket related errors.
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    protected function _guzzleRequest($method, $uri, array $options = [])
+    protected function _guzzleRequest($method, $uri, array $guzzleOptions = [])
     {
         // Add critically important options for authenticating the request.
-        $options = $this->_buildGuzzleOptions($options);
+        $guzzleOptions = $this->_buildGuzzleOptions($guzzleOptions);
 
         // Attempt the request. Will throw in case of socket errors!
-        $response = $this->_client->request($method, $uri, $options);
+        $response = $this->_client->request($method, $uri, $guzzleOptions);
 
         // Detect very serious HTTP status codes in the response.
         $httpCode = $response->getStatusCode();
@@ -429,7 +477,28 @@ class HttpInterface
     }
 
     /**
-     * @TODO: DOCUMENT
+     * Internal wrapper around _guzzleRequest().
+     *
+     * This takes care of many common additional tasks needed by our library,
+     * so you should try to always use this instead of the raw _guzzleRequest()!
+     *
+     * Available library options are:
+     * - 'noDebug': Can be set to TRUE to forcibly hide debugging output for
+     *   this request. The user controls debugging globally, but this is an
+     *   override that prevents them from seeing certain requests that you may
+     *   not want to trigger debugging (such as perhaps individual steps of a
+     *   file upload process). However, debugging SHOULD be allowed in MOST cases!
+     *   So only use this feature if you have a very good reason.
+     * - 'debugUploadedBody': Set to TRUE to make debugging display the data that
+     *   was uploaded in the body of the request. DO NOT use this if your function
+     *   uploaded binary data, since printing those bytes would kill the terminal!
+     * - 'debugUploadedBytes': Set to TRUE to make debugging display the size of
+     *   the uploaded body data. Should ALWAYS be TRUE when uploading binary data.
+     * - 'decodeToObject': If this option is provided, it MUST either be an instance
+     *   of a new class object, or FALSE to signify that you don't want us to do any
+     *   object decoding. Omitting this option entirely is the same as FALSE, but
+     *   it is highly recommended to ALWAYS include this option (even if FALSE),
+     *   for code clarity about what you intend to do with this function's response!
      *
      * @param string $method         HTTP method ("GET" or "POST").
      * @param string $endpoint       Relative API endpoint, such as "upload/photo/",
@@ -437,15 +506,20 @@ class HttpInterface
      *                               or "https:", which is then used as-provided.
      * @param array  $guzzleOptions  Guzzle request() options to apply to the HTTP request.
      * @param array  $libraryOptions Additional options for controlling Library features
-     *                               such as debugging output and response decoding.
+     *                               such as the debugging output and response decoding.
      *
+     * @throws \GuzzleHttp\Exception\GuzzleException for any socket related errors.
      * @throws InstagramException                    with code IG_API_THROTTLED
      *                                               when throttled by Instagram.
-     * @throws \GuzzleHttp\Exception\GuzzleException for any socket related errors.
+     * @throws InstagramException                    when "decodeToObject" is used,
+     *                                               if the API response is marked
+     *                                               as failed, or class decode fails.
      *
-     * @return TODO
+     * @return array An array with the Guzzle "response" object, and the raw
+     *               non-decoded HTTP "body" of the request, and the "object" if
+     *               the "decodeToObject" library option was used.
      */
-    protected function _apiRequest($method, $endpoint, array $guzzleOptions, array $libraryOptions = [])
+    protected function _apiRequest($method, $endpoint, array $guzzleOptions = [], array $libraryOptions = [])
     {
         // Determine the URI to use (it's either relative to API, or a full URI).
         if (strncmp($endpoint, 'http:', 5) === 0 || strncmp($endpoint, 'https:', 6) === 0) {
@@ -454,11 +528,51 @@ class HttpInterface
             $uri = Constants::API_URL.$endpoint;
         }
 
-        return $this->_guzzleRequest(
-            $method,
-            $uri,
-            $guzzleOptions
-        );
+        // Perform the API request and retrieve the raw HTTP response body.
+        $guzzleResponse = $this->_guzzleRequest($method, $uri, $guzzleOptions);
+        $body = $guzzleResponse->getBody()->getContents();
+
+        // Debugging (must be shown before possible decoding error).
+        if ($this->_parent->debug && (!isset($libraryOptions['noDebug']) || !$libraryOptions['noDebug'])) {
+            // Determine whether we should display the contents of the UPLOADED body.
+            if (isset($libraryOptions['debugUploadedBody']) && $libraryOptions['debugUploadedBody']) {
+                $uploadedBody = isset($guzzleOptions['body']) ? $guzzleOptions['body'] : null;
+            } else {
+                $uploadedBody = null; // Don't display.
+            }
+
+            // Determine whether we should display the size of the UPLOADED body.
+            if (isset($libraryOptions['debugUploadedBytes']) && $libraryOptions['debugUploadedBytes']) {
+                // Calculate the uploaded bytes by looking at request's body size, if it exists.
+                $uploadedBytes = isset($guzzleOptions['body']) ? strlen($guzzleOptions['body']) : null;
+            } else {
+                $uploadedBytes = null; // Don't display.
+            }
+
+            $this->_printDebug($method, $endpoint, $uploadedBody, $uploadedBytes, $guzzleResponse, $body);
+        }
+
+        // Begin building the result array.
+        $result = [
+            'response' => $guzzleResponse,
+            'body'     => $body,
+        ];
+
+        // Perform optional API response decoding and success validation.
+        if (isset($libraryOptions['decodeToObject']) && $libraryOptions['decodeToObject'] !== false) {
+            if (!is_object($libraryOptions['decodeToObject'])) {
+                throw new InstagramException('Object decoding requested, but no object instance provided.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
+            }
+
+            // Check for API response success and attempt to decode it to the desired class.
+            $result['object'] = $this->getMappedResponseObject(
+                $libraryOptions['decodeToObject'],
+                self::api_decode($body), // Important: Special JSON decoder.
+                true // Forcibly validates that the API response "status" MUST be Ok.
+            );
+        }
+
+        return $result;
     }
 
     /**
@@ -506,15 +620,18 @@ class HttpInterface
         }
 
         // Perform the API request.
-        $response = $this->_apiRequest($method, $endpoint, $options);
-        $body = $response->getBody()->getContents();
+        $response = $this->_apiRequest(
+            $method,
+            $endpoint,
+            $options,
+            [
+                'debugUploadedBody'  => true,
+                'debugUploadedBytes' => false,
+                'decodeToObject'     => false,
+            ]
+        );
 
-        // Debugging (must be shown before possible decoding error).
-        if ($this->_parent->debug) {
-            $this->_printDebug($method, $endpoint, $postData, null, $response, $body);
-        }
-
-        // Process cookies and decode the JSON response.
+        // Process cookies to extract the latest token.
         $csrftoken = null;
         $cookies = $this->_cookieJar->getIterator();
         foreach ($cookies as $cookie) {
@@ -523,55 +640,12 @@ class HttpInterface
                 break;
             }
         }
-        $result = self::api_decode($body, $assoc);
+
+        // Manually decode the JSON response, since we didn't request object decoding
+        // above. This lets our caller later map it to any object they want (or none).
+        $result = self::api_decode($response['body'], $assoc);
 
         return [$csrftoken, $result];
-    }
-
-    /**
-     * Converts a server response to a specific kind of result object.
-     *
-     * @param mixed $baseClass    An instance of a class object whose properties
-     *                            you want to fill from the $response.
-     * @param mixed $response     A decoded JSON response from Instagram's server.
-     * @param bool  $checkOk      Whether to throw exceptions if the server's
-     *                            response wasn't marked as OK by Instagram.
-     * @param mixed $fullResponse The raw response object to provide in the
-     *                            "getFullResponse()" property. Set this to
-     *                            NULL to automatically use $response. That's
-     *                            almost always what you want to do!
-     *
-     * @throws InstagramException in case of invalid or failed API response.
-     *
-     * @return mixed
-     */
-    public function getMappedResponseObject($baseClass, $response, $checkOk = true, $fullResponse = null)
-    {
-        if (is_null($response)) {
-            throw new InstagramException('No response from server. Either a connection or configuration error.', ErrorCode::EMPTY_RESPONSE);
-        }
-
-        // Perform mapping.
-        $mapper = new \JsonMapper();
-        $mapper->bStrictNullTypes = false;
-        if ($this->_parent->apiDeveloperDebug) {
-            // API developer debugging? Throws error if class lacks properties.
-            $mapper->bExceptionOnUndefinedProperty = true;
-        }
-        $responseObject = $mapper->map($response, $baseClass);
-
-        // Check if the API response was successful.
-        if ($checkOk && !$responseObject->isOk()) {
-            throw new InstagramException(get_class($baseClass).': '.$responseObject->getMessage());
-        }
-
-        // Save the raw response object as the "getFullResponse()" value.
-        if (is_null($fullResponse)) {
-            $fullResponse = $response;
-        }
-        $responseObject->setFullResponse($fullResponse);
-
-        return $responseObject;
     }
 
     /**
@@ -670,21 +744,21 @@ class HttpInterface
         ];
 
         // Perform the API request.
-        $response = $this->_apiRequest($method, $endpoint, $options);
-        $body = $response->getBody()->getContents();
-
-        // Debugging (must be shown before possible decoding error).
-        if ($this->_parent->debug) {
-            $this->_printDebug($method, $endpoint, null, strlen($payload), $response, $body);
-        }
-
-        // Decode the API response and check for success.
-        $upload = $this->getMappedResponseObject(new UploadPhotoResponse(), self::api_decode($body));
+        $response = $this->_apiRequest(
+            $method,
+            $endpoint,
+            $options,
+            [
+                'debugUploadedBody'  => false,
+                'debugUploadedBytes' => true,
+                'decodeToObject'     => new UploadPhotoResponse(),
+            ]
+        );
 
         // NOTE: The server's reply includes the upload id that was used,
         // so we don't need to return anything more than their reply.
-        // You can get it from $upload->getUploadId().
-        return $upload;
+        // You can get it from the response object->getUploadId().
+        return $response['object'];
     }
 
     /**
@@ -746,22 +820,22 @@ class HttpInterface
         ];
 
         // Perform the "pre-upload" API request.
-        $response = $this->_apiRequest($method, $endpoint, $options);
-        $body = $response->getBody()->getContents();
-
-        // Debugging (must be shown before possible decoding error).
-        if ($this->_parent->debug) {
-            $this->_printDebug($method, $endpoint, $payload, null, $response, $body);
-        }
-
-        // Decode the API response and check for success.
-        $result = $this->getMappedResponseObject(new UploadJobVideoResponse(), self::api_decode($body));
+        $response = $this->_apiRequest(
+            $method,
+            $endpoint,
+            $options,
+            [
+                'debugUploadedBody'  => true,
+                'debugUploadedBytes' => false,
+                'decodeToObject'     => new UploadJobVideoResponse(),
+            ]
+        );
 
         // Determine where their API wants us to upload the video file.
         return [
             'upload_id'  => $upload_id,
-            'upload_url' => $result->getVideoUploadUrls()[3]->url,
-            'job'        => $result->getVideoUploadUrls()[3]->job,
+            'upload_url' => $response['object']->getVideoUploadUrls()[3]->url,
+            'job'        => $response['object']->getVideoUploadUrls()[3]->job,
         ];
     }
 
@@ -829,21 +903,24 @@ class HttpInterface
                 ];
 
                 // Perform the upload of the current chunk.
-                $response = $this->_apiRequest($method, $uploadParams['upload_url'], $options);
-                $body = $response->getBody()->getContents();
-
-                // Debugging (must be shown before possible decoding error).
-                if ($this->_parent->debug) {
-                    $this->_printDebug($method, $uploadParams['upload_url'], null, $chunkSize, $response, $body);
-                }
+                $response = $this->_apiRequest(
+                    $method,
+                    $uploadParams['upload_url'],
+                    $options,
+                    [
+                        'debugUploadedBody'  => false,
+                        'debugUploadedBytes' => true,
+                        'decodeToObject'     => false,
+                    ]
+                );
 
                 // Check if Instagram's server has bugged out.
                 // NOTE: On everything except the final chunk, they MUST respond
                 // with "0-BYTESTHEYHAVESOFAR/TOTALBYTESTHEYEXPECT". The "0-" is
                 // what matters. When they bug out, they drop chunks and the
                 // start range on the server-side won't be at zero anymore.
-                if ($chunkIdx != $numChunks) {
-                    if (strncmp($body, '0-', 2) !== 0) {
+                if ($chunkIdx < $numChunks) {
+                    if (strncmp($response['body'], '0-', 2) !== 0) {
                         // Their range doesn't start with "0-". Abort!
                         break; // Don't waste time uploading further chunks!
                     }
@@ -858,19 +935,23 @@ class HttpInterface
             fclose($handle);
         }
 
-        // NOTE: $response and $body below refer to the final chunk's result!
+        // NOTE: $response below refers to the final chunk's result!
 
         // Protection against Instagram's upload server being bugged out!
         // NOTE: When their server is bugging out, the final chunk result will
         // just be yet another range specifier such as "328600-657199/657200",
         // instead of a "{...}" JSON object. Because their server will have
         // dropped all earlier chunks when they bug out (due to overload or w/e).
-        if (substr($body, 0, 1) !== '{') {
+        if (substr($response['body'], 0, 1) !== '{') {
             throw new InstagramException("Upload of \"{$videoFilename}\" failed. Instagram's server returned an unexpected reply.", ErrorCode::INTERNAL_UPLOAD_FAILED);
         }
 
-        // Decode the API response and check for successful chunked upload.
-        $upload = $this->getMappedResponseObject(new UploadVideoResponse(), self::api_decode($body));
+        // Manually decode the final API response and check for successful chunked upload.
+        $upload = $this->getMappedResponseObject(
+            new UploadVideoResponse(),
+            self::api_decode($response['body']), // Important: Special JSON decoder.
+            true // Forcibly validates that the API response "status" MUST be Ok.
+        );
 
         return $upload;
     }
@@ -976,18 +1057,18 @@ class HttpInterface
         ];
 
         // Perform the API request.
-        $response = $this->_apiRequest($method, $endpoint, $options);
-        $body = $response->getBody()->getContents();
+        $response = $this->_apiRequest(
+            $method,
+            $endpoint,
+            $options,
+            [
+                'debugUploadedBody'  => false,
+                'debugUploadedBytes' => true,
+                'decodeToObject'     => new User(),
+            ]
+        );
 
-        // Debugging (must be shown before possible decoding error).
-        if ($this->_parent->debug) {
-            $this->_printDebug($method, $endpoint, null, strlen($payload), $response, $body);
-        }
-
-        // Decode the API response and check for success.
-        $result = $this->getMappedResponseObject(new User(), self::api_decode($body));
-
-        return $result;
+        return $response['object'];
     }
 
     /**
@@ -1104,18 +1185,18 @@ class HttpInterface
         ];
 
         // Perform the API request.
-        $response = $this->_apiRequest($method, $endpoint, $options);
-        $body = $response->getBody()->getContents();
+        $response = $this->_apiRequest(
+            $method,
+            $endpoint,
+            $options,
+            [
+                'debugUploadedBody'  => false,
+                'debugUploadedBytes' => true,
+                'decodeToObject'     => new Response(),
+            ]
+        );
 
-        // Debugging (must be shown before possible decoding error).
-        if ($this->_parent->debug) {
-            $this->_printDebug($method, $endpoint, null, strlen($payload), $response, $body);
-        }
-
-        // Decode the API response and check for successful direct-share upload.
-        $upload = $this->getMappedResponseObject(new Response(), self::api_decode($body));
-
-        return $upload;
+        return $response['object'];
     }
 
     /**
