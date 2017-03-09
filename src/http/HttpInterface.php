@@ -327,7 +327,7 @@ class HttpInterface
      * @param string $uri     URI string.
      * @param array  $options Request options to apply.
      *
-     * @throws InstagramException                    with code INTERNAL_API_THROTTLED
+     * @throws InstagramException                    with code IG_API_THROTTLED
      *                                               when throttled by Instagram.
      * @throws \GuzzleHttp\Exception\GuzzleException for any socket related errors.
      *
@@ -345,7 +345,7 @@ class HttpInterface
         $httpCode = $response->getStatusCode();
         switch ($httpCode) {
         case 429: // "429 Too Many Requests"
-            throw new InstagramException('Throttled by Instagram because of too many API requests.', ErrorCode::INTERNAL_API_THROTTLED);
+            throw new InstagramException('Throttled by Instagram because of too many API requests.', ErrorCode::IG_API_THROTTLED);
             break;
         // NOTE: Detecting "404" errors was intended to help us detect when API
         // endpoints change. But it turns out that A) Instagram uses "valid" 404

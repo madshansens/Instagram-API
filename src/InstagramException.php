@@ -51,6 +51,9 @@ class ErrorCode
     const IG_RESET_PASSWORD = 9;
     const IG_RESET_PASSWORD_REGEX = '/reset(.*)password/';
 
+    // 10: Throttled by Instagram's server because of too many requests
+    const IG_API_THROTTLED = 10;
+
     /**
      * 1XX: Internal Errors.
      */
@@ -59,9 +62,8 @@ class ErrorCode
     const INTERNAL_PROXY_ERROR = 102;
     const INTERNAL_CSRF_TOKEN_ERROR = 103;
     const INTERNAL_SETTINGS_ERROR = 104;
-    const INTERNAL_API_THROTTLED = 105;
-    // const INTERNAL_HTTP_NOTFOUND = 106; // NOT USED! See HttpInterface for reason.
-    const INTERNAL_UPLOAD_FAILED = 107;
+    // const INTERNAL_HTTP_NOTFOUND = 105; // NOT USED! See HttpInterface for reason.
+    const INTERNAL_UPLOAD_FAILED = 106;
 }
 
 class InstagramException extends \Exception

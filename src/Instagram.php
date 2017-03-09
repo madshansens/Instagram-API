@@ -276,7 +276,7 @@ class Instagram
             return $request->getResponse(new autoCompleteUserListResponse());
         } catch (InstagramException $e) {
             // Throttling is so common that we'll simply return NULL in that case.
-            if ($e->getCode() == ErrorCode::INTERNAL_API_THROTTLED) {
+            if ($e->getCode() == ErrorCode::IG_API_THROTTLED) {
                 return;
             }
 
