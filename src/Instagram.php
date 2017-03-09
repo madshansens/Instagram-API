@@ -929,10 +929,6 @@ class Instagram
 
         $configure = $requestData->getResponse(new ConfigureVideoResponse());
 
-        if (!$configure->isOk()) {
-            throw new InstagramException($configure->getMessage());
-        }
-
         return $configure;
     }
 
@@ -1009,10 +1005,6 @@ class Instagram
             '"crop_original_size":'."[$size,$size]" => '"crop_original_size":'."[$size.0,$size.0]",
         ])
         ->getResponse(new ConfigureResponse());
-
-        if (!$configure->isOk()) {
-            throw new InstagramException($configure->getMessage());
-        }
 
         return $configure;
     }
