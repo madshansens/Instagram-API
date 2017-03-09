@@ -418,7 +418,6 @@ class HttpInterface
     /**
      * Wraps Guzzle's request and adds special error handling and options.
      *
-     *
      * Automatically throws exceptions on certain very serious HTTP errors. You
      * must ALWAYS use this (or _apiRequest()) instead of the raw Guzzle Client!
      * However, you can never assume the server response contains what you
