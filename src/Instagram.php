@@ -137,21 +137,30 @@ class Instagram
     }
 
     /**
-     * Login to Instagram.
+     * Login to Instagram or automatically resume and refresh previous session.
      *
-     * @param bool $force       Force login to Instagram, this will create a new session.
-     * @param int  $refreshTime How frequently login() should act like an Instagram client
-     *                          that's "refreshing its state", by asking for extended
-     *                          account state details (default: after 1800 seconds, meaning
-     *                          30 minutes since the last state-refreshing login() call).
+     * WARNING: You MUST run this function EVERY time your script runs! It handles automatic session
+     * resume and relogin and app session state refresh and other absolutely *vital* things that are
+     * important if you don't want to be banned from Instagram!
+     *
+     * @param bool $forceLogin         Force login to Instagram, this will create a new session.
+     * @param int  $appRefreshInterval How frequently login() should act like an Instagram app
+     *                                 that's been closed and reopened and needs to "refresh its
+     *                                 state", by asking for extended account state details.
+     *                                 Default: After 1800 seconds, meaning 30 minutes since the
+     *                                 last state-refreshing login() call.
+     *                                 This CANNOT be longer than 6 hours. Read code to see why!
+     *                                 The shorter your delay is the BETTER. You may even want to
+     *                                 set it to an even LOWER value than the default 30 minutes!
      *
      * @throws InstagramException
      *
      * @return ChallengeResponse|LoginResponse|ExploreResponse
      */
-    public function login($force = false, $refreshTime = 1800)
+    public function login($forceLogin = false, $appRefreshInterval = 1800)
     {
-        if (!$this->isLoggedIn || $force) {
+        // Perform a full relogin if necessary.
+        if (!$this->isLoggedIn || $forceLogin) {
             $this->syncFeatures(true);
 
             $response = $this->request('si/fetch_headers')
@@ -192,15 +201,45 @@ class Instagram
             return $this->explore();
         }
 
-        if (is_null($this->settings->get('last_login'))) {
-            $this->settings->set('last_login', time());
+        // Act like a real logged in app client refreshing its news timeline.
+        // This also lets us detect if we're still logged in with a valid session.
+        try {
+            $this->timelineFeed();
+        } catch (InstagramException $e) {
+            // If our session cookies are expired, we were now told to login,
+            // so handle that by running a forced relogin in that case!
+            if( $e->getCode() == ErrorCode::IG_LOGIN_REQUIRED ) {
+                return $this->login(true, $appRefreshInterval);
+            }
+
+            // Simply re-throw the original exception in all other error cases.
+            throw $e;
         }
 
-        $check = $this->timelineFeed();
-        if ($check->getMessage() == 'login_required') {
-            $this->login(true, $refreshTime);
+        // SUPER IMPORTANT:
+        //
+        // STOP trying to ask us to remove this code section!
+        //
+        // EVERY time the user presses their device's home button to leave the
+        // app and then comes back to the app, Instagram does ALL of these things
+        // to refresh its internal app state. We MUST emulate that perfectly,
+        // otherwise Instagram will silently detect you as a "fake" client
+        // after a while!
+        //
+        // You can configure the login's $appRefreshInterval in the function
+        // parameter above, but you should keep it VERY frequent (definitely
+        // NEVER longer than 6 hours), so that Instagram sees you as a real
+        // client that keeps quitting and opening their app like a REAL user!
+        //
+        // Otherwise they WILL detect you as a bot and silently BLOCK features
+        // or even ban you.
+        //
+        // You have been warned.
+        if ($appRefreshInterval > 21600) {
+            throw new InstagramException("Instagram's app state refresh interval is NOT allowed to be higher than 6 hours, and the lower the better!", ErrorCode::INTERNAL_INVALID_ARGUMENT);
         }
-        if (time() - $this->settings->get('last_login') > $refreshTime) {
+        $lastLoginTime = $this->settings->get('last_login');
+        if (is_null($lastLoginTime) || (time() - $lastLoginTime) > $appRefreshInterval) {
             $this->settings->set('last_login', time());
 
             $this->autoCompleteUserList();
@@ -260,7 +299,7 @@ class Instagram
                 return;
             }
 
-            // Simply re-throw the original exception in all other cases.
+            // Simply re-throw the original exception in all other error cases.
             throw $e;
         }
     }
