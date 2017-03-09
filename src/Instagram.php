@@ -475,20 +475,28 @@ class Instagram
 
     /**
      * INTERNAL.
+     *
+     * @param string $type          What type of upload ("timeline" or "story".
+     *                              but not "album". They're handled elsewhere.)
+     * @param string $photoFilename The photo filename.
+     * @param string $caption       Caption to use for the photo.
+     * @param null   $location      Location (only used for "timeline" photos).
+     * @param null   $filter        Photo filter.
+     *
+     * @throws InstagramException
+     *
+     * @return ConfigureResponse
      */
     protected function _uploadPhoto($type, $photoFilename, $caption = null, $location = null, $filter = null)
     {
-        $upload = $this->http->uploadPhoto($photoFilename, 'photofile', 'timeline');
-
-        if (!$upload->isOk()) {
-            throw new InstagramException($upload->getMessage());
+        // Make sure we don't allow "album" photo uploads via this function.
+        if ($type != 'timeline' && $type != 'story') {
+            throw new InstagramException(sprintf('Unsupported photo upload type "%s".', $type), ErrorCode::INTERNAL_INVALID_ARGUMENT);
         }
 
+        // Perform the upload and then configure it for our timeline/story.
+        $upload = $this->http->uploadPhotoData($type, $photoFilename);
         $configure = $this->configure($upload->getUploadId(), $photoFilename, $caption, $location, false, ($type == 'story' ? true : false), $filter);
-
-        if (!$configure->isOk()) {
-            throw new InstagramException($configure->getMessage());
-        }
 
         return $configure;
     }
@@ -497,9 +505,9 @@ class Instagram
      * Uploads a photo to your Instagram timeline.
 
      * @param string $photoFilename The photo filename.
-     * @param string $caption       Caption for your photo
-     * @param null   $location
-     * @param null   $filter
+     * @param string $caption       Caption to use for the photo.
+     * @param null   $location      Location where photo was taken.
+     * @param null   $filter        Photo filter.
      *
      * @throws InstagramException
      *
@@ -514,15 +522,17 @@ class Instagram
      * Uploads a photo to your Instagram story.
      *
      * @param $photoFilename
-     * @param null $caption
-     * @param null $location
-     * @param null $filter
+     * @param string $caption       Caption to display over the story photo.
+     * @param null   $filter        Photo filter.
      *
      * @throws InstagramException
      *
      * @return ConfigureResponse
      */
-    public function uploadStoryPhoto($photoFilename, $caption = null, $location = null, $filter = null)
+    public function uploadStoryPhoto($photoFilename, $caption = null, $filter = null)
+    {
+        return $this->_uploadPhoto('story', $photoFilename, $caption, null, $filter);
+    }
     {
         return $this->_uploadPhoto('story', $photoFilename, $caption, $location, $filter);
     }
@@ -552,7 +562,7 @@ class Instagram
 
             switch ($item['type']) {
             case 'photo':
-                $result = $this->http->uploadPhoto($item['file'], 'photofile', 'album');
+                $result = $this->http->uploadPhotoData('album', $item['file']);
                 $media[$key]['upload_id'] = $result->getUploadId();
                 break;
             case 'video':
@@ -760,7 +770,7 @@ class Instagram
      */
     public function configureVideo($upload_id, $videoFilename, $caption = '', $type = 'timeline', $reel_mentions = null, $customPreview = null)
     {
-        $this->http->uploadPhoto($videoFilename, 'videofile', $type, $upload_id);
+        $this->http->uploadPhotoData($type, $videoFilename, 'videofile', $upload_id);
 
         switch ($type) {
         case 'timeline':
@@ -829,9 +839,11 @@ class Instagram
      * @param bool   $story
      * @param null   $filter
      *
+     * @throws InstagramException
+     *
      * @return ConfigureResponse
      */
-    public function configure($upload_id, $photo, $caption = '', $location = null, $album = false, $story = false, $filter = null)
+    public function configure($upload_id, $photo, $caption = null, $location = null, $album = false, $story = false, $filter = null)
     {
         $size = getimagesize($photo)[0];
         if (is_null($caption)) {
@@ -884,12 +896,18 @@ class Instagram
             $requestData->addPost('edits', ['filter_type' => Utils::getFilterCode($filter)]);
         }
 
-        return $requestData->setReplacePost([
+        $configure = $requestData->setReplacePost([
             '"crop_center":[0,0]'                   => '"crop_center":[0.0,-0.0]',
             '"crop_zoom":1'                         => '"crop_zoom":1.0',
             '"crop_original_size":'."[$size,$size]" => '"crop_original_size":'."[$size.0,$size.0]",
         ])
         ->getResponse(new ConfigureResponse());
+
+        if (!$configure->isOk()) {
+            throw new InstagramException($configure->getMessage());
+        }
+
+        return $configure;
     }
 
     /**
