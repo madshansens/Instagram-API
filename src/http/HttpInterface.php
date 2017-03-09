@@ -16,14 +16,14 @@ class HttpInterface
      *
      * @var \InstagramAPI\Instagram
      */
-    protected $parent;
+    protected $_parent;
 
     /**
      * What user agent to identify our client as.
      *
      * @var string
      */
-    protected $userAgent;
+    protected $_userAgent;
 
     /**
      * The SSL certificate verification behavior of requests.
@@ -32,7 +32,7 @@ class HttpInterface
      *
      * @var bool|string
      */
-    protected $verifySSL;
+    protected $_verifySSL;
 
     /**
      * Proxy to use for all requests. Optional.
@@ -41,7 +41,7 @@ class HttpInterface
      *
      * @var string|array|null
      */
-    protected $proxy;
+    protected $_proxy;
 
     /**
      * Network interface to use.
@@ -55,12 +55,12 @@ class HttpInterface
     /**
      * @var \GuzzleHttp\Client
      */
-    private $client;
+    private $_client;
 
     /**
      * @var \GuzzleHttp\Cookie\FileCookieJar|\GuzzleHttp\Cookie\CookieJar
      */
-    private $jar;
+    private $_cookieJar;
 
     /**
      * Constructor.
@@ -69,14 +69,14 @@ class HttpInterface
      */
     public function __construct($parent)
     {
-        $this->parent = $parent;
+        $this->_parent = $parent;
 
         // Defaults.
-        $this->verifySSL = true;
-        $this->proxy = null;
+        $this->_verifySSL = true;
+        $this->_proxy = null;
 
         // Default request options (immutable after client creation).
-        $this->client = new Client([
+        $this->_client = new Client([
             'allow_redirects' => [
                 'max' => 8, // Allow up to eight redirects (that's plenty).
             ],
@@ -97,8 +97,8 @@ class HttpInterface
      */
     public function updateFromSettingsAdapter()
     {
-        $this->userAgent = $this->parent->settings->get('user_agent');
-        $this->jar = null; // Mark old jar for garbage collection.
+        $this->_userAgent = $this->_parent->settings->get('user_agent');
+        $this->_cookieJar = null; // Mark old jar for garbage collection.
         $this->loadCookieJar();
     }
 
@@ -107,17 +107,17 @@ class HttpInterface
      */
     public function loadCookieJar()
     {
-        if ($this->parent->settingsAdapter['type'] == 'file') {
+        if ($this->_parent->settingsAdapter['type'] == 'file') {
             // File-based cookie jar, which also persists temporary session cookies.
             // The FileCookieJar saves to disk whenever its object is destroyed,
             // such as at the end of script or when calling updateFromSettingsAdapter().
-            $this->jar = new FileCookieJar($this->parent->settings->cookiesPath, true);
+            $this->_cookieJar = new FileCookieJar($this->_parent->settings->cookiesPath, true);
         } else {
-            $restoredCookies = @json_decode($this->parent->settings->get('cookies'), true);
+            $restoredCookies = @json_decode($this->_parent->settings->get('cookies'), true);
             if (!is_array($restoredCookies)) {
                 $restoredCookies = []; // Create new, empty jar if restore failed.
             }
-            $this->jar = new CookieJar(false, $restoredCookies);
+            $this->_cookieJar = new CookieJar(false, $restoredCookies);
         }
 
         // Verify that the jar contains a non-expired csrftoken for the API
@@ -126,7 +126,7 @@ class HttpInterface
         // these checks succeed, the cookie may still not be valid. It's just a
         // preliminary check to detect definitely-invalid session cookies!
         $foundCSRFToken = false;
-        foreach ($this->jar->getIterator() as $cookie) {
+        foreach ($this->_cookieJar->getIterator() as $cookie) {
             if ($cookie->getName() == 'csrftoken'
                 && $cookie->getDomain() == 'i.instagram.com'
                 && $cookie->getExpires() > time()) {
@@ -135,7 +135,7 @@ class HttpInterface
             }
         }
         if (!$foundCSRFToken) {
-            $this->parent->isLoggedIn = false;
+            $this->_parent->isLoggedIn = false;
         }
     }
 
@@ -150,12 +150,12 @@ class HttpInterface
      */
     public function getCookieJarAsJSON()
     {
-        if (!$this->jar instanceof CookieJar) {
+        if (!$this->_cookieJar instanceof CookieJar) {
             return '[]';
         }
 
         // Gets ALL cookies from the jar, even temporary session-based cookies.
-        $cookies = $this->jar->toArray();
+        $cookies = $this->_cookieJar->toArray();
 
         // Throws if data can't be encoded as JSON (will never happen).
         $jsonStr = \GuzzleHttp\json_encode($cookies);
@@ -167,21 +167,21 @@ class HttpInterface
      * Tells current settings adapter to store cookies if necessary.
      *
      * There is no need to call this function manually. It's automatically
-     * called by guzzleRequest()!
+     * called by _guzzleRequest()!
      */
     public function saveCookieJar()
     {
         // If it's a FileCookieJar, we don't have to do anything. They are saved
         // automatically to disk when that object is destroyed/garbage collected.
-        if ($this->jar instanceof FileCookieJar) {
+        if ($this->_cookieJar instanceof FileCookieJar) {
             return;
         }
 
         // Tell any custom settings adapters to persist the current cookies.
-        if ($this->parent->settingsAdapter['type'] == 'mysql'
-            || $this->parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
+        if ($this->_parent->settingsAdapter['type'] == 'mysql'
+            || $this->_parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
             $newCookies = $this->getCookieJarAsJSON();
-            $this->parent->settings->set('cookies', $newCookies);
+            $this->_parent->settings->set('cookies', $newCookies);
         }
     }
 
@@ -197,7 +197,7 @@ class HttpInterface
      */
     public function setVerifySSL($state)
     {
-        $this->verifySSL = $state;
+        $this->_verifySSL = $state;
     }
 
     /**
@@ -207,7 +207,7 @@ class HttpInterface
      */
     public function getVerifySSL()
     {
-        return $this->verifySSL;
+        return $this->_verifySSL;
     }
 
     /**
@@ -220,7 +220,7 @@ class HttpInterface
      */
     public function setProxy($value)
     {
-        $this->proxy = $value;
+        $this->_proxy = $value;
     }
 
     /**
@@ -230,7 +230,7 @@ class HttpInterface
      */
     public function getProxy()
     {
-        return $this->proxy;
+        return $this->_proxy;
     }
 
     /**
@@ -245,7 +245,7 @@ class HttpInterface
      * @param object      $response     The Guzzle response object from the request.
      * @param string      $responseBody The actual text-body reply from the server.
      */
-    protected function printDebug($method, $url, $postBody, $uploadBytes, $response, $responseBody)
+    protected function _printDebug($method, $url, $postBody, $uploadBytes, $response, $responseBody)
     {
         Debug::printRequest($method, $url);
 
@@ -270,7 +270,7 @@ class HttpInterface
         Debug::printHttpCode($response->getStatusCode(), $bytes);
 
         // Display the actual API response body.
-        Debug::printResponse($responseBody, $this->parent->truncatedDebug);
+        Debug::printResponse($responseBody, $this->_parent->truncatedDebug);
     }
 
     /**
@@ -279,11 +279,11 @@ class HttpInterface
      * Remember to ALWAYS call this function at the top of any API request that
      * requires the user to be logged in!
      */
-    protected function throwIfNotLoggedIn()
+    protected function _throwIfNotLoggedIn()
     {
         // Check the cached login state. May not reflect what will happen on the
         // server. But it's the best we can check without trying the actual request!
-        if (!$this->parent->isLoggedIn) {
+        if (!$this->_parent->isLoggedIn) {
             throw new InstagramException('User not logged in. Please call login() and then try again.', ErrorCode::INTERNAL_LOGIN_REQUIRED);
         }
     }
@@ -293,18 +293,18 @@ class HttpInterface
      *
      * Takes care of adding all critical options that we need on every request.
      * Such as cookies and the user's proxy. But don't call this function
-     * manually. It's automatically called by guzzleRequest()!
+     * manually. It's automatically called by _guzzleRequest()!
      *
      * @param array $options The options specific to the current request.
      *
      * @return array A guzzle options array.
      */
-    protected function buildGuzzleOptions(array $options)
+    protected function _buildGuzzleOptions(array $options)
     {
         $criticalOptions = [
-            'cookies' => ($this->jar instanceof CookieJar ? $this->jar : false),
-            'verify'  => $this->verifySSL,
-            'proxy'   => (!is_null($this->proxy) ? $this->proxy : null),
+            'cookies' => ($this->_cookieJar instanceof CookieJar ? $this->_cookieJar : false),
+            'verify'  => $this->_verifySSL,
+            'proxy'   => (!is_null($this->_proxy) ? $this->_proxy : null),
         ];
 
         // Critical options always overwrite identical keys in regular opts.
@@ -333,13 +333,13 @@ class HttpInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    protected function guzzleRequest($method, $uri, array $options = [])
+    protected function _guzzleRequest($method, $uri, array $options = [])
     {
         // Add critically important options for authenticating the request.
-        $options = $this->buildGuzzleOptions($options);
+        $options = $this->_buildGuzzleOptions($options);
 
         // Attempt the request. Will throw in case of socket errors!
-        $response = $this->client->request($method, $uri, $options);
+        $response = $this->_client->request($method, $uri, $options);
 
         // Detect very serious HTTP status codes in the response.
         $httpCode = $response->getStatusCode();
@@ -386,12 +386,12 @@ class HttpInterface
     public function request($endpoint, $postData = null, $needsAuth = false, $assoc = true)
     {
         if (!$needsAuth) { // Only allow non-authenticated requests until logged in.
-            $this->throwIfNotLoggedIn();
+            $this->_throwIfNotLoggedIn();
         }
 
         // Build request options.
         $headers = [
-            'User-Agent'            => $this->userAgent,
+            'User-Agent'            => $this->_userAgent,
             // Keep the API's HTTPS connection alive in Guzzle for future
             // re-use, to greatly speed up all further queries after this.
             'Connection'            => 'keep-alive',
@@ -414,17 +414,17 @@ class HttpInterface
         }
 
         // Perform the API request.
-        $response = $this->guzzleRequest($method, Constants::API_URL.$endpoint, $options);
+        $response = $this->_guzzleRequest($method, Constants::API_URL.$endpoint, $options);
         $body = $response->getBody()->getContents();
 
         // Debugging (must be shown before possible decoding error).
-        if ($this->parent->debug) {
-            $this->printDebug($method, $endpoint, $postData, null, $response, $body);
+        if ($this->_parent->debug) {
+            $this->_printDebug($method, $endpoint, $postData, null, $response, $body);
         }
 
         // Process cookies and decode the JSON response.
         $csrftoken = null;
-        $cookies = $this->jar->getIterator();
+        $cookies = $this->_cookieJar->getIterator();
         foreach ($cookies as $cookie) {
             if ($cookie->getName() == 'csrftoken') {
                 $csrftoken = $cookie->getValue();
@@ -462,7 +462,7 @@ class HttpInterface
         // Perform mapping.
         $mapper = new \JsonMapper();
         $mapper->bStrictNullTypes = false;
-        if ($this->parent->apiDeveloperDebug) {
+        if ($this->_parent->apiDeveloperDebug) {
             // API developer debugging? Throws error if class lacks properties.
             $mapper->bExceptionOnUndefinedProperty = true;
         }
@@ -497,7 +497,7 @@ class HttpInterface
      */
     public function uploadPhotoData($type, $photoFilename, $fileType = 'photofile', $upload_id = null)
     {
-        $this->throwIfNotLoggedIn();
+        $this->_throwIfNotLoggedIn();
 
         $endpoint = 'upload/photo/';
 
@@ -515,7 +515,7 @@ class HttpInterface
         }
 
         // Prepare payload for the upload request.
-        $boundary = $this->parent->uuid;
+        $boundary = $this->_parent->uuid;
         //$helper = new AdaptImage(); // <-- WTF? Old leftover code.
         $bodies = [
             [
@@ -531,7 +531,7 @@ class HttpInterface
             [
                 'type' => 'form-data',
                 'name' => '_csrftoken',
-                'data' => $this->parent->token,
+                'data' => $this->_parent->token,
             ],
             [
                 'type' => 'form-data',
@@ -556,12 +556,12 @@ class HttpInterface
                 'data' => '1',
             ];
         }
-        $payload = $this->buildBody($bodies, $boundary);
+        $payload = $this->_buildBody($bodies, $boundary);
 
         // Build the request options.
         $method = 'POST';
         $headers = [
-            'User-Agent'            => $this->userAgent,
+            'User-Agent'            => $this->_userAgent,
             'Connection'            => 'keep-alive',
             'Accept'                => '*/*',
             'Accept-Encoding'       => Constants::ACCEPT_ENCODING,
@@ -578,12 +578,12 @@ class HttpInterface
         ];
 
         // Perform the API request.
-        $response = $this->guzzleRequest($method, Constants::API_URL.$endpoint, $options);
+        $response = $this->_guzzleRequest($method, Constants::API_URL.$endpoint, $options);
         $body = $response->getBody()->getContents();
 
         // Debugging (must be shown before possible decoding error).
-        if ($this->parent->debug) {
-            $this->printDebug($method, $endpoint, null, strlen($payload), $response, $body);
+        if ($this->_parent->debug) {
+            $this->_printDebug($method, $endpoint, null, strlen($payload), $response, $body);
         }
 
         // Decode the API response and check for success.
@@ -606,12 +606,12 @@ class HttpInterface
      */
     public function requestVideoUploadURL($upload_id = null)
     {
-        $this->throwIfNotLoggedIn();
+        $this->_throwIfNotLoggedIn();
 
         $endpoint = 'upload/video/';
 
         // Prepare payload for the "pre-upload" request.
-        $boundary = $this->parent->uuid;
+        $boundary = $this->_parent->uuid;
         if (is_null($upload_id)) {
             $upload_id = Utils::generateUploadId();
         }
@@ -624,7 +624,7 @@ class HttpInterface
             [
                 'type' => 'form-data',
                 'name' => '_csrftoken',
-                'data' => $this->parent->token,
+                'data' => $this->_parent->token,
             ],
             [
                 'type' => 'form-data',
@@ -637,12 +637,12 @@ class HttpInterface
                 'data' => $boundary,
             ],
         ];
-        $payload = $this->buildBody($bodies, $boundary);
+        $payload = $this->_buildBody($bodies, $boundary);
 
         // Build the "pre-upload" request's options.
         $method = 'POST';
         $headers = [
-            'User-Agent'      => $this->userAgent,
+            'User-Agent'      => $this->_userAgent,
             'Connection'      => 'keep-alive',
             'Accept'          => '*/*',
             'Content-Type'    => 'multipart/form-data; boundary='.$boundary,
@@ -654,12 +654,12 @@ class HttpInterface
         ];
 
         // Perform the "pre-upload" API request.
-        $response = $this->guzzleRequest($method, Constants::API_URL.$endpoint, $options);
+        $response = $this->_guzzleRequest($method, Constants::API_URL.$endpoint, $options);
         $body = $response->getBody()->getContents();
 
         // Debugging (must be shown before possible decoding error).
-        if ($this->parent->debug) {
-            $this->printDebug($method, $endpoint, $payload, null, $response, $body);
+        if ($this->_parent->debug) {
+            $this->_printDebug($method, $endpoint, $payload, null, $response, $body);
         }
 
         // Decode the API response and check for success.
@@ -688,7 +688,7 @@ class HttpInterface
      */
     public function uploadVideoChunks($videoFilename, array $uploadParams)
     {
-        $this->throwIfNotLoggedIn();
+        $this->_throwIfNotLoggedIn();
 
         // Determine correct file extension for video format.
         $videoExt = pathinfo($videoFilename, PATHINFO_EXTENSION);
@@ -719,7 +719,7 @@ class HttpInterface
                 // Build the current chunk's request options.
                 $method = 'POST';
                 $headers = [
-                    'User-Agent'          => $this->userAgent,
+                    'User-Agent'          => $this->_userAgent,
                     'Connection'          => 'keep-alive',
                     'Accept'              => '*/*',
                     'Cookie2'             => '$Version=1',
@@ -737,12 +737,12 @@ class HttpInterface
                 ];
 
                 // Perform the upload of the current chunk.
-                $response = $this->guzzleRequest($method, $uploadParams['upload_url'], $options);
+                $response = $this->_guzzleRequest($method, $uploadParams['upload_url'], $options);
                 $body = $response->getBody()->getContents();
 
                 // Debugging (must be shown before possible decoding error).
-                if ($this->parent->debug) {
-                    $this->printDebug($method, $uploadParams['upload_url'], null, $chunkSize, $response, $body);
+                if ($this->_parent->debug) {
+                    $this->_printDebug($method, $uploadParams['upload_url'], null, $chunkSize, $response, $body);
                 }
 
                 // Check if Instagram's server has bugged out.
@@ -800,7 +800,7 @@ class HttpInterface
      */
     public function uploadVideoData($type, $videoFilename, array $uploadParams, $maxAttempts = 4)
     {
-        $this->throwIfNotLoggedIn();
+        $this->_throwIfNotLoggedIn();
 
         // Upload the entire video file, with retries in case of chunk upload errors.
         for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
@@ -829,7 +829,7 @@ class HttpInterface
      */
     public function changeProfilePicture($photoFilename)
     {
-        $this->throwIfNotLoggedIn();
+        $this->_throwIfNotLoggedIn();
 
         $endpoint = 'accounts/change_profile_picture/';
 
@@ -838,11 +838,11 @@ class HttpInterface
         }
 
         // Prepare payload for the upload request.
-        $boundary = $this->parent->uuid;
+        $boundary = $this->_parent->uuid;
         $uData = json_encode([
-            '_csrftoken' => $this->parent->token,
+            '_csrftoken' => $this->_parent->token,
             '_uuid'      => $boundary,
-            '_uid'       => $this->parent->username_id,
+            '_uid'       => $this->_parent->username_id,
         ]);
         $bodies = [
             [
@@ -866,12 +866,12 @@ class HttpInterface
                 ],
             ],
         ];
-        $payload = $this->buildBody($bodies, $boundary);
+        $payload = $this->_buildBody($bodies, $boundary);
 
         // Build the request options.
         $method = 'POST';
         $headers = [
-            'User-Agent'       => $this->userAgent,
+            'User-Agent'       => $this->_userAgent,
             'Proxy-Connection' => 'keep-alive',
             'Connection'       => 'keep-alive',
             'Accept'           => '*/*',
@@ -884,12 +884,12 @@ class HttpInterface
         ];
 
         // Perform the API request.
-        $response = $this->guzzleRequest($method, Constants::API_URL.$endpoint, $options);
+        $response = $this->_guzzleRequest($method, Constants::API_URL.$endpoint, $options);
         $body = $response->getBody()->getContents();
 
         // Debugging (must be shown before possible decoding error).
-        if ($this->parent->debug) {
-            $this->printDebug($method, $endpoint, null, strlen($payload), $response, $body);
+        if ($this->_parent->debug) {
+            $this->_printDebug($method, $endpoint, null, strlen($payload), $response, $body);
         }
 
         // Decode the API response and check for success.
@@ -914,7 +914,7 @@ class HttpInterface
      */
     public function directShare($shareType, $recipients, array $shareData)
     {
-        $this->throwIfNotLoggedIn();
+        $this->_throwIfNotLoggedIn();
 
         // Determine which endpoint to use and validate input.
         switch ($shareType) {
@@ -953,7 +953,7 @@ class HttpInterface
         // SO WE CONSTRUCT THEIR FINAL $bodies STEP BY STEP TO AVOID
         // CODE REPETITION. BUT RECKLESS FUTURE CHANGES BELOW COULD
         // BREAK *ALL* REQUESTS IF YOU ARE NOT *VERY* CAREFUL!!!
-        $boundary = $this->parent->uuid;
+        $boundary = $this->_parent->uuid;
         $bodies = [];
         if ($shareType == 'share') {
             $bodies[] = [
@@ -994,12 +994,12 @@ class HttpInterface
             'name' => 'text',
             'data' => (!isset($shareData['text']) || is_null($shareData['text']) ? '' : $shareData['text']),
         ];
-        $payload = $this->buildBody($bodies, $boundary);
+        $payload = $this->_buildBody($bodies, $boundary);
 
         // Build the request options.
         $method = 'POST';
         $headers = [
-            'User-Agent'       => $this->userAgent,
+            'User-Agent'       => $this->_userAgent,
             'Proxy-Connection' => 'keep-alive',
             'Connection'       => 'keep-alive',
             'Accept'           => '*/*',
@@ -1012,12 +1012,12 @@ class HttpInterface
         ];
 
         // Perform the API request.
-        $response = $this->guzzleRequest($method, Constants::API_URL.$endpoint, $options);
+        $response = $this->_guzzleRequest($method, Constants::API_URL.$endpoint, $options);
         $body = $response->getBody()->getContents();
 
         // Debugging (must be shown before possible decoding error).
-        if ($this->parent->debug) {
-            $this->printDebug($method, $endpoint, null, strlen($payload), $response, $body);
+        if ($this->_parent->debug) {
+            $this->_printDebug($method, $endpoint, null, strlen($payload), $response, $body);
         }
 
         // Decode the API response and check for successful direct-share upload.
@@ -1034,7 +1034,7 @@ class HttpInterface
      *
      * @return string
      */
-    protected function buildBody(array $bodies, $boundary)
+    protected function _buildBody(array $bodies, $boundary)
     {
         $body = '';
         foreach ($bodies as $b) {
