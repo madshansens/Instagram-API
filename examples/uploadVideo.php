@@ -27,10 +27,10 @@ try {
 try {
     // Note that this performs a few automatic chunk upload retries by default,
     // in case of failing to upload the video chunks to Instagram's server!
-    $i->uploadVideo($videoFilename, $caption);
+    $i->uploadTimelineVideo($videoFilename, $caption);
     // or...
     // Example of using 8 retries instead of the default amount:
-    // $i->uploadVideo($video, $caption, 'timeline', null, null, 8);
+    // $i->uploadTimelineVideo($videoFilename, $caption, null, 8);
 } catch (Exception $e) {
     echo $e->getMessage();
 }

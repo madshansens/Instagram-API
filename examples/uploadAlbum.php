@@ -16,7 +16,8 @@ $media = [
     [
         'type'     => 'photo',
         'file'     => '', // path to the photo file
-    ], [
+    ],
+    [
         'type'     => 'photo',
         'file'     => '', // path to the photo file
         'usertags' => [ // optional, lets you tag one or more users in the photo
@@ -25,6 +26,10 @@ $media = [
                 'user_id'  => 0,
             ],
         ],
+    ],
+    [
+        'type'     => 'video',
+        'file'     => '', // path to the video file
     ],
 ];
 

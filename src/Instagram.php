@@ -616,7 +616,8 @@ class Instagram
     /**
      * Uploads Album (aka Carousel aka Sidecar).
      *
-     * @param array $media    Array of image/video metadata (type, path, usertags etc)
+     * @param array $media    Array of image/video metadata (type, file, usertags etc)
+     *                        You can only provide "usertags" for PHOTOS!
      * @param null  $caption  Text for album
      * @param null  $location Geotag
      * @param null  $filter
