@@ -115,9 +115,10 @@ class Item extends Response
      */
     public $lng;
     /**
-     * @var Location[]
+     * @var StoryLocation[]
      */
     public $story_locations;
+    public $algorithm;
 
     public function setMediaOrAd($params)
     {

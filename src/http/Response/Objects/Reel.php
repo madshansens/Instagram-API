@@ -16,4 +16,14 @@ class Reel extends Response
     public $expiring_at;
     public $seen;
     public $can_reply;
+    /**
+     * @var Location
+     */
+    public $location;
+    public $latest_reel_media;
+    public $prefetch_count;
+    /**
+     * @var Broadcast
+     */
+    public $broadcast;
 }
