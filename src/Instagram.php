@@ -533,9 +533,6 @@ class Instagram
     {
         return $this->_uploadPhoto('story', $photoFilename, $caption, null, $filter);
     }
-    {
-        return $this->_uploadPhoto('story', $photoFilename, $caption, $location, $filter);
-    }
 
     /**
      * Uploads Album (aka Carousel aka Sidecar).
