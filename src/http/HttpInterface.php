@@ -566,7 +566,7 @@ class HttpInterface
             // Check for API response success and attempt to decode it to the desired class.
             $result['object'] = $this->getMappedResponseObject(
                 $libraryOptions['decodeToObject'],
-                self::api_decode($body), // Important: Special JSON decoder.
+                self::api_body_decode($body), // Important: Special JSON decoder.
                 true // Forcibly validates that the API response "status" MUST be Ok.
             );
         }
@@ -642,7 +642,7 @@ class HttpInterface
 
         // Manually decode the JSON response, since we didn't request object decoding
         // above. This lets our caller later map it to any object they want (or none).
-        $result = self::api_decode($response['body'], $assoc);
+        $result = self::api_body_decode($response['body'], $assoc);
 
         return [$csrftoken, $result];
     }
@@ -948,7 +948,7 @@ class HttpInterface
         // Manually decode the final API response and check for successful chunked upload.
         $upload = $this->getMappedResponseObject(
             new UploadVideoResponse(),
-            self::api_decode($response['body']), // Important: Special JSON decoder.
+            self::api_body_decode($response['body']), // Important: Special JSON decoder.
             true // Forcibly validates that the API response "status" MUST be Ok.
         );
 
@@ -1242,7 +1242,7 @@ class HttpInterface
      * @return object|array|null Object if assoc false, Array if assoc true,
      *                           or NULL if unable to decode JSON.
      */
-    public static function api_decode($json, $assoc = false)
+    public static function api_body_decode($json, $assoc = false)
     {
         return json_decode($json, $assoc, 512, JSON_BIGINT_AS_STRING);
     }
