@@ -63,4 +63,5 @@ class User extends Response
     public $national_number; // getProfileData prop
     public $gender; // getProfileData prop
     public $phone_number; // getProfileData prop
+    public $needs_email_confirm; // getProfileData prop
 }

@@ -26,4 +26,5 @@ class Tray extends Response
      * @var Location
      */
     public $location;
+    public $source_token;
 }
