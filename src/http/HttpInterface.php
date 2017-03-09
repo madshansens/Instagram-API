@@ -8,6 +8,19 @@ use GuzzleHttp\Cookie\FileCookieJar;
 
 /**
  * This class handles core API communication and file uploads.
+ *
+ * WARNING TO CONTRIBUTORS: Do NOT build ANY monolithic multi-step functions
+ * within this class! Every function here MUST be a tiny, individual unit of
+ * work, such as "request upload URL" or "upload data to a URL". NOT "request
+ * upload URL, upload data, configure its location, post it to a timeline, call
+ * your grandmother and make some tea". Because that would be unmaintainable and
+ * would lock us into unmodifiable, bloated behaviors!
+ *
+ * Such larger multi-step algorithms MUST be implemented in Instagram.php
+ * instead, and MUST simply use individual functions from this class to
+ * accomplish their larger jobs.
+ *
+ * Thank you, for not writing spaghetti code! ;-)
  */
 class HttpInterface
 {
