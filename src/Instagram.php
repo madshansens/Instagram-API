@@ -289,7 +289,7 @@ class Instagram
             'users'                => $this->username_id,
         ]);
 
-        return $this->http->request('push/register/?platform=10&device_type=android_mqtt', SignatureUtils::generateSignature($data))[1];
+        return $this->http->api('push/register/?platform=10&device_type=android_mqtt', SignatureUtils::generateSignature($data))[1];
     }
 
     /**
@@ -793,7 +793,7 @@ class Instagram
         if ($cursorId) {
             $threadUrl = "direct_v2/threads/$threadId/?cursor=$cursorId";
         }
-        $directThread = $this->http->request($threadUrl)[1];
+        $directThread = $this->http->api($threadUrl)[1];
         if ($directThread['status'] != 'ok') {
             throw new InstagramException($directThread['message']);
         }
@@ -818,7 +818,7 @@ class Instagram
             '_csrftoken' => $this->token,
         ]);
 
-        return $this->http->request("direct_v2/threads/$threadId/$threadAction/", SignatureUtils::generateSignature($data))[1];
+        return $this->http->api("direct_v2/threads/$threadId/$threadAction/", SignatureUtils::generateSignature($data))[1];
     }
 
     /**
@@ -2366,7 +2366,7 @@ class Request
             $post = str_replace(array_keys($this->replacePost), array_values($this->replacePost), $post);
         }
 
-        $response = $instagramObj->http->request($endPoint, $post, $this->requireLogin, false);
+        $response = $instagramObj->http->api($endPoint, $post, $this->requireLogin, false);
 
         $responseObject = $instagramObj->http->getMappedResponseObject(
             $baseClass,

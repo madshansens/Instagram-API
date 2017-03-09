@@ -575,7 +575,7 @@ class HttpInterface
     }
 
     /**
-     * Perform an Instagram API request.
+     * Perform an Instagram API call.
      *
      * @param string     $endpoint  The relative API endpoint URL to call.
      * @param array|null $postData  Optional array of POST-parameters, to do a
@@ -588,7 +588,7 @@ class HttpInterface
      *
      * @return mixed An object or associative array.
      */
-    public function request($endpoint, $postData = null, $needsAuth = false, $assoc = true)
+    public function api($endpoint, $postData = null, $needsAuth = false, $assoc = true)
     {
         if (!$needsAuth) { // Only allow non-authenticated requests until logged in.
             $this->_throwIfNotLoggedIn();
