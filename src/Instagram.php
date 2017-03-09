@@ -496,7 +496,7 @@ class Instagram
 
         // Perform the upload and then configure it for our timeline/story.
         $upload = $this->http->uploadPhotoData($type, $photoFilename);
-        $configure = $this->configure($upload->getUploadId(), $photoFilename, $caption, $location, false, ($type == 'story' ? true : false), $filter);
+        $configure = $this->configure($type, $upload->getUploadId(), $photoFilename, $caption, $location, $filter);
 
         return $configure;
     }
@@ -725,7 +725,7 @@ class Instagram
 
         // TODO: THIS SEEMS BUGGED TO ME. Why is it only using the last item's
         // "file" value when configuring a whole array of uploadRequests?
-        $configure = $this->configure($uploadRequests, $item['file'], $caption, $location, true, false, $filter);
+        $configure = $this->configure('album', $uploadRequests, $item['file'], $caption, $location, $filter);
 
         return $configure;
     }
@@ -871,6 +871,8 @@ class Instagram
     }
 
     /**
+     * Configure video.
+     *
      * @param string $type          What type of upload ("timeline" or "story",
      *                              but not "album". They're handled elsewhere.)
      * @param string $upload_id     The ID of the upload to configure.
@@ -928,7 +930,7 @@ class Instagram
         if ($type == 'story') {
             $requestData->addPost('story_media_creation_date', time());
             if (!is_null($userTags)) {
-                //$requestData->addPost('reel_mentions', $reel_mention)
+                //$requestData->addPost('reel_mentions', $userTags)
             }
         }
 
@@ -942,28 +944,29 @@ class Instagram
     }
 
     /**
-     * @param $upload_id
-     * @param $photo
+     * Configure (primarily for photos, but also albums).
+     *
+     * @param string $type          What type of entry ("timeline", "story" or "album").
+     * @param string $upload_id     The ID of the entry to configure.
+     * @param string $photoFilename
      * @param string $caption
      * @param null   $location
-     * @param bool   $album
-     * @param bool   $story
      * @param null   $filter
      *
      * @throws InstagramException
      *
      * @return ConfigureResponse
      */
-    public function configure($upload_id, $photo, $caption = null, $location = null, $album = false, $story = false, $filter = null)
+    public function configure($type, $upload_id, $photoFilename, $caption = null, $location = null, $filter = null)
     {
-        $size = getimagesize($photo)[0];
+        $size = getimagesize($photoFilename)[0];
         if (is_null($caption)) {
             $caption = '';
         }
 
-        if ($album) {
+        if ($type == 'album') {
             $endpoint = 'media/configure_sidecar/?';
-        } elseif ($story) {
+        } elseif ($type == 'story') {
             $endpoint = 'media/configure_to_reel/';
         } else {
             $endpoint = 'media/configure/';
@@ -977,7 +980,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('caption', $caption);
 
-        if ($album) {
+        if ($type == 'album') {
             $requestData->addPost('client_sidecar_id', Utils::generateUploadId())
             ->addPost('children_metadata', $upload_id);
         } else {
@@ -1022,7 +1025,7 @@ class Instagram
     }
 
     /**
-     *  Edit media.
+     * Edit media.
      *
      * @param $mediaId  Media id
      * @param string $captionText Caption text
