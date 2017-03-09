@@ -476,7 +476,7 @@ class Instagram
     /**
      * INTERNAL.
      *
-     * @param string $type          What type of upload ("timeline" or "story".
+     * @param string $type          What type of upload ("timeline" or "story",
      *                              but not "album". They're handled elsewhere.)
      * @param string $photoFilename The photo filename.
      * @param string $caption       Caption to use for the photo.
@@ -532,6 +532,85 @@ class Instagram
     public function uploadStoryPhoto($photoFilename, $caption = null, $filter = null)
     {
         return $this->_uploadPhoto('story', $photoFilename, $caption, null, $filter);
+    }
+
+    /**
+     * INTERNAL.
+     *
+     * @param string $type          What type of upload ("timeline" or "story",
+     *                              but not "album". They're handled elsewhere.)
+     * @param string $videoFilename The video filename.
+     * @param string $caption       Caption to use for the video.
+     * @param string $customThumb   Optional path to custom video thumbnail.
+     *                              If nothing provided, we generate from video.
+     * @param null   $userTags      Tagged people (only used for "story" videos!).
+     * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
+     *
+     * @throws InstagramException
+     *
+     * @return ConfigureVideoResponse
+     */
+    protected function _uploadVideo($type, $videoFilename, $caption = null, $customThumb = null, $userTags = null, $maxAttempts = 4)
+    {
+        // Make sure we don't allow "album" video uploads via this function.
+        if ($type != 'timeline' && $type != 'story') {
+            throw new InstagramException(sprintf('Unsupported video upload type "%s".', $type), ErrorCode::INTERNAL_INVALID_ARGUMENT);
+        }
+
+        // Request parameters for uploading a new video.
+        $uploadParams = $this->http->requestVideoUploadURL();
+
+        // Attempt to upload the video data.
+        $upload = $this->http->uploadVideoData($type, $videoFilename, $uploadParams, $maxAttempts);
+
+        // Attempt to upload the thumbnail, associated with our video's ID.
+        if (is_null($customThumb)) {
+            $this->http->uploadPhotoData($type, $videoFilename, 'videofile', $uploadParams['upload_id']);
+        } else {
+            $this->http->uploadPhotoData($type, $customThumb, 'photofile', $uploadParams['upload_id']);
+        }
+
+        // Configure the uploaded video and attach it to our timeline/story.
+        $configure = $this->configureVideoWithRetries($type, $uploadParams['upload_id'], $caption, $userTags);
+
+        return $configure;
+    }
+
+    /**
+     * Uploads a video to your Instagram timeline.
+     *
+     * @param string $videoFilename The video filename.
+     * @param string $caption       Caption to use for the video.
+     * @param string $customThumb   Optional path to custom video thumbnail.
+     *                              If nothing provided, we generate from video.
+     * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
+     *
+     * @throws InstagramException
+     *
+     * @return ConfigureVideoResponse
+     */
+    public function uploadTimelineVideo($videoFilename, $caption = null, $customThumb = null, $maxAttempts = 4)
+    {
+        return $this->_uploadVideo('timeline', $videoFilename, $caption, $customThumb, null, $maxAttempts);
+    }
+
+    /**
+     * Uploads a video to your Instagram story.
+     *
+     * @param string $videoFilename The video filename.
+     * @param string $caption       Caption to use for the video.
+     * @param string $customThumb   Optional path to custom video thumbnail.
+     *                              If nothing provided, we generate from video.
+     * @param null   $userTags      Array of user IDs of people tagged in your video.
+     * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
+     *
+     * @throws InstagramException
+     *
+     * @return ConfigureVideoResponse
+     */
+    public function uploadStoryVideo($videoFilename, $caption = null, $customThumb = null, $userTags = null, $maxAttempts = 4)
+    {
+        return $this->_uploadVideo('story', $videoFilename, $caption, $customThumb, $userTags, $maxAttempts);
     }
 
     /**
@@ -628,32 +707,7 @@ class Instagram
         // "file" value when configuring a whole array of uploadRequests?
         $configure = $this->configure($uploadRequests, $item['file'], $caption, $location, true, false, $filter);
 
-        if (!$configure->isOk()) {
-            throw new InstagramException($configure->getMessage());
-        }
-
         return $configure;
-    }
-
-    /**
-     * Uploads a video to Instagram.
-     *
-     * @param string $videoFilename The video filename.
-     * @param string $caption       Caption to use for the video.
-     * @param string $type          What type of video ("timeline", "story" or "album").
-     * @param null   $reel_mentions ? TODO: document this
-     * @param string $customPreview Optional path to custom video thumbnail.
-     *                              If nothing provided, we generate from video.
-     * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
-     *
-     * @throws InstagramException
-     *
-     * @return ConfigureVideoResponse|string An upload id string if type is
-     *                                       album, otherwise configure response.
-     */
-    public function uploadVideo($videoFilename, $caption = null, $type = 'timeline', $reel_mentions = null, $customPreview = null, $maxAttempts = 4)
-    {
-        return $this->http->uploadVideo($videoFilename, $caption, $type, $reel_mentions, $customPreview, $maxAttempts);
     }
 
     /**
@@ -755,19 +809,61 @@ class Instagram
     }
 
     /**
-     * @param $upload_id
-     * @param $videoFilename
-     * @param string $caption
-     * @param string $type          What type of video ("timeline", "story" or "album").
-     * @param null   $reel_mentions
-     * @param null   $customPreview
+     * Helper function for reliably configuring videos.
      *
-     * @return ConfigureVideoResponse|null NULL if type is album, otherwise response.
+     * Exactly the same as configureVideo() but performs multiple attempts. Very
+     * useful since Instagram sometimes can't configure a newly uploaded video
+     * file until a few seconds have passed.
+     *
+     * @param string $type          What type of upload ("timeline" or "story",
+     *                              but not "album". They're handled elsewhere.)
+     * @param string $upload_id     The ID of the upload to configure.
+     * @param string $caption       Caption to use for the video.
+     * @param null   $userTags      Tagged people (only used for "story" videos!).
+     * @param int    $maxAttempts   Total attempts to configure video before throwing.
+     *
+     * @throws InstagramException
+     *
+     * @return ConfigureVideoResponse
+     *
+     * @see configureVideo()
      */
-    public function configureVideo($upload_id, $videoFilename, $caption = '', $type = 'timeline', $reel_mentions = null, $customPreview = null)
+    public function configureVideoWithRetries($type, $upload_id, $caption = null, $userTags = null, $maxAttempts = 4)
     {
-        $this->http->uploadPhotoData($type, $videoFilename, 'videofile', $upload_id);
+        for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
+            try {
+                // Attempt to configure video parameters.
+                $configure = $this->configureVideo($type, $upload_id, $caption, $userTags);
+                //$this->expose(); // <-- WTF? Old leftover code.
+                break; // Success. Exit loop.
+            } catch (InstagramException $e) {
+                if ($attempt < $maxAttempts && strpos($e->getMessage(), 'Transcode timeout') !== false) {
+                    // Do nothing, since we'll be retrying the failed configure...
+                    sleep(1); // Just wait a little before the next retry.
+                } else {
+                    // Re-throw all unhandled exceptions.
+                    throw $e;
+                }
+            }
+        }
 
+        return $configure; // ConfigureVideoResponse
+    }
+
+    /**
+     * @param string $type          What type of upload ("timeline" or "story",
+     *                              but not "album". They're handled elsewhere.)
+     * @param string $upload_id     The ID of the upload to configure.
+     * @param string $caption       Caption to use for the video.
+     * @param null   $userTags      Tagged people (only used for "story" videos!).
+     *
+     * @throws InstagramException
+     *
+     * @return ConfigureVideoResponse
+     */
+    public function configureVideo($type, $upload_id, $caption = null, $userTags = null)
+    {
+        // Make sure we don't configure "album" video uploads via this function.
         switch ($type) {
         case 'timeline':
             $endpoint = 'media/configure/';
@@ -775,15 +871,8 @@ class Instagram
         case 'story':
             $endpoint = 'media/configure_to_reel/';
             break;
-        case 'album':
-            // NOTE: Albums are configured elsewhere (in uploadAlbum()) but we
-            // still needed to do the thumbnail upload above, which is why we use
-            // configureVideo() even for videos in albums. But we don't need to do
-            // any more configure-work here in the case of album videos!
-            return; // Don't do any more work!
-            break;
         default:
-            throw new InstagramException('Invalid video type.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
+            throw new InstagramException('Invalid video configuration type.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
         }
 
         $requestData = $this->request($endpoint)
@@ -809,21 +898,27 @@ class Instagram
         ->addPost('_uid', $this->username_id)
         ->setReplacePost(['"length":0' => '"length":0.00']);
 
-        if ($caption != '' && !is_null($caption) && $caption) {
+        if ($caption !== '' && !is_null($caption) && $caption) {
             $requestData->addPost('caption', $caption);
         }
 
-        // TODO
+        // TODO: IMPLEMENT THIS "STORY USER TAGS" FEATURE!
         // Reel Mention example --> build with user id
         // [{\"y\":0.3407772676161919,\"rotation\":0,\"user_id\":\"USER_ID\",\"x\":0.39892578125,\"width\":0.5619921875,\"height\":0.06011525487256372}]
         if ($type == 'story') {
             $requestData->addPost('story_media_creation_date', time());
-            if (!is_null($reel_mentions)) {
+            if (!is_null($userTags)) {
                 //$requestData->addPost('reel_mentions', $reel_mention)
             }
         }
 
-        $requestData->getResponse(new ConfigureVideoResponse());
+        $configure = $requestData->getResponse(new ConfigureVideoResponse());
+
+        if (!$configure->isOk()) {
+            throw new InstagramException($configure->getMessage());
+        }
+
+        return $configure;
     }
 
     /**
