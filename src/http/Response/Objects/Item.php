@@ -23,6 +23,10 @@ class Item extends Response
     public $client_cache_key;
     public $filter_type;
     /**
+     * @var Attribution
+     */
+    public $attribution;
+    /**
      * @var Image_Versions2
      */
     public $image_versions2;
@@ -63,7 +67,7 @@ class Item extends Response
      */
     public $video_versions;
     public $has_audio = false;
-    public $video_duration = '';
+    public $video_duration;
     /**
      * @var User
      */
