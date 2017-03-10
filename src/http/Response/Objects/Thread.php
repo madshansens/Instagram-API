@@ -40,4 +40,8 @@ class Thread extends Response
      */
     public $inviter;
     public $pending;
+    /**
+     * @var ThreadLastSeenAt[]
+     */
+    public $last_seen_at;
 }

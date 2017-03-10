@@ -33,6 +33,7 @@ class Item extends Response
     public $has_more_comments;
     public $max_num_visible_preview_comments;
     public $preview_comments;
+    public $comments_disabled;
     public $reel_mentions;
     public $story_cta;
     public $caption_position;

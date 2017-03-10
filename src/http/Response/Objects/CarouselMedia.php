@@ -32,4 +32,8 @@ class CarouselMedia extends Response
     public $original_height;
     public $original_width;
     public $media_type;
+    /**
+     * @var Usertag
+     */
+    public $usertags;
 }

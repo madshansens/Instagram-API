@@ -15,4 +15,5 @@ class ThreadItem extends Response
      */
     public $user_id;
     public $timestamp;
+    public $client_context;
 }
