@@ -12,4 +12,8 @@ class ExploreItem extends Response
      * @var Stories
      */
     public $stories;
+    /**
+     * @var Channel
+     */
+    public $channel;
 }
