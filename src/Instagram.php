@@ -1265,7 +1265,7 @@ class Instagram
     }
 
     /**
-     * Tag User.
+     * Tag a user in a media item.
      *
      * @param string      $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param string      $userId      Numerical UserPK ID.
@@ -1284,7 +1284,7 @@ class Instagram
     }
 
     /**
-     * Untag User.
+     * Untag a user from a media item.
      *
      * @param string $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param string $userId      Numerical UserPK ID.
