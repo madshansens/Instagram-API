@@ -8,5 +8,5 @@ class UploadVideoResponse extends Response
      * @var string
      */
     public $upload_id;
-    public $message = null;
+    public $message;
 }

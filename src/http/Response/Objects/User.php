@@ -19,7 +19,7 @@ class User extends Response
     /**
      * @var FriendshipStatus
      */
-    public $friendship_status = null;
+    public $friendship_status;
     public $hd_profile_pic_versions;
     public $byline;
     public $search_social_context;

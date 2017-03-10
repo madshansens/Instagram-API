@@ -8,7 +8,7 @@ class CheckEmailResponse extends Response
     public $confirmed;
     public $status;
     public $valid;
-    public $username_suggestions = null;
+    public $username_suggestions;
 
     public function __construct($response)
     {

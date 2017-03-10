@@ -26,7 +26,7 @@ class AccountCreationResponse extends Response
     public $spam = false;
     public $feedback_action = '';
     public $feedback_url = '';
-    public $errors = null;
+    public $errors;
 
     public function __construct($response)
     {

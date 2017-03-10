@@ -8,8 +8,8 @@ class Location extends Response
     /**
      * @var string
      */
-    public $external_id_source = null;
-    public $external_source = null;
+    public $external_id_source;
+    public $external_source;
     public $address;
     /**
      * @var float
@@ -22,12 +22,12 @@ class Location extends Response
     /**
      * @var string
      */
-    public $external_id = null;
+    public $external_id;
     /**
      * @var string
      */
-    public $facebook_places_id = null;
-    public $city = null;
+    public $facebook_places_id;
+    public $city;
     /**
      * @var string
      */

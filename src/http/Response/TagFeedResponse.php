@@ -8,7 +8,7 @@ class TagFeedResponse extends Response
     /**
      * @var Item[]
      */
-    public $ranked_items = null;
+    public $ranked_items;
     public $auto_load_more_enabled;
     /**
      * @var Item[]

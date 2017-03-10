@@ -26,7 +26,7 @@ class CarouselMedia extends Response
     /**
      * @var VideoVersions[]|null
      */
-    public $video_versions = null;
+    public $video_versions;
     public $has_audio = false;
     public $video_duration = '';
     public $original_height;

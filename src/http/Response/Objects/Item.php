@@ -41,11 +41,11 @@ class Item extends Response
     /**
      * @var string
      */
-    public $next_max_id = null;
+    public $next_max_id;
     /**
      * @var CarouselMedia[]|null
      */
-    public $carousel_media = null;
+    public $carousel_media;
     /**
      * @var Comment[]
      */
@@ -54,13 +54,13 @@ class Item extends Response
     /**
      * @var Caption|null
      */
-    public $caption = null;
+    public $caption;
     public $caption_is_edited;
     public $photo_of_you;
     /**
      * @var VideoVersions[]|null
      */
-    public $video_versions = null;
+    public $video_versions;
     public $has_audio = false;
     public $video_duration = '';
     /**
@@ -87,7 +87,7 @@ class Item extends Response
     /**
      * @var Usertag|null
      */
-    public $usertags = null;
+    public $usertags;
     public $media_or_ad;
     /**
      * @var Media

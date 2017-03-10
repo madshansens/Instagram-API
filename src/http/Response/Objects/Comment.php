@@ -8,10 +8,10 @@ class Comment extends Response
     /**
      * @var string
      */
-    public $username_id = null;
+    public $username_id;
     public $created_at_utc;
     public $created_at;
-    public $bit_flags = null;
+    public $bit_flags;
     /**
      * @var User
      */

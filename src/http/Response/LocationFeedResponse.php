@@ -14,7 +14,7 @@ class LocationFeedResponse extends Response
     /**
      * @var Item[]
      */
-    public $ranked_items = null;
+    public $ranked_items;
     public $more_available;
     /**
      * @var string
