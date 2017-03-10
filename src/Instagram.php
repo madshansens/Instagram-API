@@ -27,6 +27,7 @@ class Instagram
 
     /**
      * Toggles API query/response debug output.
+     *
      * @var bool
      */
     public $debug;
@@ -117,8 +118,8 @@ class Instagram
      * Constructor.
      *
      * @param bool $debug           Show API queries and responses.
-     * @param bool $truncatedDebug   Truncate long responses.
-     * @param null $settingsAdapter  How to store session settings.
+     * @param bool $truncatedDebug  Truncate long responses.
+     * @param null $settingsAdapter How to store session settings.
      *
      * @throws InstagramException
      */
@@ -672,7 +673,7 @@ class Instagram
      * @param string $type          What type of upload ("timeline" or "story",
      *                              but not "album". They're handled elsewhere.)
      * @param string $photoFilename The photo filename.
-     * @param string $captionText       Caption to use for the photo.
+     * @param string $captionText   Caption to use for the photo.
      * @param null   $location      Location (only used for "timeline" photos).
      * @param null   $filter        Photo filter.
      *
@@ -698,7 +699,7 @@ class Instagram
      * Uploads a photo to your Instagram timeline.
 
      * @param string $photoFilename The photo filename.
-     * @param string $captionText       Caption to use for the photo.
+     * @param string $captionText   Caption to use for the photo.
      * @param null   $location      Location where photo was taken.
      * @param null   $filter        Photo filter.
      *
@@ -715,8 +716,8 @@ class Instagram
      * Uploads a photo to your Instagram story.
      *
      * @param string $photoFilename The photo filename.
-     * @param string $captionText Caption to display over the story photo.
-     * @param null   $filter  Photo filter.
+     * @param string $captionText   Caption to display over the story photo.
+     * @param null   $filter        Photo filter.
      *
      * @throws InstagramException
      *
@@ -731,13 +732,13 @@ class Instagram
      * INTERNAL.
      *
      * @param string   $type          What type of upload ("timeline" or "story",
-     *                              but not "album". They're handled elsewhere.)
+     *                                but not "album". They're handled elsewhere.)
      * @param string   $videoFilename The video filename.
-     * @param string   $captionText       Caption to use for the video.
+     * @param string   $captionText   Caption to use for the video.
      * @param string   $customThumb   Optional path to custom video thumbnail.
-     *                              If nothing provided, we generate from video.
+     *                                If nothing provided, we generate from video.
      * @param string[] $userTags      Array of UserPK IDs of people tagged in your video.
-     *                              (only used for "story" videos!).
+     *                                (only used for "story" videos!).
      * @param int      $maxAttempts   Total attempts to upload all chunks before throwing.
      *
      * @throws InstagramException
@@ -774,7 +775,7 @@ class Instagram
      * Uploads a video to your Instagram timeline.
      *
      * @param string $videoFilename The video filename.
-     * @param string $captionText       Caption to use for the video.
+     * @param string $captionText   Caption to use for the video.
      * @param string $customThumb   Optional path to custom video thumbnail.
      *                              If nothing provided, we generate from video.
      * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
@@ -791,12 +792,12 @@ class Instagram
     /**
      * Uploads a video to your Instagram story.
      *
-     * @param string $videoFilename The video filename.
-     * @param string $captionText       Caption to use for the video.
-     * @param string $customThumb   Optional path to custom video thumbnail.
-     *                              If nothing provided, we generate from video.
+     * @param string   $videoFilename The video filename.
+     * @param string   $captionText   Caption to use for the video.
+     * @param string   $customThumb   Optional path to custom video thumbnail.
+     *                                If nothing provided, we generate from video.
      * @param string[] $userTags      Array of UserPK IDs of people tagged in your video.
-     * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
+     * @param int      $maxAttempts   Total attempts to upload all chunks before throwing.
      *
      * @throws InstagramException
      *
@@ -813,10 +814,10 @@ class Instagram
      * An album is also known as a "carousel" and "sidecar". They can contain up
      * to 10 photos or videos (at the moment).
      *
-     * @param array $media    Array of image/video metadata (type, file, usertags etc)
-     *                        You can only provide "usertags" for PHOTOS!
-     * @param null  $captionText  Text for album
-     * @param null  $location Geotag
+     * @param array $media       Array of image/video metadata (type, file, usertags etc)
+     *                           You can only provide "usertags" for PHOTOS!
+     * @param null  $captionText Text for album
+     * @param null  $location    Geotag
      * @param null  $filter
      *
      * @throws InstagramException
@@ -932,8 +933,8 @@ class Instagram
      * Share media via direct message to a user's inbox.
      *
      * @param array|int $recipients One or more numeric user IDs.
-     * @param string    $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string    $text      Text message.
+     * @param string    $mediaId    The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string    $text       Text message.
      *
      * @throws InstagramException
      *
@@ -975,9 +976,9 @@ class Instagram
     /**
      * Send a photo via direct message to a user's inbox.
      *
-     * @param array|int $recipients One or more numeric user IDs.
-     * @param string    $photoFilename   The photo filename.
-     * @param string    $text       Text message.
+     * @param array|int $recipients    One or more numeric user IDs.
+     * @param string    $photoFilename The photo filename.
+     * @param string    $text          Text message.
      *
      * @throws InstagramException
      *
@@ -1049,13 +1050,13 @@ class Instagram
      * useful since Instagram sometimes can't configure a newly uploaded video
      * file until a few seconds have passed.
      *
-     * @param string $type        What type of upload ("timeline" or "story",
-     *                            but not "album". They're handled elsewhere.)
-     * @param string $upload_id   The ID of the upload to configure.
-     * @param string $captionText     Caption to use for the video.
-     * @param string[] $userTags      Array of UserPK IDs of people tagged in your video.
+     * @param string   $type        What type of upload ("timeline" or "story",
+     *                              but not "album". They're handled elsewhere.)
+     * @param string   $upload_id   The ID of the upload to configure.
+     * @param string   $captionText Caption to use for the video.
+     * @param string[] $userTags    Array of UserPK IDs of people tagged in your video.
      *                              (only used for "story" videos!).
-     * @param int    $maxAttempts Total attempts to configure video before throwing.
+     * @param int      $maxAttempts Total attempts to configure video before throwing.
      *
      * @throws InstagramException
      *
@@ -1088,11 +1089,11 @@ class Instagram
     /**
      * Configure parameters for uploaded video.
      *
-     * @param string $type      What type of upload ("timeline" or "story",
-     *                          but not "album". They're handled elsewhere.)
-     * @param string $upload_id The ID of the upload to configure.
-     * @param string $captionText   Caption to use for the video.
-     * @param string[] $userTags      Array of UserPK IDs of people tagged in your video.
+     * @param string   $type        What type of upload ("timeline" or "story",
+     *                              but not "album". They're handled elsewhere.)
+     * @param string   $upload_id   The ID of the upload to configure.
+     * @param string   $captionText Caption to use for the video.
+     * @param string[] $userTags    Array of UserPK IDs of people tagged in your video.
      *                              (only used for "story" videos!).
      *
      * @throws InstagramException
@@ -1223,8 +1224,8 @@ class Instagram
         }
 
         $configure = $requestData->setReplacePost([
-            '"crop_center":[0,0]'                   => '"crop_center":[0.0,-0.0]',
-            '"crop_zoom":1'                         => '"crop_zoom":1.0',
+            '"crop_center":[0,0]'                       => '"crop_center":[0.0,-0.0]',
+            '"crop_zoom":1'                             => '"crop_zoom":1.0',
             '"crop_original_size":'."[{$size},{$size}]" => '"crop_original_size":'."[{$size}.0,{$size}.0]",
         ])
         ->getResponse(new ConfigureResponse());
@@ -1235,9 +1236,9 @@ class Instagram
     /**
      * Edit media.
      *
-     * @param string $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string $captionText Caption text.
-     * @param string[] $userTags   Array of UserPK IDs of people tagged in your media.
+     * @param string   $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string   $captionText Caption text.
+     * @param string[] $userTags    Array of UserPK IDs of people tagged in your media.
      *
      * @throws InstagramException
      *
@@ -1267,7 +1268,7 @@ class Instagram
      * Tag User.
      *
      * @param string      $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string      $userId  Numerical UserPK ID.
+     * @param string      $userId      Numerical UserPK ID.
      * @param array|float $position    Position relative to image where the tag should sit. Example: [0.4890625,0.6140625]
      * @param string      $captionText Caption text.
      *
@@ -1286,7 +1287,7 @@ class Instagram
      * Untag User.
      *
      * @param string $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string $userId  Numerical UserPK ID.
+     * @param string $userId      Numerical UserPK ID.
      * @param string $captionText Caption text.
      *
      * @throws InstagramException
@@ -1763,9 +1764,9 @@ class Instagram
     /**
      * Get user taggings for a user.
      *
-     * @param string $userId   Numerical UserPK ID.
-     * @param null|string $maxId Next "maximum ID", used for pagination.
-     * @param null|int   $minTimestamp Minimum timestamp.
+     * @param string      $userId       Numerical UserPK ID.
+     * @param null|string $maxId        Next "maximum ID", used for pagination.
+     * @param null|int    $minTimestamp Minimum timestamp.
      *
      * @throws InstagramException
      *
@@ -1983,9 +1984,9 @@ class Instagram
     /**
      * Get a user's timeline feed.
      *
-     * @param string   $userId   Numerical UserPK ID.
-     * @param null|string $maxId Next "maximum ID", used for pagination.
-     * @param null|int   $minTimestamp Minimum timestamp.
+     * @param string      $userId       Numerical UserPK ID.
+     * @param null|string $maxId        Next "maximum ID", used for pagination.
+     * @param null|int    $minTimestamp Minimum timestamp.
      *
      * @throws InstagramException
      *
@@ -2004,8 +2005,8 @@ class Instagram
     /**
      * Get your own timeline feed.
      *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
-     * @param null|int   $minTimestamp Minimum timestamp.
+     * @param null|string $maxId        Next "maximum ID", used for pagination.
+     * @param null|int    $minTimestamp Minimum timestamp.
      *
      * @throws InstagramException
      *
@@ -2074,7 +2075,6 @@ class Instagram
         return $locations->getResponse(new LocationResponse());
     }
 
-
     /**
      * Search for Facebook locations by name.
      *
@@ -2114,8 +2114,8 @@ class Instagram
     /**
      * Get location feed.
      *
-     * @param string   $locationId
-     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param string      $locationId
+     * @param null|string $maxId      Next "maximum ID", used for pagination.
      *
      * @throws InstagramException
      *
@@ -2150,8 +2150,8 @@ class Instagram
     /**
      * Get hashtag feed.
      *
-     * @param string   $hashtagString Hashtag string, not including the "#".
-     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param string      $hashtagString Hashtag string, not including the "#".
+     * @param null|string $maxId         Next "maximum ID", used for pagination.
      *
      * @throws InstagramException
      *
@@ -2167,12 +2167,11 @@ class Instagram
         return $hashtagFeed->getResponse(new TagFeedResponse());
     }
 
-
     /**
      * Get list of who a user is following.
      *
-     * @param string   $userId Numerical UserPK ID.
-     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param string      $userId Numerical UserPK ID.
+     * @param null|string $maxId  Next "maximum ID", used for pagination.
      *
      * @throws InstagramException
      *
@@ -2192,8 +2191,8 @@ class Instagram
     /**
      * Get list of who a user is followed by.
      *
-     * @param string   $userId Numerical UserPK ID.
-     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param string      $userId Numerical UserPK ID.
+     * @param null|string $maxId  Next "maximum ID", used for pagination.
      *
      * @throws InstagramException
      *
@@ -2223,7 +2222,6 @@ class Instagram
     {
         return $this->getUserFollowings($this->username_id, $maxId);
     }
-
 
     /**
      * Get list of your own followers.
@@ -2280,8 +2278,8 @@ class Instagram
     /**
      * Get media comments.
      *
-     * @param string   $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param string      $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param null|string $maxId   Next "maximum ID", used for pagination.
      *
      * @throws InstagramException
      *
@@ -2331,7 +2329,7 @@ class Instagram
     }
 
     /**
-     * Backup all of your own uploaded photos and videos. :)
+     * Backup all of your own uploaded photos and videos. :).
      *
      * @param string|null $baseOutputPath (optional) Base-folder for output.
      *                                    Uses standard data path if null.
