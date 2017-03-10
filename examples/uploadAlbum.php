@@ -49,7 +49,7 @@ try {
 }
 
 try {
-    $i->uploadAlbum($media, $caption);
+    $i->uploadTimelineAlbum($media, $caption);
 } catch (Exception $e) {
     echo $e->getMessage();
 }

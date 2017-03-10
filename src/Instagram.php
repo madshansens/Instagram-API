@@ -823,7 +823,7 @@ class Instagram
      *
      * @return ConfigureResponse
      */
-    public function uploadAlbum($media, $captionText = null, $location = null, $filter = null)
+    public function uploadTimelineAlbum($media, $captionText = null, $location = null, $filter = null)
     {
         if (empty($media)) {
             throw new InstagramException("List of media to upload can't be empty.", ErrorCode::INTERNAL_INVALID_ARGUMENT);
