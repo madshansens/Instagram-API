@@ -20,12 +20,12 @@ class AccountCreationResponse extends Response
     public $hd_profile_pic_url_info;
     public $nux_private_enabled;
     public $is_private;
-    public $account_created = false;
-    public $feedback_title = '';
-    public $feedback_message = '';
-    public $spam = false;
-    public $feedback_action = '';
-    public $feedback_url = '';
+    public $account_created;
+    public $feedback_title;
+    public $feedback_message;
+    public $spam;
+    public $feedback_action;
+    public $feedback_url;
     public $errors;
 
     public function __construct($response)

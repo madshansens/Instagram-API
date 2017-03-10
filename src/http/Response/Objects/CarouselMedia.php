@@ -24,10 +24,10 @@ class CarouselMedia extends Response
      */
     public $image_versions2;
     /**
-     * @var VideoVersions[]|null
+     * @var VideoVersions[]
      */
     public $video_versions;
-    public $has_audio = false;
+    public $has_audio;
     public $video_duration;
     public $original_height;
     public $original_width;

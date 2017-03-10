@@ -21,7 +21,7 @@ class TimelineFeedResponse extends Response
      */
     public $feed_items;
     /**
-     * @var FeedAysf|null
+     * @var FeedAysf
      */
     public $megaphone;
 }

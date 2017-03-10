@@ -8,7 +8,7 @@ class CheckUsernameResponse extends Response
     public $available;
     public $status;
     public $error_type;
-    public $error = false;
+    public $error;
 
     public function __construct($response)
     {

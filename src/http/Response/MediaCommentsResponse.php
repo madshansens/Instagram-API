@@ -7,7 +7,7 @@ class MediaCommentsResponse extends Response
     /**
      * @var Comment[]
      */
-    public $comments = [];
+    public $comments;
     public $comment_count;
     public $comment_likes_enabled;
     /**

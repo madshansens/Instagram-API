@@ -15,9 +15,6 @@ class ActivityNewsResponse extends Response
     public $continuation;
     public $friend_request_stories;
     public $counts;
-    /**
-     * @var mixed|null
-     */
     public $subscription;
     public $continuation_token;
 }

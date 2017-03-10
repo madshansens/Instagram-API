@@ -32,7 +32,7 @@ class Item extends Response
     public $image_versions2;
     public $original_width;
     public $original_height;
-    public $view_count = 0;
+    public $view_count;
     public $organic_tracking_token;
     public $has_more_comments;
     public $max_num_visible_preview_comments;
@@ -48,25 +48,25 @@ class Item extends Response
      */
     public $next_max_id;
     /**
-     * @var CarouselMedia[]|null
+     * @var CarouselMedia[]
      */
     public $carousel_media;
     /**
      * @var Comment[]
      */
     public $comments;
-    public $comment_count = 0;
+    public $comment_count;
     /**
-     * @var Caption|null
+     * @var Caption
      */
     public $caption;
     public $caption_is_edited;
     public $photo_of_you;
     /**
-     * @var VideoVersions[]|null
+     * @var VideoVersions[]
      */
     public $video_versions;
-    public $has_audio = false;
+    public $has_audio;
     public $video_duration;
     /**
      * @var User
@@ -75,22 +75,22 @@ class Item extends Response
     /**
      * @var User[]
      */
-    public $likers = '';
-    public $like_count = 0;
+    public $likers;
+    public $like_count;
     /**
      * @var string[]
      */
-    public $preview = '';
-    public $has_liked = false;
-    public $explore_context = '';
-    public $explore_source_token = '';
+    public $preview;
+    public $has_liked;
+    public $explore_context;
+    public $explore_source_token;
     /**
-     * @var Explore|null
+     * @var Explore
      */
-    public $explore = '';
-    public $impression_token = '';
+    public $explore;
+    public $impression_token;
     /**
-     * @var Usertag|null
+     * @var Usertag
      */
     public $usertags;
     public $media_or_ad;

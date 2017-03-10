@@ -5,17 +5,17 @@ namespace InstagramAPI;
 class User extends Response
 {
     public $username;
-    public $has_anonymous_profile_picture = false;
-    public $is_favorite = false;
+    public $has_anonymous_profile_picture;
+    public $is_favorite;
     public $profile_pic_url;
     public $full_name;
     /**
      * @var string
      */
     public $pk;
-    public $is_verified = false;
-    public $is_private = false;
-    public $coeff_weight = 0;
+    public $is_verified;
+    public $is_private;
+    public $coeff_weight;
     /**
      * @var FriendshipStatus
      */
