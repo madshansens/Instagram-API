@@ -41,22 +41,57 @@ class User extends Response
      * @var string
      */
     public $profile_pic_id; // Ranked recipents response prop
-    public $auto_expand_chaining; // getUsernameInfo prop
-    public $can_boost_post; // getUsernameInfo prop
-    public $is_profile_action_needed; // getUsernameInfo prop
-    public $has_chaining; // getUsernameInfo prop
-    public $include_direct_blacklist_status; // getUsernameInfo prop
-    public $can_see_organic_insights; // getUsernameInfo prop
-    public $can_convert_to_business; // getUsernameInfo prop
-    public $show_business_conversion_icon; // getUsernameInfo prop
-    public $show_conversion_edit_entry; // getUsernameInfo prop
-    public $show_insights_terms; // getUsernameInfo prop
-    public $can_create_sponsor_tags; // getUsernameInfo prop
-    public $hd_profile_pic_url_info; // getUsernameInfo prop
-    public $usertag_review_enabled; // getUsernameInfo prop
-    public $is_needy; // getUsernameInfo prop
-    public $external_url; // getUsernameInfo prop
-    public $external_lynx_url; // getUsernameInfo prop
+    public $auto_expand_chaining; // getUserInfoById prop
+    public $can_boost_post; // getUserInfoById prop
+    public $is_profile_action_needed; // getUserInfoById prop
+    public $has_chaining; // getUserInfoById prop
+    public $include_direct_blacklist_status; // getUserInfoById prop
+    public $can_see_organic_insights; // getUserInfoById prop
+    public $can_convert_to_business; // getUserInfoById prop
+    public $show_business_conversion_icon; // getUserInfoById prop
+    public $show_conversion_edit_entry; // getUserInfoById prop
+    public $show_insights_terms; // getUserInfoById prop
+    public $can_create_sponsor_tags; // getUserInfoById prop
+    public $hd_profile_pic_url_info; // getUserInfoById prop
+    public $usertag_review_enabled; // getUserInfoById prop
+    /**
+     * @var string[]
+     */
+    public $profile_context_mutual_follow_ids; // getUserInfoById prop
+    /**
+     * @var string[]
+     */
+    public $profile_context_links_with_user_ids; // getUserInfoById prop
+    public $has_biography_translation; // getUserInfoById prop
+    public $business_contact_method; // getUserInfoById prop
+    public $category; // getUserInfoById prop
+    public $direct_messaging; // getUserInfoById prop
+    /**
+     * @var string
+     */
+    public $fb_page_call_to_action_id; // getUserInfoById prop
+    public $public_phone_country_code; // getUserInfoById prop
+    public $public_phone_number; // getUserInfoById prop
+    public $contact_phone_number; // getUserInfoById prop
+    /**
+     * @var float
+     */
+    public $latitude; // getUserInfoById prop
+    /**
+     * @var float
+     */
+    public $longitude; // getUserInfoById prop
+    public $address_street; // getUserInfoById prop
+    public $zip; // getUserInfoById prop
+    /**
+     * @var string
+     */
+    public $city_id; // getUserInfoById prop
+    public $city_name; // getUserInfoById prop
+    public $public_email; // getUserInfoById prop
+    public $is_needy; // getUserInfoById prop
+    public $external_url; // getUserInfoById prop
+    public $external_lynx_url; // getUserInfoById prop
     public $email; // getCurrentUser prop
     public $country_code; // getCurrentUser prop
     public $birthday; // getCurrentUser prop
