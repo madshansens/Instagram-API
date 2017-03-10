@@ -1946,13 +1946,40 @@ class Instagram
     }
 
     /**
-     * Get a specific user's story feed.
+     * Get a specific user's story reel feed.
+     *
+     * This function gets the user's story Reel object directly, which always
+     * exists and contains information about the user and their last story even
+     * if that user doesn't have any active story anymore.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws InstagramException
+     *
+     * @return Reel
+     *
+     * @see getUserStoryFeed
+     */
+    public function getUserReelMediaFeed($userId)
+    {
+        return $this->request("feed/user/{$userId}/reel_media/")
+        ->getResponse(new Reel());
+    }
+
+    /**
+     * Get a specific user's story feed with broadcast details.
+     *
+     * This function gets the story in a roundabout way, with some extra details
+     * about the "broadcast". But if there is no story available, this endpoint
+     * gives you an empty response.
      *
      * @param string $userId Numerical UserPK ID.
      *
      * @throws InstagramException
      *
      * @return UserStoryFeedResponse
+     *
+     * @see getUserReelMediaFeed
      */
     public function getUserStoryFeed($userId)
     {
