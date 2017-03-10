@@ -12,6 +12,9 @@ class Tray extends Response
      * @var Item[]
      */
     public $items;
+    /**
+     * @var User
+     */
     public $user;
     public $can_reply;
     public $expiring_at;

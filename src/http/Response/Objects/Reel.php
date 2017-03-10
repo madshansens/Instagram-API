@@ -12,6 +12,9 @@ class Reel extends Response
      * @var Item[]
      */
     public $items;
+    /**
+     * @var User
+     */
     public $user;
     public $expiring_at;
     public $seen;
