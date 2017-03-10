@@ -32,9 +32,9 @@ try {
 
     echo 'There are '.count($items)."\n";
 
-    echo "First item has media id: $firstItem_mediaId \n";
-    echo "First item timestamp is: $firstItem_device_timestamp\n";
-    echo "One of the first item image version candidates is: $firstItem_image_versions";
+    echo "First item has media id: {$firstItem_mediaId}\n";
+    echo "First item timestamp is: {$firstItem_device_timestamp}\n";
+    echo "One of the first item image version candidates is: {$firstItem_image_versions}\n";
 } catch (Exception $e) {
     echo $e->getMessage();
 }

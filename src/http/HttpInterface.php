@@ -844,7 +844,7 @@ class HttpInterface
      * Note that video uploads often fail when their server is overloaded.
      * So you may have to redo this call multiple times.
      *
-     * @param string $videoFilename The file to upload.
+     * @param string $videoFilename The video filename.
      * @param array  $uploadParams  An array created by requestVideoUploadURL()!
      *
      * @throws InstagramException if the upload fails.
@@ -991,9 +991,9 @@ class HttpInterface
     }
 
     /**
-     * Change your profile picture.
+     * Changes your account's profile picture.
      *
-     * @param string $photoFilename The path to a photo file.
+     * @param string $photoFilename The photo filename.
      *
      * @throws InstagramException
      *

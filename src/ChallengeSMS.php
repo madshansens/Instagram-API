@@ -124,11 +124,11 @@ class ChallengeSMS
         curl_close($ch);
 
         if ($this->debug) {
-            echo "REQUEST: $httpCode $endpoint \n";
+            echo "REQUEST: {$httpCode} {$endpoint} \n";
             if (!is_null($post)) {
                 echo 'DATA: '.http_build_query($post)."\n";
             }
-            echo "RESPONSE: $body\n\n";
+            echo "RESPONSE: {$body}\n\n";
         }
 
         return [$header, $body, $httpCode];

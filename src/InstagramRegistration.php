@@ -253,13 +253,13 @@ class InstagramRegistration
         }
 
         if ($this->debug) {
-            echo "REQUEST: $endpoint\n";
+            echo "REQUEST: {$endpoint}\n";
             if (!is_null($post)) {
                 if (!is_array($post)) {
-                    echo "DATA: $post\n";
+                    echo "DATA: {$post}\n";
                 }
             }
-            echo "RESPONSE: $body\n\n";
+            echo "RESPONSE: {$body}\n\n";
         }
 
         return [$header, json_decode($body, true, 512, JSON_BIGINT_AS_STRING)];

@@ -2,7 +2,7 @@
 
 namespace InstagramAPI;
 
-class autoCompleteUserListResponse extends Response
+class AutoCompleteUserListResponse extends Response
 {
     public $expires;
     /**

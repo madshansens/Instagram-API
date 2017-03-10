@@ -7,7 +7,7 @@ class Debug
     public static function printRequest($method, $endpoint)
     {
         if (php_sapi_name() == 'cli') {
-            $method = Utils::colouredString("$method:  ", 'light_blue');
+            $method = Utils::colouredString("{$method}:  ", 'light_blue');
         } else {
             $method = $method.':  ';
         }
@@ -27,9 +27,9 @@ class Debug
     public static function printHttpCode($httpCode, $bytes)
     {
         if (php_sapi_name() == 'cli') {
-            echo Utils::colouredString("← $httpCode \t $bytes", 'green')."\n";
+            echo Utils::colouredString("← {$httpCode} \t {$bytes}", 'green')."\n";
         } else {
-            echo "← $httpCode \t $bytes\n";
+            echo "← {$httpCode} \t {$bytes}\n";
         }
     }
 

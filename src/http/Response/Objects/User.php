@@ -57,11 +57,11 @@ class User extends Response
     public $is_needy; // getUsernameInfo prop
     public $external_url; // getUsernameInfo prop
     public $external_lynx_url; // getUsernameInfo prop
-    public $email; // getProfileData prop
-    public $country_code; // getProfileData prop
-    public $birthday; // getProfileData prop
-    public $national_number; // getProfileData prop
-    public $gender; // getProfileData prop
-    public $phone_number; // getProfileData prop
-    public $needs_email_confirm; // getProfileData prop
+    public $email; // getCurrentUser prop
+    public $country_code; // getCurrentUser prop
+    public $birthday; // getCurrentUser prop
+    public $national_number; // getCurrentUser prop
+    public $gender; // getCurrentUser prop
+    public $phone_number; // getCurrentUser prop
+    public $needs_email_confirm; // getCurrentUser prop
 }

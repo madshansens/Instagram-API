@@ -4,10 +4,38 @@ namespace InstagramAPI;
 
 class Instagram
 {
+    /**
+     * Reference to the class instance.
+     *
+     * @var Instagram
+     */
     public static $instance;
-    public $username; // Instagram username
-    public $password; // Instagram password
-    public $debug;    // Debug
+
+    /**
+     * Currently active Instagram username.
+     *
+     * @var string
+     */
+    public $username;
+
+    /**
+     * Currently active Instagram password.
+     *
+     * @var string
+     */
+    public $password;
+
+    /**
+     * Toggles API query/response debug output.
+     * @var bool
+     */
+    public $debug;
+
+    /**
+     * Toggles truncating long responses when debugging.
+     *
+     * @var bool
+     */
     public $truncatedDebug;
 
     /**
@@ -25,36 +53,74 @@ class Instagram
     public $apiDeveloperDebug = false;
 
     /**
+     * UUID.
+     *
      * @var string
      */
-    public $uuid;               // UUID
+    public $uuid;
+
     /**
+     * Device ID.
+     *
      * @var string
      */
-    public $device_id;          // Device ID
+    public $device_id;
+
     /**
+     * Numerical UserPK ID of the active user.
+     *
      * @var string
      */
-    public $username_id;        // Username ID
-    public $token;              // _csrftoken
-    public $isLoggedIn = false; // Session status
-    public $rank_token;         // Rank token
+    public $username_id;
+
     /**
+     * csrftoken.
+     *
+     * @var string
+     */
+    public $token;
+
+    /**
+     * Session status.
+     *
+     * @var bool
+     */
+    public $isLoggedIn = false;
+
+    /**
+     * Rank token.
+     *
+     * @var string
+     */
+    public $rank_token;
+
+    /**
+     * Raw API communication class.
+     *
      * @var HttpInterface
      */
     public $http;
-    public $settingsAdapter;
+
     /**
-     * @var SettingsFile
+     * @var mixed
+     */
+    public $settingsAdapter;
+
+    /**
+     * An instance of a SettingsAdapter storage class.
+     *
+     * @var mixed
      */
     public $settings;
 
     /**
-     * Default class constructor.
+     * Constructor.
      *
-     * @param bool $debug           Debug on or off, false by default
-     * @param bool $truncatedDebug
-     * @param null $settingsAdapter
+     * @param bool $debug           Show API queries and responses.
+     * @param bool $truncatedDebug   Truncate long responses.
+     * @param null $settingsAdapter  How to store session settings.
+     *
+     * @throws InstagramException
      */
     public function __construct($debug = false, $truncatedDebug = false, $settingsAdapter = null)
     {
@@ -83,15 +149,19 @@ class Instagram
     }
 
     /**
-     * Set the user. Manage multiple accounts.
+     * Set the active account for the class instance.
      *
-     * @param string $username Your Instagram username
-     * @param string $password Your Instagram password
+     * You can call this multiple times to switch between multiple accounts.
+     *
+     * @param string $username Your Instagram username.
+     * @param string $password Your Instagram password.
+     *
+     * @throws InstagramException
      */
     public function setUser($username, $password)
     {
         $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
-        $this->checkSettings($username);
+        $this->_checkSettings($username);
 
         if (is_null($this->settings->get('uuid'))
             || is_null($this->settings->get('phone_id'))
@@ -122,7 +192,12 @@ class Instagram
         $this->http->updateFromSettingsAdapter();
     }
 
-    protected function checkSettings($username)
+    /**
+     * Verifies and updates settings if necessary.
+     *
+     * @param string $username The active Instagram username.
+     */
+    protected function _checkSettings($username)
     {
         if ($this->settings->get('version') == null) {
             $this->settings->set('version', Constants::VERSION);
@@ -134,6 +209,80 @@ class Instagram
             $this->settings->set('version', Constants::VERSION);
             $this->settings->set('user_agent', $ua);
         }
+    }
+
+    /**
+     * Controls the SSL verification behavior of the HttpInterface.
+     *
+     * @see http://docs.guzzlephp.org/en/latest/request-options.html#verify
+     *
+     * @param bool|string $state TRUE to verify using PHP's default CA bundle,
+     *                           FALSE to disable SSL verification (this is
+     *                           insecure!), String to verify using this path to
+     *                           a custom CA bundle file.
+     */
+    public function setVerifySSL($state)
+    {
+        $this->http->setVerifySSL($state);
+    }
+
+    /**
+     * Gets the current SSL verification behavior of the HttpInterface.
+     *
+     * @return bool|string
+     */
+    public function getVerifySSL()
+    {
+        return $this->http->getVerifySSL();
+    }
+
+    /**
+     * Set the proxy to use for requests.
+     *
+     * @see http://docs.guzzlephp.org/en/latest/request-options.html#proxy
+     *
+     * @param string|array|null $value String or Array specifying a proxy in
+     *                                 Guzzle format, or NULL to disable proxying.
+     */
+    public function setProxy($value)
+    {
+        $this->http->setProxy($value);
+    }
+
+    /**
+     * Gets the current proxy used for requests.
+     *
+     * @return string|array|null
+     */
+    public function getProxy()
+    {
+        return $this->http->getProxy();
+    }
+
+    /**
+     * Sets the network interface override to use.
+     *
+     * Only works if Guzzle is using the cURL backend. But that's
+     * almost always the case, on most PHP installations.
+     *
+     * @see CURLOPT_INTERFACE (http://php.net/curl_setopt)
+     *
+     * @var string|null Interface name, IP address or hostname, or NULL to
+     *                  disable override and let Guzzle use any interface.
+     */
+    public function setOutputInterface($value)
+    {
+        $this->http->setOutputInterface($value);
+    }
+
+    /**
+     * Gets the current network interface override used for requests.
+     *
+     * @return string|null
+     */
+    public function getOutputInterface()
+    {
+        return $this->http->getOutputInterface();
     }
 
     /**
@@ -155,7 +304,7 @@ class Instagram
      *
      * @throws InstagramException
      *
-     * @return ChallengeResponse|LoginResponse|ExploreResponse
+     * @return ExploreResponse
      */
     public function login($forceLogin = false, $appRefreshInterval = 1800)
     {
@@ -194,7 +343,7 @@ class Instagram
             $this->getRankedRecipients();
             $this->getRecentRecipients();
             $this->megaphoneLog();
-            $this->getv2Inbox();
+            $this->getV2Inbox();
             $this->getRecentActivity();
             $this->getReelsTrayFeed();
 
@@ -208,7 +357,7 @@ class Instagram
         } catch (InstagramException $e) {
             // If our session cookies are expired, we were now told to login,
             // so handle that by running a forced relogin in that case!
-            if( $e->getCode() == ErrorCode::IG_LOGIN_REQUIRED ) {
+            if ($e->getCode() == ErrorCode::IG_LOGIN_REQUIRED) {
                 return $this->login(true, $appRefreshInterval);
             }
 
@@ -249,7 +398,7 @@ class Instagram
             $this->getRecentRecipients();
             //push register
             $this->megaphoneLog();
-            $this->getv2Inbox();
+            $this->getV2Inbox();
             $this->getRecentActivity();
 
             return $this->explore();
@@ -257,7 +406,23 @@ class Instagram
     }
 
     /**
+     * Log out of Instagram.
+     *
+     * @throws InstagramException
+     *
+     * @return LogoutResponse
+     */
+    public function logout()
+    {
+        return $this->request('accounts/logout/')->getResponse(new LogoutResponse());
+    }
+
+    /**
+     * Perform an Instagram "feature synchronization" call.
+     *
      * @param bool $prelogin
+     *
+     * @throws InstagramException
      *
      * @return SyncResponse
      */
@@ -281,7 +446,11 @@ class Instagram
     }
 
     /**
-     * @return autoCompleteUserListResponse|null Will be NULL if throttled by Instagram.
+     * Retrieve list of all friends.
+     *
+     * @throws InstagramException
+     *
+     * @return AutoCompleteUserListResponse|null Will be NULL if throttled by Instagram.
      */
     public function autoCompleteUserList()
     {
@@ -292,7 +461,7 @@ class Instagram
             ->setCheckStatus(false)
             ->addParams('version', '2');
 
-            return $request->getResponse(new autoCompleteUserListResponse());
+            return $request->getResponse(new AutoCompleteUserListResponse());
         } catch (InstagramException $e) {
             // Throttling is so common that we'll simply return NULL in that case.
             if ($e->getCode() == ErrorCode::IG_API_THROTTLED) {
@@ -305,7 +474,11 @@ class Instagram
     }
 
     /**
+     * Register to the mqtt push server.
+     *
      * @param $gcmToken
+     *
+     * @throws InstagramException
      *
      * @return mixed
      */
@@ -332,9 +505,9 @@ class Instagram
     }
 
     /**
-     * Get timeline feed.
+     * Get your own timeline feed.
      *
-     * @param $maxId
+     * @param null|string $maxId Next "maximum ID", used for pagination.
      *
      * @throws InstagramException
      *
@@ -357,6 +530,8 @@ class Instagram
      *
      * @param $day
      *
+     * @throws InstagramException
+     *
      * @return InsightsResponse
      */
     public function insights($day = null)
@@ -374,13 +549,15 @@ class Instagram
     /**
      * Get media insights.
      *
-     * @param $media_id
+     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     *
+     * @throws InstagramException
      *
      * @return MediaInsightsResponse
      */
-    public function mediaInsights($media_id)
+    public function mediaInsights($mediaId)
     {
-        $request = $this->request("insights/media_organic_insights/$media_id")
+        $request = $this->request("insights/media_organic_insights/{$mediaId}")
         ->setSignedPost(true)
         ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION);
 
@@ -388,6 +565,10 @@ class Instagram
     }
 
     /**
+     * Get megaphone log.
+     *
+     * @throws InstagramException
+     *
      * @return MegaphoneLogResponse
      */
     protected function megaphoneLog()
@@ -405,11 +586,11 @@ class Instagram
     }
 
     /**
-     * Pending Inbox.
+     * Get pending inbox data.
      *
-     * @throws InstagramException Pending Inbox Data
+     * @throws InstagramException
      *
-     * @return PendingInboxResponse|void
+     * @return PendingInboxResponse
      */
     public function getPendingInbox()
     {
@@ -417,11 +598,11 @@ class Instagram
     }
 
     /**
-     * Ranked recipients.
+     * Get ranked list of recipients.
      *
-     * @throws InstagramException Ranked recipients Data
+     * @throws InstagramException
      *
-     * @return RankedRecipientsResponse|void
+     * @return RankedRecipientsResponse
      */
     public function getRankedRecipients()
     {
@@ -431,11 +612,11 @@ class Instagram
     }
 
     /**
-     * Recent recipients.
+     * Get recent recipients.
      *
-     * @throws InstagramException Ranked recipients Data
+     * @throws InstagramException
      *
-     * @return RecentRecipientsResponse|void
+     * @return RecentRecipientsResponse
      */
     public function getRecentRecipients()
     {
@@ -444,11 +625,11 @@ class Instagram
     }
 
     /**
-     * Explore Tab.
+     * Get Explore tab dat.
      *
-     * @throws InstagramException Explore data
+     * @throws InstagramException
      *
-     * @return ExploreResponse|void
+     * @return ExploreResponse
      */
     public function explore()
     {
@@ -456,11 +637,11 @@ class Instagram
     }
 
     /**
-     * Home Channel.
+     * Get Home channel data.
      *
-     * @throws InstagramException discoverChannel data
+     * @throws InstagramException
      *
-     * @return DiscoverChannelResponse
+     * @return DiscoverChannelsResponse
      */
     public function discoverChannels()
     {
@@ -468,6 +649,10 @@ class Instagram
     }
 
     /**
+     * Expose.
+     *
+     * @throws InstagramException
+     *
      * @return ExposeResponse
      */
     public function expose()
@@ -482,23 +667,12 @@ class Instagram
     }
 
     /**
-     * Logout of Instagram.
-     *
-     * @return bool
-     *              Returns true if logged out correctly
-     */
-    public function logout()
-    {
-        return $this->request('accounts/logout/')->getResponse(new LogoutResponse());
-    }
-
-    /**
      * INTERNAL.
      *
      * @param string $type          What type of upload ("timeline" or "story",
      *                              but not "album". They're handled elsewhere.)
      * @param string $photoFilename The photo filename.
-     * @param string $caption       Caption to use for the photo.
+     * @param string $captionText       Caption to use for the photo.
      * @param null   $location      Location (only used for "timeline" photos).
      * @param null   $filter        Photo filter.
      *
@@ -506,7 +680,7 @@ class Instagram
      *
      * @return ConfigureResponse
      */
-    protected function _uploadPhoto($type, $photoFilename, $caption = null, $location = null, $filter = null)
+    protected function _uploadPhoto($type, $photoFilename, $captionText = null, $location = null, $filter = null)
     {
         // Make sure we don't allow "album" photo uploads via this function.
         if ($type != 'timeline' && $type != 'story') {
@@ -515,7 +689,7 @@ class Instagram
 
         // Perform the upload and then configure it for our timeline/story.
         $upload = $this->http->uploadPhotoData($type, $photoFilename);
-        $configure = $this->configure($type, $upload->getUploadId(), $photoFilename, $caption, $location, $filter);
+        $configure = $this->configure($type, $upload->getUploadId(), $photoFilename, $captionText, $location, $filter);
 
         return $configure;
     }
@@ -524,7 +698,7 @@ class Instagram
      * Uploads a photo to your Instagram timeline.
 
      * @param string $photoFilename The photo filename.
-     * @param string $caption       Caption to use for the photo.
+     * @param string $captionText       Caption to use for the photo.
      * @param null   $location      Location where photo was taken.
      * @param null   $filter        Photo filter.
      *
@@ -532,44 +706,45 @@ class Instagram
      *
      * @return ConfigureResponse
      */
-    public function uploadTimelinePhoto($photoFilename, $caption = null, $location = null, $filter = null)
+    public function uploadTimelinePhoto($photoFilename, $captionText = null, $location = null, $filter = null)
     {
-        return $this->_uploadPhoto('timeline', $photoFilename, $caption, $location, $filter);
+        return $this->_uploadPhoto('timeline', $photoFilename, $captionText, $location, $filter);
     }
 
     /**
      * Uploads a photo to your Instagram story.
      *
-     * @param $photoFilename
-     * @param string $caption Caption to display over the story photo.
+     * @param string $photoFilename The photo filename.
+     * @param string $captionText Caption to display over the story photo.
      * @param null   $filter  Photo filter.
      *
      * @throws InstagramException
      *
      * @return ConfigureResponse
      */
-    public function uploadStoryPhoto($photoFilename, $caption = null, $filter = null)
+    public function uploadStoryPhoto($photoFilename, $captionText = null, $filter = null)
     {
-        return $this->_uploadPhoto('story', $photoFilename, $caption, null, $filter);
+        return $this->_uploadPhoto('story', $photoFilename, $captionText, null, $filter);
     }
 
     /**
      * INTERNAL.
      *
-     * @param string $type          What type of upload ("timeline" or "story",
+     * @param string   $type          What type of upload ("timeline" or "story",
      *                              but not "album". They're handled elsewhere.)
-     * @param string $videoFilename The video filename.
-     * @param string $caption       Caption to use for the video.
-     * @param string $customThumb   Optional path to custom video thumbnail.
+     * @param string   $videoFilename The video filename.
+     * @param string   $captionText       Caption to use for the video.
+     * @param string   $customThumb   Optional path to custom video thumbnail.
      *                              If nothing provided, we generate from video.
-     * @param null   $userTags      Tagged people (only used for "story" videos!).
-     * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
+     * @param string[] $userTags      Array of UserPK IDs of people tagged in your video.
+     *                              (only used for "story" videos!).
+     * @param int      $maxAttempts   Total attempts to upload all chunks before throwing.
      *
      * @throws InstagramException
      *
      * @return ConfigureVideoResponse
      */
-    protected function _uploadVideo($type, $videoFilename, $caption = null, $customThumb = null, $userTags = null, $maxAttempts = 4)
+    protected function _uploadVideo($type, $videoFilename, $captionText = null, $customThumb = null, $userTags = null, $maxAttempts = 4)
     {
         // Make sure we don't allow "album" video uploads via this function.
         if ($type != 'timeline' && $type != 'story') {
@@ -590,7 +765,7 @@ class Instagram
         }
 
         // Configure the uploaded video and attach it to our timeline/story.
-        $configure = $this->configureVideoWithRetries($type, $uploadParams['upload_id'], $caption, $userTags);
+        $configure = $this->configureVideoWithRetries($type, $uploadParams['upload_id'], $captionText, $userTags);
 
         return $configure;
     }
@@ -599,7 +774,7 @@ class Instagram
      * Uploads a video to your Instagram timeline.
      *
      * @param string $videoFilename The video filename.
-     * @param string $caption       Caption to use for the video.
+     * @param string $captionText       Caption to use for the video.
      * @param string $customThumb   Optional path to custom video thumbnail.
      *                              If nothing provided, we generate from video.
      * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
@@ -608,36 +783,39 @@ class Instagram
      *
      * @return ConfigureVideoResponse
      */
-    public function uploadTimelineVideo($videoFilename, $caption = null, $customThumb = null, $maxAttempts = 4)
+    public function uploadTimelineVideo($videoFilename, $captionText = null, $customThumb = null, $maxAttempts = 4)
     {
-        return $this->_uploadVideo('timeline', $videoFilename, $caption, $customThumb, null, $maxAttempts);
+        return $this->_uploadVideo('timeline', $videoFilename, $captionText, $customThumb, null, $maxAttempts);
     }
 
     /**
      * Uploads a video to your Instagram story.
      *
      * @param string $videoFilename The video filename.
-     * @param string $caption       Caption to use for the video.
+     * @param string $captionText       Caption to use for the video.
      * @param string $customThumb   Optional path to custom video thumbnail.
      *                              If nothing provided, we generate from video.
-     * @param null   $userTags      Array of user IDs of people tagged in your video.
+     * @param string[] $userTags      Array of UserPK IDs of people tagged in your video.
      * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
      *
      * @throws InstagramException
      *
      * @return ConfigureVideoResponse
      */
-    public function uploadStoryVideo($videoFilename, $caption = null, $customThumb = null, $userTags = null, $maxAttempts = 4)
+    public function uploadStoryVideo($videoFilename, $captionText = null, $customThumb = null, $userTags = null, $maxAttempts = 4)
     {
-        return $this->_uploadVideo('story', $videoFilename, $caption, $customThumb, $userTags, $maxAttempts);
+        return $this->_uploadVideo('story', $videoFilename, $captionText, $customThumb, $userTags, $maxAttempts);
     }
 
     /**
-     * Uploads Album (aka Carousel aka Sidecar).
+     * Uploads an album to your Instagram timeline.
+     *
+     * An album is also known as a "carousel" and "sidecar". They can contain up
+     * to 10 photos or videos (at the moment).
      *
      * @param array $media    Array of image/video metadata (type, file, usertags etc)
      *                        You can only provide "usertags" for PHOTOS!
-     * @param null  $caption  Text for album
+     * @param null  $captionText  Text for album
      * @param null  $location Geotag
      * @param null  $filter
      *
@@ -645,7 +823,7 @@ class Instagram
      *
      * @return ConfigureResponse
      */
-    public function uploadAlbum($media, $caption = null, $location = null, $filter = null)
+    public function uploadAlbum($media, $captionText = null, $location = null, $filter = null)
     {
         if (empty($media)) {
             throw new InstagramException("List of media to upload can't be empty.", ErrorCode::INTERNAL_INVALID_ARGUMENT);
@@ -745,37 +923,39 @@ class Instagram
 
         // TODO: THIS SEEMS BUGGED TO ME. Why is it only using the last item's
         // "file" value when configuring a whole array of uploadRequests?
-        $configure = $this->configure('album', $uploadRequests, $item['file'], $caption, $location, $filter);
+        $configure = $this->configure('album', $uploadRequests, $item['file'], $captionText, $location, $filter);
 
         return $configure;
     }
 
     /**
-     * @param $recipients
-     * @param $media_id
-     * @param null $text
+     * Share media via direct message to a user's inbox.
+     *
+     * @param array|int $recipients One or more numeric user IDs.
+     * @param string    $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string    $text      Text message.
      *
      * @throws InstagramException
      *
      * @return Response
      */
-    public function directShare($recipients, $media_id, $text = null)
+    public function directShare($recipients, $mediaId, $text = null)
     {
         return $this->http->directShare(
             'share',
             $recipients,
             [
                 'text'     => $text,
-                'media_id' => $media_id,
+                'media_id' => $mediaId,
             ]
         );
     }
 
     /**
-     * Send direct message to user by inbox.
+     * Send a direct message to a user's inbox.
      *
-     * @param array|int $recipients Users id
-     * @param string    $text       Text message
+     * @param array|int $recipients One or more numeric user IDs.
+     * @param string    $text       Text message.
      *
      * @throws InstagramException
      *
@@ -793,44 +973,44 @@ class Instagram
     }
 
     /**
-     * Send photo via direct message to user by inbox.
+     * Send a photo via direct message to a user's inbox.
      *
-     * @param array|int $recipients Users id
-     * @param string    $filepath   Location of photo to upload
-     * @param string    $text       Text message
+     * @param array|int $recipients One or more numeric user IDs.
+     * @param string    $photoFilename   The photo filename.
+     * @param string    $text       Text message.
      *
      * @throws InstagramException
      *
      * @return Response
      */
-    public function directPhoto($recipients, $filepath, $text = null)
+    public function directPhoto($recipients, $photoFilename, $text = null)
     {
         return $this->http->directShare(
             'photo',
             $recipients,
             [
                 'text'     => $text,
-                'filepath' => $filepath,
+                'filepath' => $photoFilename,
             ]
         );
     }
 
     /**
-     * Direct Thread Data.
+     * Get direct message thread.
      *
-     * @param $threadId Thread Id
+     * @param $threadId Thread ID.
      * @param $cursorId
      *
-     * @throws InstagramException Direct Thread Data
+     * @throws InstagramException
      *
-     * @return array Direct Thread Data
+     * @return array Direct thread server response.
      */
-    // TODO : Missing Response
+    // TODO : Missing Response object!
     public function directThread($threadId, $cursorId = false)
     {
-        $threadUrl = "direct_v2/threads/$threadId/?";
+        $threadUrl = "direct_v2/threads/{$threadId}/?";
         if ($cursorId) {
-            $threadUrl = "direct_v2/threads/$threadId/?cursor=$cursorId";
+            $threadUrl = "direct_v2/threads/{$threadId}/?cursor={$cursorId}";
         }
         $directThread = $this->http->api($threadUrl)[1];
         if ($directThread['status'] != 'ok') {
@@ -841,14 +1021,16 @@ class Instagram
     }
 
     /**
-     * Direct Thread Action.
+     * Perform an action on a direct message thread.
      *
-     * @param string $threadId     Thread Id
-     * @param string $threadAction Thread Action 'approve' OR 'decline' OR 'block'
+     * @param string $threadId     Thread ID.
+     * @param string $threadAction Action ("approve", "decline" or "block").
      *
-     * @return array Direct Thread Action Data
+     * @throws InstagramException
+     *
+     * @return array Direct thread action server response.
      */
-    // TODO : Missing Response
+    // TODO : Missing Response object!
     public function directThreadAction($threadId, $threadAction)
     {
         $data = json_encode([
@@ -857,7 +1039,7 @@ class Instagram
             '_csrftoken' => $this->token,
         ]);
 
-        return $this->http->api("direct_v2/threads/$threadId/$threadAction/", SignatureUtils::generateSignature($data))[1];
+        return $this->http->api("direct_v2/threads/{$threadId}/{$threadAction}/", SignatureUtils::generateSignature($data))[1];
     }
 
     /**
@@ -870,8 +1052,9 @@ class Instagram
      * @param string $type        What type of upload ("timeline" or "story",
      *                            but not "album". They're handled elsewhere.)
      * @param string $upload_id   The ID of the upload to configure.
-     * @param string $caption     Caption to use for the video.
-     * @param null   $userTags    Tagged people (only used for "story" videos!).
+     * @param string $captionText     Caption to use for the video.
+     * @param string[] $userTags      Array of UserPK IDs of people tagged in your video.
+     *                              (only used for "story" videos!).
      * @param int    $maxAttempts Total attempts to configure video before throwing.
      *
      * @throws InstagramException
@@ -880,12 +1063,12 @@ class Instagram
      *
      * @see configureVideo()
      */
-    public function configureVideoWithRetries($type, $upload_id, $caption = null, $userTags = null, $maxAttempts = 4)
+    public function configureVideoWithRetries($type, $upload_id, $captionText = null, $userTags = null, $maxAttempts = 4)
     {
         for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
             try {
                 // Attempt to configure video parameters.
-                $configure = $this->configureVideo($type, $upload_id, $caption, $userTags);
+                $configure = $this->configureVideo($type, $upload_id, $captionText, $userTags);
                 //$this->expose(); // <-- WTF? Old leftover code.
                 break; // Success. Exit loop.
             } catch (InstagramException $e) {
@@ -903,19 +1086,20 @@ class Instagram
     }
 
     /**
-     * Configure video.
+     * Configure parameters for uploaded video.
      *
      * @param string $type      What type of upload ("timeline" or "story",
      *                          but not "album". They're handled elsewhere.)
      * @param string $upload_id The ID of the upload to configure.
-     * @param string $caption   Caption to use for the video.
-     * @param null   $userTags  Tagged people (only used for "story" videos!).
+     * @param string $captionText   Caption to use for the video.
+     * @param string[] $userTags      Array of UserPK IDs of people tagged in your video.
+     *                              (only used for "story" videos!).
      *
      * @throws InstagramException
      *
      * @return ConfigureVideoResponse
      */
-    public function configureVideo($type, $upload_id, $caption = null, $userTags = null)
+    public function configureVideo($type, $upload_id, $captionText = null, $userTags = null)
     {
         // Make sure we don't configure "album" video uploads via this function.
         switch ($type) {
@@ -952,8 +1136,8 @@ class Instagram
         ->addPost('_uid', $this->username_id)
         ->setReplacePost(['"length":0' => '"length":0.00']);
 
-        if ($caption !== '' && !is_null($caption) && $caption) {
-            $requestData->addPost('caption', $caption);
+        if ($captionText !== '' && !is_null($captionText) && $captionText) {
+            $requestData->addPost('caption', $captionText);
         }
 
         // TODO: IMPLEMENT THIS "STORY USER TAGS" FEATURE!
@@ -972,12 +1156,12 @@ class Instagram
     }
 
     /**
-     * Configure (primarily for photos, but also albums).
+     * Configure uploaded media parameters (primarily for photos, but also albums).
      *
      * @param string $type          What type of entry ("timeline", "story" or "album").
      * @param string $upload_id     The ID of the entry to configure.
-     * @param string $photoFilename
-     * @param string $caption
+     * @param string $photoFilename The photo filename.
+     * @param string $captionText
      * @param null   $location
      * @param null   $filter
      *
@@ -985,11 +1169,11 @@ class Instagram
      *
      * @return ConfigureResponse
      */
-    public function configure($type, $upload_id, $photoFilename, $caption = null, $location = null, $filter = null)
+    public function configure($type, $upload_id, $photoFilename, $captionText = null, $location = null, $filter = null)
     {
         $size = getimagesize($photoFilename)[0];
-        if (is_null($caption)) {
-            $caption = '';
+        if (is_null($captionText)) {
+            $captionText = '';
         }
 
         if ($type == 'album') {
@@ -1006,7 +1190,7 @@ class Instagram
         ->addPost('source_type', 4)
         ->addPost('_uid', $this->username_id)
         ->addPost('_uuid', $this->uuid)
-        ->addPost('caption', $caption);
+        ->addPost('caption', $captionText);
 
         if ($type == 'album') {
             $requestData->addPost('client_sidecar_id', Utils::generateUploadId())
@@ -1041,7 +1225,7 @@ class Instagram
         $configure = $requestData->setReplacePost([
             '"crop_center":[0,0]'                   => '"crop_center":[0.0,-0.0]',
             '"crop_zoom":1'                         => '"crop_zoom":1.0',
-            '"crop_original_size":'."[$size,$size]" => '"crop_original_size":'."[$size.0,$size.0]",
+            '"crop_original_size":'."[{$size},{$size}]" => '"crop_original_size":'."[{$size}.0,{$size}.0]",
         ])
         ->getResponse(new ConfigureResponse());
 
@@ -1051,23 +1235,25 @@ class Instagram
     /**
      * Edit media.
      *
-     * @param $mediaId  Media id
-     * @param string $captionText Caption text
-     * @param null   $usertags
+     * @param string $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string $captionText Caption text.
+     * @param string[] $userTags   Array of UserPK IDs of people tagged in your media.
      *
-     * @return MediaResponse
+     * @throws InstagramException
+     *
+     * @return EditMediaResponse
      */
     public function editMedia($mediaId, $captionText = '', $usertags = null)
     {
         if (is_null($usertags)) {
-            return $this->request("media/$mediaId/edit_media/")
+            return $this->request("media/{$mediaId}/edit_media/")
             ->addPost('_uuid', $this->uuid)
             ->addPost('_uid', $this->username_id)
             ->addPost('_csrftoken', $this->token)
             ->addPost('caption_text', $captionText)
             ->getResponse(new EditMediaResponse());
         } else {
-            return $this->request("media/$mediaId/edit_media/")
+            return $this->request("media/{$mediaId}/edit_media/")
             ->addPost('_uuid', $this->uuid)
             ->addPost('_uid', $this->username_id)
             ->addPost('_csrftoken', $this->token)
@@ -1078,51 +1264,54 @@ class Instagram
     }
 
     /**
-     *  Tag User.
+     * Tag User.
      *
-     * @param string      $mediaId     Media id
-     * @param string      $usernameId  Username id
-     * @param array|float $position    position relative to image where is placed the tag. Example: [0.4890625,0.6140625]
-     * @param string      $captionText Caption text
+     * @param string      $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string      $userId  Numerical UserPK ID.
+     * @param array|float $position    Position relative to image where the tag should sit. Example: [0.4890625,0.6140625]
+     * @param string      $captionText Caption text.
      *
-     * @return MediaResponse
+     * @throws InstagramException
+     *
+     * @return EditMediaResponse
      */
-    public function tagUser($mediaId, $usernameId, $position, $captionText = '')
+    public function tagUser($mediaId, $userId, $position, $captionText = '')
     {
-        $usertag = '{"removed":[],"in":[{"position":['.$position[0].','.$position[1].'],"user_id":"'.$usernameId.'"}]}';
+        $usertag = '{"removed":[],"in":[{"position":['.$position[0].','.$position[1].'],"user_id":"'.$userId.'"}]}';
 
         return $this->editMedia($mediaId, $captionText, $usertag);
     }
 
     /**
-     *  Untag User.
+     * Untag User.
      *
-     * @param string $mediaId     Media id
-     * @param string $usernameId  Username id
-     * @param string $captionText Caption text
+     * @param string $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string $userId  Numerical UserPK ID.
+     * @param string $captionText Caption text.
      *
-     * @return MediaResponse
+     * @throws InstagramException
+     *
+     * @return EditMediaResponse
      */
-    public function untagUser($mediaId, $usernameId, $captionText = '')
+    public function untagUser($mediaId, $userId, $captionText = '')
     {
-        $usertag = '{"removed":["'.$usernameId.'"],"in":[]}';
+        $usertag = '{"removed":["'.$userId.'"],"in":[]}';
 
         return $this->editMedia($mediaId, $captionText, $usertag);
     }
 
+    /**
+     * Save a media item.
+     *
+     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     *
+     * @throws InstagramException
+     *
+     * @return SaveAndUnsaveMedia
+     */
     public function saveMedia($mediaId)
     {
-        return $this->request("media/$mediaId/save/")
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
-        ->addPost('_csrftoken', $this->token)
-        ->setSignedPost(true)
-        ->getResponse(new SaveAndUnsaveMedia());
-    }
-
-    public function unsaveMedia($mediaId)
-    {
-        return $this->request("media/$mediaId/unsave/")
+        return $this->request("media/{$mediaId}/save/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
@@ -1131,7 +1320,28 @@ class Instagram
     }
 
     /**
-     *  Get Saved Feed.
+     * Unsave a media item.
+     *
+     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     *
+     * @throws InstagramException
+     *
+     * @return SaveAndUnsaveMedia
+     */
+    public function unsaveMedia($mediaId)
+    {
+        return $this->request("media/{$mediaId}/unsave/")
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->setSignedPost(true)
+        ->getResponse(new SaveAndUnsaveMedia());
+    }
+
+    /**
+     * Get saved media items feed.
+     *
+     * @throws InstagramException
      *
      * @return SavedFeedResponse
      */
@@ -1146,15 +1356,17 @@ class Instagram
     }
 
     /**
-     * Remove yourself from a tagged media.
+     * Remove yourself from a tagged media item.
      *
-     * @param $mediaId
+     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     *
+     * @throws InstagramException
      *
      * @return MediaResponse
      */
     public function removeSelftag($mediaId)
     {
-        return $this->request("usertags/$mediaId/remove/")
+        return $this->request("usertags/{$mediaId}/remove/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
@@ -1162,15 +1374,17 @@ class Instagram
     }
 
     /**
-     * Get media info.
+     * Get detailed media information.
      *
-     * @param $mediaId
+     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     *
+     * @throws InstagramException
      *
      * @return MediaInfoResponse
      */
     public function mediaInfo($mediaId)
     {
-        return $this->request("media/$mediaId/info/")
+        return $this->request("media/{$mediaId}/info/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
@@ -1179,15 +1393,17 @@ class Instagram
     }
 
     /**
-     * Delete photo or video.
+     * Delete a media item.
      *
-     * @param $mediaId
+     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
      *
-     * @return mixed
+     * @throws InstagramException
+     *
+     * @return MediaDeleteResponse
      */
     public function deleteMedia($mediaId)
     {
-        return $this->request("media/$mediaId/delete/")
+        return $this->request("media/{$mediaId}/delete/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
@@ -1196,15 +1412,17 @@ class Instagram
     }
 
     /**
-     * Disable comments for a media.
+     * Disable comments for a media item.
      *
-     * @param $mediaId
+     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     *
+     * @throws InstagramException
      *
      * @return Response
      */
     public function disableMediaComments($mediaId)
     {
-        return $this->request("media/$mediaId/disable_comments/")
+        return $this->request("media/{$mediaId}/disable_comments/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_csrftoken', $this->token)
         ->setSignedPost(false)
@@ -1212,15 +1430,17 @@ class Instagram
     }
 
     /**
-     * Enable comments for a media.
+     * Enable comments for a media item.
      *
-     * @param $mediaId
+     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     *
+     * @throws InstagramException
      *
      * @return Response
      */
     public function enableMediaComments($mediaId)
     {
-        return $this->request("media/$mediaId/enable_comments/")
+        return $this->request("media/{$mediaId}/enable_comments/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_csrftoken', $this->token)
         ->setSignedPost(false)
@@ -1228,16 +1448,18 @@ class Instagram
     }
 
     /**
-     * Comment media.
+     * Post a comment on a media item.
      *
-     * @param $mediaId
-     * @param $commentText
+     * @param string $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string $commentText Your comment text.
+     *
+     * @throws InstagramException
      *
      * @return CommentResponse
      */
     public function comment($mediaId, $commentText)
     {
-        return $this->request("media/$mediaId/comment/")
+        return $this->request("media/{$mediaId}/comment/")
         ->addPost('user_breadcrumb', Utils::generateUserBreadcrumb(mb_strlen($commentText)))
         ->addPost('idempotence_token', SignatureUtils::generateUUID(true))
         ->addPost('_uuid', $this->uuid)
@@ -1249,19 +1471,18 @@ class Instagram
     }
 
     /**
-     * Delete Comment.
+     * Delete a comment.
      *
-     * @param string $mediaId
-     *                          Media ID
-     * @param string $commentId
-     *                          Comment ID
+     * @param string $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string $commentId The comment's ID.
      *
-     * @return array
-     *               Delete comment data
+     * @throws InstagramException
+     *
+     * @return DeleteCommentResponse
      */
     public function deleteComment($mediaId, $commentId)
     {
-        return $this->request("media/$mediaId/comment/$commentId/delete/")
+        return $this->request("media/{$mediaId}/comment/{$commentId}/delete/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
@@ -1269,15 +1490,14 @@ class Instagram
     }
 
     /**
-     * Delete Comment Bulk.
+     * Delete multiple comments.
      *
-     * @param string $mediaId
-     *                           Media id
-     * @param string $commentIds
-     *                           List of comments to delete
+     * @param string $mediaId    The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string $commentIds List of comment IDs to delete.
      *
-     * @return array
-     *               Delete Comment Bulk Data
+     * @throws InstagramException
+     *
+     * @return DeleteCommentResponse
      */
     public function deleteCommentsBulk($mediaId, $commentIds)
     {
@@ -1292,7 +1512,7 @@ class Instagram
 
         $comment_ids_to_delete = implode(',', $string);
 
-        return $this->request("media/$mediaId/comment/bulk_delete/")
+        return $this->request("media/{$mediaId}/comment/bulk_delete/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
@@ -1301,15 +1521,17 @@ class Instagram
     }
 
     /**
-     * Like Comment.
+     * Like a comment.
      *
-     * @param string $commentId
+     * @param string $commentId The comment's ID.
+     *
+     * @throws InstagramException
      *
      * @return CommentLikeUnlikeResponse
      */
     public function likeComment($commentId)
     {
-        return $this->request("media/$commentId/comment_like/")
+        return $this->request("media/{$commentId}/comment_like/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
@@ -1317,15 +1539,17 @@ class Instagram
     }
 
     /**
-     * Unlike Comment.
+     * Unlike a comment.
      *
-     * @param string $commentId
+     * @param string $commentId The comment's ID.
+     *
+     * @throws InstagramException
      *
      * @return CommentLikeUnlikeResponse
      */
     public function unlikeComment($commentId)
     {
-        return $this->request("media/$commentId/comment_unlike/")
+        return $this->request("media/{$commentId}/comment_unlike/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
@@ -1333,21 +1557,25 @@ class Instagram
     }
 
     /**
-     * Sets account to public.
+     * Changes your account's profile picture.
      *
-     * @param string $photo
-     *                      Path to photo
+     * @param string $photoFilename The photo filename.
+     *
+     * @throws InstagramException
+     *
+     * @return User
      */
-    public function changeProfilePicture($photo)
+    public function changeProfilePicture($photoFilename)
     {
-        return $this->http->changeProfilePicture($photo);
+        return $this->http->changeProfilePicture($photoFilename);
     }
 
     /**
-     * Remove profile picture.
+     * Remove your account's profile picture.
      *
-     * @return array
-     *               status request data
+     * @throws InstagramException
+     *
+     * @return UsernameInfoResponse
      */
     public function removeProfilePicture()
     {
@@ -1359,10 +1587,11 @@ class Instagram
     }
 
     /**
-     * Sets account to private.
+     * Sets your account to private.
      *
-     * @return array
-     *               status request data
+     * @throws InstagramException
+     *
+     * @return UsernameInfoResponse
      */
     public function setPrivateAccount()
     {
@@ -1374,10 +1603,11 @@ class Instagram
     }
 
     /**
-     * Sets account to public.
+     * Sets your account to public.
      *
-     * @return array
-     *               status request data
+     * @throws InstagramException
+     *
+     * @return UsernameInfoResponse
      */
     public function setPublicAccount()
     {
@@ -1389,11 +1619,13 @@ class Instagram
     }
 
     /**
-     * Get personal profile data.
+     * Get details about the currently logged in account.
+     *
+     * @throws InstagramException
      *
      * @return UsernameInfoResponse
      */
-    public function getProfileData()
+    public function getCurrentUser()
     {
         return $this->request('accounts/current_user/')
         ->addParams('edit', true)
@@ -1404,18 +1636,20 @@ class Instagram
     }
 
     /**
-     * Edit profile.
+     * Edit your profile.
      *
-     * @param string $url        Url - website. "" for nothing
-     * @param string $phone      Phone number. "" for nothing
-     * @param string $first_name Name. "" for nothing
-     * @param string $biography  Biography text
-     * @param string $email      Email. Required
-     * @param int    $gender     Gender. male = 1 , female = 2, unknown = 3
+     * @param string $url       Website URL. Use "" for nothing.
+     * @param string $phone     Phone number. Use "" for nothing.
+     * @param string $firstName Name. Use "" for nothing.
+     * @param string $biography Biography text. Use "" for nothing.
+     * @param string $email     Email. Required.
+     * @param int    $gender    Gender. Male = 1, Female = 2, Unknown = 3.
      *
-     * @return UsernameInfoResponse edit profile data
+     * @throws InstagramException
+     *
+     * @return UsernameInfoResponse
      */
-    public function editProfile($url, $phone, $first_name, $biography, $email, $gender)
+    public function editProfile($url, $phone, $firstName, $biography, $email, $gender)
     {
         return $this->request('accounts/edit_profile/')
         ->addPost('_uuid', $this->uuid)
@@ -1424,7 +1658,7 @@ class Instagram
         ->addPost('external_url', $url)
         ->addPost('phone_number', $phone)
         ->addPost('username', $this->username)
-        ->addPost('first_name', $first_name)
+        ->addPost('first_name', $firstName)
         ->addPost('biography', $biography)
         ->addPost('email', $email)
         ->addPost('gender', $gender)
@@ -1432,12 +1666,14 @@ class Instagram
     }
 
     /**
-     * Change Password.
+     * Change your account's password.
      *
-     * @param string $oldPassword Old Password
-     * @param string $newPassword New Password
+     * @param string $oldPassword Old password.
+     * @param string $newPassword New password.
      *
-     * @return array Change Password Data
+     * @throws InstagramException
+     *
+     * @return ChangePasswordResponse
      */
     public function changePassword($oldPassword, $newPassword)
     {
@@ -1452,25 +1688,33 @@ class Instagram
     }
 
     /**
-     * Get username info.
+     * Get details about a specific user.
      *
-     * @param string $usernameId Username id
+     * @param string $userId Numerical UserPK ID.
      *
-     * @return UsernameInfoResponse Username data
+     * @throws InstagramException
+     *
+     * @return UsernameInfoResponse
      */
-    public function getUsernameInfo($usernameId)
+    public function getUserInfo($userId)
     {
-        return $this->request("users/$usernameId/info/")->getResponse(new UsernameInfoResponse());
+        return $this->request("users/{$userId}/info/")->getResponse(new UsernameInfoResponse());
     }
 
     /**
-     * Get self username info.
+     * Get user details about your own account.
      *
-     * @return UsernameInfoResponse Username data
+     * Also try getCurrentUser() instead, for even more details.
+     *
+     * @throws InstagramException
+     *
+     * @return UsernameInfoResponse
+     *
+     * @see getCurrentUser()
      */
-    public function getSelfUsernameInfo()
+    public function getSelfUserInfo()
     {
-        return $this->getUsernameInfo($this->username_id);
+        return $this->getUserInfo($this->username_id);
     }
 
     /**
@@ -1478,7 +1722,7 @@ class Instagram
      *
      * @throws InstagramException
      *
-     * @return mixed Recent activity data
+     * @return ActivityNewsResponse
      */
     public function getRecentActivity()
     {
@@ -1486,61 +1730,63 @@ class Instagram
     }
 
     /**
-     * Get recent activity from accounts followed.
+     * Get news feed with recent activity from all accounts you follow.
      *
-     * @param null $maxid
+     * @param null|string $maxId Next "maximum ID", used for pagination.
      *
      * @throws InstagramException
      *
-     * @return mixed Recent activity data of follows
+     * @return FollowingRecentActivityResponse
      */
-    public function getFollowingRecentActivity($maxid = null)
+    public function getFollowingRecentActivity($maxId = null)
     {
         $activity = $this->request('news/');
-        if (!is_null($maxid)) {
-            $activity->addParams('max_id', $maxid);
+        if (!is_null($maxId)) {
+            $activity->addParams('max_id', $maxId);
         }
 
         return $activity->getResponse(new FollowingRecentActivityResponse());
     }
 
     /**
-     * I dont know this yet.
+     * TODO: I don't know this yet.
      *
      * @throws InstagramException
      *
-     * @return V2InboxResponse v2 inbox data
+     * @return V2InboxResponse
      */
-    public function getv2Inbox()
+    public function getV2Inbox()
     {
         return $this->request('direct_v2/inbox/')->getResponse(new V2InboxResponse());
     }
 
     /**
-     * Get user tags.
+     * Get user taggings for a user.
      *
-     * @param string $usernameId
-     * @param null   $maxid
-     * @param null   $minTimestamp
+     * @param string $userId   Numerical UserPK ID.
+     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param null|int   $minTimestamp Minimum timestamp.
      *
      * @throws InstagramException
      *
-     * @return UsertagsResponse user tags data
+     * @return UsertagsResponse
      */
-    public function getUserTags($usernameId, $maxid = null, $minTimestamp = null)
+    public function getUserTags($userId, $maxId = null, $minTimestamp = null)
     {
-        return $this->request("usertags/$usernameId/feed/")
+        return $this->request("usertags/{$userId}/feed/")
         ->addParams('rank_token', $this->rank_token)
         ->addParams('ranked_content', 'true')
-        ->addParams('max_id', (!is_null($maxid) ? $maxid : ''))
+        ->addParams('max_id', (!is_null($maxId) ? $maxId : ''))
         ->addParams('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
         ->getResponse(new UsertagsResponse());
     }
 
     /**
-     * Get self user tags.
+     * Get user taggings for your own account.
      *
-     * @return UsertagsResponse self user tags data
+     * @throws InstagramException
+     *
+     * @return UsertagsResponse
      */
     public function getSelfUserTags()
     {
@@ -1548,9 +1794,9 @@ class Instagram
     }
 
     /**
-     * Get media likers.
+     * Get list of users who liked a media item.
      *
-     * @param string $mediaId
+     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
      *
      * @throws InstagramException
      *
@@ -1558,66 +1804,17 @@ class Instagram
      */
     public function getMediaLikers($mediaId)
     {
-        return $this->request("media/$mediaId/likers/")->getResponse(new MediaLikersResponse());
+        return $this->request("media/{$mediaId}/likers/")->getResponse(new MediaLikersResponse());
     }
 
     /**
-     * Get user locations media.
-     *
-     * @param string $usernameId Username id
-     *
-     * @throws InstagramException
-     *
-     * @return array Geo Media data
-     */
-    public function getGeoMedia($usernameId)
-    {
-        return $this->request("maps/user/$usernameId/")->getResponse(new GeoMediaResponse());
-    }
-
-    /**
-     * Get self user locations media.
-     *
-     * @return array Geo Media data
-     */
-    public function getSelfGeoMedia()
-    {
-        return $this->getGeoMedia($this->username_id);
-    }
-
-    /**
-     * @param $latitude
-     * @param $longitude
-     * @param null $query
-     *
-     * @throws InstagramException
-     *
-     * @return LocationResponse|void
-     */
-    public function searchLocation($latitude, $longitude, $query = null)
-    {
-        $locations = $this->request('location_search/')
-        ->addParams('rank_token', $this->rank_token)
-        ->addParams('latitude', $latitude)
-        ->addParams('longitude', $longitude);
-
-        if (is_null($query)) {
-            $locations->addParams('timestamp', time());
-        } else {
-            $locations->addParams('search_query', $query);
-        }
-
-        return $locations->getResponse(new LocationResponse());
-    }
-
-    /**
-     * facebook user search.
+     * Facebook user search.
      *
      * @param string $query
      *
      * @throws InstagramException
      *
-     * @return array query data
+     * @return FBSearchResponse
      */
     public function fbUserSearch($query)
     {
@@ -1629,13 +1826,13 @@ class Instagram
     }
 
     /**
-     * Search users.
+     * Search for Instagram users.
      *
      * @param string $query
      *
      * @throws InstagramException
      *
-     * @return array query data
+     * @return SearchUserResponse
      */
     public function searchUsers($query)
     {
@@ -1648,23 +1845,27 @@ class Instagram
     }
 
     /**
-     * Search exact username.
+     * Search for an exact username.
      *
-     * @param string usernameName username as STRING not an id
+     * @param string $username Username as string (NOT as a numerical ID).
      *
      * @throws InstagramException
      *
-     * @return UsernameInfoResponse query data
+     * @return UsernameInfoResponse
      */
-    public function searchUsername($usernameName)
+    public function searchUsername($username)
     {
-        return $this->request("users/$usernameName/usernameinfo/")->getResponse(new UsernameInfoResponse());
+        return $this->request("users/{$username}/usernameinfo/")->getResponse(new UsernameInfoResponse());
     }
 
     /**
-     * @param $username
+     * Search for an exact username and get their userpk ID.
      *
-     * @return mixed
+     * @param string $username Username as string (NOT as a numerical ID).
+     *
+     * @throws InstagramException
+     *
+     * @return string Their userpk ID.
      */
     public function getUsernameId($username)
     {
@@ -1672,14 +1873,15 @@ class Instagram
     }
 
     /**
-     * Search users using address book.
+     * Search for users via address book.
      *
      * @param array $contacts
      *
-     * @return array
-     *               query data
+     * @throws InstagramException
+     *
+     * @return AddressBookResponse
      */
-    public function syncFromAdressBook($contacts)
+    public function searchInAddressBook($contacts)
     {
         return $this->request('address_book/link/?include=extra_display_name,thumbnails')
         ->setSignedPost(false)
@@ -1694,18 +1896,18 @@ class Instagram
      *
      * @throws InstagramException
      *
-     * @return array query data
+     * @return TagRelatedResponse
      */
     public function getTagRelated($tag)
     {
-        return $this->request("tags/$tag/related")
+        return $this->request("tags/{$tag}/related")
         ->addParams('visited', '[{"id":"'.$tag.'","type":"hashtag"}]')
         ->addParams('related_types', '["hashtag"]')
         ->getResponse(new TagRelatedResponse());
     }
 
     /**
-     * Get tag info: media_count.
+     * Get detailed tag information.
      *
      * @param string $tag
      *
@@ -1715,14 +1917,22 @@ class Instagram
      */
     public function getTagInfo($tag)
     {
-        return $this->request("tags/$tag/info")
+        return $this->request("tags/{$tag}/info")
         ->getResponse(new TagInfoResponse());
     }
 
     /**
+     * Get the global story feed which contains everyone you follow.
+     *
+     * Note that users will eventually drop out of this list even though they
+     * still have stories. So it's always safer to call getUserStoryFeed() if
+     * a specific user's story feed matters to you.
+     *
      * @throws InstagramException
      *
-     * @return ReelsTrayFeedResponse|void
+     * @return ReelsTrayFeedResponse
+     *
+     * @see getUserStoryFeed()
      */
     public function getReelsTrayFeed()
     {
@@ -1730,22 +1940,26 @@ class Instagram
     }
 
     /**
-     * Get a user's Story Feed.
+     * Get a specific user's story feed.
      *
-     * @param $userId
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws InstagramException
      *
      * @return UserStoryFeedResponse
      */
     public function getUserStoryFeed($userId)
     {
-        return $this->request("feed/user/$userId/story/")
+        return $this->request("feed/user/{$userId}/story/")
         ->getResponse(new UserStoryFeedResponse());
     }
 
     /**
-     * Get multiple users' story reels.
+     * Get multiple users' story feeds at once.
      *
-     * @param array $userList List of User IDs
+     * @param string|string[] $userList List of numerical UserPK IDs.
+     *
+     * @throws InstagramException
      *
      * @return ReelsMediaResponse
      */
@@ -1767,54 +1981,108 @@ class Instagram
     }
 
     /**
-     * Get user feed.
+     * Get a user's timeline feed.
      *
-     * @param string   $usernameId   Username id
-     * @param null|int $maxid        Max Id
-     * @param null|int $minTimestamp Min timestamp
+     * @param string   $userId   Numerical UserPK ID.
+     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param null|int   $minTimestamp Minimum timestamp.
      *
      * @throws InstagramException
      *
-     * @return UserFeedResponse User feed data
+     * @return UserFeedResponse
      */
-    public function getUserFeed($usernameId, $maxid = null, $minTimestamp = null)
+    public function getUserFeed($userId, $maxId = null, $minTimestamp = null)
     {
-        return $this->request("feed/user/$usernameId/")
+        return $this->request("feed/user/{$userId}/")
         ->addParams('rank_token', $this->rank_token)
         ->addParams('ranked_content', 'true')
-        ->addParams('max_id', (!is_null($maxid) ? $maxid : ''))
+        ->addParams('max_id', (!is_null($maxId) ? $maxId : ''))
         ->addParams('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
         ->getResponse(new UserFeedResponse());
     }
 
     /**
-     * Get hashtag feed.
+     * Get your own timeline feed.
      *
-     * @param string   $hashtagString Hashtag string, not including the #
-     * @param null|int $maxid
+     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param null|int   $minTimestamp Minimum timestamp.
      *
      * @throws InstagramException
      *
-     * @return array Hashtag feed data
+     * @return UserFeedResponse
      */
-    public function getHashtagFeed($hashtagString, $maxid = null)
+    public function getSelfUserFeed($maxId = null, $minTimestamp = null)
     {
-        $hashtagFeed = $this->request("feed/tag/$hashtagString/");
-        if (!is_null($maxid)) {
-            $hashtagFeed->addParams('max_id', $maxid);
-        }
-
-        return $hashtagFeed->getResponse(new TagFeedResponse());
+        return $this->getUserFeed($this->username_id, $maxId, $minTimestamp);
     }
 
     /**
-     * Get locations.
+     * Get location based media feed for a user.
      *
-     * @param string $query search query
+     * Note that you probably want getUserFeed() instead, because the
+     * geographical feed does not contain all of the user's media.
+     *
+     * @param string $userId Numerical UserPK ID.
      *
      * @throws InstagramException
      *
-     * @return array Location location data
+     * @return GeoMediaResponse
+     *
+     * @see getUserFeed()
+     */
+    public function getGeoMedia($userId)
+    {
+        return $this->request("maps/user/{$userId}/")->getResponse(new GeoMediaResponse());
+    }
+
+    /**
+     * Get location based media feed for your own account.
+     *
+     * @throws InstagramException
+     *
+     * @return GeoMediaResponse
+     */
+    public function getSelfGeoMedia()
+    {
+        return $this->getGeoMedia($this->username_id);
+    }
+
+    /**
+     * Search for nearby Instagram locations by geographical coordinates.
+     *
+     * @param $latitude
+     * @param $longitude
+     * @param null $query
+     *
+     * @throws InstagramException
+     *
+     * @return LocationResponse
+     */
+    public function searchLocation($latitude, $longitude, $query = null)
+    {
+        $locations = $this->request('location_search/')
+        ->addParams('rank_token', $this->rank_token)
+        ->addParams('latitude', $latitude)
+        ->addParams('longitude', $longitude);
+
+        if (is_null($query)) {
+            $locations->addParams('timestamp', time());
+        } else {
+            $locations->addParams('search_query', $query);
+        }
+
+        return $locations->getResponse(new LocationResponse());
+    }
+
+
+    /**
+     * Search for Facebook locations by name.
+     *
+     * @param string $query
+     *
+     * @throws InstagramException
+     *
+     * @return FBLocationResponse
      */
     public function searchFBLocation($query)
     {
@@ -1825,14 +2093,14 @@ class Instagram
     }
 
     /**
-     * Get locations by geo point.
+     * Search for Facebook locations by geographical location.
      *
-     * @param string $lat Latitude
-     * @param string $lng Longitude
+     * @param string $lat Latitude.
+     * @param string $lng Longitude.
      *
      * @throws InstagramException
      *
-     * @return array Location location data
+     * @return FBLocationResponse
      */
     public function searchFBLocationByPoint($lat, $lng)
     {
@@ -1846,34 +2114,21 @@ class Instagram
     /**
      * Get location feed.
      *
-     * @param string   $locationId location id
-     * @param null|int $maxid
+     * @param string   $locationId
+     * @param null|string $maxId Next "maximum ID", used for pagination.
      *
      * @throws InstagramException
      *
-     * @return array Location feed data
+     * @return LocationFeedResponse
      */
-    public function getLocationFeed($locationId, $maxid = null)
+    public function getLocationFeed($locationId, $maxId = null)
     {
-        $locationFeed = $this->request("feed/location/$locationId/");
-        if (!is_null($maxid)) {
-            $locationFeed->addParams('max_id', $maxid);
+        $locationFeed = $this->request("feed/location/{$locationId}/");
+        if (!is_null($maxId)) {
+            $locationFeed->addParams('max_id', $maxId);
         }
 
         return $locationFeed->getResponse(new LocationFeedResponse());
-    }
-
-    /**
-     * Get self user feed.
-     *
-     * @param null|int $max_id
-     * @param null|int $minTimestamp
-     *
-     * @return UserFeedResponse User feed data
-     */
-    public function getSelfUserFeed($max_id = null, $minTimestamp = null)
-    {
-        return $this->getUserFeed($this->username_id, $max_id, $minTimestamp);
     }
 
     /**
@@ -1881,7 +2136,7 @@ class Instagram
      *
      * @throws InstagramException
      *
-     * @return array popular feed data
+     * @return PopularFeedResponse
      */
     public function getPopularFeed()
     {
@@ -1893,77 +2148,109 @@ class Instagram
     }
 
     /**
-     * Get user followings.
+     * Get hashtag feed.
      *
-     * @param string   $usernameId Username id
-     * @param null|int $maxid
+     * @param string   $hashtagString Hashtag string, not including the "#".
+     * @param null|string $maxId Next "maximum ID", used for pagination.
      *
-     * @return FollowerAndFollowingResponse followers data
+     * @throws InstagramException
+     *
+     * @return TagFeedResponse
      */
-    public function getUserFollowings($usernameId, $maxid = null)
+    public function getHashtagFeed($hashtagString, $maxId = null)
     {
-        $requestData = $this->request("friendships/$usernameId/following/")
+        $hashtagFeed = $this->request("feed/tag/{$hashtagString}/");
+        if (!is_null($maxId)) {
+            $hashtagFeed->addParams('max_id', $maxId);
+        }
+
+        return $hashtagFeed->getResponse(new TagFeedResponse());
+    }
+
+
+    /**
+     * Get list of who a user is following.
+     *
+     * @param string   $userId Numerical UserPK ID.
+     * @param null|string $maxId Next "maximum ID", used for pagination.
+     *
+     * @throws InstagramException
+     *
+     * @return FollowerAndFollowingResponse
+     */
+    public function getUserFollowings($userId, $maxId = null)
+    {
+        $requestData = $this->request("friendships/{$userId}/following/")
         ->addParams('rank_token', $this->rank_token);
-        if (!is_null($maxid)) {
-            $requestData->addParams('max_id', $maxid);
+        if (!is_null($maxId)) {
+            $requestData->addParams('max_id', $maxId);
         }
 
         return $requestData->getResponse(new FollowerAndFollowingResponse());
     }
 
     /**
-     * Get user followers.
+     * Get list of who a user is followed by.
      *
-     * @param string   $usernameId Username id
-     * @param null|int $maxid
+     * @param string   $userId Numerical UserPK ID.
+     * @param null|string $maxId Next "maximum ID", used for pagination.
      *
-     * @return FollowerAndFollowingResponse followers data
+     * @throws InstagramException
+     *
+     * @return FollowerAndFollowingResponse
      */
-    public function getUserFollowers($usernameId, $maxid = null)
+    public function getUserFollowers($userId, $maxId = null)
     {
-        $requestData = $this->request("friendships/$usernameId/followers/")
+        $requestData = $this->request("friendships/{$userId}/followers/")
         ->addParams('rank_token', $this->rank_token);
-        if (!is_null($maxid)) {
-            $requestData->addParams('max_id', $maxid);
+        if (!is_null($maxId)) {
+            $requestData->addParams('max_id', $maxId);
         }
 
         return $requestData->getResponse(new FollowerAndFollowingResponse());
     }
 
     /**
-     * Get self user followers.
+     * Get list of who you are following.
      *
-     * @param null|int $max_id
+     * @param null|string $maxId Next "maximum ID", used for pagination.
      *
-     * @return FollowerAndFollowingResponse followers data
+     * @throws InstagramException
+     *
+     * @return FollowerAndFollowingResponse
      */
-    public function getSelfUserFollowers($max_id = null)
+    public function getSelfUsersFollowing($maxId = null)
     {
-        return $this->getUserFollowers($this->username_id, $max_id);
+        return $this->getUserFollowings($this->username_id, $maxId);
+    }
+
+
+    /**
+     * Get list of your own followers.
+     *
+     * @param null|string $maxId Next "maximum ID", used for pagination.
+     *
+     * @throws InstagramException
+     *
+     * @return FollowerAndFollowingResponse
+     */
+    public function getSelfUserFollowers($maxId = null)
+    {
+        return $this->getUserFollowers($this->username_id, $maxId);
     }
 
     /**
-     * Get self users we are following.
+     * Like a media item.
      *
-     * @param null|int $max_id
+     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
      *
-     * @return FollowerAndFollowingResponse users we are following data
-     */
-    public function getSelfUsersFollowing($max_id = null)
-    {
-        return $this->getUserFollowings($this->username_id, $max_id);
-    }
-
-    /**
-     * Like photo or video.
+     * @throws InstagramException
      *
-     * @param string $mediaId Media id
-     *
-     * @return array status request
+     * @return Response
      */
     public function like($mediaId)
     {
-        return $this->request("media/$mediaId/like/")
+        return $this->request("media/{$mediaId}/like/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
@@ -1972,15 +2259,17 @@ class Instagram
     }
 
     /**
-     * Unlike photo or video.
+     * Unlike a media item.
      *
-     * @param string $mediaId Media id
+     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
      *
-     * @return array status request
+     * @throws InstagramException
+     *
+     * @return Response
      */
     public function unlike($mediaId)
     {
-        return $this->request("media/$mediaId/unlike/")
+        return $this->request("media/{$mediaId}/unlike/")
          ->addPost('_uuid', $this->uuid)
          ->addPost('_uid', $this->username_id)
          ->addPost('_csrftoken', $this->token)
@@ -1991,26 +2280,30 @@ class Instagram
     /**
      * Get media comments.
      *
-     * @param string   $mediaId Media id
-     * @param null|int $maxid
+     * @param string   $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param null|string $maxId Next "maximum ID", used for pagination.
      *
-     * @return MediaCommentsResponse Media comments data
+     * @throws InstagramException
+     *
+     * @return MediaCommentsResponse
      */
-    public function getMediaComments($mediaId, $maxid = null)
+    public function getMediaComments($mediaId, $maxId = null)
     {
-        return $this->request("media/$mediaId/comments/")
+        return $this->request("media/{$mediaId}/comments/")
         ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
-        ->addParams('max_id', $maxid)
+        ->addParams('max_id', $maxId)
         ->getResponse(new MediaCommentsResponse());
     }
 
     /**
-     * Set name and phone (Optional).
+     * Set your account's first name and phone (optional).
      *
-     * @param string $name
-     * @param string $phone
+     * @param string $name  Your first name.
+     * @param string $phone Your phone number (optional).
      *
-     * @return array Set status data
+     * @throws InstagramException
+     *
+     * @return Response
      */
     public function setNameAndPhone($name = '', $phone = '')
     {
@@ -2025,9 +2318,11 @@ class Instagram
     }
 
     /**
-     * Get direct share.
+     * Get direct share inbox.
      *
-     * @return array Direct share data
+     * @throws InstagramException
+     *
+     * @return DirectShareInboxResponse
      */
     public function getDirectShare()
     {
@@ -2036,7 +2331,7 @@ class Instagram
     }
 
     /**
-     * Backups all your uploaded photos and videos :).
+     * Backup all of your own uploaded photos and videos. :)
      *
      * @param string|null $baseOutputPath (optional) Base-folder for output.
      *                                    Uses standard data path if null.
@@ -2080,13 +2375,15 @@ class Instagram
     /**
      * Follow.
      *
-     * @param string $userId
+     * @param string $userId Numerical UserPK ID.
      *
-     * @return array Friendship status data
+     * @throws InstagramException
+     *
+     * @return FriendshipResponse
      */
     public function follow($userId)
     {
-        return $this->request("friendships/create/$userId/")
+        return $this->request("friendships/create/{$userId}/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
@@ -2097,13 +2394,15 @@ class Instagram
     /**
      * Unfollow.
      *
-     * @param string $userId
+     * @param string $userId Numerical UserPK ID.
      *
-     * @return array Friendship status data
+     * @throws InstagramException
+     *
+     * @return FriendshipResponse
      */
     public function unfollow($userId)
     {
-        return $this->request("friendships/destroy/$userId/")
+        return $this->request("friendships/destroy/{$userId}/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
@@ -2114,7 +2413,9 @@ class Instagram
     /**
      * Get suggested users.
      *
-     * @param string $userId
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws InstagramException
      *
      * @return SuggestedUsersResponse
      */
@@ -2126,15 +2427,17 @@ class Instagram
     }
 
     /**
-     * Block.
+     * Block a user.
      *
-     * @param string $userId
+     * @param string $userId Numerical UserPK ID.
      *
-     * @return array Friendship status data
+     * @throws InstagramException
+     *
+     * @return FriendshipResponse
      */
     public function block($userId)
     {
-        return $this->request("friendships/block/$userId/")
+        return $this->request("friendships/block/{$userId}/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
@@ -2143,15 +2446,17 @@ class Instagram
     }
 
     /**
-     * Unblock.
+     * Unblock a user.
      *
-     * @param string $userId
+     * @param string $userId Numerical UserPK ID.
      *
-     * @return array Friendship status data
+     * @throws InstagramException
+     *
+     * @return FriendshipResponse
      */
     public function unblock($userId)
     {
-        return $this->request("friendships/unblock/$userId/")
+        return $this->request("friendships/unblock/{$userId}/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
@@ -2160,21 +2465,25 @@ class Instagram
     }
 
     /**
-     * Show User Friendship.
+     * Show a user's friendship status with you.
      *
-     * @param string $userId
+     * @param string $userId Numerical UserPK ID.
      *
-     * @return FriendshipStatus relationship data
+     * @throws InstagramException
+     *
+     * @return FriendshipStatus
      */
     public function userFriendship($userId)
     {
-        return $this->request("friendships/show/$userId/")->getResponse(new FriendshipStatus());
+        return $this->request("friendships/show/{$userId}/")->getResponse(new FriendshipStatus());
     }
 
     /**
-     * Show Multiple Users Friendship.
+     * Show multiple users' friendship status with you.
      *
-     * @param string $userId
+     * @param string|string[] $userList List of numerical UserPK IDs.
+     *
+     * @throws InstagramException
      *
      * @return FriendshipsShowManyResponse
      */
@@ -2193,98 +2502,28 @@ class Instagram
     }
 
     /**
-     * Get liked media.
+     * Get feed of your liked media.
      *
-     * @return array Liked media data
+     * @param null|string $maxId Next "maximum ID", used for pagination.
+     *
+     * @throws InstagramException
+     *
+     * @return LikeFeedResponse
      */
-    public function getLikedMedia($maxid = null)
+    public function getLikedMedia($maxId = null)
     {
-        return $this->request('feed/liked/?'.(!is_null($maxid) ? 'max_id='.$maxid.'&' : ''))
+        return $this->request('feed/liked/?'.(!is_null($maxId) ? 'max_id='.$maxId.'&' : ''))
         ->getResponse(new LikeFeedResponse());
     }
 
     /**
-     * Controls the SSL verification behavior of the HttpInterface.
-     *
-     * @see http://docs.guzzlephp.org/en/latest/request-options.html#verify
-     *
-     * @param bool|string $state TRUE to verify using PHP's default CA bundle,
-     *                           FALSE to disable SSL verification (this is
-     *                           insecure!), String to verify using this path to
-     *                           a custom CA bundle file.
-     */
-    public function setVerifySSL($state)
-    {
-        $this->http->setVerifySSL($state);
-    }
-
-    /**
-     * Gets the current SSL verification behavior of the HttpInterface.
-     *
-     * @return bool|string
-     */
-    public function getVerifySSL()
-    {
-        return $this->http->getVerifySSL();
-    }
-
-    /**
-     * Set the proxy to use for requests.
-     *
-     * @see http://docs.guzzlephp.org/en/latest/request-options.html#proxy
-     *
-     * @param string|array|null $value String or Array specifying a proxy in
-     *                                 Guzzle format, or NULL to disable proxying.
-     */
-    public function setProxy($value)
-    {
-        $this->http->setProxy($value);
-    }
-
-    /**
-     * Gets the current proxy used for requests.
-     *
-     * @return string|array|null
-     */
-    public function getProxy()
-    {
-        return $this->http->getProxy();
-    }
-
-    /**
-     * Sets the network interface override to use.
-     *
-     * Only works if Guzzle is using the cURL backend. But that's
-     * almost always the case, on most PHP installations.
-     *
-     * @see CURLOPT_INTERFACE (http://php.net/curl_setopt)
-     *
-     * @var string|null Interface name, IP address or hostname, or NULL to
-     *                  disable override and let Guzzle use any interface.
-     */
-    public function setOutputInterface($value)
-    {
-        $this->http->setOutputInterface($value);
-    }
-
-    /**
-     * Gets the current network interface override used for requests.
-     *
-     * @return string|null
-     */
-    public function getOutputInterface()
-    {
-        return $this->http->getOutputInterface();
-    }
-
-    /**
-     * Search tags.
+     * Search for tags.
      *
      * @param string $query
      *
      * @throws InstagramException
      *
-     * @return array query data
+     * @return SearchTagResponse
      */
     public function searchTags($query)
     {
@@ -2295,12 +2534,26 @@ class Instagram
         ->getResponse(new SearchTagResponse());
     }
 
-    // just for easy typing for earlier php versions
+    /**
+     * Create a custom API request.
+     *
+     * Used internally, but can also be used by end-users if they want
+     * to create completely custom API queries without modifying this library.
+     *
+     * @param string $url
+     *
+     * @return Request
+     */
     public function request($url)
     {
         return new Request($url);
     }
 
+    /**
+     * Get a reference to the class instance.
+     *
+     * @return Instagram
+     */
     public static function getInstance()
     {
         if (self::$instance === null) {

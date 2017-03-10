@@ -21,11 +21,11 @@ do {
 
     $check = $r->checkUsername($username);
     if (!$check->isAvailable()) {
-        echo "Username $username not available, try with another one\n\n";
+        echo "Username {$username} not available, try with another one\n\n";
     }
 } while (!$check->isAvailable());
 
-echo "Username $username is available\n\n";
+echo "Username {$username} is available\n\n";
 
 echo "\nPassword: ";
 $password = trim(fgets(STDIN));

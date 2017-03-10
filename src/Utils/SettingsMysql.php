@@ -93,8 +93,8 @@ class SettingsMysql
             if ($key == 'id') {
                 continue;
             }
-            $fieldList[] = "$key = :$key";
-            $bindList[":$key"] = $value;
+            $fieldList[] = "{$key} = :{$key}";
+            $bindList[":{$key}"] = $value;
         }
 
         $sql = $sql.implode(',', $fieldList).(isset($this->sets['id']) ? ' where id=:id' : '');
