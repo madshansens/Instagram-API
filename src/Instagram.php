@@ -1689,36 +1689,6 @@ class Instagram
     }
 
     /**
-     * Get details about a specific user.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws InstagramException
-     *
-     * @return UsernameInfoResponse
-     */
-    public function getUserInfo($userId)
-    {
-        return $this->request("users/{$userId}/info/")->getResponse(new UsernameInfoResponse());
-    }
-
-    /**
-     * Get user details about your own account.
-     *
-     * Also try getCurrentUser() instead, for even more details.
-     *
-     * @throws InstagramException
-     *
-     * @return UsernameInfoResponse
-     *
-     * @see getCurrentUser()
-     */
-    public function getSelfUserInfo()
-    {
-        return $this->getUserInfo($this->username_id);
-    }
-
-    /**
      * Get recent activity.
      *
      * @throws InstagramException
@@ -1846,34 +1816,6 @@ class Instagram
     }
 
     /**
-     * Search for an exact username.
-     *
-     * @param string $username Username as string (NOT as a numerical ID).
-     *
-     * @throws InstagramException
-     *
-     * @return UsernameInfoResponse
-     */
-    public function searchUsername($username)
-    {
-        return $this->request("users/{$username}/usernameinfo/")->getResponse(new UsernameInfoResponse());
-    }
-
-    /**
-     * Search for an exact username and get their userpk ID.
-     *
-     * @param string $username Username as string (NOT as a numerical ID).
-     *
-     * @throws InstagramException
-     *
-     * @return string Their userpk ID.
-     */
-    public function getUsernameId($username)
-    {
-        return $this->searchUsername($username)->getUser()->getPk();
-    }
-
-    /**
      * Search for users via address book.
      *
      * @param array $contacts
@@ -1885,9 +1827,72 @@ class Instagram
     public function searchInAddressBook($contacts)
     {
         return $this->request('address_book/link/?include=extra_display_name,thumbnails')
-        ->setSignedPost(false)
-        ->addPost('contacts', json_encode($contacts, true))
-        ->getResponse(new AddressBookResponse());
+            ->setSignedPost(false)
+            ->addPost('contacts', json_encode($contacts, true))
+            ->getResponse(new AddressBookResponse());
+    }
+
+    /**
+     * Get details about a specific user via their username.
+     *
+     * @param string $username Username as string (NOT as a numerical ID).
+     *
+     * @throws InstagramException
+     *
+     * @return UsernameInfoResponse
+     */
+    public function getUserInfoByName($username)
+    {
+        return $this->request("users/{$username}/usernameinfo/")->getResponse(new UsernameInfoResponse());
+    }
+
+    /**
+     * Get details about a specific user via their UserPK ID.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws InstagramException
+     *
+     * @return UsernameInfoResponse
+     */
+    public function getUserInfoById($userId)
+    {
+        return $this->request("users/{$userId}/info/")->getResponse(new UsernameInfoResponse());
+    }
+
+    /**
+     * Get user details about your own account.
+     *
+     * Also try getCurrentUser() instead, for even more details.
+     *
+     * @throws InstagramException
+     *
+     * @return UsernameInfoResponse
+     *
+     * @see getCurrentUser()
+     */
+    public function getSelfUserInfo()
+    {
+        return $this->getUserInfoById($this->username_id);
+    }
+
+    /**
+     * Get the UserPK ID for a specific user via their username.
+     *
+     * This is just a convenient helper function. You may prefer to use
+     * getUserInfoByName() instead, which lets you see more details.
+     *
+     * @param string $username Username as string (NOT as a numerical ID).
+     *
+     * @throws InstagramException
+     *
+     * @return string Their UserPK ID.
+     *
+     * @see getUserInfoByName()
+     */
+    public function getUsernameId($username)
+    {
+        return $this->getUserInfoByName($username)->getUser()->getPk();
     }
 
     /**
