@@ -139,7 +139,7 @@ class Instagram
         if (!is_null($settingsAdapter)) {
             $this->settingsAdapter = $settingsAdapter;
         } elseif (array_key_exists('settings_adapter', $options)) {
-            $this->settingsAdapter = ['type' => $options[$settings_adapter]];
+            $this->settingsAdapter = ['type' => $options['settings_adapter']];
         } elseif (getenv('SETTINGS_ADAPTER') !== false) {
             $this->settingsAdapter = ['type' => getenv('SETTINGS_ADAPTER')];
         } else {
