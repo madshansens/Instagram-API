@@ -1958,7 +1958,7 @@ class Instagram
      *
      * @return Reel
      *
-     * @see getUserStoryFeed
+     * @see getUserStoryFeed()
      */
     public function getUserReelMediaFeed($userId)
     {
@@ -1979,7 +1979,7 @@ class Instagram
      *
      * @return UserStoryFeedResponse
      *
-     * @see getUserReelMediaFeed
+     * @see getUserReelMediaFeed()
      */
     public function getUserStoryFeed($userId)
     {
@@ -2111,7 +2111,7 @@ class Instagram
      * Search for Facebook locations by name.
      *
      * @param string $query
-     * @param int    $count
+     * @param int    $count (optional) Facebook will return up to this many results.
      *
      * @throws InstagramException
      *
@@ -2369,8 +2369,8 @@ class Instagram
     /**
      * Backup all of your own uploaded photos and videos. :).
      *
-     * @param string|null $baseOutputPath (optional) Base-folder for output.
-     *                                    Uses standard data path if null.
+     * @param string $baseOutputPath (optional) Base-folder for output.
+     *                               Uses standard data path if null.
      *
      * @throws InstagramException
      */
