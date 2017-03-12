@@ -9,12 +9,9 @@ class UploadVideoResponse extends Response
      */
     public $upload_id;
     /**
-     * @var string
+     * @var float
      */
     public $configure_delay_ms;
-    /**
-     * @var string
-     */
     public $result;
     public $message;
 }
