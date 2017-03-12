@@ -2111,17 +2111,23 @@ class Instagram
      * Search for Facebook locations by name.
      *
      * @param string $query
+     * @param int    $count
      *
      * @throws InstagramException
      *
      * @return FBLocationResponse
      */
-    public function searchFBLocation($query)
+    public function searchFBLocation($query, $count = null)
     {
-        return $this->request('fbsearch/places/')
+        $location = $this->request('fbsearch/places/')
         ->addParams('rank_token', $this->rank_token)
-        ->addParams('query', $query)
-        ->getResponse(new FBLocationResponse());
+        ->addParams('query', $query);
+
+        if (!is_null($count)) {
+            $location->addParams('count', $count);
+        }
+
+        return $location->getResponse(new FBLocationResponse());
     }
 
     /**
