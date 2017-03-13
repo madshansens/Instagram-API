@@ -14,11 +14,17 @@
         "source": "https://github.com/mgp25/Instagram-php"
     },
     "authors": [
-     {
-        "name": "mgp25",
-        "email": "me@mgp25.com"
-     }
-   ],
+        {
+            "name": "mgp25",
+            "email": "me@mgp25.com",
+            "role": "Founder"
+        },
+        {
+            "name": "SteveJobzniak",
+            "homepage": "https://github.com/SteveJobzniak",
+            "role": "Developer"
+        }
+    ],
     "autoload": {
         "classmap": [
             "src/"
