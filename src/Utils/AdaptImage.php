@@ -2,6 +2,17 @@
 
 namespace InstagramAPI;
 
+
+// TODO: THIS FILE HAS MEMORY LEAKS! DO NOT USE UNTIL REWRITTEN.
+// TODO: THIS FILE HAS MEMORY LEAKS! DO NOT USE UNTIL REWRITTEN.
+// TODO: THIS FILE HAS MEMORY LEAKS! DO NOT USE UNTIL REWRITTEN.
+// TODO: THIS FILE HAS MEMORY LEAKS! DO NOT USE UNTIL REWRITTEN.
+// TODO: THIS FILE HAS MEMORY LEAKS! DO NOT USE UNTIL REWRITTEN.
+// TODO: THIS FILE HAS MEMORY LEAKS! DO NOT USE UNTIL REWRITTEN.
+// We never use this file anymore, but if we ever do, we must rewrite it.
+// The image resources must be freed via "imagedestroy()" otherwise they stay
+// around in memory forever.
+
 class AdaptImage
 {
     protected $sizes;
