@@ -50,7 +50,7 @@ class Utils
     {
         $ffmpeg = self::checkFFMPEG();
         if ($ffmpeg) {
-            $time = exec("{$ffmpeg} -i ".$file." 2>&1 | grep 'Duration' | cut -d ' ' -f 4");
+            $time = exec("{$ffmpeg} -i {$file} 2>&1 | grep 'Duration' | cut -d ' ' -f 4");
             $duration = explode(':', $time);
             $seconds = $duration[0] * 3600 + $duration[1] * 60 + round($duration[2]);
 
@@ -99,7 +99,7 @@ class Utils
             @unlink($preview);
 
             //capture video preview
-            $command = $ffmpeg.' -i "'.$file.'" -f mjpeg -ss 00:00:01 -vframes 1 "'.$preview.'" 2>&1';
+            $command = $ffmpeg.' -i '.escapeshellarg($file).' -f mjpeg -ss 00:00:01 -vframes 1 '.escapeshellarg($preview).' 2>&1';
             @exec($command);
 
             return file_get_contents($preview);
