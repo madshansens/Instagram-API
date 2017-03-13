@@ -1108,7 +1108,7 @@ class Instagram
             $endpoint = 'media/configure/';
             break;
         case 'story':
-            $endpoint = 'media/configure_to_reel/';
+            $endpoint = 'media/configure_to_story/';
             break;
         default:
             throw new InstagramException('Invalid video configuration type.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
@@ -1116,6 +1116,7 @@ class Instagram
 
         $requestData = $this->request($endpoint)
         ->addParams('video', 1)
+        ->addPost('configure_mode', 1)
         ->addPost('video_result', 'deprecated')
         ->addPost('audio_muted', false)
         ->addPost('trim_type', 0)
@@ -1180,18 +1181,28 @@ class Instagram
         if ($type == 'album') {
             $endpoint = 'media/configure_sidecar/?';
         } elseif ($type == 'story') {
-            $endpoint = 'media/configure_to_reel/';
+            $endpoint = 'media/configure_to_story/';
         } else {
             $endpoint = 'media/configure/';
         }
 
         $requestData = $this->request($endpoint)
         ->addPost('_csrftoken', $this->token)
-        ->addPost('media_folder', 'Instagram')
-        ->addPost('source_type', 4)
+        ->addPost('client_shared_at', time())
+        ->addPost('source_type', 3)
+        ->addPost('configure_mode', 1)
         ->addPost('_uid', $this->username_id)
         ->addPost('_uuid', $this->uuid)
-        ->addPost('caption', $captionText);
+        ->addPost('caption', $captionText)
+        ->addPost('client_timestamp', time())
+        ->addPost('device',
+            [
+                'manufacturer' => $this->settings->get('manufacturer'),
+                'model' => $this->settings->get('device'),
+                'android_version'   => Constants::ANDROID_VERSION,
+                'android_release'   => Constants::ANDROID_RELEASE
+            ]
+        );
 
         if ($type == 'album') {
             $requestData->addPost('client_sidecar_id', Utils::generateUploadId())
