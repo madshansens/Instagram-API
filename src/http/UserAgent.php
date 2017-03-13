@@ -14,13 +14,12 @@ class UserAgent
     protected function getDeviceData()
     {
         $csvfile = __DIR__.'/devices.csv';
-        $file_handle = fopen($csvfile, 'r');
-        $line_of_text = [];
-        while (!feof($file_handle)) {
-            $line_of_text[] = fgetcsv($file_handle, 1024);
+        $lines = @file($csvfile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if ($lines === false) {
+            throw new \Exception('Unable to read devices.csv.');
         }
-        $deviceData = explode(';', $line_of_text[mt_rand(0, 11867)][0]);
-        fclose($file_handle);
+        $randomLine = $lines[array_rand($lines, 1)];
+        $deviceData = explode(';', $randomLine);
 
         return $deviceData;
     }
