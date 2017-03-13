@@ -1118,21 +1118,26 @@ class Instagram
         ->addParams('video', 1)
         ->addPost('configure_mode', 1)
         ->addPost('video_result', 'deprecated')
-        ->addPost('audio_muted', false)
-        ->addPost('trim_type', 0)
-        ->addPost('client_timestamp', time())
-        ->addPost('camera_position', 'unknown')
         ->addPost('upload_id', $upload_id)
-        ->addPost('source_type', 'library')
-        ->addPost('poster_frame_index', 0)
-        ->addPost('length', 0.00)
-        ->addPost('audio_muted', false)
-        ->addPost('geotag_enabled', false)
-        ->addPost('filter_type', '0')
+        ->addPost('source_type', 4)
+        // TODO 
+        //->addPost('length', number_format(0.00, 2, '.', ''))
+        ->addPost('length', 0)
+        ->addPost('date_time_original', time())
+        ->addPost('filter_type', 0)
         ->addPost('video_result', 'deprecated')
-        ->addPost('edits', [
-            'filter_strength'   => 1,
-        ])
+        ->addPost('device',
+            [
+                'manufacturer' => $this->settings->get('manufacturer'),
+                'model' => $this->settings->get('device'),
+                'android_version'   => Constants::ANDROID_VERSION,
+                'android_release'   => Constants::ANDROID_RELEASE
+            ])
+            /* TODO
+        ->addPost('clips', [
+            'length'   => number_format(0.00, 2, '.', ''),
+            'source_type'   => 4,
+        ])*/
         ->addPost('_csrftoken', $this->token)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
