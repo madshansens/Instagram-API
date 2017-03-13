@@ -50,7 +50,7 @@ class Utils
     {
         $ffmpeg = self::checkFFMPEG();
         if ($ffmpeg) {
-            $time = exec("{$ffmpeg} -i {$file} 2>&1 | grep 'Duration' | cut -d ' ' -f 4");
+            $time = exec("{$ffmpeg} -i ".escapeshellarg($file)." 2>&1 | grep 'Duration' | cut -d ' ' -f 4");
             $duration = explode(':', $time);
             $seconds = $duration[0] * 3600 + $duration[1] * 60 + round($duration[2]);
 
