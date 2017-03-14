@@ -1142,7 +1142,7 @@ class HttpInterface
         $bodies[] = [
             'type' => 'form-data',
             'name' => 'client_context',
-            'data' => $boundary,
+            'data' => SignatureUtils::generateUUID(true),
         ];
         $bodies[] = [
             'type' => 'form-data',
