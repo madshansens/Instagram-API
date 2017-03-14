@@ -1009,7 +1009,7 @@ class Instagram
     public function directThread($threadId, $cursorId = null)
     {
         $request = $this->request("direct_v2/threads/$threadId/");
-        if ($cursorId) {
+        if ($cursorId !== null) {
             $request->addParams('cursor', $cursorId);
         }
 
