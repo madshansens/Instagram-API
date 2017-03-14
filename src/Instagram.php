@@ -1731,13 +1731,19 @@ class Instagram
     /**
      * TODO: I don't know this yet.
      *
+     * @param string|null $cursor
+     *
      * @throws InstagramException
      *
      * @return V2InboxResponse
      */
-    public function getV2Inbox()
+    public function getV2Inbox($cursor = null)
     {
-        return $this->request('direct_v2/inbox/')->getResponse(new V2InboxResponse());
+        $request = $this->request('direct_v2/inbox/');
+        if ($cursor !== null) {
+            $request->addParams('cursor', $cursor);
+        }
+        return $request->getResponse(new V2InboxResponse());
     }
 
     /**
