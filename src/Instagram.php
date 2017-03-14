@@ -1004,7 +1004,7 @@ class Instagram
      *
      * @throws InstagramException
      *
-     * @return DirectThreadResponse Direct thread server response.
+     * @return DirectThreadResponse
      */
     public function directThread($threadId, $cursorId = null)
     {
