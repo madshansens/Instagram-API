@@ -2,6 +2,13 @@
 
 namespace InstagramAPI;
 
+/*
+THIS IS OUTDATED
+THIS IS OUTDATED
+THIS IS OUTDATED
+THIS IS OUTDATED
+ */
+
 class Checkpoint
 {
     protected $username;
