@@ -11,6 +11,10 @@ class ThreadItem extends Response
     public $item_type;
     public $text;
     /**
+     * @var ThreadItemMedia
+     */
+    public $media;
+    /**
      * @var string
      */
     public $user_id;
