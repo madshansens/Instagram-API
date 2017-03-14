@@ -1731,20 +1731,21 @@ class Instagram
     }
 
     /**
-     * TODO: I don't know this yet.
+     * Get direct inbox messages for your account.
      *
-     * @param string|null $cursor
+     * @param string|null $cursorId
      *
      * @throws InstagramException
      *
      * @return V2InboxResponse
      */
-    public function getV2Inbox($cursor = null)
+    public function getV2Inbox($cursorId = null)
     {
         $request = $this->request('direct_v2/inbox/');
-        if ($cursor !== null) {
-            $request->addParams('cursor', $cursor);
+        if ($cursorId !== null) {
+            $request->addParams('cursor', $cursorId);
         }
+
         return $request->getResponse(new V2InboxResponse());
     }
 
