@@ -999,26 +999,19 @@ class Instagram
     /**
      * Get direct message thread.
      *
-     * @param $threadId Thread ID.
-     * @param $cursorId
+     * @param string $threadId Thread ID.
+     * @param string|null $cursorId
      *
      * @throws InstagramException
      *
-     * @return array Direct thread server response.
+     * @return DirectThreadResponse Direct thread server response.
      */
-    // TODO : Missing Response object!
-    public function directThread($threadId, $cursorId = false)
+    public function directThread($threadId, $cursorId = null)
     {
-        $threadUrl = "direct_v2/threads/{$threadId}/?";
-        if ($cursorId) {
-            $threadUrl = "direct_v2/threads/{$threadId}/?cursor={$cursorId}";
-        }
-        $directThread = $this->http->api($threadUrl)[1];
-        if ($directThread['status'] != 'ok') {
-            throw new InstagramException($directThread['message']);
-        }
-
-        return $directThread;
+        $request = $this->request("direct_v2/threads/$threadId/");
+        if ($cursorId)
+            $request->addParams('cursor', $cursorId);
+        return $request->getResponse(new DirectThreadResponse());
     }
 
     /**
