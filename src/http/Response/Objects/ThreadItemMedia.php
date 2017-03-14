@@ -4,6 +4,9 @@ namespace InstagramAPI;
 
 class ThreadItemMedia extends Response
 {
+    const PHOTO = 1;
+    const VIDEO = 2;
+
     public $media_type;
     /**
      * @var Image_Versions2
