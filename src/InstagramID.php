@@ -48,6 +48,8 @@ class InstagramID
      *                       it's larger than the size of an integer, which MOST
      *                       Instagram IDs are!
      *
+     * @throws \InvalidArgumentException If bad parameters are provided.
+     *
      * @return string The shortcode.
      */
     public static function toCode(
@@ -56,7 +58,7 @@ class InstagramID
         // First we must convert the ID number to a binary string.
         // NOTE: Conversion speed depends on number size. With the most common
         // number size used for Instagram's IDs, my old laptop can do ~18k/s.
-        $base2 = self::base10to2($id, false); // No left-padding.
+        $base2 = self::base10to2($id, false); // No left-padding. Throws if bad.
         if ($base2 === '') {
             return ''; // Nothing to convert.
         }
@@ -91,11 +93,17 @@ class InstagramID
      *
      * @param string $code The shortcode.
      *
+     * @throws \InvalidArgumentException If bad parameters are provided.
+     *
      * @return string The numeric ID.
      */
     public static function fromCode(
         $code)
     {
+        if (!is_string($code) || preg_match('/[^A-Za-z0-9\-_]/', $code)) {
+            throw new \InvalidArgumentException('Input must be a valid Instagram shortcode.');
+        }
+
         // Convert the base64 shortcode to a base2 binary string.
         $base2 = '';
         for ($i = 0, $len = strlen($code); $i < $len; ++$i) {
