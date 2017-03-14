@@ -999,7 +999,7 @@ class Instagram
     /**
      * Get direct message thread.
      *
-     * @param string $threadId Thread ID.
+     * @param string      $threadId Thread ID.
      * @param string|null $cursorId
      *
      * @throws InstagramException
@@ -1009,8 +1009,10 @@ class Instagram
     public function directThread($threadId, $cursorId = null)
     {
         $request = $this->request("direct_v2/threads/$threadId/");
-        if ($cursorId)
+        if ($cursorId) {
             $request->addParams('cursor', $cursorId);
+        }
+
         return $request->getResponse(new DirectThreadResponse());
     }
 
@@ -1113,7 +1115,7 @@ class Instagram
         ->addPost('video_result', 'deprecated')
         ->addPost('upload_id', $upload_id)
         ->addPost('source_type', 4)
-        // TODO 
+        // TODO
         //->addPost('length', number_format(0.00, 2, '.', ''))
         ->addPost('length', 0)
         ->addPost('date_time_original', time())
@@ -1121,10 +1123,10 @@ class Instagram
         ->addPost('video_result', 'deprecated')
         ->addPost('device',
             [
-                'manufacturer' => $this->settings->get('manufacturer'),
-                'model' => $this->settings->get('device'),
+                'manufacturer'      => $this->settings->get('manufacturer'),
+                'model'             => $this->settings->get('device'),
                 'android_version'   => Constants::ANDROID_VERSION,
-                'android_release'   => Constants::ANDROID_RELEASE
+                'android_release'   => Constants::ANDROID_RELEASE,
             ])
             /* TODO
         ->addPost('clips', [
@@ -1195,10 +1197,10 @@ class Instagram
         ->addPost('client_timestamp', time())
         ->addPost('device',
             [
-                'manufacturer' => $this->settings->get('manufacturer'),
-                'model' => $this->settings->get('device'),
+                'manufacturer'      => $this->settings->get('manufacturer'),
+                'model'             => $this->settings->get('device'),
                 'android_version'   => Constants::ANDROID_VERSION,
-                'android_release'   => Constants::ANDROID_RELEASE
+                'android_release'   => Constants::ANDROID_RELEASE,
             ]
         );
 
