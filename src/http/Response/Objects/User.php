@@ -48,6 +48,7 @@ class User extends Response
     public $include_direct_blacklist_status; // getUserInfoById prop
     public $can_see_organic_insights; // getUserInfoById prop
     public $can_convert_to_business; // getUserInfoById prop
+    public $convert_from_pages; // getUserInfoById prop
     public $show_business_conversion_icon; // getUserInfoById prop
     public $show_conversion_edit_entry; // getUserInfoById prop
     public $show_insights_terms; // getUserInfoById prop
