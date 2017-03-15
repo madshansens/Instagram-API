@@ -70,6 +70,7 @@ class User extends Response
      * @var string
      */
     public $fb_page_call_to_action_id; // getUserInfoById prop
+    public $is_call_to_action_enabled; // getUserInfoById prop
     public $public_phone_country_code; // getUserInfoById prop
     public $public_phone_number; // getUserInfoById prop
     public $contact_phone_number; // getUserInfoById prop
