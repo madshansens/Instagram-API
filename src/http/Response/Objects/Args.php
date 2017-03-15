@@ -4,7 +4,13 @@ namespace InstagramAPI;
 
 class Args extends Response
 {
+    /**
+     * @var Media[]
+     */
     public $media;
+    /**
+     * @var Link[]
+     */
     public $links;
     public $text;
     /**
@@ -13,4 +19,8 @@ class Args extends Response
     public $profile_id;
     public $profile_image;
     public $timestamp;
+    /**
+     * @var string
+     */
+    public $comment_id;
 }

@@ -4,6 +4,9 @@ namespace InstagramAPI;
 
 class FollowingRecentActivityResponse extends Response
 {
+    /**
+     * @var Story[]
+     */
     public $stories;
     /**
      * @var string

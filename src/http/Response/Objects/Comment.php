@@ -8,7 +8,7 @@ class Comment extends Response
     /**
      * @var string
      */
-    public $username_id;
+    public $user_id;
     public $created_at_utc;
     public $created_at;
     public $bit_flags;
@@ -21,4 +21,8 @@ class Comment extends Response
      */
     public $pk;
     public $text;
+    public $content_type;
+    public $type;
+    public $comment_like_count;
+    public $has_liked_comment;
 }

@@ -21,4 +21,5 @@ class MediaCommentsResponse extends Response
     public $has_more_comments;
     public $caption_is_edited;
     public $preview_comments;
+    public $has_more_headload_comments;
 }
