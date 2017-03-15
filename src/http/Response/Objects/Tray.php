@@ -23,6 +23,7 @@ class Tray extends Response
     public $latest_reel_media;
     public $ranked_position;
     public $is_nux;
+    public $show_nux_tooltip;
     public $muted;
     public $prefetch_count;
     /**
