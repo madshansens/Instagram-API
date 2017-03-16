@@ -25,4 +25,5 @@ class Comment extends Response
     public $type;
     public $comment_like_count;
     public $has_liked_comment;
+    public $has_translation;
 }
