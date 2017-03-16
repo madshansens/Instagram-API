@@ -15,8 +15,8 @@ class ThreadItem extends Response
      */
     public $media_share;
     /**
-    * @var ThreadItemMedia
-    */
+     * @var ThreadItemMedia
+     */
     public $media;
     /**
      * @var string
