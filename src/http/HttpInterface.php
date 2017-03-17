@@ -942,7 +942,7 @@ class HttpInterface
         // instead of a "{...}" JSON object. Because their server will have
         // dropped all earlier chunks when they bug out (due to overload or w/e).
         if (substr($response['body'], 0, 1) !== '{') {
-            throw new InstagramException("Upload of \"{$videoFilename}\" failed. Instagram's server returned an unexpected reply.", ErrorCode::INTERNAL_UPLOAD_FAILED);
+            throw new InstagramException("Upload of \"{$videoFilename}\" failed. Instagram's server returned an unexpected reply and is probably overloaded.", ErrorCode::INTERNAL_UPLOAD_FAILED);
         }
 
         // Manually decode the final API response and check for successful chunked upload.
