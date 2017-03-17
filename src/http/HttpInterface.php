@@ -970,7 +970,7 @@ class HttpInterface
      *
      * @return UploadVideoResponse
      */
-    public function uploadVideoData($type, $videoFilename, array $uploadParams, $maxAttempts = 4)
+    public function uploadVideoData($type, $videoFilename, array $uploadParams, $maxAttempts = 10)
     {
         $this->_throwIfNotLoggedIn();
 

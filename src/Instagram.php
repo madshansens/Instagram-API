@@ -745,7 +745,7 @@ class Instagram
      *
      * @return ConfigureVideoResponse
      */
-    protected function _uploadVideo($type, $videoFilename, $captionText = null, $customThumb = null, $userTags = null, $maxAttempts = 4)
+    protected function _uploadVideo($type, $videoFilename, $captionText = null, $customThumb = null, $userTags = null, $maxAttempts = 10)
     {
         // Make sure we don't allow "album" video uploads via this function.
         if ($type != 'timeline' && $type != 'story') {
@@ -784,7 +784,7 @@ class Instagram
      *
      * @return ConfigureVideoResponse
      */
-    public function uploadTimelineVideo($videoFilename, $captionText = null, $customThumb = null, $maxAttempts = 4)
+    public function uploadTimelineVideo($videoFilename, $captionText = null, $customThumb = null, $maxAttempts = 10)
     {
         return $this->_uploadVideo('timeline', $videoFilename, $captionText, $customThumb, null, $maxAttempts);
     }
@@ -803,7 +803,7 @@ class Instagram
      *
      * @return ConfigureVideoResponse
      */
-    public function uploadStoryVideo($videoFilename, $captionText = null, $customThumb = null, $userTags = null, $maxAttempts = 4)
+    public function uploadStoryVideo($videoFilename, $captionText = null, $customThumb = null, $userTags = null, $maxAttempts = 10)
     {
         return $this->_uploadVideo('story', $videoFilename, $captionText, $customThumb, $userTags, $maxAttempts);
     }
@@ -849,6 +849,12 @@ class Instagram
                 $media[$key]['upload_id'] = $uploadParams['upload_id'];
 
                 // Attempt to upload the video data.
+                // TODO: Consider adding the final "maxAttempts" parameter and
+                // making it configurable in uploadTimelineAlbum's parameters. But first
+                // finalize the behavior of uploadTimelineAlbum (we may have to
+                // remove the "filter" parameter and making it part of the
+                // per-photo configuration array, for example, if Instagram
+                // allows per-photo filters inside of albums).
                 $this->http->uploadVideoData('album', $item['file'], $uploadParams);
 
                 // Attempt to upload the thumbnail, associated with our video's ID.
@@ -1059,7 +1065,7 @@ class Instagram
      *
      * @see configureVideo()
      */
-    public function configureVideoWithRetries($type, $upload_id, $captionText = null, $userTags = null, $maxAttempts = 4)
+    public function configureVideoWithRetries($type, $upload_id, $captionText = null, $userTags = null, $maxAttempts = 5)
     {
         for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
             try {
