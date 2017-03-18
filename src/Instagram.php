@@ -339,22 +339,22 @@ class Instagram
             $this->settings->set('last_login', time());
 
             $this->syncFeatures();
-            $this->autoCompleteUserList();
-            $this->timelineFeed();
+            $this->getAutoCompleteUserList();
+            $this->getTimelineFeed();
             $this->getRankedRecipients();
             $this->getRecentRecipients();
-            $this->megaphoneLog();
+            $this->getMegaphoneLog();
             $this->getV2Inbox();
             $this->getRecentActivity();
             $this->getReelsTrayFeed();
 
-            return $this->explore();
+            return $this->getExplore();
         }
 
         // Act like a real logged in app client refreshing its news timeline.
         // This also lets us detect if we're still logged in with a valid session.
         try {
-            $this->timelineFeed();
+            $this->getTimelineFeed();
         } catch (InstagramException $e) {
             // If our session cookies are expired, we were now told to login,
             // so handle that by running a forced relogin in that case!
@@ -392,17 +392,17 @@ class Instagram
         if (is_null($lastLoginTime) || (time() - $lastLoginTime) > $appRefreshInterval) {
             $this->settings->set('last_login', time());
 
-            $this->autoCompleteUserList();
+            $this->getAutoCompleteUserList();
             $this->getReelsTrayFeed();
             $this->getRankedRecipients();
             //push register
             $this->getRecentRecipients();
             //push register
-            $this->megaphoneLog();
+            $this->getMegaphoneLog();
             $this->getV2Inbox();
             $this->getRecentActivity();
 
-            return $this->explore();
+            return $this->getExplore();
         }
     }
 
@@ -453,7 +453,7 @@ class Instagram
      *
      * @return AutoCompleteUserListResponse|null Will be NULL if throttled by Instagram.
      */
-    public function autoCompleteUserList()
+    public function getAutoCompleteUserList()
     {
         // NOTE: This is a special, very heavily throttled API endpoint.
         // Instagram REQUIRES that you wait several minutes between calls to it.
@@ -476,6 +476,8 @@ class Instagram
 
     /**
      * Register to the mqtt push server.
+     *
+     * TODO: NOT IMPLEMENTED YET!
      *
      * @param $gcmToken
      *
@@ -514,7 +516,7 @@ class Instagram
      *
      * @return TimelineFeedResponse
      */
-    public function timelineFeed($maxId = null)
+    public function getTimelineFeed($maxId = null)
     {
         $request = $this->request('feed/timeline')
         ->addParams('rank_token', $this->rank_token)
@@ -535,7 +537,7 @@ class Instagram
      *
      * @return InsightsResponse
      */
-    public function insights($day = null)
+    public function getInsights($day = null)
     {
         if (empty($day)) {
             $day = date('d');
@@ -556,7 +558,7 @@ class Instagram
      *
      * @return MediaInsightsResponse
      */
-    public function mediaInsights($mediaId)
+    public function getMediaInsights($mediaId)
     {
         $request = $this->request("insights/media_organic_insights/{$mediaId}")
         ->setSignedPost(true)
@@ -572,7 +574,7 @@ class Instagram
      *
      * @return MegaphoneLogResponse
      */
-    protected function megaphoneLog()
+    protected function getMegaphoneLog()
     {
         return $this->request('megaphone/log/')
         ->setSignedPost(false)
@@ -626,13 +628,13 @@ class Instagram
     }
 
     /**
-     * Get Explore tab dat.
+     * Get Explore tab data.
      *
      * @throws InstagramException
      *
      * @return ExploreResponse
      */
-    public function explore()
+    public function getExplore()
     {
         return $this->request('discover/explore/')->getResponse(new ExploreResponse());
     }
@@ -644,7 +646,7 @@ class Instagram
      *
      * @return DiscoverChannelsResponse
      */
-    public function discoverChannels()
+    public function getDiscoverChannels()
     {
         return $this->request('discover/channels_home/')->getResponse(new DiscoverChannelsResponse());
     }
@@ -1382,7 +1384,7 @@ class Instagram
      *
      * @return MediaResponse
      */
-    public function removeSelftag($mediaId)
+    public function removeSelfTag($mediaId)
     {
         return $this->request("usertags/{$mediaId}/remove/")
         ->addPost('_uuid', $this->uuid)
@@ -1400,7 +1402,7 @@ class Instagram
      *
      * @return MediaInfoResponse
      */
-    public function mediaInfo($mediaId)
+    public function getMediaInfo($mediaId)
     {
         return $this->request("media/{$mediaId}/info/")
         ->addPost('_uuid', $this->uuid)
@@ -1517,7 +1519,7 @@ class Instagram
      *
      * @return DeleteCommentResponse
      */
-    public function deleteCommentsBulk($mediaId, $commentIds)
+    public function deleteComments($mediaId, $commentIds)
     {
         if (!is_array($commentIds)) {
             $commentIds = [$commentIds];
@@ -1811,7 +1813,7 @@ class Instagram
      *
      * @return FBSearchResponse
      */
-    public function fbUserSearch($query)
+    public function searchFBUsers($query)
     {
         return $this->request('fbsearch/topsearch/')
         ->addParams('context', 'blended')
@@ -2533,7 +2535,7 @@ class Instagram
      *
      * @return FriendshipStatus
      */
-    public function userFriendship($userId)
+    public function getUserFriendship($userId)
     {
         return $this->request("friendships/show/{$userId}/")->getResponse(new FriendshipStatus());
     }
@@ -2547,7 +2549,7 @@ class Instagram
      *
      * @return FriendshipsShowManyResponse
      */
-    public function usersFriendship($userList)
+    public function getUsersFriendship($userList)
     {
         if (!is_array($userList)) {
             $userList = [$userList];
