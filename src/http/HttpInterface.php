@@ -666,6 +666,11 @@ class HttpInterface
 
         $endpoint = 'upload/photo/';
 
+        // Verify that the file exists locally.
+        if (!is_file($photoFilename)) {
+            throw new InstagramException(sprintf('The photo file "%s" does not exist on disk.', $photoFilename), ErrorCode::INTERNAL_INVALID_ARGUMENT);
+        }
+
         // Determine which file contents to upload.
         if ($fileType == 'videofile') {
             // Generate a thumbnail from a video file.
@@ -855,6 +860,11 @@ class HttpInterface
     {
         $this->_throwIfNotLoggedIn();
 
+        // Verify that the file exists locally.
+        if (!is_file($videoFilename)) {
+            throw new InstagramException(sprintf('The video file "%s" does not exist on disk.', $videoFilename), ErrorCode::INTERNAL_INVALID_ARGUMENT);
+        }
+
         // Determine correct file extension for video format.
         $videoExt = pathinfo($videoFilename, PATHINFO_EXTENSION);
         if (strlen($videoExt) == 0) {
@@ -974,6 +984,11 @@ class HttpInterface
     {
         $this->_throwIfNotLoggedIn();
 
+        // Verify that the file exists locally.
+        if (!is_file($videoFilename)) {
+            throw new InstagramException(sprintf('The video file "%s" does not exist on disk.', $videoFilename), ErrorCode::INTERNAL_INVALID_ARGUMENT);
+        }
+
         // Upload the entire video file, with retries in case of chunk upload errors.
         for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
             try {
@@ -1005,8 +1020,9 @@ class HttpInterface
 
         $endpoint = 'accounts/change_profile_picture/';
 
-        if (is_null($photoFilename)) {
-            throw new InstagramException('No photo path provided.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
+        // Verify that the file exists locally.
+        if (!is_file($photoFilename)) {
+            throw new InstagramException(sprintf('The photo file "%s" does not exist on disk.', $photoFilename), ErrorCode::INTERNAL_INVALID_ARGUMENT);
         }
 
         // Prepare payload for the upload request.
