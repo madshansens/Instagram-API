@@ -34,6 +34,13 @@ class UserAgent
             throw new \InvalidArgumentException('The device parameter must be a Device class instance.');
         }
 
+        // Build the appropriate "Manufacturer" or "Manufacturer/Brand" string.
+        $manufacturerWithBrand = $device->getManufacturer();
+        if ($device->getBrand() !== null) {
+            $manufacturerWithBrand .= '/'.$device->getBrand();
+        }
+
+        // Generate the final User-Agent string.
         return sprintf(
             self::USER_AGENT_FORMAT,
             Constants::VERSION, // App version ("10.8.0").
@@ -41,7 +48,7 @@ class UserAgent
             $device->getAndroidRelease(),
             $device->getDPI(),
             $device->getResolution(),
-            $device->getManufacturer(),
+            $manufacturerWithBrand,
             $device->getModel(),
             $device->getDevice(),
             $device->getCPU(),

@@ -36,13 +36,31 @@ class Device
 
     // Properties parsed from the device string...
 
+    /** @var string Android SDK/API version. */
     protected $_androidVersion;
+
+    /** @var string Android release version. */
     protected $_androidRelease;
+
+    /** @var string Display DPI. */
     protected $_dpi;
+
+    /** @var string Display resolution. */
     protected $_resolution;
+
+    /** @var string Manufacturer. */
     protected $_manufacturer;
+
+    /** @var string|null Manufacturer's sub-brand (optional). */
+    protected $_brand;
+
+    /** @var string Hardware MODEL. */
     protected $_model;
+
+    /** @var string Hardware DEVICE. */
     protected $_device;
+
+    /** @var string Hardware CPU. */
     protected $_cpu;
 
     /**
@@ -91,17 +109,20 @@ class Device
         }
 
         // Check the android version.
-        $androidOS = explode('/', $parts[0]);
+        $androidOS = explode('/', $parts[0], 2);
         if (version_compare($androidOS[1], self::REQUIRED_ANDROID_VERSION, '<')) {
             throw new \RuntimeException(sprintf('Device string "%s" does not meet the minimum required Android version "%s" for Instagram.', $deviceString, self::REQUIRED_ANDROID_VERSION));
         }
 
         // Check the screen resolution.
-        $resolution = explode('x', $parts[2]);
+        $resolution = explode('x', $parts[2], 2);
         $pixelCount = (int) $resolution[0] * (int) $resolution[1];
         if ($pixelCount < 2073600) { // 1920x1080.
             throw new \RuntimeException(sprintf('Device string "%s" does not meet the minimum resolution requirement of 1920x1080.', $deviceString));
         }
+
+        // Extract "Manufacturer/Brand" string into separate fields.
+        $manufacturerAndBrand = explode('/', $parts[3], 2);
 
         // Store all field values.
         $this->_deviceString = $deviceString;
@@ -109,7 +130,9 @@ class Device
         $this->_androidRelease = $androidOS[1]; // "6.0.1".
         $this->_dpi = $parts[1];
         $this->_resolution = $parts[2];
-        $this->_manufacturer = $parts[3];
+        $this->_manufacturer = $manufacturerAndBrand[0];
+        $this->_brand = (isset($manufacturerAndBrand[1])
+                         ? $manufacturerAndBrand[1] : null);
         $this->_model = $parts[4];
         $this->_device = $parts[5];
         $this->_cpu = $parts[6];
@@ -153,6 +176,11 @@ class Device
     public function getManufacturer()
     {
         return $this->_manufacturer;
+    }
+
+    public function getBrand()
+    {
+        return $this->_brand;
     }
 
     public function getModel()
