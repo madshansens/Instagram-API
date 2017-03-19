@@ -154,7 +154,7 @@ class InstagramRegistration
             'username'            => $username,
             'first_name'          => $name,
             'guid'                => $this->uuid,
-            'device_id'           => SignatureUtils::generateDeviceId(md5($username.$password)),
+            'device_id'           => SignatureUtils::generateDeviceId(),
             'email'               => $email,
             'force_sign_up_code'  => '',
             'waterfall_id'        => $this->waterfall_id,

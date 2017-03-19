@@ -11,12 +11,12 @@ class SignatureUtils
         return 'ig_sig_key_version='.Constants::SIG_KEY_VERSION.'&signed_body='.$hash.'.'.urlencode($data);
     }
 
-    public static function generateDeviceId($seed)
+    public static function generateDeviceId()
     {
-        // Neutralize username/password -> device correlation
-        $volatile_seed = filemtime(__DIR__);
+        // This has 10 million possible hash subdivisions per clock second.
+        $megaRandomHash = md5(number_format(microtime(true), 7, '', ''));
 
-        return 'android-'.substr(md5($seed.$volatile_seed), 16);
+        return 'android-'.substr($megaRandomHash, 16);
     }
 
     public static function generateUUID($type)
