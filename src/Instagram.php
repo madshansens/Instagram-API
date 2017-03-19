@@ -219,6 +219,9 @@ class Instagram
             $this->token = $this->settings->get('token');
         } else {
             $this->isLoggedIn = false;
+            $this->username_id = null;
+            $this->rank_token = null;
+            $this->token = null;
         }
 
         // Configures HttpInterface for current user AND updates isLoggedIn
