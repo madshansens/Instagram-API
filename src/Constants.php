@@ -4,9 +4,7 @@ namespace InstagramAPI;
 
 class Constants
 {
-    /**
-     * Constant declarations.
-     */
+    // Core API Constants.
     const API_URL = 'https://i.instagram.com/api/v1/';
     const VERSION = '10.8.0';
     const IG_SIG_KEY = '68a04945eb02970e2e8d15266fc256f7295da123e123f44b88f09d594a5902df';
@@ -14,14 +12,17 @@ class Constants
     const LOGIN_EXPERIMENTS = 'ig_android_background_phone_confirmation_v2,ig_android_confirmation_code_registration,ig_android_non_fb_sso,ig_android_sms_consent_in_reg,ig_android_analytics_data_loss,ig_fbns_blocked,ig_android_gmail_oauth_in_reg,ig_android_show_password_in_reg_universe,ig_android_reg_inline_errors,ig_fbns_push,ig_android_gmail_oauth_in_access,ig_android_reg_whiteout_redesign_v2,ig_android_phoneid_sync_interval,ig_android_access_redesign,ig_android_link_to_access_if_email_taken_in_reg';
     const SIG_KEY_VERSION = '4';
 
-    const ACCEPT_LANGUAGE = 'en-US';
+    // User-Agent Constants.
+    const USER_AGENT_LOCALE = 'en_US'; // "language_COUNTRY".
+
+    // HTTP Protocol Constants.
+    const ACCEPT_LANGUAGE = 'en-US'; // "language-COUNTRY".
     const ACCEPT_ENCODING = 'gzip, deflate, sdch';
     const CONTENT_TYPE = 'application/x-www-form-urlencoded; charset=UTF-8';
     const X_FB_HTTP_Engine = 'Liger';
     const X_IG_Connection_Type = 'WIFI';
     const X_IG_Capabilities = '3ToAAA==';
 
-    const ANDROID_VERSION = 18;
-    const ANDROID_RELEASE = '4.3';
+    // General Constants.
     const DATA_DIR = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR;
 }

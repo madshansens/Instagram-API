@@ -45,11 +45,9 @@ class SettingsMysql
      */
     public function maybeLoggedIn()
     {
-        if (($this->get('id') !== null) && ($this->get('username_id') !== null) && ($this->get('token') !== null)) {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->get('id') !== null // Cannot use empty() since row can be 0.
+            && !empty($this->get('username_id'))
+            && !empty($this->get('token'));
     }
 
     public function get($key, $default = null)
@@ -135,16 +133,12 @@ class SettingsMysql
         $this->pdo->exec('CREATE TABLE `'.$this->dbTableName."` (
             `id` INT(10) NOT NULL AUTO_INCREMENT,
             `username` VARCHAR(50) NULL DEFAULT NULL,
-            `version` VARCHAR(10) NULL DEFAULT NULL,
-            `user_agent` VARCHAR(255) NULL DEFAULT NULL,
             `username_id` BIGINT(20) NULL DEFAULT NULL,
-            `token` VARCHAR(255) NULL DEFAULT NULL,
-            `manufacturer` VARCHAR(255) NULL DEFAULT NULL,
-            `device` VARCHAR(255) NULL DEFAULT NULL,
-            `model` VARCHAR(255) NULL DEFAULT NULL,
+            `devicestring` VARCHAR(255) NULL DEFAULT NULL,
             `device_id` VARCHAR(255) NULL DEFAULT NULL,
             `phone_id` VARCHAR(255) NULL DEFAULT NULL,
             `uuid` VARCHAR(255) NULL DEFAULT NULL,
+            `token` VARCHAR(255) NULL DEFAULT NULL,
             `cookies` TEXT NULL,
             `date` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
             `last_login` BIGINT NULL DEFAULT 0,

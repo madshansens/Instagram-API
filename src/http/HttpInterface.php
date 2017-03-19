@@ -110,29 +110,46 @@ class HttpInterface
      * Resets certain HttpInterface settings via the current SettingsAdapter.
      *
      * Used whenever the user switches setUser(), to configure our internal state.
+     *
+     * @param bool $resetCookieJar (optional) Whether to clear current cookies.
      */
-    public function updateFromSettingsAdapter()
+    public function updateFromSettingsAdapter($resetCookieJar = false)
     {
-        $this->_userAgent = $this->_parent->settings->get('user_agent');
+        $this->_userAgent = $this->_parent->device->getUserAgent();
         $this->_cookieJar = null; // Mark old jar for garbage collection.
-        $this->loadCookieJar();
+        $this->loadCookieJar($resetCookieJar);
     }
 
     /**
      * Loads all cookies via the current SettingsAdapter.
+     *
+     * @param bool $resetCookieJar (optional) Whether to clear current cookies.
      */
-    public function loadCookieJar()
+    public function loadCookieJar($resetCookieJar = false)
     {
         if ($this->_parent->settingsAdapter['type'] == 'file') {
+            $cookieFilePath = $this->_parent->settings->cookiesPath;
+
+            if ($resetCookieJar && !empty($cookieFilePath) && is_file($cookieFilePath)) {
+                @unlink($cookieFilePath);
+            }
+
             // File-based cookie jar, which also persists temporary session cookies.
             // The FileCookieJar saves to disk whenever its object is destroyed,
             // such as at the end of script or when calling updateFromSettingsAdapter().
-            $this->_cookieJar = new FileCookieJar($this->_parent->settings->cookiesPath, true);
+            $this->_cookieJar = new FileCookieJar($cookieFilePath, true);
         } else {
+            if ($resetCookieJar) {
+                $this->_parent->settings->set('cookies', '');
+            }
+
+            // Attempt to restore cookies, otherwise create a new, empty jar.
             $restoredCookies = @json_decode($this->_parent->settings->get('cookies'), true);
             if (!is_array($restoredCookies)) {
-                $restoredCookies = []; // Create new, empty jar if restore failed.
+                $restoredCookies = [];
             }
+
+            // Memory-based cookie jar which must be manually saved later.
             $this->_cookieJar = new CookieJar(false, $restoredCookies);
         }
 

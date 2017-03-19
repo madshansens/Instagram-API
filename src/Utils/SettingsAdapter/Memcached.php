@@ -78,7 +78,9 @@ class Memcached implements SettingsInterface
      */
     public function maybeLoggedIn()
     {
-        return $this->get('id') !== null && $this->get('username_id') !== null && $this->get('token') !== null;
+        return $this->get('id') !== null // Cannot use empty() since row can be 0.
+            && !empty($this->get('username_id'))
+            && !empty($this->get('token'));
     }
 
     /**

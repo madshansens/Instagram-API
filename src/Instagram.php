@@ -26,6 +26,13 @@ class Instagram
     public $password;
 
     /**
+     * The Android Device for the currently active user.
+     *
+     * @var \InstagramAPI\Devices\Device
+     */
+    public $device;
+
+    /**
      * Toggles API query/response debug output.
      *
      * @var bool
@@ -162,23 +169,51 @@ class Instagram
     public function setUser($username, $password)
     {
         $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
-        $this->_checkSettings($username);
 
-        if (is_null($this->settings->get('uuid'))
-            || is_null($this->settings->get('phone_id'))
-            || is_null($this->settings->get('device_id'))) {
-            $this->settings->set('uuid', SignatureUtils::generateUUID(true));
-            $this->settings->set('phone_id', SignatureUtils::generateUUID(true));
-            $this->settings->set('device_id', SignatureUtils::generateDeviceId(md5($username.$password)));
+        // Generate the user's Device instance, which will be created from the
+        // user's last-used device IF they've got a valid, good one stored.
+        // But if they've got a BAD/none, this will create a brand-new device.
+        $savedDeviceString = $this->settings->get('devicestring');
+        $this->device = new \InstagramAPI\Devices\Device($savedDeviceString);
+
+        // Save the chosen device string to settings if not already stored.
+        $deviceString = $this->device->getDeviceString();
+        if ($deviceString !== $savedDeviceString) {
+            $this->settings->set('devicestring', $deviceString);
         }
 
+        // Generate a brand-new device fingerprint if the Device wasn't reused
+        // from settings, OR if any of the stored fingerprints are missing.
+        // NOTE: The regeneration when our device model changes is to avoid
+        // dangerously reusing the "previous phone's" unique hardware IDs.
+        $resetCookieJar = false;
+        if ($deviceString !== $savedDeviceString
+            || empty($this->settings->get('uuid'))
+            || empty($this->settings->get('phone_id'))
+            || empty($this->settings->get('device_id')))
+        {
+            // Generate new hardware fingerprints.
+            $this->settings->set('device_id', SignatureUtils::generateDeviceId());
+            $this->settings->set('phone_id', SignatureUtils::generateUUID(true));
+            $this->settings->set('uuid', SignatureUtils::generateUUID(true));
+
+            // Remove the previous hardware's login details to force a relogin.
+            $this->settings->set('username_id', '');
+            $this->settings->set('token', '');
+            $this->settings->set('last_login', '0');
+
+            // We'll also need to throw out all previous cookies.
+            $resetCookieJar = true;
+        }
+
+        // Store various important parameters.
         $this->username = $username;
         $this->password = $password;
-
         $this->uuid = $this->settings->get('uuid');
         $this->device_id = $this->settings->get('device_id');
 
-        if ($this->settings->maybeLoggedIn()) {
+        // Load the previous session details if we're possibly logged in.
+        if (!$resetCookieJar && $this->settings->maybeLoggedIn()) {
             $this->isLoggedIn = true;
             $this->username_id = $this->settings->get('username_id');
             $this->rank_token = $this->username_id.'_'.$this->uuid;
@@ -190,26 +225,8 @@ class Instagram
         // Configures HttpInterface for current user AND updates isLoggedIn
         // state if it fails to load the expected cookies from the user's jar.
         // Must be done last here, so that isLoggedIn is properly updated!
-        $this->http->updateFromSettingsAdapter();
-    }
-
-    /**
-     * Verifies and updates settings if necessary.
-     *
-     * @param string $username The active Instagram username.
-     */
-    protected function _checkSettings($username)
-    {
-        if ($this->settings->get('version') == null) {
-            $this->settings->set('version', Constants::VERSION);
-        }
-
-        if (($this->settings->get('user_agent') == null) || (version_compare($this->settings->get('version'), Constants::VERSION) == -1)) {
-            $userAgent = new UserAgent($this);
-            $ua = $userAgent->buildUserAgent();
-            $this->settings->set('version', Constants::VERSION);
-            $this->settings->set('user_agent', $ua);
-        }
+        // NOTE: If we generated a new device we start a new cookie jar.
+        $this->http->updateFromSettingsAdapter($resetCookieJar);
     }
 
     /**
@@ -1131,10 +1148,10 @@ class Instagram
         ->addPost('video_result', 'deprecated')
         ->addPost('device',
             [
-                'manufacturer'      => $this->settings->get('manufacturer'),
-                'model'             => $this->settings->get('device'),
-                'android_version'   => Constants::ANDROID_VERSION,
-                'android_release'   => Constants::ANDROID_RELEASE,
+                'manufacturer'      => $this->device->getManufacturer(),
+                'model'             => $this->device->getDevice(), // TODO: Why not getModel? Is this a bug?
+                'android_version'   => $this->device->getAndroidVersion(),
+                'android_release'   => $this->device->getAndroidRelease(),
             ])
             /* TODO
         ->addPost('clips', [
@@ -1205,10 +1222,10 @@ class Instagram
         ->addPost('client_timestamp', time())
         ->addPost('device',
             [
-                'manufacturer'      => $this->settings->get('manufacturer'),
-                'model'             => $this->settings->get('device'),
-                'android_version'   => Constants::ANDROID_VERSION,
-                'android_release'   => Constants::ANDROID_RELEASE,
+                'manufacturer'      => $this->device->getManufacturer(),
+                'model'             => $this->device->getDevice(), // TODO: Why not getModel? Is this a bug?
+                'android_version'   => $this->device->getAndroidVersion(),
+                'android_release'   => $this->device->getAndroidRelease(),
             ]
         );
 

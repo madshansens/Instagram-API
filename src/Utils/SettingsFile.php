@@ -59,8 +59,8 @@ class SettingsFile
     public function maybeLoggedIn()
     {
         return file_exists($this->cookiesPath)
-                && $this->get('username_id') !== null
-                && $this->get('token') !== null;
+            && !empty($this->get('username_id'))
+            && !empty($this->get('token'));
     }
 
     /**
