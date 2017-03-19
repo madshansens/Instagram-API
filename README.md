@@ -13,42 +13,43 @@ This is Instagram's private API. It has all the features the Instagram app has, 
 ----------
 ## Installation
 
-### Composer
+### Via Composer
 
 ```sh
 composer require mgp25/instagram-php
 ```
 
 ```php
-require("../vendor/autoload.php");
+require('../vendor/autoload.php');
+
 $instagram = new \InstagramAPI\Instagram();
 ```
 
-If you want to test code that is in the master branch, which hasn't been pushed as a release, you can use master.
+If you want to test code that is in the master branch, which hasn't been pushed as a release, you can use master:
 
-```
+```sh
 composer require mgp25/instagram-php dev-master
 ```
 
 
 ### Don't have Composer?
 
-You can download it here: [https://getcomposer.org/](https://getcomposer.org/)
+You can download it [here](https://getcomposer.org/download/).
 
 ## Examples
 
-All examples can be found [here](https://github.com/mgp25/Instagram-API/tree/master/examples)
+All examples can be found [here](https://github.com/mgp25/Instagram-API/tree/master/examples).
 
 ## Contributing
 
 If you would like to contribute to this project, please feel free to submit a pull request.
 
-Before you do, take a look at the [contributing guide](https://github.com/mgp25/Instagram-API/blob/master/CONTRIBUTING.md)
+Before you do, take a look at the [contributing guide](https://github.com/mgp25/Instagram-API/blob/master/CONTRIBUTING.md).
 
 ## Motivations
 
 After legal measures, Facebook, WhatsApp and Instagram blocked my accounts. In order to use Instagram
- on my phone i needed a new phone, as they banned my UDID, so that is basically why i made this API.
+ on my phone I needed a new phone, as they banned my UDID, so that is basically why I made this API.
 
 ### What is Instagram?
 According to [the company](https://instagram.com/about/faq/):
