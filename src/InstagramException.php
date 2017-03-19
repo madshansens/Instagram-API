@@ -6,17 +6,17 @@ namespace InstagramAPI;
  * Instagram API-related errors.
  *
  * The error codes below are various critical *CORE* problems that can happen in
- * ANY Instagram API call. We do NOT want to add tons of regexes for the
+ * ANY Instagram API call. We do NOT want to add tons of slow regexes for the
  * millions of different problems that can happen in individual API functions,
  * such as "User not found" when doing a username lookup, etc. That would just
  * bloat and slow down this function, and all of those message strings may
  * change at any moment.
  *
- * End-users should handle them manually in their projects, by catching the
- * general "InstagramException" and reading its "getMessage()" property to look
- * for strings such as "User not found". That is NOT the job of THIS class.
+ * End-users should handle such messages MANUALLY in their projects, by catching
+ * the general "InstagramException" and reading its "getMessage()" property to
+ * look for strings such as "User not found". That is NOT the job of THIS class.
  *
- * Again: This class is ONLY meant to catch critical *CORE* API problems.
+ * Again: The error codes below are ONLY for critical *CORE* API problems.
  */
 class ErrorCode
 {
