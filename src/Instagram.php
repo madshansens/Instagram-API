@@ -2415,42 +2415,43 @@ class Instagram
      * Backup all of your own uploaded photos and videos. :).
      *
      * @param string $baseOutputPath (optional) Base-folder for output.
-     *                               Uses standard data path if null.
+     *                               Uses "backups/" path in lib dir if null.
+     * @param bool   $printProgress  (optional) Toggles terminal output.
      *
      * @throws InstagramException
      */
-    public function backup($baseOutputPath = null)
+    public function backup($baseOutputPath = null, $printProgress = true)
     {
         // Decide which path to use.
         if ($baseOutputPath === null) {
-            $baseOutputPath = Constants::DATA_DIR;
+            $baseOutputPath = Constants::SRC_DIR.'/../backups/';
         }
 
         // Recursively create output folders for the current backup.
-        $backupMainFolder = $baseOutputPath.$this->username.'/backup/';
-        $backupFolder = $backupMainFolder.'/'.date('Y-m-d').'/';
-        if (!is_dir($backupMainFolder)) {
-            mkdir($backupMainFolder, 0755, true);
-        }
+        $backupFolder = $baseOutputPath.$this->username.'/'.date('Y-m-d').'/';
         if (!is_dir($backupFolder)) {
             mkdir($backupFolder, 0755, true);
         }
 
         // Download all media to the output folders.
-        $nextUploadMaxId = null;
+        $nextMaxId = null;
         do {
-            $myUploads = $this->getSelfUserFeed($nextUploadMaxId);
+            $myTimeline = $this->getSelfUserFeed($nextMaxId);
 
-            foreach ($myUploads->getItems() as $item) {
+            foreach ($myTimeline->getItems() as $item) {
                 if ($item->media_type == Item::PHOTO) {
                     $itemUrl = $item->getImageVersions2()->candidates[0]->getUrl();
                 } else {
                     $itemUrl = $item->getVideoVersions()[0]->getUrl();
                 }
                 $fileExtension = pathinfo(parse_url($itemUrl, PHP_URL_PATH), PATHINFO_EXTENSION);
-                copy($itemUrl, $backupFolder.$item->getId().'.'.$fileExtension);
+                $filePath = $backupFolder.$item->getId().'.'.$fileExtension;
+                if ($printProgress) {
+                    echo sprintf("* Downloading \"%s\" to \"%s\".\n", $itemUrl, $filePath);
+                }
+                copy($itemUrl, $filePath);
             }
-        } while (!is_null($nextUploadMaxId = $myUploads->getNextMaxId()));
+        } while (!is_null($nextMaxId = $myTimeline->getNextMaxId()));
     }
 
     /**

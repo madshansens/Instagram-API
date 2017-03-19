@@ -6,7 +6,8 @@ sigs/sigKeys
 *.dat
 *.jpg
 *.lock
-backup/
+backups/
+sessions/
 
 # third party libraries
 vendor/

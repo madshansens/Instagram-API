@@ -24,5 +24,5 @@ class Constants
     const X_IG_Capabilities = '3ToAAA==';
 
     // General Constants.
-    const DATA_DIR = __DIR__.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR;
+    const SRC_DIR = __DIR__; // Absolute path to the "src" folder.
 }

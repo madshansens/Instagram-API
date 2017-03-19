@@ -37,7 +37,7 @@ class SettingsFile
     {
         // Decide which settings-file paths to use.
         if (empty($settingsPath)) {
-            $settingsPath = Constants::DATA_DIR;
+            $settingsPath = Constants::SRC_DIR.'/../sessions/';
         }
         $this->cookiesPath = $settingsPath.$username.DIRECTORY_SEPARATOR.$username.'-cookies.dat';
         $this->settingsPath = $settingsPath.$username.DIRECTORY_SEPARATOR.$username.'-settings.dat';
