@@ -4,6 +4,11 @@ namespace InstagramAPI\Devices;
 
 use InstagramAPI\Constants;
 
+/**
+ * Android device User-Agent builder.
+ *
+ * @author SteveJobzniak (https://github.com/SteveJobzniak)
+ */
 class UserAgent
 {
     /**

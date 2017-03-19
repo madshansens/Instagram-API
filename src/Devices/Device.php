@@ -2,6 +2,11 @@
 
 namespace InstagramAPI\Devices;
 
+/**
+ * Android hardware device representation.
+ *
+ * @author SteveJobzniak (https://github.com/SteveJobzniak)
+ */
 class Device
 {
     /**
