@@ -62,8 +62,6 @@ namespace InstagramAPI\Devices;
  * PERFECTLY. ALL CONTRIBUTIONS MUST INCLUDE THE RELEASE DATE, HANDSETDETECTION
  * AND A LINK TO A PAGE (SUCH AS AMAZON) FOR THAT EXACT MODEL SPECIFIER, AS SEEN
  * BELOW, SO THAT WE CAN VALIDATE ALL AGENTS TO SEE THAT YOU AREN'T A MORON.
- *
- *
  */
 class GoodDevices
 {
@@ -116,6 +114,7 @@ class GoodDevices
     public static function getRandomGoodDevice()
     {
         $randomIdx = array_rand(self::DEVICES, 1);
+
         return self::DEVICES[$randomIdx];
     }
 

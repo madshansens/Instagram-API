@@ -190,8 +190,7 @@ class Instagram
         if ($deviceString !== $savedDeviceString
             || empty($this->settings->get('uuid'))
             || empty($this->settings->get('phone_id'))
-            || empty($this->settings->get('device_id')))
-        {
+            || empty($this->settings->get('device_id'))) {
             // Generate new hardware fingerprints.
             $this->settings->set('device_id', SignatureUtils::generateDeviceId());
             $this->settings->set('phone_id', SignatureUtils::generateUUID(true));
