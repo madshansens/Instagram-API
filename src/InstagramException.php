@@ -5,15 +5,23 @@ namespace InstagramAPI;
 /**
  * Instagram API-related errors.
  *
- * Parses a regex from Instagram response to set error code.
- * When throwing a new Instagram-related error, make sure to
- * include the "message" field as a part of the string argument
- * used for the InstagramException's constructor.
+ * The error codes below are various critical *CORE* problems that can happen in
+ * ANY Instagram API call. We do NOT want to add tons of regexes for the
+ * millions of different problems that can happen in individual API functions,
+ * such as "User not found" when doing a username lookup, etc. That would just
+ * bloat and slow down this function, and all of those message strings may
+ * change at any moment.
+ *
+ * End-users should handle them manually in their projects, by catching the
+ * general "InstagramException" and reading its "getMessage()" property to look
+ * for strings such as "User not found". That is NOT the job of THIS class.
+ *
+ * Again: This class is ONLY meant to catch critical *CORE* API problems.
  */
 class ErrorCode
 {
     // Error codes:
-    // 0: Unrecognized by parser
+    // 0: Other Instagram error message which isn't mapped to any code.
     const UNKNOWN = 0;
 
     // 1: On Instagram login_required response
@@ -75,7 +83,7 @@ class InstagramException extends \Exception
      * that library users can identify what an exception is about! Messages are
      * unreliable and subject to change, but error codes always stay the same.
      *
-     * As for Instagram API exceptions coming from their server; always leave
+     * As for Instagram API exceptions coming from THEIR server; always leave
      * the $code empty and let this class figure it out based on the $message!
      *
      * Note that regardless of the message origin, this class always guarantees
