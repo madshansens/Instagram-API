@@ -1151,7 +1151,7 @@ class Instagram
         ->addPost('device',
             [
                 'manufacturer'      => $this->device->getManufacturer(),
-                'model'             => $this->device->getDevice(), // TODO: Why not getModel? Is this a bug?
+                'model'             => $this->device->getModel(),
                 'android_version'   => $this->device->getAndroidVersion(),
                 'android_release'   => $this->device->getAndroidRelease(),
             ])
@@ -1225,7 +1225,7 @@ class Instagram
         ->addPost('device',
             [
                 'manufacturer'      => $this->device->getManufacturer(),
-                'model'             => $this->device->getDevice(), // TODO: Why not getModel? Is this a bug?
+                'model'             => $this->device->getModel(),
                 'android_version'   => $this->device->getAndroidVersion(),
                 'android_release'   => $this->device->getAndroidRelease(),
             ]
