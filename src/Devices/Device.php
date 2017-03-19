@@ -46,12 +46,16 @@ class Device
      * @param string|null $deviceString (optional) The device string to attempt
      *                                  to construct from. If NULL or not a good
      *                                  device, we'll use a random good device.
+     * @param bool        $autoFallback (optional) Toggle automatic fallback.
+     *
+     * @throws \RuntimeException If fallback is disabled and device is invalid.
      */
     public function __construct(
-        $deviceString = null)
+        $deviceString = null,
+        $autoFallback = true)
     {
         // Use the provided device if a valid good device. Otherwise use random.
-        if (!is_string($deviceString) || !GoodDevices::isGoodDevice($deviceString)) {
+        if ($autoFallback && (!is_string($deviceString) || !GoodDevices::isGoodDevice($deviceString))) {
             $deviceString = GoodDevices::getRandomGoodDevice();
         }
 
@@ -71,6 +75,10 @@ class Device
     protected function _initFromDeviceString(
         $deviceString)
     {
+        if (!is_string($deviceString) || empty($deviceString)) {
+            throw new \RuntimeException('Device string is empty.');
+        }
+
         // Split the device identifier into its components and verify it.
         $parts = explode('; ', $deviceString);
         if (count($parts) !== 7) {
