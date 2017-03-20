@@ -32,7 +32,7 @@ try {
     // or...
 
     // Example of using 8 retries instead of the default amount:
-    // $ig->uploadTimelineVideo($videoFilename, $captionText, null, 8);
+    // $ig->uploadTimelineVideo($videoFilename, $captionText, 8);
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";
 }

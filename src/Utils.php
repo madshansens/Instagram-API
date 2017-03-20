@@ -80,66 +80,52 @@ class Utils
     }
 
     /**
-     * Creating a video icon/thumbnail.
+     * Generate a video icon/thumbnail from a video file.
      *
-     * @param string $file Path to the video file.
+     * Automatically guarantees that the generated image follows Instagram's
+     * allowed image specifications, so that there won't be any upload issues.
      *
-     * @return image Icon/thumbnail for the video.
+     * @param string $videoFilename Path to the video file.
+     *
+     * @throws \RuntimeException If FFmpeg isn't working properly.
+     * @throws \Exception        In case of various processing errors.
+     *
+     * @return string The JPEG binary data for the generated thumbnail.
      */
     public static function createVideoIcon(
-        $file)
+        $videoFilename)
     {
-        /* should install ffmpeg for the method to work successfully  */
+        // The user must have FFmpeg.
         $ffmpeg = self::checkFFMPEG();
-        if ($ffmpeg) {
-            //generate thumbnail
-            $preview = sys_get_temp_dir().'/'.md5($file).'.jpg';
-            @unlink($preview);
-
-            //capture video preview
-            $command = $ffmpeg.' -i '.escapeshellarg($file).' -f mjpeg -ss 00:00:01 -vframes 1 '.escapeshellarg($preview).' 2>&1';
-            @exec($command);
-
-            return file_get_contents($preview);
-        }
-    }
-
-    /**
-     * Implements the actual logic behind creating the icon/thumbnail.
-     *
-     * @param string $file Path to the input file.
-     *
-     * @return image Icon/thumbnail for the video.
-     */
-    public static function createIconGD(
-        $file,
-        $size = 100,
-        $raw = true)
-    {
-        list($width, $height) = getimagesize($file);
-        if ($width > $height) {
-            $y = 0;
-            $x = ($width - $height) / 2;
-            $smallestSide = $height;
-        } else {
-            $x = 0;
-            $y = ($height - $width) / 2;
-            $smallestSide = $width;
+        if ($ffmpeg === false) {
+            throw new \RuntimeException('You must have FFmpeg to generate video thumbnails.');
         }
 
-        $image_p = imagecreatetruecolor($size, $size);
-        $image = imagecreatefromstring(file_get_contents($file));
+        // Generate a temp thumbnail filename and delete if file already exists.
+        $tmpFilename = sys_get_temp_dir().'/'.md5($videoFilename).'.jpg';
+        if (is_file($tmpFilename)) {
+            @unlink($tmpFilename);
+        }
 
-        imagecopyresampled($image_p, $image, 0, 0, $x, $y, $size, $size, $smallestSide, $smallestSide);
-        ob_start();
-        imagejpeg($image_p, null, 95);
-        $i = ob_get_contents();
-        ob_end_clean();
+        try {
+            // Capture a video preview snapshot to that file via FFMPEG.
+            $command = $ffmpeg.' -i '.escapeshellarg($videoFilename).' -f mjpeg -ss 00:00:01 -vframes 1 '.escapeshellarg($tmpFilename).' 2>&1';
+            @exec($command, $output, $statusCode);
 
-        imagedestroy($image);
-        imagedestroy($image_p);
+            // Check for processing errors.
+            if ($statusCode !== 0) {
+                throw new \RuntimeException('FFmpeg failed to generate a video thumbnail.');
+            }
 
-        return $i;
+            // Automatically crop&resize the thumbnail to Instagram's requirements.
+            $resizer = new ImageAutoResizer($tmpFilename);
+            $jpegContents = file_get_contents($resizer->getFile()); // Process&get.
+            $resizer->deleteFile();
+
+            return $jpegContents;
+        } finally {
+            @unlink($tmpFilename);
+        }
     }
 
     public static function formatBytes(

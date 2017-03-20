@@ -784,8 +784,6 @@ class Instagram
      *                                but not "album". They're handled elsewhere.)
      * @param string   $videoFilename The video filename.
      * @param string   $captionText   Caption to use for the video.
-     * @param string   $customThumb   Optional path to custom video thumbnail.
-     *                                If nothing provided, we generate from video.
      * @param string[] $userTags      Array of UserPK IDs of people tagged in your video.
      *                                (only used for "story" videos!).
      * @param int      $maxAttempts   Total attempts to upload all chunks before throwing.
@@ -800,7 +798,6 @@ class Instagram
         $type,
         $videoFilename,
         $captionText = null,
-        $customThumb = null,
         $userTags = null,
         $maxAttempts = 10)
     {
@@ -816,11 +813,7 @@ class Instagram
         $upload = $this->http->uploadVideoData($type, $videoFilename, $uploadParams, $maxAttempts);
 
         // Attempt to upload the thumbnail, associated with our video's ID.
-        if (is_null($customThumb)) {
-            $this->http->uploadPhotoData($type, $videoFilename, 'videofile', $uploadParams['upload_id']);
-        } else {
-            $this->http->uploadPhotoData($type, $customThumb, 'photofile', $uploadParams['upload_id']);
-        }
+        $this->http->uploadPhotoData($type, $videoFilename, 'videofile', $uploadParams['upload_id']);
 
         // Configure the uploaded video and attach it to our timeline/story.
         $configure = $this->configureVideoWithRetries($type, $uploadParams['upload_id'], $captionText, $userTags);
@@ -833,8 +826,6 @@ class Instagram
      *
      * @param string $videoFilename The video filename.
      * @param string $captionText   Caption to use for the video.
-     * @param string $customThumb   Optional path to custom video thumbnail.
-     *                              If nothing provided, we generate from video.
      * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
      *
      * @throws \InvalidArgumentException
@@ -846,10 +837,9 @@ class Instagram
     public function uploadTimelineVideo(
         $videoFilename,
         $captionText = null,
-        $customThumb = null,
         $maxAttempts = 10)
     {
-        return $this->_uploadVideo('timeline', $videoFilename, $captionText, $customThumb, null, $maxAttempts);
+        return $this->_uploadVideo('timeline', $videoFilename, $captionText, null, $maxAttempts);
     }
 
     /**
@@ -857,8 +847,6 @@ class Instagram
      *
      * @param string   $videoFilename The video filename.
      * @param string   $captionText   Caption to use for the video.
-     * @param string   $customThumb   Optional path to custom video thumbnail.
-     *                                If nothing provided, we generate from video.
      * @param string[] $userTags      Array of UserPK IDs of people tagged in your video.
      * @param int      $maxAttempts   Total attempts to upload all chunks before throwing.
      *
@@ -871,11 +859,10 @@ class Instagram
     public function uploadStoryVideo(
         $videoFilename,
         $captionText = null,
-        $customThumb = null,
         $userTags = null,
         $maxAttempts = 10)
     {
-        return $this->_uploadVideo('story', $videoFilename, $captionText, $customThumb, $userTags, $maxAttempts);
+        return $this->_uploadVideo('story', $videoFilename, $captionText, $userTags, $maxAttempts);
     }
 
     /**
