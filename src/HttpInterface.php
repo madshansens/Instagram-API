@@ -1333,7 +1333,9 @@ class HttpInterface
      * @return object|array|null Object if assoc false, Array if assoc true,
      *                           or NULL if unable to decode JSON.
      */
-    public static function api_body_decode($json, $assoc = false)
+    public static function api_body_decode(
+        $json,
+        $assoc = false)
     {
         return json_decode($json, $assoc, 512, JSON_BIGINT_AS_STRING);
     }

@@ -100,7 +100,10 @@ class ServerMessageThrower
      * @param string|null $prefixString
      * @param string      $serverMessage
      */
-    private static function _throw($exceptionClass, $prefixString, $serverMessage)
+    private static function _throw(
+        $exceptionClass,
+        $prefixString,
+        $serverMessage)
     {
         // We need to specify the full namespace path to the class.
         $fullClassPath = '\\'.__NAMESPACE__.'\\'.$exceptionClass;
