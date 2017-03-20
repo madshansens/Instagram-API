@@ -2,7 +2,7 @@
 
 namespace InstagramAPI;
 
-class Response extends \InstagramAPI\AutoPropertyHandler
+class Response extends AutoPropertyHandler
 {
     const STATUS_OK = 'ok';
     const STATUS_FAIL = 'fail';
@@ -15,7 +15,8 @@ class Response extends \InstagramAPI\AutoPropertyHandler
     {
     }
 
-    public function setStatus($status)
+    public function setStatus(
+        $status)
     {
         $this->status = $status;
     }
@@ -25,7 +26,8 @@ class Response extends \InstagramAPI\AutoPropertyHandler
         return $this->status;
     }
 
-    public function setMessage($message)
+    public function setMessage(
+        $message)
     {
         $this->message = $message;
     }
@@ -69,7 +71,8 @@ class Response extends \InstagramAPI\AutoPropertyHandler
         }
     }
 
-    public function setFullResponse($response)
+    public function setFullResponse(
+        $response)
     {
         $this->fullResponse = $response;
     }
