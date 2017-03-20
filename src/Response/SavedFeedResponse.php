@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class SavedFeedResponse extends Response
+class SavedFeedResponse extends \InstagramAPI\Response
 {
     /**
-     * @var SavedFeedItem[]
+     * @var Model\SavedFeedItem[]
      */
     public $items;
     public $more_available;

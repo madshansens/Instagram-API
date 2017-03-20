@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class CheckUsernameResponse extends Response
+class CheckUsernameResponse extends \InstagramAPI\Response
 {
     public $username;
     public $available;

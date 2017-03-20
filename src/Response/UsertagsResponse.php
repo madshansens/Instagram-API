@@ -1,13 +1,13 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class UsertagsResponse extends Response
+class UsertagsResponse extends \InstagramAPI\Response
 {
     public $num_results;
     public $auto_load_more_enabled;
     /**
-     * @var Item[]
+     * @var Model\Item[]
      */
     public $items;
     public $more_available;

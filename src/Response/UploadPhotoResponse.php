@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class UploadPhotoResponse extends Response
+class UploadPhotoResponse extends \InstagramAPI\Response
 {
     /**
      * @var string

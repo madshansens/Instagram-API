@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class ChallengeResponse extends Response
+class ChallengeResponse extends \InstagramAPI\Response
 {
     public $status;
 }

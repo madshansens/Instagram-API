@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class TagRelatedResponse extends Response
+class TagRelatedResponse extends \InstagramAPI\Response
 {
     /**
-     * @var Related[]
+     * @var Model\Related[]
      */
     public $related;
 }

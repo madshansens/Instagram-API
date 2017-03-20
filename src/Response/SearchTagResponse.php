@@ -1,12 +1,12 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class SearchTagResponse extends Response
+class SearchTagResponse extends \InstagramAPI\Response
 {
     public $has_more;
     /**
-     * @var Tag[]
+     * @var Model\Tag[]
      */
     public $results;
 }

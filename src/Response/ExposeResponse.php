@@ -1,7 +1,7 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class ExposeResponse extends Response
+class ExposeResponse extends \InstagramAPI\Response
 {
 }

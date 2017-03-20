@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class CommentResponse extends Response
+class CommentResponse extends \InstagramAPI\Response
 {
     public $comment;
 }

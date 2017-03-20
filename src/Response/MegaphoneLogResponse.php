@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class MegaphoneLogResponse extends Response
+class MegaphoneLogResponse extends \InstagramAPI\Response
 {
     public $success;
 }

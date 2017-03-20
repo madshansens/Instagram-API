@@ -1,16 +1,16 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class ReelsMediaResponse extends Response
+class ReelsMediaResponse extends \InstagramAPI\Response
 {
     /**
-     * @var Reel[]
+     * @var Model\Reel[]
      */
     public $reels_media;
 
     /**
-     * @var Reel[]
+     * @var Model\Reel[]
      */
     public $reels;
 }

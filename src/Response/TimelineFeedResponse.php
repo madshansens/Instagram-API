@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class TimelineFeedResponse extends Response
+class TimelineFeedResponse extends \InstagramAPI\Response
 {
     public $num_results;
     public $is_direct_v2_enabled;
@@ -13,15 +13,15 @@ class TimelineFeedResponse extends Response
      */
     public $next_max_id;
     /**
-     * @var _Message[]
+     * @var Model\_Message[]
      */
     public $_messages;
     /**
-     * @var Item[]
+     * @var Model\Item[]
      */
     public $feed_items;
     /**
-     * @var FeedAysf
+     * @var Model\FeedAysf
      */
     public $megaphone;
 }

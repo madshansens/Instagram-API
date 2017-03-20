@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class SearchUserResponse extends Response
+class SearchUserResponse extends \InstagramAPI\Response
 {
     public $has_more;
     public $num_results;
@@ -11,7 +11,7 @@ class SearchUserResponse extends Response
      */
     public $next_max_id;
     /**
-     * @var User[]
+     * @var Model\User[]
      */
     public $users;
 }

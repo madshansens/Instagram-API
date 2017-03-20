@@ -1,7 +1,7 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class ChangePasswordResponse extends Response
+class ChangePasswordResponse extends \InstagramAPI\Response
 {
 }

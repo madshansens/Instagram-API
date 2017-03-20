@@ -1,12 +1,12 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class LikeFeedResponse extends Response
+class LikeFeedResponse extends \InstagramAPI\Response
 {
     public $auto_load_more_enabled;
     /**
-     * @var Item[]
+     * @var Model\Item[]
      */
     public $items;
     public $more_available;

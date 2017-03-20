@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class FollowerAndFollowingResponse extends Response
+class FollowerAndFollowingResponse extends \InstagramAPI\Response
 {
     /**
-     * @var User[]
+     * @var Model\User[]
      */
     public $users;
     /**

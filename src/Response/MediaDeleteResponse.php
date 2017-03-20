@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class MediaDeleteResponse extends Response
+class MediaDeleteResponse extends \InstagramAPI\Response
 {
     public $did_delete;
 }

@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class SyncResponse extends Response
+class SyncResponse extends \InstagramAPI\Response
 {
     /**
-     * @var Experiment[]
+     * @var Model\Experiment[]
      */
     public $experiments;
 }

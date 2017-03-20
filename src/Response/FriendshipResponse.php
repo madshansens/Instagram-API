@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class FriendshipResponse extends Response
+class FriendshipResponse extends \InstagramAPI\Response
 {
     /**
-     * @var FriendshipStatus
+     * @var Model\FriendshipStatus
      */
     public $friendship_status;
 }

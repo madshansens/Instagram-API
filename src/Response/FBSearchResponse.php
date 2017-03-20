@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class FBSearchResponse extends Response
+class FBSearchResponse extends \InstagramAPI\Response
 {
     public $has_more;
     public $hashtags;

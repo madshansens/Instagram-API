@@ -1,18 +1,18 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class LocationFeedResponse extends Response
+class LocationFeedResponse extends \InstagramAPI\Response
 {
     public $media_count;
     public $num_results;
     public $auto_load_more_enabled;
     /**
-     * @var Item[]
+     * @var Model\Item[]
      */
     public $items;
     /**
-     * @var Item[]
+     * @var Model\Item[]
      */
     public $ranked_items;
     public $more_available;

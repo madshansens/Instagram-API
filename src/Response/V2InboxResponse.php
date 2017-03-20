@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class V2InboxResponse extends Response
+class V2InboxResponse extends \InstagramAPI\Response
 {
     public $pending_requests_total;
     /**
@@ -10,15 +10,15 @@ class V2InboxResponse extends Response
      */
     public $seq_id;
     /**
-     * @var User[]
+     * @var Model\User[]
      */
     public $pending_requests_users;
     /**
-     * @var Inbox
+     * @var Model\Inbox
      */
     public $inbox;
     /**
-     * @var Subscription
+     * @var Model\Subscription
      */
     public $subscription;
 }

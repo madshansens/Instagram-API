@@ -1,12 +1,12 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class AutoCompleteUserListResponse extends Response
+class AutoCompleteUserListResponse extends \InstagramAPI\Response
 {
     public $expires;
     /**
-     * @var User[]
+     * @var Model\User[]
      */
     public $users;
 }

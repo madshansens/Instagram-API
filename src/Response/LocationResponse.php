@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class LocationResponse extends Response
+class LocationResponse extends \InstagramAPI\Response
 {
     /**
-     * @var Location[]
+     * @var Model\Location[]
      */
     public $venues;
     /**

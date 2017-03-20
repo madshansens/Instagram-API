@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class FollowingRecentActivityResponse extends Response
+class FollowingRecentActivityResponse extends \InstagramAPI\Response
 {
     /**
-     * @var Story[]
+     * @var Model\Story[]
      */
     public $stories;
     /**

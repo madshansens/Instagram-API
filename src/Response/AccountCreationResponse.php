@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class AccountCreationResponse extends Response
+class AccountCreationResponse extends \InstagramAPI\Response
 {
     public $username;
     public $has_anonymous_profile_picture;
@@ -15,7 +15,7 @@ class AccountCreationResponse extends Response
      */
     public $pk;
     /*
-     * @var HdProfilePicUrlInfo
+     * @var Model\HdProfilePicUrlInfo
      */
     public $hd_profile_pic_url_info;
     public $nux_private_enabled;

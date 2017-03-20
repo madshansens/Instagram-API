@@ -1,28 +1,28 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class ActivityNewsResponse extends Response
+class ActivityNewsResponse extends \InstagramAPI\Response
 {
     /**
-     * @var Story[]
+     * @var Model\Story[]
      */
     public $new_stories;
     /**
-     * @var Story[]
+     * @var Model\Story[]
      */
     public $old_stories;
     public $continuation;
     /**
-     * @var Story[]
+     * @var Model\Story[]
      */
     public $friend_request_stories;
     /**
-     * @var Counts
+     * @var Model\Counts
      */
     public $counts;
     /**
-     * @var Subscription
+     * @var Model\Subscription
      */
     public $subscription;
     public $continuation_token;

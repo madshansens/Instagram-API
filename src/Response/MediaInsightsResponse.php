@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class MediaInsightsResponse extends Response
+class MediaInsightsResponse extends \InstagramAPI\Response
 {
     /**
-     * @var MediaInsights[]
+     * @var Model\MediaInsights[]
      */
     public $media_organic_insights;
 }

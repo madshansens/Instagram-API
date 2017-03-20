@@ -1,12 +1,12 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class MediaLikersResponse extends Response
+class MediaLikersResponse extends \InstagramAPI\Response
 {
     public $user_count;
     /**
-     * @var User[]
+     * @var Model\User[]
      */
     public $users;
 }

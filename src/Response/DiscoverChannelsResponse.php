@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class DiscoverChannelsResponse extends Response
+class DiscoverChannelsResponse extends \InstagramAPI\Response
 {
     public $auto_load_more_enabled;
     public $items;

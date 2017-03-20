@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class PopularFeedResponse extends Response
+class PopularFeedResponse extends \InstagramAPI\Response
 {
     /**
      * @var string
@@ -11,7 +11,7 @@ class PopularFeedResponse extends Response
     public $more_available;
     public $auto_load_more_enabled;
     /**
-     * @var Item[]
+     * @var Model\Item[]
      */
     public $items;
     public $num_results;

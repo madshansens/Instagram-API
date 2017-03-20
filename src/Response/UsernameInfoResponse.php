@@ -1,12 +1,12 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class UsernameInfoResponse extends Response
+class UsernameInfoResponse extends \InstagramAPI\Response
 {
     public $megaphone;
     /**
-     * @var User
+     * @var Model\User
      */
     public $user;
 }

@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class AddressBookResponse extends Response
+class AddressBookResponse extends \InstagramAPI\Response
 {
     /**
-     * @var Suggestion[]
+     * @var Model\Suggestion[]
      */
     public $items;
 }

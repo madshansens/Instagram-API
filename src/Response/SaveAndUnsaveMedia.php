@@ -1,7 +1,7 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class SaveAndUnsaveMedia extends Response
+class SaveAndUnsaveMedia extends \InstagramAPI\Response
 {
 }

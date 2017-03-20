@@ -1,7 +1,7 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class LogoutResponse extends Response
+class LogoutResponse extends \InstagramAPI\Response
 {
 }

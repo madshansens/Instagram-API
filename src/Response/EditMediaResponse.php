@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class EditMediaResponse extends Response
+class EditMediaResponse extends \InstagramAPI\Response
 {
     /**
-     * @var Item
+     * @var Model\Item
      */
     public $media;
 }

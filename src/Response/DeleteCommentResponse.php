@@ -1,7 +1,7 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class DeleteCommentResponse extends Response
+class DeleteCommentResponse extends \InstagramAPI\Response
 {
 }

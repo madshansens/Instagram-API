@@ -1,12 +1,12 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class FBLocationResponse extends Response
+class FBLocationResponse extends \InstagramAPI\Response
 {
     public $has_more;
     /**
-     * @var LocationItem[]
+     * @var Model\LocationItem[]
      */
     public $items;
 }

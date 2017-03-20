@@ -1,15 +1,15 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class ReelsTrayFeedResponse extends Response
+class ReelsTrayFeedResponse extends \InstagramAPI\Response
 {
     /**
-     * @var Tray[]
+     * @var Model\Tray[]
      */
     public $tray;
     /**
-     * @var Broadcast[]
+     * @var Model\Broadcast[]
      */
     public $broadcasts;
 }

@@ -1,15 +1,15 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class UserStoryFeedResponse extends Response
+class UserStoryFeedResponse extends \InstagramAPI\Response
 {
     /**
-     * @var Broadcast
+     * @var Model\Broadcast
      */
     public $broadcast;
     /**
-     * @var Reel
+     * @var Model\Reel
      */
     public $reel;
 }

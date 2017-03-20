@@ -1,7 +1,7 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class CommentLikeUnlikeResponse extends Response
+class CommentLikeUnlikeResponse extends \InstagramAPI\Response
 {
 }

@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class GeoMediaResponse extends Response
+class GeoMediaResponse extends \InstagramAPI\Response
 {
     /**
-     * @var GeoMedia[]
+     * @var Model\GeoMedia[]
      */
     public $geo_media;
 }

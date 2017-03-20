@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class LoginResponse extends Response
+class LoginResponse extends \InstagramAPI\Response
 {
     public $username;
     public $has_anonymous_profile_picture;
@@ -22,7 +22,7 @@ class LoginResponse extends Response
     public $buttons; // on wrong pass
     public $invalid_credentials; // on wrong pass
     /**
-     * @var User
+     * @var Model\User
      */
     public $logged_in_user;
 }

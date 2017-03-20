@@ -1,15 +1,15 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class ConfigureResponse extends Response
+class ConfigureResponse extends \InstagramAPI\Response
 {
     /**
      * @var string
      */
     public $upload_id;
     /**
-     * @var Item
+     * @var Model\Item
      */
     public $media;
 }

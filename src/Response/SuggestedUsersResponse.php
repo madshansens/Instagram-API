@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class SuggestedUsersResponse extends Response
+class SuggestedUsersResponse extends \InstagramAPI\Response
 {
     /**
-     * @var User[]
+     * @var Model\User[]
      */
     public $users;
     public $is_backup;

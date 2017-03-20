@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class MediaCommentsResponse extends Response
+class MediaCommentsResponse extends \InstagramAPI\Response
 {
     /**
-     * @var Comment[]
+     * @var Model\Comment[]
      */
     public $comments;
     public $comment_count;
@@ -15,7 +15,7 @@ class MediaCommentsResponse extends Response
      */
     public $next_max_id;
     /**
-     * @var Caption
+     * @var Model\Caption
      */
     public $caption;
     public $has_more_comments;

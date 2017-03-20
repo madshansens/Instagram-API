@@ -1,13 +1,13 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class ExploreResponse extends Response
+class ExploreResponse extends \InstagramAPI\Response
 {
     public $num_results;
     public $auto_load_more_enabled;
     /**
-     * @var ExploreItem[]
+     * @var Model\ExploreItem[]
      */
     public $items;
     public $more_available;

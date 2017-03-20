@@ -1,18 +1,18 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class RankedRecipientsResponse extends Response
+class RankedRecipientsResponse extends \InstagramAPI\Response
 {
     public $expires;
     /**
-     * @var RankedRecipientsUserList[]
+     * @var Model\RankedRecipientsUserList[]
      */
     public $ranked_recipients;
     public $filtered;
 }
 
-class RankedRecipientsUserList extends Response
+class RankedRecipientsUserList extends \InstagramAPI\Response
 {
     /**
      * @var User

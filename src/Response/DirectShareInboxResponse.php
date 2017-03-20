@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class DirectShareInboxResponse extends Response
+class DirectShareInboxResponse extends \InstagramAPI\Response
 {
     public $shares;
     /**

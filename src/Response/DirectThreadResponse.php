@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class DirectThreadResponse extends Response
+class DirectThreadResponse extends \InstagramAPI\Response
 {
     /**
-     * @var Thread
+     * @var Model\Thread
      */
     public $thread;
 }
