@@ -13,7 +13,7 @@ class Utils
     }
 
     /**
-     * Generates user breadcrumb for use in posting a comment.
+     * Generates user breadcrumb for use when posting a comment.
      *
      * @return string
      */
@@ -39,13 +39,11 @@ class Utils
     }
 
     /**
-     * Length of the file in Seconds.
+     * Get the length of a video file in seconds.
      *
-     * @param string $file
-     *                     path to the file name
+     * @param string $file Path to the file name.
      *
-     * @return int
-     *             length of the file in seconds
+     * @return int Length of the file in seconds.
      */
     public static function getSeconds(
         $file)
@@ -65,8 +63,7 @@ class Utils
     /**
      * Check for ffmpeg/avconv dependencies.
      *
-     * @return string/boolean
-     *                        name of the library if present, false otherwise
+     * @return string|bool Name of the library if present, otherwise FALSE.
      */
     public static function checkFFMPEG()
     {
@@ -85,11 +82,9 @@ class Utils
     /**
      * Creating a video icon/thumbnail.
      *
-     * @param string $file
-     *                     path to the video file
+     * @param string $file Path to the video file.
      *
-     * @return image
-     *               icon/thumbnail for the video
+     * @return image Icon/thumbnail for the video.
      */
     public static function createVideoIcon(
         $file)
@@ -112,11 +107,9 @@ class Utils
     /**
      * Implements the actual logic behind creating the icon/thumbnail.
      *
-     * @param string $file
-     *                     path to the file name
+     * @param string $file Path to the input file.
      *
-     * @return image
-     *               icon/thumbnail for the video
+     * @return image Icon/thumbnail for the video.
      */
     public static function createIconGD(
         $file,

@@ -170,13 +170,13 @@ class Instagram
      */
     public function setUser($username, $password)
     {
-        $this->settings = new \InstagramAPI\Settings\Adapter($this->settingsAdapter, $username);
+        $this->settings = new Settings\Adapter($this->settingsAdapter, $username);
 
         // Generate the user's Device instance, which will be created from the
         // user's last-used device IF they've got a valid, good one stored.
         // But if they've got a BAD/none, this will create a brand-new device.
         $savedDeviceString = $this->settings->get('devicestring');
-        $this->device = new \InstagramAPI\Devices\Device($savedDeviceString);
+        $this->device = new Devices\Device($savedDeviceString);
 
         // Save the chosen device string to settings if not already stored.
         $deviceString = $this->device->getDeviceString();
@@ -327,7 +327,7 @@ class Instagram
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return ExploreResponse
+     * @return \InstagramAPI\Response\ExploreResponse
      */
     public function login($forceLogin = false, $appRefreshInterval = 1800)
     {
@@ -339,7 +339,7 @@ class Instagram
             ->requireLogin(true)
             ->addParams('challenge_type', 'signup')
             ->addParams('guid', $this->uuid)
-            ->getResponse(new ChallengeResponse(), true);
+            ->getResponse(new Response\ChallengeResponse(), true);
 
             $response = $this->request('accounts/login/')
             ->requireLogin(true)
@@ -350,7 +350,7 @@ class Instagram
             ->addPost('device_id', $this->device_id)
             ->addPost('password', $this->password)
             ->addPost('login_attempt_count', 0)
-            ->getResponse(new LoginResponse(), true);
+            ->getResponse(new Response\LoginResponse(), true);
 
             $this->isLoggedIn = true;
             $this->username_id = $response->getLoggedInUser()->getPk();
@@ -428,11 +428,11 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return LogoutResponse
+     * @return \InstagramAPI\Response\LogoutResponse
      */
     public function logout()
     {
-        return $this->request('accounts/logout/')->getResponse(new LogoutResponse());
+        return $this->request('accounts/logout/')->getResponse(new Response\LogoutResponse());
     }
 
     /**
@@ -442,7 +442,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return SyncResponse
+     * @return \InstagramAPI\Response\SyncResponse
      */
     public function syncFeatures($prelogin = false)
     {
@@ -451,7 +451,7 @@ class Instagram
             ->requireLogin(true)
             ->addPost('id', Signatures::generateUUID(true))
             ->addPost('experiments', Constants::LOGIN_EXPERIMENTS)
-            ->getResponse(new SyncResponse());
+            ->getResponse(new Response\SyncResponse());
         } else {
             return $this->request('qe/sync/')
             ->addPost('_uuid', $this->uuid)
@@ -459,7 +459,7 @@ class Instagram
             ->addPost('_csrftoken', $this->token)
             ->addPost('id', $this->username_id)
             ->addPost('experiments', Constants::EXPERIMENTS)
-            ->getResponse(new SyncResponse());
+            ->getResponse(new Response\SyncResponse());
         }
     }
 
@@ -468,7 +468,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return AutoCompleteUserListResponse|null Will be NULL if throttled by Instagram.
+     * @return \InstagramAPI\Response\AutoCompleteUserListResponse|null Will be NULL if throttled by Instagram.
      */
     public function getAutoCompleteUserList()
     {
@@ -479,7 +479,7 @@ class Instagram
             ->setCheckStatus(false)
             ->addParams('version', '2');
 
-            return $request->getResponse(new AutoCompleteUserListResponse());
+            return $request->getResponse(new Response\AutoCompleteUserListResponse());
         } catch (\InstagramAPI\Exception\ThrottledException $e) {
             // Throttling is so common that we'll simply return NULL in that case.
             return;
@@ -526,7 +526,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return TimelineFeedResponse
+     * @return \InstagramAPI\Response\TimelineFeedResponse
      */
     public function getTimelineFeed($maxId = null)
     {
@@ -537,7 +537,7 @@ class Instagram
             $request->addParams('max_id', $maxId);
         }
 
-        return $request->getResponse(new TimelineFeedResponse());
+        return $request->getResponse(new Response\TimelineFeedResponse());
     }
 
     /**
@@ -547,7 +547,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return InsightsResponse
+     * @return \InstagramAPI\Response\InsightsResponse
      */
     public function getInsights($day = null)
     {
@@ -558,7 +558,7 @@ class Instagram
         ->addParams('show_promotions_in_landing_page', 'true')
         ->addParams('first', $day);
 
-        return $request->getResponse(new InsightsResponse());
+        return $request->getResponse(new Response\InsightsResponse());
     }
 
     /**
@@ -568,7 +568,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return MediaInsightsResponse
+     * @return \InstagramAPI\Response\MediaInsightsResponse
      */
     public function getMediaInsights($mediaId)
     {
@@ -576,7 +576,7 @@ class Instagram
         ->setSignedPost(true)
         ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION);
 
-        return $request->getResponse(new MediaInsightsResponse());
+        return $request->getResponse(new Response\MediaInsightsResponse());
     }
 
     /**
@@ -584,7 +584,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return MegaphoneLogResponse
+     * @return \InstagramAPI\Response\MegaphoneLogResponse
      */
     protected function getMegaphoneLog()
     {
@@ -597,7 +597,7 @@ class Instagram
         ->addPost('device_id', $this->device_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('uuid', md5(time()))
-        ->getResponse(new MegaphoneLogResponse());
+        ->getResponse(new Response\MegaphoneLogResponse());
     }
 
     /**
@@ -605,11 +605,11 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return PendingInboxResponse
+     * @return \InstagramAPI\Response\PendingInboxResponse
      */
     public function getPendingInbox()
     {
-        return $this->request('direct_v2/pending_inbox')->getResponse(new PendingInboxResponse());
+        return $this->request('direct_v2/pending_inbox')->getResponse(new Response\PendingInboxResponse());
     }
 
     /**
@@ -617,13 +617,13 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return RankedRecipientsResponse
+     * @return \InstagramAPI\Response\RankedRecipientsResponse
      */
     public function getRankedRecipients()
     {
         return $this->request('direct_v2/ranked_recipients')
         ->addParams('show_threads', true)
-        ->getResponse(new RankedRecipientsResponse());
+        ->getResponse(new Response\RankedRecipientsResponse());
     }
 
     /**
@@ -631,12 +631,12 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return RecentRecipientsResponse
+     * @return \InstagramAPI\Response\RecentRecipientsResponse
      */
     public function getRecentRecipients()
     {
         return $this->request('direct_share/recent_recipients/')
-        ->getResponse(new RecentRecipientsResponse());
+        ->getResponse(new Response\RecentRecipientsResponse());
     }
 
     /**
@@ -644,11 +644,11 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return ExploreResponse
+     * @return \InstagramAPI\Response\ExploreResponse
      */
     public function getExplore()
     {
-        return $this->request('discover/explore/')->getResponse(new ExploreResponse());
+        return $this->request('discover/explore/')->getResponse(new Response\ExploreResponse());
     }
 
     /**
@@ -656,11 +656,11 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return DiscoverChannelsResponse
+     * @return \InstagramAPI\Response\DiscoverChannelsResponse
      */
     public function getDiscoverChannels()
     {
-        return $this->request('discover/channels_home/')->getResponse(new DiscoverChannelsResponse());
+        return $this->request('discover/channels_home/')->getResponse(new Response\DiscoverChannelsResponse());
     }
 
     /**
@@ -668,7 +668,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return ExposeResponse
+     * @return \InstagramAPI\Response\ExposeResponse
      */
     public function expose()
     {
@@ -678,7 +678,7 @@ class Instagram
         ->addPost('id', $this->username_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('experiment', 'ig_android_profile_contextual_feed')
-        ->getResponse(new ExposeResponse());
+        ->getResponse(new Response\ExposeResponse());
     }
 
     /**
@@ -694,7 +694,7 @@ class Instagram
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return ConfigureResponse
+     * @return \InstagramAPI\Response\ConfigureResponse
      */
     protected function _uploadPhoto($type, $photoFilename, $captionText = null, $location = null, $filter = null)
     {
@@ -721,7 +721,7 @@ class Instagram
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return ConfigureResponse
+     * @return \InstagramAPI\Response\ConfigureResponse
      */
     public function uploadTimelinePhoto($photoFilename, $captionText = null, $location = null, $filter = null)
     {
@@ -738,7 +738,7 @@ class Instagram
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return ConfigureResponse
+     * @return \InstagramAPI\Response\ConfigureResponse
      */
     public function uploadStoryPhoto($photoFilename, $captionText = null, $filter = null)
     {
@@ -762,7 +762,7 @@ class Instagram
      * @throws \InstagramAPI\Exception\InstagramException
      * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
      *
-     * @return ConfigureVideoResponse
+     * @return \InstagramAPI\Response\ConfigureVideoResponse
      */
     protected function _uploadVideo($type, $videoFilename, $captionText = null, $customThumb = null, $userTags = null, $maxAttempts = 10)
     {
@@ -803,7 +803,7 @@ class Instagram
      * @throws \InstagramAPI\Exception\InstagramException
      * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
      *
-     * @return ConfigureVideoResponse
+     * @return \InstagramAPI\Response\ConfigureVideoResponse
      */
     public function uploadTimelineVideo($videoFilename, $captionText = null, $customThumb = null, $maxAttempts = 10)
     {
@@ -824,7 +824,7 @@ class Instagram
      * @throws \InstagramAPI\Exception\InstagramException
      * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
      *
-     * @return ConfigureVideoResponse
+     * @return \InstagramAPI\Response\ConfigureVideoResponse
      */
     public function uploadStoryVideo($videoFilename, $captionText = null, $customThumb = null, $userTags = null, $maxAttempts = 10)
     {
@@ -847,7 +847,7 @@ class Instagram
      * @throws \InstagramAPI\Exception\InstagramException
      * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
      *
-     * @return ConfigureResponse
+     * @return \InstagramAPI\Response\ConfigureResponse
      */
     public function uploadTimelineAlbum($media, $captionText = null, $location = null, $filter = null)
     {
@@ -969,7 +969,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return Response
+     * @return \InstagramAPI\Response
      */
     public function directShare($recipients, $mediaId, $text = null)
     {
@@ -991,7 +991,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return Response
+     * @return \InstagramAPI\Response
      */
     public function directMessage($recipients, $text)
     {
@@ -1013,7 +1013,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return Response
+     * @return \InstagramAPI\Response
      */
     public function directPhoto($recipients, $photoFilename, $text = null)
     {
@@ -1035,7 +1035,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return DirectThreadResponse
+     * @return \InstagramAPI\Response\DirectThreadResponse
      */
     public function directThread($threadId, $cursorId = null)
     {
@@ -1044,7 +1044,7 @@ class Instagram
             $request->addParams('cursor', $cursorId);
         }
 
-        return $request->getResponse(new DirectThreadResponse());
+        return $request->getResponse(new Response\DirectThreadResponse());
     }
 
     /**
@@ -1086,7 +1086,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return ConfigureVideoResponse
+     * @return \InstagramAPI\Response\ConfigureVideoResponse
      *
      * @see configureVideo()
      */
@@ -1125,7 +1125,7 @@ class Instagram
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return ConfigureVideoResponse
+     * @return \InstagramAPI\Response\ConfigureVideoResponse
      */
     public function configureVideo($type, $upload_id, $captionText = null, $userTags = null)
     {
@@ -1184,7 +1184,7 @@ class Instagram
             }
         }
 
-        $configure = $requestData->getResponse(new ConfigureVideoResponse());
+        $configure = $requestData->getResponse(new Response\ConfigureVideoResponse());
 
         return $configure;
     }
@@ -1201,7 +1201,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return ConfigureResponse
+     * @return \InstagramAPI\Response\ConfigureResponse
      */
     public function configure($type, $upload_id, $photoFilename, $captionText = null, $location = null, $filter = null)
     {
@@ -1271,7 +1271,7 @@ class Instagram
             '"crop_zoom":1'                             => '"crop_zoom":1.0',
             '"crop_original_size":'."[{$size},{$size}]" => '"crop_original_size":'."[{$size}.0,{$size}.0]",
         ])
-        ->getResponse(new ConfigureResponse());
+        ->getResponse(new Response\ConfigureResponse());
 
         return $configure;
     }
@@ -1285,7 +1285,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return EditMediaResponse
+     * @return \InstagramAPI\Response\EditMediaResponse
      */
     public function editMedia($mediaId, $captionText = '', $usertags = null)
     {
@@ -1295,7 +1295,7 @@ class Instagram
             ->addPost('_uid', $this->username_id)
             ->addPost('_csrftoken', $this->token)
             ->addPost('caption_text', $captionText)
-            ->getResponse(new EditMediaResponse());
+            ->getResponse(new Response\EditMediaResponse());
         } else {
             return $this->request("media/{$mediaId}/edit_media/")
             ->addPost('_uuid', $this->uuid)
@@ -1303,7 +1303,7 @@ class Instagram
             ->addPost('_csrftoken', $this->token)
             ->addPost('caption_text', $captionText)
             ->addPost('usertags', $usertags)
-            ->getResponse(new EditMediaResponse());
+            ->getResponse(new Response\EditMediaResponse());
         }
     }
 
@@ -1317,7 +1317,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return EditMediaResponse
+     * @return \InstagramAPI\Response\EditMediaResponse
      */
     public function tagUser($mediaId, $userId, $position, $captionText = '')
     {
@@ -1335,7 +1335,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return EditMediaResponse
+     * @return \InstagramAPI\Response\EditMediaResponse
      */
     public function untagUser($mediaId, $userId, $captionText = '')
     {
@@ -1351,7 +1351,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return SaveAndUnsaveMedia
+     * @return \InstagramAPI\Response\SaveAndUnsaveMedia
      */
     public function saveMedia($mediaId)
     {
@@ -1360,7 +1360,7 @@ class Instagram
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
         ->setSignedPost(true)
-        ->getResponse(new SaveAndUnsaveMedia());
+        ->getResponse(new Response\SaveAndUnsaveMedia());
     }
 
     /**
@@ -1370,7 +1370,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return SaveAndUnsaveMedia
+     * @return \InstagramAPI\Response\SaveAndUnsaveMedia
      */
     public function unsaveMedia($mediaId)
     {
@@ -1379,7 +1379,7 @@ class Instagram
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
         ->setSignedPost(true)
-        ->getResponse(new SaveAndUnsaveMedia());
+        ->getResponse(new Response\SaveAndUnsaveMedia());
     }
 
     /**
@@ -1387,7 +1387,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return SavedFeedResponse
+     * @return \InstagramAPI\Response\SavedFeedResponse
      */
     public function getSavedFeed()
     {
@@ -1396,7 +1396,7 @@ class Instagram
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
         ->setSignedPost(true)
-        ->getResponse(new SavedFeedResponse());
+        ->getResponse(new Response\SavedFeedResponse());
     }
 
     /**
@@ -1406,7 +1406,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return MediaResponse
+     * @return \InstagramAPI\Response\MediaResponse
      */
     public function removeSelfTag($mediaId)
     {
@@ -1414,7 +1414,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new MediaResponse());
+        ->getResponse(new Response\MediaResponse());
     }
 
     /**
@@ -1424,7 +1424,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return MediaInfoResponse
+     * @return \InstagramAPI\Response\MediaInfoResponse
      */
     public function getMediaInfo($mediaId)
     {
@@ -1433,7 +1433,7 @@ class Instagram
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('media_id', $mediaId)
-        ->getResponse(new MediaInfoResponse());
+        ->getResponse(new Response\MediaInfoResponse());
     }
 
     /**
@@ -1443,7 +1443,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return MediaDeleteResponse
+     * @return \InstagramAPI\Response\MediaDeleteResponse
      */
     public function deleteMedia($mediaId)
     {
@@ -1452,7 +1452,7 @@ class Instagram
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('media_id', $mediaId)
-        ->getResponse(new MediaDeleteResponse());
+        ->getResponse(new Response\MediaDeleteResponse());
     }
 
     /**
@@ -1462,7 +1462,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return Response
+     * @return \InstagramAPI\Response
      */
     public function disableMediaComments($mediaId)
     {
@@ -1470,7 +1470,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_csrftoken', $this->token)
         ->setSignedPost(false)
-        ->getResponse(new Response());
+        ->getResponse(new \InstagramAPI\Response());
     }
 
     /**
@@ -1480,7 +1480,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return Response
+     * @return \InstagramAPI\Response
      */
     public function enableMediaComments($mediaId)
     {
@@ -1488,7 +1488,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_csrftoken', $this->token)
         ->setSignedPost(false)
-        ->getResponse(new Response());
+        ->getResponse(new \InstagramAPI\Response());
     }
 
     /**
@@ -1499,7 +1499,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return CommentResponse
+     * @return \InstagramAPI\Response\CommentResponse
      */
     public function comment($mediaId, $commentText)
     {
@@ -1511,7 +1511,7 @@ class Instagram
         ->addPost('_csrftoken', $this->token)
         ->addPost('comment_text', $commentText)
         ->addPost('containermodule', 'comments_feed_timeline')
-        ->getResponse(new CommentResponse());
+        ->getResponse(new Response\CommentResponse());
     }
 
     /**
@@ -1522,7 +1522,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return DeleteCommentResponse
+     * @return \InstagramAPI\Response\DeleteCommentResponse
      */
     public function deleteComment($mediaId, $commentId)
     {
@@ -1530,7 +1530,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new DeleteCommentResponse());
+        ->getResponse(new Response\DeleteCommentResponse());
     }
 
     /**
@@ -1541,7 +1541,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return DeleteCommentResponse
+     * @return \InstagramAPI\Response\DeleteCommentResponse
      */
     public function deleteComments($mediaId, $commentIds)
     {
@@ -1561,7 +1561,7 @@ class Instagram
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('comment_ids_to_delete', $comment_ids_to_delete)
-        ->getResponse(new DeleteCommentResponse());
+        ->getResponse(new Response\DeleteCommentResponse());
     }
 
     /**
@@ -1571,7 +1571,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return CommentLikeUnlikeResponse
+     * @return \InstagramAPI\Response\CommentLikeUnlikeResponse
      */
     public function likeComment($commentId)
     {
@@ -1579,7 +1579,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new CommentLikeUnlikeResponse());
+        ->getResponse(new Response\CommentLikeUnlikeResponse());
     }
 
     /**
@@ -1589,7 +1589,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return CommentLikeUnlikeResponse
+     * @return \InstagramAPI\Response\CommentLikeUnlikeResponse
      */
     public function unlikeComment($commentId)
     {
@@ -1597,7 +1597,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new CommentLikeUnlikeResponse());
+        ->getResponse(new Response\CommentLikeUnlikeResponse());
     }
 
     /**
@@ -1607,7 +1607,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return User
+     * @return \InstagramAPI\Response\Model\User
      */
     public function changeProfilePicture($photoFilename)
     {
@@ -1619,7 +1619,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return UsernameInfoResponse
+     * @return \InstagramAPI\Response\UsernameInfoResponse
      */
     public function removeProfilePicture()
     {
@@ -1627,7 +1627,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new UsernameInfoResponse());
+        ->getResponse(new Response\UsernameInfoResponse());
     }
 
     /**
@@ -1635,7 +1635,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return UsernameInfoResponse
+     * @return \InstagramAPI\Response\UsernameInfoResponse
      */
     public function setPrivateAccount()
     {
@@ -1643,7 +1643,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new UsernameInfoResponse());
+        ->getResponse(new Response\UsernameInfoResponse());
     }
 
     /**
@@ -1651,7 +1651,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return UsernameInfoResponse
+     * @return \InstagramAPI\Response\UsernameInfoResponse
      */
     public function setPublicAccount()
     {
@@ -1659,7 +1659,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new UsernameInfoResponse());
+        ->getResponse(new Response\UsernameInfoResponse());
     }
 
     /**
@@ -1667,7 +1667,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return UsernameInfoResponse
+     * @return \InstagramAPI\Response\UsernameInfoResponse
      */
     public function getCurrentUser()
     {
@@ -1676,7 +1676,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new UsernameInfoResponse());
+        ->getResponse(new Response\UsernameInfoResponse());
     }
 
     /**
@@ -1691,7 +1691,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return UsernameInfoResponse
+     * @return \InstagramAPI\Response\UsernameInfoResponse
      */
     public function editProfile($url, $phone, $firstName, $biography, $email, $gender)
     {
@@ -1706,7 +1706,7 @@ class Instagram
         ->addPost('biography', $biography)
         ->addPost('email', $email)
         ->addPost('gender', $gender)
-        ->getResponse(new UsernameInfoResponse());
+        ->getResponse(new Response\UsernameInfoResponse());
     }
 
     /**
@@ -1717,7 +1717,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return ChangePasswordResponse
+     * @return \InstagramAPI\Response\ChangePasswordResponse
      */
     public function changePassword($oldPassword, $newPassword)
     {
@@ -1728,7 +1728,7 @@ class Instagram
         ->addPost('old_password', $oldPassword)
         ->addPost('new_password1', $newPassword)
         ->addPost('new_password2', $newPassword)
-        ->getResponse(new ChangePasswordResponse());
+        ->getResponse(new Response\ChangePasswordResponse());
     }
 
     /**
@@ -1736,11 +1736,11 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return ActivityNewsResponse
+     * @return \InstagramAPI\Response\ActivityNewsResponse
      */
     public function getRecentActivity()
     {
-        return $this->request('news/inbox/')->addParams('activity_module', 'all')->getResponse(new ActivityNewsResponse());
+        return $this->request('news/inbox/')->addParams('activity_module', 'all')->getResponse(new Response\ActivityNewsResponse());
     }
 
     /**
@@ -1750,7 +1750,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return FollowingRecentActivityResponse
+     * @return \InstagramAPI\Response\FollowingRecentActivityResponse
      */
     public function getFollowingRecentActivity($maxId = null)
     {
@@ -1759,7 +1759,7 @@ class Instagram
             $activity->addParams('max_id', $maxId);
         }
 
-        return $activity->getResponse(new FollowingRecentActivityResponse());
+        return $activity->getResponse(new Response\FollowingRecentActivityResponse());
     }
 
     /**
@@ -1769,7 +1769,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return V2InboxResponse
+     * @return \InstagramAPI\Response\V2InboxResponse
      */
     public function getV2Inbox($cursorId = null)
     {
@@ -1778,7 +1778,7 @@ class Instagram
             $request->addParams('cursor', $cursorId);
         }
 
-        return $request->getResponse(new V2InboxResponse());
+        return $request->getResponse(new Response\V2InboxResponse());
     }
 
     /**
@@ -1790,7 +1790,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return UsertagsResponse
+     * @return \InstagramAPI\Response\UsertagsResponse
      */
     public function getUserTags($userId, $maxId = null, $minTimestamp = null)
     {
@@ -1799,7 +1799,7 @@ class Instagram
         ->addParams('ranked_content', 'true')
         ->addParams('max_id', (!is_null($maxId) ? $maxId : ''))
         ->addParams('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
-        ->getResponse(new UsertagsResponse());
+        ->getResponse(new Response\UsertagsResponse());
     }
 
     /**
@@ -1807,7 +1807,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return UsertagsResponse
+     * @return \InstagramAPI\Response\UsertagsResponse
      */
     public function getSelfUserTags()
     {
@@ -1821,11 +1821,11 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return MediaLikersResponse
+     * @return \InstagramAPI\Response\MediaLikersResponse
      */
     public function getMediaLikers($mediaId)
     {
-        return $this->request("media/{$mediaId}/likers/")->getResponse(new MediaLikersResponse());
+        return $this->request("media/{$mediaId}/likers/")->getResponse(new Response\MediaLikersResponse());
     }
 
     /**
@@ -1835,7 +1835,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return FBSearchResponse
+     * @return \InstagramAPI\Response\FBSearchResponse
      */
     public function searchFBUsers($query)
     {
@@ -1843,7 +1843,7 @@ class Instagram
         ->addParams('context', 'blended')
         ->addParams('query', $query)
         ->addParams('rank_token', $this->rank_token)
-        ->getResponse(new FBSearchResponse());
+        ->getResponse(new Response\FBSearchResponse());
     }
 
     /**
@@ -1853,7 +1853,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return SearchUserResponse
+     * @return \InstagramAPI\Response\SearchUserResponse
      */
     public function searchUsers($query)
     {
@@ -1862,7 +1862,7 @@ class Instagram
         ->addParams('is_typeahead', true)
         ->addParams('query', $query)
         ->addParams('rank_token', $this->rank_token)
-        ->getResponse(new SearchUserResponse());
+        ->getResponse(new Response\SearchUserResponse());
     }
 
     /**
@@ -1872,14 +1872,14 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return AddressBookResponse
+     * @return \InstagramAPI\Response\AddressBookResponse
      */
     public function searchInAddressBook($contacts)
     {
         return $this->request('address_book/link/?include=extra_display_name,thumbnails')
             ->setSignedPost(false)
             ->addPost('contacts', json_encode($contacts, true))
-            ->getResponse(new AddressBookResponse());
+            ->getResponse(new Response\AddressBookResponse());
     }
 
     /**
@@ -1889,11 +1889,11 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return UsernameInfoResponse
+     * @return \InstagramAPI\Response\UsernameInfoResponse
      */
     public function getUserInfoByName($username)
     {
-        return $this->request("users/{$username}/usernameinfo/")->getResponse(new UsernameInfoResponse());
+        return $this->request("users/{$username}/usernameinfo/")->getResponse(new Response\UsernameInfoResponse());
     }
 
     /**
@@ -1903,11 +1903,11 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return UsernameInfoResponse
+     * @return \InstagramAPI\Response\UsernameInfoResponse
      */
     public function getUserInfoById($userId)
     {
-        return $this->request("users/{$userId}/info/")->getResponse(new UsernameInfoResponse());
+        return $this->request("users/{$userId}/info/")->getResponse(new Response\UsernameInfoResponse());
     }
 
     /**
@@ -1917,7 +1917,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return UsernameInfoResponse
+     * @return \InstagramAPI\Response\UsernameInfoResponse
      *
      * @see getCurrentUser()
      */
@@ -1952,14 +1952,14 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return TagRelatedResponse
+     * @return \InstagramAPI\Response\TagRelatedResponse
      */
     public function getTagRelated($tag)
     {
         return $this->request("tags/{$tag}/related")
         ->addParams('visited', '[{"id":"'.$tag.'","type":"hashtag"}]')
         ->addParams('related_types', '["hashtag"]')
-        ->getResponse(new TagRelatedResponse());
+        ->getResponse(new Response\TagRelatedResponse());
     }
 
     /**
@@ -1969,12 +1969,12 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return TagInfoResponse
+     * @return \InstagramAPI\Response\TagInfoResponse
      */
     public function getTagInfo($tag)
     {
         return $this->request("tags/{$tag}/info")
-        ->getResponse(new TagInfoResponse());
+        ->getResponse(new Response\TagInfoResponse());
     }
 
     /**
@@ -1986,13 +1986,13 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return ReelsTrayFeedResponse
+     * @return \InstagramAPI\Response\ReelsTrayFeedResponse
      *
      * @see getUserStoryFeed()
      */
     public function getReelsTrayFeed()
     {
-        return $this->request('feed/reels_tray/')->getResponse(new ReelsTrayFeedResponse());
+        return $this->request('feed/reels_tray/')->getResponse(new Response\ReelsTrayFeedResponse());
     }
 
     /**
@@ -2006,14 +2006,14 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return Reel
+     * @return \InstagramAPI\Response\Model\Reel
      *
      * @see getUserStoryFeed()
      */
     public function getUserReelMediaFeed($userId)
     {
         return $this->request("feed/user/{$userId}/reel_media/")
-        ->getResponse(new Reel());
+        ->getResponse(new Response\Model\Reel());
     }
 
     /**
@@ -2027,14 +2027,14 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return UserStoryFeedResponse
+     * @return \InstagramAPI\Response\UserStoryFeedResponse
      *
      * @see getUserReelMediaFeed()
      */
     public function getUserStoryFeed($userId)
     {
         return $this->request("feed/user/{$userId}/story/")
-        ->getResponse(new UserStoryFeedResponse());
+        ->getResponse(new Response\UserStoryFeedResponse());
     }
 
     /**
@@ -2044,7 +2044,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return ReelsMediaResponse
+     * @return \InstagramAPI\Response\ReelsMediaResponse
      */
     public function getReelsMediaFeed($userList)
     {
@@ -2060,7 +2060,7 @@ class Instagram
         return $this->request('feed/reels_media/')
         ->setSignedPost(true)
         ->addPost('user_ids', $userIDs)
-        ->getResponse(new ReelsMediaResponse());
+        ->getResponse(new Response\ReelsMediaResponse());
     }
 
     /**
@@ -2072,7 +2072,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return UserFeedResponse
+     * @return \InstagramAPI\Response\UserFeedResponse
      */
     public function getUserFeed($userId, $maxId = null, $minTimestamp = null)
     {
@@ -2081,7 +2081,7 @@ class Instagram
         ->addParams('ranked_content', 'true')
         ->addParams('max_id', (!is_null($maxId) ? $maxId : ''))
         ->addParams('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
-        ->getResponse(new UserFeedResponse());
+        ->getResponse(new Response\UserFeedResponse());
     }
 
     /**
@@ -2092,7 +2092,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return UserFeedResponse
+     * @return \InstagramAPI\Response\UserFeedResponse
      */
     public function getSelfUserFeed($maxId = null, $minTimestamp = null)
     {
@@ -2109,13 +2109,13 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return GeoMediaResponse
+     * @return \InstagramAPI\Response\GeoMediaResponse
      *
      * @see getUserFeed()
      */
     public function getGeoMedia($userId)
     {
-        return $this->request("maps/user/{$userId}/")->getResponse(new GeoMediaResponse());
+        return $this->request("maps/user/{$userId}/")->getResponse(new Response\GeoMediaResponse());
     }
 
     /**
@@ -2123,7 +2123,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return GeoMediaResponse
+     * @return \InstagramAPI\Response\GeoMediaResponse
      */
     public function getSelfGeoMedia()
     {
@@ -2139,7 +2139,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return LocationResponse
+     * @return \InstagramAPI\Response\LocationResponse
      */
     public function searchLocation($latitude, $longitude, $query = null)
     {
@@ -2154,7 +2154,7 @@ class Instagram
             $locations->addParams('search_query', $query);
         }
 
-        return $locations->getResponse(new LocationResponse());
+        return $locations->getResponse(new Response\LocationResponse());
     }
 
     /**
@@ -2165,7 +2165,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return FBLocationResponse
+     * @return \InstagramAPI\Response\FBLocationResponse
      */
     public function searchFBLocation($query, $count = null)
     {
@@ -2177,7 +2177,7 @@ class Instagram
             $location->addParams('count', $count);
         }
 
-        return $location->getResponse(new FBLocationResponse());
+        return $location->getResponse(new Response\FBLocationResponse());
     }
 
     /**
@@ -2188,7 +2188,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return FBLocationResponse
+     * @return \InstagramAPI\Response\FBLocationResponse
      */
     public function searchFBLocationByPoint($lat, $lng)
     {
@@ -2196,7 +2196,7 @@ class Instagram
         ->addParams('rank_token', $this->rank_token)
         ->addParams('lat', $lat)
         ->addParams('lng', $lng)
-        ->getResponse(new FBLocationResponse());
+        ->getResponse(new Response\FBLocationResponse());
     }
 
     /**
@@ -2207,7 +2207,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return LocationFeedResponse
+     * @return \InstagramAPI\Response\LocationFeedResponse
      */
     public function getLocationFeed($locationId, $maxId = null)
     {
@@ -2216,7 +2216,7 @@ class Instagram
             $locationFeed->addParams('max_id', $maxId);
         }
 
-        return $locationFeed->getResponse(new LocationFeedResponse());
+        return $locationFeed->getResponse(new Response\LocationFeedResponse());
     }
 
     /**
@@ -2224,7 +2224,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return PopularFeedResponse
+     * @return \InstagramAPI\Response\PopularFeedResponse
      */
     public function getPopularFeed()
     {
@@ -2232,7 +2232,7 @@ class Instagram
         ->addParams('people_teaser_supported', '1')
         ->addParams('rank_token', $this->rank_token)
         ->addParams('ranked_content', 'true')
-        ->getResponse(new PopularFeedResponse());
+        ->getResponse(new Response\PopularFeedResponse());
     }
 
     /**
@@ -2243,7 +2243,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return TagFeedResponse
+     * @return \InstagramAPI\Response\TagFeedResponse
      */
     public function getHashtagFeed($hashtagString, $maxId = null)
     {
@@ -2252,7 +2252,7 @@ class Instagram
             $hashtagFeed->addParams('max_id', $maxId);
         }
 
-        return $hashtagFeed->getResponse(new TagFeedResponse());
+        return $hashtagFeed->getResponse(new Response\TagFeedResponse());
     }
 
     /**
@@ -2263,7 +2263,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return FollowerAndFollowingResponse
+     * @return \InstagramAPI\Response\FollowerAndFollowingResponse
      */
     public function getUserFollowings($userId, $maxId = null)
     {
@@ -2273,7 +2273,7 @@ class Instagram
             $requestData->addParams('max_id', $maxId);
         }
 
-        return $requestData->getResponse(new FollowerAndFollowingResponse());
+        return $requestData->getResponse(new Response\FollowerAndFollowingResponse());
     }
 
     /**
@@ -2284,7 +2284,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return FollowerAndFollowingResponse
+     * @return \InstagramAPI\Response\FollowerAndFollowingResponse
      */
     public function getUserFollowers($userId, $maxId = null)
     {
@@ -2294,7 +2294,7 @@ class Instagram
             $requestData->addParams('max_id', $maxId);
         }
 
-        return $requestData->getResponse(new FollowerAndFollowingResponse());
+        return $requestData->getResponse(new Response\FollowerAndFollowingResponse());
     }
 
     /**
@@ -2304,7 +2304,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return FollowerAndFollowingResponse
+     * @return \InstagramAPI\Response\FollowerAndFollowingResponse
      */
     public function getSelfUsersFollowing($maxId = null)
     {
@@ -2318,7 +2318,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return FollowerAndFollowingResponse
+     * @return \InstagramAPI\Response\FollowerAndFollowingResponse
      */
     public function getSelfUserFollowers($maxId = null)
     {
@@ -2332,7 +2332,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return Response
+     * @return \InstagramAPI\Response
      */
     public function like($mediaId)
     {
@@ -2341,7 +2341,7 @@ class Instagram
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('media_id', $mediaId)
-        ->getResponse(new Response());
+        ->getResponse(new \InstagramAPI\Response());
     }
 
     /**
@@ -2351,7 +2351,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return Response
+     * @return \InstagramAPI\Response
      */
     public function unlike($mediaId)
     {
@@ -2360,7 +2360,7 @@ class Instagram
          ->addPost('_uid', $this->username_id)
          ->addPost('_csrftoken', $this->token)
          ->addPost('media_id', $mediaId)
-         ->getResponse(new Response());
+         ->getResponse(new \InstagramAPI\Response());
     }
 
     /**
@@ -2371,14 +2371,14 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return MediaCommentsResponse
+     * @return \InstagramAPI\Response\MediaCommentsResponse
      */
     public function getMediaComments($mediaId, $maxId = null)
     {
         return $this->request("media/{$mediaId}/comments/")
         ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
         ->addParams('max_id', $maxId)
-        ->getResponse(new MediaCommentsResponse());
+        ->getResponse(new Response\MediaCommentsResponse());
     }
 
     /**
@@ -2389,7 +2389,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return Response
+     * @return \InstagramAPI\Response
      */
     public function setNameAndPhone($name = '', $phone = '')
     {
@@ -2400,7 +2400,7 @@ class Instagram
         ->addPost('_csrftoken', $this->token)
         ->addPost('first_name', $name)
         ->addPost('phone_number', $phone)
-        ->getResponse(new Response());
+        ->getResponse(new \InstagramAPI\Response());
     }
 
     /**
@@ -2408,12 +2408,12 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return DirectShareInboxResponse
+     * @return \InstagramAPI\Response\DirectShareInboxResponse
      */
     public function getDirectShare()
     {
         return $this->request('direct_share/inbox/?')
-        ->getResponse(new DirectShareInboxResponse());
+        ->getResponse(new Response\DirectShareInboxResponse());
     }
 
     /**
@@ -2466,7 +2466,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return FriendshipResponse
+     * @return \InstagramAPI\Response\FriendshipResponse
      */
     public function follow($userId)
     {
@@ -2475,7 +2475,7 @@ class Instagram
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('user_id', $userId)
-        ->getResponse(new FriendshipResponse());
+        ->getResponse(new Response\FriendshipResponse());
     }
 
     /**
@@ -2485,7 +2485,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return FriendshipResponse
+     * @return \InstagramAPI\Response\FriendshipResponse
      */
     public function unfollow($userId)
     {
@@ -2494,7 +2494,7 @@ class Instagram
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('user_id', $userId)
-        ->getResponse(new FriendshipResponse());
+        ->getResponse(new Response\FriendshipResponse());
     }
 
     /**
@@ -2504,13 +2504,13 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return SuggestedUsersResponse
+     * @return \InstagramAPI\Response\SuggestedUsersResponse
      */
     public function getSuggestedUsers($userId)
     {
         return $this->request('discover/chaining/')
         ->addParams('target_id', $userId)
-        ->getResponse(new SuggestedUsersResponse());
+        ->getResponse(new Response\SuggestedUsersResponse());
     }
 
     /**
@@ -2520,7 +2520,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return FriendshipResponse
+     * @return \InstagramAPI\Response\FriendshipResponse
      */
     public function block($userId)
     {
@@ -2529,7 +2529,7 @@ class Instagram
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('user_id', $userId)
-        ->getResponse(new FriendshipResponse());
+        ->getResponse(new Response\FriendshipResponse());
     }
 
     /**
@@ -2539,7 +2539,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return FriendshipResponse
+     * @return \InstagramAPI\Response\FriendshipResponse
      */
     public function unblock($userId)
     {
@@ -2548,7 +2548,7 @@ class Instagram
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('user_id', $userId)
-        ->getResponse(new FriendshipResponse());
+        ->getResponse(new Response\FriendshipResponse());
     }
 
     /**
@@ -2558,11 +2558,11 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return FriendshipStatus
+     * @return \InstagramAPI\Response\Model\FriendshipStatus
      */
     public function getUserFriendship($userId)
     {
-        return $this->request("friendships/show/{$userId}/")->getResponse(new FriendshipStatus());
+        return $this->request("friendships/show/{$userId}/")->getResponse(new Response\Model\FriendshipStatus());
     }
 
     /**
@@ -2572,7 +2572,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return FriendshipsShowManyResponse
+     * @return \InstagramAPI\Response\FriendshipsShowManyResponse
      */
     public function getUsersFriendship($userList)
     {
@@ -2585,7 +2585,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('user_ids', implode(',', $userList))
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new FriendshipsShowManyResponse());
+        ->getResponse(new Response\FriendshipsShowManyResponse());
     }
 
     /**
@@ -2595,12 +2595,12 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return LikeFeedResponse
+     * @return \InstagramAPI\Response\LikeFeedResponse
      */
     public function getLikedMedia($maxId = null)
     {
         return $this->request('feed/liked/?'.(!is_null($maxId) ? 'max_id='.$maxId.'&' : ''))
-        ->getResponse(new LikeFeedResponse());
+        ->getResponse(new Response\LikeFeedResponse());
     }
 
     /**
@@ -2610,7 +2610,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return SearchTagResponse
+     * @return \InstagramAPI\Response\SearchTagResponse
      */
     public function searchTags($query)
     {
@@ -2618,7 +2618,7 @@ class Instagram
         ->addParams('is_typeahead', true)
         ->addParams('q', $query)
         ->addParams('rank_token', $this->rank_token)
-        ->getResponse(new SearchTagResponse());
+        ->getResponse(new Response\SearchTagResponse());
     }
 
     /**
