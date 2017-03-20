@@ -39,44 +39,66 @@ class Utils
     }
 
     /**
-     * Get the length of a video file in seconds.
-     *
-     * @param string $file Path to the file name.
-     *
-     * @return int Length of the file in seconds.
-     */
-    public static function getSeconds(
-        $file)
-    {
-        $ffmpeg = self::checkFFMPEG();
-        if ($ffmpeg) {
-            $time = exec("{$ffmpeg} -i ".escapeshellarg($file)." 2>&1 | grep 'Duration' | cut -d ' ' -f 4");
-            $duration = explode(':', $time);
-            $seconds = $duration[0] * 3600 + $duration[1] * 60 + round($duration[2]);
-
-            return $seconds;
-        }
-
-        return mt_rand(15, 300);
-    }
-
-    /**
      * Check for ffmpeg/avconv dependencies.
      *
      * @return string|bool Name of the library if present, otherwise FALSE.
      */
     public static function checkFFMPEG()
     {
-        @exec('ffmpeg -version 2>&1', $output, $returnvalue);
-        if ($returnvalue === 0) {
+        @exec('ffmpeg -version 2>&1', $output, $statusCode);
+        if ($statusCode === 0) {
             return 'ffmpeg';
         }
-        @exec('avconv -version 2>&1', $output, $returnvalue);
-        if ($returnvalue === 0) {
+        @exec('avconv -version 2>&1', $output, $statusCode);
+        if ($statusCode === 0) {
             return 'avconv';
         }
 
         return false;
+    }
+
+    /**
+     * Get the length of a video file in seconds.
+     *
+     * @param string $videoFilename Path to the video file.
+     *
+     * @throws \InvalidArgumentException If the video file is missing.
+     * @throws \RuntimeException If FFmpeg isn't working properly.
+     * @throws \Exception        In case of various processing errors.
+     *
+     * @return int Length of the file in seconds.
+     */
+    public static function getSeconds(
+        $videoFilename)
+    {
+        // The user must have FFmpeg.
+        $ffmpeg = self::checkFFMPEG();
+        if ($ffmpeg === false) {
+            throw new \RuntimeException('You must have FFmpeg to generate video thumbnails.');
+        }
+
+        // Check if input file exits.
+        if (empty($videoFilename) || !is_file($videoFilename)) {
+            throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
+        }
+
+        // Load with FFMPEG. Shows duration and exits, since we give no outfile.
+        $command = $ffmpeg.' -i '.escapeshellarg($videoFilename).' 2>&1';
+        @exec($command, $output, $statusCode);
+
+        // Extract the video duration if available.
+        $seconds = -1;
+        foreach ($output as $line) {
+            if (preg_match('/Duration: (\d{2}):(\d{2}):(\d{2})/', $line, $matches)) {
+                $seconds = (int) ($matches[1] * 3600 + $matches[2] * 60 + round($matches[3]));
+                break;
+            }
+        }
+        if ($seconds == -1) {
+            throw new \RuntimeException('FFmpeg failed to detect the video duration. Is this a valid video file?');
+        }
+
+        return $seconds;
     }
 
     /**
@@ -87,8 +109,9 @@ class Utils
      *
      * @param string $videoFilename Path to the video file.
      *
-     * @throws \RuntimeException If FFmpeg isn't working properly.
-     * @throws \Exception        In case of various processing errors.
+     * @throws \InvalidArgumentException If the video file is missing.
+     * @throws \RuntimeException         If FFmpeg isn't working properly.
+     * @throws \Exception                In case of various processing errors.
      *
      * @return string The JPEG binary data for the generated thumbnail.
      */
@@ -99,6 +122,11 @@ class Utils
         $ffmpeg = self::checkFFMPEG();
         if ($ffmpeg === false) {
             throw new \RuntimeException('You must have FFmpeg to generate video thumbnails.');
+        }
+
+        // Check if input file exits.
+        if (empty($videoFilename) || !is_file($videoFilename)) {
+            throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
         }
 
         // Generate a temp thumbnail filename and delete if file already exists.
