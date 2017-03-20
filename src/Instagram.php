@@ -704,12 +704,12 @@ class Instagram
     /**
      * INTERNAL.
      *
-     * @param string $type          What type of upload ("timeline" or "story",
-     *                              but not "album". They're handled elsewhere.)
-     * @param string $photoFilename The photo filename.
-     * @param string $captionText   Caption to use for the photo.
-     * @param null   $location      Location (only used for "timeline" photos).
-     * @param null   $filter        Photo filter.
+     * @param string                  $type          What type of upload ("timeline" or "story",
+     *                                               but not "album". They're handled elsewhere.)
+     * @param string                  $photoFilename The photo filename.
+     * @param string                  $captionText   Caption to use for the photo.
+     * @param Response\Model\Location $location      Location (only used for "timeline" photos).
+     * @param null                    $filter        Photo filter. THIS DOES NOTHING.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -738,10 +738,10 @@ class Instagram
     /**
      * Uploads a photo to your Instagram timeline.
 
-     * @param string $photoFilename The photo filename.
-     * @param string $captionText   Caption to use for the photo.
-     * @param null   $location      Location where photo was taken.
-     * @param null   $filter        Photo filter.
+     * @param string                  $photoFilename The photo filename.
+     * @param string                  $captionText   Caption to use for the photo.
+     * @param Response\Model\Location $location      Location where the photo was taken.
+     * @param null                    $filter        Photo filter. THIS DOES NOTHING.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -762,7 +762,7 @@ class Instagram
      *
      * @param string $photoFilename The photo filename.
      * @param string $captionText   Caption to display over the story photo.
-     * @param null   $filter        Photo filter.
+     * @param null   $filter        Photo filter. THIS DOES NOTHING.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -871,11 +871,13 @@ class Instagram
      * An album is also known as a "carousel" and "sidecar". They can contain up
      * to 10 photos or videos (at the moment).
      *
-     * @param array $media       Array of image/video metadata (type, file, usertags etc)
-     *                           You can only provide "usertags" for PHOTOS!
-     * @param null  $captionText Caption to use for the album.
-     * @param null  $location    Geotag
-     * @param null  $filter
+     * @param array                   $media       Array of image/video metadata
+     *                                             (type, file, usertags etc).
+     *                                             You can only provide the
+     *                                             "usertags" for PHOTOS!
+     * @param null                    $captionText Caption to use for the album.
+     * @param Response\Model\Location $location    Location where the album was taken.
+     * @param null                    $filter      Photo filter. THIS DOES NOTHING.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -1251,12 +1253,12 @@ class Instagram
     /**
      * Configure uploaded media parameters (primarily for photos, but also albums).
      *
-     * @param string $type          What type of entry ("timeline", "story" or "album").
-     * @param string $upload_id     The ID of the entry to configure.
-     * @param string $photoFilename The photo filename.
-     * @param string $captionText
-     * @param null   $location
-     * @param null   $filter
+     * @param string                  $type          What type of entry ("timeline", "story" or "album").
+     * @param string                  $upload_id     The ID of the entry to configure.
+     * @param string                  $photoFilename The photo filename.
+     * @param string                  $captionText   Caption to use for the media.
+     * @param Response\Model\Location $location      A Location object describing where media was taken.
+     * @param null                    $filter        Photo filter. THIS DOES NOTHING.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -1308,7 +1310,7 @@ class Instagram
             $requestData->addPost('upload_id', $upload_id);
         }
 
-        if (!is_null($location)) {
+        if ($location instanceof Response\Model\Location) {
             $loc = [
                 $location->getExternalIdSource().'_id'   => $location->getExternalId(),
                 'name'                                   => $location->getName(),
