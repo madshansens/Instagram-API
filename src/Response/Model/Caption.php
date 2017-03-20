@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Caption extends Response
+class Caption extends \InstagramAPI\Response
 {
     public $status;
     /**

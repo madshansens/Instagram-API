@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Stories extends Response
+class Stories extends \InstagramAPI\Response
 {
     public $is_portrait;
     /**

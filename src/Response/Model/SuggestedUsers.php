@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class SuggestedUsers extends Response
+class SuggestedUsers extends \InstagramAPI\Response
 {
     /**
      * @var string

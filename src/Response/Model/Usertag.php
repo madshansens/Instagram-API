@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Usertag extends Response
+class Usertag extends \InstagramAPI\Response
 {
     /**
      * @var In[]

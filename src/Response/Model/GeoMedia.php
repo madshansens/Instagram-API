@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class GeoMedia extends Response
+class GeoMedia extends \InstagramAPI\Response
 {
     /**
      * @var string

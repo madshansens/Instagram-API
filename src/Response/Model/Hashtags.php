@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Hashtags extends Response
+class Hashtags extends \InstagramAPI\Response
 {
     public $position;
     public $hashtag;

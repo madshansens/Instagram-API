@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class SavedFeedItem extends Response
+class SavedFeedItem extends \InstagramAPI\Response
 {
     /**
      * @var Item

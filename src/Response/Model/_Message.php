@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class _Message extends Response
+class _Message extends \InstagramAPI\Response
 {
     public $key;
     public $time;

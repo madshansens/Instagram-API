@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Media extends Response
+class Media extends \InstagramAPI\Response
 {
     public $image;
     /**

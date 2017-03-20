@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Image_Versions2 extends Response
+class Image_Versions2 extends \InstagramAPI\Response
 {
     /**
      * @var HdProfilePicUrlInfo[]

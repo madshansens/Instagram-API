@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Attribution extends Response
+class Attribution extends \InstagramAPI\Response
 {
     public $name;
 }

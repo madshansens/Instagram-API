@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Experiment extends Response
+class Experiment extends \InstagramAPI\Response
 {
     /**
      * @var Param[]

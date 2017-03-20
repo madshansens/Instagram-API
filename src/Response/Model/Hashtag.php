@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Hashtag extends Response
+class Hashtag extends \InstagramAPI\Response
 {
     public $media_count;
     public $name;

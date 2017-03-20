@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Comment extends Response
+class Comment extends \InstagramAPI\Response
 {
     public $status;
     /**

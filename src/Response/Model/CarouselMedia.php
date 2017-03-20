@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class CarouselMedia extends Response
+class CarouselMedia extends \InstagramAPI\Response
 {
     const PHOTO = 1;
     const VIDEO = 2;

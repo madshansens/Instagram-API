@@ -1,11 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Insights extends Response
+class Insights extends \InstagramAPI\Response
 {
-    /**
-     * @var instagram_insights[]
-     */
     public $instagram_insights;
 }

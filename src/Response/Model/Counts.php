@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Counts extends Response
+class Counts extends \InstagramAPI\Response
 {
     public $relationships;
     public $requests;

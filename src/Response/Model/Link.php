@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Link extends Response
+class Link extends \InstagramAPI\Response
 {
     public $start;
     public $end;

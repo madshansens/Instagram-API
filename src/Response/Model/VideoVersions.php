@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class VideoVersions extends Response
+class VideoVersions extends \InstagramAPI\Response
 {
     public $url;
     public $type;

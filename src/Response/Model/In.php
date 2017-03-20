@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class In extends Response
+class In extends \InstagramAPI\Response
 {
     /*
      * @var Position

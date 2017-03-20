@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Subscription extends Response
+class Subscription extends \InstagramAPI\Response
 {
     public $topic;
     public $url;

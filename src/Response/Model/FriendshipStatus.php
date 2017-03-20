@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class FriendshipStatus extends Response
+class FriendshipStatus extends \InstagramAPI\Response
 {
     public $following;
     public $followed_by;

@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class FeedAysf extends Response
+class FeedAysf extends \InstagramAPI\Response
 {
     public $landing_site_type;
     /**

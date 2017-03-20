@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Item extends Response
+class Item extends \InstagramAPI\Response
 {
     const PHOTO = 1;
     const VIDEO = 2;

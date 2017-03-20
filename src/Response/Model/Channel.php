@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Channel extends Response
+class Channel extends \InstagramAPI\Response
 {
     /**
      * @var string

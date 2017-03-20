@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class HdProfilePicUrlInfo extends Response
+class HdProfilePicUrlInfo extends \InstagramAPI\Response
 {
     public $url;
     public $width;

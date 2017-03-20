@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Related extends Response
+class Related extends \InstagramAPI\Response
 {
     public $name;
     /**

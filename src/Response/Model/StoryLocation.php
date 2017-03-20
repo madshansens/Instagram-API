@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class StoryLocation extends Response
+class StoryLocation extends \InstagramAPI\Response
 {
     /**
      * @var float

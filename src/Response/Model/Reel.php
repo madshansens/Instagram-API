@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Reel extends Response
+class Reel extends \InstagramAPI\Response
 {
     /**
      * @var string

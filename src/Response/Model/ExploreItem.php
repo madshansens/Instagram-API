@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class ExploreItem extends Response
+class ExploreItem extends \InstagramAPI\Response
 {
     /**
      * @var Item

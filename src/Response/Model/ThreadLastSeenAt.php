@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class ThreadLastSeenAt extends Response
+class ThreadLastSeenAt extends \InstagramAPI\Response
 {
     /**
      * @var string

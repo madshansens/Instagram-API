@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class User extends Response
+class User extends \InstagramAPI\Response
 {
     public $username;
     public $has_anonymous_profile_picture;

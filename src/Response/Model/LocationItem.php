@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class LocationItem extends Response
+class LocationItem extends \InstagramAPI\Response
 {
     public $media_bundles;
     public $subtitle;

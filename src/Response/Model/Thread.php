@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Thread extends Response
+class Thread extends \InstagramAPI\Response
 {
     public $named;
     /**

@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class BroadcastOwner extends Response
+class BroadcastOwner extends \InstagramAPI\Response
 {
     /**
      * @var string

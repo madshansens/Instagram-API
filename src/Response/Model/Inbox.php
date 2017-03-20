@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Inbox extends Response
+class Inbox extends \InstagramAPI\Response
 {
     public $unseen_count;
     public $has_older;

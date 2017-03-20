@@ -1,8 +1,8 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Suggestion extends Response
+class Suggestion extends \InstagramAPI\Response
 {
     public $media_infos;
     public $social_context;
