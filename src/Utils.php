@@ -17,7 +17,8 @@ class Utils
      *
      * @return string
      */
-    public static function generateUserBreadcrumb($size)
+    public static function generateUserBreadcrumb(
+        $size)
     {
         $key = 'iN4$aGr0m';
         $date = (int) (microtime(true) * 1000);
@@ -46,7 +47,8 @@ class Utils
      * @return int
      *             length of the file in seconds
      */
-    public static function getSeconds($file)
+    public static function getSeconds(
+        $file)
     {
         $ffmpeg = self::checkFFMPEG();
         if ($ffmpeg) {
@@ -89,7 +91,8 @@ class Utils
      * @return image
      *               icon/thumbnail for the video
      */
-    public static function createVideoIcon($file)
+    public static function createVideoIcon(
+        $file)
     {
         /* should install ffmpeg for the method to work successfully  */
         $ffmpeg = self::checkFFMPEG();
@@ -115,7 +118,10 @@ class Utils
      * @return image
      *               icon/thumbnail for the video
      */
-    public static function createIconGD($file, $size = 100, $raw = true)
+    public static function createIconGD(
+        $file,
+        $size = 100,
+        $raw = true)
     {
         list($width, $height) = getimagesize($file);
         if ($width > $height) {
@@ -143,7 +149,9 @@ class Utils
         return $i;
     }
 
-    public static function formatBytes($bytes, $precision = 2)
+    public static function formatBytes(
+        $bytes,
+        $precision = 2)
     {
         $units = ['B', 'kB', 'mB', 'gB', 'tB'];
 
@@ -156,7 +164,9 @@ class Utils
         return round($bytes, $precision).''.$units[$pow];
     }
 
-    public static function colouredString($string, $colour)
+    public static function colouredString(
+        $string,
+        $colour)
     {
         $colours['black'] = '0;30';
         $colours['dark_gray'] = '1;30';
@@ -186,7 +196,8 @@ class Utils
         return $colored_string;
     }
 
-    public static function getFilterCode($filter)
+    public static function getFilterCode(
+        $filter)
     {
         $filters = [];
         $filters[108] = 'Charmes';
