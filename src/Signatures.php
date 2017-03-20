@@ -2,9 +2,10 @@
 
 namespace InstagramAPI;
 
-class SignatureUtils
+class Signatures
 {
-    public static function generateSignature($data)
+    public static function generateSignature(
+        $data)
     {
         $hash = hash_hmac('sha256', $data, Constants::IG_SIG_KEY);
 
@@ -19,7 +20,8 @@ class SignatureUtils
         return 'android-'.substr($megaRandomHash, 16);
     }
 
-    public static function generateUUID($type)
+    public static function generateUUID(
+        $type)
     {
         $uuid = sprintf(
             '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',

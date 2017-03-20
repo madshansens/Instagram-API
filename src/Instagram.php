@@ -194,9 +194,9 @@ class Instagram
             || empty($this->settings->get('phone_id'))
             || empty($this->settings->get('device_id'))) {
             // Generate new hardware fingerprints.
-            $this->settings->set('device_id', SignatureUtils::generateDeviceId());
-            $this->settings->set('phone_id', SignatureUtils::generateUUID(true));
-            $this->settings->set('uuid', SignatureUtils::generateUUID(true));
+            $this->settings->set('device_id', Signatures::generateDeviceId());
+            $this->settings->set('phone_id', Signatures::generateUUID(true));
+            $this->settings->set('uuid', Signatures::generateUUID(true));
 
             // Remove the previous hardware's login details to force a relogin.
             $this->settings->set('username_id', '');
@@ -449,7 +449,7 @@ class Instagram
         if ($prelogin) {
             return $this->request('qe/sync/')
             ->requireLogin(true)
-            ->addPost('id', SignatureUtils::generateUUID(true))
+            ->addPost('id', Signatures::generateUUID(true))
             ->addPost('experiments', Constants::LOGIN_EXPERIMENTS)
             ->getResponse(new SyncResponse());
         } else {
@@ -516,7 +516,7 @@ class Instagram
             'users'                => $this->username_id,
         ]);
 
-        return $this->http->api('push/register/?platform=10&device_type=android_mqtt', SignatureUtils::generateSignature($data))[1];
+        return $this->http->api('push/register/?platform=10&device_type=android_mqtt', Signatures::generateSignature($data))[1];
     }
 
     /**
@@ -1066,7 +1066,7 @@ class Instagram
             '_csrftoken' => $this->token,
         ]);
 
-        return $this->http->api("direct_v2/threads/{$threadId}/{$threadAction}/", SignatureUtils::generateSignature($data))[1];
+        return $this->http->api("direct_v2/threads/{$threadId}/{$threadAction}/", Signatures::generateSignature($data))[1];
     }
 
     /**
@@ -1505,7 +1505,7 @@ class Instagram
     {
         return $this->request("media/{$mediaId}/comment/")
         ->addPost('user_breadcrumb', Utils::generateUserBreadcrumb(mb_strlen($commentText)))
-        ->addPost('idempotence_token', SignatureUtils::generateUUID(true))
+        ->addPost('idempotence_token', Signatures::generateUUID(true))
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)

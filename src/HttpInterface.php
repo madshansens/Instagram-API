@@ -1188,7 +1188,7 @@ class HttpInterface
             'name' => 'client_context',
             // WARNING: Must be random every time otherwise we can only
             // make a single post per direct-discussion thread.
-            'data' => SignatureUtils::generateUUID(true),
+            'data' => Signatures::generateUUID(true),
         ];
         $bodies[] = [
             'type' => 'form-data',
