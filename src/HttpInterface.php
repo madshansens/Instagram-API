@@ -84,7 +84,8 @@ class HttpInterface
      *
      * @param \InstagramAPI\Instagram $parent
      */
-    public function __construct($parent)
+    public function __construct(
+        $parent)
     {
         $this->_parent = $parent;
 
@@ -114,7 +115,8 @@ class HttpInterface
      *
      * @param bool $resetCookieJar (optional) Whether to clear current cookies.
      */
-    public function updateFromSettingsAdapter($resetCookieJar = false)
+    public function updateFromSettingsAdapter(
+        $resetCookieJar = false)
     {
         $this->_userAgent = $this->_parent->device->getUserAgent();
         $this->_cookieJar = null; // Mark old jar for garbage collection.
@@ -126,7 +128,8 @@ class HttpInterface
      *
      * @param bool $resetCookieJar (optional) Whether to clear current cookies.
      */
-    public function loadCookieJar($resetCookieJar = false)
+    public function loadCookieJar(
+        $resetCookieJar = false)
     {
         if ($this->_parent->settingsAdapter['type'] == 'file') {
             $cookieFilePath = $this->_parent->settings->cookiesPath;
@@ -229,7 +232,8 @@ class HttpInterface
      *                           insecure!), String to verify using this path to
      *                           a custom CA bundle file.
      */
-    public function setVerifySSL($state)
+    public function setVerifySSL(
+        $state)
     {
         $this->_verifySSL = $state;
     }
@@ -252,7 +256,8 @@ class HttpInterface
      * @param string|array|null $value String or Array specifying a proxy in
      *                                 Guzzle format, or NULL to disable proxying.
      */
-    public function setProxy($value)
+    public function setProxy(
+        $value)
     {
         $this->_proxy = $value;
     }
@@ -278,7 +283,8 @@ class HttpInterface
      * @var string|null Interface name, IP address or hostname, or NULL to
      *                  disable override and let Guzzle use any interface.
      */
-    public function setOutputInterface($value)
+    public function setOutputInterface(
+        $value)
     {
         $this->_outputInterface = $value;
     }
@@ -305,7 +311,13 @@ class HttpInterface
      * @param object      $response      The Guzzle response object from the request.
      * @param string      $responseBody  The actual text-body reply from the server.
      */
-    protected function _printDebug($method, $url, $uploadedBody, $uploadedBytes, $response, $responseBody)
+    protected function _printDebug(
+        $method,
+        $url,
+        $uploadedBody,
+        $uploadedBytes,
+        $response,
+        $responseBody)
     {
         Debug::printRequest($method, $url);
 
@@ -368,7 +380,11 @@ class HttpInterface
      *
      * @return mixed
      */
-    public function getMappedResponseObject($baseClass, $response, $checkOk = true, $fullResponse = null)
+    public function getMappedResponseObject(
+        $baseClass,
+        $response,
+        $checkOk = true,
+        $fullResponse = null)
     {
         if (is_null($response)) {
             throw new \InstagramAPI\Exception\EmptyResponseException('No response from server. Either a connection or configuration error.');
@@ -408,7 +424,8 @@ class HttpInterface
      *
      * @return array A guzzle options array.
      */
-    protected function _buildGuzzleOptions(array $guzzleOptions)
+    protected function _buildGuzzleOptions(
+        array $guzzleOptions)
     {
         $criticalOptions = [
             'cookies' => ($this->_cookieJar instanceof CookieJar ? $this->_cookieJar : false),
@@ -459,7 +476,10 @@ class HttpInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    protected function _guzzleRequest($method, $uri, array $guzzleOptions = [])
+    protected function _guzzleRequest(
+        $method,
+        $uri,
+        array $guzzleOptions = [])
     {
         // Add critically important options for authenticating the request.
         $guzzleOptions = $this->_buildGuzzleOptions($guzzleOptions);
@@ -540,7 +560,11 @@ class HttpInterface
      *               non-decoded HTTP "body" of the request, and the "object" if
      *               the "decodeToObject" library option was used.
      */
-    protected function _apiRequest($method, $endpoint, array $guzzleOptions = [], array $libraryOptions = [])
+    protected function _apiRequest(
+        $method,
+        $endpoint,
+        array $guzzleOptions = [],
+        array $libraryOptions = [])
     {
         // Determine the URI to use (it's either relative to API, or a full URI).
         if (strncmp($endpoint, 'http:', 5) === 0 || strncmp($endpoint, 'https:', 6) === 0) {
@@ -610,7 +634,11 @@ class HttpInterface
      *
      * @return mixed An object or associative array.
      */
-    public function api($endpoint, $postData = null, $needsAuth = false, $assoc = true)
+    public function api(
+        $endpoint,
+        $postData = null,
+        $needsAuth = false,
+        $assoc = true)
     {
         if (!$needsAuth) { // Only allow non-authenticated requests until logged in.
             $this->_throwIfNotLoggedIn();
@@ -683,7 +711,11 @@ class HttpInterface
      *
      * @return \InstagramAPI\Response\UploadPhotoResponse
      */
-    public function uploadPhotoData($type, $photoFilename, $fileType = 'photofile', $upload_id = null)
+    public function uploadPhotoData(
+        $type,
+        $photoFilename,
+        $fileType = 'photofile',
+        $upload_id = null)
     {
         $this->_throwIfNotLoggedIn();
 
@@ -796,7 +828,8 @@ class HttpInterface
      *
      * @return array
      */
-    public function requestVideoUploadURL($upload_id = null)
+    public function requestVideoUploadURL(
+        $upload_id = null)
     {
         $this->_throwIfNotLoggedIn();
 
@@ -880,7 +913,9 @@ class HttpInterface
      *
      * @return \InstagramAPI\Response\UploadVideoResponse
      */
-    public function uploadVideoChunks($videoFilename, array $uploadParams)
+    public function uploadVideoChunks(
+        $videoFilename,
+        array $uploadParams)
     {
         $this->_throwIfNotLoggedIn();
 
@@ -1006,7 +1041,11 @@ class HttpInterface
      *
      * @return \InstagramAPI\Response\UploadVideoResponse
      */
-    public function uploadVideoData($type, $videoFilename, array $uploadParams, $maxAttempts = 10)
+    public function uploadVideoData(
+        $type,
+        $videoFilename,
+        array $uploadParams,
+        $maxAttempts = 10)
     {
         $this->_throwIfNotLoggedIn();
 
@@ -1041,7 +1080,8 @@ class HttpInterface
      *
      * @return \InstagramAPI\Response\Model\User
      */
-    public function changeProfilePicture($photoFilename)
+    public function changeProfilePicture(
+        $photoFilename)
     {
         $this->_throwIfNotLoggedIn();
 
@@ -1128,7 +1168,10 @@ class HttpInterface
      *
      * @return \InstagramAPI\Response
      */
-    public function directShare($shareType, $recipients, array $shareData)
+    public function directShare(
+        $shareType,
+        $recipients,
+        array $shareData)
     {
         $this->_throwIfNotLoggedIn();
 
@@ -1252,7 +1295,9 @@ class HttpInterface
      *
      * @return string
      */
-    protected function _buildBody(array $bodies, $boundary)
+    protected function _buildBody(
+        array $bodies,
+        $boundary)
     {
         $body = '';
         foreach ($bodies as $b) {

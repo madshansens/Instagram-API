@@ -125,7 +125,8 @@ class Item extends \InstagramAPI\Response
     public $story_locations;
     public $algorithm;
 
-    public function setMediaOrAd($params)
+    public function setMediaOrAd(
+        $params)
     {
         foreach ($params as $k => $v) {
             $this->$k = $v;

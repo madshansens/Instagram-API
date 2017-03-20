@@ -15,7 +15,9 @@ interface StorageInterface
      * @param string $instagramUsername
      * @param array  $config
      */
-    public function __construct($instagramUsername, $config);
+    public function __construct(
+        $instagramUsername,
+        $config);
 
     /**
      * @param string $key
@@ -23,7 +25,9 @@ interface StorageInterface
      *
      * @return void
      */
-    public function set($key, $value);
+    public function set(
+        $key,
+        $value);
 
     /**
      * @param string $key
@@ -31,7 +35,9 @@ interface StorageInterface
      *
      * @return mixed
      */
-    public function get($key, $default = null);
+    public function get(
+        $key,
+        $default = null);
 
     /**
      * Does a preliminary guess about whether we're logged in.

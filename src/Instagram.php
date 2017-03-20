@@ -132,7 +132,10 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      */
-    public function __construct($debug = false, $truncatedDebug = false, $settingsAdapter = null)
+    public function __construct(
+        $debug = false,
+        $truncatedDebug = false,
+        $settingsAdapter = null)
     {
         self::$instance = $this;
         $this->debug = $debug;
@@ -168,7 +171,9 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      */
-    public function setUser($username, $password)
+    public function setUser(
+        $username,
+        $password)
     {
         $this->settings = new Settings\Adapter($this->settingsAdapter, $username);
 
@@ -243,7 +248,8 @@ class Instagram
      *                           insecure!), String to verify using this path to
      *                           a custom CA bundle file.
      */
-    public function setVerifySSL($state)
+    public function setVerifySSL(
+        $state)
     {
         $this->http->setVerifySSL($state);
     }
@@ -266,7 +272,8 @@ class Instagram
      * @param string|array|null $value String or Array specifying a proxy in
      *                                 Guzzle format, or NULL to disable proxying.
      */
-    public function setProxy($value)
+    public function setProxy(
+        $value)
     {
         $this->http->setProxy($value);
     }
@@ -292,7 +299,8 @@ class Instagram
      * @var string|null Interface name, IP address or hostname, or NULL to
      *                  disable override and let Guzzle use any interface.
      */
-    public function setOutputInterface($value)
+    public function setOutputInterface(
+        $value)
     {
         $this->http->setOutputInterface($value);
     }
@@ -329,7 +337,9 @@ class Instagram
      *
      * @return \InstagramAPI\Response\ExploreResponse
      */
-    public function login($forceLogin = false, $appRefreshInterval = 1800)
+    public function login(
+        $forceLogin = false,
+        $appRefreshInterval = 1800)
     {
         // Perform a full relogin if necessary.
         if (!$this->isLoggedIn || $forceLogin) {
@@ -444,7 +454,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\SyncResponse
      */
-    public function syncFeatures($prelogin = false)
+    public function syncFeatures(
+        $prelogin = false)
     {
         if ($prelogin) {
             return $this->request('qe/sync/')
@@ -497,7 +508,8 @@ class Instagram
      *
      * @return mixed
      */
-    public function pushRegister($gcmToken)
+    public function pushRegister(
+        $gcmToken)
     {
         $deviceToken = json_encode([
             'k' => $gcmToken,
@@ -528,7 +540,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\TimelineFeedResponse
      */
-    public function getTimelineFeed($maxId = null)
+    public function getTimelineFeed(
+        $maxId = null)
     {
         $request = $this->request('feed/timeline')
         ->addParams('rank_token', $this->rank_token)
@@ -549,7 +562,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\InsightsResponse
      */
-    public function getInsights($day = null)
+    public function getInsights(
+        $day = null)
     {
         if (empty($day)) {
             $day = date('d');
@@ -570,7 +584,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\MediaInsightsResponse
      */
-    public function getMediaInsights($mediaId)
+    public function getMediaInsights(
+        $mediaId)
     {
         $request = $this->request("insights/media_organic_insights/{$mediaId}")
         ->setSignedPost(true)
@@ -696,7 +711,12 @@ class Instagram
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      */
-    protected function _uploadPhoto($type, $photoFilename, $captionText = null, $location = null, $filter = null)
+    protected function _uploadPhoto(
+        $type,
+        $photoFilename,
+        $captionText = null,
+        $location = null,
+        $filter = null)
     {
         // Make sure we don't allow "album" photo uploads via this function.
         if ($type != 'timeline' && $type != 'story') {
@@ -723,7 +743,11 @@ class Instagram
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      */
-    public function uploadTimelinePhoto($photoFilename, $captionText = null, $location = null, $filter = null)
+    public function uploadTimelinePhoto(
+        $photoFilename,
+        $captionText = null,
+        $location = null,
+        $filter = null)
     {
         return $this->_uploadPhoto('timeline', $photoFilename, $captionText, $location, $filter);
     }
@@ -740,7 +764,10 @@ class Instagram
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      */
-    public function uploadStoryPhoto($photoFilename, $captionText = null, $filter = null)
+    public function uploadStoryPhoto(
+        $photoFilename,
+        $captionText = null,
+        $filter = null)
     {
         return $this->_uploadPhoto('story', $photoFilename, $captionText, null, $filter);
     }
@@ -764,7 +791,13 @@ class Instagram
      *
      * @return \InstagramAPI\Response\ConfigureVideoResponse
      */
-    protected function _uploadVideo($type, $videoFilename, $captionText = null, $customThumb = null, $userTags = null, $maxAttempts = 10)
+    protected function _uploadVideo(
+        $type,
+        $videoFilename,
+        $captionText = null,
+        $customThumb = null,
+        $userTags = null,
+        $maxAttempts = 10)
     {
         // Make sure we don't allow "album" video uploads via this function.
         if ($type != 'timeline' && $type != 'story') {
@@ -805,7 +838,11 @@ class Instagram
      *
      * @return \InstagramAPI\Response\ConfigureVideoResponse
      */
-    public function uploadTimelineVideo($videoFilename, $captionText = null, $customThumb = null, $maxAttempts = 10)
+    public function uploadTimelineVideo(
+        $videoFilename,
+        $captionText = null,
+        $customThumb = null,
+        $maxAttempts = 10)
     {
         return $this->_uploadVideo('timeline', $videoFilename, $captionText, $customThumb, null, $maxAttempts);
     }
@@ -826,7 +863,12 @@ class Instagram
      *
      * @return \InstagramAPI\Response\ConfigureVideoResponse
      */
-    public function uploadStoryVideo($videoFilename, $captionText = null, $customThumb = null, $userTags = null, $maxAttempts = 10)
+    public function uploadStoryVideo(
+        $videoFilename,
+        $captionText = null,
+        $customThumb = null,
+        $userTags = null,
+        $maxAttempts = 10)
     {
         return $this->_uploadVideo('story', $videoFilename, $captionText, $customThumb, $userTags, $maxAttempts);
     }
@@ -849,7 +891,11 @@ class Instagram
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      */
-    public function uploadTimelineAlbum($media, $captionText = null, $location = null, $filter = null)
+    public function uploadTimelineAlbum(
+        $media,
+        $captionText = null,
+        $location = null,
+        $filter = null)
     {
         if (empty($media)) {
             throw new \InvalidArgumentException("List of media to upload can't be empty.");
@@ -971,7 +1017,10 @@ class Instagram
      *
      * @return \InstagramAPI\Response
      */
-    public function directShare($recipients, $mediaId, $text = null)
+    public function directShare(
+        $recipients,
+        $mediaId,
+        $text = null)
     {
         return $this->http->directShare(
             'share',
@@ -993,7 +1042,9 @@ class Instagram
      *
      * @return \InstagramAPI\Response
      */
-    public function directMessage($recipients, $text)
+    public function directMessage(
+        $recipients,
+        $text)
     {
         return $this->http->directShare(
             'message',
@@ -1015,7 +1066,10 @@ class Instagram
      *
      * @return \InstagramAPI\Response
      */
-    public function directPhoto($recipients, $photoFilename, $text = null)
+    public function directPhoto(
+        $recipients,
+        $photoFilename,
+        $text = null)
     {
         return $this->http->directShare(
             'photo',
@@ -1037,7 +1091,9 @@ class Instagram
      *
      * @return \InstagramAPI\Response\DirectThreadResponse
      */
-    public function directThread($threadId, $cursorId = null)
+    public function directThread(
+        $threadId,
+        $cursorId = null)
     {
         $request = $this->request("direct_v2/threads/$threadId/");
         if ($cursorId !== null) {
@@ -1058,7 +1114,9 @@ class Instagram
      * @return array Direct thread action server response.
      */
     // TODO : Missing Response object!
-    public function directThreadAction($threadId, $threadAction)
+    public function directThreadAction(
+        $threadId,
+        $threadAction)
     {
         $data = json_encode([
             '_uuid'      => $this->uuid,
@@ -1090,7 +1148,12 @@ class Instagram
      *
      * @see configureVideo()
      */
-    public function configureVideoWithRetries($type, $upload_id, $captionText = null, $userTags = null, $maxAttempts = 5)
+    public function configureVideoWithRetries(
+        $type,
+        $upload_id,
+        $captionText = null,
+        $userTags = null,
+        $maxAttempts = 5)
     {
         for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
             try {
@@ -1127,7 +1190,11 @@ class Instagram
      *
      * @return \InstagramAPI\Response\ConfigureVideoResponse
      */
-    public function configureVideo($type, $upload_id, $captionText = null, $userTags = null)
+    public function configureVideo(
+        $type,
+        $upload_id,
+        $captionText = null,
+        $userTags = null)
     {
         // Make sure we don't configure "album" video uploads via this function.
         switch ($type) {
@@ -1203,7 +1270,13 @@ class Instagram
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      */
-    public function configure($type, $upload_id, $photoFilename, $captionText = null, $location = null, $filter = null)
+    public function configure(
+        $type,
+        $upload_id,
+        $photoFilename,
+        $captionText = null,
+        $location = null,
+        $filter = null)
     {
         $size = getimagesize($photoFilename)[0];
         if (is_null($captionText)) {
@@ -1287,7 +1360,10 @@ class Instagram
      *
      * @return \InstagramAPI\Response\EditMediaResponse
      */
-    public function editMedia($mediaId, $captionText = '', $usertags = null)
+    public function editMedia(
+        $mediaId,
+        $captionText = '',
+        $usertags = null)
     {
         if (is_null($usertags)) {
             return $this->request("media/{$mediaId}/edit_media/")
@@ -1319,7 +1395,11 @@ class Instagram
      *
      * @return \InstagramAPI\Response\EditMediaResponse
      */
-    public function tagUser($mediaId, $userId, $position, $captionText = '')
+    public function tagUser(
+        $mediaId,
+        $userId,
+        $position,
+        $captionText = '')
     {
         $usertag = '{"removed":[],"in":[{"position":['.$position[0].','.$position[1].'],"user_id":"'.$userId.'"}]}';
 
@@ -1337,7 +1417,10 @@ class Instagram
      *
      * @return \InstagramAPI\Response\EditMediaResponse
      */
-    public function untagUser($mediaId, $userId, $captionText = '')
+    public function untagUser(
+        $mediaId,
+        $userId,
+        $captionText = '')
     {
         $usertag = '{"removed":["'.$userId.'"],"in":[]}';
 
@@ -1353,7 +1436,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\SaveAndUnsaveMedia
      */
-    public function saveMedia($mediaId)
+    public function saveMedia(
+        $mediaId)
     {
         return $this->request("media/{$mediaId}/save/")
         ->addPost('_uuid', $this->uuid)
@@ -1372,7 +1456,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\SaveAndUnsaveMedia
      */
-    public function unsaveMedia($mediaId)
+    public function unsaveMedia(
+        $mediaId)
     {
         return $this->request("media/{$mediaId}/unsave/")
         ->addPost('_uuid', $this->uuid)
@@ -1408,7 +1493,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\MediaResponse
      */
-    public function removeSelfTag($mediaId)
+    public function removeSelfTag(
+        $mediaId)
     {
         return $this->request("usertags/{$mediaId}/remove/")
         ->addPost('_uuid', $this->uuid)
@@ -1426,7 +1512,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\MediaInfoResponse
      */
-    public function getMediaInfo($mediaId)
+    public function getMediaInfo(
+        $mediaId)
     {
         return $this->request("media/{$mediaId}/info/")
         ->addPost('_uuid', $this->uuid)
@@ -1445,7 +1532,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\MediaDeleteResponse
      */
-    public function deleteMedia($mediaId)
+    public function deleteMedia(
+        $mediaId)
     {
         return $this->request("media/{$mediaId}/delete/")
         ->addPost('_uuid', $this->uuid)
@@ -1464,7 +1552,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response
      */
-    public function disableMediaComments($mediaId)
+    public function disableMediaComments(
+        $mediaId)
     {
         return $this->request("media/{$mediaId}/disable_comments/")
         ->addPost('_uuid', $this->uuid)
@@ -1482,7 +1571,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response
      */
-    public function enableMediaComments($mediaId)
+    public function enableMediaComments(
+        $mediaId)
     {
         return $this->request("media/{$mediaId}/enable_comments/")
         ->addPost('_uuid', $this->uuid)
@@ -1501,7 +1591,9 @@ class Instagram
      *
      * @return \InstagramAPI\Response\CommentResponse
      */
-    public function comment($mediaId, $commentText)
+    public function comment(
+        $mediaId,
+        $commentText)
     {
         return $this->request("media/{$mediaId}/comment/")
         ->addPost('user_breadcrumb', Utils::generateUserBreadcrumb(mb_strlen($commentText)))
@@ -1524,7 +1616,9 @@ class Instagram
      *
      * @return \InstagramAPI\Response\DeleteCommentResponse
      */
-    public function deleteComment($mediaId, $commentId)
+    public function deleteComment(
+        $mediaId,
+        $commentId)
     {
         return $this->request("media/{$mediaId}/comment/{$commentId}/delete/")
         ->addPost('_uuid', $this->uuid)
@@ -1543,7 +1637,9 @@ class Instagram
      *
      * @return \InstagramAPI\Response\DeleteCommentResponse
      */
-    public function deleteComments($mediaId, $commentIds)
+    public function deleteComments(
+        $mediaId,
+        $commentIds)
     {
         if (!is_array($commentIds)) {
             $commentIds = [$commentIds];
@@ -1573,7 +1669,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\CommentLikeUnlikeResponse
      */
-    public function likeComment($commentId)
+    public function likeComment(
+        $commentId)
     {
         return $this->request("media/{$commentId}/comment_like/")
         ->addPost('_uuid', $this->uuid)
@@ -1591,7 +1688,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\CommentLikeUnlikeResponse
      */
-    public function unlikeComment($commentId)
+    public function unlikeComment(
+        $commentId)
     {
         return $this->request("media/{$commentId}/comment_unlike/")
         ->addPost('_uuid', $this->uuid)
@@ -1609,7 +1707,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\Model\User
      */
-    public function changeProfilePicture($photoFilename)
+    public function changeProfilePicture(
+        $photoFilename)
     {
         return $this->http->changeProfilePicture($photoFilename);
     }
@@ -1693,7 +1792,13 @@ class Instagram
      *
      * @return \InstagramAPI\Response\UsernameInfoResponse
      */
-    public function editProfile($url, $phone, $firstName, $biography, $email, $gender)
+    public function editProfile(
+        $url,
+        $phone,
+        $firstName,
+        $biography,
+        $email,
+        $gender)
     {
         return $this->request('accounts/edit_profile/')
         ->addPost('_uuid', $this->uuid)
@@ -1719,7 +1824,9 @@ class Instagram
      *
      * @return \InstagramAPI\Response\ChangePasswordResponse
      */
-    public function changePassword($oldPassword, $newPassword)
+    public function changePassword(
+        $oldPassword,
+        $newPassword)
     {
         return $this->request('accounts/change_password/')
         ->addPost('_uuid', $this->uuid)
@@ -1752,7 +1859,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FollowingRecentActivityResponse
      */
-    public function getFollowingRecentActivity($maxId = null)
+    public function getFollowingRecentActivity(
+        $maxId = null)
     {
         $activity = $this->request('news/');
         if (!is_null($maxId)) {
@@ -1771,7 +1879,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\V2InboxResponse
      */
-    public function getV2Inbox($cursorId = null)
+    public function getV2Inbox(
+        $cursorId = null)
     {
         $request = $this->request('direct_v2/inbox/');
         if ($cursorId !== null) {
@@ -1792,7 +1901,10 @@ class Instagram
      *
      * @return \InstagramAPI\Response\UsertagsResponse
      */
-    public function getUserTags($userId, $maxId = null, $minTimestamp = null)
+    public function getUserTags(
+        $userId,
+        $maxId = null,
+        $minTimestamp = null)
     {
         return $this->request("usertags/{$userId}/feed/")
         ->addParams('rank_token', $this->rank_token)
@@ -1823,7 +1935,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\MediaLikersResponse
      */
-    public function getMediaLikers($mediaId)
+    public function getMediaLikers(
+        $mediaId)
     {
         return $this->request("media/{$mediaId}/likers/")->getResponse(new Response\MediaLikersResponse());
     }
@@ -1837,7 +1950,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FBSearchResponse
      */
-    public function searchFBUsers($query)
+    public function searchFBUsers(
+        $query)
     {
         return $this->request('fbsearch/topsearch/')
         ->addParams('context', 'blended')
@@ -1855,7 +1969,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\SearchUserResponse
      */
-    public function searchUsers($query)
+    public function searchUsers(
+        $query)
     {
         return $this->request('users/search/')
         ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
@@ -1874,7 +1989,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\AddressBookResponse
      */
-    public function searchInAddressBook($contacts)
+    public function searchInAddressBook(
+        $contacts)
     {
         return $this->request('address_book/link/?include=extra_display_name,thumbnails')
             ->setSignedPost(false)
@@ -1891,7 +2007,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\UsernameInfoResponse
      */
-    public function getUserInfoByName($username)
+    public function getUserInfoByName(
+        $username)
     {
         return $this->request("users/{$username}/usernameinfo/")->getResponse(new Response\UsernameInfoResponse());
     }
@@ -1905,7 +2022,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\UsernameInfoResponse
      */
-    public function getUserInfoById($userId)
+    public function getUserInfoById(
+        $userId)
     {
         return $this->request("users/{$userId}/info/")->getResponse(new Response\UsernameInfoResponse());
     }
@@ -1940,7 +2058,8 @@ class Instagram
      *
      * @see getUserInfoByName()
      */
-    public function getUsernameId($username)
+    public function getUsernameId(
+        $username)
     {
         return $this->getUserInfoByName($username)->getUser()->getPk();
     }
@@ -1954,7 +2073,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\TagRelatedResponse
      */
-    public function getTagRelated($tag)
+    public function getTagRelated(
+        $tag)
     {
         return $this->request("tags/{$tag}/related")
         ->addParams('visited', '[{"id":"'.$tag.'","type":"hashtag"}]')
@@ -1971,7 +2091,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\TagInfoResponse
      */
-    public function getTagInfo($tag)
+    public function getTagInfo(
+        $tag)
     {
         return $this->request("tags/{$tag}/info")
         ->getResponse(new Response\TagInfoResponse());
@@ -2010,7 +2131,8 @@ class Instagram
      *
      * @see getUserStoryFeed()
      */
-    public function getUserReelMediaFeed($userId)
+    public function getUserReelMediaFeed(
+        $userId)
     {
         return $this->request("feed/user/{$userId}/reel_media/")
         ->getResponse(new Response\Model\Reel());
@@ -2031,7 +2153,8 @@ class Instagram
      *
      * @see getUserReelMediaFeed()
      */
-    public function getUserStoryFeed($userId)
+    public function getUserStoryFeed(
+        $userId)
     {
         return $this->request("feed/user/{$userId}/story/")
         ->getResponse(new Response\UserStoryFeedResponse());
@@ -2046,7 +2169,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\ReelsMediaResponse
      */
-    public function getReelsMediaFeed($userList)
+    public function getReelsMediaFeed(
+        $userList)
     {
         if (!is_array($userList)) {
             $userList = [$userList];
@@ -2074,7 +2198,10 @@ class Instagram
      *
      * @return \InstagramAPI\Response\UserFeedResponse
      */
-    public function getUserFeed($userId, $maxId = null, $minTimestamp = null)
+    public function getUserFeed(
+        $userId,
+        $maxId = null,
+        $minTimestamp = null)
     {
         return $this->request("feed/user/{$userId}/")
         ->addParams('rank_token', $this->rank_token)
@@ -2094,7 +2221,9 @@ class Instagram
      *
      * @return \InstagramAPI\Response\UserFeedResponse
      */
-    public function getSelfUserFeed($maxId = null, $minTimestamp = null)
+    public function getSelfUserFeed(
+        $maxId = null,
+        $minTimestamp = null)
     {
         return $this->getUserFeed($this->username_id, $maxId, $minTimestamp);
     }
@@ -2113,7 +2242,8 @@ class Instagram
      *
      * @see getUserFeed()
      */
-    public function getGeoMedia($userId)
+    public function getGeoMedia(
+        $userId)
     {
         return $this->request("maps/user/{$userId}/")->getResponse(new Response\GeoMediaResponse());
     }
@@ -2141,7 +2271,10 @@ class Instagram
      *
      * @return \InstagramAPI\Response\LocationResponse
      */
-    public function searchLocation($latitude, $longitude, $query = null)
+    public function searchLocation(
+        $latitude,
+        $longitude,
+        $query = null)
     {
         $locations = $this->request('location_search/')
         ->addParams('rank_token', $this->rank_token)
@@ -2167,7 +2300,9 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FBLocationResponse
      */
-    public function searchFBLocation($query, $count = null)
+    public function searchFBLocation(
+        $query,
+        $count = null)
     {
         $location = $this->request('fbsearch/places/')
         ->addParams('rank_token', $this->rank_token)
@@ -2190,7 +2325,9 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FBLocationResponse
      */
-    public function searchFBLocationByPoint($lat, $lng)
+    public function searchFBLocationByPoint(
+        $lat,
+        $lng)
     {
         return $this->request('fbsearch/places/')
         ->addParams('rank_token', $this->rank_token)
@@ -2209,7 +2346,9 @@ class Instagram
      *
      * @return \InstagramAPI\Response\LocationFeedResponse
      */
-    public function getLocationFeed($locationId, $maxId = null)
+    public function getLocationFeed(
+        $locationId,
+        $maxId = null)
     {
         $locationFeed = $this->request("feed/location/{$locationId}/");
         if (!is_null($maxId)) {
@@ -2245,7 +2384,9 @@ class Instagram
      *
      * @return \InstagramAPI\Response\TagFeedResponse
      */
-    public function getHashtagFeed($hashtagString, $maxId = null)
+    public function getHashtagFeed(
+        $hashtagString,
+        $maxId = null)
     {
         $hashtagFeed = $this->request("feed/tag/{$hashtagString}/");
         if (!is_null($maxId)) {
@@ -2265,7 +2406,9 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FollowerAndFollowingResponse
      */
-    public function getUserFollowings($userId, $maxId = null)
+    public function getUserFollowings(
+        $userId,
+        $maxId = null)
     {
         $requestData = $this->request("friendships/{$userId}/following/")
         ->addParams('rank_token', $this->rank_token);
@@ -2286,7 +2429,9 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FollowerAndFollowingResponse
      */
-    public function getUserFollowers($userId, $maxId = null)
+    public function getUserFollowers(
+        $userId,
+        $maxId = null)
     {
         $requestData = $this->request("friendships/{$userId}/followers/")
         ->addParams('rank_token', $this->rank_token);
@@ -2306,7 +2451,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FollowerAndFollowingResponse
      */
-    public function getSelfUsersFollowing($maxId = null)
+    public function getSelfUsersFollowing(
+        $maxId = null)
     {
         return $this->getUserFollowings($this->username_id, $maxId);
     }
@@ -2320,7 +2466,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FollowerAndFollowingResponse
      */
-    public function getSelfUserFollowers($maxId = null)
+    public function getSelfUserFollowers(
+        $maxId = null)
     {
         return $this->getUserFollowers($this->username_id, $maxId);
     }
@@ -2334,7 +2481,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response
      */
-    public function like($mediaId)
+    public function like(
+        $mediaId)
     {
         return $this->request("media/{$mediaId}/like/")
         ->addPost('_uuid', $this->uuid)
@@ -2353,7 +2501,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response
      */
-    public function unlike($mediaId)
+    public function unlike(
+        $mediaId)
     {
         return $this->request("media/{$mediaId}/unlike/")
          ->addPost('_uuid', $this->uuid)
@@ -2373,7 +2522,9 @@ class Instagram
      *
      * @return \InstagramAPI\Response\MediaCommentsResponse
      */
-    public function getMediaComments($mediaId, $maxId = null)
+    public function getMediaComments(
+        $mediaId,
+        $maxId = null)
     {
         return $this->request("media/{$mediaId}/comments/")
         ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
@@ -2391,7 +2542,9 @@ class Instagram
      *
      * @return \InstagramAPI\Response
      */
-    public function setNameAndPhone($name = '', $phone = '')
+    public function setNameAndPhone(
+        $name = '',
+        $phone = '')
     {
         return $this->request('accounts/set_phone_and_name/')
         ->setSignedPost(true)
@@ -2425,7 +2578,9 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      */
-    public function backup($baseOutputPath = null, $printProgress = true)
+    public function backup(
+        $baseOutputPath = null,
+        $printProgress = true)
     {
         // Decide which path to use.
         if ($baseOutputPath === null) {
@@ -2468,7 +2623,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FriendshipResponse
      */
-    public function follow($userId)
+    public function follow(
+        $userId)
     {
         return $this->request("friendships/create/{$userId}/")
         ->addPost('_uuid', $this->uuid)
@@ -2487,7 +2643,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FriendshipResponse
      */
-    public function unfollow($userId)
+    public function unfollow(
+        $userId)
     {
         return $this->request("friendships/destroy/{$userId}/")
         ->addPost('_uuid', $this->uuid)
@@ -2506,7 +2663,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\SuggestedUsersResponse
      */
-    public function getSuggestedUsers($userId)
+    public function getSuggestedUsers(
+        $userId)
     {
         return $this->request('discover/chaining/')
         ->addParams('target_id', $userId)
@@ -2522,7 +2680,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FriendshipResponse
      */
-    public function block($userId)
+    public function block(
+        $userId)
     {
         return $this->request("friendships/block/{$userId}/")
         ->addPost('_uuid', $this->uuid)
@@ -2541,7 +2700,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FriendshipResponse
      */
-    public function unblock($userId)
+    public function unblock(
+        $userId)
     {
         return $this->request("friendships/unblock/{$userId}/")
         ->addPost('_uuid', $this->uuid)
@@ -2560,7 +2720,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\Model\FriendshipStatus
      */
-    public function getUserFriendship($userId)
+    public function getUserFriendship(
+        $userId)
     {
         return $this->request("friendships/show/{$userId}/")->getResponse(new Response\Model\FriendshipStatus());
     }
@@ -2574,7 +2735,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FriendshipsShowManyResponse
      */
-    public function getUsersFriendship($userList)
+    public function getUsersFriendship(
+        $userList)
     {
         if (!is_array($userList)) {
             $userList = [$userList];
@@ -2597,7 +2759,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\LikeFeedResponse
      */
-    public function getLikedMedia($maxId = null)
+    public function getLikedMedia(
+        $maxId = null)
     {
         return $this->request('feed/liked/?'.(!is_null($maxId) ? 'max_id='.$maxId.'&' : ''))
         ->getResponse(new Response\LikeFeedResponse());
@@ -2612,7 +2775,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\SearchTagResponse
      */
-    public function searchTags($query)
+    public function searchTags(
+        $query)
     {
         return $this->request('tags/search/')
         ->addParams('is_typeahead', true)
@@ -2631,7 +2795,8 @@ class Instagram
      *
      * @return \InstagramAPI\Request
      */
-    public function request($url)
+    public function request(
+        $url)
     {
         return new Request($url);
     }
