@@ -4,7 +4,9 @@ namespace InstagramAPI;
 
 class Debug
 {
-    public static function printRequest($method, $endpoint)
+    public static function printRequest(
+        $method,
+        $endpoint)
     {
         if (php_sapi_name() == 'cli') {
             $method = Utils::colouredString("{$method}:  ", 'light_blue');
@@ -14,7 +16,8 @@ class Debug
         echo $method.$endpoint."\n";
     }
 
-    public static function printUpload($uploadBytes)
+    public static function printUpload(
+        $uploadBytes)
     {
         if (php_sapi_name() == 'cli') {
             $dat = Utils::colouredString('→ '.$uploadBytes, 'yellow');
@@ -24,7 +27,9 @@ class Debug
         echo $dat."\n";
     }
 
-    public static function printHttpCode($httpCode, $bytes)
+    public static function printHttpCode(
+        $httpCode,
+        $bytes)
     {
         if (php_sapi_name() == 'cli') {
             echo Utils::colouredString("← {$httpCode} \t {$bytes}", 'green')."\n";
@@ -33,7 +38,9 @@ class Debug
         }
     }
 
-    public static function printResponse($response, $truncated = false)
+    public static function printResponse(
+        $response,
+        $truncated = false)
     {
         if (php_sapi_name() == 'cli') {
             $res = Utils::colouredString('RESPONSE: ', 'cyan');
@@ -46,7 +53,8 @@ class Debug
         echo $res.$response."\n\n";
     }
 
-    public static function printPostData($post)
+    public static function printPostData(
+        $post)
     {
         if (php_sapi_name() == 'cli') {
             $dat = Utils::colouredString('DATA: ', 'yellow');
