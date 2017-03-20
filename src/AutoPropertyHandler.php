@@ -21,27 +21,20 @@ class AutoPropertyHandler
         }
         list($functionType, $propName) = explode('_', $underScoreNames, 2);
 
+        // Make sure the requested function corresponds to an object property.
+        if (!property_exists($this, $propName)) {
+            throw new \Exception("Unknown function {$function}.");
+        }
+
         // Return the kind of response expected by their function.
         switch ($functionType) {
         case 'get':
-            if (!property_exists($this, $propName)) {
-                throw new \Exception("Unknown function {$function}.");
-            }
-
             return $this->$propName;
             break;
         case 'set':
-            if (!property_exists($this, $propName)) {
-                throw new \Exception("Unknown function {$function}.");
-            }
-
             $this->$propName = $args[0];
             break;
         case 'is':
-            if (!property_exists($this, $propName)) {
-                throw new \Exception("Unknown function {$function}.");
-            }
-
             return $this->$propName ? true : false;
             break;
         default:
