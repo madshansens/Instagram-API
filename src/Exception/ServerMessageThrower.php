@@ -20,6 +20,14 @@ class ServerMessageThrower
      * Note that not all exceptions are listed below. Some are thrown via other
      * methods than this automatic message parser.
      *
+     * WARNING TO CONTRIBUTORS: Do not "contribute" a bunch of function-specific
+     * garbage exceptions here, such as "User not found", "No permission to view
+     * profile" or other garbage. Those messages are human-readable, unreliable
+     * and are also totally non-critical. You should handle them yourself in
+     * your end-user applications by simply catching FunctionException and
+     * looking at the contents of its getMessage() property. The exceptions
+     * listed below are *critical* exceptions related to the CORE of the API!
+     *
      * @var array
      */
     const EXCEPTION_MAP = [
@@ -52,7 +60,7 @@ class ServerMessageThrower
      *
      * @throws InstagramException The appropriate exception.
      */
-    public static function throw(
+    public static function autoThrow(
         $prefixString,
         $serverMessage)
     {
@@ -81,7 +89,7 @@ class ServerMessageThrower
             }
         }
 
-        // Nothing found. Use generic "API function exception".
+        // No critical exception found. Use a generic "API function exception".
         throw new FunctionException($serverMessage);
     }
 

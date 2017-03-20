@@ -19,7 +19,7 @@ $exceptionsToTest = [
 foreach ($exceptionsToTest as $exceptionClassName => $testMessages) {
     foreach ($testMessages as $testMessage) {
         try {
-            ServerMessageThrower::throw(null, $testMessage);
+            ServerMessageThrower::autoThrow(null, $testMessage);
         } catch (\InstagramAPI\Exception\InstagramException $e) {
             $thisClassName = get_class($e);
             if ($exceptionClassName == $thisClassName) {

@@ -401,7 +401,7 @@ class HttpInterface
 
         // Check if the API response was successful.
         if ($checkOk && !$responseObject->isOk()) {
-            ServerMessageThrower::throw(get_class($baseClass), $responseObject->getMessage());
+            ServerMessageThrower::autoThrow(get_class($baseClass), $responseObject->getMessage());
         }
 
         // Save the raw response object as the "getFullResponse()" value.
