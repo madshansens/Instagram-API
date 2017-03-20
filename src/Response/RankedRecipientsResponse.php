@@ -6,16 +6,8 @@ class RankedRecipientsResponse extends \InstagramAPI\Response
 {
     public $expires;
     /**
-     * @var Model\RankedRecipientsUserList[]
+     * @var Model\Users[]
      */
     public $ranked_recipients;
     public $filtered;
-}
-
-class RankedRecipientsUserList extends \InstagramAPI\Response
-{
-    /**
-     * @var User
-     */
-    public $user;
 }
