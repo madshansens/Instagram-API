@@ -2,7 +2,7 @@
 
 namespace InstagramAPI;
 
-class Suggestion
+class Suggestion extends Response
 {
     public $media_infos;
     public $social_context;
