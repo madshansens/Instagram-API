@@ -108,7 +108,7 @@ class HttpInterface
     }
 
     /**
-     * Resets certain HttpInterface settings via the current SettingsAdapter.
+     * Resets certain HttpInterface settings via the current Settings adapter.
      *
      * Used whenever the user switches setUser(), to configure our internal state.
      *
@@ -122,7 +122,7 @@ class HttpInterface
     }
 
     /**
-     * Loads all cookies via the current SettingsAdapter.
+     * Loads all cookies via the current Settings adapter.
      *
      * @param bool $resetCookieJar (optional) Whether to clear current cookies.
      */
@@ -176,7 +176,7 @@ class HttpInterface
     /**
      * Gives you all cookies in the Jar encoded as a JSON string.
      *
-     * This allows custom SettingsAdapters to retrieve all cookies for saving.
+     * This allows custom Settings adapters to retrieve all cookies for saving.
      *
      * @throws \InvalidArgumentException If the JSON cannot be encoded.
      *
@@ -213,7 +213,7 @@ class HttpInterface
 
         // Tell any custom settings adapters to persist the current cookies.
         if ($this->_parent->settingsAdapter['type'] == 'mysql'
-            || $this->_parent->settings->setting instanceof SettingsAdapter\SettingsInterface) {
+            || $this->_parent->settings->storage instanceof \InstagramAPI\Settings\StorageInterface) {
             $newCookies = $this->getCookieJarAsJSON();
             $this->_parent->settings->set('cookies', $newCookies);
         }

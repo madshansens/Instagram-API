@@ -110,14 +110,16 @@ class Instagram
     public $http;
 
     /**
-     * @var mixed
+     * The configuration used for initializing our settings adapter.
+     *
+     * @var array|null
      */
     public $settingsAdapter;
 
     /**
-     * An instance of a SettingsAdapter storage class.
+     * Our settings storage adapter instance.
      *
-     * @var mixed
+     * @var \InstagramAPI\Settings\Adapter|null
      */
     public $settings;
 
@@ -168,7 +170,7 @@ class Instagram
      */
     public function setUser($username, $password)
     {
-        $this->settings = new SettingsAdapter($this->settingsAdapter, $username);
+        $this->settings = new \InstagramAPI\Settings\Adapter($this->settingsAdapter, $username);
 
         // Generate the user's Device instance, which will be created from the
         // user's last-used device IF they've got a valid, good one stored.

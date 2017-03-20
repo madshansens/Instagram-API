@@ -1,13 +1,13 @@
 <?php
 
-namespace InstagramAPI\SettingsAdapter;
+namespace InstagramAPI\Settings\Storage;
 
 /**
  * Class Memcached.
  *
  * @author ilyk <ilyk@ilyk.im>
  */
-class Memcached implements SettingsInterface
+class Memcached implements \InstagramAPI\Settings\StorageInterface
 {
     /**
      * @var \Memcached
@@ -20,7 +20,9 @@ class Memcached implements SettingsInterface
      * @param string $instagramUsername
      * @param array  $config
      */
-    public function __construct($instagramUsername, $config)
+    public function __construct(
+        $instagramUsername,
+        $config)
     {
         $this->memcached = $memcached = new \Memcached((isset($config['persistent_id']) ? $config['persistent_id'] : 'instagram'));
 
@@ -51,7 +53,9 @@ class Memcached implements SettingsInterface
      *
      * @return void
      */
-    public function set($key, $value)
+    public function set(
+        $key,
+        $value)
     {
         $this->memcached->set($key, $value);
     }
@@ -62,7 +66,9 @@ class Memcached implements SettingsInterface
      *
      * @return mixed
      */
-    public function get($key, $default = null)
+    public function get(
+        $key,
+        $default = null)
     {
         $result = $this->memcached->get($key);
 
@@ -86,7 +92,7 @@ class Memcached implements SettingsInterface
     /**
      * @return void
      */
-    public function Save()
+    public function save()
     {
     }
 }

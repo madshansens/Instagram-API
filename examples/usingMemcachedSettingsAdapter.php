@@ -12,7 +12,7 @@ $truncatedDebug = false;
 // Example using Memcached for storing settings and cookies
 $i = new \InstagramAPI\Instagram($debug, $truncatedDebug, [
     'type'             => 'custom',
-    'class'            => \InstagramAPI\SettingsAdapter\Memcached::class,
+    'class'            => \InstagramAPI\Settings\Storage\Memcached::class,
     'persistent_id'    => 'instagram',
     'memcache_options' => [
         Memcached::OPT_PREFIX_KEY => 'settings_',

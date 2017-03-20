@@ -1,10 +1,13 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Settings;
 
-class SettingsAdapter
+class Adapter
 {
-    protected function getCmdOptions(array $longOpts)
+    public $storage;
+
+    protected function getCmdOptions(
+        array $longOpts)
     {
         $cmdOptions = getopt('', $longOpts);
 
@@ -15,7 +18,10 @@ class SettingsAdapter
         return $cmdOptions;
     }
 
-    protected function getUserConfig($settingName, array $config, array $cmdOptions)
+    protected function getUserConfig(
+        $settingName,
+        array $config,
+        array $cmdOptions)
     {
         // Look for a user-provided value for the setting.
         if (array_key_exists($settingName, $config)) {
@@ -43,7 +49,9 @@ class SettingsAdapter
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */
-    public function __construct($config, $username)
+    public function __construct(
+        $config,
+        $username)
     {
         switch ($config['type']) {
         case 'mysql':
@@ -73,7 +81,7 @@ class SettingsAdapter
                 $mysqlOptions['db_name'] = $this->getUserConfig('db_name', $config, $cmdOptions);
             }
 
-            $this->setting = new SettingsMysql($username, $mysqlOptions);
+            $this->storage = new \InstagramAPI\Settings\Storage\MySQL($username, $mysqlOptions);
             break;
         case 'file':
             $cmdOptions = $this->getCmdOptions([
@@ -83,32 +91,36 @@ class SettingsAdapter
             // Settings that can optionally be provided.
             $settingsPath = $this->getUserConfig('settings_path', $config, $cmdOptions);
 
-            $this->setting = new SettingsFile($username, $settingsPath);
+            $this->storage = new \InstagramAPI\Settings\Storage\File($username, $settingsPath);
             break;
         case 'custom':
-            if (!isset($config['class']) || !class_exists($config['class']) || !in_array(SettingsAdapter\SettingsInterface::class, class_implements($config['class']))) {
+            if (!isset($config['class']) || !class_exists($config['class']) || !in_array(StorageInterface::class, class_implements($config['class']))) {
                 throw new \InstagramAPI\Exception\SettingsException('Unknown custom settings class specified.');
             }
 
             $customClass = $config['class'];
-            /** @var SettingsAdapter\SettingsInterface $settings */
+
+            /** @var \InstagramAPI\Settings\StorageInterface $settings */
             $settings = new $customClass($username, $config);
 
-            $this->setting = $settings;
+            $this->storage = $settings;
             break;
         default:
             throw new \InstagramAPI\Exception\SettingsException('Unrecognized settings type.');
         }
     }
 
-    public function __call($func, $args)
+    public function __call(
+        $func,
+        $args)
     {
         // pass functions to releated settings class
-        return call_user_func_array([$this->setting, $func], $args);
+        return call_user_func_array([$this->storage, $func], $args);
     }
 
-    public function __get($prop)
+    public function __get(
+        $prop)
     {
-        return $this->setting->$prop;
+        return $this->storage->$prop;
     }
 }

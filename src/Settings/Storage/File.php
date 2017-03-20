@@ -1,8 +1,10 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Settings\Storage;
 
-class SettingsFile
+use InstagramAPI\Constants;
+
+class File implements \InstagramAPI\Settings\StorageInterface
 {
     /**
      * Key-value cache which holds all settings in memory.
@@ -33,7 +35,9 @@ class SettingsFile
      * @param string $username     The instagram username the settings belong to.
      * @param string $settingsPath Where to store the settings files.
      */
-    public function __construct($username, $settingsPath = null)
+    public function __construct(
+        $username,
+        $settingsPath = null)
     {
         // Decide which settings-file paths to use.
         if (empty($settingsPath)) {
@@ -71,7 +75,9 @@ class SettingsFile
      *
      * @return mixed
      */
-    public function get($key, $default = null)
+    public function get(
+        $key,
+        $default = null)
     {
         if ($key == 'sets') {
             return $this->sets; // Return 'sets' itself which contains all data.
@@ -90,7 +96,9 @@ class SettingsFile
      *
      * @throws \InvalidArgumentException
      */
-    public function set($key, $value)
+    public function set(
+        $key,
+        $value)
     {
         if ($key == 'sets') {
             throw new \InvalidArgumentException('You are not allowed to write to the special "sets" key.');
@@ -107,7 +115,7 @@ class SettingsFile
         if (!array_key_exists($key, $this->sets) || $this->sets[$key] !== $value) {
             // The value differs, so save to memory cache and write to disk.
             $this->sets[$key] = $value;
-            $this->Save();
+            $this->save();
         }
     }
 
@@ -148,7 +156,7 @@ class SettingsFile
      * Don't call this manually. It is automatically done by set() whenever a
      * setting is changed compared to its value on disk.
      */
-    public function Save()
+    public function save()
     {
         // Generate a text representation of all settings.
         $data = '';
@@ -177,7 +185,10 @@ class SettingsFile
      *
      * @return mixed Number of bytes written on success, otherwise FALSE.
      */
-    private function atomicwrite($filename, $data, $atomicSuffix = 'atomictmp')
+    private function atomicwrite(
+        $filename,
+        $data,
+        $atomicSuffix = 'atomictmp')
     {
         // Perform an exclusive (locked) overwrite to a temporary file.
         $filenameTmp = sprintf('%s.%s', $filename, $atomicSuffix);

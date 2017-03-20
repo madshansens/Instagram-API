@@ -1,16 +1,16 @@
 <?php
 
-namespace InstagramAPI\SettingsAdapter;
+namespace InstagramAPI\Settings;
 
 /**
- * Interface SettingsInterface.
+ * Interface StorageInterface.
  *
  * @author ilyk <ilyk@ilyk.im>
  */
-interface SettingsInterface
+interface StorageInterface
 {
     /**
-     * SettingsInterface constructor.
+     * Constructor.
      *
      * @param string $instagramUsername
      * @param array  $config
@@ -45,5 +45,5 @@ interface SettingsInterface
     /**
      * @return void
      */
-    public function Save();
+    public function save();
 }

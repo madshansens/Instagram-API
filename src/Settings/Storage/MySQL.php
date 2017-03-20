@@ -1,10 +1,10 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Settings\Storage;
 
 use PDO;
 
-class SettingsMysql
+class MySQL implements \InstagramAPI\Settings\StorageInterface
 {
     private $sets;
     private $pdo;
@@ -12,7 +12,9 @@ class SettingsMysql
 
     public $dbTableName = 'user_settings';
 
-    public function __construct($username, $mysqlOptions)
+    public function __construct(
+        $username,
+        $mysqlOptions)
     {
         $this->instagramUsername = $username;
 
@@ -50,7 +52,9 @@ class SettingsMysql
             && !empty($this->get('token'));
     }
 
-    public function get($key, $default = null)
+    public function get(
+        $key,
+        $default = null)
     {
         if ($key == 'sets') {
             return $this->sets; // Return 'sets' itself which contains all data.
@@ -63,17 +67,19 @@ class SettingsMysql
         return $default;
     }
 
-    public function set($key, $value)
+    public function set(
+        $key,
+        $value)
     {
         if ($key == 'sets' || $key == 'username') {
             return; // Don't allow writing to special 'sets' or 'username' keys.
         }
 
         $this->sets[$key] = $value;
-        $this->Save();
+        $this->save();
     }
 
-    public function Save()
+    public function save()
     {
         // Special key where we store what username these settings belong to.
         $this->sets['username'] = $this->instagramUsername;
@@ -109,7 +115,11 @@ class SettingsMysql
     /**
      * @throws \InstagramAPI\Exception\SettingsException
      */
-    private function connect($username, $password, $host, $dbName)
+    private function connect(
+        $username,
+        $password,
+        $host,
+        $dbName)
     {
         try {
             $pdo = new \PDO("mysql:host={$host};dbname={$dbName}", $username, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
