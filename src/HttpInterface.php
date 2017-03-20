@@ -681,7 +681,7 @@ class HttpInterface
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return UploadPhotoResponse
+     * @return \InstagramAPI\Response\UploadPhotoResponse
      */
     public function uploadPhotoData($type, $photoFilename, $fileType = 'photofile', $upload_id = null)
     {
@@ -777,7 +777,7 @@ class HttpInterface
             [
                 'debugUploadedBody'  => false,
                 'debugUploadedBytes' => true,
-                'decodeToObject'     => new UploadPhotoResponse(),
+                'decodeToObject'     => new Response\UploadPhotoResponse(),
             ]
         );
 
@@ -853,7 +853,7 @@ class HttpInterface
             [
                 'debugUploadedBody'  => true,
                 'debugUploadedBytes' => false,
-                'decodeToObject'     => new UploadJobVideoResponse(),
+                'decodeToObject'     => new Response\UploadJobVideoResponse(),
             ]
         );
 
@@ -878,7 +878,7 @@ class HttpInterface
      * @throws \InstagramAPI\Exception\InstagramException
      * @throws \InstagramAPI\Exception\UploadFailedException If the upload fails.
      *
-     * @return UploadVideoResponse
+     * @return \InstagramAPI\Response\UploadVideoResponse
      */
     public function uploadVideoChunks($videoFilename, array $uploadParams)
     {
@@ -981,7 +981,7 @@ class HttpInterface
 
         // Manually decode the final API response and check for successful chunked upload.
         $upload = $this->getMappedResponseObject(
-            new UploadVideoResponse(),
+            new Response\UploadVideoResponse(),
             self::api_body_decode($response['body']), // Important: Special JSON decoder.
             true // Forcibly validates that the API response "status" MUST be Ok.
         );
@@ -1004,7 +1004,7 @@ class HttpInterface
      * @throws \InstagramAPI\Exception\InstagramException
      * @throws \InstagramAPI\Exception\UploadFailedException If the upload fails.
      *
-     * @return UploadVideoResponse
+     * @return \InstagramAPI\Response\UploadVideoResponse
      */
     public function uploadVideoData($type, $videoFilename, array $uploadParams, $maxAttempts = 10)
     {
@@ -1039,7 +1039,7 @@ class HttpInterface
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return User
+     * @return \InstagramAPI\Response\Model\User
      */
     public function changeProfilePicture($photoFilename)
     {
@@ -1106,7 +1106,7 @@ class HttpInterface
             [
                 'debugUploadedBody'  => false,
                 'debugUploadedBytes' => true,
-                'decodeToObject'     => new User(),
+                'decodeToObject'     => new Response\Model\User(),
             ]
         );
 
@@ -1126,7 +1126,7 @@ class HttpInterface
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return Response
+     * @return \InstagramAPI\Response
      */
     public function directShare($shareType, $recipients, array $shareData)
     {
@@ -1237,7 +1237,7 @@ class HttpInterface
             [
                 'debugUploadedBody'  => false,
                 'debugUploadedBytes' => true,
-                'decodeToObject'     => new Response(),
+                'decodeToObject'     => new \InstagramAPI\Response(),
             ]
         );
 
