@@ -3,57 +3,99 @@
 namespace InstagramAPI;
 
 /**
- * Automatically creates virtual "getX", "setX" and "isX" functions for all
- * object properties.
+ * Automatic object property handler.
+ *
+ * By deriving from this base object, it will automatically create virtual
+ * "getX()", "setX()" and "isX()" functions for all of your object's properties.
+ *
+ * This class is intended to handle Instagram's server responses, so all of your
+ * object properties must be named the same way as Instagram's standardized var
+ * format, which is "$some_value". That object property can then be magically
+ * accessed via "getSomeValue()", "setSomeValue()" and "isSomeValue()".
+ *
+ * @author SteveJobzniak (https://github.com/SteveJobzniak)
  */
 class AutoPropertyHandler
 {
-    // CALL is invoked when attempting to access missing functions.
-    // This allows us to auto-map setters and getters for properties.
+    /**
+     * __CALL is invoked when attempting to access missing functions.
+     *
+     * This handler auto-maps setters and getters for object properties.
+     *
+     * @param string $functionName Name of the method being called.
+     * @param array  $arguments    Array of arguments passed to the method.
+     *
+     * @throws \Exception If the function type or property name is invalid.
+     *
+     * @return mixed
+     *
+     * @see http://php.net/manual/en/language.oop5.magic.php
+     */
     public function __call(
-        $function,
-        $args)
+        $functionName,
+        $arguments)
     {
-        // Parse the name of the function they tried to call.
-        $underScoreNames = $this->camelCaseToUnderScore($function);
-        if (strpos($underScoreNames, '_') === false) {
-            throw new \Exception("Unknown function {$function}.");
-        }
-        list($functionType, $propName) = explode('_', $underScoreNames, 2);
-
-        // Make sure the requested function corresponds to an object property.
-        if (!property_exists($this, $propName)) {
-            throw new \Exception("Unknown function {$function}.");
+        // Extract the components of the function they tried to call.
+        $chunks = self::explodeCamelCase($functionName);
+        if ($chunks === false || count($chunks) < 2) {
+            throw new \Exception("Unknown function {$functionName}.");
         }
 
-        // Return the kind of response expected by their function.
+        // Determine the type (such as "get") and the property (ie "is_valid").
+        $functionType = array_shift($chunks);
+        $propertyName = implode('_', $chunks);
+
+        // Make sure the requested function has a corresponding object property.
+        if (!property_exists($this, $propertyName)) {
+            throw new \Exception("Unknown function {$functionName}.");
+        }
+
+        // Return the kind of response expected by their desired function.
         switch ($functionType) {
         case 'get':
-            return $this->$propName;
+            return $this->{$propertyName};
             break;
         case 'set':
-            $this->$propName = $args[0];
+            $this->{$propertyName} = $arguments[0];
             break;
         case 'is':
-            return $this->$propName ? true : false;
+            return $this->{$propertyName} ? true : false;
             break;
         default:
-            // Unknown camelcased function call...
-            throw new \Exception("Unknown function {$function}.");
+            // Unknown function type prefix...
+            throw new \Exception("Unknown function {$functionName}.");
         }
     }
 
-    public function camelCaseToUnderScore(
-        $input)
+    /**
+     * Explodes a string on camelcase boundaries.
+     *
+     * Examples:
+     * - "getSome0XThing" => "get", "some0", "x", "thing".
+     * - "getSome0xThing" => "get", "some0x", "thing".
+     *
+     * @param string $inputString
+     *
+     * @return string[]|bool Array with parts if successful, otherwise FALSE.
+     */
+    public static function explodeCamelCase(
+        $inputString)
     {
-        // This is a highly optimized regexp which achieves the matching in very
-        // few regex engine steps and with very high performance. Do not touch!
-        preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
-        $ret = $matches[0];
-        foreach ($ret as &$match) {
-            $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
+        // Split the input into chunks on all camelcase boundaries.
+        // NOTE: The input must be 2+ characters AND have at least one uppercase.
+        $chunks = preg_split('/(?=[A-Z])/', $inputString, -1, PREG_SPLIT_NO_EMPTY);
+        if ($chunks === false) {
+            return false;
         }
 
-        return implode('_', $ret);
+        // Process all individual chunks and make them all completely lowercase.
+        // NOTE: Since all chunks are split on camelcase boundaries above, it
+        // means that each chunk ONLY holds a SINGLE fragment which can ONLY
+        // contain at most a SINGLE capital letter (the chunk's first letter).
+        foreach ($chunks as &$chunk) {
+            $chunk = lcfirst($chunk); // Only first letter may be uppercase.
+        }
+
+        return $chunks;
     }
 }
