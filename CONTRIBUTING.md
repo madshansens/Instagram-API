@@ -2,20 +2,20 @@
 
 A brief guide for contributors.
 
-In order to add endpints to the API you will need to capture the requests first. For this, you can use the proxy you want. You can find a lot of information in internet. Remember that you need to install CA in your device so the proxy can decrypt the requests and show to you.
+In order to add endpoints to the API you will need to capture the requests first. For this, you can use any proxy you want. You can find a lot of information on the internet. Remember that you need to install a root CA in your device so the proxy can decrypt the requests and show them to you.
 
 
 Once you have the endpoint and params, how to add them? Easy, you can follow this example:
 
 ```php
-    public function myExampleEndpint()
+    public function getAwesome()
     {
         return $this->request('awesome/endpoint/')
         ->setSignedPost(false)
         ->addPost('_uuid', $this->uuid)
         ->addPost('user_ids', implode(',', $userList))
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new awesomeResponse());
+        ->getResponse(new Response\AwesomeResponse());
     }
 ```
 
@@ -46,7 +46,7 @@ If the request is a GET request, you can add the params like this:
 And finally, we always add the `getResponse` function, which will read the response and return us an object with all the values:
 
 ```php
-->getResponse(new awesomeResponse());
+->getResponse(new Response\AwesomeResponse());
 ```
 
 Now you might be wondering, how do you create that response class now, but there is nothing to worry about, it's very simple.
@@ -61,25 +61,25 @@ You can use [http://jsoneditoronline.org](http://jsoneditoronline.org/) for bett
 
 <img src="https://s29.postimg.org/3xyopcbg7/insta_help.jpg" width="300">
 
-So `awesomeResponse` class should contain one public var named `items`, JSONMapper needs also a comment to know if its a class, string array, etc, by default, if you dont specify any comment, it will read it as a string.
+So `AwesomeResponse` class should contain one public var named `items`, JSONMapper needs also a comment to know if its a class, string array, etc, by default, if you dont specify any comment, it will read it as a string.
 
 In this scenario:
 
 ```php
     /**
-     * @var Suggestion[]
+     * @var Model\Suggestion[]
      */
     public $items;
  ```
  
- `items` will contain an array of Suggestion object. And `Suggestion` will look like this:
+ `items` will contain an array of Suggestion model objects. And `Suggestion` will look like this:
 
 ```php
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response\Model;
 
-class Suggestion
+class Suggestion extends \InstagramAPI\Response
 {
     public $media_infos;
     public $social_context;
@@ -103,19 +103,19 @@ class Suggestion
 }
 ```
 
-Here in `Suggestion` you see vars that doesnt appear in this request, but many others shares the same object and depending the request, the responses may change.
+Here in `Suggestion` you see vars that doesn't appear in this request, but many others shares the same object and depending the request, the responses may change. Also note that Model objects don't have to use the "Model\" prefix when referring to other model objects, since they are in the same namespace already.
 
-So our `awesomeResponse.php` is like the following code:
+Lastly, our `AwesomeResponse.php` is like the following code:
 
 ```php
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Response;
 
-class awesomeResponse extends Response
+class AwesomeResponse extends \InstagramAPI\Response
 {
     /**
-     * @var Suggestion[]
+     * @var Model\Suggestion[]
      */
     public $items;
 }
@@ -124,7 +124,7 @@ class awesomeResponse extends Response
 Now you can test your new endpoint, in order to see the response object:
 
 ```
-$a = $i->myNewRequest();
+$a = $i->getAwesome();
 var_dump($a); // this will print the response object
 ```
 
