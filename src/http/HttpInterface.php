@@ -5,6 +5,7 @@ namespace InstagramAPI;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\FileCookieJar;
+use InstagramAPI\Exception\ServerMessageThrower;
 
 /**
  * This class handles core API communication and file uploads.
@@ -177,7 +178,7 @@ class HttpInterface
      *
      * This allows custom SettingsAdapters to retrieve all cookies for saving.
      *
-     * @throws \InvalidArgumentException if the JSON cannot be encoded.
+     * @throws \InvalidArgumentException If the JSON cannot be encoded.
      *
      * @return string
      */
@@ -337,13 +338,15 @@ class HttpInterface
      *
      * Remember to ALWAYS call this function at the top of any API request that
      * requires the user to be logged in!
+     *
+     * @throws \InstagramAPI\Exception\LoginRequiredException
      */
     protected function _throwIfNotLoggedIn()
     {
         // Check the cached login state. May not reflect what will happen on the
         // server. But it's the best we can check without trying the actual request!
         if (!$this->_parent->isLoggedIn) {
-            throw new InstagramException('User not logged in. Please call login() and then try again.', ErrorCode::INTERNAL_LOGIN_REQUIRED);
+            throw new \InstagramAPI\Exception\LoginRequiredException('User not logged in. Please call login() and then try again.');
         }
     }
 
@@ -360,14 +363,15 @@ class HttpInterface
      *                            NULL to automatically use $response. That's
      *                            almost always what you want to do!
      *
-     * @throws InstagramException in case of invalid or failed API response.
+     * @throws \InstagramAPI\Exception\InstagramException In case of invalid or
+     *                                                    failed API response.
      *
      * @return mixed
      */
     public function getMappedResponseObject($baseClass, $response, $checkOk = true, $fullResponse = null)
     {
         if (is_null($response)) {
-            throw new InstagramException('No response from server. Either a connection or configuration error.', ErrorCode::EMPTY_RESPONSE);
+            throw new \InstagramAPI\Exception\EmptyResponseException('No response from server. Either a connection or configuration error.');
         }
 
         // Perform mapping.
@@ -381,7 +385,7 @@ class HttpInterface
 
         // Check if the API response was successful.
         if ($checkOk && !$responseObject->isOk()) {
-            throw new InstagramException(get_class($baseClass).': '.$responseObject->getMessage());
+            ServerMessageThrower::throw(get_class($baseClass), $responseObject->getMessage());
         }
 
         // Save the raw response object as the "getFullResponse()" value.
@@ -450,9 +454,8 @@ class HttpInterface
      * @param string $uri           Full URI string.
      * @param array  $guzzleOptions Request options to apply.
      *
-     * @throws \GuzzleHttp\Exception\GuzzleException for any socket related errors.
-     * @throws InstagramException                    with code IG_API_THROTTLED
-     *                                               when throttled by Instagram.
+     * @throws \GuzzleHttp\Exception\GuzzleException      For any socket related errors.
+     * @throws \InstagramAPI\Exception\ThrottledException When we're throttled by server.
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
@@ -468,7 +471,7 @@ class HttpInterface
         $httpCode = $response->getStatusCode();
         switch ($httpCode) {
         case 429: // "429 Too Many Requests"
-            throw new InstagramException('Throttled by Instagram because of too many API requests.', ErrorCode::IG_API_THROTTLED);
+            throw new \InstagramAPI\Exception\ThrottledException('Throttled by Instagram because of too many API requests.');
             break;
         // NOTE: Detecting "404" errors was intended to help us detect when API
         // endpoints change. But it turns out that A) Instagram uses "valid" 404
@@ -480,7 +483,7 @@ class HttpInterface
         // pointless and harmful. This is a warning to future contributors!
         // ---
         // case 404: // "404 Not Found"
-        //     throw new InstagramException("The requested URL was not found (\"{$uri}\").", ErrorCode::INTERNAL_HTTP_NOTFOUND);
+        //     die("The requested URL was not found (\"{$uri}\").");
         //     break;
         }
 
@@ -524,12 +527,14 @@ class HttpInterface
      * @param array  $libraryOptions Additional options for controlling Library features
      *                               such as the debugging output and response decoding.
      *
-     * @throws \GuzzleHttp\Exception\GuzzleException for any socket related errors.
-     * @throws InstagramException                    with code IG_API_THROTTLED
-     *                                               when throttled by Instagram.
-     * @throws InstagramException                    when "decodeToObject" is used,
-     *                                               if the API response is marked
-     *                                               as failed, or class decode fails.
+     * @throws \GuzzleHttp\Exception\GuzzleException      For any socket related errors.
+     * @throws \InstagramAPI\Exception\ThrottledException When we're throttled by server.
+     * @throws \InstagramAPI\Exception\InstagramException When "decodeToObject"
+     *                                                    was requested and the
+     *                                                    API response was
+     *                                                    invalid or failed or
+     *                                                    class decode failed.
+     * @throws \InvalidArgumentException                  If no object provided.
      *
      * @return array An array with the Guzzle "response" object, and the raw
      *               non-decoded HTTP "body" of the request, and the "object" if
@@ -577,7 +582,7 @@ class HttpInterface
         // Perform optional API response decoding and success validation.
         if (isset($libraryOptions['decodeToObject']) && $libraryOptions['decodeToObject'] !== false) {
             if (!is_object($libraryOptions['decodeToObject'])) {
-                throw new InstagramException('Object decoding requested, but no object instance provided.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
+                throw new \InvalidArgumentException('Object decoding requested, but no object instance provided.');
             }
 
             // Check for API response success and attempt to decode it to the desired class.
@@ -601,7 +606,7 @@ class HttpInterface
      * @param bool       $assoc     Whether to decode to associative array,
      *                              otherwise we decode to object.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return mixed An object or associative array.
      */
@@ -673,7 +678,8 @@ class HttpInterface
      *                              In case of videofile we'll generate a thumbnail from it.
      * @param null   $upload_id     Custom upload ID if wanted. Otherwise autogenerated.
      *
-     * @throws InstagramException
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return UploadPhotoResponse
      */
@@ -685,7 +691,7 @@ class HttpInterface
 
         // Verify that the file exists locally.
         if (!is_file($photoFilename)) {
-            throw new InstagramException(sprintf('The photo file "%s" does not exist on disk.', $photoFilename), ErrorCode::INTERNAL_INVALID_ARGUMENT);
+            throw new \InvalidArgumentException(sprintf('The photo file "%s" does not exist on disk.', $photoFilename));
         }
 
         // Determine which file contents to upload.
@@ -703,7 +709,6 @@ class HttpInterface
 
         // Prepare payload for the upload request.
         $boundary = $this->_parent->uuid;
-        //$helper = new AdaptImage(); // <-- WTF? Old leftover code.
         $bodies = [
             [
                 'type' => 'form-data',
@@ -787,7 +792,7 @@ class HttpInterface
      *
      * @param string $upload_id ID to use, or NULL to generate a brand new ID.
      *
-     * @throws InstagramException if the request fails.
+     * @throws \InstagramAPI\Exception\InstagramException If the request fails.
      *
      * @return array
      */
@@ -869,7 +874,9 @@ class HttpInterface
      * @param string $videoFilename The video filename.
      * @param array  $uploadParams  An array created by requestVideoUploadURL()!
      *
-     * @throws InstagramException if the upload fails.
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException If the upload fails.
      *
      * @return UploadVideoResponse
      */
@@ -879,7 +886,7 @@ class HttpInterface
 
         // Verify that the file exists locally.
         if (!is_file($videoFilename)) {
-            throw new InstagramException(sprintf('The video file "%s" does not exist on disk.', $videoFilename), ErrorCode::INTERNAL_INVALID_ARGUMENT);
+            throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
         }
 
         // Determine correct file extension for video format.
@@ -969,7 +976,7 @@ class HttpInterface
         // instead of a "{...}" JSON object. Because their server will have
         // dropped all earlier chunks when they bug out (due to overload or w/e).
         if (substr($response['body'], 0, 1) !== '{') {
-            throw new InstagramException("Upload of \"{$videoFilename}\" failed. Instagram's server returned an unexpected reply and is probably overloaded.", ErrorCode::INTERNAL_UPLOAD_FAILED);
+            throw new \InstagramAPI\Exception\UploadFailedException(sprintf("Upload of \"%s\" failed. Instagram's server returned an unexpected reply and is probably overloaded.", $videoFilename));
         }
 
         // Manually decode the final API response and check for successful chunked upload.
@@ -993,7 +1000,9 @@ class HttpInterface
      * @param array  $uploadParams  An array created by requestVideoUploadURL()!
      * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
      *
-     * @throws InstagramException if the upload fails.
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException If the upload fails.
      *
      * @return UploadVideoResponse
      */
@@ -1003,7 +1012,7 @@ class HttpInterface
 
         // Verify that the file exists locally.
         if (!is_file($videoFilename)) {
-            throw new InstagramException(sprintf('The video file "%s" does not exist on disk.', $videoFilename), ErrorCode::INTERNAL_INVALID_ARGUMENT);
+            throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
         }
 
         // Upload the entire video file, with retries in case of chunk upload errors.
@@ -1011,11 +1020,11 @@ class HttpInterface
             try {
                 // Attempt an upload and return the result if successful.
                 return $this->uploadVideoChunks($videoFilename, $uploadParams);
-            } catch (InstagramException $e) {
-                if ($attempt < $maxAttempts && $e->getCode() == ErrorCode::INTERNAL_UPLOAD_FAILED) {
+            } catch (\InstagramAPI\Exception\UploadFailedException $e) {
+                if ($attempt < $maxAttempts) {
                     // Do nothing, since we'll be retrying the failed upload...
                 } else {
-                    // Re-throw all unhandled exceptions.
+                    // Re-throw unhandled exception.
                     throw $e;
                 }
             }
@@ -1027,7 +1036,8 @@ class HttpInterface
      *
      * @param string $photoFilename The photo filename.
      *
-     * @throws InstagramException
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return User
      */
@@ -1039,7 +1049,7 @@ class HttpInterface
 
         // Verify that the file exists locally.
         if (!is_file($photoFilename)) {
-            throw new InstagramException(sprintf('The photo file "%s" does not exist on disk.', $photoFilename), ErrorCode::INTERNAL_INVALID_ARGUMENT);
+            throw new \InvalidArgumentException(sprintf('The photo file "%s" does not exist on disk.', $photoFilename));
         }
 
         // Prepare payload for the upload request.
@@ -1113,7 +1123,8 @@ class HttpInterface
      *                                    "text" and "media_id". "message" uses
      *                                    "text". "photo" uses "text" and "filepath".
      *
-     * @throws InstagramException
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return Response
      */
@@ -1127,23 +1138,23 @@ class HttpInterface
             $endpoint = 'direct_v2/threads/broadcast/media_share/?media_type=photo';
             if ((!isset($shareData['text']) || is_null($shareData['text']))
                 && (!isset($shareData['media_id']) || is_null($shareData['media_id']))) {
-                throw new InstagramException('You must provide either a text message or a media id.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
+                throw new \InvalidArgumentException('You must provide either a text message or a media id.');
             }
             break;
         case 'message':
             $endpoint = 'direct_v2/threads/broadcast/text/';
             if (!isset($shareData['text']) || is_null($shareData['text'])) {
-                throw new InstagramException('No text message provided.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
+                throw new \InvalidArgumentException('No text message provided.');
             }
             break;
         case 'photo':
             $endpoint = 'direct_v2/threads/broadcast/upload_photo/';
             if (!isset($shareData['filepath']) || is_null($shareData['filepath'])) {
-                throw new InstagramException('No photo path provided.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
+                throw new \InvalidArgumentException('No photo path provided.');
             }
             break;
         default:
-            throw new InstagramException('Invalid shareType parameter value.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
+            throw new \InvalidArgumentException('Invalid shareType parameter value.');
         }
 
         // Build the list of direct-share recipients.

@@ -128,7 +128,7 @@ class Instagram
      * @param bool $truncatedDebug  Truncate long responses.
      * @param null $settingsAdapter How to store session settings.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      */
     public function __construct($debug = false, $truncatedDebug = false, $settingsAdapter = null)
     {
@@ -164,7 +164,7 @@ class Instagram
      * @param string $username Your Instagram username.
      * @param string $password Your Instagram password.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      */
     public function setUser($username, $password)
     {
@@ -322,7 +322,8 @@ class Instagram
      *                                 The shorter your delay is the BETTER. You may even want to
      *                                 set it to an even LOWER value than the default 30 minutes!
      *
-     * @throws InstagramException
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return ExploreResponse
      */
@@ -374,15 +375,10 @@ class Instagram
         // This also lets us detect if we're still logged in with a valid session.
         try {
             $this->getTimelineFeed();
-        } catch (InstagramException $e) {
+        } catch (\InstagramAPI\Exception\LoginRequiredException $e) {
             // If our session cookies are expired, we were now told to login,
             // so handle that by running a forced relogin in that case!
-            if ($e->getCode() == ErrorCode::IG_LOGIN_REQUIRED) {
-                return $this->login(true, $appRefreshInterval);
-            }
-
-            // Simply re-throw the original exception in all other error cases.
-            throw $e;
+            return $this->login(true, $appRefreshInterval);
         }
 
         // SUPER IMPORTANT:
@@ -405,7 +401,7 @@ class Instagram
         //
         // You have been warned.
         if ($appRefreshInterval > 21600) {
-            throw new InstagramException("Instagram's app state refresh interval is NOT allowed to be higher than 6 hours, and the lower the better!", ErrorCode::INTERNAL_INVALID_ARGUMENT);
+            throw new \InvalidArgumentException("Instagram's app state refresh interval is NOT allowed to be higher than 6 hours, and the lower the better!");
         }
         $lastLoginTime = $this->settings->get('last_login');
         if (is_null($lastLoginTime) || (time() - $lastLoginTime) > $appRefreshInterval) {
@@ -428,7 +424,7 @@ class Instagram
     /**
      * Log out of Instagram.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return LogoutResponse
      */
@@ -442,7 +438,7 @@ class Instagram
      *
      * @param bool $prelogin
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return SyncResponse
      */
@@ -468,7 +464,7 @@ class Instagram
     /**
      * Retrieve list of all friends.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return AutoCompleteUserListResponse|null Will be NULL if throttled by Instagram.
      */
@@ -482,14 +478,9 @@ class Instagram
             ->addParams('version', '2');
 
             return $request->getResponse(new AutoCompleteUserListResponse());
-        } catch (InstagramException $e) {
+        } catch (\InstagramAPI\Exception\ThrottledException $e) {
             // Throttling is so common that we'll simply return NULL in that case.
-            if ($e->getCode() == ErrorCode::IG_API_THROTTLED) {
-                return;
-            }
-
-            // Simply re-throw the original exception in all other error cases.
-            throw $e;
+            return;
         }
     }
 
@@ -500,7 +491,7 @@ class Instagram
      *
      * @param $gcmToken
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return mixed
      */
@@ -531,7 +522,7 @@ class Instagram
      *
      * @param null|string $maxId Next "maximum ID", used for pagination.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return TimelineFeedResponse
      */
@@ -552,7 +543,7 @@ class Instagram
      *
      * @param $day
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return InsightsResponse
      */
@@ -573,7 +564,7 @@ class Instagram
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return MediaInsightsResponse
      */
@@ -589,7 +580,7 @@ class Instagram
     /**
      * Get megaphone log.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return MegaphoneLogResponse
      */
@@ -610,7 +601,7 @@ class Instagram
     /**
      * Get pending inbox data.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return PendingInboxResponse
      */
@@ -622,7 +613,7 @@ class Instagram
     /**
      * Get ranked list of recipients.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return RankedRecipientsResponse
      */
@@ -636,7 +627,7 @@ class Instagram
     /**
      * Get recent recipients.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return RecentRecipientsResponse
      */
@@ -649,7 +640,7 @@ class Instagram
     /**
      * Get Explore tab data.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return ExploreResponse
      */
@@ -661,7 +652,7 @@ class Instagram
     /**
      * Get Home channel data.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return DiscoverChannelsResponse
      */
@@ -673,7 +664,7 @@ class Instagram
     /**
      * Expose.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return ExposeResponse
      */
@@ -698,7 +689,8 @@ class Instagram
      * @param null   $location      Location (only used for "timeline" photos).
      * @param null   $filter        Photo filter.
      *
-     * @throws InstagramException
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return ConfigureResponse
      */
@@ -706,7 +698,7 @@ class Instagram
     {
         // Make sure we don't allow "album" photo uploads via this function.
         if ($type != 'timeline' && $type != 'story') {
-            throw new InstagramException(sprintf('Unsupported photo upload type "%s".', $type), ErrorCode::INTERNAL_INVALID_ARGUMENT);
+            throw new \InvalidArgumentException(sprintf('Unsupported photo upload type "%s".', $type));
         }
 
         // Perform the upload and then configure it for our timeline/story.
@@ -724,7 +716,8 @@ class Instagram
      * @param null   $location      Location where photo was taken.
      * @param null   $filter        Photo filter.
      *
-     * @throws InstagramException
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return ConfigureResponse
      */
@@ -740,7 +733,8 @@ class Instagram
      * @param string $captionText   Caption to display over the story photo.
      * @param null   $filter        Photo filter.
      *
-     * @throws InstagramException
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return ConfigureResponse
      */
@@ -762,7 +756,9 @@ class Instagram
      *                                (only used for "story" videos!).
      * @param int      $maxAttempts   Total attempts to upload all chunks before throwing.
      *
-     * @throws InstagramException
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
      *
      * @return ConfigureVideoResponse
      */
@@ -770,7 +766,7 @@ class Instagram
     {
         // Make sure we don't allow "album" video uploads via this function.
         if ($type != 'timeline' && $type != 'story') {
-            throw new InstagramException(sprintf('Unsupported video upload type "%s".', $type), ErrorCode::INTERNAL_INVALID_ARGUMENT);
+            throw new \InvalidArgumentException(sprintf('Unsupported video upload type "%s".', $type));
         }
 
         // Request parameters for uploading a new video.
@@ -801,7 +797,9 @@ class Instagram
      *                              If nothing provided, we generate from video.
      * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
      *
-     * @throws InstagramException
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
      *
      * @return ConfigureVideoResponse
      */
@@ -820,7 +818,9 @@ class Instagram
      * @param string[] $userTags      Array of UserPK IDs of people tagged in your video.
      * @param int      $maxAttempts   Total attempts to upload all chunks before throwing.
      *
-     * @throws InstagramException
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
      *
      * @return ConfigureVideoResponse
      */
@@ -841,20 +841,22 @@ class Instagram
      * @param null  $location    Geotag
      * @param null  $filter
      *
-     * @throws InstagramException
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
      *
      * @return ConfigureResponse
      */
     public function uploadTimelineAlbum($media, $captionText = null, $location = null, $filter = null)
     {
         if (empty($media)) {
-            throw new InstagramException("List of media to upload can't be empty.", ErrorCode::INTERNAL_INVALID_ARGUMENT);
+            throw new \InvalidArgumentException("List of media to upload can't be empty.");
         }
 
         $hasUploadedVideo = false;
         foreach ($media as $key => $item) {
             if (!file_exists($item['file'])) {
-                throw new InstagramException(sprintf('File "%s" does not exist.', $item['file']), ErrorCode::INTERNAL_INVALID_ARGUMENT);
+                throw new \InvalidArgumentException(sprintf('File "%s" does not exist.', $item['file']));
             }
 
             switch ($item['type']) {
@@ -884,7 +886,7 @@ class Instagram
                 // We don't call configure! Album videos are configured below instead.
                 break;
             default:
-                throw new InstagramException(sprintf('Unsupported album media type "%s".', $item['type']), ErrorCode::INTERNAL_INVALID_ARGUMENT);
+                throw new \InvalidArgumentException(sprintf('Unsupported album media type "%s".', $item['type']));
             }
         }
 
@@ -963,7 +965,7 @@ class Instagram
      * @param string    $mediaId    The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param string    $text       Text message.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return Response
      */
@@ -985,7 +987,7 @@ class Instagram
      * @param array|int $recipients One or more numeric user IDs.
      * @param string    $text       Text message.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return Response
      */
@@ -1007,7 +1009,7 @@ class Instagram
      * @param string    $photoFilename The photo filename.
      * @param string    $text          Text message.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return Response
      */
@@ -1029,7 +1031,7 @@ class Instagram
      * @param string      $threadId Thread ID.
      * @param string|null $cursorId
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return DirectThreadResponse
      */
@@ -1049,7 +1051,7 @@ class Instagram
      * @param string $threadId     Thread ID.
      * @param string $threadAction Action ("approve", "decline" or "block").
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return array Direct thread action server response.
      */
@@ -1080,7 +1082,7 @@ class Instagram
      *                              (only used for "story" videos!).
      * @param int      $maxAttempts Total attempts to configure video before throwing.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return ConfigureVideoResponse
      *
@@ -1094,7 +1096,7 @@ class Instagram
                 $configure = $this->configureVideo($type, $upload_id, $captionText, $userTags);
                 //$this->expose(); // <-- WTF? Old leftover code.
                 break; // Success. Exit loop.
-            } catch (InstagramException $e) {
+            } catch (\InstagramAPI\Exception\InstagramException $e) {
                 if ($attempt < $maxAttempts && strpos($e->getMessage(), 'Transcode timeout') !== false) {
                     // Do nothing, since we'll be retrying the failed configure...
                     sleep(1); // Just wait a little before the next retry.
@@ -1118,7 +1120,8 @@ class Instagram
      * @param string[] $userTags    Array of UserPK IDs of people tagged in your video.
      *                              (only used for "story" videos!).
      *
-     * @throws InstagramException
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return ConfigureVideoResponse
      */
@@ -1133,7 +1136,7 @@ class Instagram
             $endpoint = 'media/configure_to_story/';
             break;
         default:
-            throw new InstagramException('Invalid video configuration type.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
+            throw new \InvalidArgumentException('Invalid video configuration type.');
         }
 
         $requestData = $this->request($endpoint)
@@ -1194,7 +1197,7 @@ class Instagram
      * @param null   $location
      * @param null   $filter
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return ConfigureResponse
      */
@@ -1278,7 +1281,7 @@ class Instagram
      * @param string   $captionText Caption text.
      * @param string[] $userTags    Array of UserPK IDs of people tagged in your media.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return EditMediaResponse
      */
@@ -1310,7 +1313,7 @@ class Instagram
      * @param array|float $position    Position relative to image where the tag should sit. Example: [0.4890625,0.6140625]
      * @param string      $captionText Caption text.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return EditMediaResponse
      */
@@ -1328,7 +1331,7 @@ class Instagram
      * @param string $userId      Numerical UserPK ID.
      * @param string $captionText Caption text.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return EditMediaResponse
      */
@@ -1344,7 +1347,7 @@ class Instagram
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return SaveAndUnsaveMedia
      */
@@ -1363,7 +1366,7 @@ class Instagram
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return SaveAndUnsaveMedia
      */
@@ -1380,7 +1383,7 @@ class Instagram
     /**
      * Get saved media items feed.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return SavedFeedResponse
      */
@@ -1399,7 +1402,7 @@ class Instagram
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return MediaResponse
      */
@@ -1417,7 +1420,7 @@ class Instagram
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return MediaInfoResponse
      */
@@ -1436,7 +1439,7 @@ class Instagram
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return MediaDeleteResponse
      */
@@ -1455,7 +1458,7 @@ class Instagram
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return Response
      */
@@ -1473,7 +1476,7 @@ class Instagram
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return Response
      */
@@ -1492,7 +1495,7 @@ class Instagram
      * @param string $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param string $commentText Your comment text.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return CommentResponse
      */
@@ -1515,7 +1518,7 @@ class Instagram
      * @param string $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param string $commentId The comment's ID.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return DeleteCommentResponse
      */
@@ -1534,7 +1537,7 @@ class Instagram
      * @param string $mediaId    The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param string $commentIds List of comment IDs to delete.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return DeleteCommentResponse
      */
@@ -1564,7 +1567,7 @@ class Instagram
      *
      * @param string $commentId The comment's ID.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return CommentLikeUnlikeResponse
      */
@@ -1582,7 +1585,7 @@ class Instagram
      *
      * @param string $commentId The comment's ID.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return CommentLikeUnlikeResponse
      */
@@ -1600,7 +1603,7 @@ class Instagram
      *
      * @param string $photoFilename The photo filename.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return User
      */
@@ -1612,7 +1615,7 @@ class Instagram
     /**
      * Remove your account's profile picture.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return UsernameInfoResponse
      */
@@ -1628,7 +1631,7 @@ class Instagram
     /**
      * Sets your account to private.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return UsernameInfoResponse
      */
@@ -1644,7 +1647,7 @@ class Instagram
     /**
      * Sets your account to public.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return UsernameInfoResponse
      */
@@ -1660,7 +1663,7 @@ class Instagram
     /**
      * Get details about the currently logged in account.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return UsernameInfoResponse
      */
@@ -1684,7 +1687,7 @@ class Instagram
      * @param string $email     Email. Required.
      * @param int    $gender    Gender. Male = 1, Female = 2, Unknown = 3.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return UsernameInfoResponse
      */
@@ -1710,7 +1713,7 @@ class Instagram
      * @param string $oldPassword Old password.
      * @param string $newPassword New password.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return ChangePasswordResponse
      */
@@ -1729,7 +1732,7 @@ class Instagram
     /**
      * Get recent activity.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return ActivityNewsResponse
      */
@@ -1743,7 +1746,7 @@ class Instagram
      *
      * @param null|string $maxId Next "maximum ID", used for pagination.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return FollowingRecentActivityResponse
      */
@@ -1762,7 +1765,7 @@ class Instagram
      *
      * @param string|null $cursorId
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return V2InboxResponse
      */
@@ -1783,7 +1786,7 @@ class Instagram
      * @param null|string $maxId        Next "maximum ID", used for pagination.
      * @param null|int    $minTimestamp Minimum timestamp.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return UsertagsResponse
      */
@@ -1800,7 +1803,7 @@ class Instagram
     /**
      * Get user taggings for your own account.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return UsertagsResponse
      */
@@ -1814,7 +1817,7 @@ class Instagram
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return MediaLikersResponse
      */
@@ -1828,7 +1831,7 @@ class Instagram
      *
      * @param string $query
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return FBSearchResponse
      */
@@ -1846,7 +1849,7 @@ class Instagram
      *
      * @param string $query
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return SearchUserResponse
      */
@@ -1865,7 +1868,7 @@ class Instagram
      *
      * @param array $contacts
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return AddressBookResponse
      */
@@ -1882,7 +1885,7 @@ class Instagram
      *
      * @param string $username Username as string (NOT as a numerical ID).
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return UsernameInfoResponse
      */
@@ -1896,7 +1899,7 @@ class Instagram
      *
      * @param string $userId Numerical UserPK ID.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return UsernameInfoResponse
      */
@@ -1910,7 +1913,7 @@ class Instagram
      *
      * Also try getCurrentUser() instead, for even more details.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return UsernameInfoResponse
      *
@@ -1929,7 +1932,7 @@ class Instagram
      *
      * @param string $username Username as string (NOT as a numerical ID).
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return string Their UserPK ID.
      *
@@ -1945,7 +1948,7 @@ class Instagram
      *
      * @param string $tag
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return TagRelatedResponse
      */
@@ -1962,7 +1965,7 @@ class Instagram
      *
      * @param string $tag
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return TagInfoResponse
      */
@@ -1979,7 +1982,7 @@ class Instagram
      * still have stories. So it's always safer to call getUserStoryFeed() if
      * a specific user's story feed matters to you.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return ReelsTrayFeedResponse
      *
@@ -1999,7 +2002,7 @@ class Instagram
      *
      * @param string $userId Numerical UserPK ID.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return Reel
      *
@@ -2020,7 +2023,7 @@ class Instagram
      *
      * @param string $userId Numerical UserPK ID.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return UserStoryFeedResponse
      *
@@ -2037,7 +2040,7 @@ class Instagram
      *
      * @param string|string[] $userList List of numerical UserPK IDs.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return ReelsMediaResponse
      */
@@ -2065,7 +2068,7 @@ class Instagram
      * @param null|string $maxId        Next "maximum ID", used for pagination.
      * @param null|int    $minTimestamp Minimum timestamp.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return UserFeedResponse
      */
@@ -2085,7 +2088,7 @@ class Instagram
      * @param null|string $maxId        Next "maximum ID", used for pagination.
      * @param null|int    $minTimestamp Minimum timestamp.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return UserFeedResponse
      */
@@ -2102,7 +2105,7 @@ class Instagram
      *
      * @param string $userId Numerical UserPK ID.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return GeoMediaResponse
      *
@@ -2116,7 +2119,7 @@ class Instagram
     /**
      * Get location based media feed for your own account.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return GeoMediaResponse
      */
@@ -2132,7 +2135,7 @@ class Instagram
      * @param $longitude
      * @param null $query
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return LocationResponse
      */
@@ -2158,7 +2161,7 @@ class Instagram
      * @param string $query
      * @param int    $count (optional) Facebook will return up to this many results.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return FBLocationResponse
      */
@@ -2181,7 +2184,7 @@ class Instagram
      * @param string $lat Latitude.
      * @param string $lng Longitude.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return FBLocationResponse
      */
@@ -2200,7 +2203,7 @@ class Instagram
      * @param string      $locationId
      * @param null|string $maxId      Next "maximum ID", used for pagination.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return LocationFeedResponse
      */
@@ -2217,7 +2220,7 @@ class Instagram
     /**
      * Get popular feed.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return PopularFeedResponse
      */
@@ -2236,7 +2239,7 @@ class Instagram
      * @param string      $hashtagString Hashtag string, not including the "#".
      * @param null|string $maxId         Next "maximum ID", used for pagination.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return TagFeedResponse
      */
@@ -2256,7 +2259,7 @@ class Instagram
      * @param string      $userId Numerical UserPK ID.
      * @param null|string $maxId  Next "maximum ID", used for pagination.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return FollowerAndFollowingResponse
      */
@@ -2277,7 +2280,7 @@ class Instagram
      * @param string      $userId Numerical UserPK ID.
      * @param null|string $maxId  Next "maximum ID", used for pagination.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return FollowerAndFollowingResponse
      */
@@ -2297,7 +2300,7 @@ class Instagram
      *
      * @param null|string $maxId Next "maximum ID", used for pagination.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return FollowerAndFollowingResponse
      */
@@ -2311,7 +2314,7 @@ class Instagram
      *
      * @param null|string $maxId Next "maximum ID", used for pagination.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return FollowerAndFollowingResponse
      */
@@ -2325,7 +2328,7 @@ class Instagram
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return Response
      */
@@ -2344,7 +2347,7 @@ class Instagram
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return Response
      */
@@ -2364,7 +2367,7 @@ class Instagram
      * @param string      $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param null|string $maxId   Next "maximum ID", used for pagination.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return MediaCommentsResponse
      */
@@ -2382,7 +2385,7 @@ class Instagram
      * @param string $name  Your first name.
      * @param string $phone Your phone number (optional).
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return Response
      */
@@ -2401,7 +2404,7 @@ class Instagram
     /**
      * Get direct share inbox.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return DirectShareInboxResponse
      */
@@ -2418,7 +2421,7 @@ class Instagram
      *                               Uses "backups/" path in lib dir if null.
      * @param bool   $printProgress  (optional) Toggles terminal output.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      */
     public function backup($baseOutputPath = null, $printProgress = true)
     {
@@ -2459,7 +2462,7 @@ class Instagram
      *
      * @param string $userId Numerical UserPK ID.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return FriendshipResponse
      */
@@ -2478,7 +2481,7 @@ class Instagram
      *
      * @param string $userId Numerical UserPK ID.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return FriendshipResponse
      */
@@ -2497,7 +2500,7 @@ class Instagram
      *
      * @param string $userId Numerical UserPK ID.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return SuggestedUsersResponse
      */
@@ -2513,7 +2516,7 @@ class Instagram
      *
      * @param string $userId Numerical UserPK ID.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return FriendshipResponse
      */
@@ -2532,7 +2535,7 @@ class Instagram
      *
      * @param string $userId Numerical UserPK ID.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return FriendshipResponse
      */
@@ -2551,7 +2554,7 @@ class Instagram
      *
      * @param string $userId Numerical UserPK ID.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return FriendshipStatus
      */
@@ -2565,7 +2568,7 @@ class Instagram
      *
      * @param string|string[] $userList List of numerical UserPK IDs.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return FriendshipsShowManyResponse
      */
@@ -2588,7 +2591,7 @@ class Instagram
      *
      * @param null|string $maxId Next "maximum ID", used for pagination.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return LikeFeedResponse
      */
@@ -2603,7 +2606,7 @@ class Instagram
      *
      * @param string $query
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return SearchTagResponse
      */

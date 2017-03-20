@@ -19,13 +19,13 @@ $i->setUser($username, $password);
 
 try {
     $i->login();
-} catch (Exception $e) {
+} catch (\Exception $e) {
     $e->getMessage();
     exit();
 }
 
 try {
     $i->uploadTimelinePhoto($photo, $caption);
-} catch (Exception $e) {
+} catch (\Exception $e) {
     echo $e->getMessage();
 }

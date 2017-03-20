@@ -87,11 +87,13 @@ class SettingsFile
      *
      * @param string $key   Name of setting.
      * @param string $value The data to store. Must be castable to string.
+     *
+     * @throws \InvalidArgumentException
      */
     public function set($key, $value)
     {
         if ($key == 'sets') {
-            throw new InstagramException('You are not allowed to write to the special "sets" key.', ErrorCode::INTERNAL_INVALID_ARGUMENT);
+            throw new \InvalidArgumentException('You are not allowed to write to the special "sets" key.');
         }
 
         // Cast the value to a string to ensure we don't try writing objects.
@@ -195,7 +197,7 @@ class SettingsFile
     /**
      * Checks whether we can write to the settings folder.
      *
-     * @throws InstagramException
+     * @throws \InstagramAPI\Exception\SettingsException
      *
      * @return bool
      */
@@ -210,6 +212,6 @@ class SettingsFile
             return true;
         }
 
-        throw new InstagramException('The settings folder is not writable.', ErrorCode::INTERNAL_SETTINGS_ERROR);
+        throw new \InstagramAPI\Exception\SettingsException('The settings folder is not writable.');
     }
 }

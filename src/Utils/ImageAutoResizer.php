@@ -128,6 +128,8 @@ class ImageAutoResizer
      *                                    self::MAX_RATIO if not set.
      * @param string|null $tmpPath        Path to temp directory, uses system
      *                                    temp location if not set.
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(
         $inputFile,
@@ -242,7 +244,7 @@ class ImageAutoResizer
     /**
      * Checks whether we should process the input file.
      *
-     * @throws \Exception
+     * @throws \RuntimeException
      *
      * @return bool
      */
@@ -250,7 +252,7 @@ class ImageAutoResizer
     {
         $info = @getimagesize($this->_inputFile);
         if ($info === false) {
-            throw new \Exception(sprintf('File "%s" is not an image.', $this->_inputFile));
+            throw new \RuntimeException(sprintf('File "%s" is not an image.', $this->_inputFile));
         }
 
         // Get basic image info.
@@ -327,7 +329,7 @@ class ImageAutoResizer
      * @param int      $bgColor
      * @param int|null $flip
      *
-     * @throws \Exception
+     * @throws \RuntimeException
      *
      * @return resource
      */
@@ -340,7 +342,7 @@ class ImageAutoResizer
         // Flip the image resource if needed. Does not create a new resource.
         if ($flip !== null) {
             if (imageflip($original, $flip) === false) {
-                throw new \Exception('Failed to flip image.');
+                throw new \RuntimeException('Failed to flip image.');
             }
         }
 
@@ -352,7 +354,7 @@ class ImageAutoResizer
         // Attempt to create a new, rotated image resource.
         $result = imagerotate($original, $angle, $bgColor);
         if ($result === false) {
-            throw new \Exception('Failed to rotate image.');
+            throw new \RuntimeException('Failed to rotate image.');
         }
 
         // Destroy the original resource since we'll return the new resource.
@@ -370,7 +372,7 @@ class ImageAutoResizer
      * @param int      $dst_w
      * @param int      $dst_h
      *
-     * @throws \Exception
+     * @throws \RuntimeException
      */
     protected function _cropAndResize(
         $source,
@@ -383,7 +385,7 @@ class ImageAutoResizer
     {
         $output = imagecreatetruecolor($dst_w, $dst_h);
         if ($output === false) {
-            throw new \Exception('Failed to create output image.');
+            throw new \RuntimeException('Failed to create output image.');
         }
         try {
             // Create an output canvas with a white background.
@@ -391,15 +393,15 @@ class ImageAutoResizer
             // resulting JPG if a transparent image was used as input.
             $white = imagecolorallocate($output, 255, 255, 255);
             if ($white === false) {
-                throw new \Exception('Failed to allocate color.');
+                throw new \RuntimeException('Failed to allocate color.');
             }
             if (imagefilledrectangle($output, 0, 0, $dst_w - 1, $dst_h - 1, $white) === false) {
-                throw new \Exception('Failed to fill image with default color.');
+                throw new \RuntimeException('Failed to fill image with default color.');
             }
 
             // Copy the resized (and resampled) image onto the new canvas.
             if (imagecopyresampled($output, $source, 0, 0, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h) === false) {
-                throw new \Exception('Failed to resample image.');
+                throw new \RuntimeException('Failed to resample image.');
             }
 
             // Handle image rotation.
@@ -432,7 +434,7 @@ class ImageAutoResizer
             try {
                 $tempFile = $this->_makeTempFile();
                 if (imagejpeg($output, $tempFile, self::JPEG_QUALITY) === false) {
-                    throw new \Exception('Failed to create JPEG image file.');
+                    throw new \RuntimeException('Failed to create JPEG image file.');
                 }
                 $this->_outputFile = $tempFile;
             } catch (\Exception $e) {
@@ -450,7 +452,7 @@ class ImageAutoResizer
     /**
      * @param resource $resource
      *
-     * @throws \Exception
+     * @throws \RuntimeException
      */
     protected function _processResource(
         $resource)
@@ -537,7 +539,7 @@ class ImageAutoResizer
     }
 
     /**
-     * @throws \Exception
+     * @throws \RuntimeException
      */
     protected function _process()
     {
@@ -553,10 +555,10 @@ class ImageAutoResizer
                 $resource = imagecreatefromgif($this->_inputFile);
                 break;
             default:
-                throw new \Exception('Unsupported image type.');
+                throw new \RuntimeException('Unsupported image type.');
         }
         if ($resource === false) {
-            throw new \Exception('Failed to load image.');
+            throw new \RuntimeException('Failed to load image.');
         }
 
         // Attempt to process the input file.

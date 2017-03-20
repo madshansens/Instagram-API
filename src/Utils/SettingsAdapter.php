@@ -37,6 +37,12 @@ class SettingsAdapter
         // NOTE: Damn you StyleCI for not allowing "return null;" for clarity.
     }
 
+    /**
+     * @param array  $config
+     * @param string $username
+     *
+     * @throws \InstagramAPI\Exception\SettingsException
+     */
     public function __construct($config, $username)
     {
         switch ($config['type']) {
@@ -81,7 +87,7 @@ class SettingsAdapter
             break;
         case 'custom':
             if (!isset($config['class']) || !class_exists($config['class']) || !in_array(SettingsAdapter\SettingsInterface::class, class_implements($config['class']))) {
-                throw new InstagramException('Unknown custom settings class specified.', ErrorCode::INTERNAL_SETTINGS_ERROR);
+                throw new \InstagramAPI\Exception\SettingsException('Unknown custom settings class specified.');
             }
 
             $customClass = $config['class'];
@@ -91,7 +97,7 @@ class SettingsAdapter
             $this->setting = $settings;
             break;
         default:
-            throw new InstagramException('Unrecognized settings type.', ErrorCode::INTERNAL_SETTINGS_ERROR);
+            throw new \InstagramAPI\Exception\SettingsException('Unrecognized settings type.');
         }
     }
 

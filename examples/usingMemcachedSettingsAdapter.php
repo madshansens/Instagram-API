@@ -32,7 +32,7 @@ $i->setUser($username, $password);
 
 try {
     $i->login();
-} catch (Exception $e) {
+} catch (\Exception $e) {
     echo 'something went wrong '.$e->getMessage()."\n";
     exit(0);
 }

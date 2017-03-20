@@ -33,7 +33,7 @@ class Response extends AutoResponseFunctionSetter
     /**
      * Gets the message.
      *
-     * @throws \Exception if the message object is of an unsupported type.
+     * @throws \Exception If the message object is of an unsupported type.
      *
      * @return string|null A message string if one exists, otherwise NULL.
      */

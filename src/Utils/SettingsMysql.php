@@ -106,6 +106,9 @@ class SettingsMysql
         }
     }
 
+    /**
+     * @throws \InstagramAPI\Exception\SettingsException
+     */
     private function connect($username, $password, $host, $dbName)
     {
         try {
@@ -115,7 +118,7 @@ class SettingsMysql
             $pdo->setAttribute(PDO::ERRMODE_WARNING, PDO::ERRMODE_EXCEPTION);
             $this->pdo = $pdo;
         } catch (\PDOException $e) {
-            throw new InstagramException('Cannot connect to MySQL settings adapter.', ErrorCode::INTERNAL_SETTINGS_ERROR);
+            throw new \InstagramAPI\Exception\SettingsException('Cannot connect to MySQL settings adapter.');
         }
     }
 

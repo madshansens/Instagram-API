@@ -43,13 +43,13 @@ $i->setUser($username, $password);
 
 try {
     $i->login();
-} catch (Exception $e) {
+} catch (\Exception $e) {
     $e->getMessage();
     exit();
 }
 
 try {
     $i->uploadTimelineAlbum($media, $caption);
-} catch (Exception $e) {
+} catch (\Exception $e) {
     echo $e->getMessage();
 }

@@ -20,7 +20,7 @@ $i->setUser($username, $password);
 
 try {
     $i->login();
-} catch (Exception $e) {
+} catch (\Exception $e) {
     echo 'something went wrong '.$e->getMessage()."\n";
     exit(0);
 }
@@ -42,6 +42,6 @@ try {
     foreach ($followers as $follower) {
         echo '- '.$follower->getUsername()."\n";
     }
-} catch (Exception $e) {
+} catch (\Exception $e) {
     echo $e->getMessage();
 }
