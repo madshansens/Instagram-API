@@ -1,6 +1,6 @@
 <?php
 
-include __DIR__.'/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 /////// CONFIG ///////
 $username = '';
@@ -9,7 +9,7 @@ $debug = true;
 $truncatedDebug = false;
 //////////////////////
 
-// Example using Memcached for storing settings and cookies
+// Example of using Memcached for storing settings and cookies.
 $i = new \InstagramAPI\Instagram($debug, $truncatedDebug, [
     'type'             => 'custom',
     'class'            => \InstagramAPI\Settings\Storage\Memcached::class,
@@ -29,10 +29,9 @@ $i = new \InstagramAPI\Instagram($debug, $truncatedDebug, [
 ]);
 
 $i->setUser($username, $password);
-
 try {
     $i->login();
 } catch (\Exception $e) {
-    echo 'something went wrong '.$e->getMessage()."\n";
+    echo 'Something went wrong: '.$e->getMessage()."\n";
     exit(0);
 }

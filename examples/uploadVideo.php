@@ -1,36 +1,38 @@
 <?php
 
-include __DIR__.'/../vendor/autoload.php';
-require '../src/Instagram.php';
+require __DIR__.'/../vendor/autoload.php';
 
 /////// CONFIG ///////
 $username = '';
 $password = '';
 $debug = true;
 $truncatedDebug = false;
-
-$videoFilename = '';  // path to the video
-$caption = '';        // video caption
 //////////////////////
 
-$i = new \InstagramAPI\Instagram($debug, $truncatedDebug);
+/////// MEDIA ////////
+$videoFilename = '';
+$captionText = '';
+//////////////////////
 
-$i->setUser($username, $password);
+$ig = new \InstagramAPI\Instagram($debug, $truncatedDebug);
 
+$ig->setUser($username, $password);
 try {
-    $i->login();
+    $ig->login();
 } catch (\Exception $e) {
-    echo $e->getMessage();
-    exit();
+    echo 'Something went wrong: '.$e->getMessage()."\n";
+    exit(0);
 }
 
 try {
     // Note that this performs a few automatic chunk upload retries by default,
     // in case of failing to upload the video chunks to Instagram's server!
-    $i->uploadTimelineVideo($videoFilename, $caption);
+    $ig->uploadTimelineVideo($videoFilename, $captionText);
+
     // or...
+
     // Example of using 8 retries instead of the default amount:
-    // $i->uploadTimelineVideo($videoFilename, $caption, null, 8);
+    // $ig->uploadTimelineVideo($videoFilename, $captionText, null, 8);
 } catch (\Exception $e) {
-    echo $e->getMessage();
+    echo 'Something went wrong: '.$e->getMessage()."\n";
 }

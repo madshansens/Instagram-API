@@ -56,6 +56,15 @@ class ServerMessageThrower
         $prefixString,
         $serverMessage)
     {
+        // Some Instagram messages already have punctuation, and others need it.
+        // Prettify the message by ensuring that it ALWAYS ends in punctuation,
+        // for consistency with all of our internal error messages.
+        $lastChar = substr($serverMessage, -1);
+        if ($lastChar !== '' && $lastChar !== '.' && $lastChar !== '!' && $lastChar !== '?') {
+            $serverMessage .= '.';
+        }
+
+        // Now search for the server message in our lookup table.
         foreach (self::EXCEPTION_MAP as $exceptionClass => $patterns) {
             foreach ($patterns as $pattern) {
                 if ($pattern[0] == '/') {
@@ -72,7 +81,7 @@ class ServerMessageThrower
             }
         }
 
-        // Nothing found. Use generic function exception.
+        // Nothing found. Use generic "API function exception".
         throw new FunctionException($serverMessage);
     }
 
@@ -87,14 +96,6 @@ class ServerMessageThrower
     {
         // We need to specify the full namespace path to the class.
         $fullClassPath = '\\'.__NAMESPACE__.'\\'.$exceptionClass;
-
-        // Some Instagram messages already have punctuation, and others need it.
-        // Prettify the message by ensuring that it ALWAYS ends in punctuation,
-        // for consistency with all of our internal error messages.
-        $lastChar = substr($serverMessage, -1);
-        if ($lastChar !== '' && $lastChar !== '.' && $lastChar !== '!' && $lastChar !== '?') {
-            $serverMessage .= '.';
-        }
 
         throw new $fullClassPath(
             $prefixString !== null

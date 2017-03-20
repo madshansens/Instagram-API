@@ -1,31 +1,31 @@
 <?php
 
-include __DIR__.'/../vendor/autoload.php';
-require '../src/Instagram.php';
+require __DIR__.'/../vendor/autoload.php';
 
 /////// CONFIG ///////
 $username = '';
 $password = '';
 $debug = true;
 $truncatedDebug = false;
-
-$photo = '';     // path to the photo
-$caption = '';     // caption
 //////////////////////
 
-$i = new \InstagramAPI\Instagram($debug, $truncatedDebug);
+/////// MEDIA ////////
+$photoFilename = '';
+$captionText = '';
+//////////////////////
 
-$i->setUser($username, $password);
+$ig = new \InstagramAPI\Instagram($debug, $truncatedDebug);
 
+$ig->setUser($username, $password);
 try {
-    $i->login();
+    $ig->login();
 } catch (\Exception $e) {
-    $e->getMessage();
-    exit();
+    echo 'Something went wrong: '.$e->getMessage()."\n";
+    exit(0);
 }
 
 try {
-    $i->uploadTimelinePhoto($photo, $caption);
+    $ig->uploadTimelinePhoto($photoFilename, $captionText);
 } catch (\Exception $e) {
-    echo $e->getMessage();
+    echo 'Something went wrong: '.$e->getMessage()."\n";
 }

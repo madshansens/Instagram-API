@@ -1,55 +1,55 @@
 <?php
 
 /**
- * Upload Album example (aka carousel aka sidecar).
+ * Uploading a timeline album (aka carousel aka sidecar).
  */
-include __DIR__.'/../vendor/autoload.php';
-require '../src/Instagram.php';
+
+require __DIR__.'/../vendor/autoload.php';
 
 /////// CONFIG ///////
 $username = '';
 $password = '';
 $debug = true;
 $truncatedDebug = false;
+//////////////////////
 
+/////// MEDIA ////////
 $media = [
     [
         'type'     => 'photo',
-        'file'     => '', // path to the photo file
+        'file'     => '', // Path to the photo file.
     ],
     [
         'type'     => 'photo',
-        'file'     => '', // path to the photo file
-        'usertags' => [ // optional, lets you tag one or more users in the photo
+        'file'     => '', // Path to the photo file.
+        'usertags' => [ // Optional, lets you tag one or more users in a photo.
             [
                 'position' => [0.5, 0.5],
-                'user_id'  => 0,
+                'user_id'  => '0', // Must be a numerical UserPK ID.
             ],
         ],
     ],
     [
         'type'     => 'video',
-        'file'     => '', // path to the video file
+        'file'     => '', // Path to the video file.
     ],
 ];
 
-$caption = '';
-
+$captionText = ''; // Caption text to use for the album.
 //////////////////////
 
-$i = new \InstagramAPI\Instagram($debug, $truncatedDebug);
+$ig = new \InstagramAPI\Instagram($debug, $truncatedDebug);
 
-$i->setUser($username, $password);
-
+$ig->setUser($username, $password);
 try {
-    $i->login();
+    $ig->login();
 } catch (\Exception $e) {
-    $e->getMessage();
-    exit();
+    echo 'Something went wrong: '.$e->getMessage()."\n";
+    exit(0);
 }
 
 try {
-    $i->uploadTimelineAlbum($media, $caption);
+    $ig->uploadTimelineAlbum($media, $captionText);
 } catch (\Exception $e) {
-    echo $e->getMessage();
+    echo 'Something went wrong: '.$e->getMessage()."\n";
 }

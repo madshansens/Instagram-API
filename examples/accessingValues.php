@@ -1,6 +1,6 @@
 <?php
 
-include __DIR__.'/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 /////// CONFIG ///////
 $username = '';
@@ -9,31 +9,37 @@ $debug = true;
 $truncatedDebug = false;
 //////////////////////
 
-$i = new \InstagramAPI\Instagram($debug, $truncatedDebug);
+$ig = new \InstagramAPI\Instagram($debug, $truncatedDebug);
 
-$i->setUser($username, $password);
-
+$ig->setUser($username, $password);
 try {
-    $i->login();
+    $ig->login();
 } catch (\Exception $e) {
-    echo 'something went wrong '.$e->getMessage()."\n";
+    echo 'Something went wrong: '.$e->getMessage()."\n";
     exit(0);
 }
+
 try {
-    $a = $i->getPopularFeed();
-    $items = $a->getItems(); // PopularFeed Response has a items var, so you can get it with getItems()
+    $feed = $ig->getPopularFeed();
 
-    $firstItem_mediaId = $items[0]->getId(); // Item object has a id var, you can grab this value by using getId()
-    $firstItem_device_timestamp = $items[0]->getDeviceTimestamp(); // Item object has a device_stamp var, you can get it by using getDeviceStamp
+    // The getPopularFeed() has an "items" property, which we need.
+    $items = $feed->getItems();
 
-    // Something similar happens with. var is called image_versions_2, you can get it with getImageVersions2, and so on.
+    // Individual item objects have an "id" property.
+    $firstItem_mediaId = $items[0]->getId();
+
+    // To get properties with underscores, such as "device_stamp",
+    // just specify them as camelcase, ie "getDeviceTimestamp" below.
+    $firstItem_device_timestamp = $items[0]->getDeviceTimestamp();
+
+    // You can chain multiple function calls in a row to get to the data.
     $firstItem_image_versions = $items[0]->getImageVersions2()->getCandidates()[0]->getUrl();
 
-    echo 'There are '.count($items)."\n";
+    echo 'There are '.count($items)." items.\n";
 
-    echo "First item has media id: {$firstItem_mediaId}\n";
-    echo "First item timestamp is: {$firstItem_device_timestamp}\n";
-    echo "One of the first item image version candidates is: {$firstItem_image_versions}\n";
+    echo "First item has media id: {$firstItem_mediaId}.\n";
+    echo "First item timestamp is: {$firstItem_device_timestamp}.\n";
+    echo "One of the first item image version candidates is: {$firstItem_image_versions}.\n";
 } catch (\Exception $e) {
-    echo $e->getMessage();
+    echo 'Something went wrong: '.$e->getMessage()."\n";
 }

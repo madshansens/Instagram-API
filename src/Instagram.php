@@ -881,7 +881,7 @@ class Instagram
      *
      * @param array $media       Array of image/video metadata (type, file, usertags etc)
      *                           You can only provide "usertags" for PHOTOS!
-     * @param null  $captionText Text for album
+     * @param null  $captionText Caption to use for the album.
      * @param null  $location    Geotag
      * @param null  $filter
      *
