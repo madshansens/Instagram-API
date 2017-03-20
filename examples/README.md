@@ -1,9 +1,7 @@
 ## Examples
 
-### Ready to run:
+These examples demonstrate various common tasks and are meant to get you started
+with this library.
 
-- PaginationExample.php
-- uploadPhoto.php
-- uploadVideo.php
-
-In these examples, you need to edit it and add your data.
+Many of these files contain a configuration section at the top, which you must
+edit to provide your own account and media details before running the example.
