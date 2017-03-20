@@ -26,9 +26,9 @@
         }
     ],
     "autoload": {
-        "classmap": [
-            "src/"
-        ]
+        "psr-4": {
+            "InstagramAPI\\": "src/"
+        }
     },
     "require": {
         "netresearch/jsonmapper": "^1.0",
