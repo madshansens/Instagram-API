@@ -2,7 +2,7 @@
 
 namespace InstagramAPI;
 
-class Response extends AutoResponseFunctionSetter
+class Response extends \InstagramAPI\AutoPropertyHandler
 {
     const STATUS_OK = 'ok';
     const STATUS_FAIL = 'fail';

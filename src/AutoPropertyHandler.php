@@ -2,11 +2,17 @@
 
 namespace InstagramAPI;
 
-class AutoResponseFunctionSetter
+/**
+ * Automatically creates virtual "getX", "setX" and "isX" functions for all
+ * object properties.
+ */
+class AutoPropertyHandler
 {
     // CALL is invoked when attempting to access missing functions.
     // This allows us to auto-map setters and getters for properties.
-    public function __call($function, $args)
+    public function __call(
+        $function,
+        $args)
     {
         // Parse the name of the function they tried to call.
         $underScoreNames = $this->camelCaseToUnderScore($function);
@@ -44,7 +50,8 @@ class AutoResponseFunctionSetter
         }
     }
 
-    public function camelCaseToUnderScore($input)
+    public function camelCaseToUnderScore(
+        $input)
     {
         // This is a highly optimized regexp which achieves the matching in very
         // few regex engine steps and with very high performance. Do not touch!
