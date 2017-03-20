@@ -3,7 +3,6 @@
 /**
  * Uploading a timeline album (aka carousel aka sidecar).
  */
-
 require __DIR__.'/../vendor/autoload.php';
 
 /////// CONFIG ///////
@@ -40,8 +39,8 @@ $captionText = ''; // Caption text to use for the album.
 
 $ig = new \InstagramAPI\Instagram($debug, $truncatedDebug);
 
-$ig->setUser($username, $password);
 try {
+    $ig->setUser($username, $password);
     $ig->login();
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";

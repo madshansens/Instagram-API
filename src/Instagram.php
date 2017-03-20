@@ -169,12 +169,17 @@ class Instagram
      * @param string $username Your Instagram username.
      * @param string $password Your Instagram password.
      *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      */
     public function setUser(
         $username,
         $password)
     {
+        if (empty($username) || empty($password)) {
+            throw new \InvalidArgumentException('You must provide a username and password to setUser().');
+        }
+
         $this->settings = new Settings\Adapter($this->settingsAdapter, $username);
 
         // Generate the user's Device instance, which will be created from the

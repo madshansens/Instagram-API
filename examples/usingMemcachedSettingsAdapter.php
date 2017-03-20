@@ -10,7 +10,7 @@ $truncatedDebug = false;
 //////////////////////
 
 // Example of using Memcached for storing settings and cookies.
-$i = new \InstagramAPI\Instagram($debug, $truncatedDebug, [
+$ig = new \InstagramAPI\Instagram($debug, $truncatedDebug, [
     'type'             => 'custom',
     'class'            => \InstagramAPI\Settings\Storage\Memcached::class,
     'persistent_id'    => 'instagram',
@@ -28,9 +28,9 @@ $i = new \InstagramAPI\Instagram($debug, $truncatedDebug, [
     ]],
 ]);
 
-$i->setUser($username, $password);
 try {
-    $i->login();
+    $ig->setUser($username, $password);
+    $ig->login();
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";
     exit(0);
