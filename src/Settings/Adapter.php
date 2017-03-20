@@ -81,7 +81,7 @@ class Adapter
                 $mysqlOptions['db_name'] = $this->getUserConfig('db_name', $config, $cmdOptions);
             }
 
-            $this->storage = new \InstagramAPI\Settings\Storage\MySQL($username, $mysqlOptions);
+            $this->storage = new Storage\MySQL($username, $mysqlOptions);
             break;
         case 'file':
             $cmdOptions = $this->getCmdOptions([
@@ -91,7 +91,7 @@ class Adapter
             // Settings that can optionally be provided.
             $settingsPath = $this->getUserConfig('settings_path', $config, $cmdOptions);
 
-            $this->storage = new \InstagramAPI\Settings\Storage\File($username, $settingsPath);
+            $this->storage = new Storage\File($username, $settingsPath);
             break;
         case 'custom':
             if (!isset($config['class']) || !class_exists($config['class']) || !in_array(StorageInterface::class, class_implements($config['class']))) {
