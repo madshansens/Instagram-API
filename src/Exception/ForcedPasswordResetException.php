@@ -2,4 +2,6 @@
 
 namespace InstagramAPI\Exception;
 
-class ForcedPasswordResetException extends RequestException {}
+class ForcedPasswordResetException extends RequestException
+{
+}

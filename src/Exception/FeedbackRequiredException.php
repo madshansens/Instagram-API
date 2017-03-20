@@ -2,4 +2,6 @@
 
 namespace InstagramAPI\Exception;
 
-class FeedbackRequiredException extends RequestException {}
+class FeedbackRequiredException extends RequestException
+{
+}

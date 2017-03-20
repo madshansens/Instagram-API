@@ -28,11 +28,11 @@ class ServerMessageThrower
         'CheckpointRequiredException'  => ['checkpoint_required'],
         'IncorrectPasswordException'   => [
             // "The password you entered is incorrect".
-            '/password(.*)incorrect/'
+            '/password(.*)incorrect/',
         ],
         'AccountDisabledException'     => [
             // "Your account has been disabled for violating our terms"
-            '/account(.*)disabled(.*)violating/'
+            '/account(.*)disabled(.*)violating/',
         ],
         'SentryBlockException'         => ['sentry_block'],
         'InvalidUserException'         => ['invalid_user'],
@@ -44,11 +44,11 @@ class ServerMessageThrower
      *
      * Uses the generic FunctionException if no other exceptions match.
      *
-     * @param string|null $prefixString What prefix to use for the message in
-     *                                  the final exception. Should be something
-     *                                  helpful such as the name of the class or
-     *                                  function which threw. Can be NULL.
-     * @param string     $serverMessage The failure string from Instagram's API.
+     * @param string|null $prefixString  What prefix to use for the message in
+     *                                   the final exception. Should be something
+     *                                   helpful such as the name of the class or
+     *                                   function which threw. Can be NULL.
+     * @param string      $serverMessage The failure string from Instagram's API.
      *
      * @throws InstagramException The appropriate exception.
      */
@@ -58,7 +58,6 @@ class ServerMessageThrower
     {
         foreach (self::EXCEPTION_MAP as $exceptionClass => $patterns) {
             foreach ($patterns as $pattern) {
-                echo $pattern . PHP_EOL;
                 if ($pattern[0] == '/') {
                     // Regex check.
                     if (preg_match($pattern, $serverMessage)) {
@@ -84,7 +83,8 @@ class ServerMessageThrower
      * @param string|null $prefixString
      * @param string      $serverMessage
      */
-    private static function _throw($exceptionClass, $prefixString, $serverMessage) {
+    private static function _throw($exceptionClass, $prefixString, $serverMessage)
+    {
         // We need to specify the full namespace path to the class.
         $fullClassPath = '\\'.__NAMESPACE__.'\\'.$exceptionClass;
 

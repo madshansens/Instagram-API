@@ -2,4 +2,6 @@
 
 namespace InstagramAPI\Exception;
 
-class AccountDisabledException extends RequestException {}
+class AccountDisabledException extends RequestException
+{
+}

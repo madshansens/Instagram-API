@@ -2,4 +2,6 @@
 
 namespace InstagramAPI\Exception;
 
-class EmptyResponseException extends RequestException {}
+class EmptyResponseException extends RequestException
+{
+}

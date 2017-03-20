@@ -7,4 +7,6 @@ namespace InstagramAPI\Exception;
  *
  * If you catch this exception, you KNOW it came from our Instagram-API library.
  */
-interface InstagramException {}
+interface InstagramException
+{
+}

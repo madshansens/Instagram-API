@@ -2,4 +2,6 @@
 
 namespace InstagramAPI\Exception;
 
-class CheckpointRequiredException extends RequestException {}
+class CheckpointRequiredException extends RequestException
+{
+}

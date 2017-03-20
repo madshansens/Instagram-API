@@ -115,7 +115,7 @@ foreach ($testDevices as $thisDevice) {
                 $mediaInfo = $ig->getMediaInfo($videoId)->getItems()[0];
                 break;
             } catch (\InstagramAPI\Exception\ThrottledException $e) {
-                if ($attempt < 4 ) {
+                if ($attempt < 4) {
                     sleep(10);
                 } else {
                     throw $e;

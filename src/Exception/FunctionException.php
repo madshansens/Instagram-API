@@ -8,4 +8,6 @@ namespace InstagramAPI\Exception;
  * This encapsulates function-call specific problems such as "User not found"
  * and so on. To see what happened, simply getMessage() on this exception.
  */
-class FunctionException extends RequestException {}
+class FunctionException extends RequestException
+{
+}

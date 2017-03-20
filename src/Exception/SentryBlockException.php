@@ -2,4 +2,6 @@
 
 namespace InstagramAPI\Exception;
 
-class SentryBlockException extends RequestException {}
+class SentryBlockException extends RequestException
+{
+}
