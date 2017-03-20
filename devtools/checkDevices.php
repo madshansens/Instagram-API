@@ -197,7 +197,7 @@ function buildVideoList($ig, $userPk)
     do {
         $feed = $ig->getUserFeed($userPk, $maxId);
         foreach ($feed->getItems() as $item) {
-            if ($item->getMediaType() != \InstagramAPI\Item::VIDEO) {
+            if ($item->getMediaType() != \InstagramAPI\Response\Model\Item::VIDEO) {
                 continue;
             }
 

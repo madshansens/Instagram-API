@@ -2599,7 +2599,7 @@ class Instagram
             $myTimeline = $this->getSelfUserFeed($nextMaxId);
 
             foreach ($myTimeline->getItems() as $item) {
-                if ($item->media_type == Item::PHOTO) {
+                if ($item->media_type == Response\Model\Item::PHOTO) {
                     $itemUrl = $item->getImageVersions2()->candidates[0]->getUrl();
                 } else {
                     $itemUrl = $item->getVideoVersions()[0]->getUrl();
