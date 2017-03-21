@@ -65,12 +65,7 @@ class ServerMessageThrower
         $serverMessage)
     {
         // Some Instagram messages already have punctuation, and others need it.
-        // Prettify the message by ensuring that it ALWAYS ends in punctuation,
-        // for consistency with all of our internal error messages.
-        $lastChar = substr($serverMessage, -1);
-        if ($lastChar !== '' && $lastChar !== '.' && $lastChar !== '!' && $lastChar !== '?') {
-            $serverMessage .= '.';
-        }
+        $serverMessage = self::prettifyMessage($serverMessage);
 
         // Now search for the server message in our CRITICAL exception table.
         foreach (self::EXCEPTION_MAP as $exceptionClass => $patterns) {
@@ -113,5 +108,29 @@ class ServerMessageThrower
             ? $prefixString.': '.$serverMessage
             : $serverMessage
         );
+    }
+
+    /**
+     * Nicely reformats externally generated exception messages.
+     *
+     * This is used for guaranteeing consistent message formatting with full
+     * English sentences, ready for display to the user.
+     *
+     * @param string $message The original message.
+     *
+     * @return string The cleaned-up message.
+     */
+    public static function prettifyMessage(
+        $message)
+    {
+        // Some messages already have punctuation, and others need it. Prettify
+        // the message by ensuring that it ALWAYS ends in punctuation, for
+        // consistency with all of our internal error messages.
+        $lastChar = substr($message, -1);
+        if ($lastChar !== '' && $lastChar !== '.' && $lastChar !== '!' && $lastChar !== '?') {
+            $message .= '.';
+        }
+
+        return $message;
     }
 }

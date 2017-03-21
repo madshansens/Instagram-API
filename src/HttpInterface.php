@@ -456,7 +456,8 @@ class HttpInterface
     /**
      * Wraps Guzzle's request and adds special error handling and options.
      *
-     * Automatically throws exceptions on certain very serious HTTP errors. You
+     * Automatically throws exceptions on certain very serious HTTP errors. And
+     * re-wraps all Guzzle errors to our own internal exceptions instead. You
      * must ALWAYS use this (or _apiRequest()) instead of the raw Guzzle Client!
      * However, you can never assume the server response contains what you
      * wanted. Be sure to validate the API reply too, since Instagram's API
@@ -471,7 +472,7 @@ class HttpInterface
      * @param string $uri           Full URI string.
      * @param array  $guzzleOptions Request options to apply.
      *
-     * @throws \GuzzleHttp\Exception\GuzzleException      For any socket related errors.
+     * @throws \InstagramAPI\Exception\NetworkException   For any network/socket related errors.
      * @throws \InstagramAPI\Exception\ThrottledException When we're throttled by server.
      *
      * @return \Psr\Http\Message\ResponseInterface
@@ -485,7 +486,12 @@ class HttpInterface
         $guzzleOptions = $this->_buildGuzzleOptions($guzzleOptions);
 
         // Attempt the request. Will throw in case of socket errors!
-        $response = $this->_client->request($method, $uri, $guzzleOptions);
+        try {
+            $response = $this->_client->request($method, $uri, $guzzleOptions);
+        } catch (\Exception $e) {
+            // Re-wrap Guzzle's exception using our own NetworkException.
+            throw new \InstagramAPI\Exception\NetworkException($e);
+        }
 
         // Detect very serious HTTP status codes in the response.
         $httpCode = $response->getStatusCode();
@@ -547,7 +553,7 @@ class HttpInterface
      * @param array  $libraryOptions Additional options for controlling Library features
      *                               such as the debugging output and response decoding.
      *
-     * @throws \GuzzleHttp\Exception\GuzzleException      For any socket related errors.
+     * @throws \InstagramAPI\Exception\NetworkException   For any network/socket related errors.
      * @throws \InstagramAPI\Exception\ThrottledException When we're throttled by server.
      * @throws \InstagramAPI\Exception\InstagramException When "decodeToObject"
      *                                                    was requested and the
