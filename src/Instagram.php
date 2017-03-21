@@ -904,6 +904,9 @@ class Instagram
         if (empty($media)) {
             throw new \InvalidArgumentException("List of media to upload can't be empty.");
         }
+        if (count($media) < 2 || count($media) > 10) {
+            throw new \InvalidArgumentException(sprintf('Instagram requires that albums contain 2-10 items. You tried to submit %d.', count($media)));
+        }
 
         $hasUploadedVideo = false;
         foreach ($media as $key => $item) {
