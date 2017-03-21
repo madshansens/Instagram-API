@@ -24,7 +24,7 @@ class ServerMessageThrower
      * garbage exceptions here, such as "User not found", "No permission to view
      * profile" or other garbage. Those messages are human-readable, unreliable
      * and are also totally non-critical. You should handle them yourself in
-     * your end-user applications by simply catching FunctionException and
+     * your end-user applications by simply catching their EndpointException and
      * looking at the contents of its getMessage() property. The exceptions
      * listed below are *critical* exceptions related to the CORE of the API!
      *
@@ -32,8 +32,8 @@ class ServerMessageThrower
      */
     const EXCEPTION_MAP = [
         'LoginRequiredException'       => ['login_required'],
-        'FeedbackRequiredException'    => ['feedback_required'],
         'CheckpointRequiredException'  => ['checkpoint_required'],
+        'FeedbackRequiredException'    => ['feedback_required'],
         'IncorrectPasswordException'   => [
             // "The password you entered is incorrect".
             '/password(.*)incorrect/',
@@ -50,7 +50,7 @@ class ServerMessageThrower
     /**
      * Parses a server message and throws the appropriate exception.
      *
-     * Uses the generic FunctionException if no other exceptions match.
+     * Uses the generic EndpointException if no other exceptions match.
      *
      * @param string|null $prefixString  What prefix to use for the message in
      *                                   the final exception. Should be something
@@ -72,7 +72,7 @@ class ServerMessageThrower
             $serverMessage .= '.';
         }
 
-        // Now search for the server message in our lookup table.
+        // Now search for the server message in our CRITICAL exception table.
         foreach (self::EXCEPTION_MAP as $exceptionClass => $patterns) {
             foreach ($patterns as $pattern) {
                 if ($pattern[0] == '/') {
@@ -90,7 +90,7 @@ class ServerMessageThrower
         }
 
         // No critical exception found. Use a generic "API function exception".
-        throw new FunctionException($serverMessage);
+        throw new EndpointException($serverMessage);
     }
 
     /**
