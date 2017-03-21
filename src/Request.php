@@ -12,7 +12,6 @@ class Request
     protected $requireLogin = false;
     protected $checkStatus = true;
     protected $signedPost = true;
-    protected $replacePost = [];
 
     public function __construct(
         $url)
@@ -67,14 +66,6 @@ class Request
         return $this;
     }
 
-    public function setReplacePost(
-        $replace = [])
-    {
-        $this->replacePost = $replace;
-
-        return $this;
-    }
-
     public function getResponse(
         $baseClass,
         $includeHeader = false)
@@ -86,10 +77,8 @@ class Request
         } else {
             $endPoint = $this->url;
         }
+
         $payload = json_encode($this->posts);
-        if ($this->replacePost) {
-            $payload = str_replace(array_keys($this->replacePost), array_values($this->replacePost), $payload);
-        }
         if ($this->posts) {
             if ($this->signedPost) {
                 $post = Signatures::generateSignature($payload);

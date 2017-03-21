@@ -997,7 +997,7 @@ class Instagram
                 break;
             case 'video':
                 $videoConfig = [
-                    'length'              => number_format($item['seconds'], 2),
+                    'length'              => round($item['seconds'], 2),
                     'date_time_original'  => $date,
                     'scene_type'          => 1,
                     'poster_frame_index'  => 0,
@@ -1238,7 +1238,7 @@ class Instagram
         ->addPost('video_result', 'deprecated')
         ->addPost('upload_id', $uploadId)
         ->addPost('source_type', 4)
-        ->addPost('length', number_format($metadata['seconds'], 2))
+        ->addPost('length', round($metadata['seconds'], 2))
         ->addPost('date_time_original', time())
         ->addPost('filter_type', 0)
         ->addPost('video_result', 'deprecated')
@@ -1251,13 +1251,12 @@ class Instagram
             ])
             /* TODO
         ->addPost('clips', [
-            'length'   => number_format(0.00, 2, '.', ''),
+            'length'   => round(0.00, 2),
             'source_type'   => 4,
         ])*/
         ->addPost('_csrftoken', $this->token)
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
-        ->setReplacePost(['"length":0' => '"length":0.00']);
+        ->addPost('_uid', $this->username_id);
 
         if ($captionText !== '' && !is_null($captionText) && $captionText) {
             $requestData->addPost('caption', $captionText);
@@ -1368,12 +1367,7 @@ class Instagram
             $requestData->addPost('edits', ['filter_type' => Utils::getFilterCode($filter)]);
         }
 
-        $configure = $requestData->setReplacePost([
-            '"crop_center":[0,0]'                       => '"crop_center":[0.0,-0.0]',
-            '"crop_zoom":1'                             => '"crop_zoom":1.0',
-            '"crop_original_size":'."[{$size},{$size}]" => '"crop_original_size":'."[{$size}.0,{$size}.0]",
-        ])
-        ->getResponse(new Response\ConfigureResponse());
+        $configure = $requestData->getResponse(new Response\ConfigureResponse());
 
         return $configure;
     }
