@@ -811,6 +811,7 @@ class Instagram
         $this->http->uploadPhotoData($type, $videoFilename, 'videofile', $uploadParams['upload_id']);
 
         // Configure the uploaded video and attach it to our timeline/story.
+        $metadata['length'] = Utils::getSeconds($videoFilename);
         $configure = $this->configureVideoWithRetries($type, $uploadParams['upload_id'], $metadata);
 
         return $configure;
@@ -1208,9 +1209,7 @@ class Instagram
         ->addPost('video_result', 'deprecated')
         ->addPost('upload_id', $uploadId)
         ->addPost('source_type', 4)
-        // TODO
-        //->addPost('length', number_format(0.00, 2, '.', ''))
-        ->addPost('length', 0)
+        ->addPost('length', $metadata['length'])
         ->addPost('date_time_original', time())
         ->addPost('filter_type', 0)
         ->addPost('video_result', 'deprecated')
