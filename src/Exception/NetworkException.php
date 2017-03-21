@@ -35,7 +35,9 @@ class NetworkException extends RequestException
      *
      * @param \Exception $guzzleException The original Guzzle exception.
      */
-    public function __construct(\Exception $guzzleException) {
+    public function __construct(
+        \Exception $guzzleException)
+    {
         $this->_guzzleException = $guzzleException;
 
         // Ensure that the message is nicely formatted and follows our standard.

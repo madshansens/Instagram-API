@@ -727,7 +727,7 @@ class Instagram
         }
 
         $size = getimagesize($photoFilename);
-        $metadata['width']  = $size[0];
+        $metadata['width'] = $size[0];
         $metadata['height'] = $size[1];
 
         // Perform the upload and then configure it for our timeline/story.
@@ -1339,13 +1339,13 @@ class Instagram
             [
                 'crop_original_size'    => [$metadata['width'], $metadata['height']],
                 'crop_zoom'             => 1,
-                'crop_center'           => [0.0, -0.0]
+                'crop_center'           => [0.0, -0.0],
             ]
         )
         ->addPost('extra',
             [
                 'source_width'  => $metadata['width'],
-                'source_height' => $metadata['height']
+                'source_height' => $metadata['height'],
             ]
         );
 
