@@ -704,24 +704,22 @@ class Instagram
     /**
      * INTERNAL.
      *
-     * @param string                  $type          What type of upload ("timeline" or "story",
-     *                                               but not "album". They're handled elsewhere.)
-     * @param string                  $photoFilename The photo filename.
-     * @param string                  $captionText   Caption to use for the photo.
-     * @param Response\Model\Location $location      Location (only used for "timeline" photos).
-     * @param null                    $filter        Photo filter. THIS DOES NOTHING.
+     * @param string     $type          What type of upload ("timeline" or "story",
+     *                                  but not "album". They're handled elsewhere.)
+     * @param string     $photoFilename The photo filename.
+     * @param array|null $metadata      (optional) Metadata key-value pairs.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see configure() for available metadata fields.
      */
     protected function _uploadPhoto(
         $type,
         $photoFilename,
-        $captionText = null,
-        $location = null,
-        $filter = null)
+        array $metadata = null)
     {
         // Make sure we don't allow "album" photo uploads via this function.
         if ($type != 'timeline' && $type != 'story') {
@@ -730,7 +728,7 @@ class Instagram
 
         // Perform the upload and then configure it for our timeline/story.
         $upload = $this->http->uploadPhotoData($type, $photoFilename);
-        $configure = $this->configure($type, $upload->getUploadId(), $photoFilename, $captionText, $location, $filter);
+        $configure = $this->configure($type, $upload->getUploadId(), $photoFilename, $metadata);
 
         return $configure;
     }
@@ -738,67 +736,64 @@ class Instagram
     /**
      * Uploads a photo to your Instagram timeline.
 
-     * @param string                  $photoFilename The photo filename.
-     * @param string                  $captionText   Caption to use for the photo.
-     * @param Response\Model\Location $location      Location where the photo was taken.
-     * @param null                    $filter        Photo filter. THIS DOES NOTHING.
+     * @param string     $photoFilename The photo filename.
+     * @param array|null $metadata      (optional) Metadata key-value pairs.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see configure() for available metadata fields.
      */
     public function uploadTimelinePhoto(
         $photoFilename,
-        $captionText = null,
-        $location = null,
-        $filter = null)
+        array $metadata = null)
     {
-        return $this->_uploadPhoto('timeline', $photoFilename, $captionText, $location, $filter);
+        return $this->_uploadPhoto('timeline', $photoFilename, $metadata);
     }
 
     /**
      * Uploads a photo to your Instagram story.
      *
-     * @param string $photoFilename The photo filename.
-     * @param string $captionText   Caption to display over the story photo.
-     * @param null   $filter        Photo filter. THIS DOES NOTHING.
+     * @param string     $photoFilename The photo filename.
+     * @param array|null $metadata      (optional) Metadata key-value pairs.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see configure() for available metadata fields.
      */
     public function uploadStoryPhoto(
         $photoFilename,
-        $captionText = null,
-        $filter = null)
+        array $metadata = null)
     {
-        return $this->_uploadPhoto('story', $photoFilename, $captionText, null, $filter);
+        return $this->_uploadPhoto('story', $photoFilename, $metadata);
     }
 
     /**
      * INTERNAL.
      *
-     * @param string   $type          What type of upload ("timeline" or "story",
-     *                                but not "album". They're handled elsewhere.)
-     * @param string   $videoFilename The video filename.
-     * @param string   $captionText   Caption to use for the video.
-     * @param string[] $userTags      Array of UserPK IDs of people tagged in your video.
-     *                                (only used for "story" videos!).
-     * @param int      $maxAttempts   Total attempts to upload all chunks before throwing.
+     * @param string     $type          What type of upload ("timeline" or "story",
+     *                                  but not "album". They're handled elsewhere.)
+     * @param string     $videoFilename The video filename.
+     * @param array|null $metadata      (optional) Metadata key-value pairs.
+     * @param int        $maxAttempts   (optional) Total attempts to upload all chunks before throwing.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
      *
      * @return \InstagramAPI\Response\ConfigureVideoResponse
+     *
+     * @see configureVideo() for available metadata fields.
      */
     protected function _uploadVideo(
         $type,
         $videoFilename,
-        $captionText = null,
-        $userTags = null,
+        array $metadata = null,
         $maxAttempts = 10)
     {
         // Make sure we don't allow "album" video uploads via this function.
@@ -816,7 +811,7 @@ class Instagram
         $this->http->uploadPhotoData($type, $videoFilename, 'videofile', $uploadParams['upload_id']);
 
         // Configure the uploaded video and attach it to our timeline/story.
-        $configure = $this->configureVideoWithRetries($type, $uploadParams['upload_id'], $captionText, $userTags);
+        $configure = $this->configureVideoWithRetries($type, $uploadParams['upload_id'], $metadata);
 
         return $configure;
     }
@@ -824,45 +819,47 @@ class Instagram
     /**
      * Uploads a video to your Instagram timeline.
      *
-     * @param string $videoFilename The video filename.
-     * @param string $captionText   Caption to use for the video.
-     * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
+     * @param string     $videoFilename The video filename.
+     * @param array|null $metadata      (optional) Metadata key-value pairs.
+     * @param int        $maxAttempts   Total attempts to upload all chunks before throwing.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
      *
      * @return \InstagramAPI\Response\ConfigureVideoResponse
+     *
+     * @see configureVideo() for available metadata fields.
      */
     public function uploadTimelineVideo(
         $videoFilename,
-        $captionText = null,
+        array $metadata = null,
         $maxAttempts = 10)
     {
-        return $this->_uploadVideo('timeline', $videoFilename, $captionText, null, $maxAttempts);
+        return $this->_uploadVideo('timeline', $videoFilename, $metadata, $maxAttempts);
     }
 
     /**
      * Uploads a video to your Instagram story.
      *
-     * @param string   $videoFilename The video filename.
-     * @param string   $captionText   Caption to use for the video.
-     * @param string[] $userTags      Array of UserPK IDs of people tagged in your video.
-     * @param int      $maxAttempts   Total attempts to upload all chunks before throwing.
+     * @param string     $videoFilename The video filename.
+     * @param array|null $metadata      (optional) Metadata key-value pairs.
+     * @param int        $maxAttempts   Total attempts to upload all chunks before throwing.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
      *
      * @return \InstagramAPI\Response\ConfigureVideoResponse
+     *
+     * @see configureVideo() for available metadata fields.
      */
     public function uploadStoryVideo(
         $videoFilename,
-        $captionText = null,
-        $userTags = null,
+        array $metadata = null,
         $maxAttempts = 10)
     {
-        return $this->_uploadVideo('story', $videoFilename, $captionText, $userTags, $maxAttempts);
+        return $this->_uploadVideo('story', $videoFilename, $metadata, $maxAttempts);
     }
 
     /**
@@ -871,25 +868,26 @@ class Instagram
      * An album is also known as a "carousel" and "sidecar". They can contain up
      * to 10 photos or videos (at the moment).
      *
-     * @param array                   $media       Array of image/video metadata
-     *                                             (type, file, usertags etc).
-     *                                             You can only provide the
-     *                                             "usertags" for PHOTOS!
-     * @param null                    $captionText Caption to use for the album.
-     * @param Response\Model\Location $location    Location where the album was taken.
-     * @param null                    $filter      Photo filter. THIS DOES NOTHING.
+     * @param array      $media         Array of image/video files and their per-file
+     *                                  metadata (type, file, and optionally usertags).
+     *                                  The "type" must be "photo" or "video".
+     *                                  The "file" must be its disk path. And
+     *                                  the optional "usertags" can only be used
+     *                                  on PHOTOS, never on videos.
+     * @param array|null $albumMetadata (optional) Metadata key-value pairs for the
+     *                                  album itself (its caption, location, etc).
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
      *
      * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see configure() for available album metadata fields.
      */
     public function uploadTimelineAlbum(
         $media,
-        $captionText = null,
-        $location = null,
-        $filter = null)
+        array $albumMetadata = null)
     {
         if (empty($media)) {
             throw new \InvalidArgumentException("List of media to upload can't be empty.");
@@ -960,6 +958,7 @@ class Instagram
                     ],
                 ];
 
+                // This usertag per-file metadata is only supported for PHOTOS!
                 if (isset($item['usertags'])) {
                     $photoConfig['usertags'] = json_encode(['in' => $item['usertags']]);
                 }
@@ -995,7 +994,7 @@ class Instagram
 
         // TODO: THIS SEEMS BUGGED TO ME. Why is it only using the last item's
         // "file" value when configuring a whole array of uploadRequests?
-        $configure = $this->configure('album', $uploadRequests, $item['file'], $captionText, $location, $filter);
+        $configure = $this->configure('album', $uploadRequests, $item['file'], $albumMetadata);
 
         return $configure;
     }
@@ -1128,31 +1127,28 @@ class Instagram
      * useful since Instagram sometimes can't configure a newly uploaded video
      * file until a few seconds have passed.
      *
-     * @param string   $type        What type of upload ("timeline" or "story",
-     *                              but not "album". They're handled elsewhere.)
-     * @param string   $upload_id   The ID of the upload to configure.
-     * @param string   $captionText Caption to use for the video.
-     * @param string[] $userTags    Array of UserPK IDs of people tagged in your video.
-     *                              (only used for "story" videos!).
-     * @param int      $maxAttempts Total attempts to configure video before throwing.
+     * @param string     $type        What type of upload ("timeline" or "story",
+     *                                but not "album". They're handled elsewhere.)
+     * @param string     $uploadId    The ID of the upload to configure.
+     * @param array|null $metadata    (optional) Metadata key-value pairs.
+     * @param int        $maxAttempts Total attempts to configure video before throwing.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\ConfigureVideoResponse
      *
-     * @see configureVideo()
+     * @see configureVideo() for available metadata fields.
      */
     public function configureVideoWithRetries(
         $type,
-        $upload_id,
-        $captionText = null,
-        $userTags = null,
+        $uploadId,
+        array $metadata = null,
         $maxAttempts = 5)
     {
         for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
             try {
                 // Attempt to configure video parameters.
-                $configure = $this->configureVideo($type, $upload_id, $captionText, $userTags);
+                $configure = $this->configureVideo($type, $uploadId, $metadata);
                 //$this->expose(); // <-- WTF? Old leftover code.
                 break; // Success. Exit loop.
             } catch (\InstagramAPI\Exception\InstagramException $e) {
@@ -1172,12 +1168,10 @@ class Instagram
     /**
      * Configure parameters for uploaded video.
      *
-     * @param string   $type        What type of upload ("timeline" or "story",
-     *                              but not "album". They're handled elsewhere.)
-     * @param string   $upload_id   The ID of the upload to configure.
-     * @param string   $captionText Caption to use for the video.
-     * @param string[] $userTags    Array of UserPK IDs of people tagged in your video.
-     *                              (only used for "story" videos!).
+     * @param string     $type     What type of upload ("timeline" or "story",
+     *                             but not "album". They're handled elsewhere.)
+     * @param string     $uploadId The ID of the upload to configure.
+     * @param array|null $metadata (optional) Metadata key-value pairs.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -1186,10 +1180,16 @@ class Instagram
      */
     public function configureVideo(
         $type,
-        $upload_id,
-        $captionText = null,
-        $userTags = null)
+        $uploadId,
+        array $metadata = null)
     {
+        // Available metadata parameters:
+        /** @var string|null Caption to use for the media. */
+        $captionText = isset($metadata['caption']) ? $metadata['caption'] : null;
+        /** @var string[]|null Array of UserPK IDs of people tagged in your
+         * video. ONLY USED IN STORY VIDEOS! TODO: Actually, it's not even implemented for stories. */
+        $userTags = (isset($metadata['usertags']) && $type == 'story') ? $metadata['usertags'] : null;
+
         // Make sure we don't configure "album" video uploads via this function.
         switch ($type) {
         case 'timeline':
@@ -1206,7 +1206,7 @@ class Instagram
         ->addParams('video', 1)
         ->addPost('configure_mode', 1)
         ->addPost('video_result', 'deprecated')
-        ->addPost('upload_id', $upload_id)
+        ->addPost('upload_id', $uploadId)
         ->addPost('source_type', 4)
         // TODO
         //->addPost('length', number_format(0.00, 2, '.', ''))
@@ -1253,12 +1253,10 @@ class Instagram
     /**
      * Configure uploaded media parameters (primarily for photos, but also albums).
      *
-     * @param string                  $type          What type of entry ("timeline", "story" or "album").
-     * @param string                  $upload_id     The ID of the entry to configure.
-     * @param string                  $photoFilename The photo filename.
-     * @param string                  $captionText   Caption to use for the media.
-     * @param Response\Model\Location $location      A Location object describing where media was taken.
-     * @param null                    $filter        Photo filter. THIS DOES NOTHING.
+     * @param string     $type          What type of entry ("timeline", "story" or "album").
+     * @param string     $uploadId      The ID of the entry to configure.
+     * @param string     $photoFilename The photo filename.
+     * @param array|null $metadata      (optional) Metadata key-value pairs.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -1266,12 +1264,21 @@ class Instagram
      */
     public function configure(
         $type,
-        $upload_id,
+        $uploadId,
         $photoFilename,
-        $captionText = null,
-        $location = null,
-        $filter = null)
+        array $metadata = null)
     {
+        // Available metadata parameters:
+        /** @var string|null Caption to use for the media. */
+        $captionText = isset($metadata['caption']) ? $metadata['caption'] : null;
+        /** @var Response\Model\Location|null A Location object describing where
+            the media was taken. NOT USED FOR STORY MEDIA! */
+        $location = (isset($metadata['location']) && $type != 'story') ? $metadata['location'] : null;
+        /** @var void Photo filter. THIS DOES NOTHING! All real filters are done in the mobile app. */
+        // $filter = isset($metadata['filter']) ? $metadata['filter'] : null;
+        $filter = null; // COMMENTED OUT SO USERS UNDERSTAND THEY CAN'T USE THIS!
+
+        // Begin...
         $size = getimagesize($photoFilename)[0];
         if (is_null($captionText)) {
             $captionText = '';
@@ -1305,9 +1312,9 @@ class Instagram
 
         if ($type == 'album') {
             $requestData->addPost('client_sidecar_id', Utils::generateUploadId())
-            ->addPost('children_metadata', $upload_id);
+            ->addPost('children_metadata', $uploadId);
         } else {
-            $requestData->addPost('upload_id', $upload_id);
+            $requestData->addPost('upload_id', $uploadId);
         }
 
         if ($location instanceof Response\Model\Location) {
