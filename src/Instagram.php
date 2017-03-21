@@ -801,6 +801,18 @@ class Instagram
             throw new \InvalidArgumentException(sprintf('Unsupported video upload type "%s".', $type));
         }
 
+        // Figure out how long the video is.
+        // NOTE: We do this first, since it validates whether the video file is
+        // valid and lets us avoid wasting time uploading totally invalid files!
+        $metadata['seconds'] = Utils::getSeconds($videoFilename);
+
+        // Validate video length. Instagram only allows 3-60 seconds.
+        // NOTE: Instagram has no disk size limit, but this length validation
+        // also ensures we can only upload small files exactly as intended.
+        if ($metadata['seconds'] < 3 || $metadata['seconds'] > 60) {
+            throw new \InvalidArgumentException(sprintf('Instagram only accepts videos that are between 3 and 60 seconds long. Your video "%s" is %d seconds long.', $videoFilename, $metadata['seconds']));
+        }
+
         // Request parameters for uploading a new video.
         $uploadParams = $this->http->requestVideoUploadURL();
 
@@ -811,7 +823,6 @@ class Instagram
         $this->http->uploadPhotoData($type, $videoFilename, 'videofile', $uploadParams['upload_id']);
 
         // Configure the uploaded video and attach it to our timeline/story.
-        $metadata['length'] = Utils::getSeconds($videoFilename);
         $configure = $this->configureVideoWithRetries($type, $uploadParams['upload_id'], $metadata);
 
         return $configure;
@@ -908,6 +919,21 @@ class Instagram
             case 'video':
                 $hasUploadedVideo = true;
 
+                // Figure out how long the video is.
+                // NOTE: We do this first, since it validates whether the video
+                // file is valid and lets us avoid wasting time uploading
+                // totally invalid files!
+                $seconds = Utils::getSeconds($item['file']);
+                $media[$key]['seconds'] = $seconds;
+
+                // Validate video length. Instagram only allows 3-60 seconds.
+                // NOTE: Instagram has no disk size limit, but this length
+                // validation also ensures we can only upload small files
+                // exactly as intended.
+                if ($seconds < 3 || $seconds > 60) {
+                    throw new \InvalidArgumentException(sprintf('Instagram only accepts videos that are between 3 and 60 seconds long. Your video "%s" is %d seconds long.', $item['file'], $seconds));
+                }
+
                 // Request parameters for uploading a new video.
                 $uploadParams = $this->http->requestVideoUploadURL();
                 $media[$key]['upload_id'] = $uploadParams['upload_id'];
@@ -968,7 +994,7 @@ class Instagram
                 break;
             case 'video':
                 $videoConfig = [
-                    //'length'              => 0.00,
+                    'length'              => number_format($item['seconds'], 2),
                     'date_time_original'  => $date,
                     'scene_type'          => 1,
                     'poster_frame_index'  => 0,
@@ -978,7 +1004,7 @@ class Instagram
                     'source_type'         => 'library',
                     'geotag_enabled'      => false,
                     'edits', [
-                        //'length'          => 0.00,
+                        //'length'          => '0.00', // TODO! Should this always be 0.00?
                         'cinema'          => 'unsupported',
                         'original_length' => 0.00,
                         'source_type'     => 'library',
@@ -1209,7 +1235,7 @@ class Instagram
         ->addPost('video_result', 'deprecated')
         ->addPost('upload_id', $uploadId)
         ->addPost('source_type', 4)
-        ->addPost('length', $metadata['length'])
+        ->addPost('length', number_format($metadata['seconds'], 2))
         ->addPost('date_time_original', time())
         ->addPost('filter_type', 0)
         ->addPost('video_result', 'deprecated')
@@ -1271,7 +1297,7 @@ class Instagram
         /** @var string|null Caption to use for the media. */
         $captionText = isset($metadata['caption']) ? $metadata['caption'] : null;
         /** @var Response\Model\Location|null A Location object describing where
-            the media was taken. NOT USED FOR STORY MEDIA! */
+         the media was taken. NOT USED FOR STORY MEDIA! */
         $location = (isset($metadata['location']) && $type != 'story') ? $metadata['location'] : null;
         /** @var void Photo filter. THIS DOES NOTHING! All real filters are done in the mobile app. */
         // $filter = isset($metadata['filter']) ? $metadata['filter'] : null;
