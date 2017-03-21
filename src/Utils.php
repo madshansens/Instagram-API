@@ -63,8 +63,8 @@ class Utils
      * @param string $videoFilename Path to the video file.
      *
      * @throws \InvalidArgumentException If the video file is missing.
-     * @throws \RuntimeException If FFmpeg isn't working properly.
-     * @throws \Exception        In case of various processing errors.
+     * @throws \RuntimeException         If FFmpeg isn't working properly.
+     * @throws \Exception                In case of various processing errors.
      *
      * @return int Length of the file in seconds.
      */
@@ -89,9 +89,8 @@ class Utils
         // Extract the video duration if available.
         $seconds = -1;
         foreach ($output as $line) {
-            if (preg_match('/Duration: (\d{2}):(\d{2}):(\d{2})/', $line, $matches)) {
-                $seconds = (int) ($matches[1] * 3600 + $matches[2] * 60 + round($matches[3]));
-                $seconds = number_format($seconds, 2);
+            if (preg_match('/Duration: (\d{2}):(\d{2}):(\d{2}\.\d{2})/', $line, $matches)) {
+                $seconds = (int) ($matches[1] * 3600 + $matches[2] * 60 + ceil($matches[3]));
                 break;
             }
         }
