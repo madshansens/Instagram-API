@@ -12,4 +12,8 @@ class ConfigureResponse extends \InstagramAPI\Response
      * @var Model\Item
      */
     public $media;
+    /**
+     * @var string
+     */
+    public $client_sidecar_id;
 }

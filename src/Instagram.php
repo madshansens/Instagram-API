@@ -1337,9 +1337,9 @@ class Instagram
         )
         ->addPost('edits',
             [
-                'crop_original_size'    => [number_format($metadata['width'], 1), number_format($metadata['height'], 1)],
-                'crop_zoom'             => number_format(1, 1),
-                'crop_center'           => [number_format(0, 1), '-'.number_format(0, 1)]
+                'crop_original_size'    => [$metadata['width'], $metadata['height']],
+                'crop_zoom'             => 1,
+                'crop_center'           => [0.0, -0.0]
             ]
         )
         ->addPost('extra',
@@ -1358,7 +1358,7 @@ class Instagram
                 break;
             case 'story':
                 $requestData->addPost('client_shared_at', time())
-                ->addPost('source_type', 4)
+                ->addPost('source_type', 3)
                 ->addPost('configure_mode', 1)
                 ->addPost('client_timestamp', time())
                 ->addPost('upload_id', $uploadId);
