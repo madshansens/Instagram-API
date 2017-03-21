@@ -726,6 +726,10 @@ class Instagram
             throw new \InvalidArgumentException(sprintf('Unsupported photo upload type "%s".', $type));
         }
 
+        $size = getimagesize($photoFilename);
+        $metadata['width']  = $size[0];
+        $metadata['height'] = $size[1];
+
         // Perform the upload and then configure it for our timeline/story.
         $upload = $this->http->uploadPhotoData($type, $photoFilename);
         $configure = $this->configure($type, $upload->getUploadId(), $photoFilename, $metadata);
@@ -1321,13 +1325,8 @@ class Instagram
 
         $requestData = $this->request($endpoint)
         ->addPost('_csrftoken', $this->token)
-        ->addPost('client_shared_at', time())
-        ->addPost('source_type', 3)
-        ->addPost('configure_mode', 1)
         ->addPost('_uid', $this->username_id)
         ->addPost('_uuid', $this->uuid)
-        ->addPost('caption', $captionText)
-        ->addPost('client_timestamp', time())
         ->addPost('device',
             [
                 'manufacturer'      => $this->device->getManufacturer(),
@@ -1335,13 +1334,41 @@ class Instagram
                 'android_version'   => $this->device->getAndroidVersion(),
                 'android_release'   => $this->device->getAndroidRelease(),
             ]
+        )
+        ->addPost('edits',
+            [
+                'crop_original_size'    => [number_format($metadata['width'], 1), number_format($metadata['height'], 1)],
+                'crop_zoom'             => number_format(1, 1),
+                'crop_center'           => [number_format(0, 1), '-'.number_format(0, 1)]
+            ]
+        )
+        ->addPost('extra',
+            [
+                'source_width'  => $metadata['width'],
+                'source_height' => $metadata['height']
+            ]
         );
 
-        if ($type == 'album') {
-            $requestData->addPost('client_sidecar_id', Utils::generateUploadId())
-            ->addPost('children_metadata', $uploadId);
-        } else {
-            $requestData->addPost('upload_id', $uploadId);
+        switch ($type) {
+            case 'timeline':
+                $requestData->addPost('caption', $captionText)
+                ->addPost('source_type', 4)
+                ->addPost('media_folder', 'Camera')
+                ->addPost('upload_id', $uploadId);
+                break;
+            case 'story':
+                $requestData->addPost('client_shared_at', time())
+                ->addPost('source_type', 4)
+                ->addPost('configure_mode', 1)
+                ->addPost('client_timestamp', time())
+                ->addPost('upload_id', $uploadId);
+                break;
+            case 'album':
+                $requestData->addPost('client_sidecar_id', Utils::generateUploadId())
+                ->addPost('children_metadata', $uploadId);
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf('Unsupported media type "%s".', $type));
         }
 
         if ($location instanceof Response\Model\Location) {
@@ -1363,9 +1390,10 @@ class Instagram
             ->addPost('altitude', mt_rand(10, 800));
         }
 
+        /* TODO
         if (!is_null($filter)) {
             $requestData->addPost('edits', ['filter_type' => Utils::getFilterCode($filter)]);
-        }
+        }*/
 
         $configure = $requestData->getResponse(new Response\ConfigureResponse());
 
