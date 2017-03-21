@@ -86,8 +86,9 @@ class Request
         } else {
             $endPoint = $this->url;
         }
+        $payload = json_encode($this->posts);
         if ($this->replacePost) {
-            $payload = str_replace(array_keys($this->replacePost), array_values($this->replacePost), json_encode($this->posts));
+            $payload = str_replace(array_keys($this->replacePost), array_values($this->replacePost), $payload);
         }
         if ($this->posts) {
             if ($this->signedPost) {

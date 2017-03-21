@@ -91,6 +91,7 @@ class Utils
         foreach ($output as $line) {
             if (preg_match('/Duration: (\d{2}):(\d{2}):(\d{2})/', $line, $matches)) {
                 $seconds = (int) ($matches[1] * 3600 + $matches[2] * 60 + round($matches[3]));
+                $seconds = number_format($seconds, 2);
                 break;
             }
         }
