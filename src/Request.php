@@ -86,17 +86,17 @@ class Request
         } else {
             $endPoint = $this->url;
         }
+        if ($this->replacePost) {
+            $payload = str_replace(array_keys($this->replacePost), array_values($this->replacePost), json_encode($this->posts));
+        }
         if ($this->posts) {
             if ($this->signedPost) {
-                $post = Signatures::generateSignature(json_encode($this->posts));
+                $post = Signatures::generateSignature($payload);
             } else {
                 $post = http_build_query($this->posts);
             }
         } else {
             $post = null;
-        }
-        if ($this->replacePost) {
-            $post = str_replace(array_keys($this->replacePost), array_values($this->replacePost), $post);
         }
 
         $response = $instagramObj->http->api($endPoint, $post, $this->requireLogin, false);
