@@ -1,8 +1,8 @@
 <?php
 
-/**
- * Uploading a timeline album (aka carousel aka sidecar).
- */
+set_time_limit(0);
+date_default_timezone_set('UTC');
+
 require __DIR__.'/../vendor/autoload.php';
 
 /////// CONFIG ///////
@@ -12,8 +12,12 @@ $debug = true;
 $truncatedDebug = false;
 //////////////////////
 
+/**
+ * Uploading a timeline album (aka carousel aka sidecar).
+ */
+
 /////// MEDIA ////////
-$media = [
+$media = [ // Albums can contain between 2 and 10 photos/videos.
     [
         'type'     => 'photo',
         'file'     => '', // Path to the photo file.
