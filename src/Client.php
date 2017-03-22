@@ -828,14 +828,16 @@ class Client
     /**
      * Asks Instagram for parameters for uploading a new video.
      *
-     * @param string $type What type of upload ("timeline", "story" or "album").
+     * @param string     $type     What type of upload ("timeline", "story" or "album").
+     * @param array|null $metadata (optional) Metadata key-value pairs.
      *
      * @throws \InstagramAPI\Exception\InstagramException If the request fails.
      *
      * @return array
      */
     public function requestVideoUploadURL(
-        $type)
+        $type,
+        array $metadata = null)
     {
         $this->_throwIfNotLoggedIn();
 
