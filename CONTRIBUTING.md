@@ -1,18 +1,16 @@
 # GENERAL PROJECT RULES
 
-Your contributions MUST follow ALL of these rules, for a consistent and bug-free project. Otherwise WE will have to fix YOUR BUGS every time you contribute something. And that hurts us and it hurts every user and every other developer.
+Important! Your contributions MUST follow ALL of these rules, for a consistent and bug-free project. Otherwise WE will have to fix YOUR BUGS every time you contribute something. And that hurts us and it hurts every user and every other developer.
 
 Write. Your. Code. **Carefully.** Otherwise we don't want it.
 
-When we merge people's pull requests, we must ALWAYS verify that they've followed the standards in this document. Most people in the past have been total _idiots_ and have broken the code repeatedly. We will _not_ tolerate sloppy idiots anymore, because _their_ sloppiness just leads to _massive_ amounts of extra work for _us_ with having to unbreak their idiotic mess.
-
-Please don't dump your idiotic mess on us. It's like walking into our house and taking a shit on our floor and saying "here, merge this steaming, brown pile of shit".
+Please don't dump some sloppy, idiotic mess on us. It's like walking into our house and taking a shit on our floor and saying "here, merge this steaming, brown pile of shit".
 
 Guess what? We don't want your sloppy 1-second edits that break everything. If you _can't_ do it properly, then ask _someone else_ to do the changes.
 
-This is a document which, among other things, describes PSR-4 class autoloading, clean commits, how to handle/document exceptions, how to structure function arguments, naming clear variables, always adding/updating PHPdoc blocks, and how to verify that your changes don't _break everything_ when performing big changes to existing functions or adding brand new functions and classes.
+This is a document which, among other things, describes PSR-4 class autoloading, clean commits, how to handle/document exceptions, how to structure function arguments, naming clear variables, always adding/updating PHPdoc blocks in all affected functions, and how to verify that your changes don't _break everything_ when performing big changes to existing functions or adding brand new functions and classes.
 
-This document is _not_ some weak, loose "recommendation". It's a _total requirement_, to prevent turning this project into a broken, buggy mess again.
+This document is _not_ some soft "recommendation". It's a _strong requirement_, to prevent turning this project into a broken, buggy mess again, the way it was in its wild and buggy past.
 
 Everyone who _ever_ wants to contribute needs to familiarize themselves with _everything_ in this document. Nobody wants to go back to the broken, buggy mess that was version 1.x of this library.
 
@@ -181,7 +179,7 @@ $width = floor($this->_height * $this->_maxAspectRatio);
 
 - All functions MUST have occasional comments that explain what they're doing in their various substeps. Look at our codebase and follow our commenting style.
 - Our comments start with a capital letter and end in punctuation, and describe the purpose in as few words as possible, such as: `// Default request options (immutable after client creation).`
-- All functions MUST do as little work as possible, so that they are easy to maintain and bugfix. Huge algorithms MUST therefore be broken into smaller functions, to AVOID SPAGHETTI CODE. We DON'T want a 500-line function. Instead, want a clean 10-line function which in turn calls four separate "task-oriented" functions to cleanly achieve the same work that the 500-line function achieved. With separation into smaller tasks, the code becomes maintainable and can easily be re-used to do other jobs. If you just dump it all into a single function like a moron, then it becomes impossible to maintain or re-use for other purposes.
+- All functions MUST do as little work as possible, so that they are easy to maintain and bugfix. Huge algorithms MUST therefore be broken into smaller functions, to AVOID SPAGHETTI CODE. We DON'T want a 500-line function. Instead, we want a clean 10-line function which in turn calls four separate "task-oriented" functions to cleanly achieve the same work that the 500-line function achieved. With separation into smaller tasks, the code becomes maintainable and can easily be re-used to do other jobs. If you just dump it all into a single function like a moron, then it becomes impossible to maintain or re-use for other purposes.
 
 Example of a GOOD function layout:
 
@@ -231,7 +229,7 @@ That would be an absolute HELL to extend later, and it's HELL for users to _use_
 
 DON'T design functions like that. Don't be an idiot!
 
-Make such multi-argument functions take future-extensible argument arrays instead, especially if you expect that more properties may be added in the future.
+Make such multi-argument functions take future-extensible option-arrays instead, especially if you expect that more properties may be added in the future.
 
 So the above would instead be PROPERLY designed as follows:
 
@@ -243,7 +241,7 @@ Now users can just say `uploadVideo($videoFilename, ['hashtags'=>$hashTags]);`, 
 
 ### Function Documentation
 
-- All functions MUST have _COMPLETE_ PHPdoc doc-blocks. The critically important information is the `summary-line` (ALWAYS), then the `detailed description` (if necessary), then the `@params` (if any), then the `@return` (if the function returns something), then the `@throws` (one for EVERY type of exception that it throws, even uncaught ones thrown from DEEPER functions called within this function), and lastly one or more `@see` if there's a necessary reference to a URL or another function or class.
+- All functions MUST have _COMPLETE_ PHPdoc doc-blocks. The critically important information is the single-sentence `summary-line` (ALWAYS), then the `detailed description` (if necessary), then the `@param` descriptions (if any), then the `@throws` (one for EVERY type of exception that it throws, even uncaught ones thrown from DEEPER functions called within this function), then the `@return` (if the function returns something), and lastly one or more `@see` if there's any need for a documentation reference to a URL or another function or class.
 
 Example of a properly documented function:
 
@@ -273,14 +271,14 @@ Example of a properly documented function:
     }
 ```
 
-- You MUST take EXTREMELY GOOD CARE to ALWAYS _perfectly_ document ALL parameters, the EXACT return-type, and ALL thrown exceptions.
+- You MUST take EXTREMELY GOOD CARE to ALWAYS _perfectly_ document ALL parameters, the EXACT return-type, and ALL thrown exceptions. All other project developers RELY on the function-documentation ALWAYS being CORRECT! With incorrect documentation, other developers would make incorrect assumptions and bugs would be introduced!
 
 ### Exceptions (EXTREMELY IMPORTANT)
 
-- ALL thrown exceptions that can happen inside a function or in ANY of its SUB-FUNCTION calls MUST be documented as `@throws`, so that we get a COMPLETE OVERVIEW of ALL exceptions that may be thrown when we call the function. YES, that EVEN means exceptions that come from deeper function calls, whose exceptions are NOT being caught by your function and which will therefore bubble up if they're thrown by the deeper sub-functions!
-- Always remember that Exceptions will CRITICALLY BREAK ALL OTHER CODE AND STOP PHP'S EXECUTION if not handled or documented properly! They are a LOT of responsibility! So you MUST put a LOT OF TIME AND EFFORT into PROPERLY handling (_catching and doing something_) with ALL exceptions, AND _documenting_ the ones that your function DOESN'T catch/handle internally and which WILL therefore bubble upwards and would possibly BREAK other code (which is exactly what would happen if an exception ISN'T documented by you and someone uses your bad function and doesn't "catch" your exception since YOU didn't tell them that it can be thrown)!
+- ALL thrown exceptions that can happen inside a function or in ANY of its SUB-FUNCTION calls MUST be documented as `@throws`, so that we get a COMPLETE OVERVIEW of ALL exceptions that may be thrown when we call the function. YES, that EVEN means exceptions that come from deeper function calls, whose exceptions are NOT being caught by your function and which will therefore bubble up if they're thrown by those deeper sub-functions!
+- Always remember that Exceptions WILL CRITICALLY BREAK ALL OTHER CODE AND STOP PHP'S EXECUTION if not handled or documented properly! They are a LOT of responsibility! So you MUST put a LOT OF TIME AND EFFORT into PROPERLY handling (_catching and doing something_) for ALL exceptions that your function should handle, AND adding PHPdoc _documentation_ about the ones that your function DOESN'T catch/handle internally and which WILL therefore bubble upwards and would possibly BREAK other code (which is EXACTLY what would happen if an exception ISN'T documented by you and someone then uses your bad function and doesn't "catch" your exception since YOU didn't tell them that it can be thrown)!
 - All of our internal exceptions derive from `\InstagramAPI\Exception\InstagramException`, so it's always safe to declare that one as a `@throws \InstagramAPI\Exception\InstagramException` if you're calling anything that throws exceptions based on our internal `src/Exception/*.php` system. But it's even better if you can pinpoint which exact exceptions are thrown, by looking at the functions you're calling and seeing their `@throws` documentation, WHICH OF COURSE DEPENDS ON PEOPLE HAVING WRITTEN PROPER `@throws` FOR THOSE OTHER FUNCTIONS SO THAT _YOU_ KNOW WHAT THE FUNCTIONS YOU'RE CALLING WILL THROW. DO YOU SEE _NOW_ HOW IMPORTANT IT IS TO DECLARE EXCEPTIONS PROPERLY AND TO _ALWAYS_ KEEP THAT LIST UP TO DATE?!
-- Whenever you are using an EXTERNAL LIBRARY that throws its own custom exceptions (meaning NOT one of the standard PHP ones such as `\Exception` or `\InvalidArgumentException`, etc), then you MUST ALWAYS re-wrap the exception into some appropriate exception from our own library instead, otherwise users will not be able to say `catch (\InstagramAPI\Exception\InstagramException $e)`, since the 3rd party exceptions wouldn't be derived from our base exception. To solve that, look at the design of our `src/Exception/NetworkException.php`, which we use in `src/HttpInterface.php` to re-wrap all Guzzle exceptions into our own exception type instead. Read the source-code of our NetworkException and it will explain how to properly re-wrap 3rd party exceptions and how to ensure that your re-wrapped exception will give users helpful messages and helpful stack traces.
+- Whenever you are using an EXTERNAL LIBRARY that throws its own custom exceptions (meaning NOT one of the standard PHP ones such as `\Exception` or `\InvalidArgumentException`, etc), then you MUST ALWAYS re-wrap the exception into some appropriate exception from our own library instead, otherwise users will not be able to say `catch (\InstagramAPI\Exception\InstagramException $e)`, since the 3rd party exceptions wouldn't be derived from our base exception and wouldn't be caught, thus breaking the user's program. To solve that, look at the design of our `src/Exception/NetworkException.php`, which we use in `src/Client.php` to re-wrap all Guzzle exceptions into our own exception type instead. Read the source-code of our NetworkException and it will explain how to properly re-wrap 3rd party exceptions and how to ensure that your re-wrapped exception will give users helpful messages and helpful stack traces.
 
 
 # CONTRIBUTING NEW ENDPOINTS
