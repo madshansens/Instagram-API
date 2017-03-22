@@ -20,12 +20,12 @@ composer require mgp25/instagram-php
 ```
 
 ```php
-require('../vendor/autoload.php');
+require __DIR__.'/../vendor/autoload.php';
 
-$instagram = new \InstagramAPI\Instagram();
+$ig = new \InstagramAPI\Instagram();
 ```
 
-If you want to test code that is in the master branch, which hasn't been pushed as a release, you can use master:
+If you want to test new and possibly unstable code that is in the master branch, and which hasn't yet been released, then you can use master instead (at your own risk):
 
 ```sh
 composer require mgp25/instagram-php dev-master
@@ -62,8 +62,8 @@ MIT
 
 # Terms and conditions
 
-- You will NOT use this API for marketing purposes (spam, massive sending...).
-- We do NOT give support to anyone that wants this API to send massive messages or similar.
+- You will NOT use this API for marketing purposes (spam, botting, harassment, massive bulk messaging...).
+- We do NOT give support to anyone who wants to use this API to send spam or commit other crimes.
 - We reserve the right to block any user of this repository that does not meet these conditions.
 
 ## Legal
