@@ -7,6 +7,13 @@ namespace InstagramAPI;
  */
 class Request
 {
+    /**
+     * The Instagram class instance we belong to.
+     *
+     * @var \InstagramAPI\Instagram
+     */
+    protected $_parent;
+
     protected $_url;
     protected $_params = [];
     protected $_posts = [];
@@ -15,8 +22,10 @@ class Request
     protected $_signedPost = true;
 
     public function __construct(
+        \InstagramAPI\Instagram $parent,
         $url)
     {
+        $this->_parent = $parent;
         $this->_url = $url;
 
         return $this;
@@ -71,8 +80,6 @@ class Request
         $baseClass,
         $includeHeader = false)
     {
-        $instagramObj = Instagram::getInstance();
-
         if ($this->_params) {
             $endpoint = $this->_url.'?'.http_build_query($this->_params);
         } else {
@@ -89,9 +96,9 @@ class Request
             $post = null;
         }
 
-        $response = $instagramObj->client->api($endpoint, $post, $this->_requireLogin, false);
+        $response = $this->_parent->client->api($endpoint, $post, $this->_requireLogin, false);
 
-        $responseObject = $instagramObj->client->getMappedResponseObject(
+        $responseObject = $this->_parent->client->getMappedResponseObject(
             $baseClass,
             $response[1], // [0] = Token. [1] = The actual server response.
             $this->_checkStatus, // Whether to validate that API response "status" MUST be Ok.

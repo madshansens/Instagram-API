@@ -5,13 +5,6 @@ namespace InstagramAPI;
 class Instagram
 {
     /**
-     * Reference to the class instance.
-     *
-     * @var Instagram
-     */
-    public static $instance;
-
-    /**
      * Currently active Instagram username.
      *
      * @var string
@@ -137,7 +130,6 @@ class Instagram
         $truncatedDebug = false,
         $settingsAdapter = null)
     {
-        self::$instance = $this;
         $this->debug = $debug;
         $this->truncatedDebug = $truncatedDebug;
 
@@ -2849,20 +2841,6 @@ class Instagram
     public function request(
         $url)
     {
-        return new Request($url);
-    }
-
-    /**
-     * Get a reference to the class instance.
-     *
-     * @return \InstagramAPI\Instagram
-     */
-    public static function getInstance()
-    {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
+        return new Request($this, $url);
     }
 }
