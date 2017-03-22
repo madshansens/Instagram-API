@@ -916,6 +916,7 @@ class Client
      * Note that video uploads often fail when their server is overloaded.
      * So you may have to redo this call multiple times.
      *
+     * @param string $type          What type of upload ("timeline", "story" or "album").
      * @param string $videoFilename The video filename.
      * @param array  $uploadParams  An array created by requestVideoUploadURL()!
      *
@@ -926,6 +927,7 @@ class Client
      * @return \InstagramAPI\Response\UploadVideoResponse
      */
     public function uploadVideoChunks(
+        $type,
         $videoFilename,
         array $uploadParams)
     {
@@ -1042,8 +1044,8 @@ class Client
      * The retries are very important since their media server is often overloaded and
      * aborts the upload. So you almost always want this instead of uploadVideoChunks().
      *
-     * @param string $videoFilename The video filename.
      * @param string $type          What type of video ("timeline", "story" or "album").
+     * @param string $videoFilename The video filename.
      * @param array  $uploadParams  An array created by requestVideoUploadURL()!
      * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
      *
@@ -1070,7 +1072,7 @@ class Client
         for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
             try {
                 // Attempt an upload and return the result if successful.
-                return $this->uploadVideoChunks($videoFilename, $uploadParams);
+                return $this->uploadVideoChunks($type, $videoFilename, $uploadParams);
             } catch (\InstagramAPI\Exception\UploadFailedException $e) {
                 if ($attempt < $maxAttempts) {
                     // Do nothing, since we'll be retrying the failed upload...
