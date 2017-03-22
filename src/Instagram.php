@@ -811,7 +811,7 @@ class Instagram
 
         $metadata['size'] = Utils::getVideoSize($videoFilename);
         if (($metadata['size']['width'] <= 320 )|| ($metadata['size']['width'] >= 1080)) {
-            throw new \InvalidArgumentException(sprintf('Invalid video width. Instagram only accepts videos that are between 320 and 1080 width. Your video "%s" width is %d.', $videoFilename, $metadata['size']['width']));
+            throw new \InvalidArgumentException(sprintf('Invalid video width. Instagram only accepts videos that are between 320 and 1080 pixels wide. Your video "%s" is %d pixels wide.', $videoFilename, $metadata['size']['width']));
         }
 
         // Request parameters for uploading a new video.
