@@ -810,7 +810,7 @@ class Instagram
         }
 
         // Request parameters for uploading a new video.
-        $uploadParams = $this->client->requestVideoUploadURL();
+        $uploadParams = $this->client->requestVideoUploadURL($type);
 
         // Attempt to upload the video data.
         $upload = $this->client->uploadVideoData($type, $videoFilename, $uploadParams, $maxAttempts);
@@ -934,7 +934,7 @@ class Instagram
                 }
 
                 // Request parameters for uploading a new video.
-                $uploadParams = $this->client->requestVideoUploadURL(null, true);
+                $uploadParams = $this->client->requestVideoUploadURL('album');
                 $media[$key]['upload_id'] = $uploadParams['upload_id'];
 
                 // Attempt to upload the video data.
