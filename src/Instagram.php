@@ -606,7 +606,7 @@ class Instagram
      *
      * @return \InstagramAPI\Response\MegaphoneLogResponse
      */
-    protected function getMegaphoneLog()
+    public function getMegaphoneLog()
     {
         return $this->request('megaphone/log/')
         ->setSignedPost(false)

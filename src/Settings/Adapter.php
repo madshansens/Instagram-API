@@ -6,7 +6,7 @@ class Adapter
 {
     public $storage;
 
-    protected function getCmdOptions(
+    protected function _getCmdOptions(
         array $longOpts)
     {
         $cmdOptions = getopt('', $longOpts);
@@ -18,7 +18,7 @@ class Adapter
         return $cmdOptions;
     }
 
-    protected function getUserConfig(
+    protected function _getUserConfig(
         $settingName,
         array $config,
         array $cmdOptions)
@@ -55,7 +55,7 @@ class Adapter
     {
         switch ($config['type']) {
         case 'mysql':
-            $cmdOptions = $this->getCmdOptions([
+            $cmdOptions = $this->_getCmdOptions([
                 'db_username::',
                 'db_password::',
                 'db_host::',
@@ -65,7 +65,7 @@ class Adapter
 
             // Settings that can be used regardless of connection method.
             $mysqlOptions = [
-                'db_tablename'       => $this->getUserConfig('db_tablename', $config, $cmdOptions),
+                'db_tablename'       => $this->_getUserConfig('db_tablename', $config, $cmdOptions),
             ];
 
             if (isset($config['pdo'])) {
@@ -75,21 +75,21 @@ class Adapter
                 $mysqlOptions['pdo'] = $config['pdo'];
             } else {
                 // Settings that can be provided if a PDO object is not used.
-                $mysqlOptions['db_username'] = $this->getUserConfig('db_username', $config, $cmdOptions);
-                $mysqlOptions['db_password'] = $this->getUserConfig('db_password', $config, $cmdOptions);
-                $mysqlOptions['db_host'] = $this->getUserConfig('db_host', $config, $cmdOptions);
-                $mysqlOptions['db_name'] = $this->getUserConfig('db_name', $config, $cmdOptions);
+                $mysqlOptions['db_username'] = $this->_getUserConfig('db_username', $config, $cmdOptions);
+                $mysqlOptions['db_password'] = $this->_getUserConfig('db_password', $config, $cmdOptions);
+                $mysqlOptions['db_host'] = $this->_getUserConfig('db_host', $config, $cmdOptions);
+                $mysqlOptions['db_name'] = $this->_getUserConfig('db_name', $config, $cmdOptions);
             }
 
             $this->storage = new Storage\MySQL($username, $mysqlOptions);
             break;
         case 'file':
-            $cmdOptions = $this->getCmdOptions([
+            $cmdOptions = $this->_getCmdOptions([
                 'settings_path::',
             ]);
 
             // Settings that can optionally be provided.
-            $settingsPath = $this->getUserConfig('settings_path', $config, $cmdOptions);
+            $settingsPath = $this->_getUserConfig('settings_path', $config, $cmdOptions);
 
             $this->storage = new Storage\File($username, $settingsPath);
             break;

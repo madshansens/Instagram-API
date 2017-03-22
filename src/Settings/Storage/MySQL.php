@@ -6,9 +6,9 @@ use PDO;
 
 class MySQL implements \InstagramAPI\Settings\StorageInterface
 {
-    private $sets;
-    private $pdo;
-    private $instagramUsername;
+    private $_sets;
+    private $_pdo;
+    private $_instagramUsername;
 
     public $dbTableName = 'user_settings';
 
@@ -16,7 +16,7 @@ class MySQL implements \InstagramAPI\Settings\StorageInterface
         $username,
         $mysqlOptions)
     {
-        $this->instagramUsername = $username;
+        $this->_instagramUsername = $username;
 
         if (isset($mysqlOptions['db_tablename'])) {
             $this->dbTableName = $mysqlOptions['db_tablename'];
@@ -24,18 +24,18 @@ class MySQL implements \InstagramAPI\Settings\StorageInterface
 
         if (isset($mysqlOptions['pdo'])) {
             // Pre-provided PDO object.
-            $this->pdo = $mysqlOptions['pdo'];
+            $this->_pdo = $mysqlOptions['pdo'];
         } else {
             // We should connect for the user.
             $username = (is_null($mysqlOptions['db_username']) ? 'root' : $mysqlOptions['db_username']);
             $password = (is_null($mysqlOptions['db_password']) ? '' : $mysqlOptions['db_password']);
             $host = (is_null($mysqlOptions['db_host']) ? 'localhost' : $mysqlOptions['db_host']);
             $dbName = (is_null($mysqlOptions['db_name']) ? 'instagram' : $mysqlOptions['db_name']);
-            $this->connect($username, $password, $host, $dbName);
+            $this->_connect($username, $password, $host, $dbName);
         }
 
-        $this->autoInstall();
-        $this->populateObject();
+        $this->_autoInstall();
+        $this->_populateObject();
     }
 
     /**
@@ -57,11 +57,11 @@ class MySQL implements \InstagramAPI\Settings\StorageInterface
         $default = null)
     {
         if ($key == 'sets') {
-            return $this->sets; // Return 'sets' itself which contains all data.
+            return $this->_sets; // Return '_sets' itself which contains all data.
         }
 
-        if (isset($this->sets[$key])) {
-            return $this->sets[$key];
+        if (isset($this->_sets[$key])) {
+            return $this->_sets[$key];
         }
 
         return $default;
@@ -75,25 +75,25 @@ class MySQL implements \InstagramAPI\Settings\StorageInterface
             return; // Don't allow writing to special 'sets' or 'username' keys.
         }
 
-        $this->sets[$key] = $value;
+        $this->_sets[$key] = $value;
         $this->save();
     }
 
     public function save()
     {
         // Special key where we store what username these settings belong to.
-        $this->sets['username'] = $this->instagramUsername;
+        $this->_sets['username'] = $this->_instagramUsername;
 
         // Update if user already exists in db, otherwise insert.
-        if (isset($this->sets['id'])) {
+        if (isset($this->_sets['id'])) {
             $sql = "update {$this->dbTableName} set ";
-            $bindList[':id'] = $this->sets['id'];
+            $bindList[':id'] = $this->_sets['id'];
         } else {
             $sql = "insert into {$this->dbTableName} set ";
         }
 
         // Add all settings to storage.
-        foreach ($this->sets as $key => $value) {
+        foreach ($this->_sets as $key => $value) {
             if ($key == 'id') {
                 continue;
             }
@@ -101,21 +101,21 @@ class MySQL implements \InstagramAPI\Settings\StorageInterface
             $bindList[":{$key}"] = $value;
         }
 
-        $sql = $sql.implode(',', $fieldList).(isset($this->sets['id']) ? ' where id=:id' : '');
-        $std = $this->pdo->prepare($sql);
+        $sql = $sql.implode(',', $fieldList).(isset($this->_sets['id']) ? ' where id=:id' : '');
+        $std = $this->_pdo->prepare($sql);
 
         $std->execute($bindList);
 
         // Keep track of which database row id the user has been assigned as.
-        if (!isset($this->sets['id'])) {
-            $this->sets['id'] = $this->pdo->lastinsertid();
+        if (!isset($this->_sets['id'])) {
+            $this->_sets['id'] = $this->_pdo->lastinsertid();
         }
     }
 
     /**
      * @throws \InstagramAPI\Exception\SettingsException
      */
-    private function connect(
+    private function _connect(
         $username,
         $password,
         $host,
@@ -126,24 +126,24 @@ class MySQL implements \InstagramAPI\Settings\StorageInterface
             $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $pdo->query('SET NAMES UTF8');
             $pdo->setAttribute(PDO::ERRMODE_WARNING, PDO::ERRMODE_EXCEPTION);
-            $this->pdo = $pdo;
+            $this->_pdo = $pdo;
         } catch (\PDOException $e) {
             throw new \InstagramAPI\Exception\SettingsException('Cannot connect to MySQL settings adapter.');
         }
     }
 
-    private function autoInstall()
+    private function _autoInstall()
     {
         // Detect the name of the MySQL database that PDO is connected to.
-        $dbName = $this->pdo->query('select database()')->fetchColumn();
+        $dbName = $this->_pdo->query('select database()')->fetchColumn();
 
-        $std = $this->pdo->prepare('SHOW TABLES WHERE tables_in_'.$dbName.' = :tableName');
+        $std = $this->_pdo->prepare('SHOW TABLES WHERE tables_in_'.$dbName.' = :tableName');
         $std->execute([':tableName' => $this->dbTableName]);
         if ($std->rowCount()) {
             return true;
         }
 
-        $this->pdo->exec('CREATE TABLE `'.$this->dbTableName."` (
+        $this->_pdo->exec('CREATE TABLE `'.$this->dbTableName."` (
             `id` INT(10) NOT NULL AUTO_INCREMENT,
             `username` VARCHAR(50) NULL DEFAULT NULL,
             `username_id` BIGINT(20) NULL DEFAULT NULL,
@@ -163,14 +163,14 @@ class MySQL implements \InstagramAPI\Settings\StorageInterface
         ");
     }
 
-    private function populateObject()
+    private function _populateObject()
     {
-        $std = $this->pdo->prepare("select * from {$this->dbTableName} where username=:username");
-        $std->execute([':username' => $this->instagramUsername]);
+        $std = $this->_pdo->prepare("select * from {$this->dbTableName} where username=:username");
+        $std->execute([':username' => $this->_instagramUsername]);
         $result = $std->fetch(PDO::FETCH_ASSOC);
         if ($result) {
             foreach ($result as $key => $value) {
-                $this->sets[$key] = $value;
+                $this->_sets[$key] = $value;
             }
         }
     }
