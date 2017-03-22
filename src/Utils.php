@@ -144,15 +144,17 @@ class Utils
         $videoFilename,
         array $videoDetails)
     {
-        // Validate story video length. Instagram only allows 3-15 seconds.
+        // Validate video length.
+        // NOTE: Instagram has no disk size limit, but this length validation
+        // also ensures we can only upload small files exactly as intended.
         if ($type == 'story') {
+            // Instagram only allows 3-15 seconds for stories.
             if ($videoDetails['duration'] < 3 || $videoDetails['duration'] > 15) {
                 throw new \InvalidArgumentException(sprintf('Instagram only accepts story videos that are between 3 and 15 seconds long. Your story video "%s" is %d seconds long.', $videoFilename, $videoDetails['duration']));
             }
         } else {
             // Validate video length. Instagram only allows 3-60 seconds.
-            // NOTE: Instagram has no disk size limit, but this length validation
-            // also ensures we can only upload small files exactly as intended.
+            //SEE: https://help.instagram.com/270963803047681
             if ($videoDetails['duration'] < 3 || $videoDetails['duration'] > 60) {
                 throw new \InvalidArgumentException(sprintf('Instagram only accepts videos that are between 3 and 60 seconds long. Your video "%s" is %d seconds long.', $videoFilename, $videoDetails['duration']));
             }
