@@ -1761,7 +1761,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\UsernameInfoResponse
+     * @return \InstagramAPI\Response\UserInfoResponse
      */
     public function removeProfilePicture()
     {
@@ -1769,7 +1769,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new Response\UsernameInfoResponse());
+        ->getResponse(new Response\UserInfoResponse());
     }
 
     /**
@@ -1777,7 +1777,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\UsernameInfoResponse
+     * @return \InstagramAPI\Response\UserInfoResponse
      */
     public function setPrivateAccount()
     {
@@ -1785,7 +1785,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new Response\UsernameInfoResponse());
+        ->getResponse(new Response\UserInfoResponse());
     }
 
     /**
@@ -1793,7 +1793,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\UsernameInfoResponse
+     * @return \InstagramAPI\Response\UserInfoResponse
      */
     public function setPublicAccount()
     {
@@ -1801,7 +1801,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new Response\UsernameInfoResponse());
+        ->getResponse(new Response\UserInfoResponse());
     }
 
     /**
@@ -1809,7 +1809,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\UsernameInfoResponse
+     * @return \InstagramAPI\Response\UserInfoResponse
      */
     public function getCurrentUser()
     {
@@ -1818,7 +1818,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
-        ->getResponse(new Response\UsernameInfoResponse());
+        ->getResponse(new Response\UserInfoResponse());
     }
 
     /**
@@ -1833,7 +1833,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\UsernameInfoResponse
+     * @return \InstagramAPI\Response\UserInfoResponse
      */
     public function editProfile(
         $url,
@@ -1854,7 +1854,7 @@ class Instagram
         ->addPost('biography', $biography)
         ->addPost('email', $email)
         ->addPost('gender', $gender)
-        ->getResponse(new Response\UsernameInfoResponse());
+        ->getResponse(new Response\UserInfoResponse());
     }
 
     /**
@@ -2048,12 +2048,12 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\UsernameInfoResponse
+     * @return \InstagramAPI\Response\UserInfoResponse
      */
     public function getUserInfoByName(
         $username)
     {
-        return $this->request("users/{$username}/usernameinfo/")->getResponse(new Response\UsernameInfoResponse());
+        return $this->request("users/{$username}/usernameinfo/")->getResponse(new Response\UserInfoResponse());
     }
 
     /**
@@ -2063,12 +2063,12 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\UsernameInfoResponse
+     * @return \InstagramAPI\Response\UserInfoResponse
      */
     public function getUserInfoById(
         $userId)
     {
-        return $this->request("users/{$userId}/info/")->getResponse(new Response\UsernameInfoResponse());
+        return $this->request("users/{$userId}/info/")->getResponse(new Response\UserInfoResponse());
     }
 
     /**
@@ -2078,7 +2078,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\UsernameInfoResponse
+     * @return \InstagramAPI\Response\UserInfoResponse
      *
      * @see getCurrentUser()
      */

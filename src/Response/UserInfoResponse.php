@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Response;
 
-class UsernameInfoResponse extends \InstagramAPI\Response
+class UserInfoResponse extends \InstagramAPI\Response
 {
     public $megaphone;
     /**
