@@ -1208,6 +1208,9 @@ class Instagram
         /** @var string[]|null Array of UserPK IDs of people tagged in your
          * video. ONLY USED IN STORY VIDEOS! TODO: Actually, it's not even implemented for stories. */
         $userTags = (isset($metadata['usertags']) && $type == 'story') ? $metadata['usertags'] : null;
+        /** @var Response\Model\Location|null A Location object describing where
+         the media was taken. NOT USED FOR STORY MEDIA! */
+        $location = (isset($metadata['location']) && $type != 'story') ? $metadata['location'] : null;
 
         // Make sure we don't configure "album" video uploads via this function.
         switch ($type) {
@@ -1223,13 +1226,13 @@ class Instagram
 
         $requestData = $this->request($endpoint)
         ->addParams('video', 1)
-        ->addPost('configure_mode', 1)
         ->addPost('video_result', 'deprecated')
         ->addPost('upload_id', $uploadId)
-        ->addPost('source_type', 4)
-        ->addPost('length', round($metadata['videodetails']['duration'], 2))
-        ->addPost('date_time_original', time())
+        ->addPost('poster_frame_index', 0)
+        ->addPost('length', round($metadata['videodetails']['duration'], 1))
+        ->addPost('audio_muted', false)
         ->addPost('filter_type', 0)
+        ->addPost('source_type', 4)
         ->addPost('video_result', 'deprecated')
         ->addPost('device',
             [
@@ -1238,14 +1241,21 @@ class Instagram
                 'android_version'   => $this->device->getAndroidVersion(),
                 'android_release'   => $this->device->getAndroidRelease(),
             ])
-            /* TODO
-        ->addPost('clips', [
-            'length'   => round(0.00, 2),
-            'source_type'   => 4,
-        ])*/
+        ->addPost('extra',
+            [
+                'source_width'  => $metadata['videodetails']['width'],
+                'source_height' => $metadata['videodetails']['height'],
+            ])
         ->addPost('_csrftoken', $this->token)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->username_id);
+
+        if ($type == 'story') {
+            $requestData->addPost('configure_mode', 1) // 1 - REEL_SHARE, 2 - DIRECT_STORY_SHARE
+            ->addPost('story_media_creation_date', time() - mt_rand(10, 20))
+            ->addPost('client_shared_at', time() - mt_rand(3, 10))
+            ->addPost('client_timestamp', time());
+        }
 
         if ($captionText !== '' && !is_null($captionText) && $captionText) {
             $requestData->addPost('caption', $captionText);
@@ -1259,6 +1269,26 @@ class Instagram
             if (!is_null($userTags)) {
                 //$requestData->addPost('reel_mentions', $userTags)
             }
+        }
+
+        if ($location instanceof Response\Model\Location) {
+            $loc = [
+                $location->getExternalIdSource().'_id'   => $location->getExternalId(),
+                'name'                                   => $location->getName(),
+                'lat'                                    => $location->getLat(),
+                'lng'                                    => $location->getLng(),
+                'address'                                => $location->getAddress(),
+                'external_source'                        => $location->getExternalIdSource(),
+            ];
+
+            $requestData->addPost('location', json_encode($loc))
+            ->addPost('geotag_enabled', '1')
+            ->addPost('av_latitude', 0.0)
+            ->addPost('av_longitude', 0.0)
+            ->addPost('posting_latitude', $location->getLat())
+            ->addPost('posting_longitude', $location->getLng())
+            ->addPost('media_latitude', $location->getLat())
+            ->addPost('media_longitude', $location->getLng());
         }
 
         $configure = $requestData->getResponse(new Response\ConfigureVideoResponse());
