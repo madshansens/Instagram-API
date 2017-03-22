@@ -870,11 +870,31 @@ class Client
                 'data' => '1',
             ];
         } else {
-            $bodies[] = [
-                'type' => 'form-data',
-                'name' => 'media_type',
-                'data' => '2',
+            $mediaBody = [
+                [
+                    'type' => 'form-data',
+                    'name' => 'media_type',
+                    'data' => '2',
+                ],
+                [
+                    'type' => 'form-data',
+                    'name' => 'upload_media_duration_ms',
+                    'data' => $metadata['seconds']*1000,
+                ],
+                [
+                    'type' => 'form-data',
+                    'name' => 'upload_media_width',
+                    'data' => $metadata['size']['width'],
+                ],
+                [
+                    'type' => 'form-data',
+                    'name' => 'upload_media_height',
+                    'data' => $metadata['size']['height'],
+                ]
             ];
+            foreach($mediaBody as $body) {
+                array_push($bodies, $body);
+            }
         }
         $payload = $this->_buildBody($bodies, $boundary);
 

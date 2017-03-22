@@ -102,6 +102,53 @@ class Utils
     }
 
     /**
+     * Get size attributes of a video.
+     *
+     * @param string $videoFilename Path to the video file.
+     *
+     * @throws \InvalidArgumentException If the video file is missing.
+     * @throws \RuntimeException         If FFmpeg isn't working properly.
+     * @throws \Exception                In case of various processing errors.
+     *
+     * @return array codec, width and height.
+     */
+    public static function getVideoSize(
+        $videoFilename)
+    {
+        // The user must have FFmpeg.
+        $ffmpeg = self::checkFFMPEG();
+        if ($ffmpeg === false) {
+            throw new \RuntimeException('You must have FFmpeg to generate video thumbnails.');
+        }
+
+        // Check if input file exits.
+        if (empty($videoFilename) || !is_file($videoFilename)) {
+            throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
+        }
+
+        // Load with FFMPEG. Shows duration and exits, since we give no outfile.
+        $command = $ffmpeg.' -i '.escapeshellarg($videoFilename).' 2>&1';
+        $output = @shell_exec($command);;
+
+        $regex_sizes = "/Video: ([^,]*), ([^,]*), ([0-9]{1,4})x([0-9]{1,4})/";
+        if (preg_match($regex_sizes, $output, $regs)) {
+            $codec = $regs [1] ? $regs [1] : null;
+            $width = $regs [3] ? $regs [3] : null;
+            $height = $regs [4] ? $regs [4] : null;
+        }
+
+        if (is_null($codec) || is_null($width) || is_null($height)) {
+            throw new \RuntimeException('FFmpeg failed to detect video size. Is this a valid video file?');
+        }
+
+        return [
+            'codec'     => $codec,
+            'width'     => $width,
+            'height'    => $height
+        ];
+    }
+
+    /**
      * Generate a video icon/thumbnail from a video file.
      *
      * Automatically guarantees that the generated image follows Instagram's

@@ -809,8 +809,13 @@ class Instagram
             throw new \InvalidArgumentException(sprintf('Instagram only accepts videos that are between 3 and 60 seconds long. Your video "%s" is %d seconds long.', $videoFilename, $metadata['seconds']));
         }
 
+        $metadata['size'] = Utils::getVideoSize($videoFilename);
+        if (($metadata['size']['width'] <= 320 )|| ($metadata['size']['width'] >= 1080)) {
+            throw new \InvalidArgumentException(sprintf('Invalid video width. Instagram only accepts videos that are between 320 and 1080 width. Your video "%s" width is %d.', $videoFilename, $metadata['size']['width']));
+        }
+
         // Request parameters for uploading a new video.
-        $uploadParams = $this->client->requestVideoUploadURL($type);
+        $uploadParams = $this->client->requestVideoUploadURL($type, $metadata);
 
         // Attempt to upload the video data.
         $upload = $this->client->uploadVideoData($type, $videoFilename, $uploadParams, $maxAttempts);
