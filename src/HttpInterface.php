@@ -132,7 +132,7 @@ class HttpInterface
         $resetCookieJar = false)
     {
         if ($this->_parent->settingsAdapter['type'] == 'file') {
-            $cookieFilePath = $this->_parent->settings->cookiesPath;
+            $cookieFilePath = $this->_parent->settings->getCookiesPath();
 
             if ($resetCookieJar && !empty($cookieFilePath) && is_file($cookieFilePath)) {
                 @unlink($cookieFilePath);

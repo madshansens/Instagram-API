@@ -11,23 +11,21 @@ class File implements \InstagramAPI\Settings\StorageInterface
      *
      * @var array
      */
-    private $sets;
+    private $_sets;
 
     /**
      * Path to the cookies file.
      *
-     * This is public because it's used by HttpInterface!
-     *
      * @var string
      */
-    public $cookiesPath;
+    private $_cookiesPath;
 
     /**
      * Path to the settings file.
      *
      * @var string
      */
-    private $settingsPath;
+    private $_settingsPath;
 
     /**
      * Constructor.
@@ -43,14 +41,14 @@ class File implements \InstagramAPI\Settings\StorageInterface
         if (empty($settingsPath)) {
             $settingsPath = Constants::SRC_DIR.'/../sessions/';
         }
-        $this->cookiesPath = $settingsPath.$username.DIRECTORY_SEPARATOR.$username.'-cookies.dat';
-        $this->settingsPath = $settingsPath.$username.DIRECTORY_SEPARATOR.$username.'-settings.dat';
+        $this->_cookiesPath = $settingsPath.$username.DIRECTORY_SEPARATOR.$username.'-cookies.dat';
+        $this->_settingsPath = $settingsPath.$username.DIRECTORY_SEPARATOR.$username.'-settings.dat';
 
         // Test write-permissions to the settings file and create if necessary.
-        $this->checkPermissions();
+        $this->_checkPermissions();
 
         // Read all existing settings.
-        $this->loadSettingsFromDisk();
+        $this->_loadSettingsFromDisk();
     }
 
     /**
@@ -62,7 +60,7 @@ class File implements \InstagramAPI\Settings\StorageInterface
      */
     public function maybeLoggedIn()
     {
-        return file_exists($this->cookiesPath)
+        return file_exists($this->_cookiesPath)
             && !empty($this->get('username_id'))
             && !empty($this->get('token'));
     }
@@ -80,11 +78,11 @@ class File implements \InstagramAPI\Settings\StorageInterface
         $default = null)
     {
         if ($key == 'sets') {
-            return $this->sets; // Return 'sets' itself which contains all data.
+            return $this->_sets; // Return 'sets' itself which contains all data.
         }
 
-        return isset($this->sets[$key])
-                ? $this->sets[$key]
+        return isset($this->_sets[$key])
+                ? $this->_sets[$key]
                 : $default;
     }
 
@@ -112,9 +110,9 @@ class File implements \InstagramAPI\Settings\StorageInterface
 
         // Check if the value differs from our cached on-disk value.
         // NOTE: This optimizes disk writes by only writing when values change!
-        if (!array_key_exists($key, $this->sets) || $this->sets[$key] !== $value) {
+        if (!array_key_exists($key, $this->_sets) || $this->_sets[$key] !== $value) {
             // The value differs, so save to memory cache and write to disk.
-            $this->sets[$key] = $value;
+            $this->_sets[$key] = $value;
             $this->save();
         }
     }
@@ -122,12 +120,12 @@ class File implements \InstagramAPI\Settings\StorageInterface
     /**
      * Loads all settings from disk.
      */
-    private function loadSettingsFromDisk()
+    private function _loadSettingsFromDisk()
     {
-        $this->sets = [];
+        $this->_sets = [];
 
-        if (file_exists($this->settingsPath)) {
-            $lines = @file($this->settingsPath, FILE_SKIP_EMPTY_LINES);
+        if (file_exists($this->_settingsPath)) {
+            $lines = @file($this->_settingsPath, FILE_SKIP_EMPTY_LINES);
             if ($lines !== false) {
                 foreach ($lines as $line) {
                     // Remove all trailing newline characters and spaces.
@@ -143,7 +141,7 @@ class File implements \InstagramAPI\Settings\StorageInterface
                         $value = $matches[2];
 
                         // Cache the value internally.
-                        $this->sets[$key] = $value;
+                        $this->_sets[$key] = $value;
                     }
                 }
             }
@@ -160,7 +158,7 @@ class File implements \InstagramAPI\Settings\StorageInterface
     {
         // Generate a text representation of all settings.
         $data = '';
-        foreach ($this->sets as $key => $value) {
+        foreach ($this->_sets as $key => $value) {
             $data .= "{$key}={$value}\n";
         }
 
@@ -168,7 +166,7 @@ class File implements \InstagramAPI\Settings\StorageInterface
         // NOTE: If we had just written directly to settingsPath, the file would
         // have become corrupted if the script was killed mid-write. The atomic
         // write process guarantees that the data is fully written to disk.
-        $this->atomicwrite($this->settingsPath, $data);
+        $this->_atomicwrite($this->_settingsPath, $data);
     }
 
     /**
@@ -185,7 +183,7 @@ class File implements \InstagramAPI\Settings\StorageInterface
      *
      * @return mixed Number of bytes written on success, otherwise FALSE.
      */
-    private function atomicwrite(
+    private function _atomicwrite(
         $filename,
         $data,
         $atomicSuffix = 'atomictmp')
@@ -212,9 +210,9 @@ class File implements \InstagramAPI\Settings\StorageInterface
      *
      * @return bool
      */
-    private function checkPermissions()
+    private function _checkPermissions()
     {
-        $folder = dirname($this->settingsPath);
+        $folder = dirname($this->_settingsPath);
         if (is_writable($folder)) {
             return true;
         } elseif (mkdir($folder, 0755, true)) {
@@ -224,5 +222,17 @@ class File implements \InstagramAPI\Settings\StorageInterface
         }
 
         throw new \InstagramAPI\Exception\SettingsException('The settings folder is not writable.');
+    }
+
+    /**
+     * Get the path to the cookies file.
+     *
+     * This is used by HttpInterface!
+     *
+     * @return string
+     */
+    public function getCookiesPath()
+    {
+        return $this->_cookiesPath;
     }
 }
