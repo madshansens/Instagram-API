@@ -7,16 +7,17 @@ namespace InstagramAPI;
  */
 class Request
 {
-    protected $params = [];
-    protected $posts = [];
-    protected $requireLogin = false;
-    protected $checkStatus = true;
-    protected $signedPost = true;
+    protected $_url;
+    protected $_params = [];
+    protected $_posts = [];
+    protected $_requireLogin = false;
+    protected $_checkStatus = true;
+    protected $_signedPost = true;
 
     public function __construct(
         $url)
     {
-        $this->url = $url;
+        $this->_url = $url;
 
         return $this;
     }
@@ -28,7 +29,7 @@ class Request
         if ($value === true) {
             $value = 'true';
         }
-        $this->params[$key] = $value;
+        $this->_params[$key] = $value;
 
         return $this;
     }
@@ -37,7 +38,7 @@ class Request
         $key,
         $value)
     {
-        $this->posts[$key] = $value;
+        $this->_posts[$key] = $value;
 
         return $this;
     }
@@ -45,7 +46,7 @@ class Request
     public function requireLogin(
         $requireLogin = false)
     {
-        $this->requireLogin = $requireLogin;
+        $this->_requireLogin = $requireLogin;
 
         return $this;
     }
@@ -53,7 +54,7 @@ class Request
     public function setCheckStatus(
         $checkStatus = true)
     {
-        $this->checkStatus = $checkStatus;
+        $this->_checkStatus = $checkStatus;
 
         return $this;
     }
@@ -61,7 +62,7 @@ class Request
     public function setSignedPost(
         $signedPost = true)
     {
-        $this->signedPost = $signedPost;
+        $this->_signedPost = $signedPost;
 
         return $this;
     }
@@ -72,29 +73,28 @@ class Request
     {
         $instagramObj = Instagram::getInstance();
 
-        if ($this->params) {
-            $endPoint = $this->url.'?'.http_build_query($this->params);
+        if ($this->_params) {
+            $endpoint = $this->_url.'?'.http_build_query($this->_params);
         } else {
-            $endPoint = $this->url;
+            $endpoint = $this->_url;
         }
 
-        $payload = json_encode($this->posts);
-        if ($this->posts) {
-            if ($this->signedPost) {
-                $post = Signatures::generateSignature($payload);
+        if ($this->_posts) {
+            if ($this->_signedPost) {
+                $post = Signatures::generateSignature(json_encode($this->_posts));
             } else {
-                $post = http_build_query($this->posts);
+                $post = http_build_query($this->_posts);
             }
         } else {
             $post = null;
         }
 
-        $response = $instagramObj->http->api($endPoint, $post, $this->requireLogin, false);
+        $response = $instagramObj->http->api($endpoint, $post, $this->_requireLogin, false);
 
         $responseObject = $instagramObj->http->getMappedResponseObject(
             $baseClass,
             $response[1], // [0] = Token. [1] = The actual server response.
-            $this->checkStatus, // Whether to validate that API response "status" MUST be Ok.
+            $this->_checkStatus, // Whether to validate that API response "status" MUST be Ok.
             ($includeHeader ? $response : null) // null = Reuse $response[1].
         );
 
