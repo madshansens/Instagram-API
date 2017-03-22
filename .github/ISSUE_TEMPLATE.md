@@ -2,7 +2,7 @@
 
 - You will be asked some questions and requested to provide some information, please read them **carefully** and answer completely.
 - Put an `x` into all the boxes [ ] relevant to your issue (like so [x]).
-- Use the *Preview* tab to see how your issue will actually look like.
+- Use the *Preview* tab to see how your issue will actually look like, before sending it.
 
 ---
 
@@ -15,53 +15,59 @@
 
 ### Purpose of your issue?
 - [ ] Bug report (encountered problems/errors)
-- [ ] Feature request (request for a new functionality)
+- [ ] Feature request (request for new functionality)
 - [ ] Question
 - [ ] Other
 
 ---
 
-### The following sections requests more details for particular types of issues, you can remove any section (the contents between the triple ---) not applicable to your issue.
+### The following sections request more details for particular types of issues, you can remove any section (the contents between the triple ---) not applicable to your issue.
 
 ---
 
-### For a *bug report*, you must include below *code* that will replicate the error, and the *error log/traceback*.
+### For a *bug report*, you must include *code* that will replicate the error, and the *error log/traceback*.
 
-Code:
+Example Code:
 
 ```php
-// Please provide your own code here
-require("./vendor/autoload.php");
+set_time_limit(0);
+date_default_timezone_set('UTC');
+
+require __DIR__.'/../vendor/autoload.php';
+
+// Please provide your own code here, for example:
 
 try {
     $debug = true;
-    $api = new \InstagramAPI\Instagram($debug);
-    $api->setUser('yourusername', 'yourpassword');
-    $api->login();
-    $result = $api->comment('14123451234567890_1234567890', "Hello World");
+    $ig = new \InstagramAPI\Instagram($debug);
+    $ig->setUser('yourusername', 'yourpassword');
+    $ig->login();
+    $result = $ig->comment('14123451234567890_1234567890', "Hello World");
     var_dump($result);
-} catch (Exception $e) {
-    echo $e->getMessage() . PHP_EOL;
+} catch (\Exception $e) {
+    echo $e->getMessage()."\n";
 }
 ```
 
-Error/Log/var_dump:
+Error Log/var_dump:
 
 ```php
-// Please provide your error log/dump here
+// Please provide your error log/dump here, for example:
+
 RESPONSE: {"status": "fail", "message": "Sorry, the comment data may have been corrupted."}
 
-InstagramAPI\CommentResponse : Sorry, the comment data may have been corrupted.
+InstagramAPI\Response\CommentResponse: Sorry, the comment data may have been corrupted.
 ```
 
 ---
 
-### For a new endpoint *feature request*, you should include below the *capture of the request and response*.
+### For a new endpoint *feature request*, you should include the *capture of the request and response*.
 
 Request:
 
 ```http
-# Please provide your capture below
+# Please provide your capture below, for example:
+
 GET /api/v1/si/fetch_headers/?guid=123456abcdeff19cc2f123456&challenge_type=signup HTTP/1.1
 Host: i.instagram.com
 Connection: keep-alive
@@ -76,7 +82,8 @@ Accept-Encoding: gzip, deflate, sdch
 Response:
 
 ```http
-# Please provide your capture below
+# Please provide your capture below, for example:
+
 HTTP/1.1 200 OK
 Content-Language: en
 Expires: Sat, 01 Jan 2000 00:00:00 GMT
@@ -95,4 +102,8 @@ Content-Length: 16
 
 ### Describe your issue
 
-Explanation of your issue goes here. Please make sure the description is worded well enough to be understood with as much context and examples as possible.
+Explanation of your issue goes here.
+
+Please make sure the description is worded well enough to be understood, and with as much context and examples as possible.
+
+We reserve the right to close your ticket without answer if you can't bother spending a few minutes to write a helpful report for us.
