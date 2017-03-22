@@ -5,6 +5,13 @@ namespace InstagramAPI;
 class Utils
 {
     /**
+     * Name of the detected ffmpeg executable, or FALSE if none found.
+     *
+     * @var string|bool|null
+     */
+    public static $ffmpegBin = null;
+
+    /**
      * @return string
      */
     public static function generateUploadId()
@@ -45,16 +52,22 @@ class Utils
      */
     public static function checkFFMPEG()
     {
-        @exec('ffmpeg -version 2>&1', $output, $statusCode);
-        if ($statusCode === 0) {
-            return 'ffmpeg';
-        }
-        @exec('avconv -version 2>&1', $output, $statusCode);
-        if ($statusCode === 0) {
-            return 'avconv';
+        // We only resolve this once per session and then cache the result.
+        if (self::$ffmpegBin === null) {
+            @exec('ffmpeg -version 2>&1', $output, $statusCode);
+            if ($statusCode === 0) {
+                self::$ffmpegBin = 'ffmpeg';
+            } else {
+                @exec('avconv -version 2>&1', $output, $statusCode);
+                if ($statusCode === 0) {
+                    self::$ffmpegBin = 'avconv';
+                } else {
+                    self::$ffmpegBin = false; // Nothing found!
+                }
+            }
         }
 
-        return false;
+        return self::$ffmpegBin;
     }
 
     /**
@@ -80,7 +93,7 @@ class Utils
             throw new \RuntimeException('You must have FFmpeg to generate video thumbnails.');
         }
 
-        // Check if input file exits.
+        // Check if input file exists.
         if (empty($videoFilename) || !is_file($videoFilename)) {
             throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
         }
@@ -172,7 +185,7 @@ class Utils
             throw new \RuntimeException('You must have FFmpeg to generate video thumbnails.');
         }
 
-        // Check if input file exits.
+        // Check if input file exists.
         if (empty($videoFilename) || !is_file($videoFilename)) {
             throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
         }
