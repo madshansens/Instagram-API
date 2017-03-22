@@ -58,7 +58,10 @@ class Utils
     }
 
     /**
-     * Get the length of a video file in seconds.
+     * Get detailed information about a video file.
+     *
+     * This also validates that a file is actually a video, since FFmpeg will
+     * fail to read details from badly broken / non-video files.
      *
      * @param string $videoFilename Path to the video file.
      *
@@ -66,9 +69,9 @@ class Utils
      * @throws \RuntimeException         If FFmpeg isn't working properly.
      * @throws \Exception                In case of various processing errors.
      *
-     * @return int Length of the file in seconds.
+     * @return array Video codec name, float duration, int width and height.
      */
-    public static function getSeconds(
+    public static function getVideoFileDetails(
         $videoFilename)
     {
         // The user must have FFmpeg.
@@ -82,70 +85,68 @@ class Utils
             throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
         }
 
-        // Load with FFMPEG. Shows duration and exits, since we give no outfile.
-        $command = $ffmpeg.' -i '.escapeshellarg($videoFilename).' 2>&1';
+        // Load with FFMPEG. Shows details and exits, since we give no outfile.
+        $command = $ffmpeg.' -hide_banner -i '.escapeshellarg($videoFilename).' 2>&1';
         @exec($command, $output, $statusCode);
 
-        // Extract the video duration if available.
-        $seconds = -1;
+        // Extract the video details if available.
+        $videoDetails = [
+            'codec'    => '', // string
+            'duration' => -1.0, // float (length in seconds, with decimals)
+            'width'    => -1, // int
+            'height'   => -1, //int
+        ];
         foreach ($output as $line) {
+            if (preg_match('/Video: (\S+)[^,]*, [^,]+, (\d+)x(\d+)/', $line, $matches)) {
+                $videoDetails['codec'] = $matches[1];
+                $videoDetails['width'] = intval($matches[2], 10);
+                $videoDetails['height'] = intval($matches[3], 10);
+            }
             if (preg_match('/Duration: (\d{2}):(\d{2}):(\d{2}\.\d{2})/', $line, $matches)) {
-                $seconds = (int) ($matches[1] * 3600 + $matches[2] * 60 + ceil($matches[3]));
-                break;
+                $videoDetails['duration'] = (float) ($matches[1] * 3600 + $matches[2] * 60 + floatval($matches[3]));
             }
         }
-        if ($seconds == -1) {
-            throw new \RuntimeException('FFmpeg failed to detect the video duration. Is this a valid video file?');
+
+        // Verify that we have ALL details.
+        // NOTE: Since width+height are found together with codec, we only need
+        // to check 1 of those 3 fields, so I'm checking the codec field.
+        if ($videoDetails['duration'] < 0 || $videoDetails['codec'] === '') {
+            throw new \RuntimeException('FFmpeg failed to detect the video format details. Is this a valid video file?');
         }
 
-        return $seconds;
+        return $videoDetails;
     }
 
     /**
-     * Get size attributes of a video.
+     * Verifies that a video's details follow Instagram's requirements.
      *
-     * @param string $videoFilename Path to the video file.
+     * @param string $videoFilename The video filename.
+     * @param array  $videoDetails  An array created by getVideoFileDetails().
      *
-     * @throws \InvalidArgumentException If the video file is missing.
-     * @throws \RuntimeException         If FFmpeg isn't working properly.
-     * @throws \Exception                In case of various processing errors.
-     *
-     * @return array codec, width and height.
+     * @throws \InvalidArgumentException If Instagram won't allow this video.
      */
-    public static function getVideoSize(
-        $videoFilename)
+    public static function throwIfIllegalVideoDetails(
+        $videoFilename,
+        array $videoDetails)
     {
-        // The user must have FFmpeg.
-        $ffmpeg = self::checkFFMPEG();
-        if ($ffmpeg === false) {
-            throw new \RuntimeException('You must have FFmpeg to generate video thumbnails.');
+        // Validate video length. Instagram only allows 3-60 seconds.
+        // NOTE: Instagram has no disk size limit, but this length validation
+        // also ensures we can only upload small files exactly as intended.
+        if ($videoDetails['duration'] < 3 || $videoDetails['duration'] > 60) {
+            throw new \InvalidArgumentException(sprintf('Instagram only accepts videos that are between 3 and 60 seconds long. Your video "%s" is %d seconds long.', $videoFilename, $videoDetails['duration']));
         }
 
-        // Check if input file exits.
-        if (empty($videoFilename) || !is_file($videoFilename)) {
-            throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
+        // Validate resolution. Instagram allows between 320px-1080px width.
+        if (($videoDetails['width'] < 320 )|| ($videoDetails['width'] > 1080)) {
+            throw new \InvalidArgumentException(sprintf('Instagram only accepts videos that are between 320 and 1080 pixels wide. Your video "%s" is %d pixels wide.', $videoFilename, $videoDetails['width']));
         }
 
-        // Load with FFMPEG. Shows duration and exits, since we give no outfile.
-        $command = $ffmpeg.' -i '.escapeshellarg($videoFilename).' 2>&1';
-        $output = @shell_exec($command);;
-
-        $regex_sizes = "/Video: ([^,]*), ([^,]*), ([0-9]{1,4})x([0-9]{1,4})/";
-        if (preg_match($regex_sizes, $output, $regs)) {
-            $codec = $regs [1] ? $regs [1] : null;
-            $width = $regs [3] ? $regs [3] : null;
-            $height = $regs [4] ? $regs [4] : null;
+        // Validate aspect ratio. Instagram has SAME requirements as for photos!
+        // NOTE: See ImageAutoResizer for latest up-to-date allowed ratios.
+        $aspectRatio = $videoDetails['width'] / $videoDetails['height'];
+        if ($aspectRatio < ImageAutoResizer::MIN_RATIO || $aspectRatio > ImageAutoResizer::MAX_RATIO) {
+            throw new \InvalidArgumentException(sprintf('Instagram only accepts videos with aspect ratios between %.2f and %.2f. Your video "%s" has a %.2f aspect ratio.', ImageAutoResizer::MIN_RATIO, ImageAutoResizer::MAX_RATIO, $videoFilename, $aspectRatio));
         }
-
-        if (is_null($codec) || is_null($width) || is_null($height)) {
-            throw new \RuntimeException('FFmpeg failed to detect video size. Is this a valid video file?');
-        }
-
-        return [
-            'codec'     => $codec,
-            'width'     => $width,
-            'height'    => $height
-        ];
     }
 
     /**

@@ -797,22 +797,13 @@ class Instagram
             throw new \InvalidArgumentException(sprintf('Unsupported video upload type "%s".', $type));
         }
 
-        // Figure out how long the video is.
+        // Figure out the video file details.
         // NOTE: We do this first, since it validates whether the video file is
         // valid and lets us avoid wasting time uploading totally invalid files!
-        $metadata['seconds'] = Utils::getSeconds($videoFilename);
+        $metadata['videodetails'] = Utils::getVideoFileDetails($videoFilename);
 
-        // Validate video length. Instagram only allows 3-60 seconds.
-        // NOTE: Instagram has no disk size limit, but this length validation
-        // also ensures we can only upload small files exactly as intended.
-        if ($metadata['seconds'] < 3 || $metadata['seconds'] > 60) {
-            throw new \InvalidArgumentException(sprintf('Instagram only accepts videos that are between 3 and 60 seconds long. Your video "%s" is %d seconds long.', $videoFilename, $metadata['seconds']));
-        }
-
-        $metadata['size'] = Utils::getVideoSize($videoFilename);
-        if (($metadata['size']['width'] <= 320 )|| ($metadata['size']['width'] >= 1080)) {
-            throw new \InvalidArgumentException(sprintf('Invalid video width. Instagram only accepts videos that are between 320 and 1080 pixels wide. Your video "%s" is %d pixels wide.', $videoFilename, $metadata['size']['width']));
-        }
+        // Validate the video details and throw if Instagram won't allow it.
+        Utils::throwIfIllegalVideoDetails($videoFilename, $metadata['videodetails']);
 
         // Request parameters for uploading a new video.
         $uploadParams = $this->client->requestVideoUploadURL($type, $metadata);
@@ -909,6 +900,18 @@ class Instagram
             throw new \InvalidArgumentException(sprintf('Instagram requires that albums contain 2-10 items. You tried to submit %d.', count($media)));
         }
 
+        // Figure out the video file details for ALL videos in the album.
+        // NOTE: We do this first, since it validates whether the video files are
+        // valid and lets us avoid wasting time uploading totally invalid albums!
+        foreach ($media as $key => $item) {
+            if ($item['type'] == 'video') {
+                $media[$key]['videodetails'] = Utils::getVideoFileDetails($item['file']);
+
+                // Validate the video details and throw if Instagram won't allow it.
+                Utils::throwIfIllegalVideoDetails($item['file'], $media[$key]['videodetails']);
+            }
+        }
+
         $hasUploadedVideo = false;
         foreach ($media as $key => $item) {
             if (!file_exists($item['file'])) {
@@ -922,21 +925,6 @@ class Instagram
                 break;
             case 'video':
                 $hasUploadedVideo = true;
-
-                // Figure out how long the video is.
-                // NOTE: We do this first, since it validates whether the video
-                // file is valid and lets us avoid wasting time uploading
-                // totally invalid files!
-                $seconds = Utils::getSeconds($item['file']);
-                $media[$key]['seconds'] = $seconds;
-
-                // Validate video length. Instagram only allows 3-60 seconds.
-                // NOTE: Instagram has no disk size limit, but this length
-                // validation also ensures we can only upload small files
-                // exactly as intended.
-                if ($seconds < 3 || $seconds > 60) {
-                    throw new \InvalidArgumentException(sprintf('Instagram only accepts videos that are between 3 and 60 seconds long. Your video "%s" is %d seconds long.', $item['file'], $seconds));
-                }
 
                 // Request parameters for uploading a new video.
                 $uploadParams = $this->client->requestVideoUploadURL('album');
@@ -998,7 +986,7 @@ class Instagram
                 break;
             case 'video':
                 $videoConfig = [
-                    'length'              => round($item['seconds'], 2),
+                    'length'              => round($item['videodetails']['duration'], 2),
                     'date_time_original'  => $date,
                     'scene_type'          => 1,
                     'poster_frame_index'  => 0,
@@ -1239,7 +1227,7 @@ class Instagram
         ->addPost('video_result', 'deprecated')
         ->addPost('upload_id', $uploadId)
         ->addPost('source_type', 4)
-        ->addPost('length', round($metadata['seconds'], 2))
+        ->addPost('length', round($metadata['videodetails']['duration'], 2))
         ->addPost('date_time_original', time())
         ->addPost('filter_type', 0)
         ->addPost('video_result', 'deprecated')

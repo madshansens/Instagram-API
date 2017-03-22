@@ -878,17 +878,18 @@ class Client
             $bodies[] = [
                 'type' => 'form-data',
                 'name' => 'upload_media_duration_ms',
-                'data' => $metadata['seconds']*1000,
+                // NOTE: ceil() is to round up and get rid of any MS decimals.
+                'data' => (int) ceil($metadata['videodetails']['duration']*1000),
             ];
             $bodies[] = [
                 'type' => 'form-data',
                 'name' => 'upload_media_width',
-                'data' => $metadata['size']['width'],
+                'data' => $metadata['videodetails']['width'],
             ];
             $bodies[] = [
                 'type' => 'form-data',
                 'name' => 'upload_media_height',
-                'data' => $metadata['size']['height'],
+                'data' => $metadata['videodetails']['height'],
             ];
         }
         $payload = $this->_buildBody($bodies, $boundary);
