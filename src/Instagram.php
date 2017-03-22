@@ -803,7 +803,7 @@ class Instagram
         $metadata['videodetails'] = Utils::getVideoFileDetails($videoFilename);
 
         // Validate the video details and throw if Instagram won't allow it.
-        Utils::throwIfIllegalVideoDetails($videoFilename, $metadata['videodetails']);
+        Utils::throwIfIllegalVideoDetails($type, $videoFilename, $metadata['videodetails']);
 
         // Request parameters for uploading a new video.
         $uploadParams = $this->client->requestVideoUploadURL($type, $metadata);
@@ -908,7 +908,7 @@ class Instagram
                 $media[$key]['videodetails'] = Utils::getVideoFileDetails($item['file']);
 
                 // Validate the video details and throw if Instagram won't allow it.
-                Utils::throwIfIllegalVideoDetails($item['file'], $media[$key]['videodetails']);
+                Utils::throwIfIllegalVideoDetails('album', $item['file'], $media[$key]['videodetails']);
             }
         }
 

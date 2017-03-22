@@ -133,20 +133,29 @@ class Utils
     /**
      * Verifies that a video's details follow Instagram's requirements.
      *
+     * @param string $type          What type of video ("timeline", "story" or "album").
      * @param string $videoFilename The video filename.
      * @param array  $videoDetails  An array created by getVideoFileDetails().
      *
      * @throws \InvalidArgumentException If Instagram won't allow this video.
      */
     public static function throwIfIllegalVideoDetails(
+        $type,
         $videoFilename,
         array $videoDetails)
     {
-        // Validate video length. Instagram only allows 3-60 seconds.
-        // NOTE: Instagram has no disk size limit, but this length validation
-        // also ensures we can only upload small files exactly as intended.
-        if ($videoDetails['duration'] < 3 || $videoDetails['duration'] > 60) {
-            throw new \InvalidArgumentException(sprintf('Instagram only accepts videos that are between 3 and 60 seconds long. Your video "%s" is %d seconds long.', $videoFilename, $videoDetails['duration']));
+        // Validate story video length. Instagram only allows 3-15 seconds.
+        if ($type == 'story') {
+            if ($videoDetails['duration'] < 3 || $videoDetails['duration'] > 15) {
+                throw new \InvalidArgumentException(sprintf('Instagram only accepts story videos that are between 3 and 15 seconds long. Your story video "%s" is %d seconds long.', $videoFilename, $videoDetails['duration']));
+            }
+        } else {
+            // Validate video length. Instagram only allows 3-60 seconds.
+            // NOTE: Instagram has no disk size limit, but this length validation
+            // also ensures we can only upload small files exactly as intended.
+            if ($videoDetails['duration'] < 3 || $videoDetails['duration'] > 60) {
+                throw new \InvalidArgumentException(sprintf('Instagram only accepts videos that are between 3 and 60 seconds long. Your video "%s" is %d seconds long.', $videoFilename, $videoDetails['duration']));
+            }
         }
 
         // Validate resolution. Instagram allows between 320px-1080px width.
