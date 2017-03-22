@@ -2,13 +2,13 @@
 
 namespace InstagramAPI;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\FileCookieJar;
 use InstagramAPI\Exception\ServerMessageThrower;
 
 /**
- * This class handles core API communication and file uploads.
+ * This class handles core API network communication and file uploads.
  *
  * WARNING TO CONTRIBUTORS: Do NOT build ANY monolithic multi-step functions
  * within this class! Every function here MUST be a tiny, individual unit of
@@ -23,7 +23,7 @@ use InstagramAPI\Exception\ServerMessageThrower;
  *
  * Thank you, for not writing spaghetti code! ;-)
  */
-class HttpInterface
+class Client
 {
     /**
      * The Instagram class instance we belong to.
@@ -72,7 +72,7 @@ class HttpInterface
     /**
      * @var \GuzzleHttp\Client
      */
-    private $_client;
+    private $_guzzleClient;
 
     /**
      * @var \GuzzleHttp\Cookie\FileCookieJar|\GuzzleHttp\Cookie\CookieJar
@@ -94,7 +94,7 @@ class HttpInterface
         $this->_proxy = null;
 
         // Default request options (immutable after client creation).
-        $this->_client = new Client([
+        $this->_guzzleClient = new GuzzleClient([
             'allow_redirects' => [
                 'max' => 8, // Allow up to eight redirects (that's plenty).
             ],
@@ -109,7 +109,7 @@ class HttpInterface
     }
 
     /**
-     * Resets certain HttpInterface settings via the current Settings adapter.
+     * Resets certain Client settings via the current Settings adapter.
      *
      * Used whenever the user switches setUser(), to configure our internal state.
      *
@@ -223,7 +223,7 @@ class HttpInterface
     }
 
     /**
-     * Controls the SSL verification behavior of the HttpInterface.
+     * Controls the SSL verification behavior of the Client.
      *
      * @see http://docs.guzzlephp.org/en/latest/request-options.html#verify
      *
@@ -239,7 +239,7 @@ class HttpInterface
     }
 
     /**
-     * Gets the current SSL verification behavior of the HttpInterface.
+     * Gets the current SSL verification behavior of the Client.
      *
      * @return bool|string
      */
@@ -487,7 +487,7 @@ class HttpInterface
 
         // Attempt the request. Will throw in case of socket errors!
         try {
-            $response = $this->_client->request($method, $uri, $guzzleOptions);
+            $response = $this->_guzzleClient->request($method, $uri, $guzzleOptions);
         } catch (\Exception $e) {
             // Re-wrap Guzzle's exception using our own NetworkException.
             throw new \InstagramAPI\Exception\NetworkException($e);

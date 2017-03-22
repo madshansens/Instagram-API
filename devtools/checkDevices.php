@@ -158,9 +158,9 @@ function switchDevice($ig, $value)
     // Create the new Device object, without automatic fallbacks.
     $device = ($value instanceof Device ? $value : new Device($value, false));
 
-    // Update the HTTP interface's User-Agent to the new Device.
+    // Update the Instagram Client's User-Agent to the new Device.
     $ig->device = $device;
-    $ig->http->updateFromSettingsAdapter();
+    $ig->client->updateFromSettingsAdapter();
 }
 
 /**

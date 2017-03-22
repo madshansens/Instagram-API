@@ -103,11 +103,11 @@ class Instagram
     public $rank_token;
 
     /**
-     * Raw API communication class.
+     * Raw API communication/networking class.
      *
-     * @var HttpInterface
+     * @var Client
      */
-    public $http;
+    public $client;
 
     /**
      * The configuration used for initializing our settings adapter.
@@ -158,7 +158,7 @@ class Instagram
             $this->settingsAdapter = ['type' => 'file'];
         }
 
-        $this->http = new HttpInterface($this);
+        $this->client = new Client($this);
     }
 
     /**
@@ -236,15 +236,15 @@ class Instagram
             $this->token = null;
         }
 
-        // Configures HttpInterface for current user AND updates isLoggedIn
-        // state if it fails to load the expected cookies from the user's jar.
+        // Configures Client for current user AND updates isLoggedIn state
+        // if it fails to load the expected cookies from the user's jar.
         // Must be done last here, so that isLoggedIn is properly updated!
         // NOTE: If we generated a new device we start a new cookie jar.
-        $this->http->updateFromSettingsAdapter($resetCookieJar);
+        $this->client->updateFromSettingsAdapter($resetCookieJar);
     }
 
     /**
-     * Controls the SSL verification behavior of the HttpInterface.
+     * Controls the SSL verification behavior of the Client.
      *
      * @see http://docs.guzzlephp.org/en/latest/request-options.html#verify
      *
@@ -256,17 +256,17 @@ class Instagram
     public function setVerifySSL(
         $state)
     {
-        $this->http->setVerifySSL($state);
+        $this->client->setVerifySSL($state);
     }
 
     /**
-     * Gets the current SSL verification behavior of the HttpInterface.
+     * Gets the current SSL verification behavior of the Client.
      *
      * @return bool|string
      */
     public function getVerifySSL()
     {
-        return $this->http->getVerifySSL();
+        return $this->client->getVerifySSL();
     }
 
     /**
@@ -280,7 +280,7 @@ class Instagram
     public function setProxy(
         $value)
     {
-        $this->http->setProxy($value);
+        $this->client->setProxy($value);
     }
 
     /**
@@ -290,7 +290,7 @@ class Instagram
      */
     public function getProxy()
     {
-        return $this->http->getProxy();
+        return $this->client->getProxy();
     }
 
     /**
@@ -307,7 +307,7 @@ class Instagram
     public function setOutputInterface(
         $value)
     {
-        $this->http->setOutputInterface($value);
+        $this->client->setOutputInterface($value);
     }
 
     /**
@@ -317,7 +317,7 @@ class Instagram
      */
     public function getOutputInterface()
     {
-        return $this->http->getOutputInterface();
+        return $this->client->getOutputInterface();
     }
 
     /**
@@ -533,7 +533,7 @@ class Instagram
             'users'                => $this->username_id,
         ]);
 
-        return $this->http->api('push/register/?platform=10&device_type=android_mqtt', Signatures::generateSignature($data))[1];
+        return $this->client->api('push/register/?platform=10&device_type=android_mqtt', Signatures::generateSignature($data))[1];
     }
 
     /**
@@ -731,7 +731,7 @@ class Instagram
         $metadata['height'] = $size[1];
 
         // Perform the upload and then configure it for our timeline/story.
-        $upload = $this->http->uploadPhotoData($type, $photoFilename);
+        $upload = $this->client->uploadPhotoData($type, $photoFilename);
         $configure = $this->configure($type, $upload->getUploadId(), $photoFilename, $metadata);
 
         return $configure;
@@ -818,13 +818,13 @@ class Instagram
         }
 
         // Request parameters for uploading a new video.
-        $uploadParams = $this->http->requestVideoUploadURL();
+        $uploadParams = $this->client->requestVideoUploadURL();
 
         // Attempt to upload the video data.
-        $upload = $this->http->uploadVideoData($type, $videoFilename, $uploadParams, $maxAttempts);
+        $upload = $this->client->uploadVideoData($type, $videoFilename, $uploadParams, $maxAttempts);
 
         // Attempt to upload the thumbnail, associated with our video's ID.
-        $this->http->uploadPhotoData($type, $videoFilename, 'videofile', $uploadParams['upload_id']);
+        $this->client->uploadPhotoData($type, $videoFilename, 'videofile', $uploadParams['upload_id']);
 
         // Configure the uploaded video and attach it to our timeline/story.
         $configure = $this->configureVideoWithRetries($type, $uploadParams['upload_id'], $metadata);
@@ -920,7 +920,7 @@ class Instagram
 
             switch ($item['type']) {
             case 'photo':
-                $result = $this->http->uploadPhotoData('album', $item['file']);
+                $result = $this->client->uploadPhotoData('album', $item['file']);
                 $media[$key]['upload_id'] = $result->getUploadId();
                 break;
             case 'video':
@@ -942,7 +942,7 @@ class Instagram
                 }
 
                 // Request parameters for uploading a new video.
-                $uploadParams = $this->http->requestVideoUploadURL();
+                $uploadParams = $this->client->requestVideoUploadURL();
                 $media[$key]['upload_id'] = $uploadParams['upload_id'];
 
                 // Attempt to upload the video data.
@@ -952,10 +952,10 @@ class Instagram
                 // remove the "filter" parameter and making it part of the
                 // per-photo configuration array, for example, if Instagram
                 // allows per-photo filters inside of albums).
-                $this->http->uploadVideoData('album', $item['file'], $uploadParams);
+                $this->client->uploadVideoData('album', $item['file'], $uploadParams);
 
                 // Attempt to upload the thumbnail, associated with our video's ID.
-                $this->http->uploadPhotoData('album', $item['file'], 'videofile', $uploadParams['upload_id']);
+                $this->client->uploadPhotoData('album', $item['file'], 'videofile', $uploadParams['upload_id']);
 
                 // We don't call configure! Album videos are configured below instead.
                 break;
@@ -1049,7 +1049,7 @@ class Instagram
         $mediaId,
         $text = null)
     {
-        return $this->http->directShare(
+        return $this->client->directShare(
             'share',
             $recipients,
             [
@@ -1073,7 +1073,7 @@ class Instagram
         $recipients,
         $text)
     {
-        return $this->http->directShare(
+        return $this->client->directShare(
             'message',
             $recipients,
             [
@@ -1098,7 +1098,7 @@ class Instagram
         $photoFilename,
         $text = null)
     {
-        return $this->http->directShare(
+        return $this->client->directShare(
             'photo',
             $recipients,
             [
@@ -1151,7 +1151,7 @@ class Instagram
             '_csrftoken' => $this->token,
         ]);
 
-        return $this->http->api("direct_v2/threads/{$threadId}/{$threadAction}/", Signatures::generateSignature($data))[1];
+        return $this->client->api("direct_v2/threads/{$threadId}/{$threadAction}/", Signatures::generateSignature($data))[1];
     }
 
     /**
@@ -1761,7 +1761,7 @@ class Instagram
     public function changeProfilePicture(
         $photoFilename)
     {
-        return $this->http->changeProfilePicture($photoFilename);
+        return $this->client->changeProfilePicture($photoFilename);
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace InstagramAPI;
 
 /**
- * Bridge between HttpInterface object & mapper & response.
+ * Bridge between Instagram Client calls, the object mapper & Response objects.
  */
 class Request
 {
@@ -89,9 +89,9 @@ class Request
             $post = null;
         }
 
-        $response = $instagramObj->http->api($endpoint, $post, $this->_requireLogin, false);
+        $response = $instagramObj->client->api($endpoint, $post, $this->_requireLogin, false);
 
-        $responseObject = $instagramObj->http->getMappedResponseObject(
+        $responseObject = $instagramObj->client->getMappedResponseObject(
             $baseClass,
             $response[1], // [0] = Token. [1] = The actual server response.
             $this->_checkStatus, // Whether to validate that API response "status" MUST be Ok.

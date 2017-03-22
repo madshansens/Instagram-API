@@ -227,7 +227,7 @@ class File implements \InstagramAPI\Settings\StorageInterface
     /**
      * Get the path to the cookies file.
      *
-     * This is used by HttpInterface!
+     * This is used by \InstagramAPI\Client!
      *
      * @return string
      */

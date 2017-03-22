@@ -3,7 +3,7 @@
 namespace InstagramAPI\Exception;
 
 /**
- * This exception re-wraps ALL networking exceptions.
+ * This exception re-wraps ALL networking/socket exceptions.
  *
  * Currently (and probably forever) we're using the great Guzzle library for all
  * network communication. So this exception is used for re-wrapping their
