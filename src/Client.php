@@ -830,12 +830,15 @@ class Client
      *
      * @param string $upload_id ID to use, or NULL to generate a brand new ID.
      *
+     * @param bool $is_sidecar Set this to true to upload video to album.
+     *
      * @throws \InstagramAPI\Exception\InstagramException If the request fails.
      *
      * @return array
      */
     public function requestVideoUploadURL(
-        $upload_id = null)
+        $upload_id = null,
+        $is_sidecar = false)
     {
         $this->_throwIfNotLoggedIn();
 
@@ -859,15 +862,25 @@ class Client
             ],
             [
                 'type' => 'form-data',
-                'name' => 'media_type',
-                'data' => '2',
-            ],
-            [
-                'type' => 'form-data',
                 'name' => '_uuid',
                 'data' => $boundary,
             ],
         ];
+        if ($is_sidecar) {
+            $bodies[] =
+                [
+                    'type' => 'form-data',
+                    'name' => 'is_sidecar',
+                    'data' => '1',
+                ];
+        } else {
+            $bodies[] =
+                [
+                    'type' => 'form-data',
+                    'name' => 'media_type',
+                    'data' => '2',
+                ];
+        }
         $payload = $this->_buildBody($bodies, $boundary);
 
         // Build the "pre-upload" request's options.

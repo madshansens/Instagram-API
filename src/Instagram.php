@@ -934,7 +934,7 @@ class Instagram
                 }
 
                 // Request parameters for uploading a new video.
-                $uploadParams = $this->client->requestVideoUploadURL();
+                $uploadParams = $this->client->requestVideoUploadURL(null, true);
                 $media[$key]['upload_id'] = $uploadParams['upload_id'];
 
                 // Attempt to upload the video data.
