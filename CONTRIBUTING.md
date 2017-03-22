@@ -137,9 +137,9 @@ public function doSomething(
 ```
 
 - All properties and functions MUST be named using `camelCase`, NOT `snake_case`. (The _only_ exception to this rule is  Instagram's server response property objects, meaning everything in the `src/Response/` folder, since _their_ server replies use underscores.)
-- Private and protected properties/functions MUST be _prefixed_ with an underscore, to clearly show that they are internal inside the class and _cannot_ be used from the outside. But the PUBLIC properties/functions MUST _NEVER_ be prefixed with an underscore (_except_ the _obvious_, specially named, built-in PHP double-underscore ones such as `public function __construct()`).
+- Private and protected properties/functions MUST be _prefixed_ with an underscore, to clearly show that they are internal inside the class and _cannot_ be used from the outside. But the PUBLIC properties/functions MUST _NEVER_ be prefixed with an underscore (_except_ the _obvious_, specially named, built-in PHP double-underscore ones such as `public function __construct()`). And also note that function _arguments_ (such as in setters) MUST NEVER be prefixed by underscores.
 
-Example of a class with proper function and property underscore prefixes for private/protected members:
+Example of a class with proper function and property underscore prefixes for private/protected members, and with the proper function argument style:
 
 ```php
 class Something
@@ -153,10 +153,29 @@ class Something
         return $this->_protectedProperty;
     }
     
+    public function setProtectedProperty(
+        $protectedProperty)
+    {
+        $this->_protectedProperty = $protectedProperty;
+    }
+
+    public function getPublicProperty()
+    {
+        return $this->_publicProperty;
+    }
+    
+    public function setPublicProperty(
+        $publicProperty)
+    {
+        $this->publicProperty = $publicProperty;
+    }
+    
     protected function _somethingInternal()
     {
         ...
     }
+    
+    ...
 }
 ```
 
@@ -193,7 +212,7 @@ function configureVideo(...);
 function uploadVideo(...)
 {
     $url = $this->requestVideoURL();
-    if (...validate the URL and handle any errors)
+    if (...handle any errors from the previous function)
     
     $uploadResult = $this->uploadVideoChunks($url, ...);
     
@@ -231,13 +250,15 @@ DON'T design functions like that. Don't be an idiot!
 
 Make such multi-argument functions take future-extensible option-arrays instead, especially if you expect that more properties may be added in the future.
 
+Furthermore, its `uploadVideo` name is too generic. What if we _later_ need to be able to upload Story videos, when Instagram added its Story feature? And Album videos? Suddenly, the existing `uploadVideo` function name would be a huge problem for us.
+
 So the above would instead be PROPERLY designed as follows:
 
 ```php
-function uploadVideo($videoFilename, array $metadata);
+function uploadTimelineVideo($videoFilename, array $metadata);
 ```
 
-Now users can just say `uploadVideo($videoFilename, ['hashtags'=>$hashTags]);`, and we can easily add more metadata fields in the future without ever breaking backwards-compatibility with projects that are using our function!
+Now users can just say `uploadTimelineVideo($videoFilename, ['hashtags'=>$hashTags]);`, and we can easily add more metadata fields in the future without ever breaking backwards-compatibility with projects that are using our function! And since the function name is good and _specific_, it also means that we can easily add _other_ kinds of "video" upload functions for any _future features_ Instagram introduces, simply by creating new functions such as `uploadStoryVideo`, which gives us total freedom to implement Instagram's new features without breaking backwards-compatibility with anyone using the _other_ functions.
 
 ### Function Documentation
 
@@ -271,7 +292,7 @@ Example of a properly documented function:
     }
 ```
 
-- You MUST take EXTREMELY GOOD CARE to ALWAYS _perfectly_ document ALL parameters, the EXACT return-type, and ALL thrown exceptions. All other project developers RELY on the function-documentation ALWAYS being CORRECT! With incorrect documentation, other developers would make incorrect assumptions and bugs would be introduced!
+- You MUST take EXTREMELY GOOD CARE to ALWAYS _perfectly_ document ALL parameters, the EXACT return-type, and ALL thrown exceptions. All other project developers RELY on the function-documentation ALWAYS being CORRECT! With incorrect documentation, other developers would make incorrect assumptions and _severe_ bugs would be introduced!
 
 ### Exceptions (EXTREMELY IMPORTANT)
 
