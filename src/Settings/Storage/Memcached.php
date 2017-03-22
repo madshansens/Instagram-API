@@ -12,7 +12,7 @@ class Memcached implements \InstagramAPI\Settings\StorageInterface
     /**
      * @var \Memcached
      */
-    protected $memcached;
+    protected $_memcached;
 
     /**
      * Memcached constructor.
@@ -24,26 +24,26 @@ class Memcached implements \InstagramAPI\Settings\StorageInterface
         $instagramUsername,
         $config)
     {
-        $this->memcached = $memcached = new \Memcached((isset($config['persistent_id']) ? $config['persistent_id'] : 'instagram'));
+        $this->_memcached = new \Memcached((isset($config['persistent_id']) ? $config['persistent_id'] : 'instagram'));
 
         if (isset($config['init_callback']) && is_callable($config['init_callback'])) {
-            $config['init_callback']($memcached);
+            $config['init_callback']($this->_memcached);
         }
 
         if (isset($config['memcache_options'])) {
-            $memcached->setOptions((array) $config['memcache_options']);
+            $this->_memcached->setOptions((array) $config['memcache_options']);
         }
 
         if (isset($config['servers'])) {
-            $memcached->addServers($config['servers']);
+            $this->_memcached->addServers($config['servers']);
         } elseif (isset($config['server'])) {
-            $memcached->addServer(
+            $this->_memcached->addServer(
                 $config['server']['host'],
                 (isset($config['server']['port']) ? $config['server']['port'] : 11211),
                 (isset($config['server']['weight']) ? $config['server']['weight'] : 0)
             );
         } else {
-            $memcached->addServer('localhost', 11211);
+            $this->_memcached->addServer('localhost', 11211);
         }
     }
 
@@ -57,7 +57,7 @@ class Memcached implements \InstagramAPI\Settings\StorageInterface
         $key,
         $value)
     {
-        $this->memcached->set($key, $value);
+        $this->_memcached->set($key, $value);
     }
 
     /**
@@ -70,9 +70,11 @@ class Memcached implements \InstagramAPI\Settings\StorageInterface
         $key,
         $default = null)
     {
-        $result = $this->memcached->get($key);
+        $result = $this->_memcached->get($key);
 
-        return \Memcached::RES_NOTFOUND === ($this->memcached->getResultCode() ? $default : $result);
+        return \Memcached::RES_NOTFOUND === $this->_memcached->getResultCode()
+                                        ? $default
+                                        : $result;
     }
 
     /**
