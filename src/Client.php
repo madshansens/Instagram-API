@@ -706,7 +706,7 @@ class Client
     /**
      * Uploads a photo to Instagram.
      *
-     * @param string $type          What type of upload ("timeline", "story" or "album").
+     * @param string $targetFeed    Target feed for this media ("timeline", "story" or "album").
      * @param string $photoFilename The photo filename.
      * @param string $fileType      Whether the file is a "photofile" or "videofile".
      *                              In case of videofile we'll generate a thumbnail from it.
@@ -718,7 +718,7 @@ class Client
      * @return \InstagramAPI\Response\UploadPhotoResponse
      */
     public function uploadPhotoData(
-        $type,
+        $targetFeed,
         $photoFilename,
         $fileType = 'photofile',
         $uploadId = null)
@@ -779,7 +779,7 @@ class Client
                 ],
             ],
         ];
-        if ($type == 'album') {
+        if ($targetFeed == 'album') {
             $bodies[] = [
                 'type' => 'form-data',
                 'name' => 'is_sidecar',
@@ -835,20 +835,23 @@ class Client
     /**
      * Asks Instagram for parameters for uploading a new video.
      *
-     * @param string     $type     What type of upload ("timeline", "story" or "album").
-     * @param array|null $metadata (optional) Metadata key-value pairs.
+     * @param string $targetFeed       Target feed for this media ("timeline", "story" or "album").
+     * @param array  $internalMetadata (optional) Internal library-generated metadata key-value pairs.
      *
      * @throws \InstagramAPI\Exception\InstagramException If the request fails.
      *
      * @return array
      */
     public function requestVideoUploadURL(
-        $type,
-        array $metadata = null)
+        $targetFeed,
+        array $internalMetadata = [])
     {
         $this->_throwIfNotLoggedIn();
 
         $endpoint = 'upload/video/';
+
+        // Critically important internal library-generated metadata parameters:
+        // NOTE: NO INTERNAL DATA IS NEEDED HERE YET.
 
         // Prepare payload for the "pre-upload" request.
         $boundary = $this->_parent->uuid;
@@ -870,13 +873,17 @@ class Client
                 'data' => $boundary,
             ],
         ];
-        if ($type == 'album') {
+        if ($targetFeed == 'album') {
             $bodies[] = [
                 'type' => 'form-data',
                 'name' => 'is_sidecar',
                 'data' => '1',
             ];
         } else {
+            // Get all of the INTERNAL metadata needed for non-album videos.
+            /** @var array Video details array. */
+            $videoDetails = $internalMetadata['videoDetails'];
+
             $bodies[] = [
                 'type' => 'form-data',
                 'name' => 'media_type',
@@ -886,17 +893,17 @@ class Client
                 'type' => 'form-data',
                 'name' => 'upload_media_duration_ms',
                 // NOTE: ceil() is to round up and get rid of any MS decimals.
-                'data' => (int) ceil($metadata['videodetails']['duration'] * 1000),
+                'data' => (int) ceil($videoDetails['duration'] * 1000),
             ];
             $bodies[] = [
                 'type' => 'form-data',
                 'name' => 'upload_media_width',
-                'data' => $metadata['videodetails']['width'],
+                'data' => $videoDetails['width'],
             ];
             $bodies[] = [
                 'type' => 'form-data',
                 'name' => 'upload_media_height',
-                'data' => $metadata['videodetails']['height'],
+                'data' => $videoDetails['height'],
             ];
         }
         $payload = $this->_buildBody($bodies, $boundary);
@@ -929,9 +936,9 @@ class Client
 
         // Determine where their API wants us to upload the video file.
         return [
-            'upload_id'  => $uploadId,
-            'upload_url' => $response['object']->getVideoUploadUrls()[3]->url,
-            'job'        => $response['object']->getVideoUploadUrls()[3]->job,
+            'uploadId'  => $uploadId,
+            'uploadUrl' => $response['object']->getVideoUploadUrls()[3]->url,
+            'job'       => $response['object']->getVideoUploadUrls()[3]->job,
         ];
     }
 
@@ -941,7 +948,7 @@ class Client
      * Note that video uploads often fail when their server is overloaded.
      * So you may have to redo this call multiple times.
      *
-     * @param string $type          What type of upload ("timeline", "story" or "album").
+     * @param string $targetFeed    Target feed for this media ("timeline", "story" or "album").
      * @param string $videoFilename The video filename.
      * @param array  $uploadParams  An array created by requestVideoUploadURL()!
      *
@@ -952,7 +959,7 @@ class Client
      * @return \InstagramAPI\Response\UploadVideoResponse
      */
     public function uploadVideoChunks(
-        $type,
+        $targetFeed,
         $videoFilename,
         array $uploadParams)
     {
@@ -998,7 +1005,7 @@ class Client
                     'Cookie2'             => '$Version=1',
                     'Accept-Encoding'     => 'gzip, deflate',
                     'Content-Type'        => 'application/octet-stream',
-                    'Session-ID'          => $uploadParams['upload_id'],
+                    'Session-ID'          => $uploadParams['uploadId'],
                     'Accept-Language'     => Constants::ACCEPT_LANGUAGE,
                     'Content-Disposition' => "attachment; filename=\"video.{$videoExt}\"",
                     'Content-Range'       => 'bytes '.$rangeStart.'-'.$rangeEnd.'/'.$videoSize,
@@ -1012,7 +1019,7 @@ class Client
                 // Perform the upload of the current chunk.
                 $response = $this->_apiRequest(
                     $method,
-                    $uploadParams['upload_url'],
+                    $uploadParams['uploadUrl'],
                     $options,
                     [
                         'debugUploadedBody'  => false,
@@ -1044,6 +1051,12 @@ class Client
 
         // NOTE: $response below refers to the final chunk's result!
 
+        // TODO: FIX BUG AND REMOVE THIS SECTION ---- FROM HERE----
+        if (strpos($response['body'], 'StagedUpload not found') !== false) {
+            throw new \Exception('TODO: IMPLEMENT WHATEVER THE HELL STAGEDUPLOAD MEANS.');
+        }
+        // ---- TO HERE -----
+
         // Protection against Instagram's upload server being bugged out!
         // NOTE: When their server is bugging out, the final chunk result will
         // just be yet another range specifier such as "328600-657199/657200",
@@ -1069,7 +1082,7 @@ class Client
      * The retries are very important since their media server is often overloaded and
      * aborts the upload. So you almost always want this instead of uploadVideoChunks().
      *
-     * @param string $type          What type of video ("timeline", "story" or "album").
+     * @param string $targetFeed    Target feed for this media ("timeline", "story" or "album").
      * @param string $videoFilename The video filename.
      * @param array  $uploadParams  An array created by requestVideoUploadURL()!
      * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
@@ -1081,7 +1094,7 @@ class Client
      * @return \InstagramAPI\Response\UploadVideoResponse
      */
     public function uploadVideoData(
-        $type,
+        $targetFeed,
         $videoFilename,
         array $uploadParams,
         $maxAttempts = 10)
@@ -1097,7 +1110,7 @@ class Client
         for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
             try {
                 // Attempt an upload and return the result if successful.
-                return $this->uploadVideoChunks($type, $videoFilename, $uploadParams);
+                return $this->uploadVideoChunks($targetFeed, $videoFilename, $uploadParams);
             } catch (\InstagramAPI\Exception\UploadFailedException $e) {
                 if ($attempt < $maxAttempts) {
                     // Do nothing, since we'll be retrying the failed upload...

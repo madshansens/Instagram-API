@@ -21,7 +21,7 @@ class Signatures
     }
 
     public static function generateUUID(
-        $type)
+        $keepDashes = true)
     {
         $uuid = sprintf(
             '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
@@ -35,6 +35,6 @@ class Signatures
             mt_rand(0, 0xffff)
         );
 
-        return $type ? $uuid : str_replace('-', '', $uuid);
+        return $keepDashes ? $uuid : str_replace('-', '', $uuid);
     }
 }

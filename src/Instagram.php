@@ -706,331 +706,6 @@ class Instagram
     }
 
     /**
-     * INTERNAL.
-     *
-     * @param string     $type          What type of upload ("timeline" or "story",
-     *                                  but not "album". They're handled elsewhere.)
-     * @param string     $photoFilename The photo filename.
-     * @param array|null $metadata      (optional) Metadata key-value pairs.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ConfigureResponse
-     *
-     * @see configure() for available metadata fields.
-     */
-    protected function _uploadPhoto(
-        $type,
-        $photoFilename,
-        array $metadata = null)
-    {
-        // Make sure we don't allow "album" photo uploads via this function.
-        if ($type != 'timeline' && $type != 'story') {
-            throw new \InvalidArgumentException(sprintf('Unsupported photo upload type "%s".', $type));
-        }
-
-        $size = getimagesize($photoFilename);
-        $metadata['width'] = $size[0];
-        $metadata['height'] = $size[1];
-
-        // Perform the upload and then configure it for our timeline/story.
-        $upload = $this->client->uploadPhotoData($type, $photoFilename);
-        $configure = $this->configure($type, $upload->getUploadId(), $photoFilename, $metadata);
-
-        return $configure;
-    }
-
-    /**
-     * Uploads a photo to your Instagram timeline.
-
-     * @param string     $photoFilename The photo filename.
-     * @param array|null $metadata      (optional) Metadata key-value pairs.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ConfigureResponse
-     *
-     * @see configure() for available metadata fields.
-     */
-    public function uploadTimelinePhoto(
-        $photoFilename,
-        array $metadata = null)
-    {
-        return $this->_uploadPhoto('timeline', $photoFilename, $metadata);
-    }
-
-    /**
-     * Uploads a photo to your Instagram story.
-     *
-     * @param string     $photoFilename The photo filename.
-     * @param array|null $metadata      (optional) Metadata key-value pairs.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ConfigureResponse
-     *
-     * @see configure() for available metadata fields.
-     */
-    public function uploadStoryPhoto(
-        $photoFilename,
-        array $metadata = null)
-    {
-        return $this->_uploadPhoto('story', $photoFilename, $metadata);
-    }
-
-    /**
-     * INTERNAL.
-     *
-     * @param string     $type          What type of upload ("timeline" or "story",
-     *                                  but not "album". They're handled elsewhere.)
-     * @param string     $videoFilename The video filename.
-     * @param array|null $metadata      (optional) Metadata key-value pairs.
-     * @param int        $maxAttempts   (optional) Total attempts to upload all chunks before throwing.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
-     *
-     * @return \InstagramAPI\Response\ConfigureVideoResponse
-     *
-     * @see configureVideo() for available metadata fields.
-     */
-    protected function _uploadVideo(
-        $type,
-        $videoFilename,
-        array $metadata = null,
-        $maxAttempts = 10)
-    {
-        // Make sure we don't allow "album" video uploads via this function.
-        if ($type != 'timeline' && $type != 'story') {
-            throw new \InvalidArgumentException(sprintf('Unsupported video upload type "%s".', $type));
-        }
-
-        // Figure out the video file details.
-        // NOTE: We do this first, since it validates whether the video file is
-        // valid and lets us avoid wasting time uploading totally invalid files!
-        $metadata['videodetails'] = Utils::getVideoFileDetails($videoFilename);
-
-        // Validate the video details and throw if Instagram won't allow it.
-        Utils::throwIfIllegalVideoDetails($type, $videoFilename, $metadata['videodetails']);
-
-        // Request parameters for uploading a new video.
-        $uploadParams = $this->client->requestVideoUploadURL($type, $metadata);
-
-        // Attempt to upload the video data.
-        $upload = $this->client->uploadVideoData($type, $videoFilename, $uploadParams, $maxAttempts);
-
-        // Attempt to upload the thumbnail, associated with our video's ID.
-        $this->client->uploadPhotoData($type, $videoFilename, 'videofile', $uploadParams['upload_id']);
-
-        // Configure the uploaded video and attach it to our timeline/story.
-        $configure = $this->configureVideoWithRetries($type, $uploadParams['upload_id'], $metadata);
-
-        return $configure;
-    }
-
-    /**
-     * Uploads a video to your Instagram timeline.
-     *
-     * @param string     $videoFilename The video filename.
-     * @param array|null $metadata      (optional) Metadata key-value pairs.
-     * @param int        $maxAttempts   Total attempts to upload all chunks before throwing.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
-     *
-     * @return \InstagramAPI\Response\ConfigureVideoResponse
-     *
-     * @see configureVideo() for available metadata fields.
-     */
-    public function uploadTimelineVideo(
-        $videoFilename,
-        array $metadata = null,
-        $maxAttempts = 10)
-    {
-        return $this->_uploadVideo('timeline', $videoFilename, $metadata, $maxAttempts);
-    }
-
-    /**
-     * Uploads a video to your Instagram story.
-     *
-     * @param string     $videoFilename The video filename.
-     * @param array|null $metadata      (optional) Metadata key-value pairs.
-     * @param int        $maxAttempts   Total attempts to upload all chunks before throwing.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
-     *
-     * @return \InstagramAPI\Response\ConfigureVideoResponse
-     *
-     * @see configureVideo() for available metadata fields.
-     */
-    public function uploadStoryVideo(
-        $videoFilename,
-        array $metadata = null,
-        $maxAttempts = 10)
-    {
-        return $this->_uploadVideo('story', $videoFilename, $metadata, $maxAttempts);
-    }
-
-    /**
-     * Uploads an album to your Instagram timeline.
-     *
-     * An album is also known as a "carousel" and "sidecar". They can contain up
-     * to 10 photos or videos (at the moment).
-     *
-     * @param array      $media         Array of image/video files and their per-file
-     *                                  metadata (type, file, and optionally usertags).
-     *                                  The "type" must be "photo" or "video".
-     *                                  The "file" must be its disk path. And
-     *                                  the optional "usertags" can only be used
-     *                                  on PHOTOS, never on videos.
-     * @param array|null $albumMetadata (optional) Metadata key-value pairs for the
-     *                                  album itself (its caption, location, etc).
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
-     *
-     * @return \InstagramAPI\Response\ConfigureResponse
-     *
-     * @see configure() for available album metadata fields.
-     */
-    public function uploadTimelineAlbum(
-        $media,
-        array $albumMetadata = null)
-    {
-        if (empty($media)) {
-            throw new \InvalidArgumentException("List of media to upload can't be empty.");
-        }
-        if (count($media) < 2 || count($media) > 10) {
-            throw new \InvalidArgumentException(sprintf('Instagram requires that albums contain 2-10 items. You tried to submit %d.', count($media)));
-        }
-
-        // Figure out the video file details for ALL videos in the album.
-        // NOTE: We do this first, since it validates whether the video files are
-        // valid and lets us avoid wasting time uploading totally invalid albums!
-        foreach ($media as $key => $item) {
-            if ($item['type'] == 'video') {
-                $media[$key]['videodetails'] = Utils::getVideoFileDetails($item['file']);
-
-                // Validate the video details and throw if Instagram won't allow it.
-                Utils::throwIfIllegalVideoDetails('album', $item['file'], $media[$key]['videodetails']);
-            }
-        }
-
-        $hasUploadedVideo = false;
-        foreach ($media as $key => $item) {
-            if (!file_exists($item['file'])) {
-                throw new \InvalidArgumentException(sprintf('File "%s" does not exist.', $item['file']));
-            }
-
-            switch ($item['type']) {
-            case 'photo':
-                $result = $this->client->uploadPhotoData('album', $item['file']);
-                $media[$key]['upload_id'] = $result->getUploadId();
-                break;
-            case 'video':
-                $hasUploadedVideo = true;
-
-                // Request parameters for uploading a new video.
-                $uploadParams = $this->client->requestVideoUploadURL('album');
-                $media[$key]['upload_id'] = $uploadParams['upload_id'];
-
-                // Attempt to upload the video data.
-                // TODO: Consider adding the final "maxAttempts" parameter and
-                // making it configurable in uploadTimelineAlbum's parameters. But first
-                // finalize the behavior of uploadTimelineAlbum (we may have to
-                // remove the "filter" parameter and making it part of the
-                // per-photo configuration array, for example, if Instagram
-                // allows per-photo filters inside of albums).
-                $this->client->uploadVideoData('album', $item['file'], $uploadParams);
-
-                // Attempt to upload the thumbnail, associated with our video's ID.
-                $this->client->uploadPhotoData('album', $item['file'], 'videofile', $uploadParams['upload_id']);
-
-                // We don't call configure! Album videos are configured below instead.
-                break;
-            default:
-                throw new \InvalidArgumentException(sprintf('Unsupported album media type "%s".', $item['type']));
-            }
-        }
-
-        if ($hasUploadedVideo) {
-            // TODO: We could write this in a nicer way but this solves it for now.
-            // In the future we may want to act like configureVideoWithRetries().
-            sleep(5); // Super important to avoid configure-problems on new videos!
-        }
-
-        $date = date('Y:m:d H:i:s');
-
-        $uploadRequests = [];
-        foreach ($media as $item) {
-            switch ($item['type']) {
-            case 'photo':
-                $photoConfig = [
-                    'date_time_original'  => $date,
-                    'scene_type'          => 1,
-                    'disable_comments'    => false,
-                    'upload_id'           => $item['upload_id'],
-                    'source_type'         => 0,
-                    'scene_capture_type'  => 'standard',
-                    'date_time_digitized' => $date,
-                    'geotag_enabled'      => false,
-                    'camera_position'     => 'back',
-                    'edits', [
-                        'filter_strength' => 1,
-                        'filter_name'     => 'IGNormalFilter',
-                    ],
-                ];
-
-                // This usertag per-file metadata is only supported for PHOTOS!
-                if (isset($item['usertags'])) {
-                    $photoConfig['usertags'] = json_encode(['in' => $item['usertags']]);
-                }
-
-                $uploadRequests[] = $photoConfig;
-                break;
-            case 'video':
-                $videoConfig = [
-                    'length'              => round($item['videodetails']['duration'], 2),
-                    'date_time_original'  => $date,
-                    'scene_type'          => 1,
-                    'poster_frame_index'  => 0,
-                    'trim_type'           => 0,
-                    'disable_comments'    => false,
-                    'upload_id'           => $item['upload_id'],
-                    'source_type'         => 'library',
-                    'geotag_enabled'      => false,
-                    'edits', [
-                        //'length'          => '0.00', // TODO! Should this always be 0.00?
-                        'cinema'          => 'unsupported',
-                        'original_length' => 0.00,
-                        'source_type'     => 'library',
-                        'start_time'      => 0,
-                        'camera_position' => 'unknown',
-                        'trim_type'       => 0,
-                    ],
-                ];
-
-                $uploadRequests[] = $videoConfig;
-                break;
-            }
-        }
-
-        // TODO: THIS SEEMS BUGGED TO ME. Why is it only using the last item's
-        // "file" value when configuring a whole array of uploadRequests?
-        $configure = $this->configure('album', $uploadRequests, $item['file'], $albumMetadata);
-
-        return $configure;
-    }
-
-    /**
      * Share media via direct message to a user's inbox.
      *
      * @param array|int $recipients One or more numeric user IDs.
@@ -1151,81 +826,338 @@ class Instagram
         return $this->client->api("direct_v2/threads/{$threadId}/{$threadAction}/", Signatures::generateSignature($data))[1];
     }
 
-    /**
-     * Helper function for reliably configuring videos.
-     *
-     * Exactly the same as configureVideo() but performs multiple attempts. Very
-     * useful since Instagram sometimes can't configure a newly uploaded video
-     * file until a few seconds have passed.
-     *
-     * @param string     $type        What type of upload ("timeline" or "story",
-     *                                but not "album". They're handled elsewhere.)
-     * @param string     $uploadId    The ID of the upload to configure.
-     * @param array|null $metadata    (optional) Metadata key-value pairs.
-     * @param int        $maxAttempts Total attempts to configure video before throwing.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ConfigureVideoResponse
-     *
-     * @see configureVideo() for available metadata fields.
-     */
-    public function configureVideoWithRetries(
-        $type,
-        $uploadId,
-        array $metadata = null,
-        $maxAttempts = 5)
-    {
-        for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
-            try {
-                // Attempt to configure video parameters.
-                $configure = $this->configureVideo($type, $uploadId, $metadata);
-                //$this->expose(); // <-- WTF? Old leftover code.
-                break; // Success. Exit loop.
-            } catch (\InstagramAPI\Exception\InstagramException $e) {
-                if ($attempt < $maxAttempts && strpos($e->getMessage(), 'Transcode timeout') !== false) {
-                    // Do nothing, since we'll be retrying the failed configure...
-                    sleep(1); // Just wait a little before the next retry.
-                } else {
-                    // Re-throw all unhandled exceptions.
-                    throw $e;
-                }
-            }
-        }
-
-        return $configure; // ConfigureVideoResponse
-    }
 
     /**
-     * Configure parameters for uploaded video.
+     * INTERNAL. UPLOADS A *SINGLE* PHOTO.
      *
-     * @param string     $type     What type of upload ("timeline" or "story",
-     *                             but not "album". They're handled elsewhere.)
-     * @param string     $uploadId The ID of the upload to configure.
-     * @param array|null $metadata (optional) Metadata key-value pairs.
+     * @param string $targetFeed       Target feed for this media ("timeline", "story",
+     *                                 but NOT "album", they are handled elsewhere).
+     * @param string $photoFilename    The photo filename.
+     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\ConfigureVideoResponse
+     * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see configureSinglePhoto() for available metadata fields.
      */
-    public function configureVideo(
-        $type,
-        $uploadId,
-        array $metadata = null)
+    protected function _uploadSinglePhoto(
+        $targetFeed,
+        $photoFilename,
+        array $externalMetadata = [])
     {
-        // Available metadata parameters:
-        /** @var string|null Caption to use for the media. */
-        $captionText = isset($metadata['caption']) ? $metadata['caption'] : null;
-        /** @var string[]|null Array of UserPK IDs of people tagged in your
-         * video. ONLY USED IN STORY VIDEOS! TODO: Actually, it's not even implemented for stories. */
-        $userTags = (isset($metadata['usertags']) && $type == 'story') ? $metadata['usertags'] : null;
-        /** @var Response\Model\Location|null A Location object describing where
-         the media was taken. NOT USED FOR STORY MEDIA! */
-        $location = (isset($metadata['location']) && $type != 'story') ? $metadata['location'] : null;
+        // Make sure we only allow these particular feeds for this function.
+        if ($targetFeed != 'timeline' && $targetFeed != 'story') {
+            throw new \InvalidArgumentException(sprintf('Bad target feed "%s".', $targetFeed));
+        }
 
-        // Make sure we don't configure "album" video uploads via this function.
-        switch ($type) {
+        // Verify that the file exists locally.
+        if (!is_file($photoFilename)) {
+            throw new \InvalidArgumentException(sprintf('The photo file "%s" does not exist on disk.', $photoFilename));
+        }
+
+        // Determine the width and height of the photo.
+        $imagesize = @getimagesize($photoFilename);
+        if ($imagesize === false) {
+            throw new \InvalidArgumentException(sprintf('File "%s" is not an image.', $photoFilename));
+        }
+        list($photoWidth, $photoHeight) = $imagesize;
+
+        // Validate image resolution and aspect ratio.
+        Utils::throwIfIllegalMediaResolution($targetFeed, 'photofile', $photoFilename, $photoWidth, $photoHeight);
+
+        // Perform the upload.
+        $upload = $this->client->uploadPhotoData($targetFeed, $photoFilename);
+
+        // Configure the uploaded image and attach it to our timeline/story.
+        $internalMetadata = [
+            'uploadId'      => $upload->getUploadId(),
+            'photoWidth'    => $photoWidth,
+            'photoHeight'   => $photoHeight,
+        ];
+        $configure = $this->configureSinglePhoto($targetFeed, $internalMetadata, $externalMetadata);
+
+        return $configure;
+    }
+
+    /**
+     * Uploads a photo to your Instagram timeline.
+
+     * @param string $photoFilename    The photo filename.
+     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see configureSinglePhoto() for available metadata fields.
+     */
+    public function uploadTimelinePhoto(
+        $photoFilename,
+        array $externalMetadata = [])
+    {
+        return $this->_uploadSinglePhoto('timeline', $photoFilename, $externalMetadata);
+    }
+
+    /**
+     * Uploads a photo to your Instagram story.
+     *
+     * @param string $photoFilename    The photo filename.
+     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see configureSinglePhoto() for available metadata fields.
+     */
+    public function uploadStoryPhoto(
+        $photoFilename,
+        array $externalMetadata = [])
+    {
+        return $this->_uploadSinglePhoto('story', $photoFilename, $externalMetadata);
+    }
+
+    /**
+     * INTERNAL. UPLOADS A *SINGLE* VIDEO.
+     *
+     * @param string $targetFeed       Target feed for this media ("timeline", "story",
+     *                                 but NOT "album", they are handled elsewhere).
+     * @param string $videoFilename    The video filename.
+     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
+     * @param int    $maxAttempts      (optional) Total attempts to upload all chunks before throwing.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
+     *
+     * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see configureSingleVideo() for available metadata fields.
+     */
+    protected function _uploadSingleVideo(
+        $targetFeed,
+        $videoFilename,
+        array $externalMetadata = [],
+        $maxAttempts = 10)
+    {
+        // Make sure we only allow these particular feeds for this function.
+        if ($targetFeed != 'timeline' && $targetFeed != 'story') {
+            throw new \InvalidArgumentException(sprintf('Bad target feed "%s".', $targetFeed));
+        }
+
+        // Verify that the file exists locally.
+        if (!is_file($videoFilename)) {
+            throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
+        }
+
+        $internalMetadata = [];
+
+        // Figure out the video file details.
+        // NOTE: We do this first, since it validates whether the video file is
+        // valid and lets us avoid wasting time uploading totally invalid files!
+        $internalMetadata['videoDetails'] = Utils::getVideoFileDetails($videoFilename);
+
+        // Validate the video details and throw if Instagram won't allow it.
+        Utils::throwIfIllegalVideoDetails($targetFeed, $videoFilename, $internalMetadata['videoDetails']);
+
+        // Request parameters for uploading a new video.
+        $uploadParams = $this->client->requestVideoUploadURL($targetFeed, $internalMetadata);
+        $internalMetadata['uploadId'] = $uploadParams['uploadId'];
+
+        // Attempt to upload the video data.
+        $upload = $this->client->uploadVideoData($targetFeed, $videoFilename, $uploadParams, $maxAttempts);
+
+        // Attempt to upload the thumbnail, associated with our video's ID.
+        $this->client->uploadPhotoData($targetFeed, $videoFilename, 'videofile', $uploadParams['uploadId']);
+
+        // Configure the uploaded video and attach it to our timeline/story.
+        $configure = $this->configureSingleVideoWithRetries($targetFeed, $internalMetadata, $externalMetadata);
+
+        return $configure;
+    }
+
+    /**
+     * Uploads a video to your Instagram timeline.
+     *
+     * @param string $videoFilename    The video filename.
+     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
+     * @param int    $maxAttempts      Total attempts to upload all chunks before throwing.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
+     *
+     * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see configureSingleVideo() for available metadata fields.
+     */
+    public function uploadTimelineVideo(
+        $videoFilename,
+        array $externalMetadata = [],
+        $maxAttempts = 10)
+    {
+        return $this->_uploadSingleVideo('timeline', $videoFilename, $externalMetadata, $maxAttempts);
+    }
+
+    /**
+     * Uploads a video to your Instagram story.
+     *
+     * @param string $videoFilename    The video filename.
+     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
+     * @param int    $maxAttempts      Total attempts to upload all chunks before throwing.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
+     *
+     * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see configureSingleVideo() for available metadata fields.
+     */
+    public function uploadStoryVideo(
+        $videoFilename,
+        array $externalMetadata = [],
+        $maxAttempts = 10)
+    {
+        return $this->_uploadSingleVideo('story', $videoFilename, $externalMetadata, $maxAttempts);
+    }
+
+    /**
+     * Uploads an album to your Instagram timeline.
+     *
+     * An album is also known as a "carousel" and "sidecar". They can contain up
+     * to 10 photos or videos (at the moment).
+     *
+     * @param array $media            Array of image/video files and their per-file
+     *                                metadata (type, file, and optionally
+     *                                usertags). The "type" must be "photo" or
+     *                                "video". The "file" must be its disk path.
+     *                                And the optional "usertags" can only be
+     *                                used on PHOTOS, never on videos.
+     * @param array $externalMetadata (optional) User-provided metadata key-value pairs
+     *                                for the album itself (its caption, location, etc).
+     * @param int   $maxAttempts      Total attempts to upload all video chunks before throwing.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
+     *
+     * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see configureTimelineAlbum() for available album metadata fields.
+     */
+    public function uploadTimelineAlbum(
+        array $media,
+        array $externalMetadata = [],
+        $maxAttempts = 10)
+    {
+        if (empty($media)) {
+            throw new \InvalidArgumentException("List of media to upload can't be empty.");
+        }
+        if (count($media) < 2 || count($media) > 10) {
+            throw new \InvalidArgumentException(sprintf('Instagram requires that albums contain 2-10 items. You tried to submit %d.', count($media)));
+        }
+
+        // Figure out the media file details for ALL media in the album.
+        // NOTE: We do this first, since it validates whether the media files are
+        // valid and lets us avoid wasting time uploading totally invalid albums!
+        foreach ($media as $key => $item) {
+            // Verify that the file exists locally.
+            if (!is_file($item['file'])) {
+                throw new \InvalidArgumentException(sprintf('The media file "%s" does not exist on disk.', $item['file']));
+            }
+
+            $media[$key]['internalMetadata'] = [];
+
+            // Pre-process media details and throw if not allowed on Instagram.
+            switch ($item['type']) {
+            case 'photo':
+                // Determine the width and height of the photo.
+                $imagesize = @getimagesize($item['file']);
+                if ($imagesize === false) {
+                    throw new \InvalidArgumentException(sprintf('File "%s" is not an image.', $item['file']));
+                }
+                $media[$key]['internalMetadata']['photoWidth'] = $imagesize[0];
+                $media[$key]['internalMetadata']['photoHeight'] = $imagesize[1];
+
+                // Validate image resolution and aspect ratio.
+                Utils::throwIfIllegalMediaResolution('album', 'photofile', $item['file'],
+                                                     $media[$key]['internalMetadata']['photoWidth'],
+                                                     $media[$key]['internalMetadata']['photoHeight']);
+                break;
+            case 'video':
+                // Determine the video details.
+                $media[$key]['internalMetadata']['videoDetails'] = Utils::getVideoFileDetails($item['file']);
+
+                // Validate those details.
+                Utils::throwIfIllegalVideoDetails('album', $item['file'], $media[$key]['internalMetadata']['videoDetails']);
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf('Unsupported album media type "%s".', $item['type']));
+            }
+        }
+
+        // Perform all media file uploads.
+        foreach ($media as $key => $item) {
+            if (!file_exists($item['file'])) {
+                throw new \InvalidArgumentException(sprintf('File "%s" does not exist.', $item['file']));
+            }
+
+            switch ($item['type']) {
+            case 'photo':
+                $result = $this->client->uploadPhotoData('album', $item['file']);
+                $media[$key]['internalMetadata']['uploadId'] = $result->getUploadId();
+                break;
+            case 'video':
+                // Request parameters for uploading a new video.
+                $uploadParams = $this->client->requestVideoUploadURL('album');
+                $media[$key]['internalMetadata']['uploadId'] = $uploadParams['uploadId'];
+
+                // Attempt to upload the video data.
+                $this->client->uploadVideoData('album', $item['file'], $uploadParams, $maxAttempts);
+
+                // Attempt to upload the thumbnail, associated with our video's ID.
+                $this->client->uploadPhotoData('album', $item['file'], 'videofile', $uploadParams['uploadId']);
+            }
+        }
+
+        // Configure the uploaded album and attach it to our timeline.
+        $internalMetadata = []; // NOTE: NO INTERNAL DATA IS NEEDED HERE YET.
+        $configure = $this->configureTimelineAlbumWithRetries($media, $internalMetadata, $externalMetadata);
+
+        return $configure;
+    }
+
+    /**
+     * Configures parameters for a *SINGLE* uploaded photo file.
+     *
+     * WARNING TO CONTRIBUTORS: THIS IS ONLY FOR *TIMELINE* AND *STORY* -PHOTOS-.
+     * USE "configureTimelineAlbum()" FOR ALBUMS and "configureSingleVideo()" FOR VIDEOS.
+     * AND IF FUTURE INSTAGRAM FEATURES NEED CONFIGURATION AND ARE NON-TRIVIAL,
+     * GIVE THEM THEIR OWN FUNCTION LIKE WE DID WITH "configureTimelineAlbum()",
+     * TO AVOID ADDING BUGGY AND UNMAINTAINABLE SPIDERWEB CODE!
+     *
+     * @param string $targetFeed       Target feed for this media ("timeline", "story",
+     *                                 but NOT "album", they are handled elsewhere).
+     * @param array  $internalMetadata Internal library-generated metadata key-value pairs.
+     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ConfigureResponse
+     */
+    public function configureSinglePhoto(
+        $targetFeed,
+        array $internalMetadata,
+        array $externalMetadata = [])
+    {
+        // Determine the target endpoint for the photo.
+        switch ($targetFeed) {
         case 'timeline':
             $endpoint = 'media/configure/';
             break;
@@ -1233,19 +1165,43 @@ class Instagram
             $endpoint = 'media/configure_to_story/';
             break;
         default:
-            throw new \InvalidArgumentException('Invalid video configuration type.');
+            throw new \InvalidArgumentException(sprintf('Bad target feed "%s".', $targetFeed));
         }
 
+        // Available external metadata parameters:
+        /** @var string|null Caption to use for the media. */
+        $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : null;
+        /** @var Response\Model\Location|null A Location object describing where
+         the media was taken. NOT USED FOR STORY MEDIA! */
+        $location = (isset($externalMetadata['location']) && $targetFeed != 'story') ? $externalMetadata['location'] : null;
+        /** @var void Photo filter. THIS DOES NOTHING! All real filters are done in the mobile app. */
+        // $filter = isset($externalMetadata['filter']) ? $externalMetadata['filter'] : null;
+        $filter = null; // COMMENTED OUT SO USERS UNDERSTAND THEY CAN'T USE THIS!
+
+        // Fix very bad external user-metadata values.
+        if (!is_string($captionText)) {
+            $captionText = '';
+        }
+
+        // Critically important internal library-generated metadata parameters:
+        /** @var string The ID of the entry to configure. */
+        $uploadId = $internalMetadata['uploadId'];
+        /** @var int|float Width of the photo. */
+        $photoWidth = $internalMetadata['photoWidth'];
+        /** @var int|float Height of the photo. */
+        $photoHeight = $internalMetadata['photoHeight'];
+
+        // Build the request...
         $requestData = $this->request($endpoint)
-        ->addParams('video', 1)
-        ->addPost('video_result', 'deprecated')
-        ->addPost('upload_id', $uploadId)
-        ->addPost('poster_frame_index', 0)
-        ->addPost('length', round($metadata['videodetails']['duration'], 1))
-        ->addPost('audio_muted', false)
-        ->addPost('filter_type', 0)
-        ->addPost('source_type', 4)
-        ->addPost('video_result', 'deprecated')
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('edits',
+            [
+                'crop_original_size'    => [$photoWidth, $photoHeight],
+                'crop_zoom'             => 1,
+                'crop_center'           => [0.0, -0.0],
+            ])
         ->addPost('device',
             [
                 'manufacturer'      => $this->device->getManufacturer(),
@@ -1255,130 +1211,11 @@ class Instagram
             ])
         ->addPost('extra',
             [
-                'source_width'  => $metadata['videodetails']['width'],
-                'source_height' => $metadata['videodetails']['height'],
-            ])
-        ->addPost('_csrftoken', $this->token)
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id);
+                'source_width'  => $photoWidth,
+                'source_height' => $photoHeight,
+            ]);
 
-        if ($type == 'story') {
-            $requestData->addPost('configure_mode', 1) // 1 - REEL_SHARE, 2 - DIRECT_STORY_SHARE
-            ->addPost('story_media_creation_date', time() - mt_rand(10, 20))
-            ->addPost('client_shared_at', time() - mt_rand(3, 10))
-            ->addPost('client_timestamp', time());
-        }
-
-        if ($captionText !== '' && !is_null($captionText) && $captionText) {
-            $requestData->addPost('caption', $captionText);
-        }
-
-        // TODO: IMPLEMENT THIS "STORY USER TAGS" FEATURE!
-        // Reel Mention example --> build with user id
-        // [{\"y\":0.3407772676161919,\"rotation\":0,\"user_id\":\"USER_ID\",\"x\":0.39892578125,\"width\":0.5619921875,\"height\":0.06011525487256372}]
-        if ($type == 'story') {
-            $requestData->addPost('story_media_creation_date', time());
-            if (!is_null($userTags)) {
-                //$requestData->addPost('reel_mentions', addcslashes(json_encode($userTags)));
-            }
-        }
-
-        if ($location instanceof Response\Model\Location) {
-            $loc = [
-                $location->getExternalIdSource().'_id'   => $location->getExternalId(),
-                'name'                                   => $location->getName(),
-                'lat'                                    => $location->getLat(),
-                'lng'                                    => $location->getLng(),
-                'address'                                => $location->getAddress(),
-                'external_source'                        => $location->getExternalIdSource(),
-            ];
-
-            $requestData->addPost('location', json_encode($loc))
-            ->addPost('geotag_enabled', '1')
-            ->addPost('av_latitude', 0.0)
-            ->addPost('av_longitude', 0.0)
-            ->addPost('posting_latitude', $location->getLat())
-            ->addPost('posting_longitude', $location->getLng())
-            ->addPost('media_latitude', $location->getLat())
-            ->addPost('media_longitude', $location->getLng());
-        }
-
-        $configure = $requestData->getResponse(new Response\ConfigureVideoResponse());
-
-        return $configure;
-    }
-
-    /**
-     * Configure uploaded media parameters (primarily for photos, but also albums).
-     *
-     * @param string     $type          What type of entry ("timeline", "story" or "album").
-     * @param string     $uploadId      The ID of the entry to configure.
-     * @param string     $photoFilename The photo filename.
-     * @param array|null $metadata      (optional) Metadata key-value pairs.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ConfigureResponse
-     */
-    public function configure(
-        $type,
-        $uploadId,
-        $photoFilename,
-        array $metadata = null)
-    {
-        // Available metadata parameters:
-        /** @var string|null Caption to use for the media. */
-        $captionText = isset($metadata['caption']) ? $metadata['caption'] : null;
-        /** @var Response\Model\Location|null A Location object describing where
-         the media was taken. NOT USED FOR STORY MEDIA! */
-        $location = (isset($metadata['location']) && $type != 'story') ? $metadata['location'] : null;
-        /** @var void Photo filter. THIS DOES NOTHING! All real filters are done in the mobile app. */
-        // $filter = isset($metadata['filter']) ? $metadata['filter'] : null;
-        $filter = null; // COMMENTED OUT SO USERS UNDERSTAND THEY CAN'T USE THIS!
-
-        // Begin...
-        $size = getimagesize($photoFilename)[0];
-        if (is_null($captionText)) {
-            $captionText = '';
-        }
-
-        if ($type == 'album') {
-            $endpoint = 'media/configure_sidecar/';
-        } elseif ($type == 'story') {
-            $endpoint = 'media/configure_to_story/';
-        } else {
-            $endpoint = 'media/configure/';
-        }
-
-        $requestData = $this->request($endpoint)
-        ->addPost('_csrftoken', $this->token)
-        ->addPost('_uid', $this->username_id)
-        ->addPost('_uuid', $this->uuid);
-
-        if ($type != 'album') {
-            $requestData->addPost('edits',
-                [
-                    'crop_original_size'    => [$metadata['width'], $metadata['height']],
-                    'crop_zoom'             => 1,
-                    'crop_center'           => [0.0, -0.0],
-                ]
-            )
-            ->addPost('device',
-                [
-                    'manufacturer'      => $this->device->getManufacturer(),
-                    'model'             => $this->device->getModel(),
-                    'android_version'   => $this->device->getAndroidVersion(),
-                    'android_release'   => $this->device->getAndroidRelease(),
-                ]
-            )
-            ->addPost('extra',
-                [
-                    'source_width'  => $metadata['width'],
-                    'source_height' => $metadata['height'],
-                ]);
-        }
-
-        switch ($type) {
+        switch ($targetFeed) {
             case 'timeline':
                 $requestData->addPost('caption', $captionText)
                 ->addPost('source_type', 4)
@@ -1392,13 +1229,6 @@ class Instagram
                 ->addPost('client_timestamp', time())
                 ->addPost('upload_id', $uploadId);
                 break;
-            case 'album':
-                $requestData->addPost('client_sidecar_id', Utils::generateUploadId())
-                ->addPost('caption', $captionText)
-                ->addPost('children_metadata', $uploadId);
-                break;
-            default:
-                throw new \InvalidArgumentException(sprintf('Unsupported media type "%s".', $type));
         }
 
         if ($location instanceof Response\Model\Location) {
@@ -1416,17 +1246,379 @@ class Instagram
             ->addPost('posting_latitude', $location->getLat())
             ->addPost('posting_longitude', $location->getLng())
             ->addPost('media_latitude', $location->getLat())
-            ->addPost('media_longitude', $location->getLng());
+            ->addPost('media_longitude', $location->getLng())
+            ->addPost('av_latitude', 0.0)
+            ->addPost('av_longitude', 0.0);
+        }
 
-            if ($type == 'album') {
-                $requestData->addPost('location', json_encode($loc))
-                ->addPost('exif_latitude', 0.0)
-                ->addPost('exif_longitude', 0.0);
-            } else {
-                $requestData->addPost('location', json_encode($loc))
-                ->addPost('av_latitude', 0.0)
-                ->addPost('av_longitude', 0.0);
+        $configure = $requestData->getResponse(new Response\ConfigureResponse());
+
+        return $configure;
+    }
+
+
+    /**
+     * Helper function for reliably configuring videos.
+     *
+     * Exactly the same as configureSingleVideo() but performs multiple attempts. Very
+     * useful since Instagram sometimes can't configure a newly uploaded video
+     * file until a few seconds have passed.
+     *
+     * @param string $targetFeed       Target feed for this media ("timeline", "story",
+     *                                 but NOT "album", they are handled elsewhere).
+     * @param array  $internalMetadata Internal library-generated metadata key-value pairs.
+     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
+     * @param int    $maxAttempts      Total attempts to configure video before throwing.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see configureSingleVideo() for available metadata fields.
+     */
+    public function configureSingleVideoWithRetries(
+        $targetFeed,
+        array $internalMetadata,
+        array $externalMetadata = [],
+        $maxAttempts = 5)
+    {
+        for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
+            try {
+                // Attempt to configure video parameters.
+                $configure = $this->configureSingleVideo($targetFeed, $internalMetadata, $externalMetadata);
+                break; // Success. Exit loop.
+            } catch (\InstagramAPI\Exception\InstagramException $e) {
+                if ($attempt < $maxAttempts && strpos($e->getMessage(), 'Transcode timeout') !== false) {
+                    // Do nothing, since we'll be retrying the failed configure...
+                    sleep(1); // Just wait a little before the next retry.
+                } else {
+                    // Re-throw all unhandled exceptions.
+                    throw $e;
+                }
             }
+        }
+
+        return $configure; // ConfigureResponse
+    }
+
+    /**
+     * Configures parameters for a *SINGLE* uploaded video file.
+     *
+     * WARNING TO CONTRIBUTORS: THIS IS ONLY FOR *TIMELINE* AND *STORY* -VIDEOS-.
+     * USE "configureTimelineAlbum()" FOR ALBUMS and "configureSinglePhoto()" FOR PHOTOS.
+     * AND IF FUTURE INSTAGRAM FEATURES NEED CONFIGURATION AND ARE NON-TRIVIAL,
+     * GIVE THEM THEIR OWN FUNCTION LIKE WE DID WITH "configureTimelineAlbum()",
+     * TO AVOID ADDING BUGGY AND UNMAINTAINABLE SPIDERWEB CODE!
+     *
+     * @param string $targetFeed       Target feed for this media ("timeline", "story",
+     *                                 but NOT "album", they are handled elsewhere).
+     * @param array  $internalMetadata Internal library-generated metadata key-value pairs.
+     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ConfigureResponse
+     */
+    public function configureSingleVideo(
+        $targetFeed,
+        array $internalMetadata,
+        array $externalMetadata = [])
+    {
+        // Determine the target endpoint for the video.
+        switch ($targetFeed) {
+        case 'timeline':
+            $endpoint = 'media/configure/';
+            break;
+        case 'story':
+            $endpoint = 'media/configure_to_story/';
+            break;
+        default:
+            throw new \InvalidArgumentException(sprintf('Bad target feed "%s".', $targetFeed));
+        }
+
+        // Available external metadata parameters:
+        /** @var string|null Caption to use for the media. */
+        $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : null;
+        /** @var string[]|null Array of UserPK IDs of people tagged in your
+         * video. ONLY USED IN STORY VIDEOS! TODO: Actually, it's not even implemented for stories. */
+        $userTags = (isset($externalMetadata['usertags']) && $targetFeed == 'story') ? $externalMetadata['usertags'] : null;
+        /** @var Response\Model\Location|null A Location object describing where
+         the media was taken. NOT USED FOR STORY MEDIA! */
+        $location = (isset($externalMetadata['location']) && $targetFeed != 'story') ? $externalMetadata['location'] : null;
+
+        // Fix very bad external user-metadata values.
+        if (!is_string($captionText)) {
+            $captionText = '';
+        }
+
+        // Critically important internal library-generated metadata parameters:
+        /** @var string The ID of the entry to configure. */
+        $uploadId = $internalMetadata['uploadId'];
+        /** @var array Video details array. */
+        $videoDetails = $internalMetadata['videoDetails'];
+
+        // Build the request...
+        $requestData = $this->request($endpoint)
+        ->addParams('video', 1)
+        ->addPost('video_result', 'deprecated')
+        ->addPost('upload_id', $uploadId)
+        ->addPost('poster_frame_index', 0)
+        ->addPost('length', round($videoDetails['duration'], 1))
+        ->addPost('audio_muted', false)
+        ->addPost('filter_type', 0)
+        ->addPost('source_type', 4)
+        ->addPost('video_result', 'deprecated')
+        ->addPost('device',
+            [
+                'manufacturer'      => $this->device->getManufacturer(),
+                'model'             => $this->device->getModel(),
+                'android_version'   => $this->device->getAndroidVersion(),
+                'android_release'   => $this->device->getAndroidRelease(),
+            ])
+        ->addPost('extra',
+            [
+                'source_width'  => $videoDetails['width'],
+                'source_height' => $videoDetails['height'],
+            ])
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id);
+
+        if ($targetFeed == 'story') {
+            $requestData->addPost('configure_mode', 1) // 1 - REEL_SHARE, 2 - DIRECT_STORY_SHARE
+            ->addPost('story_media_creation_date', time() - mt_rand(10, 20))
+            ->addPost('client_shared_at', time() - mt_rand(3, 10))
+            ->addPost('client_timestamp', time());
+        }
+
+        $requestData->addPost('caption', $captionText);
+
+        if ($targetFeed == 'story') {
+            $requestData->addPost('story_media_creation_date', time());
+            if (!is_null($userTags)) {
+                // Reel Mention example:
+                // [{\"y\":0.3407772676161919,\"rotation\":0,\"user_id\":\"USER_ID\",\"x\":0.39892578125,\"width\":0.5619921875,\"height\":0.06011525487256372}]
+                // NOTE: The backslashes are just double JSON encoding, ignore
+                // that and just give us an array with these clean values, don't
+                // try to encode it in any way, we do all encoding to match the above.
+                // This post field will get wrapped in another json_encode call during transfer.
+                $requestData->addPost('reel_mentions', json_encode($userTags));
+            }
+        }
+
+        if ($location instanceof Response\Model\Location) {
+            $loc = [
+                $location->getExternalIdSource().'_id'   => $location->getExternalId(),
+                'name'                                   => $location->getName(),
+                'lat'                                    => $location->getLat(),
+                'lng'                                    => $location->getLng(),
+                'address'                                => $location->getAddress(),
+                'external_source'                        => $location->getExternalIdSource(),
+            ];
+
+            $requestData->addPost('location', json_encode($loc))
+            ->addPost('geotag_enabled', '1')
+            ->addPost('posting_latitude', $location->getLat())
+            ->addPost('posting_longitude', $location->getLng())
+            ->addPost('media_latitude', $location->getLat())
+            ->addPost('media_longitude', $location->getLng())
+            ->addPost('av_latitude', 0.0)
+            ->addPost('av_longitude', 0.0);
+        }
+
+        $configure = $requestData->getResponse(new Response\ConfigureResponse());
+
+        return $configure;
+    }
+
+    /**
+     * Helper function for reliably configuring albums.
+     *
+     * Exactly the same as configureTimelineAlbum() but performs multiple
+     * attempts. Very useful since Instagram sometimes can't configure a newly
+     * uploaded video file until a few seconds have passed.
+     *
+     * @param array $media            Extended media array coming from uploadTimelineAlbum(),
+     *                                containing the user's per-file metadata,
+     *                                and internally generated per-file metadata.
+     * @param array $internalMetadata Internal library-generated metadata key-value pairs.
+     * @param array $externalMetadata (optional) User-provided metadata key-value pairs
+     *                                for the album itself (its caption, location, etc).
+     * @param int   $maxAttempts      Total attempts to configure videos before throwing.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see configureTimelineAlbum() for available metadata fields.
+     */
+    public function configureTimelineAlbumWithRetries(
+        array $media,
+        array $internalMetadata,
+        array $externalMetadata = [],
+        $maxAttempts = 5)
+    {
+        for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
+            try {
+                // Attempt to configure album parameters.
+                $configure = $this->configureTimelineAlbum($media, $internalMetadata, $externalMetadata);
+                break; // Success. Exit loop.
+            } catch (\InstagramAPI\Exception\InstagramException $e) {
+                if ($attempt < $maxAttempts && strpos($e->getMessage(), 'Transcode timeout') !== false) {
+                    // Do nothing, since we'll be retrying the failed configure...
+                    sleep(1); // Just wait a little before the next retry.
+                } else {
+                    // Re-throw all unhandled exceptions.
+                    throw $e;
+                }
+            }
+        }
+
+        return $configure; // ConfigureResponse
+    }
+
+    /**
+     * Configures parameters for a whole album of uploaded media files.
+     *
+     * WARNING TO CONTRIBUTORS: THIS IS ONLY FOR *TIMELINE ALBUMS*. DO NOT MAKE
+     * IT DO ANYTHING ELSE, TO AVOID ADDING BUGGY AND UNMAINTAINABLE SPIDERWEB
+     * CODE!
+     *
+     * @param array $media            Extended media array coming from uploadTimelineAlbum(),
+     *                                containing the user's per-file metadata,
+     *                                and internally generated per-file metadata.
+     * @param array $internalMetadata Internal library-generated metadata key-value pairs.
+     * @param array $externalMetadata (optional) User-provided metadata key-value pairs
+     *                                for the album itself (its caption, location, etc).
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ConfigureResponse
+     */
+    public function configureTimelineAlbum(
+        array $media,
+        array $internalMetadata,
+        array $externalMetadata = [])
+    {
+        $endpoint = 'media/configure_sidecar/';
+
+        // Available external metadata parameters:
+        /** @var string|null Caption to use for the album. */
+        $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : null;
+        /** @var Response\Model\Location|null A Location object describing where
+         the album was taken. */
+        $location = isset($externalMetadata['location']) ? $externalMetadata['location'] : null;
+
+        // Fix very bad external user-metadata values.
+        if (!is_string($captionText)) {
+            $captionText = '';
+        }
+
+        // Critically important internal library-generated metadata parameters:
+        // NOTE: NO INTERNAL DATA IS NEEDED HERE YET.
+
+        // Build the album's per-children metadata.
+        $date = date('Y:m:d H:i:s');
+        $childrenMetadata = [];
+        foreach ($media as $item) {
+            // Get all of the common, INTERNAL per-file metadata.
+            $uploadId = $item['internalMetadata']['uploadId'];
+
+            switch ($item['type']) {
+            case 'photo':
+                // Get all of the INTERNAL per-PHOTO metadata.
+                /** @var int|float */
+                $photoWidth = $item['internalMetadata']['photoWidth'];
+                /** @var int|float */
+                $photoHeight = $item['internalMetadata']['photoHeight'];
+
+                // Build this item's configuration.
+                $photoConfig = [
+                    'date_time_original'  => $date,
+                    'scene_type'          => 1,
+                    'disable_comments'    => false,
+                    'upload_id'           => $uploadId,
+                    'source_type'         => 0,
+                    'scene_capture_type'  => 'standard',
+                    'date_time_digitized' => $date,
+                    'geotag_enabled'      => false,
+                    'camera_position'     => 'back',
+                    'edits', [
+                        'filter_strength' => 1,
+                        'filter_name'     => 'IGNormalFilter',
+                    ],
+                ];
+
+                // This usertag per-file EXTERNAL metadata is only supported for PHOTOS!
+                if (isset($item['usertags'])) {
+                    $photoConfig['usertags'] = json_encode(['in' => $item['usertags']]);
+                }
+
+                $childrenMetadata[] = $photoConfig;
+                break;
+            case 'video':
+                // Get all of the INTERNAL per-VIDEO metadata.
+                /** @var array Video details array. */
+                $videoDetails = $item['internalMetadata']['videoDetails'];
+
+                // Build this item's configuration.
+                $videoConfig = [
+                    'length'              => round($videoDetails['duration'], 1),
+                    'date_time_original'  => $date,
+                    'scene_type'          => 1,
+                    'poster_frame_index'  => 0,
+                    'trim_type'           => 0,
+                    'disable_comments'    => false,
+                    'upload_id'           => $uploadId,
+                    'source_type'         => 'library',
+                    'geotag_enabled'      => false,
+                    'edits', [
+                        'length'          => 0.00, // TODO! Should this always be zero?
+                        'cinema'          => 'unsupported',
+                        'original_length' => 0.00,
+                        'source_type'     => 'library',
+                        'start_time'      => 0,
+                        'camera_position' => 'unknown',
+                        'trim_type'       => 0,
+                    ],
+                ];
+
+                $childrenMetadata[] = $videoConfig;
+                break;
+            }
+        }
+
+        // Build the request...
+        $requestData = $this->request($endpoint)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('client_sidecar_id', Utils::generateUploadId())
+        ->addPost('caption', $captionText)
+        ->addPost('children_metadata', $childrenMetadata);
+
+        if ($location instanceof Response\Model\Location) {
+            $loc = [
+                $location->getExternalIdSource().'_id'   => $location->getExternalId(),
+                'name'                                   => $location->getName(),
+                'lat'                                    => $location->getLat(),
+                'lng'                                    => $location->getLng(),
+                'address'                                => $location->getAddress(),
+                'external_source'                        => $location->getExternalIdSource(),
+            ];
+
+            $requestData->addPost('location', json_encode($loc))
+            ->addPost('geotag_enabled', '1')
+            ->addPost('posting_latitude', $location->getLat())
+            ->addPost('posting_longitude', $location->getLng())
+            ->addPost('media_latitude', $location->getLat())
+            ->addPost('media_longitude', $location->getLng())
+            ->addPost('exif_latitude', 0.0)
+            ->addPost('exif_longitude', 0.0);
         }
 
         $configure = $requestData->getResponse(new Response\ConfigureResponse());
