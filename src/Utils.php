@@ -12,6 +12,13 @@ class Utils
     public static $ffmpegBin = null;
 
     /**
+     * Name of the detected ffprobe executable, or FALSE if none found.
+     *
+     * @var string|bool|null
+     */
+    public static $ffprobeBin = null;
+
+    /**
      * @return string
      */
     public static function generateUploadId()
@@ -71,6 +78,26 @@ class Utils
     }
 
     /**
+     * Check for ffprobe dependency.
+     *
+     * @return string|bool Name of the library if present, otherwise FALSE.
+     */
+    public static function checkFFPROBE()
+    {
+        // We only resolve this once per session and then cache the result.
+        if (self::$ffprobeBin === null) {
+            @exec('ffprobe -version 2>&1', $output, $statusCode);
+            if ($statusCode === 0) {
+                self::$ffprobeBin = 'ffprobe';
+            } else {
+                self::$ffprobeBin = false; // Nothing found!
+            }
+        }
+
+        return self::$ffprobeBin;
+    }
+
+    /**
      * Get detailed information about a video file.
      *
      * This also validates that a file is actually a video, since FFmpeg will
@@ -87,10 +114,10 @@ class Utils
     public static function getVideoFileDetails(
         $videoFilename)
     {
-        // The user must have FFmpeg.
-        $ffmpeg = self::checkFFMPEG();
-        if ($ffmpeg === false) {
-            throw new \RuntimeException('You must have FFmpeg to generate video thumbnails.');
+        // The user must have FFprobe.
+        $ffprobe = self::checkFFPROBE();
+        if ($ffprobe === false) {
+            throw new \RuntimeException('You must have FFprobe to analyze video details.');
         }
 
         // Check if input file exists.
@@ -98,56 +125,122 @@ class Utils
             throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
         }
 
-        // Load with FFMPEG. Shows details and exits, since we give no outfile.
-        $command = $ffmpeg.' -hide_banner -i '.escapeshellarg($videoFilename).' 2>&1';
-        @exec($command, $output, $statusCode);
+        // Load with FFPROBE. Shows details as JSON and exits.
+        $command = $ffprobe.' -v quiet -print_format json -show_format -show_streams '.escapeshellarg($videoFilename);
+        $jsonInfo = @shell_exec($command);
 
-        // Extract the video details if available.
-        $videoDetails = [
-            'codec'    => '', // string
-            'duration' => -1.0, // float (length in seconds, with decimals)
-            'width'    => -1, // int
-            'height'   => -1, //int
-        ];
-        foreach ($output as $line) {
-            if (preg_match('/Video: (\S+)[^,]*, [^,]+, (\d+)x(\d+)/', $line, $matches)) {
-                $videoDetails['codec'] = $matches[1];
-                $videoDetails['width'] = intval($matches[2], 10);
-                $videoDetails['height'] = intval($matches[3], 10);
-            }
-            if (preg_match('/Duration: (\d{2}):(\d{2}):(\d{2}\.\d{2})/', $line, $matches)) {
-                $videoDetails['duration'] = (float) ($matches[1] * 3600 + $matches[2] * 60 + floatval($matches[3]));
+        // Check for processing errors.
+        if ($jsonInfo === null) {
+            throw new \RuntimeException(sprintf('FFprobe failed to analyze your video file "%s".', $videoFilename));
+        }
+
+        // Attempt to decode the JSON.
+        $probeResult = @json_decode($jsonInfo, true);
+        if ($probeResult === null) {
+            throw new \RuntimeException(sprintf('FFprobe gave us invalid JSON for "%s".', $videoFilename));
+        }
+
+        // Now analyze all streams to find the first video stream.
+        // We ignore all audio and subtitle streams.
+        $videoDetails = [];
+        foreach ($probeResult['streams'] as $streamIdx => $streamInfo) {
+            if ($streamInfo['codec_type'] == 'video') {
+                $videoDetails['codec'] = $streamInfo['codec_name']; // string
+                $videoDetails['width'] = intval($streamInfo['width'], 10);
+                $videoDetails['height'] = intval($streamInfo['height'], 10);
+                // NOTE: Duration is a float such as "230.138000".
+                $videoDetails['duration'] = floatval($streamInfo['duration']);
+
+                break; // Stop checking streams.
             }
         }
 
-        // Verify that we have ALL details.
-        // NOTE: Since width+height are found together with codec, we only need
-        // to check 1 of those 3 fields, so I'm checking the codec field.
-        if ($videoDetails['duration'] < 0 || $videoDetails['codec'] === '') {
-            throw new \RuntimeException('FFmpeg failed to detect the video format details. Is this a valid video file?');
+        // Make sure we have found format details.
+        if (count($videoDetails) === 0) {
+            throw new \RuntimeException(sprintf('FFprobe failed to detect any video format details. Is "%s" a valid video file?', $videoFilename));
         }
 
         return $videoDetails;
     }
 
     /**
+     * Verifies that a piece of media follows Instagram's size/aspect rules.
+     *
+     * Currently all photos and videos everywhere have the exact same rules.
+     * We bring in the up-to-date rules from the ImageAutoResizer class.
+     *
+     * @param string    $targetFeed    Target feed for this media ("timeline", "story" or "album").
+     * @param string    $fileType      Whether the file is a "photofile" or "videofile".
+     * @param string    $mediaFilename Filename to display to the user in case of error.
+     * @param int|float $width         The media width.
+     * @param int|float $height        The media height.
+     *
+     * @throws \InvalidArgumentException If Instagram won't allow this file.
+     *
+     * @see ImageAutoResizer
+     */
+    public static function throwIfIllegalMediaResolution(
+        $targetFeed,
+        $fileType,
+        $mediaFilename,
+        $width,
+        $height)
+    {
+        // WARNING TO CONTRIBUTORS: $mediaFilename is for ERROR DISPLAY to
+        // users. Do NOT use it to read from the hard disk!
+
+        // Check Resolution.
+        if ($fileType == 'photofile') {
+            // Validate photo resolution.
+            if ($width > ImageAutoResizer::MAX_WIDTH || $height > ImageAutoResizer::MAX_HEIGHT) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Instagram only accepts photos with a maximum resolution up to %dx%d. Your file "%s" has a %dx%d resolution.',
+                    ImageAutoResizer::MAX_WIDTH, ImageAutoResizer::MAX_HEIGHT, $mediaFilename, $width, $height
+                ));
+            }
+        } else {
+            // Validate video resolution. Instagram allows between 320px-1080px width.
+            // NOTE: They have height-limits too, but we automatically enforce
+            // those when validating the aspect ratio further down.
+            if ($width < 320 || $width > 1080) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Instagram only accepts videos that are between 320 and 1080 pixels wide. Your file "%s" is %d pixels wide.',
+                    $mediaFilename, $width
+                ));
+            }
+        }
+
+        // Check Aspect Ratio.
+        // NOTE: This Instagram rule is the same for both videos and photos.
+        // See ImageAutoResizer for the latest up-to-date allowed ratios.
+        $aspectRatio = $width / $height;
+        if ($aspectRatio < ImageAutoResizer::MIN_RATIO || $aspectRatio > ImageAutoResizer::MAX_RATIO) {
+            throw new \InvalidArgumentException(sprintf(
+                'Instagram only accepts media with aspect ratios between %.2f and %.2f. Your file "%s" has a %.2f aspect ratio.',
+                ImageAutoResizer::MIN_RATIO, ImageAutoResizer::MAX_RATIO, $mediaFilename, $aspectRatio
+            ));
+        }
+    }
+
+
+    /**
      * Verifies that a video's details follow Instagram's requirements.
      *
-     * @param string $type          What type of video ("timeline", "story" or "album").
+     * @param string $targetFeed    Target feed for this media ("timeline", "story" or "album").
      * @param string $videoFilename The video filename.
      * @param array  $videoDetails  An array created by getVideoFileDetails().
      *
      * @throws \InvalidArgumentException If Instagram won't allow this video.
      */
     public static function throwIfIllegalVideoDetails(
-        $type,
+        $targetFeed,
         $videoFilename,
         array $videoDetails)
     {
         // Validate video length.
         // NOTE: Instagram has no disk size limit, but this length validation
         // also ensures we can only upload small files exactly as intended.
-        if ($type == 'story') {
+        if ($targetFeed == 'story') {
             // Instagram only allows 3-15 seconds for stories.
             if ($videoDetails['duration'] < 3 || $videoDetails['duration'] > 15) {
                 throw new \InvalidArgumentException(sprintf('Instagram only accepts story videos that are between 3 and 15 seconds long. Your story video "%s" is %d seconds long.', $videoFilename, $videoDetails['duration']));
@@ -160,17 +253,8 @@ class Utils
             }
         }
 
-        // Validate resolution. Instagram allows between 320px-1080px width.
-        if ($videoDetails['width'] < 320 || $videoDetails['width'] > 1080) {
-            throw new \InvalidArgumentException(sprintf('Instagram only accepts videos that are between 320 and 1080 pixels wide. Your video "%s" is %d pixels wide.', $videoFilename, $videoDetails['width']));
-        }
-
-        // Validate aspect ratio. Instagram has SAME requirements as for photos!
-        // NOTE: See ImageAutoResizer for latest up-to-date allowed ratios.
-        $aspectRatio = $videoDetails['width'] / $videoDetails['height'];
-        if ($aspectRatio < ImageAutoResizer::MIN_RATIO || $aspectRatio > ImageAutoResizer::MAX_RATIO) {
-            throw new \InvalidArgumentException(sprintf('Instagram only accepts videos with aspect ratios between %.2f and %.2f. Your video "%s" has a %.2f aspect ratio.', ImageAutoResizer::MIN_RATIO, ImageAutoResizer::MAX_RATIO, $videoFilename, $aspectRatio));
-        }
+        // Validate video resolution and aspect ratio.
+        self::throwIfIllegalMediaResolution($targetFeed, 'videofile', $videoFilename, $videoDetails['width'], $videoDetails['height']);
     }
 
     /**
