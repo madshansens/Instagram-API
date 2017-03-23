@@ -1353,28 +1353,30 @@ class Instagram
         $requestData = $this->request($endpoint)
         ->addPost('_csrftoken', $this->token)
         ->addPost('_uid', $this->username_id)
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('device',
-            [
-                'manufacturer'      => $this->device->getManufacturer(),
-                'model'             => $this->device->getModel(),
-                'android_version'   => $this->device->getAndroidVersion(),
-                'android_release'   => $this->device->getAndroidRelease(),
-            ]
-        )
-        ->addPost('edits',
-            [
-                'crop_original_size'    => [$metadata['width'], $metadata['height']],
-                'crop_zoom'             => 1,
-                'crop_center'           => [0.0, -0.0],
-            ]
-        )
-        ->addPost('extra',
-            [
-                'source_width'  => $metadata['width'],
-                'source_height' => $metadata['height'],
-            ]
-        );
+        ->addPost('_uuid', $this->uuid);
+
+        if ($type != 'album') {
+            $requestData->addPost('edits',
+                [
+                    'crop_original_size'    => [$metadata['width'], $metadata['height']],
+                    'crop_zoom'             => 1,
+                    'crop_center'           => [0.0, -0.0],
+                ]
+            )
+            ->addPost('device',
+                [
+                    'manufacturer'      => $this->device->getManufacturer(),
+                    'model'             => $this->device->getModel(),
+                    'android_version'   => $this->device->getAndroidVersion(),
+                    'android_release'   => $this->device->getAndroidRelease(),
+                ]
+            )
+            ->addPost('extra',
+                [
+                    'source_width'  => $metadata['width'],
+                    'source_height' => $metadata['height'],
+                ]);
+        }
 
         switch ($type) {
             case 'timeline':
