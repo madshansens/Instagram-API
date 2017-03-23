@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Response;
 
-class StickerResponse extends \InstagramAPI\Response
+class StickerAssetsResponse extends \InstagramAPI\Response
 {
     public $version;
     /**

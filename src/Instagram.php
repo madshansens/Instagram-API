@@ -2561,7 +2561,7 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FollowerAndFollowingResponse
      */
-    public function getPendingFriendshipRequets()
+    public function getPendingFriendshipRequests()
     {
         $requestData = $this->request('friendships/pending/');
         return $requestData->getResponse(new Response\FollowerAndFollowingResponse());
@@ -2750,24 +2750,24 @@ class Instagram
     }
 
     /**
-     * Report media.
+     * Report media in the Explore-feed.
      *
-     * @param string $exploreSourceToken Token related to the media.
+     * @param string $exploreSourceToken Token related to the Explore media.
      * @param string $userId             Numerical UserPK ID.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\ReportResponse
+     * @return \InstagramAPI\Response\ReportExploreMediaResponse
      */
-    public function reportMedia(
+    public function reportExploreMedia(
         $exploreSourceToken,
         $userId)
     {
         return $this->request('discover/explore_report/')
         ->addParam('explore_source_token', $exploreSourceToken)
-        ->addParam('m_pk', $this->$username_id)
+        ->addParam('m_pk', $this->username_id)
         ->addParam('a_pk', $userId)
-        ->getResponse(new Response\ReportResponse());
+        ->getResponse(new Response\ReportExploreMediaResponse());
     }
 
     /**
@@ -2944,26 +2944,27 @@ class Instagram
     }
 
     /**
-     * Get sticker asseets.
+     * Get sticker assets.
      *
-     * @param string $stickerType
-     * @param array $location       Array containing lat, lng and horizontalAccuracy.
+     * @param string $stickerType Type of sticker (currently only "static_stickers").
+     * @param array  $location    Array containing lat, lng and horizontalAccuracy.
      *
      * @throws \InstagramAPI\Exception\InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\StickerResponse
+     * @return \InstagramAPI\Response\StickerAssetsResponse
      */
     public function getStickerAssets(
         $stickerType = 'static_stickers',
         $location = null)
     {
         if ($stickerType != 'static_stickers') {
-            throw new \InvalidArgumentException('You must provide a correct sticker type.');
+            throw new \InvalidArgumentException('You must provide a valid sticker type.');
         }
         if (!is_null($location) && (!isset($location['lat']) || !isset($location['lng']) || !isset($location['horizontalAccuracy']))) {
-            throw new \InvalidArgumentException('You must provide a correct array with the following keys: lat, lng and horizontalAccuracy.');
+            throw new \InvalidArgumentException('Your location array must contain keys for "lat", "lng" and "horizontalAccuracy".');
         }
+
         $requestData = $this->request('creatives/assets/')
         ->setSignedPost(true)
         ->addPost('type', $stickerType);
@@ -2974,7 +2975,7 @@ class Instagram
             ->addPost('horizontalAccuracy', $location['horizontalAccuracy']);
         }
 
-        $requestData->getResponse(new Response\StickerResponse());
+        $requestData->getResponse(new Response\StickerAssetsResponse());
     }
 
     /**

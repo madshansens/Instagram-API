@@ -6,7 +6,7 @@ class DiscoverTopLiveResponse extends \InstagramAPI\Response
 {
     public $auto_load_more_enabled;
     /**
-     * @var Model\broadcastItem[]
+     * @var Model\BroadcastItem[]
      */
     public $broadcasts;
     public $more_available;

@@ -154,14 +154,14 @@ class Utils
             }
         } else {
             // Validate video length. Instagram only allows 3-60 seconds.
-            //SEE: https://help.instagram.com/270963803047681
+            // SEE: https://help.instagram.com/270963803047681
             if ($videoDetails['duration'] < 3 || $videoDetails['duration'] > 60) {
                 throw new \InvalidArgumentException(sprintf('Instagram only accepts videos that are between 3 and 60 seconds long. Your video "%s" is %d seconds long.', $videoFilename, $videoDetails['duration']));
             }
         }
 
         // Validate resolution. Instagram allows between 320px-1080px width.
-        if (($videoDetails['width'] < 320) || ($videoDetails['width'] > 1080)) {
+        if ($videoDetails['width'] < 320 || $videoDetails['width'] > 1080) {
             throw new \InvalidArgumentException(sprintf('Instagram only accepts videos that are between 320 and 1080 pixels wide. Your video "%s" is %d pixels wide.', $videoFilename, $videoDetails['width']));
         }
 
