@@ -1394,6 +1394,7 @@ class Instagram
                 break;
             case 'album':
                 $requestData->addPost('client_sidecar_id', Utils::generateUploadId())
+                ->addPost('caption', $captionText)
                 ->addPost('children_metadata', $uploadId);
                 break;
             default:
@@ -2566,6 +2567,7 @@ class Instagram
     public function getPendingFriendshipRequests()
     {
         $requestData = $this->request('friendships/pending/');
+        
         return $requestData->getResponse(new Response\FollowerAndFollowingResponse());
     }
 
