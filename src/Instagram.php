@@ -2555,6 +2555,19 @@ class Instagram
     }
 
     /**
+     * Get list of pending friendship requests
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FollowerAndFollowingResponse
+     */
+    public function getPendingFriendshipRequets()
+    {
+        $requestData = $this->request("friendships/pending/");
+        return $requestData->getResponse(new Response\FollowerAndFollowingResponse());
+    }
+
+    /**
      * Like a media item.
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
@@ -2737,6 +2750,27 @@ class Instagram
     }
 
     /**
+     * Report media.
+     *
+     * @param string $exploreSourceToken Token related to the media.
+     * @param string $userId             Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ReportResponse
+     */
+    public function reportMedia(
+        $exploreSourceToken,
+        $userId)
+    {
+        return $this->request('discover/explore_report/')
+        ->addParam('explore_source_token', $exploreSourceToken)
+        ->addParam('m_pk', $this->$username_id)
+        ->addParam('a_pk', $userId)
+        ->getResponse(new Response\ReportResponse());
+    }
+
+    /**
      * Get suggested users.
      *
      * @param string $userId Numerical UserPK ID.
@@ -2790,6 +2824,48 @@ class Instagram
         ->addPost('_uid', $this->username_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('user_id', $userId)
+        ->getResponse(new Response\FriendshipResponse());
+    }
+
+    /**
+     * Block a user from viewing your story.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FriendshipResponse
+     */
+    public function blockFriendStory(
+        $userId)
+    {
+        return $this->request("friendships/block_friend_reel/{$userId}/")
+        ->setSignedPost(true)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('source', 'profile')
+        ->getResponse(new Response\FriendshipResponse());
+    }
+
+    /**
+     * Unblock a user from viewing your story.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FriendshipResponse
+     */
+    public function unblockFriendStory(
+        $userId)
+    {
+        return $this->request("friendships/unblock_friend_reel/{$userId}/")
+        ->setSignedPost(true)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->username_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('source', 'profile')
         ->getResponse(new Response\FriendshipResponse());
     }
 
