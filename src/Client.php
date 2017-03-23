@@ -785,6 +785,13 @@ class Client
                 'name' => 'is_sidecar',
                 'data' => '1',
             ];
+            if ($fileType == 'videofile') {
+                $bodies[] = [
+                    'type' => 'form-data',
+                    'name' => 'media_type',
+                    'data' => '2',
+                ];
+            }
         }
         $payload = $this->_buildBody($bodies, $boundary);
 
@@ -901,7 +908,7 @@ class Client
             'Connection'      => 'keep-alive',
             'Accept'          => '*/*',
             'Content-Type'    => 'multipart/form-data; boundary='.$boundary,
-            'Accept-Language' => 'en-en',
+            'Accept-Language' => Constants::ACCEPT_LANGUAGE,
         ];
         $options = [
             'headers' => $headers,
@@ -992,7 +999,7 @@ class Client
                     'Accept-Encoding'     => 'gzip, deflate',
                     'Content-Type'        => 'application/octet-stream',
                     'Session-ID'          => $uploadParams['upload_id'],
-                    'Accept-Language'     => 'en-en',
+                    'Accept-Language'     => Constants::ACCEPT_LANGUAGE,
                     'Content-Disposition' => "attachment; filename=\"video.{$videoExt}\"",
                     'Content-Range'       => 'bytes '.$rangeStart.'-'.$rangeEnd.'/'.$videoSize,
                     'job'                 => $uploadParams['job'],
@@ -1163,7 +1170,7 @@ class Client
             'Connection'       => 'keep-alive',
             'Accept'           => '*/*',
             'Content-Type'     => 'multipart/form-data; boundary='.$boundary,
-            'Accept-Language'  => 'en-en',
+            'Accept-Language'  => Constants::ACCEPT_LANGUAGE,
         ];
         $options = [
             'headers' => $headers,
@@ -1297,7 +1304,7 @@ class Client
             'Connection'       => 'keep-alive',
             'Accept'           => '*/*',
             'Content-Type'     => 'multipart/form-data; boundary='.$boundary,
-            'Accept-Language'  => 'en-en',
+            'Accept-Language'  => Constants::ACCEPT_LANGUAGE,
         ];
         $options = [
             'headers' => $headers,

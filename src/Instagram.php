@@ -676,6 +676,18 @@ class Instagram
     }
 
     /**
+     * Get top live broadcasts.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\DiscoverTopLiveResponse
+     */
+    public function getDiscoverTopLive()
+    {
+        return $this->request('discover/top_live/')->getResponse(new Response\DiscoverTopLiveResponse());
+    }
+
+    /**
      * Expose.
      *
      * @throws \InstagramAPI\Exception\InstagramException
@@ -1261,13 +1273,15 @@ class Instagram
             $requestData->addPost('caption', $captionText);
         }
 
+
+
         // TODO: IMPLEMENT THIS "STORY USER TAGS" FEATURE!
         // Reel Mention example --> build with user id
         // [{\"y\":0.3407772676161919,\"rotation\":0,\"user_id\":\"USER_ID\",\"x\":0.39892578125,\"width\":0.5619921875,\"height\":0.06011525487256372}]
         if ($type == 'story') {
             $requestData->addPost('story_media_creation_date', time());
             if (!is_null($userTags)) {
-                //$requestData->addPost('reel_mentions', $userTags)
+                //$requestData->addPost('reel_mentions', addcslashes(json_encode($userTags)));
             }
         }
 
@@ -1331,7 +1345,7 @@ class Instagram
         }
 
         if ($type == 'album') {
-            $endpoint = 'media/configure_sidecar/?';
+            $endpoint = 'media/configure_sidecar/';
         } elseif ($type == 'story') {
             $endpoint = 'media/configure_to_story/';
         } else {
@@ -1397,18 +1411,22 @@ class Instagram
             ];
 
             $requestData->addPost('location', json_encode($loc))
-            ->addPost('geotag_enabled', true)
-            ->addPost('media_latitude', $location->getLat())
+            ->addPost('geotag_enabled', '1')
             ->addPost('posting_latitude', $location->getLat())
-            ->addPost('media_longitude', $location->getLng())
             ->addPost('posting_longitude', $location->getLng())
-            ->addPost('altitude', mt_rand(10, 800));
-        }
+            ->addPost('media_latitude', $location->getLat())
+            ->addPost('media_longitude', $location->getLng());
 
-        /* TODO
-        if (!is_null($filter)) {
-            $requestData->addPost('edits', ['filter_type' => Utils::getFilterCode($filter)]);
-        }*/
+            if ($type == 'album') {
+                $requestData->addPost('location', json_encode($loc))
+                ->addPost('exif_latitude', 0.0)
+                ->addPost('exif_longitude', 0.0);
+            } else {
+                $requestData->addPost('location', json_encode($loc))
+                ->addPost('av_latitude', 0.0)
+                ->addPost('av_longitude', 0.0);
+            }
+        }
 
         $configure = $requestData->getResponse(new Response\ConfigureResponse());
 

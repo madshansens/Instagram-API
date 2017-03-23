@@ -2,13 +2,13 @@
 
 namespace InstagramAPI\Response;
 
-class DiscoverChannelsResponse extends \InstagramAPI\Response
+class DiscoverTopLiveResponse extends \InstagramAPI\Response
 {
     public $auto_load_more_enabled;
     /**
-     * @var Model\Item[]
+     * @var Model\broadcastItem[]
      */
-    public $items;
+    public $broadcasts;
     public $more_available;
     /**
      * @var string
