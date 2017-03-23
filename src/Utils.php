@@ -161,7 +161,7 @@ class Utils
         }
 
         // Validate resolution. Instagram allows between 320px-1080px width.
-        if (($videoDetails['width'] < 320 )|| ($videoDetails['width'] > 1080)) {
+        if (($videoDetails['width'] < 320) || ($videoDetails['width'] > 1080)) {
             throw new \InvalidArgumentException(sprintf('Instagram only accepts videos that are between 320 and 1080 pixels wide. Your video "%s" is %d pixels wide.', $videoFilename, $videoDetails['width']));
         }
 

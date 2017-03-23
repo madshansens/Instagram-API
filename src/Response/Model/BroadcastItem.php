@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Response\Model;
 
-class broadcastItem extends \InstagramAPI\Response
+class BroadcastItem extends \InstagramAPI\Response
 {
     public $organic_tracking_token;
     public $published_time;

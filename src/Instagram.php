@@ -1273,8 +1273,6 @@ class Instagram
             $requestData->addPost('caption', $captionText);
         }
 
-
-
         // TODO: IMPLEMENT THIS "STORY USER TAGS" FEATURE!
         // Reel Mention example --> build with user id
         // [{\"y\":0.3407772676161919,\"rotation\":0,\"user_id\":\"USER_ID\",\"x\":0.39892578125,\"width\":0.5619921875,\"height\":0.06011525487256372}]

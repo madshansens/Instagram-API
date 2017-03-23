@@ -886,7 +886,7 @@ class Client
                 'type' => 'form-data',
                 'name' => 'upload_media_duration_ms',
                 // NOTE: ceil() is to round up and get rid of any MS decimals.
-                'data' => (int) ceil($metadata['videodetails']['duration']*1000),
+                'data' => (int) ceil($metadata['videodetails']['duration'] * 1000),
             ];
             $bodies[] = [
                 'type' => 'form-data',
