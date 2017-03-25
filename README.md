@@ -40,6 +40,12 @@ You can download it [here](https://getcomposer.org/download/).
 
 All examples can be found [here](https://github.com/mgp25/Instagram-API/tree/master/examples).
 
+## Code of Conduct
+
+This project adheres to the Contributor Covenant [code of conduct](CODE_OF_CONDUCT.md).
+By participating, you are expected to uphold this code.
+Please report any unacceptable behavior.
+
 ## Contributing
 
 If you would like to contribute to this project, please feel free to submit a pull request.
