@@ -2,99 +2,314 @@
 
 namespace InstagramAPI\Settings\Storage;
 
+use InstagramAPI\Settings\StorageInterface;
+use InstagramAPI\Exception\SettingsException;
+use Memcached as PHPMemcached;
+
 /**
- * Class Memcached.
+ * Semi-persistent storage backend which uses a Memcached server daemon.
  *
- * @author ilyk <ilyk@ilyk.im>
+ * @author SteveJobzniak (https://github.com/SteveJobzniak)
  */
-class Memcached implements \InstagramAPI\Settings\StorageInterface
+class Memcached implements StorageInterface
 {
-    /**
-     * @var \Memcached
-     */
-    protected $_memcached;
+    /** @var \Memcached Our connection to the database. */
+    private $_memcached;
+
+    /** @var bool Whether we own Memcached's connection or are borrowing it. */
+    private $_isSharedMemcached;
+
+    /** @var string Current Instagram username that all settings belong to. */
+    private $_username;
 
     /**
-     * Memcached constructor.
+     * Connect to a storage location and perform necessary startup preparations.
      *
-     * @param string $instagramUsername
-     * @param array  $config
+     * {@inheritDoc}
      */
-    public function __construct(
-        $instagramUsername,
-        $config)
+    public function openLocation(
+        array $locationConfig)
     {
-        $this->_memcached = new \Memcached((isset($config['persistent_id']) ? $config['persistent_id'] : 'instagram'));
-
-        if (isset($config['init_callback']) && is_callable($config['init_callback'])) {
-            $config['init_callback']($this->_memcached);
-        }
-
-        if (isset($config['memcache_options'])) {
-            $this->_memcached->setOptions((array) $config['memcache_options']);
-        }
-
-        if (isset($config['servers'])) {
-            $this->_memcached->addServers($config['servers']);
-        } elseif (isset($config['server'])) {
-            $this->_memcached->addServer(
-                $config['server']['host'],
-                (isset($config['server']['port']) ? $config['server']['port'] : 11211),
-                (isset($config['server']['weight']) ? $config['server']['weight'] : 0)
-            );
+        if (isset($locationConfig['memcached'])) {
+            // Pre-provided connection to re-use instead of creating a new one.
+            if (!$locationConfig['memcached'] instanceof PHPMemcached) {
+                throw new SettingsException('The custom Memcached object is invalid.');
+            }
+            $this->_isSharedMemcached = true;
+            $this->_memcached = $locationConfig['memcached'];
         } else {
-            $this->_memcached->addServer('localhost', 11211);
+            try {
+                // Configure memcached with a persistent data retention ID.
+                $this->_isSharedMemcached = false;
+                $this->_memcached = new PHPMemcached(
+                    is_string($locationConfig['persistent_id'])
+                    ? $locationConfig['persistent_id']
+                    : 'instagram'
+                );
+
+                // Apply any custom options the user has provided.
+                if (is_array($locationConfig['memcached_options'])) {
+                    $this->_memcached->setOptions($locationConfig['memcached_options']);
+                }
+
+                // Add the provided servers to the pool.
+                if (is_array($locationConfig['servers'])) {
+                    $this->_memcached->addServers($locationConfig['servers']);
+                } else {
+                    // Use default port on localhost if nothing was provided.
+                    $this->_memcached->addServer('localhost', 11211);
+                }
+            } catch (\Exception $e) {
+                throw new SettingsException('Memcached Connection Failed: '.$e->getMessage());
+            }
         }
     }
 
     /**
-     * @param string $key
-     * @param mixed  $value
+     * Retrieve a memcached key for a particular user.
      *
-     * @return void
+     * @param string $username The Instagram username.
+     * @param string $key      Name of the subkey.
+     *
+     * @throws \InstagramAPI\Exception\SettingsException
+     *
+     * @return string|null The value as a string IF the user's key exists,
+     *                     otherwise NULL.
      */
-    public function set(
+    private function _getUserKey(
+        $username,
+        $key)
+    {
+        try {
+            $realKey = $username.'_'.$key;
+            $result = $this->_memcached->get($realKey);
+            return ($this->_memcached->getResultCode() !== PHPMemcached::RES_NOTFOUND
+                    ? (string) $result
+                    : null);
+        } catch (\Exception $e) {
+            throw new SettingsException('Memcached Error: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Set a memcached key for a particular user.
+     *
+     * @param string       $username The Instagram username.
+     * @param string       $key      Name of the subkey.
+     * @param string|mixed $value    The data to store. MUST be castable to string.
+     *
+     * @throws \InstagramAPI\Exception\SettingsException
+     */
+    private function _setUserKey(
+        $username,
         $key,
         $value)
     {
-        $this->_memcached->set($key, $value);
+        try {
+            $realKey = $username.'_'.$key;
+            $success = $this->_memcached->set($realKey, (string) $value);
+            if (!$success) {
+                throw new SettingsException(sprintf(
+                    'Memcached failed to write to key "%s".',
+                    $realKey
+                ));
+            }
+        } catch (SettingsException $e) {
+            throw $e; // Ugly but necessary to re-throw only our own messages.
+        } catch (\Exception $e) {
+            throw new SettingsException('Memcached Error: '.$e->getMessage());
+        }
     }
 
     /**
-     * @param string $key
-     * @param mixed  $default
+     * Delete a memcached key for a particular user.
      *
-     * @return mixed
+     * @param string       $username The Instagram username.
+     * @param string       $key      Name of the subkey.
+     *
+     * @throws \InstagramAPI\Exception\SettingsException
      */
-    public function get(
-        $key,
-        $default = null)
+    private function _delUserKey(
+        $username,
+        $key)
     {
-        $result = $this->_memcached->get($key);
-
-        return \Memcached::RES_NOTFOUND === $this->_memcached->getResultCode()
-                                        ? $default
-                                        : $result;
+        try {
+            $realKey = $username.'_'.$key;
+            $this->_memcached->delete($realKey);
+        } catch (\Exception $e) {
+            throw new SettingsException('Memcached Error: '.$e->getMessage());
+        }
     }
 
     /**
-     * Does a preliminary guess about whether we're logged in.
+     * Whether the storage backend contains a specific user.
      *
-     * The session it looks for may be expired, so there's no guarantee.
-     *
-     * @return bool
+     * {@inheritDoc}
      */
-    public function maybeLoggedIn()
+    public function hasUser(
+        $username)
     {
-        return $this->get('id') !== null // Cannot use empty() since row can be 0.
-            && !empty($this->get('username_id'))
-            && !empty($this->get('token'));
+        // Check whether the user's settings exist (empty string allowed).
+        $hasUser = $this->_getUserKey($username, 'settings');
+        return ($hasUser !== null ? true : false);
     }
 
     /**
-     * @return void
+     * Move the internal data for a username to a new username.
+     *
+     * {@inheritDoc}
      */
-    public function save()
+    public function moveUser(
+        $oldUsername,
+        $newUsername)
     {
+        // Verify that the old username exists and fetch the old data.
+        $oldSettings = $this->_getUserKey($oldUsername, 'settings');
+        $oldCookies = $this->_getUserKey($oldUsername, 'cookies');
+        if ($oldSettings === null) { // Only settings are vital.
+            throw new SettingsException(sprintf(
+                'Cannot move non-existent user "%s".',
+                $oldUsername
+            ));
+        }
+
+        // Verify that the new username does not exist.
+        if ($this->hasUser($newUsername)) {
+            throw new SettingsException(sprintf(
+                'Refusing to overwrite existing user "%s".',
+                $newUsername
+            ));
+        }
+
+        // Now attempt to write all data to the new name.
+        $this->_setUserKey($newUsername, 'settings', $oldSettings);
+        if ($oldCookies !== null) { // Only if cookies existed.
+            $this->_setUserKey($newUsername, 'cookies', $oldCookies);
+        }
+
+        // Delete the previous user keys.
+        $this->deleteUser($oldUsername);
+    }
+
+    /**
+     * Delete all internal data for a given username.
+     *
+     * {@inheritDoc}
+     */
+    public function deleteUser(
+        $username)
+    {
+        $this->_delUserKey($username, 'settings');
+        $this->_delUserKey($username, 'cookies');
+    }
+
+    /**
+     * Open the data storage for a specific user.
+     *
+     * {@inheritDoc}
+     */
+    public function openUser(
+        $username)
+    {
+        // Just cache the username. We'll create storage later if necessary.
+        $this->_username = $username;
+    }
+
+    /**
+     * Load all settings for the currently active user.
+     *
+     * {@inheritDoc}
+     */
+    public function loadUserSettings()
+    {
+        $userSettings = [];
+
+        $encodedData = $this->_getUserKey($this->_username, 'settings');
+        if (!empty($encodedData)) {
+            $userSettings = @json_decode($encodedData, true, 512, JSON_BIGINT_AS_STRING);
+            if (!is_array($userSettings)) {
+                throw new SettingsException(sprintf(
+                    'Failed to decode corrupt settings for account "%s".',
+                    $this->_username
+                ));
+            }
+        }
+
+        return $userSettings;
+    }
+
+    /**
+     * Save the settings for the currently active user.
+     *
+     * {@inheritDoc}
+     */
+    public function saveUserSettings(
+        array $userSettings,
+        $triggerKey)
+    {
+        // Store the settings as a JSON blob.
+        $encodedData = json_encode($userSettings);
+        $this->_setUserKey($this->_username, 'settings', $encodedData);
+    }
+
+    /**
+     * Whether the storage backend has cookies for the currently active user.
+     *
+     * {@inheritDoc}
+     */
+    public function hasUserCookies()
+    {
+        // Simply check if the storage key for cookies exists and is non-empty.
+        return (!empty($this->loadUserCookies()) ? true : false);
+    }
+
+    /**
+     * Load all cookies for the currently active user.
+     *
+     * {@inheritDoc}
+     */
+    public function loadUserCookies()
+    {
+        return $this->_getUserKey($this->_username, 'cookies');
+    }
+
+    /**
+     * Save all cookies for the currently active user.
+     *
+     * {@inheritDoc}
+     */
+    public function saveUserCookies(
+        $rawData)
+    {
+        // Store the raw cookie data as-provided.
+        $this->_setUserKey($this->_username, 'cookies', $rawData);
+    }
+
+    /**
+     * Close the settings storage for the currently active user.
+     *
+     * {@inheritDoc}
+     */
+    public function closeUser()
+    {
+        $this->_username = null;
+    }
+
+    /**
+     * Disconnect from a storage location and perform necessary shutdown steps.
+     *
+     * {@inheritDoc}
+     */
+    public function closeLocation()
+    {
+        // Close all server connections if this was our own Memcached object.
+        if (!$this->_isSharedMemcached) {
+            try {
+                $this->_memcached->quit();
+            } catch (\Exception $e) {
+                throw new SettingsException('Memcached Disconnection Failed: '.$e->getMessage());
+            }
+        }
+        $this->_memcached = null;
     }
 }

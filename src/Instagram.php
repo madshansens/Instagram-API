@@ -2,6 +2,21 @@
 
 namespace InstagramAPI;
 
+/**
+ * Instagram's Private API.
+ *
+ * TERMS OF USE:
+ * - This code is in no way affiliated with, authorized, maintained, sponsored
+ *   or endorsed by Instagram or any of its affiliates or subsidiaries. This is
+ *   an independent and unofficial API. Use at your own risk.
+ * - We do NOT support or tolerate anyone who wants to use this API to send spam
+ *   or commit other online crimes.
+ * - You will NOT use this API for marketing or other abusive purposes (spam,
+ *   botting, harassment, massive bulk messaging...).
+ *
+ * @author mgp25: Founder, Reversing, Project Leader (https://github.com/mgp25)
+ * @author SteveJobzniak (https://github.com/SteveJobzniak)
+ */
 class Instagram
 {
     /**
@@ -68,11 +83,11 @@ class Instagram
     public $device_id;
 
     /**
-     * Numerical UserPK ID of the active user.
+     * Numerical UserPK ID of the active user account.
      *
      * @var string
      */
-    public $username_id;
+    public $account_id;
 
     /**
      * csrftoken.
@@ -103,53 +118,33 @@ class Instagram
     public $client;
 
     /**
-     * The configuration used for initializing our settings adapter.
+     * The account settings storage.
      *
-     * @var array|null
-     */
-    public $settingsAdapter;
-
-    /**
-     * Our settings storage adapter instance.
-     *
-     * @var \InstagramAPI\Settings\Adapter|null
+     * @var \InstagramAPI\Settings\StorageHandler|null
      */
     public $settings;
 
     /**
      * Constructor.
      *
-     * @param bool $debug           Show API queries and responses.
-     * @param bool $truncatedDebug  Truncate long responses.
-     * @param null $settingsAdapter How to store session settings.
+     * @param bool  $debug          Show API queries and responses.
+     * @param bool  $truncatedDebug Truncate long responses in debug.
+     * @param array $storageConfig  Configuration for the desired
+     *                              user settings storage backend.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      */
     public function __construct(
         $debug = false,
         $truncatedDebug = false,
-        $settingsAdapter = null)
+        $storageConfig = [])
     {
+        // Debugging options.
         $this->debug = $debug;
         $this->truncatedDebug = $truncatedDebug;
 
-        $longOpts = ['settings_adapter::'];
-        $options = getopt('', $longOpts);
-
-        if (!$options) {
-            $options = [];
-        }
-
-        if (!is_null($settingsAdapter)) {
-            $this->settingsAdapter = $settingsAdapter;
-        } elseif (array_key_exists('settings_adapter', $options)) {
-            $this->settingsAdapter = ['type' => $options['settings_adapter']];
-        } elseif (getenv('SETTINGS_ADAPTER') !== false) {
-            $this->settingsAdapter = ['type' => getenv('SETTINGS_ADAPTER')];
-        } else {
-            $this->settingsAdapter = ['type' => 'file'];
-        }
-
+        // Configure the settings storage and network client.
+        $this->settings = Settings\Factory::createHandler($storageConfig);
         $this->client = new Client($this);
     }
 
@@ -172,7 +167,8 @@ class Instagram
             throw new \InvalidArgumentException('You must provide a username and password to setUser().');
         }
 
-        $this->settings = new Settings\Adapter($this->settingsAdapter, $username);
+        // Load all settings from the storage and mark as current user.
+        $this->settings->setActiveUser($username);
 
         // Generate the user's Device instance, which will be created from the
         // user's last-used device IF they've got a valid, good one stored.
@@ -201,7 +197,7 @@ class Instagram
             $this->settings->set('uuid', Signatures::generateUUID(true));
 
             // Remove the previous hardware's login details to force a relogin.
-            $this->settings->set('username_id', '');
+            $this->settings->set('account_id', '');
             $this->settings->set('token', '');
             $this->settings->set('last_login', '0');
 
@@ -216,14 +212,14 @@ class Instagram
         $this->device_id = $this->settings->get('device_id');
 
         // Load the previous session details if we're possibly logged in.
-        if (!$resetCookieJar && $this->settings->maybeLoggedIn()) {
+        if (!$resetCookieJar && $this->settings->isMaybeLoggedIn()) {
             $this->isLoggedIn = true;
-            $this->username_id = $this->settings->get('username_id');
-            $this->rank_token = $this->username_id.'_'.$this->uuid;
+            $this->account_id = $this->settings->get('account_id');
+            $this->rank_token = $this->account_id.'_'.$this->uuid;
             $this->token = $this->settings->get('token');
         } else {
             $this->isLoggedIn = false;
-            $this->username_id = null;
+            $this->account_id = null;
             $this->rank_token = null;
             $this->token = null;
         }
@@ -232,7 +228,7 @@ class Instagram
         // if it fails to load the expected cookies from the user's jar.
         // Must be done last here, so that isLoggedIn is properly updated!
         // NOTE: If we generated a new device we start a new cookie jar.
-        $this->client->updateFromSettingsAdapter($resetCookieJar);
+        $this->client->updateFromCurrentSettings($resetCookieJar);
     }
 
     /**
@@ -360,9 +356,9 @@ class Instagram
             ->getResponse(new Response\LoginResponse(), true);
 
             $this->isLoggedIn = true;
-            $this->username_id = $response->getLoggedInUser()->getPk();
-            $this->settings->set('username_id', $this->username_id);
-            $this->rank_token = $this->username_id.'_'.$this->uuid;
+            $this->account_id = $response->getLoggedInUser()->getPk();
+            $this->settings->set('account_id', $this->account_id);
+            $this->rank_token = $this->account_id.'_'.$this->uuid;
             $this->token = $response->getFullResponse()[0];
             $this->settings->set('token', $this->token);
             $this->settings->set('last_login', time());
@@ -463,9 +459,9 @@ class Instagram
         } else {
             return $this->request('qe/sync/')
             ->addPost('_uuid', $this->uuid)
-            ->addPost('_uid', $this->username_id)
+            ->addPost('_uid', $this->account_id)
             ->addPost('_csrftoken', $this->token)
-            ->addPost('id', $this->username_id)
+            ->addPost('id', $this->account_id)
             ->addPost('experiments', Constants::EXPERIMENTS)
             ->getResponse(new Response\SyncResponse());
         }
@@ -522,7 +518,7 @@ class Instagram
             'device_token'         => $deviceToken,
             'is_main_push_channel' => true,
             '_csrftoken'           => $this->token,
-            'users'                => $this->username_id,
+            'users'                => $this->account_id,
         ]);
 
         return $this->client->api('push/register/?platform=10&device_type=android_mqtt', Signatures::generateSignature($data))[1];
@@ -698,8 +694,8 @@ class Instagram
     {
         return $this->request('qe/expose/')
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
-        ->addPost('id', $this->username_id)
+        ->addPost('_uid', $this->account_id)
+        ->addPost('id', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('experiment', 'ig_android_profile_contextual_feed')
         ->getResponse(new Response\ExposeResponse());
@@ -819,7 +815,7 @@ class Instagram
     {
         $data = json_encode([
             '_uuid'      => $this->uuid,
-            '_uid'       => $this->username_id,
+            '_uid'       => $this->account_id,
             '_csrftoken' => $this->token,
         ]);
 
@@ -1194,7 +1190,7 @@ class Instagram
         // Build the request...
         $requestData = $this->request($endpoint)
         ->addPost('_csrftoken', $this->token)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_uuid', $this->uuid)
         ->addPost('edits',
             [
@@ -1341,8 +1337,9 @@ class Instagram
         // Available external metadata parameters:
         /** @var string|null Caption to use for the media. */
         $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : null;
-        /** @var string[]|null Array of UserPK IDs of people tagged in your
-         * video. ONLY USED IN STORY VIDEOS! TODO: Actually, it's not even implemented for stories. */
+        /** @var string[]|null Array of numerical UserPK IDs of people tagged in
+         * your video. ONLY USED IN STORY VIDEOS! TODO: Actually, it's not even
+         * implemented for stories. */
         $userTags = (isset($externalMetadata['usertags']) && $targetFeed == 'story') ? $externalMetadata['usertags'] : null;
         /** @var Response\Model\Location|null A Location object describing where
          the media was taken. NOT USED FOR STORY MEDIA! */
@@ -1384,7 +1381,7 @@ class Instagram
             ])
         ->addPost('_csrftoken', $this->token)
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id);
+        ->addPost('_uid', $this->account_id);
 
         if ($targetFeed == 'story') {
             $requestData->addPost('configure_mode', 1) // 1 - REEL_SHARE, 2 - DIRECT_STORY_SHARE
@@ -1595,7 +1592,7 @@ class Instagram
         // Build the request...
         $requestData = $this->request($endpoint)
         ->addPost('_csrftoken', $this->token)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_uuid', $this->uuid)
         ->addPost('client_sidecar_id', Utils::generateUploadId())
         ->addPost('caption', $captionText)
@@ -1631,7 +1628,7 @@ class Instagram
      *
      * @param string   $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param string   $captionText Caption text.
-     * @param string[] $userTags    Array of UserPK IDs of people tagged in your media.
+     * @param string[] $userTags    Array of numerical UserPK IDs of people tagged in your media.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -1645,14 +1642,14 @@ class Instagram
         if (is_null($usertags)) {
             return $this->request("media/{$mediaId}/edit_media/")
             ->addPost('_uuid', $this->uuid)
-            ->addPost('_uid', $this->username_id)
+            ->addPost('_uid', $this->account_id)
             ->addPost('_csrftoken', $this->token)
             ->addPost('caption_text', $captionText)
             ->getResponse(new Response\EditMediaResponse());
         } else {
             return $this->request("media/{$mediaId}/edit_media/")
             ->addPost('_uuid', $this->uuid)
-            ->addPost('_uid', $this->username_id)
+            ->addPost('_uid', $this->account_id)
             ->addPost('_csrftoken', $this->token)
             ->addPost('caption_text', $captionText)
             ->addPost('usertags', $usertags)
@@ -1718,7 +1715,7 @@ class Instagram
     {
         return $this->request("media/{$mediaId}/save/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->setSignedPost(true)
         ->getResponse(new Response\SaveAndUnsaveMedia());
@@ -1738,7 +1735,7 @@ class Instagram
     {
         return $this->request("media/{$mediaId}/unsave/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->setSignedPost(true)
         ->getResponse(new Response\SaveAndUnsaveMedia());
@@ -1755,7 +1752,7 @@ class Instagram
     {
         return $this->request('feed/saved/')
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->setSignedPost(true)
         ->getResponse(new Response\SavedFeedResponse());
@@ -1775,7 +1772,7 @@ class Instagram
     {
         return $this->request("usertags/{$mediaId}/remove/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->getResponse(new Response\MediaResponse());
     }
@@ -1794,7 +1791,7 @@ class Instagram
     {
         return $this->request("media/{$mediaId}/info/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('media_id', $mediaId)
         ->getResponse(new Response\MediaInfoResponse());
@@ -1814,7 +1811,7 @@ class Instagram
     {
         return $this->request("media/{$mediaId}/delete/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('media_id', $mediaId)
         ->getResponse(new Response\MediaDeleteResponse());
@@ -1876,7 +1873,7 @@ class Instagram
         ->addPost('user_breadcrumb', Utils::generateUserBreadcrumb(mb_strlen($commentText)))
         ->addPost('idempotence_token', Signatures::generateUUID(true))
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('comment_text', $commentText)
         ->addPost('containermodule', 'comments_feed_timeline')
@@ -1899,7 +1896,7 @@ class Instagram
     {
         return $this->request("media/{$mediaId}/comment/{$commentId}/delete/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->getResponse(new Response\DeleteCommentResponse());
     }
@@ -1931,7 +1928,7 @@ class Instagram
 
         return $this->request("media/{$mediaId}/comment/bulk_delete/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('comment_ids_to_delete', $comment_ids_to_delete)
         ->getResponse(new Response\DeleteCommentResponse());
@@ -1951,7 +1948,7 @@ class Instagram
     {
         return $this->request("media/{$commentId}/comment_like/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->getResponse(new Response\CommentLikeUnlikeResponse());
     }
@@ -1970,7 +1967,7 @@ class Instagram
     {
         return $this->request("media/{$commentId}/comment_unlike/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->getResponse(new Response\CommentLikeUnlikeResponse());
     }
@@ -2001,7 +1998,7 @@ class Instagram
     {
         return $this->request('accounts/remove_profile_picture/')
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->getResponse(new Response\UserInfoResponse());
     }
@@ -2017,7 +2014,7 @@ class Instagram
     {
         return $this->request('accounts/set_private/')
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->getResponse(new Response\UserInfoResponse());
     }
@@ -2033,7 +2030,7 @@ class Instagram
     {
         return $this->request('accounts/set_public/')
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->getResponse(new Response\UserInfoResponse());
     }
@@ -2050,7 +2047,7 @@ class Instagram
         return $this->request('accounts/current_user/')
         ->addParams('edit', true)
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->getResponse(new Response\UserInfoResponse());
     }
@@ -2079,7 +2076,7 @@ class Instagram
     {
         return $this->request('accounts/edit_profile/')
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('external_url', $url)
         ->addPost('phone_number', $phone)
@@ -2107,7 +2104,7 @@ class Instagram
     {
         return $this->request('accounts/change_password/')
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('old_password', $oldPassword)
         ->addPost('new_password1', $newPassword)
@@ -2200,7 +2197,7 @@ class Instagram
      */
     public function getSelfUserTags()
     {
-        return $this->getUserTags($this->username_id);
+        return $this->getUserTags($this->account_id);
     }
 
     /**
@@ -2291,7 +2288,7 @@ class Instagram
     }
 
     /**
-     * Get details about a specific user via their UserPK ID.
+     * Get details about a specific user via their numerical UserPK ID.
      *
      * @param string $userId Numerical UserPK ID.
      *
@@ -2318,11 +2315,11 @@ class Instagram
      */
     public function getSelfUserInfo()
     {
-        return $this->getUserInfoById($this->username_id);
+        return $this->getUserInfoById($this->account_id);
     }
 
     /**
-     * Get the UserPK ID for a specific user via their username.
+     * Get the numerical UserPK ID for a specific user via their username.
      *
      * This is just a convenient helper function. You may prefer to use
      * getUserInfoByName() instead, which lets you see more details.
@@ -2331,7 +2328,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return string Their UserPK ID.
+     * @return string Their numerical UserPK ID.
      *
      * @see getUserInfoByName()
      */
@@ -2502,7 +2499,7 @@ class Instagram
         $maxId = null,
         $minTimestamp = null)
     {
-        return $this->getUserFeed($this->username_id, $maxId, $minTimestamp);
+        return $this->getUserFeed($this->account_id, $maxId, $minTimestamp);
     }
 
     /**
@@ -2534,7 +2531,7 @@ class Instagram
      */
     public function getSelfGeoMedia()
     {
-        return $this->getGeoMedia($this->username_id);
+        return $this->getGeoMedia($this->account_id);
     }
 
     /**
@@ -2731,7 +2728,7 @@ class Instagram
     public function getSelfUsersFollowing(
         $maxId = null)
     {
-        return $this->getUserFollowings($this->username_id, $maxId);
+        return $this->getUserFollowings($this->account_id, $maxId);
     }
 
     /**
@@ -2746,7 +2743,7 @@ class Instagram
     public function getSelfUserFollowers(
         $maxId = null)
     {
-        return $this->getUserFollowers($this->username_id, $maxId);
+        return $this->getUserFollowers($this->account_id, $maxId);
     }
 
     /**
@@ -2777,7 +2774,7 @@ class Instagram
     {
         return $this->request("media/{$mediaId}/like/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('media_id', $mediaId)
         ->getResponse(new \InstagramAPI\Response());
@@ -2797,7 +2794,7 @@ class Instagram
     {
         return $this->request("media/{$mediaId}/unlike/")
          ->addPost('_uuid', $this->uuid)
-         ->addPost('_uid', $this->username_id)
+         ->addPost('_uid', $this->account_id)
          ->addPost('_csrftoken', $this->token)
          ->addPost('media_id', $mediaId)
          ->getResponse(new \InstagramAPI\Response());
@@ -2840,7 +2837,7 @@ class Instagram
         return $this->request('accounts/set_phone_and_name/')
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('first_name', $name)
         ->addPost('phone_number', $phone)
@@ -2919,7 +2916,7 @@ class Instagram
     {
         return $this->request("friendships/create/{$userId}/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('user_id', $userId)
         ->getResponse(new Response\FriendshipResponse());
@@ -2939,7 +2936,7 @@ class Instagram
     {
         return $this->request("friendships/destroy/{$userId}/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('user_id', $userId)
         ->getResponse(new Response\FriendshipResponse());
@@ -2961,7 +2958,7 @@ class Instagram
     {
         return $this->request('discover/explore_report/')
         ->addParam('explore_source_token', $exploreSourceToken)
-        ->addParam('m_pk', $this->username_id)
+        ->addParam('m_pk', $this->account_id)
         ->addParam('a_pk', $userId)
         ->getResponse(new Response\ReportExploreMediaResponse());
     }
@@ -2997,7 +2994,7 @@ class Instagram
     {
         return $this->request("friendships/block/{$userId}/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('user_id', $userId)
         ->getResponse(new Response\FriendshipResponse());
@@ -3017,7 +3014,7 @@ class Instagram
     {
         return $this->request("friendships/unblock/{$userId}/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('user_id', $userId)
         ->getResponse(new Response\FriendshipResponse());
@@ -3038,7 +3035,7 @@ class Instagram
         return $this->request("friendships/block_friend_reel/{$userId}/")
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('source', 'profile')
         ->getResponse(new Response\FriendshipResponse());
@@ -3059,7 +3056,7 @@ class Instagram
         return $this->request("friendships/unblock_friend_reel/{$userId}/")
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->username_id)
+        ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('source', 'profile')
         ->getResponse(new Response\FriendshipResponse());

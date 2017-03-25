@@ -161,7 +161,7 @@ function switchDevice($ig, $value)
 
     // Update the Instagram Client's User-Agent to the new Device.
     $ig->device = $device;
-    $ig->client->updateFromSettingsAdapter();
+    $ig->client->updateFromCurrentSettings();
 }
 
 /**

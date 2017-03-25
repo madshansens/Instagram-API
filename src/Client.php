@@ -22,6 +22,9 @@ use InstagramAPI\Exception\ServerMessageThrower;
  * accomplish their larger jobs.
  *
  * Thank you, for not writing spaghetti code! ;-)
+ *
+ * @author mgp25: Founder, Reversing, Project Leader (https://github.com/mgp25)
+ * @author SteveJobzniak (https://github.com/SteveJobzniak)
  */
 class Client
 {
@@ -80,6 +83,13 @@ class Client
     private $_cookieJar;
 
     /**
+     * The cookie format expected by the current settings storage.
+     *
+     * @var string
+     */
+    private $_settingsCookieFormat;
+
+    /**
      * Constructor.
      *
      * @param \InstagramAPI\Instagram $parent
@@ -109,13 +119,13 @@ class Client
     }
 
     /**
-     * Resets certain Client settings via the current Settings adapter.
+     * Resets certain Client settings via the current Settings storage.
      *
      * Used whenever the user switches setUser(), to configure our internal state.
      *
      * @param bool $resetCookieJar (optional) Whether to clear current cookies.
      */
-    public function updateFromSettingsAdapter(
+    public function updateFromCurrentSettings(
         $resetCookieJar = false)
     {
         $this->_userAgent = $this->_parent->device->getUserAgent();
@@ -124,31 +134,38 @@ class Client
     }
 
     /**
-     * Loads all cookies via the current Settings adapter.
+     * Loads all cookies via the current Settings storage.
      *
      * @param bool $resetCookieJar (optional) Whether to clear current cookies.
      */
     public function loadCookieJar(
         $resetCookieJar = false)
     {
-        if ($this->_parent->settingsAdapter['type'] == 'file') {
-            $cookieFilePath = $this->_parent->settings->getCookiesPath();
+        // Get all cookies for the currently active user.
+        $userCookies = $this->_parent->settings->getCookies();
+        $this->_settingsCookieFormat = $userCookies['format'];
 
+        if ($userCookies['format'] == 'cookiefile') {
+            $cookieFilePath = $userCookies['data'];
+
+            // Delete existing cookie jar file if this is a reset.
             if ($resetCookieJar && !empty($cookieFilePath) && is_file($cookieFilePath)) {
                 @unlink($cookieFilePath);
             }
 
             // File-based cookie jar, which also persists temporary session cookies.
             // The FileCookieJar saves to disk whenever its object is destroyed,
-            // such as at the end of script or when calling updateFromSettingsAdapter().
+            // such as at the end of script or when calling updateFromCurrentSettings().
             $this->_cookieJar = new FileCookieJar($cookieFilePath, true);
         } else {
+            // Delete existing cookie data from the storage if this is a reset.
             if ($resetCookieJar) {
-                $this->_parent->settings->set('cookies', '');
+                $userCookies['data'] = '';
+                $this->_parent->settings->setCookies('');
             }
 
             // Attempt to restore cookies, otherwise create a new, empty jar.
-            $restoredCookies = @json_decode($this->_parent->settings->get('cookies'), true);
+            $restoredCookies = @json_decode($userCookies['data'], true);
             if (!is_array($restoredCookies)) {
                 $restoredCookies = [];
             }
@@ -179,7 +196,7 @@ class Client
     /**
      * Gives you all cookies in the Jar encoded as a JSON string.
      *
-     * This allows custom Settings adapters to retrieve all cookies for saving.
+     * This allows custom Settings storages to retrieve all cookies for saving.
      *
      * @throws \InvalidArgumentException If the JSON cannot be encoded.
      *
@@ -201,7 +218,7 @@ class Client
     }
 
     /**
-     * Tells current settings adapter to store cookies if necessary.
+     * Tells current settings storage to store cookies if necessary.
      *
      * There is no need to call this function manually. It's automatically
      * called by _guzzleRequest()!
@@ -214,11 +231,10 @@ class Client
             return;
         }
 
-        // Tell any custom settings adapters to persist the current cookies.
-        if ($this->_parent->settingsAdapter['type'] == 'mysql'
-            || $this->_parent->settings->storage instanceof \InstagramAPI\Settings\StorageInterface) {
+        // Tell any non-file settings storages to persist the latest cookies.
+        if ($this->_settingsCookieFormat != 'cookiefile') {
             $newCookies = $this->getCookieJarAsJSON();
-            $this->_parent->settings->set('cookies', $newCookies);
+            $this->_parent->settings->setCookies($newCookies);
         }
     }
 
@@ -1149,7 +1165,7 @@ class Client
         $uData = json_encode([
             '_csrftoken' => $this->_parent->token,
             '_uuid'      => $boundary,
-            '_uid'       => $this->_parent->username_id,
+            '_uid'       => $this->_parent->account_id,
         ]);
         $bodies = [
             [
