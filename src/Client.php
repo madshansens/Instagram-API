@@ -1003,6 +1003,24 @@ class Client
             throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
         }
 
+        // To support video uploads to albums, we MUST fake-inject the
+        // "sessionid" cookie from "i.instagram" into our "upload.instagram"
+        // request, otherwise the server will reply with a "StagedUpload not
+        // found" error when the final chunk has been uploaded.
+        $sessionIDCookie = null;
+        if ($targetFeed == 'album') {
+            foreach ($this->_cookieJar->getIterator() as $cookie) {
+                if ($cookie->getName() == 'sessionid'
+                    && $cookie->getDomain() == 'i.instagram.com') {
+                    $sessionIDCookie = $cookie->getValue();
+                    break;
+                }
+            }
+            if ($sessionIDCookie === null) {
+                throw new \InstagramAPI\Exception\UploadFailedException('Unable to find the necessary SessionID cookie for uploading video album chunks.');
+            }
+        }
+
         // Determine correct file extension for video format.
         $videoExt = pathinfo($videoFilename, PATHINFO_EXTENSION);
         if (strlen($videoExt) == 0) {
@@ -1049,6 +1067,14 @@ class Client
                     'body'    => $chunkData,
                 ];
 
+                // When uploading videos to albums, we must fake-inject the
+                // "sessionid" cookie (the official app fake-injects it too).
+                if ($targetFeed == 'album' && $sessionIDCookie !== null) {
+                    // We'll add it with the default options ("single use") so
+                    // that the fake cookie is only added to THIS request.
+                    $this->_clientMiddleware->addFakeCookie('sessionid', $sessionIDCookie);
+                }
+
                 // Perform the upload of the current chunk.
                 $response = $this->_apiRequest(
                     $method,
@@ -1083,12 +1109,6 @@ class Client
         }
 
         // NOTE: $response below refers to the final chunk's result!
-
-        // TODO: FIX BUG AND REMOVE THIS SECTION ---- FROM HERE----
-        if (strpos($response['body'], 'StagedUpload not found') !== false) {
-            throw new \Exception('TODO: IMPLEMENT WHATEVER THE HELL STAGEDUPLOAD MEANS.');
-        }
-        // ---- TO HERE -----
 
         // Protection against Instagram's upload server being bugged out!
         // NOTE: When their server is bugging out, the final chunk result will
