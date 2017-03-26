@@ -3,10 +3,9 @@
 namespace InstagramAPI;
 
 use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\FileCookieJar;
-use InstagramAPI\ClientMiddleware;
+use GuzzleHttp\HandlerStack;
 use InstagramAPI\Exception\ServerMessageThrower;
 
 /**

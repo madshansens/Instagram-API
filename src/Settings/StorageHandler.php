@@ -222,9 +222,9 @@ class StorageHandler
     {
         $this->_throwIfNoActiveUser();
 
-        return ($this->_storage->hasUserCookies()
+        return $this->_storage->hasUserCookies()
                 && !empty($this->get('account_id'))
-                && !empty($this->get('token')));
+                && !empty($this->get('token'));
     }
 
     /**
@@ -254,10 +254,10 @@ class StorageHandler
 
         // Return value if it's a NON-EMPTY string, otherwise return NULL.
         // NOTE: All values are cached as strings so no casting is needed.
-        return ((isset($this->_userSettings[$key])
+        return (isset($this->_userSettings[$key])
                  && $this->_userSettings[$key] !== '')
                 ? $this->_userSettings[$key]
-                : null);
+                : null;
     }
 
     /**
@@ -415,7 +415,7 @@ class StorageHandler
     {
         if ($this->_username === null) {
             throw new SettingsException(
-                "Called user-related function before setting the current storage user."
+                'Called user-related function before setting the current storage user.'
             );
         }
     }

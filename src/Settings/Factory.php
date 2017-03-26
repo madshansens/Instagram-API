@@ -52,7 +52,7 @@ class Factory
 
             // Generate the final storage location configuration.
             $locationConfig = [
-                'basefolder' => $baseFolder
+                'basefolder' => $baseFolder,
             ];
 
             $storageInstance = new Storage\File();
@@ -103,7 +103,7 @@ class Factory
             if (isset($storageConfig['memcached'])) {
                 // Re-use the user's own Memcached object.
                 $locationConfig = [
-                    'memcached' => $storageConfig['memcached']
+                    'memcached' => $storageConfig['memcached'],
                 ];
             } else {
                 // Make a new connection. Optional settings for it:
@@ -160,7 +160,7 @@ class Factory
     /**
      * Get option values via command-line parameters.
      *
-     * @var array $longOptions The longnames for the options to look for.
+     * @param array $longOpts The longnames for the options to look for.
      *
      * @return array
      */
@@ -178,9 +178,9 @@ class Factory
     /**
      * Looks for the highest-priority result for a Storage config value.
      *
-     * @var string $settingName   The name of the setting.
-     * @var array  $storageConfig The Factory's configuration array.
-     * @var array  $cmdOptions    All parsed command-line options.
+     * @param string $settingName   The name of the setting.
+     * @param array  $storageConfig The Factory's configuration array.
+     * @param array  $cmdOptions    All parsed command-line options.
      *
      * @return string|null The value if found, otherwise NULL.
      */
@@ -198,7 +198,7 @@ class Factory
         // Environment variables have the second highest precedence.
         // NOTE: Settings provided via env must be UPPERCASED and have
         // a "SETTINGS_" prefix, for example "SETTINGS_STORAGE".
-        $envValue = getenv("SETTINGS_".strtoupper($settingName));
+        $envValue = getenv('SETTINGS_'.strtoupper($settingName));
         if ($envValue !== false) {
             return $envValue;
         }

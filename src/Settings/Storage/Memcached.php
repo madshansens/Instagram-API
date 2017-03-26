@@ -2,8 +2,8 @@
 
 namespace InstagramAPI\Settings\Storage;
 
-use InstagramAPI\Settings\StorageInterface;
 use InstagramAPI\Exception\SettingsException;
+use InstagramAPI\Settings\StorageInterface;
 use Memcached as PHPMemcached;
 
 /**
@@ -25,7 +25,7 @@ class Memcached implements StorageInterface
     /**
      * Connect to a storage location and perform necessary startup preparations.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function openLocation(
         array $locationConfig)
@@ -83,9 +83,10 @@ class Memcached implements StorageInterface
         try {
             $realKey = $username.'_'.$key;
             $result = $this->_memcached->get($realKey);
-            return ($this->_memcached->getResultCode() !== PHPMemcached::RES_NOTFOUND
+
+            return $this->_memcached->getResultCode() !== PHPMemcached::RES_NOTFOUND
                     ? (string) $result
-                    : null);
+                    : null;
         } catch (\Exception $e) {
             throw new SettingsException('Memcached Error: '.$e->getMessage());
         }
@@ -124,8 +125,8 @@ class Memcached implements StorageInterface
     /**
      * Delete a memcached key for a particular user.
      *
-     * @param string       $username The Instagram username.
-     * @param string       $key      Name of the subkey.
+     * @param string $username The Instagram username.
+     * @param string $key      Name of the subkey.
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */
@@ -144,20 +145,21 @@ class Memcached implements StorageInterface
     /**
      * Whether the storage backend contains a specific user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function hasUser(
         $username)
     {
         // Check whether the user's settings exist (empty string allowed).
         $hasUser = $this->_getUserKey($username, 'settings');
-        return ($hasUser !== null ? true : false);
+
+        return $hasUser !== null ? true : false;
     }
 
     /**
      * Move the internal data for a username to a new username.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function moveUser(
         $oldUsername,
@@ -194,7 +196,7 @@ class Memcached implements StorageInterface
     /**
      * Delete all internal data for a given username.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function deleteUser(
         $username)
@@ -206,7 +208,7 @@ class Memcached implements StorageInterface
     /**
      * Open the data storage for a specific user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function openUser(
         $username)
@@ -218,7 +220,7 @@ class Memcached implements StorageInterface
     /**
      * Load all settings for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function loadUserSettings()
     {
@@ -241,7 +243,7 @@ class Memcached implements StorageInterface
     /**
      * Save the settings for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function saveUserSettings(
         array $userSettings,
@@ -255,18 +257,18 @@ class Memcached implements StorageInterface
     /**
      * Whether the storage backend has cookies for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function hasUserCookies()
     {
         // Simply check if the storage key for cookies exists and is non-empty.
-        return (!empty($this->loadUserCookies()) ? true : false);
+        return !empty($this->loadUserCookies()) ? true : false;
     }
 
     /**
      * Load all cookies for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function loadUserCookies()
     {
@@ -276,7 +278,7 @@ class Memcached implements StorageInterface
     /**
      * Save all cookies for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function saveUserCookies(
         $rawData)
@@ -288,7 +290,7 @@ class Memcached implements StorageInterface
     /**
      * Close the settings storage for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function closeUser()
     {
@@ -298,7 +300,7 @@ class Memcached implements StorageInterface
     /**
      * Disconnect from a storage location and perform necessary shutdown steps.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function closeLocation()
     {

@@ -2,9 +2,9 @@
 
 namespace InstagramAPI\Settings\Storage;
 
-use InstagramAPI\Settings\StorageInterface;
-use InstagramAPI\Exception\SettingsException;
 use InstagramAPI\Constants;
+use InstagramAPI\Exception\SettingsException;
+use InstagramAPI\Settings\StorageInterface;
 
 /**
  * Persistent storage backend which keeps settings in a reliable binary file.
@@ -37,7 +37,7 @@ class File implements StorageInterface
     /**
      * Connect to a storage location and perform necessary startup preparations.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function openLocation(
         array $locationConfig)
@@ -53,20 +53,21 @@ class File implements StorageInterface
     /**
      * Whether the storage backend contains a specific user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function hasUser(
         $username)
     {
         // Check whether the user's settings-file exists.
         $hasUser = $this->_generateUserPaths($username);
-        return (is_file($hasUser['settingsFile']) ? true : false);
+
+        return is_file($hasUser['settingsFile']) ? true : false;
     }
 
     /**
      * Move the internal data for a username to a new username.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function moveUser(
         $oldUsername,
@@ -112,7 +113,7 @@ class File implements StorageInterface
     /**
      * Delete all internal data for a given username.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function deleteUser(
         $username)
@@ -125,7 +126,7 @@ class File implements StorageInterface
     /**
      * Open the data storage for a specific user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function openUser(
         $username)
@@ -140,7 +141,7 @@ class File implements StorageInterface
     /**
      * Load all settings for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function loadUserSettings()
     {
@@ -175,7 +176,7 @@ class File implements StorageInterface
     /**
      * Save the settings for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function saveUserSettings(
         array $userSettings,
@@ -198,7 +199,7 @@ class File implements StorageInterface
     /**
      * Whether the storage backend has cookies for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function hasUserCookies()
     {
@@ -208,7 +209,7 @@ class File implements StorageInterface
     /**
      * Load all cookies for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function loadUserCookies()
     {
@@ -219,7 +220,7 @@ class File implements StorageInterface
     /**
      * Save all cookies for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function saveUserCookies(
         $rawData)
@@ -230,7 +231,7 @@ class File implements StorageInterface
     /**
      * Close the settings storage for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function closeUser()
     {
@@ -242,7 +243,7 @@ class File implements StorageInterface
     /**
      * Disconnect from a storage location and perform necessary shutdown steps.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function closeLocation()
     {
@@ -291,7 +292,6 @@ class File implements StorageInterface
              * Version 2 uses JSON encoding and perfectly stores any value.
              * And file corruption can't happen, thanks to the atomic writer.
              */
-
             $loadedSettings = @json_decode($rawData, true, 512, JSON_BIGINT_AS_STRING);
             if (!is_array($loadedSettings)) {
                 throw new SettingsException(sprintf(
@@ -357,6 +357,7 @@ class File implements StorageInterface
         $userFolder = $this->_baseFolder.'/'.$username.'/';
         $settingsFile = $userFolder.sprintf(self::SETTINGSFILE_NAME, $username);
         $cookiesFile = $userFolder.sprintf(self::COOKIESFILE_NAME, $username);
+
         return [
             'userFolder'   => $userFolder,
             'settingsFile' => $settingsFile,
@@ -420,6 +421,6 @@ class File implements StorageInterface
         }
 
         // Delete the root folder itself?
-        return (!$keepRootFolder ? @rmdir($folder) : true);
+        return !$keepRootFolder ? @rmdir($folder) : true;
     }
 }

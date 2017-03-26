@@ -2,8 +2,6 @@
 
 namespace InstagramAPI\Settings;
 
-use InstagramAPI\Exception\SettingsException;
-
 /**
  * Data Storage Interface.
  *

@@ -830,7 +830,6 @@ class Instagram
         return $this->client->api("direct_v2/threads/{$threadId}/{$threadAction}/", Signatures::generateSignature($data))[1];
     }
 
-
     /**
      * INTERNAL. UPLOADS A *SINGLE* PHOTO.
      *
@@ -888,6 +887,7 @@ class Instagram
     /**
      * Uploads a photo to your Instagram timeline.
 
+     *
      * @param string $photoFilename    The photo filename.
      * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
      *
@@ -1259,7 +1259,6 @@ class Instagram
 
         return $configure;
     }
-
 
     /**
      * Helper function for reliably configuring videos.
@@ -2764,7 +2763,7 @@ class Instagram
     public function getPendingFriendshipRequests()
     {
         $requestData = $this->request('friendships/pending/');
-        
+
         return $requestData->getResponse(new Response\FollowerAndFollowingResponse());
     }
 

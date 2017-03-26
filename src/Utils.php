@@ -222,7 +222,6 @@ class Utils
         }
     }
 
-
     /**
      * Verifies that a video's details follow Instagram's requirements.
      *

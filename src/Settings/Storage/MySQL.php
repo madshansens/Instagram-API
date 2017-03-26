@@ -2,8 +2,8 @@
 
 namespace InstagramAPI\Settings\Storage;
 
-use InstagramAPI\Settings\StorageInterface;
 use InstagramAPI\Exception\SettingsException;
+use InstagramAPI\Settings\StorageInterface;
 use PDO;
 
 /**
@@ -31,7 +31,7 @@ class MySQL implements StorageInterface
     /**
      * Connect to a storage location and perform necessary startup preparations.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function openLocation(
         array $locationConfig)
@@ -175,7 +175,7 @@ class MySQL implements StorageInterface
     /**
      * Whether the storage backend contains a specific user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function hasUser(
         $username)
@@ -185,13 +185,14 @@ class MySQL implements StorageInterface
         $sth->execute([':username' => $username]);
         $result = $sth->fetchColumn();
         $sth->closeCursor();
-        return ($result > 0 ? true : false);
+
+        return $result > 0 ? true : false;
     }
 
     /**
      * Move the internal data for a username to a new username.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function moveUser(
         $oldUsername,
@@ -228,7 +229,7 @@ class MySQL implements StorageInterface
     /**
      * Delete all internal data for a given username.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function deleteUser(
         $username)
@@ -246,7 +247,7 @@ class MySQL implements StorageInterface
     /**
      * Open the data storage for a specific user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function openUser(
         $username)
@@ -277,7 +278,7 @@ class MySQL implements StorageInterface
     /**
      * Load all settings for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function loadUserSettings()
     {
@@ -299,7 +300,7 @@ class MySQL implements StorageInterface
     /**
      * Save the settings for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function saveUserSettings(
         array $userSettings,
@@ -313,30 +314,30 @@ class MySQL implements StorageInterface
     /**
      * Whether the storage backend has cookies for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function hasUserCookies()
     {
-        return (isset($this->_cache['cookies'])
-                && !empty($this->_cache['cookies']));
+        return isset($this->_cache['cookies'])
+                && !empty($this->_cache['cookies']);
     }
 
     /**
      * Load all cookies for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function loadUserCookies()
     {
-        return (isset($this->_cache['cookies'])
+        return isset($this->_cache['cookies'])
                 ? $this->_cache['cookies']
-                : null );
+                : null;
     }
 
     /**
      * Save all cookies for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function saveUserCookies(
         $rawData)
@@ -348,7 +349,7 @@ class MySQL implements StorageInterface
     /**
      * Close the settings storage for the currently active user.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function closeUser()
     {
@@ -359,7 +360,7 @@ class MySQL implements StorageInterface
     /**
      * Disconnect from a storage location and perform necessary shutdown steps.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function closeLocation()
     {
