@@ -1805,6 +1805,22 @@ class Instagram
     }
 
     /**
+     * Get broadcast information.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BroadcastInfoResponse
+     */
+    public function getBroadcastInfo(
+        $broadcastId)
+    {
+        return $this->request("live/{$broadcastId}/info/")
+        ->getResponse(new Response\BroadcastInfoResponse());
+    }
+
+    /**
      * Delete a media item.
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
@@ -2808,6 +2824,49 @@ class Instagram
     }
 
     /**
+     * Like a broadcast.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BroadcastLikeResponse
+     */
+    public function broadcastLike(
+        $broadcastId,
+        $likeCount = 1)
+    {
+        if ($likeCount < 1 || $likeCount > 7) {
+            throw new \InvalidArgumentException('You must provide a valid like count, between 1 and 6, both included.');
+        }
+        return $this->request("live/{$broadcastId}/like/")
+         ->addPost('_uuid', $this->uuid)
+         ->addPost('_uid', $this->account_id)
+         ->addPost('_csrftoken', $this->token)
+         ->addPost('user_like_count', $likeCount)
+         ->getResponse(new Response\BroadcastLikeResponse());
+    }
+
+    /**
+     * Get a live broadcast's like count
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param string $likeTs Like timestamp.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BroadcastLikeCountResponse
+     */
+    public function getBroadcastLikeCount(
+        $broadcastId,
+        $likeTs = 0)
+    {
+        return $this->request("live/{$broadcastId}/get_like_count/")
+         ->addParams('like_ts', $likeTs)
+         ->getResponse(new Response\BroadcastLikeCountResponse());
+    }
+
+    /**
      * Get media comments.
      *
      * @param string      $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
@@ -2985,6 +3044,19 @@ class Instagram
         return $this->request('discover/chaining/')
         ->addParams('target_id', $userId)
         ->getResponse(new Response\SuggestedUsersResponse());
+    }
+
+    /**
+     * Get suggested broadcasts.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\SuggestedBroadcastsResponse
+     */
+    public function getSuggestedBroascasts()
+    {
+        return $this->request('live/get_suggested_broadcasts')
+        ->getResponse(new Response\SuggestedBroadcastsResponse());
     }
 
     /**
