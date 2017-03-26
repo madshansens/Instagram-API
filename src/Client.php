@@ -3,8 +3,10 @@
 namespace InstagramAPI;
 
 use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\FileCookieJar;
+use InstagramAPI\ClientMiddleware;
 use InstagramAPI\Exception\ServerMessageThrower;
 
 /**
@@ -78,6 +80,11 @@ class Client
     private $_guzzleClient;
 
     /**
+     * @var \InstagramAPI\ClientMiddleware
+     */
+    private $_clientMiddleware;
+
+    /**
      * @var \GuzzleHttp\Cookie\FileCookieJar|\GuzzleHttp\Cookie\CookieJar
      */
     private $_cookieJar;
@@ -103,8 +110,18 @@ class Client
         $this->_verifySSL = true;
         $this->_proxy = null;
 
+        // Create a default handler stack with Guzzle's auto-selected "best
+        // possible transfer handler for the user's system", and with all of
+        // Guzzle's default middleware (cookie jar support, etc).
+        $stack = HandlerStack::create();
+
+        // Create our custom Guzzle client middleware and add it to the stack.
+        $this->_clientMiddleware = new ClientMiddleware();
+        $stack->push($this->_clientMiddleware);
+
         // Default request options (immutable after client creation).
         $this->_guzzleClient = new GuzzleClient([
+            'handler'         => $stack, // Our middleware is now injected.
             'allow_redirects' => [
                 'max' => 8, // Allow up to eight redirects (that's plenty).
             ],
