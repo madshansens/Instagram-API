@@ -3,7 +3,7 @@
 namespace InstagramAPI;
 
 /**
- * Instagram's Private API.
+ * Instagram's Private API v2.
  *
  * TERMS OF USE:
  * - This code is in no way affiliated with, authorized, maintained, sponsored
@@ -429,9 +429,17 @@ class Instagram
     /**
      * Log out of Instagram.
      *
+     * WARNING: Most people should NEVER call logout()! Our library emulates
+     * the Instagram app for Android, where you are supposed to stay logged in
+     * forever. By calling this function, you will tell Instagram that you are
+     * logging out of the APP. But you shouldn't do that! In almost 100% of all
+     * cases you want to *stay logged in* so that LOGIN() resumes your session!
+     *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\LogoutResponse
+     *
+     * @see login()
      */
     public function logout()
     {
