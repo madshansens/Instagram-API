@@ -692,6 +692,27 @@ class Instagram
     }
 
     /**
+     * Get status for a list of broadcast ids.
+     *
+     * @param array|int $broadcastIds One or more numeric broadcast IDs.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\TopLiveStatusResponse
+     */
+    public function getTopLiveStatus(
+        $broadcastIds)
+    {
+        if (!is_array($broadcastIds)) {
+            $broadcastIds = [$broadcastIds];
+        }
+
+        return $this->request('discover/top_live_status/')
+        ->addPost('broadcast_ids', $broadcastIds)
+        ->getResponse(new Response\TopLiveStatusResponse());
+    }
+
+    /**
      * Expose.
      *
      * @throws \InstagramAPI\Exception\InstagramException
@@ -1821,6 +1842,24 @@ class Instagram
     }
 
     /**
+     * Get a live broadcast's heartbeat and viewer count.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BroadcastHeartbeatAndViewerCountResponse
+     */
+    public function getBroadcastHeartbeatAndViewerCount(
+        $broadcastId)
+    {
+        return $this->request("live/{$broadcastId}/heartbeat_and_get_viewer_count/")
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new Response\BroadcastHeartbeatAndViewerCountResponse());
+    }
+
+    /**
      * Delete a media item.
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
@@ -1901,6 +1940,29 @@ class Instagram
         ->addPost('comment_text', $commentText)
         ->addPost('containermodule', 'comments_feed_timeline')
         ->getResponse(new Response\CommentResponse());
+    }
+
+    /**
+     * Post a comment to a live broadcast.
+     *
+     * @param string $broadcastId   The media ID in Instagram's internal format (ie "17854587811139572").
+     * @param string $commentText   Your comment text.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CommentBroadcastResponse
+     */
+    public function commentBroadcast(
+        $broadcastId,
+        $commentText)
+    {
+        return $this->request("live/{$broadcastId}/comment/")
+        ->addPost('user_breadcrumb', Utils::generateUserBreadcrumb(mb_strlen($commentText)))
+        ->addPost('idempotence_token', Signatures::generateUUID(true))
+        ->addPost('comment_text', $commentText)
+        ->addPost('live_or_vod', 1)
+        ->addPost('offset_to_video_start', 0)
+        ->getResponse(new Response\CommentBroadcastResponse());
     }
 
     /**
@@ -2827,6 +2889,7 @@ class Instagram
      * Like a broadcast.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param string $likeCount Number of likes ("hearts") to send (optional).
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -2884,6 +2947,25 @@ class Instagram
         ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
         ->addParams('max_id', $maxId)
         ->getResponse(new Response\MediaCommentsResponse());
+    }
+
+    /**
+     * Get broadcast comments.
+     *
+     * @param string      $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param string      $lastCommentTs Last comments timestamp (optional).
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BroadcastCommentsResponse
+     */
+    public function getBroadcastComments(
+        $broadcastId,
+        $lastCommentTs = 0)
+    {
+        return $this->request("live/{$broadcastId}/get_comment/")
+        ->addParams('last_comment_ts', $lastCommentTs)
+        ->getResponse(new Response\BroadcastCommentsResponse());
     }
 
     /**

@@ -20,6 +20,10 @@ class Comment extends \InstagramAPI\Response
      * @var string
      */
     public $pk;
+    /**
+     * @var string
+     */
+    public $media_id;
     public $text;
     public $content_type;
     public $type;
