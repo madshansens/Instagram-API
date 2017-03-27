@@ -1945,8 +1945,8 @@ class Instagram
     /**
      * Post a comment to a live broadcast.
      *
-     * @param string $broadcastId   The media ID in Instagram's internal format (ie "17854587811139572").
-     * @param string $commentText   Your comment text.
+     * @param string $broadcastId The media ID in Instagram's internal format (ie "17854587811139572").
+     * @param string $commentText Your comment text.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -2889,7 +2889,7 @@ class Instagram
      * Like a broadcast.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param string $likeCount Number of likes ("hearts") to send (optional).
+     * @param string $likeCount   Number of likes ("hearts") to send (optional).
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -2902,6 +2902,7 @@ class Instagram
         if ($likeCount < 1 || $likeCount > 6) {
             throw new \InvalidArgumentException('Like count must be a number from 1 to 6.');
         }
+
         return $this->request("live/{$broadcastId}/like/")
          ->addPost('_uuid', $this->uuid)
          ->addPost('_uid', $this->account_id)
@@ -2952,8 +2953,8 @@ class Instagram
     /**
      * Get broadcast comments.
      *
-     * @param string      $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param string      $lastCommentTs Last comments timestamp (optional).
+     * @param string $broadcastId   The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param string $lastCommentTs Last comments timestamp (optional).
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
