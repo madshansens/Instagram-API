@@ -782,7 +782,7 @@ class Instagram
     /**
      * Send a photo via direct message to a user's inbox.
      *
-     * @param string|string[] $recipients One or more numeric user IDs.
+     * @param string|string[] $recipients    One or more numeric user IDs.
      * @param string          $photoFilename The photo filename.
      * @param string          $text          Text message.
      *
