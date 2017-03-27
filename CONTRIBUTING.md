@@ -38,7 +38,7 @@ This is a document which, among other things, describes PSR-4 class autoloading,
 
 ### Commits
 
-- You **MUST** try to **separate** work into smaller commits. So if you `"changed Utils.php to fix getSeconds and changed Request.php to fix Request()"`, then make **TWO SEPARATE COMMITS**, so it is easily to find find changes in history, and revert if its something wrong whithout changing other code. So remember: 1 commit per task :smile:
+- You **MUST** try to **separate** work into smaller commits. So if you `"changed Utils.php to fix getSeconds and changed Request.php to fix Request()"`, then make **TWO SEPARATE COMMITS**, so that we can easily find your changes in the project history, and can easily revert any individual broken changes without losing tons of other code too! So remember: 1 commit per task. :smile:
 
 - Use the detailed description field of your commit, to document why you did certain changes if it's not an obvious change (such as a typo fix). Your description gets added to the history of the project so that we can know what you were thinking, if we need to check the change again later.
 
