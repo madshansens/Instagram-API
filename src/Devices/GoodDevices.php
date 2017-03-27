@@ -62,6 +62,11 @@ namespace InstagramAPI\Devices;
  * However, note that the device above isn't at least 1920x1080. Don't use it.
  *
  *
+ * When you have a "possibly good" agent, you must finally TEST IT: Use the
+ * "devtools/checkDevices.php" developer script to check your agent and verify
+ * that Instagram detects it as a high-resolution device and gives it HD videos!
+ *
+ *
  * LASTLY, YOU MUST UNDERSTAND THE FOLLOWING: THE DEVICE LIST BELOW IS MEANT TO
  * BE A "SNAPSHOT" OF DEVICES AND THEIR ANDROID VERSIONS AT THAT MOMENT IN TIME.
  * WE ARE *ONLY* SUPPOSED TO *ADD* NEW DEVICES TO IT OR COMPLETELY *DELETE* OLD
@@ -80,7 +85,8 @@ namespace InstagramAPI\Devices;
  * TO THIS LIST IF YOU DON'T UNDERSTAND *ALL* INSTRUCTIONS ABOVE. PERFECTLY. ALL
  * CONTRIBUTIONS MUST INCLUDE THE RELEASE DATE, HANDSETDETECTION AND A LINK TO A
  * PAGE (SUCH AS AMAZON) FOR THAT EXACT MODEL SPECIFIER, AS SEEN BELOW, SO THAT
- * WE CAN VALIDATE ALL AGENTS TO SEE THAT YOU AREN'T A MORON.
+ * WE CAN VALIDATE ALL AGENTS TO SEE THAT YOU AREN'T ADDING AN INCORRECTLY
+ * WRITTEN OR UNPOPULAR DEVICE AGENT WHICH WILL GET US BANNED BY INSTAGRAM!
  */
 class GoodDevices
 {
