@@ -694,7 +694,7 @@ class Instagram
     /**
      * Get status for a list of broadcast ids.
      *
-     * @param array|int $broadcastIds One or more numeric broadcast IDs.
+     * @param string|string[] $broadcastIds One or more numeric broadcast IDs.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -733,9 +733,9 @@ class Instagram
     /**
      * Share media via direct message to a user's inbox.
      *
-     * @param array|int $recipients One or more numeric user IDs.
-     * @param string    $mediaId    The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string    $text       Text message.
+     * @param string|string[] $recipients One or more numeric user IDs.
+     * @param string          $mediaId    The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string          $text       Text message.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -759,8 +759,8 @@ class Instagram
     /**
      * Send a direct message to a user's inbox.
      *
-     * @param array|int $recipients One or more numeric user IDs.
-     * @param string    $text       Text message.
+     * @param string|string[] $recipients One or more numeric user IDs.
+     * @param string          $text       Text message.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -782,9 +782,9 @@ class Instagram
     /**
      * Send a photo via direct message to a user's inbox.
      *
-     * @param array|int $recipients    One or more numeric user IDs.
-     * @param string    $photoFilename The photo filename.
-     * @param string    $text          Text message.
+     * @param string|string[] $recipients One or more numeric user IDs.
+     * @param string          $photoFilename The photo filename.
+     * @param string          $text          Text message.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
