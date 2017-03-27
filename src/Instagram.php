@@ -2832,7 +2832,7 @@ class Instagram
      *
      * @return \InstagramAPI\Response\BroadcastLikeResponse
      */
-    public function broadcastLike(
+    public function likeBroadcast(
         $broadcastId,
         $likeCount = 1)
     {
@@ -2848,10 +2848,10 @@ class Instagram
     }
 
     /**
-     * Get a live broadcast's like count
+     * Get a live broadcast's like count.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param string $likeTs Like timestamp.
+     * @param string $likeTs      Like timestamp.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
