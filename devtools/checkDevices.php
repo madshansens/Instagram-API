@@ -37,8 +37,7 @@ $ig->login();
 
 // Code for building video lists (uncomment both lines).
 // $userPk = $ig->getUserInfoByName('selenagomez')->getUser()->getPk();
-// buildVideoList($ig, $userPk); exit; // SelenaGomez (any random narcissist
-// will do for finding HD videos that are shot in idiotic portrait, haha)
+// buildVideoList($ig, $userPk); exit; 
 
 // List of good videos and resolutions that we MUST see with a GOOD user agent.
 // Manually created via buildVideoList() and the code above, by selecting some
