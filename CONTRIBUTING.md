@@ -70,7 +70,7 @@ Response: Parse timestamps as floats
 
 - Do NOT look at your changes in isolation. Look at the BIG PICTURE of what your change now does to the REST of the codebase.
 
-- For example, if you change the returned variable type from a function (such as from an `"int"` to a `"string"`), then you MUST update the function's PHPdoc block to document the new return value (with `@return string`), and you MUST also slowly and carefully check ALL OTHER CODE that relied on the OLD behavior of that function. There's a command-line tool called "grep" to search for text in files. USE IT to check ALL other code locations that called your modified function, and make sure that you didn't break ANY of them AT ALL!
+- For example, if you change the returned variable type from a function (such as from an `"int"` to a `"string"`), then you MUST update the function's PHPdoc block to document the new return value (with `@return string`), and you MUST also slowly and carefully check ALL OTHER CODE that relied on the OLD behavior of that function. There's a command-line tool called "grep" (or an even better one especially made for programmers, called ["ag" aka "the silver searcher"](https://github.com/ggreer/the_silver_searcher)) to search for text in files. USE IT to check ALL other code locations that called your modified function, and make sure that you didn't break ANY of them AT ALL!
 
 - In fact, ANY TIME that you change a function's ARGUMENTS, RETURN VALUE or THROWN EXCEPTIONS (new/deleted ones), then you MUST update the function's PHPdoc block to match the new truth. And you MUST check ALL other functions that CALL your function, and update those too. For example let's say they DON'T handle a new exception you're now throwing, in which case you MUST now update THEIR `@throws` documentation to document the fact that THEY now let yet another exception bubble up. And then you MUST search for the functions that called THOSE updated functions and update THEIR documentation TOO, all the way until you've reached the top and have FULLY documented what exceptions are being thrown in the whole chain of function calls.
 
@@ -78,13 +78,13 @@ Response: Parse timestamps as floats
 
 Here's a checklist for what you MUST do to ENSURE totally correct documentation EVERY TIME that you make a CHANGE to a function's ARGUMENTS or RETURN TYPE or EXCEPTIONS of an existing function, OR when you introduce a NEW function whose use is being added to any existing functions.
 
-1. You MUST ALWAYS use grep. Find EVERY other code location that uses your new/modified function.
+1. You MUST ALWAYS use grep/ag. Find EVERY other code location that uses your new/modified function.
 
 2. Check: Did your changes just BREAK EVERYTHING somewhere else, which now has to be updated to match? Almost GUARANTEED the answer is YES, and you MUST update the other locations that expected the old function behavior/return type/parameters/exceptions.
 
 3. Check: Do you need to also UPDATE the PHPdoc for those OTHER functions too? OFTEN the answer is YES. For example, if you've changed the exceptions that a deep, internal function throws, then you MUST either catch it in all higher functions and do something with it, OR let it pass through them upwards. And if you do let it pass through and bubble up then you MUST ALSO update the PHPdoc for THAT higher function to say `"@throws TheNewException"` (or delete something in case you changed a subfunction to no longer throw).
 
-4. If your updates to the affected higher-level functions in steps 2/3 means that THOSE other functions now ALSO behave differently (meaning THEY have new return values/exceptions/parameters), then you MUST also do ANOTHER grep to check for anything that uses THOSE functions, and update all of those code locations TOO.
+4. If your updates to the affected higher-level functions in steps 2/3 means that THOSE other functions now ALSO behave differently (meaning THEY have new return values/exceptions/parameters), then you MUST also do ANOTHER grep/ag to check for anything that uses THOSE functions, and update all of those code locations TOO. And continue that way up the entire chain of functions that call each other, until you reach the top of the project, so that the entire chain of function calls is caught/documented properly. Otherwise, those unexpected (undocumented) exceptions will terminate PHP, so this is very important!
 
 
 
