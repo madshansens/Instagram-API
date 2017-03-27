@@ -2836,8 +2836,8 @@ class Instagram
         $broadcastId,
         $likeCount = 1)
     {
-        if ($likeCount < 1 || $likeCount > 7) {
-            throw new \InvalidArgumentException('You must provide a valid like count, between 1 and 6, both included.');
+        if ($likeCount < 1 || $likeCount > 6) {
+            throw new \InvalidArgumentException('Like count must be a number from 1 to 6.');
         }
         return $this->request("live/{$broadcastId}/like/")
          ->addPost('_uuid', $this->uuid)
@@ -3053,7 +3053,7 @@ class Instagram
      *
      * @return \InstagramAPI\Response\SuggestedBroadcastsResponse
      */
-    public function getSuggestedBroascasts()
+    public function getSuggestedBroadcasts()
     {
         return $this->request('live/get_suggested_broadcasts')
         ->getResponse(new Response\SuggestedBroadcastsResponse());
