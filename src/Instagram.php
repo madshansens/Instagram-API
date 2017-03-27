@@ -2650,6 +2650,24 @@ class Instagram
     }
 
     /**
+     * Search for related locations by location ID.
+     *
+     * @param $locationId
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\RelatedLocationResponse
+     */
+    public function searchRelatedLocation(
+        $locationId)
+    {
+        return $this->request("locations/{$locationId}/related")
+        ->addParams('visited', json_encode(['id' => $locationId, 'type' => 'location']))
+        ->addParams('related_types', json_encode(['location']))
+        ->getResponse(new Response\RelatedLocationResponse());
+    }
+
+    /**
      * Search for Facebook locations by name.
      *
      * @param string $query
