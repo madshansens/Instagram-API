@@ -339,13 +339,13 @@ class Instagram
             $this->syncFeatures(true);
 
             $response = $this->request('si/fetch_headers')
-            ->requireLogin(true)
+            ->setNeedsAuth(false)
             ->addParams('challenge_type', 'signup')
             ->addParams('guid', $this->uuid)
             ->getResponse(new Response\ChallengeResponse(), true);
 
             $response = $this->request('accounts/login/')
-            ->requireLogin(true)
+            ->setNeedsAuth(false)
             ->addPost('phone_id', $this->settings->get('phone_id'))
             ->addPost('_csrftoken', $response->getFullResponse()[0])
             ->addPost('username', $this->username)
@@ -460,7 +460,7 @@ class Instagram
     {
         if ($prelogin) {
             return $this->request('qe/sync/')
-            ->requireLogin(true)
+            ->setNeedsAuth(false)
             ->addPost('id', Signatures::generateUUID(true))
             ->addPost('experiments', Constants::LOGIN_EXPERIMENTS)
             ->getResponse(new Response\SyncResponse());

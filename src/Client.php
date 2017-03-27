@@ -675,10 +675,11 @@ class Client
     public function api(
         $endpoint,
         $postData = null,
-        $needsAuth = false,
+        $needsAuth = true,
         $assoc = true)
     {
-        if (!$needsAuth) { // Only allow non-authenticated requests until logged in.
+        if ($needsAuth) {
+            // Throw if this requires authentication and we're not logged in.
             $this->_throwIfNotLoggedIn();
         }
 

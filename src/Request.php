@@ -17,7 +17,16 @@ class Request
     protected $_url;
     protected $_params = [];
     protected $_posts = [];
-    protected $_requireLogin = false;
+
+    /**
+     * Whether this API call needs authorization.
+     *
+     * On by default since most calls require authorization.
+     *
+     * @var bool
+     */
+    protected $_needsAuth = true;
+
     protected $_checkStatus = true;
     protected $_signedPost = true;
 
@@ -52,10 +61,10 @@ class Request
         return $this;
     }
 
-    public function requireLogin(
-        $requireLogin = false)
+    public function setNeedsAuth(
+        $needsAuth = true)
     {
-        $this->_requireLogin = $requireLogin;
+        $this->_needsAuth = $needsAuth;
 
         return $this;
     }
@@ -96,7 +105,7 @@ class Request
             $post = null;
         }
 
-        $response = $this->_parent->client->api($endpoint, $post, $this->_requireLogin, false);
+        $response = $this->_parent->client->api($endpoint, $post, $this->_needsAuth, false);
 
         $responseObject = $this->_parent->client->getMappedResponseObject(
             $baseClass,
