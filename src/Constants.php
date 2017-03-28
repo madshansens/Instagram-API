@@ -21,7 +21,7 @@ class Constants
     const CONTENT_TYPE = 'application/x-www-form-urlencoded; charset=UTF-8';
     const X_FB_HTTP_Engine = 'Liger';
     const X_IG_Connection_Type = 'WIFI';
-    const X_IG_Capabilities = '3ToAAA==';
+    const X_IG_Capabilities = '3boBAA==';
 
     // General Constants.
     const SRC_DIR = __DIR__; // Absolute path to the "src" folder.
