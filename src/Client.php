@@ -528,7 +528,7 @@ class Client
         // Detect very serious HTTP status codes in the response.
         $httpCode = $response->getStatusCode();
         switch ($httpCode) {
-        case TOO_MANY_REQUESTS: // "429 Too Many Requests"
+        case 429: // "429 Too Many Requests"
             throw new \InstagramAPI\Exception\ThrottledException('Throttled by Instagram because of too many API requests.');
             break;
         // NOTE: Detecting "404" errors was intended to help us detect when API
