@@ -29,6 +29,11 @@ use InstagramAPI\Exception\ServerMessageThrower;
  */
 class Client
 {
+    const BAD_REQUEST = 400;
+    const NOT_FOUND = 404;
+    const TOO_MANY_REQUESTS = 429;
+    const INTERNAL_SERVER_ERROR = 500;
+
     /**
      * The Instagram class instance we belong to.
      *
@@ -528,7 +533,7 @@ class Client
         // Detect very serious HTTP status codes in the response.
         $httpCode = $response->getStatusCode();
         switch ($httpCode) {
-        case 429: // "429 Too Many Requests"
+        case Client::TOO_MANY_REQUESTS: // "429 Too Many Requests"
             throw new \InstagramAPI\Exception\ThrottledException('Throttled by Instagram because of too many API requests.');
             break;
         // NOTE: Detecting "404" errors was intended to help us detect when API

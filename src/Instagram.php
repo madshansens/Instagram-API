@@ -2622,9 +2622,9 @@ class Instagram
     /**
      * Search for nearby Instagram locations by geographical coordinates.
      *
-     * @param $latitude
-     * @param $longitude
-     * @param null $query
+     * @param string      $latitude
+     * @param string      $longitude
+     * @param null|string $query
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -2652,7 +2652,7 @@ class Instagram
     /**
      * Search for related locations by location ID.
      *
-     * @param $locationId
+     * @param $locationId string
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
