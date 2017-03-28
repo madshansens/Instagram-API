@@ -2652,7 +2652,7 @@ class Instagram
     /**
      * Search for related locations by location ID.
      *
-     * @param $locationId string
+     * @param string $locationId
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
