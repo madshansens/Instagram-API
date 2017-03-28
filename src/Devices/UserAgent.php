@@ -2,8 +2,6 @@
 
 namespace InstagramAPI\Devices;
 
-use InstagramAPI\Constants;
-
 /**
  * Android device User-Agent builder.
  *
@@ -21,13 +19,17 @@ class UserAgent
     /**
      * Generates a User Agent string from a Device.
      *
-     * @param \InstagramAPI\Devices\Device $device
+     * @param string $appVersion Instagram client app version.
+     * @param string $userLocale The user's locale, such as "en_US".
+     * @param Device $device
      *
      * @throws \InvalidArgumentException If the device parameter is invalid.
      *
      * @return string
      */
     public static function buildUserAgent(
+        $appVersion,
+        $userLocale,
         Device $device)
     {
         if (!$device instanceof Device) {
@@ -43,7 +45,7 @@ class UserAgent
         // Generate the final User-Agent string.
         return sprintf(
             self::USER_AGENT_FORMAT,
-            Constants::VERSION, // App version ("10.8.0").
+            $appVersion, // App version ("10.8.0").
             $device->getAndroidVersion(),
             $device->getAndroidRelease(),
             $device->getDPI(),
@@ -52,7 +54,7 @@ class UserAgent
             $device->getModel(),
             $device->getDevice(),
             $device->getCPU(),
-            Constants::USER_AGENT_LOCALE // Locale ("en_US").
+            $userLocale // Locale ("en_US").
         );
     }
 }

@@ -21,6 +21,20 @@ class Device
     const REQUIRED_ANDROID_VERSION = '2.2';
 
     /**
+     * Which Instagram client app version this "device" is running.
+     *
+     * @var string
+     */
+    protected $_appVersion;
+
+    /**
+     * The device user's locale, such as "en_US".
+     *
+     * @var string
+     */
+    protected $_userLocale;
+
+    /**
      * Which device string we were built with internally.
      *
      * @var string
@@ -66,6 +80,8 @@ class Device
     /**
      * Constructor.
      *
+     * @param string      $appVersion   Instagram client app version.
+     * @param string      $userLocale   The user's locale, such as "en_US".
      * @param string|null $deviceString (optional) The device string to attempt
      *                                  to construct from. If NULL or not a good
      *                                  device, we'll use a random good device.
@@ -74,9 +90,14 @@ class Device
      * @throws \RuntimeException If fallback is disabled and device is invalid.
      */
     public function __construct(
+        $appVersion,
+        $userLocale,
         $deviceString = null,
         $autoFallback = true)
     {
+        $this->_appVersion = $appVersion;
+        $this->_userLocale = $userLocale;
+
         // Use the provided device if a valid good device. Otherwise use random.
         if ($autoFallback && (!is_string($deviceString) || !GoodDevices::isGoodDevice($deviceString))) {
             $deviceString = GoodDevices::getRandomGoodDevice();
@@ -138,7 +159,7 @@ class Device
         $this->_cpu = $parts[6];
 
         // Build our user agent.
-        $this->_userAgent = UserAgent::buildUserAgent($this);
+        $this->_userAgent = UserAgent::buildUserAgent($this->_appVersion, $this->_userLocale, $this);
     }
 
     // Getters for all properties...

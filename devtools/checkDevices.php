@@ -20,6 +20,7 @@ date_default_timezone_set('UTC');
 
 require __DIR__.'/../vendor/autoload.php';
 
+use InstagramAPI\Constants;
 use InstagramAPI\Devices\Device;
 use InstagramAPI\Devices\GoodDevices;
 
@@ -93,7 +94,7 @@ $testDevices = array_merge(
 // any "bad devicestring" construction errors before wasting time.
 foreach ($testDevices as $key => $deviceString) {
     // Create the new Device object, without automatic fallbacks.
-    $testDevices[$key] = new Device($deviceString, false);
+    $testDevices[$key] = new Device(Constants::VERSION, Constants::USER_AGENT_LOCALE, $deviceString, false);
 }
 
 // Test all devices in our list!
@@ -156,7 +157,7 @@ foreach ($testDevices as $thisDevice) {
 function switchDevice($ig, $value)
 {
     // Create the new Device object, without automatic fallbacks.
-    $device = ($value instanceof Device ? $value : new Device($value, false));
+    $device = ($value instanceof Device ? $value : new Device(Constants::VERSION, Constants::USER_AGENT_LOCALE, $value, false));
 
     // Update the Instagram Client's User-Agent to the new Device.
     $ig->device = $device;

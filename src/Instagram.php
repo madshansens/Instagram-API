@@ -174,7 +174,7 @@ class Instagram
         // user's last-used device IF they've got a valid, good one stored.
         // But if they've got a BAD/none, this will create a brand-new device.
         $savedDeviceString = $this->settings->get('devicestring');
-        $this->device = new Devices\Device($savedDeviceString);
+        $this->device = new Devices\Device(Constants::VERSION, Constants::USER_AGENT_LOCALE, $savedDeviceString);
 
         // Save the chosen device string to settings if not already stored.
         $deviceString = $this->device->getDeviceString();
