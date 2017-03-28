@@ -1,3 +1,6 @@
+# The php:7.0-apache Docker image is based on debian:jessie.
+# See: https://github.com/docker-library/php/blob/20b89e64d16dc9310ba6493a38385e36304dded7/7.0/Dockerfile
+
 FROM php:7.0-apache
 RUN echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/sources.list \
     && apt-get update
