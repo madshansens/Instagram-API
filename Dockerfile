@@ -3,7 +3,7 @@
 
 FROM php:7.0-apache
 RUN echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/sources.list \
-    && apt-get update
+    && apt-get update \
     && apt-get install -y \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
