@@ -60,7 +60,7 @@ class User extends \InstagramAPI\Response
      */
     public $profile_context_mutual_follow_ids; // getUserInfoById prop
     /**
-     * @var string[]
+     * @var Link[]
      */
     public $profile_context_links_with_user_ids; // getUserInfoById prop
     public $has_biography_translation; // getUserInfoById prop
