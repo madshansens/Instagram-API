@@ -3086,6 +3086,7 @@ class Instagram
         ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('user_id', $userId)
+        ->addPost('radio_type', 'wifi-none')
         ->getResponse(new Response\FriendshipResponse());
     }
 
@@ -3106,6 +3107,7 @@ class Instagram
         ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('user_id', $userId)
+        ->addPost('radio_type', 'wifi-none')
         ->getResponse(new Response\FriendshipResponse());
     }
 
