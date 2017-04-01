@@ -76,6 +76,13 @@ class Instagram
     public $uuid;
 
     /**
+     * Google Ad Id.
+     *
+     * @var string
+     */
+    public $adid;
+
+    /**
      * Device ID.
      *
      * @var string
@@ -174,7 +181,7 @@ class Instagram
         // user's last-used device IF they've got a valid, good one stored.
         // But if they've got a BAD/none, this will create a brand-new device.
         $savedDeviceString = $this->settings->get('devicestring');
-        $this->device = new Devices\Device(Constants::VERSION, Constants::USER_AGENT_LOCALE, $savedDeviceString);
+        $this->device = new Devices\Device(Constants::IG_VERSION, Constants::USER_AGENT_LOCALE, $savedDeviceString);
 
         // Save the chosen device string to settings if not already stored.
         $deviceString = $this->device->getDeviceString();
@@ -188,6 +195,7 @@ class Instagram
         // dangerously reusing the "previous phone's" unique hardware IDs.
         $resetCookieJar = false;
         if ($deviceString !== $savedDeviceString
+            || empty($this->settings->get('adid'))
             || empty($this->settings->get('uuid'))
             || empty($this->settings->get('phone_id'))
             || empty($this->settings->get('device_id'))) {
@@ -195,6 +203,7 @@ class Instagram
             $this->settings->set('device_id', Signatures::generateDeviceId());
             $this->settings->set('phone_id', Signatures::generateUUID(true));
             $this->settings->set('uuid', Signatures::generateUUID(true));
+            $this->settings->set('adid', Signatures::generateUUID(true));
 
             // Remove the previous hardware's login details to force a relogin.
             $this->settings->set('account_id', '');
@@ -209,6 +218,7 @@ class Instagram
         $this->username = $username;
         $this->password = $password;
         $this->uuid = $this->settings->get('uuid');
+        $this->adid = $this->settings->get('adid');
         $this->device_id = $this->settings->get('device_id');
 
         // Load the previous session details if we're possibly logged in.
@@ -341,7 +351,7 @@ class Instagram
             $response = $this->request('si/fetch_headers')
             ->setNeedsAuth(false)
             ->addParams('challenge_type', 'signup')
-            ->addParams('guid', $this->uuid)
+            ->addParams('guid', str_replace('-', '', $this->uuid))
             ->getResponse(new Response\ChallengeResponse(), true);
 
             $response = $this->request('accounts/login/')
@@ -350,6 +360,7 @@ class Instagram
             ->addPost('_csrftoken', $response->getFullResponse()[0])
             ->addPost('username', $this->username)
             ->addPost('guid', $this->uuid)
+            ->addPost('adid', $this->adid)
             ->addPost('device_id', $this->device_id)
             ->addPost('password', $this->password)
             ->addPost('login_attempt_count', 0)
@@ -365,15 +376,17 @@ class Instagram
 
             $this->syncFeatures();
             $this->getAutoCompleteUserList();
+            $this->getReelsTrayFeed();
+            $this->getRecentRecipients();
             $this->getTimelineFeed();
             $this->getRankedRecipients();
-            $this->getRecentRecipients();
-            $this->getMegaphoneLog();
+            //push register
             $this->getV2Inbox();
             $this->getRecentActivity();
-            $this->getReelsTrayFeed();
-
-            return $this->getExplore();
+            $this->getVisualInbox();
+            //$this->getMegaphoneLog();
+            $this->getExplore();
+            //$this->getFacebookOTA();
         }
 
         // Act like a real logged in app client refreshing its news timeline.
@@ -529,7 +542,28 @@ class Instagram
             'users'                => $this->account_id,
         ]);
 
-        return $this->client->api('push/register/?platform=10&device_type=android_mqtt', Signatures::generateSignature($data))[1];
+        return $this->client->api('push/register/?platform=10&device_type=android_mqtt', Signatures::generateSignatureForPost($data))[1];
+    }
+
+    /**
+     * Get Facebook OTA.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FacebookOTAResponse
+     */
+    public function getFacebookOTA()
+    {
+        return $this->request('facebook_ota/')
+        ->addParams('fields', Constants::FACEBOOK_OTA_FIELDS)
+        ->addParams('custom_user_id', $this->account_id)
+        ->addParams('signed_body', Signatures::generateSignature('').'.')
+        ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
+        ->addParams('version_code', Constants::VERSION_CODE)
+        ->addParams('version_name', Constants::IG_VERSION)
+        ->addParams('custom_app_id', Constants::FACEBOOK_ORCA_APPLICATION_ID)
+        ->addParams('custom_device_id', $this->uuid)
+        ->getResponse(new Response\FacebookOTAResponse());
     }
 
     /**
@@ -626,6 +660,18 @@ class Instagram
     public function getPendingInbox()
     {
         return $this->request('direct_v2/pending_inbox')->getResponse(new Response\PendingInboxResponse());
+    }
+
+    /**
+     * Get visual inbox data.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\VisualInboxResponse
+     */
+    public function getVisualInbox()
+    {
+        return $this->request('direct_v2/visual_inbox')->getResponse(new Response\VisualInboxResponse());
     }
 
     /**
@@ -848,7 +894,7 @@ class Instagram
             '_csrftoken' => $this->token,
         ]);
 
-        return $this->client->api("direct_v2/threads/{$threadId}/{$threadAction}/", Signatures::generateSignature($data))[1];
+        return $this->client->api("direct_v2/threads/{$threadId}/{$threadAction}/", Signatures::generateSignatureForPost($data))[1];
     }
 
     /**

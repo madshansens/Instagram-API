@@ -12,4 +12,5 @@ class ReelsTrayFeedResponse extends \InstagramAPI\Response
      * @var Model\Broadcast[]
      */
     public $broadcasts;
+    public $sticker_version;
 }

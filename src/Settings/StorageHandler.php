@@ -28,6 +28,7 @@ class StorageHandler
         'device_id',
         'phone_id',
         'uuid',
+        'adid',
         'token',
         'last_login',
     ];

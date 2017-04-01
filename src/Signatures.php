@@ -7,9 +7,13 @@ class Signatures
     public static function generateSignature(
         $data)
     {
-        $hash = hash_hmac('sha256', $data, Constants::IG_SIG_KEY);
+        return hash_hmac('sha256', $data, Constants::IG_SIG_KEY);
+    }
 
-        return 'ig_sig_key_version='.Constants::SIG_KEY_VERSION.'&signed_body='.$hash.'.'.urlencode($data);
+    public static function generateSignatureForPost(
+        $data)
+    {
+        return 'ig_sig_key_version='.Constants::SIG_KEY_VERSION.'&signed_body='.self::generateSignature($data).'.'.urlencode($data);
     }
 
     public static function generateDeviceId()

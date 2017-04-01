@@ -97,7 +97,7 @@ class Request
 
         if ($this->_posts) {
             if ($this->_signedPost) {
-                $post = Signatures::generateSignature(json_encode($this->_posts));
+                $post = Signatures::generateSignatureForPost(json_encode($this->_posts));
             } else {
                 $post = http_build_query($this->_posts);
             }
