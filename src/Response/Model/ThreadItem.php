@@ -38,4 +38,9 @@ class ThreadItem extends \InstagramAPI\Response
     public $user_id;
     public $timestamp;
     public $client_context;
+    public $hide_in_thread;
+    /**
+     * @var ActionLog
+     */
+    public $action_log;
 }
