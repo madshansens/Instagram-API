@@ -382,6 +382,7 @@ class Instagram
 
             if (!$response->isOk() && $response->getTwoFactorRequired()) {
                 $this->token = $response->getFullResponse()[0];
+
                 return $response;
             } elseif (!$response->isOk()) {
                 throw new \InstagramAPI\Exception\LoginException($response->getMessage());
@@ -445,7 +446,6 @@ class Instagram
      *
      * @param bool $justLoggedIn
      * @param int  $appRefreshInterval
-     *
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
