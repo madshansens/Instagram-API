@@ -77,9 +77,6 @@ class Item extends \InstagramAPI\Response
      */
     public $likers;
     public $like_count;
-    /**
-     * @var string[]
-     */
     public $preview;
     public $has_liked;
     public $explore_context;
@@ -98,6 +95,9 @@ class Item extends \InstagramAPI\Response
      * @var Media
      */
     public $media;
+    /**
+     * @var Stories
+     */
     public $stories;
     public $top_likers;
     /**
@@ -124,6 +124,14 @@ class Item extends \InstagramAPI\Response
      */
     public $story_locations;
     public $algorithm;
+    /**
+     * @var Channel
+     */
+    public $channel;
+    /**
+     * @var Gating
+     */
+    public $gating;
 
     public function setMediaOrAd(
         $params)

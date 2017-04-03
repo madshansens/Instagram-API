@@ -25,4 +25,13 @@ class LoginResponse extends \InstagramAPI\Response
      * @var Model\User
      */
     public $logged_in_user;
+    public $two_factor_required;
+    /**
+     * @var Model\PhoneVerificationSettings
+     */
+    public $phone_verification_settings;
+    /**
+     * @var Model\TwoFactorInfo
+     */
+    public $two_factor_info;
 }

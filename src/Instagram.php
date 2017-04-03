@@ -319,6 +319,23 @@ class Instagram
     }
 
     /**
+     * Signup challenge is used to get _csrftoken in order to make a successful login or
+     * registration request.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ChallengeResponse
+     */
+    protected function _getSignupChallenge()
+    {
+        return $this->request('si/fetch_headers')
+        ->setNeedsAuth(false)
+        ->addParams('challenge_type', 'signup')
+        ->addParams('guid', str_replace('-', '', $this->uuid))
+        ->getResponse(new Response\ChallengeResponse(), true);
+    }
+
+    /**
      * Login to Instagram or automatically resume and refresh previous session.
      *
      * WARNING: You MUST run this function EVERY time your script runs! It handles automatic session
@@ -338,7 +355,7 @@ class Instagram
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\ExploreResponse
+     * @return \InstagramAPI\Response\LoginResponse
      */
     public function login(
         $forceLogin = false,
@@ -348,16 +365,13 @@ class Instagram
         if (!$this->isLoggedIn || $forceLogin) {
             $this->syncFeatures(true);
 
-            $response = $this->request('si/fetch_headers')
-            ->setNeedsAuth(false)
-            ->addParams('challenge_type', 'signup')
-            ->addParams('guid', str_replace('-', '', $this->uuid))
-            ->getResponse(new Response\ChallengeResponse(), true);
+            $signupChallenge = $this->_getSignupChallenge();
 
             $response = $this->request('accounts/login/')
             ->setNeedsAuth(false)
+            ->setCheckStatus(false)
             ->addPost('phone_id', $this->settings->get('phone_id'))
-            ->addPost('_csrftoken', $response->getFullResponse()[0])
+            ->addPost('_csrftoken', $signupChallenge->getFullResponse()[0])
             ->addPost('username', $this->username)
             ->addPost('guid', $this->uuid)
             ->addPost('adid', $this->adid)
@@ -365,6 +379,13 @@ class Instagram
             ->addPost('password', $this->password)
             ->addPost('login_attempt_count', 0)
             ->getResponse(new Response\LoginResponse(), true);
+
+            if (!$response->isOk() && $response->getTwoFactorRequired()) {
+                $this->token = $response->getFullResponse()[0];
+                return $response;
+            } elseif (!$response->isOk()) {
+                throw new \InstagramAPI\Exception\LoginException($response->getMessage());
+            }
 
             $this->isLoggedIn = true;
             $this->account_id = $response->getLoggedInUser()->getPk();
@@ -374,31 +395,66 @@ class Instagram
             $this->settings->set('token', $this->token);
             $this->settings->set('last_login', time());
 
-            $this->syncFeatures();
-            $this->getAutoCompleteUserList();
-            $this->getReelsTrayFeed();
-            $this->getRecentRecipients();
-            $this->getTimelineFeed();
-            $this->getRankedRecipients();
-            //push register
-            $this->getV2Inbox();
-            $this->getRecentActivity();
-            $this->getVisualInbox();
-            //$this->getMegaphoneLog();
-            $this->getExplore();
-            //$this->getFacebookOTA();
+            $this->_sendLoginFlow(true, $appRefreshInterval);
         }
 
-        // Act like a real logged in app client refreshing its news timeline.
-        // This also lets us detect if we're still logged in with a valid session.
-        try {
-            $this->getTimelineFeed();
-        } catch (\InstagramAPI\Exception\LoginRequiredException $e) {
-            // If our session cookies are expired, we were now told to login,
-            // so handle that by running a forced relogin in that case!
-            return $this->login(true, $appRefreshInterval);
-        }
+        $this->_sendLoginFlow(false, $appRefreshInterval);
+    }
 
+    /**
+     * Login to Instagram using two factor authentication.
+     *
+     * @param string $verificationCode    Verification code you have received via SMS.
+     * @param string $twoFactorIdentifier Two factor identifier, obtained in login() response. Format: 123456.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\LoginResponse
+     */
+    public function twoFactorLogin(
+        $verificationCode,
+        $twoFactorIdentifier)
+    {
+        $verificationCode = trim(str_replace(' ', '', $verificationCode));
+
+        $response = $this->request('accounts/two_factor_login/')
+        ->setNeedsAuth(false)
+        ->addPost('verification_code', $verificationCode)
+        ->addPost('two_factor_identifier', $twoFactorIdentifier)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('username', $this->username)
+        ->addPost('device_id', $this->device_id)
+        ->addPost('password', $this->password)
+        ->getResponse(new Response\LoginResponse(), true);
+
+        $this->isLoggedIn = true;
+        $this->account_id = $response->getLoggedInUser()->getPk();
+        $this->settings->set('account_id', $this->account_id);
+        $this->rank_token = $this->account_id.'_'.$this->uuid;
+        $this->token = $response->getFullResponse()[0];
+        $this->settings->set('token', $this->token);
+        $this->settings->set('last_login', time());
+
+        $this->_sendLoginFlow(true);
+
+        return $response;
+    }
+
+    /**
+     * Sends login flow. This is required to emulate real device behavior.
+     *
+     * @param bool $justLoggedIn
+     * @param int  $appRefreshInterval
+     *
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\LoginRequiredException
+     */
+    protected function _sendLoginFlow(
+        $justLoggedIn,
+        $appRefreshInterval = 1800)
+    {
         // SUPER IMPORTANT:
         //
         // STOP trying to ask us to remove this code section!
@@ -418,24 +474,50 @@ class Instagram
         // or even ban you.
         //
         // You have been warned.
-        if ($appRefreshInterval > 21600) {
-            throw new \InvalidArgumentException("Instagram's app state refresh interval is NOT allowed to be higher than 6 hours, and the lower the better!");
-        }
-        $lastLoginTime = $this->settings->get('last_login');
-        if (is_null($lastLoginTime) || (time() - $lastLoginTime) > $appRefreshInterval) {
-            $this->settings->set('last_login', time());
-
+        if ($justLoggedIn) {
+            $this->syncFeatures();
             $this->getAutoCompleteUserList();
             $this->getReelsTrayFeed();
+            $this->getRecentRecipients();
+            $this->getTimelineFeed();
             $this->getRankedRecipients();
             //push register
-            $this->getRecentRecipients();
-            //push register
-            $this->getMegaphoneLog();
             $this->getV2Inbox();
             $this->getRecentActivity();
+            $this->getVisualInbox();
+            //$this->getMegaphoneLog();
+            $this->getExplore();
+            //$this->getFacebookOTA();
+        } else {
+            // Act like a real logged in app client refreshing its news timeline.
+            // This also lets us detect if we're still logged in with a valid session.
+            try {
+                $this->getTimelineFeed();
+            } catch (\InstagramAPI\Exception\LoginRequiredException $e) {
+                // If our session cookies are expired, we were now told to login,
+                // so handle that by running a forced relogin in that case!
+                return $this->login(true, $appRefreshInterval);
+            }
 
-            return $this->getExplore();
+            if ($appRefreshInterval > 21600) {
+                throw new \InvalidArgumentException("Instagram's app state refresh interval is NOT allowed to be higher than 6 hours, and the lower the better!");
+            }
+
+            $lastLoginTime = $this->settings->get('last_login');
+            if (is_null($lastLoginTime) || (time() - $lastLoginTime) > $appRefreshInterval) {
+                $this->settings->set('last_login', time());
+
+                $this->getAutoCompleteUserList();
+                $this->getReelsTrayFeed();
+                $this->getRankedRecipients();
+                //push register
+                $this->getRecentRecipients();
+                //push register
+                $this->getMegaphoneLog();
+                $this->getV2Inbox();
+                $this->getRecentActivity();
+                $this->getExplore();
+            }
         }
     }
 
@@ -457,6 +539,98 @@ class Instagram
     public function logout()
     {
         return $this->request('accounts/logout/')->getResponse(new Response\LogoutResponse());
+    }
+
+    /**
+     * Sends a SMS to your phone number. The SMS have a verification code
+     * that will be used to enable two factor authentication in your account.
+     *
+     * @param string $phoneNumber Phone number with country code. Fomat: +34123456789.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\RequestTwoFactorResponse
+     */
+    public function requestTwoFactor(
+        $phoneNumber)
+    {
+        if (strpos($phoneNumber, '+') === false) {
+            $phoneNumber = '+'.$phoneNumber;
+        }
+
+        return $this->request('accounts/send_two_factor_enable_sms/')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->account_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('device_id', $this->device_id)
+        ->addPost('phone_number', $phoneNumber)
+        ->getResponse(new Response\RequestTwoFactorResponse());
+    }
+
+    /**
+     * Enable Two Factor authentication.
+     *
+     * @param string $phoneNumber      Phone number with country code. Fomat: +34123456789.
+     * @param string $verificationCode
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\AccountSecurityInfoResponse
+     */
+    public function enableTwoFactor(
+        $phoneNumber,
+        $verificationCode)
+    {
+        if (strpos($phoneNumber, '+') === false) {
+            $phoneNumber = '+'.$phoneNumber;
+        }
+
+        $response = $this->request('accounts/enable_sms_two_factor/')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->account_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('device_id', $this->device_id)
+        ->addPost('phone_number', $phoneNumber)
+        ->addPost('verification_code', $verificationCode)
+        ->getResponse(new Response\EnableTwoFactorResponse());
+
+        return $this->getAccountSecurityInfo();
+    }
+
+    /**
+     * Disable Two Factor authentication.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\DisableTwoFactorResponse
+     */
+    public function disableTwoFactor()
+    {
+        return $this->request('accounts/disable_sms_two_factor/')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->account_id)
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new Response\DisableTwoFactorResponse());
+    }
+
+    /**
+     * Get account security info and backup codes.
+     * WARNING: STORE AND KEEP BACKUP CODES IN A SAFE PLACE. YOU WILL GET THE CODES
+     *          IN THE RESPONSE.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\AccountSecurityInfoResponse
+     *
+     * @see enableTwoFactor()
+     */
+    public function getAccountSecurityInfo()
+    {
+        return $this->request('accounts/account_security_info/')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->account_id)
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new Response\AccountSecurityInfoResponse());
     }
 
     /**
