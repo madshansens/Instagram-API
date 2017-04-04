@@ -24,4 +24,6 @@ class Args extends \InstagramAPI\Response
      */
     public $comment_id;
     public $request_count;
+    public $action_url;
+    public $destination;
 }
