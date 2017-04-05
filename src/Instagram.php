@@ -2,6 +2,8 @@
 
 namespace InstagramAPI;
 
+use InstagramAPI\Exception\ServerMessageThrower;
+
 /**
  * Instagram's Private API v2.
  *
@@ -367,6 +369,7 @@ class Instagram
 
             $signupChallenge = $this->_getSignupChallenge();
 
+            $baseClass = new Response\LoginResponse();
             $response = $this->request('accounts/login/')
             ->setNeedsAuth(false)
             ->setCheckStatus(false)
@@ -378,14 +381,18 @@ class Instagram
             ->addPost('device_id', $this->device_id)
             ->addPost('password', $this->password)
             ->addPost('login_attempt_count', 0)
-            ->getResponse(new Response\LoginResponse(), true);
+            ->getResponse($baseClass, true);
 
-            if (!$response->isOk() && $response->getTwoFactorRequired()) {
-                $this->token = $response->getFullResponse()[0];
+            if (!$response->isOk()) {
+                if ($response->getTwoFactorRequired()) {
+                    // Login failed because two-factor login is required.
+                    $this->token = $response->getFullResponse()[0];
 
-                return $response;
-            } elseif (!$response->isOk()) {
-                throw new \InstagramAPI\Exception\LoginException($response->getMessage());
+                    return $response;
+                } else {
+                    // Login failed for some other reason... Throw error.
+                    ServerMessageThrower::autoThrow(get_class($baseClass), $response->getMessage());
+                }
             }
 
             $this->isLoggedIn = true;
