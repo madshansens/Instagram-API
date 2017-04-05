@@ -1799,7 +1799,7 @@ class Instagram
                     'date_time_digitized' => $date,
                     'geotag_enabled'      => false,
                     'camera_position'     => 'back',
-                    'edits', [
+                    'edits' => [
                         'filter_strength' => 1,
                         'filter_name'     => 'IGNormalFilter',
                     ],
@@ -1828,10 +1828,10 @@ class Instagram
                     'upload_id'           => $uploadId,
                     'source_type'         => 'library',
                     'geotag_enabled'      => false,
-                    'edits', [
-                        'length'          => 0.00, // TODO! Should this always be zero?
+                    'edits' => [
+                        'length'          => round($videoDetails['duration'], 1),
                         'cinema'          => 'unsupported',
-                        'original_length' => 0.00,
+                        'original_length' => round($videoDetails['duration'], 1),
                         'source_type'     => 'library',
                         'start_time'      => 0,
                         'camera_position' => 'unknown',
