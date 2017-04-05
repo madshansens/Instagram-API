@@ -1799,7 +1799,7 @@ class Instagram
                     'date_time_digitized' => $date,
                     'geotag_enabled'      => false,
                     'camera_position'     => 'back',
-                    'edits' => [
+                    'edits'               => [
                         'filter_strength' => 1,
                         'filter_name'     => 'IGNormalFilter',
                     ],
@@ -1828,7 +1828,7 @@ class Instagram
                     'upload_id'           => $uploadId,
                     'source_type'         => 'library',
                     'geotag_enabled'      => false,
-                    'edits' => [
+                    'edits'               => [
                         'length'          => round($videoDetails['duration'], 1),
                         'cinema'          => 'unsupported',
                         'original_length' => round($videoDetails['duration'], 1),
