@@ -36,4 +36,5 @@ class CarouselMedia extends \InstagramAPI\Response
      * @var Usertag
      */
     public $usertags;
+    public $preview;
 }
