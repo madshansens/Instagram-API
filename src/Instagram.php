@@ -2166,6 +2166,7 @@ class Instagram
         ->addPost('_csrftoken', $this->token)
         ->addPost('comment_text', $commentText)
         ->addPost('containermodule', 'comments_feed_timeline')
+        ->addPost('radio_type', 'wifi-none')
         ->getResponse(new Response\CommentResponse());
     }
 
@@ -3543,6 +3544,22 @@ class Instagram
         ->addParams('q', $query)
         ->addParams('rank_token', $this->rank_token)
         ->getResponse(new Response\SearchTagResponse());
+    }
+
+    /**
+     * Send a confirmation to verify your email.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\SendConfirmEmailResponse
+     */
+    public function sendConfirmEmail()
+    {
+        return $this->request('accounts/send_confirm_email/')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('send_source', 'profile_megaphone')
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new Response\SendConfirmEmailResponse());
     }
 
     /**

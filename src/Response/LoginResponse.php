@@ -34,4 +34,6 @@ class LoginResponse extends \InstagramAPI\Response
      * @var Model\TwoFactorInfo
      */
     public $two_factor_info;
+    public $checkpoint_url;
+    public $lock;
 }

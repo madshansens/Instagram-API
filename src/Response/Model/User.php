@@ -101,4 +101,5 @@ class User extends \InstagramAPI\Response
     public $gender; // getCurrentUser prop
     public $phone_number; // getCurrentUser prop
     public $needs_email_confirm; // getCurrentUser prop
+    public $is_active;
 }

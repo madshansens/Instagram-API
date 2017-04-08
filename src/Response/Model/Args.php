@@ -26,4 +26,8 @@ class Args extends \InstagramAPI\Response
     public $request_count;
     public $action_url;
     public $destination;
+    /**
+     * @var InlineFollow
+     */
+    public $inline_follow;
 }
