@@ -1999,7 +1999,7 @@ class Instagram
     /**
      * Get saved media items feed.
      *
-     * @param null|string $maxId  Next "maximum ID", used for pagination.
+     * @param null|string $maxId Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
