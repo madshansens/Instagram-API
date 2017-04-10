@@ -1999,18 +1999,26 @@ class Instagram
     /**
      * Get saved media items feed.
      *
+     * @param null|string $maxId Next "maximum ID", used for pagination.
+     *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\SavedFeedResponse
      */
-    public function getSavedFeed()
+    public function getSavedFeed(
+        $maxId = null)
     {
-        return $this->request('feed/saved/')
+        $requestData = $this->request('feed/saved/')
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
-        ->setSignedPost(true)
-        ->getResponse(new Response\SavedFeedResponse());
+        ->setSignedPost(true);
+
+        if (!is_null($maxId)) {
+            $requestData->addParams('max_id', $maxId);
+        }
+
+        return $requestData->getResponse(new Response\SavedFeedResponse());
     }
 
     /**
