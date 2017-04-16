@@ -463,6 +463,10 @@ class Instagram
         $justLoggedIn,
         $appRefreshInterval = 1800)
     {
+        if ($appRefreshInterval > 21600) {
+            throw new \InvalidArgumentException("Instagram's app state refresh interval is NOT allowed to be higher than 6 hours, and the lower the better!");
+        }
+
         // SUPER IMPORTANT:
         //
         // STOP trying to ask us to remove this code section!
@@ -505,10 +509,6 @@ class Instagram
                 // If our session cookies are expired, we were now told to login,
                 // so handle that by running a forced relogin in that case!
                 return $this->login(true, $appRefreshInterval);
-            }
-
-            if ($appRefreshInterval > 21600) {
-                throw new \InvalidArgumentException("Instagram's app state refresh interval is NOT allowed to be higher than 6 hours, and the lower the better!");
             }
 
             $lastLoginTime = $this->settings->get('last_login');
