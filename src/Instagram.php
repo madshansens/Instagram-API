@@ -407,6 +407,8 @@ class Instagram
         }
 
         $this->_sendLoginFlow(false, $appRefreshInterval);
+
+        return $response;
     }
 
     /**
