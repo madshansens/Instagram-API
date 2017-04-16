@@ -78,11 +78,16 @@ class Instagram
     public $uuid;
 
     /**
-     * Google Ad Id.
+     * Google Play Advertising ID.
+     *
+     * The advertising ID is a unique ID for advertising, provided by Google
+     * Play services for use in Google Play apps. Used by Instagram.
      *
      * @var string
+     *
+     * @see https://support.google.com/googleplay/android-developer/answer/6048248?hl=en
      */
-    public $adid;
+    public $advertising_id;
 
     /**
      * Device ID.
@@ -197,7 +202,7 @@ class Instagram
         // dangerously reusing the "previous phone's" unique hardware IDs.
         $resetCookieJar = false;
         if ($deviceString !== $savedDeviceString
-            || empty($this->settings->get('adid'))
+            || empty($this->settings->get('advertising_id'))
             || empty($this->settings->get('uuid'))
             || empty($this->settings->get('phone_id'))
             || empty($this->settings->get('device_id'))) {
@@ -205,7 +210,7 @@ class Instagram
             $this->settings->set('device_id', Signatures::generateDeviceId());
             $this->settings->set('phone_id', Signatures::generateUUID(true));
             $this->settings->set('uuid', Signatures::generateUUID(true));
-            $this->settings->set('adid', Signatures::generateUUID(true));
+            $this->settings->set('advertising_id', Signatures::generateUUID(true));
 
             // Remove the previous hardware's login details to force a relogin.
             $this->settings->set('account_id', '');
@@ -220,7 +225,7 @@ class Instagram
         $this->username = $username;
         $this->password = $password;
         $this->uuid = $this->settings->get('uuid');
-        $this->adid = $this->settings->get('adid');
+        $this->advertising_id = $this->settings->get('advertising_id');
         $this->device_id = $this->settings->get('device_id');
 
         // Load the previous session details if we're possibly logged in.
@@ -377,7 +382,7 @@ class Instagram
             ->addPost('_csrftoken', $signupChallenge->getFullResponse()[0])
             ->addPost('username', $this->username)
             ->addPost('guid', $this->uuid)
-            ->addPost('adid', $this->adid)
+            ->addPost('adid', $this->advertising_id)
             ->addPost('device_id', $this->device_id)
             ->addPost('password', $this->password)
             ->addPost('login_attempt_count', 0)

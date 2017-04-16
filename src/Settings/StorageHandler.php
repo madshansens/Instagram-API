@@ -25,12 +25,12 @@ class StorageHandler
     const PERSISTENT_KEYS = [
         'account_id', // The numerical UserPK ID of the account.
         'devicestring', // Which Android device they're identifying as.
-        'device_id',
-        'phone_id',
-        'uuid',
-        'adid',
-        'token',
-        'last_login',
+        'device_id', // Hardware identifier.
+        'phone_id', // Hardware identifier.
+        'uuid', // Universally unique identifier.
+        'token', // CSRF token for the logged in session.
+        'advertising_id', // Google Play advertising ID.
+        'last_login', // Tracks time elapsed since our last login state refresh.
     ];
 
     /** @var StorageInterface The active storage backend. */
@@ -195,9 +195,11 @@ class StorageHandler
         // Retrieve any existing settings for the user from the backend.
         $loadedSettings = $this->_storage->loadUserSettings();
         foreach ($loadedSettings as $key => $value) {
-            // Map renamed old-school v1.x keys to new v2.x key names.
+            // Map renamed old-school keys to new key names.
             if ($key == 'username_id') {
                 $key = 'account_id';
+            } elseif ($key == 'adid') {
+                $key = 'advertising_id';
             }
 
             // Only keep values for keys that are still in use. Discard others.
