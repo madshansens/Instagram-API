@@ -350,7 +350,7 @@ class Instagram
      *                                 state", by asking for extended account state details.
      *                                 Default: After 1800 seconds, meaning 30 minutes since the
      *                                 last state-refreshing login() call.
-     *                                 This CANNOT be longer than 6 hours. Read code to see why!
+     *                                 This CANNOT be longer than 6 hours. Read _sendLoginFlow()!
      *                                 The shorter your delay is the BETTER. You may even want to
      *                                 set it to an even LOWER value than the default 30 minutes!
      *
@@ -456,7 +456,6 @@ class Instagram
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
-     * @throws \InstagramAPI\Exception\LoginRequiredException
      */
     protected function _sendLoginFlow(
         $justLoggedIn,
@@ -549,14 +548,18 @@ class Instagram
     }
 
     /**
-     * Sends a SMS to your phone number. The SMS have a verification code
-     * that will be used to enable two factor authentication in your account.
+     * Request that Instagram enables two factor SMS authentication.
      *
-     * @param string $phoneNumber Phone number with country code. Fomat: +34123456789.
+     * The SMS will have a verification code for enabling two factor SMS
+     * authentication. You must then give that code to enableTwoFactor().
+     *
+     * @param string $phoneNumber Phone number with country code. Format: +34123456789.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\RequestTwoFactorResponse
+     *
+     * @see enableTwoFactor()
      */
     public function requestTwoFactor(
         $phoneNumber)
@@ -577,12 +580,14 @@ class Instagram
     /**
      * Enable Two Factor authentication.
      *
-     * @param string $phoneNumber      Phone number with country code. Fomat: +34123456789.
-     * @param string $verificationCode
+     * @param string $phoneNumber      Phone number with country code. Format: +34123456789.
+     * @param string $verificationCode The code sent to your phone via requestTwoFactor().
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\AccountSecurityInfoResponse
+     *
+     * @see requestTwoFactor()
      */
     public function enableTwoFactor(
         $phoneNumber,
@@ -622,8 +627,9 @@ class Instagram
 
     /**
      * Get account security info and backup codes.
-     * WARNING: STORE AND KEEP BACKUP CODES IN A SAFE PLACE. YOU WILL GET THE CODES
-     *          IN THE RESPONSE.
+     *
+     * WARNING: STORE AND KEEP BACKUP CODES IN A SAFE PLACE.
+     *          YOU WILL GET THE CODES IN THE RESPONSE.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -3555,7 +3561,7 @@ class Instagram
     }
 
     /**
-     * Send a confirmation to verify your email.
+     * Tell Instagram to send you a message to verify your email address.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *

@@ -21,9 +21,9 @@ try {
     if (!is_null($loginResponse) && $loginResponse->getTwoFactorRequired()) {
         $twoFactorIdentifier = $loginResponse->getTwoFactorInfo()->getTwoFactorIdentifier();
 
-         // I added this line so i could write in the code in CLI.
-         // You can replace this line with the logic you want.
-         // Verification code will be received via SMS.
+         // The "STDIN" lets you paste the code via terminal for testing.
+         // You should replace this line with the logic you want.
+         // The verification code will be sent by Instagram via SMS.
         $verificationCode = trim(fgets(STDIN));
         $ig->twoFactorLogin($verificationCode, $twoFactorIdentifier);
     }
