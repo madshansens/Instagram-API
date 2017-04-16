@@ -415,13 +415,7 @@ class Instagram
                 }
             }
 
-            $this->isLoggedIn = true;
-            $this->account_id = $response->getLoggedInUser()->getPk();
-            $this->settings->set('account_id', $this->account_id);
-            $this->rank_token = $this->account_id.'_'.$this->uuid;
-            $this->token = $response->getFullResponse()[0];
-            $this->settings->set('token', $this->token);
-            $this->settings->set('last_login', time());
+            $this->_updateLoginState($response);
 
             $this->_sendLoginFlow(true, $appRefreshInterval);
         }
@@ -457,6 +451,31 @@ class Instagram
         ->addPost('password', $this->password)
         ->getResponse(new Response\LoginResponse(), true);
 
+        $this->_updateLoginState($response);
+
+        $this->_sendLoginFlow(true);
+
+        return $response;
+    }
+
+    /**
+     * Updates the internal state after a successful login.
+     *
+     * @param Response\LoginResponse $response The login response.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     */
+    protected function _updateLoginState(
+        Response\LoginResponse $response)
+    {
+        // This check is just protection against accidental bugs. It makes sure
+        // that we always call this function with a *successful* login response!
+        if (!$response instanceof Response\LoginResponse
+            || !$response->isOk()) {
+            throw new \InvalidArgumentException('Invalid login response provided to _updateLoginState().');
+        }
+
         $this->isLoggedIn = true;
         $this->account_id = $response->getLoggedInUser()->getPk();
         $this->settings->set('account_id', $this->account_id);
@@ -464,10 +483,6 @@ class Instagram
         $this->token = $response->getFullResponse()[0];
         $this->settings->set('token', $this->token);
         $this->settings->set('last_login', time());
-
-        $this->_sendLoginFlow(true);
-
-        return $response;
     }
 
     /**
