@@ -200,17 +200,21 @@ class Instagram
         // from settings, OR if any of the stored fingerprints are missing.
         // NOTE: The regeneration when our device model changes is to avoid
         // dangerously reusing the "previous phone's" unique hardware IDs.
+        // WARNING TO CONTRIBUTORS: Only add new parameter-checks here if they
+        // are CRITICALLY important to the particular device. We don't want to
+        // frivolously force the users to generate new device IDs constantly.
         $resetCookieJar = false;
-        if ($deviceString !== $savedDeviceString
-            || empty($this->settings->get('advertising_id'))
-            || empty($this->settings->get('uuid'))
-            || empty($this->settings->get('phone_id'))
-            || empty($this->settings->get('device_id'))) {
+        if ($deviceString !== $savedDeviceString // Brand new device, or missing
+            || empty($this->settings->get('uuid')) // one of the critically...
+            || empty($this->settings->get('phone_id')) // ...important device...
+            || empty($this->settings->get('device_id'))) { // ...parameters.
             // Generate new hardware fingerprints.
             $this->settings->set('device_id', Signatures::generateDeviceId());
             $this->settings->set('phone_id', Signatures::generateUUID(true));
             $this->settings->set('uuid', Signatures::generateUUID(true));
-            $this->settings->set('advertising_id', Signatures::generateUUID(true));
+
+            // Clear other params we also need to regenerate for the new device.
+            $this->settings->set('advertising_id', '');
 
             // Remove the previous hardware's login details to force a relogin.
             $this->settings->set('account_id', '');
@@ -221,7 +225,18 @@ class Instagram
             $resetCookieJar = true;
         }
 
-        // Store various important parameters.
+        // Generate other missing values. These are for less critical parameters
+        // that don't need to trigger a complete device reset like above. For
+        // example, this is good for new parameters that Instagram introduces
+        // over time, since those can be added one-by-one over time without
+        // needing to wipe/reset the whole device. Just be sure to also add them
+        // to the "clear other params" section above so that these are always
+        // properly regenerated whenever the user's whole "device" changes.
+        if (empty($this->settings->get('advertising_id'))) {
+            $this->settings->set('advertising_id', Signatures::generateUUID(true));
+        }
+
+        // Store various important parameters for easy access.
         $this->username = $username;
         $this->password = $password;
         $this->uuid = $this->settings->get('uuid');
