@@ -330,7 +330,7 @@ class Instagram
      */
     protected function _getSignupChallenge()
     {
-        return $this->request('si/fetch_headers')
+        return $this->request('si/fetch_headers/')
         ->setNeedsAuth(false)
         ->addParams('challenge_type', 'signup')
         ->addParams('guid', str_replace('-', '', $this->uuid))
