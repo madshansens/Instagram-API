@@ -590,6 +590,7 @@ class Instagram
      * @return \InstagramAPI\Response\AccountSecurityInfoResponse
      *
      * @see requestTwoFactor()
+     * @see getAccountSecurityInfo()
      */
     public function enableTwoFactor(
         $phoneNumber,
@@ -630,8 +631,10 @@ class Instagram
     /**
      * Get account security info and backup codes.
      *
-     * WARNING: STORE AND KEEP BACKUP CODES IN A SAFE PLACE.
-     *          YOU WILL GET THE CODES IN THE RESPONSE.
+     * WARNING: STORE AND KEEP BACKUP CODES IN A SAFE PLACE. THEY ARE EXTREMELY
+     *          IMPORTANT! YOU WILL GET THE CODES IN THE RESPONSE. THE BACKUP
+     *          CODES LET YOU REGAIN CONTROL OF YOUR ACCOUNT IF YOU LOSE THE
+     *          PHONE NUMBER! WITHOUT THE CODES, YOU RISK LOSING YOUR ACCOUNT!
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
