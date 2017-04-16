@@ -406,6 +406,8 @@ class Instagram
             if (!$response->isOk()) {
                 if ($response->getTwoFactorRequired()) {
                     // Login failed because two-factor login is required.
+                    // NOTE: We NEED this token in twoFactorLogin() but we'll
+                    // only save it to settings storage AFTER successful login!
                     $this->token = $response->getFullResponse()[0];
 
                     return $response;
