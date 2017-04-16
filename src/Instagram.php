@@ -411,6 +411,7 @@ class Instagram
                     // only save it to settings storage AFTER successful login!
                     $this->token = $response->getFullResponse()[0];
 
+                    // Return server response to tell user they need 2-factor.
                     return $response;
                 } else {
                     // Login failed for some other reason... Throw error.
@@ -421,9 +422,14 @@ class Instagram
             $this->_updateLoginState($response);
 
             $this->_sendLoginFlow(true, $appRefreshInterval);
+
+            // Full (re-)login successfully completed. Return server response.
+            return $response;
         }
 
-        $this->_sendLoginFlow(false, $appRefreshInterval);
+        // Attempt to resume an existing session, or full re-login if necessary.
+        // NOTE: The "return" here gives a LoginResponse in case of re-login.
+        return $this->_sendLoginFlow(false, $appRefreshInterval);
     }
 
     /**
@@ -494,6 +500,9 @@ class Instagram
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\LoginResponse|null A login response if a full (re-)login is needed
+     *                                                   during the login flow attempt, otherwise NULL.
      */
     protected function _sendLoginFlow(
         $justLoggedIn,
