@@ -377,7 +377,8 @@ class Instagram
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\LoginResponse
+     * @return \InstagramAPI\Response\LoginResponse|null A login response if a full (re-)login happens,
+     *                                                   otherwise NULL if an existing session is resumed.
      */
     public function login(
         $forceLogin = false,
@@ -423,8 +424,6 @@ class Instagram
         }
 
         $this->_sendLoginFlow(false, $appRefreshInterval);
-
-        return $response;
     }
 
     /**
