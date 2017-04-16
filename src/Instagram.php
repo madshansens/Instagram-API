@@ -566,16 +566,14 @@ class Instagram
     public function requestTwoFactor(
         $phoneNumber)
     {
-        if (strpos($phoneNumber, '+') === false) {
-            $phoneNumber = '+'.$phoneNumber;
-        }
+        $cleanNumber = '+'.preg_replace('/[^0-9]/', '', $phoneNumber);
 
         return $this->request('accounts/send_two_factor_enable_sms/')
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('device_id', $this->device_id)
-        ->addPost('phone_number', $phoneNumber)
+        ->addPost('phone_number', $cleanNumber)
         ->getResponse(new Response\RequestTwoFactorResponse());
     }
 
@@ -596,16 +594,14 @@ class Instagram
         $phoneNumber,
         $verificationCode)
     {
-        if (strpos($phoneNumber, '+') === false) {
-            $phoneNumber = '+'.$phoneNumber;
-        }
+        $cleanNumber = '+'.preg_replace('/[^0-9]/', '', $phoneNumber);
 
         $response = $this->request('accounts/enable_sms_two_factor/')
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
         ->addPost('device_id', $this->device_id)
-        ->addPost('phone_number', $phoneNumber)
+        ->addPost('phone_number', $cleanNumber)
         ->addPost('verification_code', $verificationCode)
         ->getResponse(new Response\EnableTwoFactorResponse());
 
