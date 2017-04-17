@@ -18,7 +18,7 @@ try {
     $ig->setUser($username, $password);
     $loginResponse = $ig->login();
 
-    if ($loginResponse->getTwoFactorRequired()) {
+    if (!is_null($loginResponse) && $loginResponse->getTwoFactorRequired()) {
         $twoFactorIdentifier = $loginResponse->getTwoFactorInfo()->getTwoFactorIdentifier();
 
          // The "STDIN" lets you paste the code via terminal for testing.
