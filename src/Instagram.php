@@ -1273,7 +1273,7 @@ class Instagram
         $internalMetadata['uploadId'] = $uploadParams['uploadId'];
 
         // Attempt to upload the video data.
-        $upload = $this->client->uploadVideoData($targetFeed, $videoFilename, $uploadParams, $maxAttempts);
+        $upload = $this->client->uploadVideoChunks($targetFeed, $videoFilename, $uploadParams, $maxAttempts);
 
         // Attempt to upload the thumbnail, associated with our video's ID.
         $this->client->uploadPhotoData($targetFeed, $videoFilename, 'videofile', $uploadParams['uploadId']);
@@ -1422,7 +1422,7 @@ class Instagram
                 $media[$key]['internalMetadata']['uploadId'] = $uploadParams['uploadId'];
 
                 // Attempt to upload the video data.
-                $this->client->uploadVideoData('album', $item['file'], $uploadParams, $maxAttempts);
+                $this->client->uploadVideoChunks('album', $item['file'], $uploadParams, $maxAttempts);
 
                 // Attempt to upload the thumbnail, associated with our video's ID.
                 $this->client->uploadPhotoData('album', $item['file'], 'videofile', $uploadParams['uploadId']);
