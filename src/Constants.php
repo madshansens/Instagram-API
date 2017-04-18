@@ -25,7 +25,7 @@ class Constants
     const X_IG_Capabilities = '3boBAA==';
 
     // Facebook Constants.
-    const FACEBOOK_OTA_FIELDS = 'update%257Bdownload_uri%252Cdownload_uri_delta_base%252Cversion_code_delta_base%252Cdownload_uri_delta%252Cfallback_to_full_update%252Cfile_size_delta%252Cversion_code%252Cpublished_date%252Cfile_size%252Cota_bundle_type%252Cresources_checksum%257D';
+    const FACEBOOK_OTA_FIELDS = 'update%7Bdownload_uri%2Cdownload_uri_delta_base%2Cversion_code_delta_base%2Cdownload_uri_delta%2Cfallback_to_full_update%2Cfile_size_delta%2Cversion_code%2Cpublished_date%2Cfile_size%2Cota_bundle_type%2Cresources_checksum%7D';
     const FACEBOOK_ORCA_PROTOCOL_VERSION = 20150314;
     const FACEBOOK_ORCA_APPLICATION_ID = '124024574287414';
 
