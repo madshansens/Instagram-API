@@ -734,13 +734,15 @@ class Instagram
         // Instagram REQUIRES that you wait several minutes between calls to it.
         try {
             $request = $this->request('friendships/autocomplete_user_list/')
-            ->setCheckStatus(false)
             ->addParams('version', '2');
 
             return $request->getResponse(new Response\AutoCompleteUserListResponse());
         } catch (\InstagramAPI\Exception\ThrottledException $e) {
             // Throttling is so common that we'll simply return NULL in that case.
             return;
+        } catch (\InstagramAPI\Exception\InstagramException $e) {
+            // If any other errors happen, we'll still return the server reply.
+            return $e->getResponse();
         }
     }
 
