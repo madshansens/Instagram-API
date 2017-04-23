@@ -2,6 +2,8 @@
 
 namespace InstagramAPI\Exception;
 
+use \InstagramAPI\Response;
+
 /**
  * Parses Instagram's API error messages and throws an appropriate exception.
  *
@@ -20,13 +22,16 @@ class ServerMessageThrower
      * Note that not all exceptions are listed below. Some are thrown via other
      * methods than this automatic message parser.
      *
-     * WARNING TO CONTRIBUTORS: Do not "contribute" a bunch of function-specific
-     * garbage exceptions here, such as "User not found", "No permission to view
-     * profile" or other garbage. Those messages are human-readable, unreliable
-     * and are also totally non-critical. You should handle them yourself in
-     * your end-user applications by simply catching their EndpointException and
-     * looking at the contents of its getMessage() property. The exceptions
-     * listed below are *critical* exceptions related to the CORE of the API!
+     * WARNING TO CONTRIBUTORS: Do NOT "contribute" a bunch of endpoint function
+     * specific garbage exceptions here, such as "User not found", "Duplicate
+     * comment", "No permission to view profile" or other garbage. Those server
+     * messages are human-readable, unreliable (they can change at any time) and
+     * are also totally non-critical. You should handle them yourself in your
+     * end-user applications by simply catching their EndpointException and
+     * looking at the contents of its getMessage() property, or checking if it
+     * hasResponse() and then getResponse() to see the full server response. The
+     * exceptions listed below are *critical* exceptions related to the CORE of
+     * the API! Nothing else.
      *
      * @var array
      */
@@ -52,62 +57,64 @@ class ServerMessageThrower
      *
      * Uses the generic EndpointException if no other exceptions match.
      *
-     * @param string|null $prefixString  What prefix to use for the message in
-     *                                   the final exception. Should be something
-     *                                   helpful such as the name of the class or
-     *                                   function which threw. Can be NULL.
-     * @param string      $serverMessage The failure string from Instagram's API.
+     * @param string|null   $prefixString   What prefix to use for the message in
+     *                                      the final exception. Should be something
+     *                                      helpful such as the name of the class or
+     *                                      function which threw. Can be NULL.
+     * @param string        $serverMessage  The failure string from Instagram's API.
+     * @param Response|null $serverResponse The complete server response object,
+     *                                      if one is available (optional).
      *
      * @throws InstagramException The appropriate exception.
      */
     public static function autoThrow(
         $prefixString,
-        $serverMessage)
+        $serverMessage,
+        Response $serverResponse = null)
     {
         // Some Instagram messages already have punctuation, and others need it.
         $serverMessage = self::prettifyMessage($serverMessage);
 
-        // Now search for the server message in our CRITICAL exception table.
-        foreach (self::EXCEPTION_MAP as $exceptionClass => $patterns) {
+        // Generic "API function exception" if no critical exception is found.
+        $exceptionClass = 'EndpointException';
+
+        // Now check if the server message is in our CRITICAL exception table.
+        foreach (self::EXCEPTION_MAP as $className => $patterns) {
             foreach ($patterns as $pattern) {
                 if ($pattern[0] == '/') {
                     // Regex check.
                     if (preg_match($pattern, $serverMessage)) {
-                        return self::_throw($exceptionClass, $prefixString, $serverMessage);
+                        $exceptionClass = $className;
+                        break 2;
                     }
                 } else {
                     // Regular string search.
                     if (strpos($serverMessage, $pattern) !== false) {
-                        return self::_throw($exceptionClass, $prefixString, $serverMessage);
+                        $exceptionClass = $className;
+                        break 2;
                     }
                 }
             }
         }
 
-        // No critical exception found. Use a generic "API function exception".
-        throw new EndpointException($serverMessage);
-    }
-
-    /**
-     * Internal function which performs the actual throwing.
-     *
-     * @param string      $exceptionClass
-     * @param string|null $prefixString
-     * @param string      $serverMessage
-     */
-    private static function _throw(
-        $exceptionClass,
-        $prefixString,
-        $serverMessage)
-    {
-        // We need to specify the full namespace path to the class.
+        // We need to specify the full namespace path to the exception class.
         $fullClassPath = '\\'.__NAMESPACE__.'\\'.$exceptionClass;
 
-        throw new $fullClassPath(
+        // Create an instance of the final exception class.
+        $e = new $fullClassPath(
             $prefixString !== null
-            ? $prefixString.': '.$serverMessage
+            ? sprintf('%s: %s', $prefixString, $serverMessage)
             : $serverMessage
         );
+
+        // Attach the server response to the exception, IF a response exists.
+        // NOTE: Only possible on exceptions derived from InstagramException.
+        if ($serverResponse instanceof Response
+            && $e instanceof \InstagramAPI\Exception\InstagramException) {
+            $e->setResponse($serverResponse);
+        }
+
+        throw $e;
     }
 
     /**
