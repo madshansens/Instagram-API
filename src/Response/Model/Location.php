@@ -32,4 +32,5 @@ class Location extends \InstagramAPI\Response
      * @var string
      */
     public $pk;
+    public $short_name;
 }

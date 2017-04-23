@@ -13,4 +13,5 @@ class ReelsTrayFeedResponse extends \InstagramAPI\Response
      */
     public $broadcasts;
     public $sticker_version;
+    public $story_ranking_token;
 }
