@@ -100,7 +100,7 @@ class File implements StorageInterface
         }
         if (is_file($oldUser['cookiesFile'])
             && !@rename($oldUser['cookiesFile'], $newUser['cookiesFile'])) {
-            throw new CookiesException(sprintf(
+            throw new SettingsException(sprintf(
                 'Failed to move "%s" to "%s".',
                 $oldUser['cookiesFile'], $newUser['cookiesFile']
             ));
