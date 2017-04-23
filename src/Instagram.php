@@ -2,8 +2,6 @@
 
 namespace InstagramAPI;
 
-use InstagramAPI\Exception\ServerMessageThrower;
-
 /**
  * Instagram's Private API v2.
  *
@@ -390,32 +388,30 @@ class Instagram
 
             $signupChallenge = $this->_getSignupChallenge();
 
-            $baseClass = new Response\LoginResponse();
-            $response = $this->request('accounts/login/')
-            ->setNeedsAuth(false)
-            ->setCheckStatus(false)
-            ->addPost('phone_id', $this->settings->get('phone_id'))
-            ->addPost('_csrftoken', $signupChallenge->getFullResponse()[0])
-            ->addPost('username', $this->username)
-            ->addPost('guid', $this->uuid)
-            ->addPost('adid', $this->advertising_id)
-            ->addPost('device_id', $this->device_id)
-            ->addPost('password', $this->password)
-            ->addPost('login_attempt_count', 0)
-            ->getResponse($baseClass, true);
-
-            if (!$response->isOk()) {
-                if ($response->getTwoFactorRequired()) {
+            try {
+                $response = $this->request('accounts/login/')
+                ->setNeedsAuth(false)
+                ->addPost('phone_id', $this->settings->get('phone_id'))
+                ->addPost('_csrftoken', $signupChallenge->getFullResponse()[0])
+                ->addPost('username', $this->username)
+                ->addPost('guid', $this->uuid)
+                ->addPost('adid', $this->advertising_id)
+                ->addPost('device_id', $this->device_id)
+                ->addPost('password', $this->password)
+                ->addPost('login_attempt_count', 0)
+                ->getResponse(new Response\LoginResponse(), true);
+            } catch (\InstagramAPI\Exception\InstagramException $e) {
+                if ($e->hasResponse() && $e->getResponse()->getTwoFactorRequired()) {
                     // Login failed because two-factor login is required.
                     // NOTE: We NEED this token in twoFactorLogin() but we'll
                     // only save it to settings storage AFTER successful login!
-                    $this->token = $response->getFullResponse()[0];
+                    $this->token = $e->getResponse()->getFullResponse()[0];
 
                     // Return server response to tell user they need 2-factor.
-                    return $response;
+                    return $e->getResponse();
                 } else {
-                    // Login failed for some other reason... Throw error.
-                    ServerMessageThrower::autoThrow(get_class($baseClass), $response->getMessage());
+                    // Login failed for some other reason... Re-throw error.
+                    throw $e;
                 }
             }
 
