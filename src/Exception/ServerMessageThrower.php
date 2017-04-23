@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Exception;
 
-use \InstagramAPI\Response;
+use InstagramAPI\Response;
 
 /**
  * Parses Instagram's API error messages and throws an appropriate exception.

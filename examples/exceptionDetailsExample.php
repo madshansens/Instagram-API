@@ -39,6 +39,7 @@ try {
     $ig->deleteMedia('123456'); // Invalid media ID, to trigger a server error.
 } catch (\InstagramAPI\Exception\InstagramException $e) {
     echo 'Something went wrong (InstagramException): '.$e->getMessage()."\n";
+
     if ($e->hasResponse()) { // <-- VERY IMPORTANT TO CHECK FIRST!
         echo "The current exception contains a full server response:\n";
         var_dump($e->getResponse());
@@ -55,12 +56,22 @@ try {
     $ig->deleteMedia('123456'); // Invalid media ID, to trigger a server error.
 } catch (\InstagramAPI\Exception\EndpointException $e) {
     echo 'Something went wrong (EndpointException): '.$e->getMessage()."\n";
+
     if ($e->hasResponse()) { // <-- VERY IMPORTANT TO CHECK FIRST!
         echo "The current exception contains a full server response:\n";
         var_dump($e->getResponse());
         echo "Showing the 'did_delete' and 'message' values of the response:\n";
         var_dump($e->getResponse()->getDidDelete());
         var_dump($e->getResponse()->getMessage());
+    }
+
+    // Bonus: This shows how to look for specific "error reason" messages in an
+    // EndpointException. There are hundreds or even thousands of different
+    // error messages and we won't add exceptions for them (that would be a
+    // nightmare to maintain). Instead, it's up to the library users to check
+    // for the per-endpoint error messages they care about. Such as this one:
+    if (strpos($e->getMessage(), 'Could not delete') !== false) {
+        echo "* The problem in this generic EndpointException was that Instagram could not delete the media!\n";
     }
 }
 
