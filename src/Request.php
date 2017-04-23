@@ -27,7 +27,6 @@ class Request
      */
     protected $_needsAuth = true;
 
-    protected $_checkStatus = true;
     protected $_signedPost = true;
 
     public function __construct(
@@ -65,14 +64,6 @@ class Request
         $needsAuth = true)
     {
         $this->_needsAuth = $needsAuth;
-
-        return $this;
-    }
-
-    public function setCheckStatus(
-        $checkStatus = true)
-    {
-        $this->_checkStatus = $checkStatus;
 
         return $this;
     }
