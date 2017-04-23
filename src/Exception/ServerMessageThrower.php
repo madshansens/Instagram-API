@@ -131,6 +131,9 @@ class ServerMessageThrower
             $message .= '.';
         }
 
+        // Guarantee that the first letter is uppercase.
+        $message = ucfirst($message);
+
         return $message;
     }
 }
