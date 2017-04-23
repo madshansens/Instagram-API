@@ -400,8 +400,6 @@ class Client
      * @param mixed $baseClass    An instance of a class object whose properties
      *                            you want to fill from the $response.
      * @param mixed $response     A decoded JSON response from Instagram's server.
-     * @param bool  $checkOk      Whether to throw exceptions if the server's
-     *                            response wasn't marked as OK by Instagram.
      * @param mixed $fullResponse The raw response object to provide in the
      *                            "getFullResponse()" property. Set this to
      *                            NULL to automatically use $response. That's
@@ -415,14 +413,13 @@ class Client
     public function getMappedResponseObject(
         $baseClass,
         $response,
-        $checkOk = true,
         $fullResponse = null)
     {
         if (is_null($response)) {
             throw new \InstagramAPI\Exception\EmptyResponseException('No response from server. Either a connection or configuration error.');
         }
 
-        // Perform mapping.
+        // Perform mapping of all response properties.
         $mapper = new \JsonMapper();
         $mapper->bStrictNullTypes = false;
         if ($this->_parent->apiDeveloperDebug) {
@@ -431,16 +428,23 @@ class Client
         }
         $responseObject = $mapper->map($response, $baseClass);
 
-        // Check if the API response was successful.
-        if ($checkOk && !$responseObject->isOk()) {
-            ServerMessageThrower::autoThrow(get_class($baseClass), $responseObject->getMessage());
-        }
-
         // Save the raw response object as the "getFullResponse()" value.
         if (is_null($fullResponse)) {
             $fullResponse = $response;
         }
         $responseObject->setFullResponse($fullResponse);
+
+        // Throw an exception if the API response was unsuccessful.
+        // NOTE: It will contain the full server response object too, which
+        // means that the user can look at the full response details via the
+        // exception itself.
+        if (!$responseObject->isOk()) {
+            ServerMessageThrower::autoThrow(
+                get_class($baseClass),
+                $responseObject->getMessage(),
+                $responseObject
+            );
+        }
 
         return $responseObject;
     }
@@ -650,8 +654,7 @@ class Client
             // Check for API response success and attempt to decode it to the desired class.
             $result['object'] = $this->getMappedResponseObject(
                 $libraryOptions['decodeToObject'],
-                self::api_body_decode($body), // Important: Special JSON decoder.
-                true // Forcibly validates that the API response "status" MUST be Ok.
+                self::api_body_decode($body) // Important: Special JSON decoder.
             );
         }
 
@@ -1207,8 +1210,7 @@ class Client
         // Manually decode the final API response and check for successful chunked upload.
         $upload = $this->getMappedResponseObject(
             new Response\UploadVideoResponse(),
-            self::api_body_decode($response['body']), // Important: Special JSON decoder.
-            true // Forcibly validates that the API response "status" MUST be Ok.
+            self::api_body_decode($response['body']) // Important: Special JSON decoder.
         );
 
         return $upload;

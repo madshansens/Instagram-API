@@ -110,7 +110,6 @@ class Request
         $responseObject = $this->_parent->client->getMappedResponseObject(
             $baseClass,
             $response[1], // [0] = Token. [1] = The actual server response.
-            $this->_checkStatus, // Whether to validate that API response "status" MUST be Ok.
             ($includeHeader ? $response : null) // null = Reuse $response[1].
         );
 
