@@ -10,5 +10,8 @@ class RankedRecipientsResponse extends \InstagramAPI\Response
      */
     public $ranked_recipients;
     public $filtered;
+    /**
+     * @var string
+     */
     public $request_id;
 }
