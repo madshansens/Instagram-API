@@ -13,6 +13,10 @@ class User extends \InstagramAPI\Response
      * @var string
      */
     public $pk;
+    /**
+     * @var string
+     */
+    public $id;
     public $is_verified;
     public $is_private;
     public $coeff_weight;
