@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Response;
 
-class AddressBookResponse extends \InstagramAPI\Response
+class LinkAddressBookResponse extends \InstagramAPI\Response
 {
     /**
      * @var Model\Suggestion[]

@@ -2654,7 +2654,7 @@ class Instagram
     }
 
     /**
-     * Search for users via address book.
+     * Search for users by linking your address book to Instagram.
      *
      * @param array $contacts
      *
@@ -2662,23 +2662,23 @@ class Instagram
      *
      * @return \InstagramAPI\Response\AddressBookResponse
      */
-    public function searchInAddressBook(
+    public function linkAddressBook(
         $contacts)
     {
         return $this->request('address_book/link/?include=extra_display_name,thumbnails')
             ->setSignedPost(false)
             ->addPost('contacts', json_encode($contacts, true))
-            ->getResponse(new Response\AddressBookResponse());
+            ->getResponse(new Response\LinkAddressBookResponse());
     }
 
     /**
-     * Unlink address book.
+     * Unlink your address book from Instagram.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\UnlinkAddressBookResponse
      */
-    public function UnlinkAddressBook()
+    public function unlinkAddressBook()
     {
         return $this->request('address_book/unlink/')
             ->addPost('_uuid', $this->uuid)
