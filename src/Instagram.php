@@ -2587,6 +2587,34 @@ class Instagram
     }
 
     /**
+     * Get a simplified, chronological list of users who liked a media item.
+     *
+     * WARNING! DANGEROUS! Although this function works, we don't know
+     * whether it's used by Instagram's app right now. If it isn't used by
+     * the app, then you can easily get BANNED for using this function!
+     *
+     * If you call this function, you do that AT YOUR OWN RISK and you
+     * risk losing your Instagram account! This notice will be removed if
+     * the function is safe to use. Otherwise this whole function will
+     * be removed someday, if it wasn't safe.
+     *
+     * Only use this if you are OK with possibly losing your account!
+     *
+     * TODO: Research when/if the official app calls this function.
+     *
+     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\MediaLikersResponse
+     */
+    public function getMediaLikersChrono(
+        $mediaId)
+    {
+        return $this->request("media/{$mediaId}/likers_chrono/")->getResponse(new Response\MediaLikersResponse());
+    }
+
+    /**
      * Facebook user search.
      *
      * @param string $query
