@@ -141,6 +141,9 @@ class ServerMessageThrower
         // Guarantee that the first letter is uppercase.
         $message = ucfirst($message);
 
+        // Replace all underscores (ie. "Login_required.") with spaces.
+        $message = str_replace('_', ' ', $message);
+
         return $message;
     }
 }
