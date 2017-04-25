@@ -30,4 +30,8 @@ class Args extends \InstagramAPI\Response
      * @var InlineFollow
      */
     public $inline_follow;
+    /**
+     * @var string[]
+     */
+    public $comment_ids;
 }
