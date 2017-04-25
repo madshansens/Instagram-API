@@ -2672,6 +2672,22 @@ class Instagram
     }
 
     /**
+     * Unlink address book.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\UnlinkAddressBookResponse
+     */
+    public function UnlinkAddressBook()
+    {
+        return $this->request('address_book/unlink/')
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->token)
+            ->getResponse(new Response\UnlinkAddressBookResponse());
+    }
+
+    /**
      * Get details about a specific user via their username.
      *
      * @param string $username Username as string (NOT as a numerical ID).
