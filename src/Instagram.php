@@ -2660,7 +2660,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\AddressBookResponse
+     * @return \InstagramAPI\Response\LinkAddressBookResponse
      */
     public function linkAddressBook(
         $contacts)
