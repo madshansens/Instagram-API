@@ -12,6 +12,10 @@ class User extends \InstagramAPI\Response
     /**
      * @var string
      */
+    public $user_id;
+    /**
+     * @var string
+     */
     public $pk;
     /**
      * @var string
@@ -106,4 +110,5 @@ class User extends \InstagramAPI\Response
     public $phone_number; // getCurrentUser prop
     public $needs_email_confirm; // getCurrentUser prop
     public $is_active;
+    public $block_at; // getBlockedList prop
 }

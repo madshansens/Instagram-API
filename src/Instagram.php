@@ -3614,6 +3614,19 @@ class Instagram
     }
 
     /**
+     * Get a list with all blocked users.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BlockedListResponse
+     */
+    public function getBlockedList()
+    {
+        return $this->request('users/blocked_list/')
+        ->getResponse(new Response\BlockedListResponse());
+    }
+
+    /**
      * Get feed of your liked media.
      *
      * @param null|string $maxId Next "maximum ID", used for pagination.
