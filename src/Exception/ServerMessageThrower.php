@@ -72,9 +72,6 @@ class ServerMessageThrower
         $serverMessage,
         Response $serverResponse = null)
     {
-        // Some Instagram messages already have punctuation, and others need it.
-        $serverMessage = self::prettifyMessage($serverMessage);
-
         // Generic "API function exception" if no critical exception is found.
         $exceptionClass = 'EndpointException';
 
@@ -100,7 +97,10 @@ class ServerMessageThrower
         // We need to specify the full namespace path to the exception class.
         $fullClassPath = '\\'.__NAMESPACE__.'\\'.$exceptionClass;
 
-        // Create an instance of the final exception class.
+        // Some Instagram messages already have punctuation, and others need it.
+        $serverMessage = self::prettifyMessage($serverMessage);
+
+        // Create an instance of the final exception class, with the pretty msg.
         $e = new $fullClassPath(
             $prefixString !== null
             ? sprintf('%s: %s', $prefixString, $serverMessage)
