@@ -2520,7 +2520,7 @@ class Instagram
      */
     public function setCommentFilter($config_value)
     {
-        return $this->request("accounts/set_comment_filter/")
+        return $this->request('accounts/set_comment_filter/')
             ->addPost('_uuid', $this->uuid)
             ->addPost('_uid', $this->account_id)
             ->addPost('_csrftoken', $this->token)
@@ -2540,7 +2540,7 @@ class Instagram
      */
     public function setCommentFilterKeywords($keywords)
     {
-        return $this->request("accounts/set_comment_filter_keywords/")
+        return $this->request('accounts/set_comment_filter_keywords/')
             ->addPost('_uuid', $this->uuid)
             ->addPost('_uid', $this->account_id)
             ->addPost('_csrftoken', $this->token)
