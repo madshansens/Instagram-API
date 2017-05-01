@@ -2501,7 +2501,7 @@ class Instagram
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\CommentFilterResponse
+     * @return \InstagramAPI\Response\CommentFilterKeywordsResponse
      */
     public function getCommentFilterKeywords()
     {
@@ -2512,13 +2512,14 @@ class Instagram
     /**
      * Set account spam filter status (on/off).
      *
-     * @param int $config_value 0 or 1, whether spam filter is on
+     * @param int $config_value Whether spam filter is on (0 or 1).
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\CommentFilterResponse
+     * @return \InstagramAPI\Response\CommentFilterSetResponse
      */
-    public function setCommentFilter($config_value)
+    public function setCommentFilter(
+        $config_value)
     {
         return $this->request('accounts/set_comment_filter/')
             ->addPost('_uuid', $this->uuid)
@@ -2532,13 +2533,14 @@ class Instagram
     /**
      * Set account spam filter keywords.
      *
-     * @param string $keywords list of stop-words, separated by comma
+     * @param string $keywords List of blocked words, separated by comma.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\CommentFilterResponse
+     * @return \InstagramAPI\Response\CommentFilterSetResponse
      */
-    public function setCommentFilterKeywords($keywords)
+    public function setCommentFilterKeywords(
+        $keywords)
     {
         return $this->request('accounts/set_comment_filter_keywords/')
             ->addPost('_uuid', $this->uuid)
