@@ -2484,6 +2484,72 @@ class Instagram
     }
 
     /**
+     * Get account spam filter status.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CommentFilterResponse
+     */
+    public function getCommentFilter()
+    {
+        return $this->request('accounts/get_comment_filter/')
+            ->getResponse(new Response\CommentFilterResponse());
+    }
+
+    /**
+     * Get account spam filter keywords.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CommentFilterResponse
+     */
+    public function getCommentFilterKeywords()
+    {
+        return $this->request('accounts/get_comment_filter_keywords/')
+            ->getResponse(new Response\CommentFilterKeywordsResponse());
+    }
+
+    /**
+     * Set account spam filter status (on/off).
+     *
+     * @param int $config_value 0 or 1, whether spam filter is on
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CommentFilterResponse
+     */
+    public function setCommentFilter($config_value)
+    {
+        return $this->request("accounts/set_comment_filter/")
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->token)
+            ->addPost('config_value', $config_value)
+            ->setSignedPost(true)
+            ->getResponse(new Response\CommentFilterSetResponse());
+    }
+
+    /**
+     * Set account spam filter keywords.
+     *
+     * @param string $keywords list of stop-words, separated by comma
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CommentFilterResponse
+     */
+    public function setCommentFilterKeywords($keywords)
+    {
+        return $this->request("accounts/set_comment_filter_keywords/")
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->token)
+            ->addPost('keywords', $keywords)
+            ->setSignedPost(true)
+            ->getResponse(new Response\CommentFilterSetResponse());
+    }
+
+    /**
      * Get recent activity.
      *
      * @throws \InstagramAPI\Exception\InstagramException
