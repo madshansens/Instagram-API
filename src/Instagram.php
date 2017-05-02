@@ -2945,6 +2945,29 @@ class Instagram
     }
 
     /**
+     * Mark stories as seen.
+     *
+     * @param string[] $reels List of <mediaId> and <published_time>_<viewed_time>.
+     *                 Example: ["1505064750529487094_242921316_242921316"] = ["1494537719_1493645553", 1493537719_1493645553]
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ReelsMediaResponse
+     */
+    public function sendMediaSeen(
+        $reels)
+    {
+        return $this->request('https://i.instagram.com/api/v2/media/seen/')
+        ->setSignedPost(true)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->account_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('reels', $reels)
+        ->addPost('nuxes', [])
+        ->getResponse(new Response\ReelsMediaResponse());
+    }
+
+    /**
      * Get a user's timeline feed.
      *
      * @param string      $userId       Numerical UserPK ID.

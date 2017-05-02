@@ -111,4 +111,5 @@ class User extends \InstagramAPI\Response
     public $needs_email_confirm; // getCurrentUser prop
     public $is_active;
     public $block_at; // getBlockedList prop
+    public $aggregate_promote_engagement; // getSelfUserInfo prop
 }
