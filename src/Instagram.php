@@ -2963,7 +2963,7 @@ class Instagram
      * @throws \InstagramAPI\Exception\InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\ReelsMediaResponse
+     * @return \InstagramAPI\Response\MediaSeenResponse
      */
     public function markMediaSeen(
         array $items)
@@ -3008,7 +3008,7 @@ class Instagram
         ->addPost('_csrftoken', $this->token)
         ->addPost('reels', $reels)
         ->addPost('nuxes', [])
-        ->getResponse(new Response\ReelsMediaResponse());
+        ->getResponse(new Response\MediaSeenResponse());
     }
 
     /**
