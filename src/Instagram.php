@@ -2948,7 +2948,7 @@ class Instagram
      * Mark stories as seen.
      *
      * @param string[] $reels List of <mediaId> and <published_time>_<viewed_time>.
-     *                 Example: ["1505064750529487094_242921316_242921316"] = ["1494537719_1493645553", 1493537719_1493645553]
+     *                 Example: ["1505064750529487094_242921316_242921316"] = ["1494537719_1493645553", "1493537719_1493645553"]
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
