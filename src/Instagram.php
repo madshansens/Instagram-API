@@ -2945,18 +2945,62 @@ class Instagram
     }
 
     /**
-     * Mark stories as seen.
+     * Mark story media items as seen.
      *
-     * @param string[] $reels List of <mediaId> and <published_time>_<viewed_time>.
-     *                 Example: ["1505064750529487094_242921316_242921316"] = ["1494537719_1493645553", "1493537719_1493645553"]
+     * The various story-related endpoints only give you lists of story media.
+     * They don't actually mark any stories as "seen", so the user doesn't know
+     * that you've seen their story. Actually marking the story as "seen" is
+     * done via this endpoint instead. The official app calls this endpoint
+     * periodically (with 1 or more items at a time) while watching a story.
      *
+     * Tip: You can pass in the whole "getItems()" array from a user's story
+     * feed (retrieved via any of the other story endpoints), to easily mark
+     * all of that user's story media items as seen.
+     *
+     * @param \InstagramAPI\Response\Model\Item[] $items An array of one or more
+     *                                                   story media Items.
+     *
+     * @throws \InstagramAPI\Exception\InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\ReelsMediaResponse
      */
-    public function sendMediaSeen(
-        $reels)
+    public function markMediaSeen(
+        array $items)
     {
+        // Build the list of seen media, with human randomization of seen-time.
+        $reels = [];
+        $seenAt = time() - (3 * count($items)); // Start "seenAt" in the past.
+        foreach ($items as $item) {
+            if (!$item instanceof Response\Model\Item) {
+                throw new \InvalidArgumentException(
+                    'markMediaSeen(): All items must be instances of \InstagramAPI\Response\Model\Item.'
+                );
+            }
+
+            // Raise "seenAt" if it's somehow older than the item's "takenAt".
+            // NOTE: Can only happen if you see a story instantly when posted.
+            $itemTakenAt = $item->getTakenAt();
+            if ($itemTakenAt > $seenAt) {
+                $seenAt = $itemTakenAt + 2;
+            }
+
+            // Do not let "seenAt" exceed the current global UTC time.
+            $maxSeenAt = time();
+            if ($seenAt > $maxSeenAt) {
+                $seenAt = $maxSeenAt;
+            }
+
+            // Key Format: "mediaPk_userPk_userPk" (yes, userPK is repeated).
+            $reelId = $item->getId().'_'.$item->getUser()->getPk();
+
+            // Value Format: ["mediaTakenAt_seenAt"] (array with single string).
+            $reels[$reelId] = [$item->getTakenAt().'_'.$seenAt];
+
+            // Randomly add 1-3 seconds to next seenAt timestamp, to act human.
+            $seenAt += rand(1, 3);
+        }
+
         return $this->request('https://i.instagram.com/api/v2/media/seen/')
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
