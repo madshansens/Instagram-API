@@ -2970,7 +2970,8 @@ class Instagram
     {
         // Build the list of seen media, with human randomization of seen-time.
         $reels = [];
-        $seenAt = time() - (3 * count($items)); // Start "seenAt" in the past.
+        $maxSeenAt = time(); // Get current global UTC timestamp.
+        $seenAt = $maxSeenAt - (3 * count($items)); // Start seenAt in the past.
         foreach ($items as $item) {
             if (!$item instanceof Response\Model\Item) {
                 throw new \InvalidArgumentException(
@@ -2981,12 +2982,11 @@ class Instagram
             // Raise "seenAt" if it's somehow older than the item's "takenAt".
             // NOTE: Can only happen if you see a story instantly when posted.
             $itemTakenAt = $item->getTakenAt();
-            if ($itemTakenAt > $seenAt) {
+            if ($seenAt < $itemTakenAt) {
                 $seenAt = $itemTakenAt + 2;
             }
 
             // Do not let "seenAt" exceed the current global UTC time.
-            $maxSeenAt = time();
             if ($seenAt > $maxSeenAt) {
                 $seenAt = $maxSeenAt;
             }
