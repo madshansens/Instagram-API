@@ -14,6 +14,13 @@ class Request
      */
     protected $_parent;
 
+    /**
+     * Which API version to use for this request.
+     *
+     * @var int
+     */
+    protected $_apiVersion = 1;
+
     protected $_url;
     protected $_params = [];
     protected $_posts = [];
@@ -35,6 +42,14 @@ class Request
     {
         $this->_parent = $parent;
         $this->_url = $url;
+
+        return $this;
+    }
+
+    public function setVersion(
+        $apiVersion = 1)
+    {
+        $this->_apiVersion = $apiVersion;
 
         return $this;
     }
@@ -96,7 +111,7 @@ class Request
             $post = null;
         }
 
-        $response = $this->_parent->client->api($endpoint, $post, $this->_needsAuth, false);
+        $response = $this->_parent->client->api($this->_apiVersion, $endpoint, $post, $this->_needsAuth, false);
 
         $responseObject = $this->_parent->client->getMappedResponseObject(
             $baseClass,

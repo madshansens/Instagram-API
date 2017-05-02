@@ -773,7 +773,7 @@ class Instagram
             'users'                => $this->account_id,
         ]);
 
-        return $this->client->api('push/register/?platform=10&device_type=android_mqtt', Signatures::generateSignatureForPost($data))[1];
+        return $this->client->api(1, 'push/register/?platform=10&device_type=android_mqtt', Signatures::generateSignatureForPost($data))[1];
     }
 
     /**
@@ -1125,7 +1125,7 @@ class Instagram
             '_csrftoken' => $this->token,
         ]);
 
-        return $this->client->api("direct_v2/threads/{$threadId}/{$threadAction}/", Signatures::generateSignatureForPost($data))[1];
+        return $this->client->api(1, "direct_v2/threads/{$threadId}/{$threadAction}/", Signatures::generateSignatureForPost($data))[1];
     }
 
     /**
@@ -3001,7 +3001,8 @@ class Instagram
             $seenAt += rand(1, 3);
         }
 
-        return $this->request('https://i.instagram.com/api/v2/media/seen/')
+        return $this->request('media/seen/')
+        ->setVersion(2)
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)

@@ -582,9 +582,11 @@ class Client
      *   for code clarity about what you intend to do with this function's response!
      *
      * @param string $method         HTTP method ("GET" or "POST").
+     * @param int    $apiVersion     The Instagram API version to call (1, 2, etc).
      * @param string $endpoint       Relative API endpoint, such as "upload/photo/",
      *                               but can also be a full URI starting with "http:"
-     *                               or "https:", which is then used as-provided.
+     *                               or "https:", which is then used as-provided
+     *                               (and apiVersion will be ignored).
      * @param array  $guzzleOptions  Guzzle request() options to apply to the HTTP request.
      * @param array  $libraryOptions Additional options for controlling Library features
      *                               such as the debugging output and response decoding.
@@ -604,6 +606,7 @@ class Client
      */
     protected function _apiRequest(
         $method,
+        $apiVersion,
         $endpoint,
         array $guzzleOptions = [],
         array $libraryOptions = [])
@@ -612,7 +615,7 @@ class Client
         if (strncmp($endpoint, 'http:', 5) === 0 || strncmp($endpoint, 'https:', 6) === 0) {
             $uri = $endpoint;
         } else {
-            $uri = Constants::API_URL.$endpoint;
+            $uri = Constants::API_URLS[$apiVersion].$endpoint;
         }
 
         // Perform the API request and retrieve the raw HTTP response body.
@@ -664,18 +667,23 @@ class Client
     /**
      * Perform an Instagram API call.
      *
-     * @param string     $endpoint  The relative API endpoint URL to call.
-     * @param array|null $postData  Optional array of POST-parameters, to do a
-     *                              POST request instead of a GET.
-     * @param bool       $needsAuth Whether this API call needs authorization.
-     * @param bool       $assoc     Whether to decode to associative array,
-     *                              otherwise we decode to object.
+     * @param int        $apiVersion The Instagram API version to call (1, 2, etc).
+     * @param string     $endpoint   Relative API endpoint, such as "media/seen/",
+     *                               but can also be a full URI starting with "http:"
+     *                               or "https:", which is then used as-provided
+     *                               (and apiVersion will be ignored).
+     * @param array|null $postData   Optional array of POST-parameters, to do a
+     *                               POST request instead of a GET.
+     * @param bool       $needsAuth  Whether this API call needs authorization.
+     * @param bool       $assoc      Whether to decode to associative array,
+     *                               otherwise we decode to object.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return mixed An object or associative array.
      */
     public function api(
+        $apiVersion,
         $endpoint,
         $postData = null,
         $needsAuth = true,
@@ -713,6 +721,7 @@ class Client
         // Perform the API request.
         $response = $this->_apiRequest(
             $method,
+            $apiVersion,
             $endpoint,
             $options,
             [
@@ -853,6 +862,7 @@ class Client
         // Perform the API request.
         $response = $this->_apiRequest(
             $method,
+            1, // API Version.
             $endpoint,
             $options,
             [
@@ -961,6 +971,7 @@ class Client
         // Perform the "pre-upload" API request.
         $response = $this->_apiRequest(
             $method,
+            1, // API Version.
             $endpoint,
             $options,
             [
@@ -1145,6 +1156,7 @@ class Client
                     // Perform the upload of the current chunk.
                     $response = $this->_apiRequest(
                         $method,
+                        1, // API Version.
                         $uploadParams['uploadUrl'],
                         $options,
                         [
@@ -1287,6 +1299,7 @@ class Client
         // Perform the API request.
         $response = $this->_apiRequest(
             $method,
+            1, // API Version.
             $endpoint,
             $options,
             [
@@ -1421,6 +1434,7 @@ class Client
         // Perform the API request.
         $response = $this->_apiRequest(
             $method,
+            1, // API Version.
             $endpoint,
             $options,
             [
