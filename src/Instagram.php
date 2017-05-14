@@ -1471,7 +1471,7 @@ class Instagram
         }
 
         // Available external metadata parameters:
-        /** @var string|null Caption to use for the media. */
+        /** @var string|null Caption to use for the media. NOT USED FOR STORY MEDIA! */
         $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : null;
         /** @var Response\Model\Location|null A Location object describing where
          the media was taken. NOT USED FOR STORY MEDIA! */
