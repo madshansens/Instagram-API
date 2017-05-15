@@ -9,4 +9,6 @@ class Counts extends \InstagramAPI\Response
     public $photos_of_you;
     public $usertags;
     public $comments;
+    public $likes;
+    public $comment_likes;
 }

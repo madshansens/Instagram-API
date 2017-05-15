@@ -136,6 +136,7 @@ class Item extends \InstagramAPI\Response
     public $ad_action;
     public $link_text;
     public $is_dash_eligible;
+    public $video_dash_manifest;
 
     public function setMediaOrAd(
         $params)

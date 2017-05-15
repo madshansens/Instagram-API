@@ -14,4 +14,5 @@ class RankedRecipientsResponse extends \InstagramAPI\Response
      * @var string
      */
     public $request_id;
+    public $rank_token;
 }
