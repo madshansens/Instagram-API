@@ -75,6 +75,7 @@ class User extends \InstagramAPI\Response
     public $business_contact_method; // getUserInfoById prop
     public $category; // getUserInfoById prop
     public $direct_messaging; // getUserInfoById prop
+    public $page_name; //getUserInfoById prop
     /**
      * @var string
      */
