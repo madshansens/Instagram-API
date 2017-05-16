@@ -34,4 +34,7 @@ class Args extends \InstagramAPI\Response
      * @var string[]
      */
     public $comment_ids;
+    public $second_profile_id;
+    public $second_profile_image;
+    public $profile_image_destination;
 }
