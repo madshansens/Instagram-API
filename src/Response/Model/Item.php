@@ -33,6 +33,7 @@ class Item extends \InstagramAPI\Response
     public $original_width;
     public $original_height;
     public $view_count;
+    public $viewer_count;
     public $organic_tracking_token;
     public $has_more_comments;
     public $max_num_visible_preview_comments;
