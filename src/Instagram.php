@@ -3520,18 +3520,62 @@ class Instagram
         do {
             $myTimeline = $this->getSelfUserFeed($nextMaxId);
 
+            // Build a list of all media files on this page.
+            $mediaFiles = []; // Reset queue.
             foreach ($myTimeline->getItems() as $item) {
-                if ($item->media_type == Response\Model\Item::PHOTO) {
-                    $itemUrl = $item->getImageVersions2()->candidates[0]->getUrl();
+                $itemDate = date('Y-m-d \a\t H.i.s O', $item->getTakenAt());
+                if ($item->media_type == Response\Model\Item::ALBUM) {
+                    // Albums contain multiple items which must all be queued.
+                    // NOTE: We won't name them by their subitem's getIds, since
+                    // those Ids have no meaning outside of the album and they
+                    // would just mean that the album content is spread out with
+                    // wildly varying filenames. Instead, we will name all album
+                    // items after their album's Id, with a position offset in
+                    // their filename to show their position within the album.
+                    $subPosition = 0;
+                    foreach ($item->getCarouselMedia() as $subItem) {
+                        ++$subPosition;
+                        if ($subItem->media_type == Response\Model\CarouselMedia::PHOTO) {
+                            $mediaUrl = $subItem->getImageVersions2()->candidates[0]->getUrl();
+                        } else {
+                            $mediaUrl = $subItem->getVideoVersions()[0]->getUrl();
+                        }
+                        $subItemId = sprintf('%s [%s-%02d]', $itemDate, $item->getId(), $subPosition);
+                        $mediaFiles[$subItemId] = [
+                            'taken_at' => $item->getTakenAt(),
+                            'url'      => $mediaUrl,
+                        ];
+                    }
                 } else {
-                    $itemUrl = $item->getVideoVersions()[0]->getUrl();
+                    if ($item->media_type == Response\Model\Item::PHOTO) {
+                        $mediaUrl = $item->getImageVersions2()->candidates[0]->getUrl();
+                    } else {
+                        $mediaUrl = $item->getVideoVersions()[0]->getUrl();
+                    }
+                    $itemId = sprintf('%s [%s]', $itemDate, $item->getId());
+                    $mediaFiles[$itemId] = [
+                        'taken_at' => $item->getTakenAt(),
+                        'url'      => $mediaUrl,
+                    ];
                 }
-                $fileExtension = pathinfo(parse_url($itemUrl, PHP_URL_PATH), PATHINFO_EXTENSION);
-                $filePath = $backupFolder.$item->getId().'.'.$fileExtension;
+            }
+
+            // Download all media files in the current page's file queue.
+            foreach ($mediaFiles as $mediaId => $mediaInfo) {
+                $mediaUrl = $mediaInfo['url'];
+                $fileExtension = pathinfo(parse_url($mediaUrl, PHP_URL_PATH), PATHINFO_EXTENSION);
+                $filePath = $backupFolder.$mediaId.'.'.$fileExtension;
+
+                // Attempt to download the file.
                 if ($printProgress) {
-                    echo sprintf("* Downloading \"%s\" to \"%s\".\n", $itemUrl, $filePath);
+                    echo sprintf("* Downloading \"%s\" to \"%s\".\n", $mediaUrl, $filePath);
                 }
-                copy($itemUrl, $filePath);
+                copy($mediaUrl, $filePath);
+
+                // Set the file modification time to the taken_at timestamp.
+                if (is_file($filePath)) {
+                    touch($filePath, $mediaInfo['taken_at']);
+                }
             }
         } while (!is_null($nextMaxId = $myTimeline->getNextMaxId()));
     }
