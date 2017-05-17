@@ -3494,6 +3494,11 @@ class Instagram
     /**
      * Backup all of your own uploaded photos and videos. :).
      *
+     * Note that the backup filenames contain the date and time that the media
+     * was uploaded. It uses PHP's timezone to calculate the local time. So be
+     * sure to use date_default_timezone_set() with your local timezone if you
+     * want correct times in the filenames!
+     *
      * @param string $baseOutputPath (optional) Base-folder for output.
      *                               Uses "backups/" path in lib dir if null.
      * @param bool   $printProgress  (optional) Toggles terminal output.
