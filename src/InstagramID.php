@@ -47,6 +47,7 @@ class InstagramID
         do {
             $encoded = self::BASE64URL_CHARMAP[(int) ($id & 63)].$encoded;
         } while (($id >>= 6) > 0);
+
         return $encoded;
     }
 
@@ -70,6 +71,7 @@ class InstagramID
         for ($i = 0, $len = strlen($code); $i < $len; ++$i) {
             $id = $id << 6 | strpos(self::BASE64URL_CHARMAP, $code[$i]);
         }
+
         return gmp_strval($id);
     }
 }
