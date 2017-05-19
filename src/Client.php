@@ -1402,7 +1402,7 @@ class Client
                 'type'     => 'form-data',
                 'name'     => 'photo',
                 'data'     => file_get_contents($shareData['filepath']),
-                'filename' => 'photo',
+                'filename' => 'direct_temp_photo_'.Utils::generateUploadId().'.jpg',
                 'headers'  => [
                     'Content-Type: '.mime_content_type($shareData['filepath']),
                     'Content-Transfer-Encoding: binary',
@@ -1464,8 +1464,7 @@ class Client
             $body .= '--'.$boundary."\r\n";
             $body .= 'Content-Disposition: '.$b['type'].'; name="'.$b['name'].'"';
             if (isset($b['filename'])) {
-                $ext = pathinfo($b['filename'], PATHINFO_EXTENSION);
-                $body .= '; filename="'.'pending_media_'.Utils::generateUploadId().'.'.$ext.'"';
+                $body .= '; filename="'.basename($b['filename']).'"';
             }
             if (isset($b['headers']) && is_array($b['headers'])) {
                 foreach ($b['headers'] as $header) {
