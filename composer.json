@@ -37,6 +37,7 @@
         "ext-curl": "*",
         "ext-mbstring": "*",
         "ext-gd": "*",
+        "ext-gmp": "*",
         "ext-exif": "*"
     }
 }
