@@ -5,6 +5,20 @@ namespace InstagramAPI;
 class Utils
 {
     /**
+     * Used for multipart boundary generation.
+     *
+     * @const string
+     */
+    const BOUNDARY_CHARS = '-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+    /**
+     * Length of generated multipart boundary.
+     *
+     * @const int
+     */
+    const BOUNDARY_LENGTH = 30;
+
+    /**
      * Name of the detected ffmpeg executable, or FALSE if none found.
      *
      * @var string|bool|null
@@ -24,6 +38,22 @@ class Utils
     public static function generateUploadId()
     {
         return number_format(round(microtime(true) * 1000), 0, '', '');
+    }
+
+    /**
+     * Generates random multipart boundary string.
+     *
+     * @return string
+     */
+    public static function generateMultipartBoundary()
+    {
+        $result = '';
+        $max = strlen(self::BOUNDARY_CHARS) - 1;
+        for ($i = 0; $i < self::BOUNDARY_LENGTH; ++$i) {
+            $result .= self::BOUNDARY_CHARS[mt_rand(0, $max)];
+        }
+
+        return $result;
     }
 
     /**
