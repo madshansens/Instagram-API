@@ -113,4 +113,5 @@ class User extends \InstagramAPI\Response
     public $is_active;
     public $block_at; // getBlockedList prop
     public $aggregate_promote_engagement; // getSelfUserInfo prop
+    public $fbuid;
 }

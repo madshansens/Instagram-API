@@ -11,4 +11,5 @@ class Counts extends \InstagramAPI\Response
     public $comments;
     public $likes;
     public $comment_likes;
+    public $campaign_notification;
 }
