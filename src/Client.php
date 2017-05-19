@@ -791,7 +791,7 @@ class Client
         }
 
         // Prepare payload for the upload request.
-        $boundary = $this->_parent->uuid;
+        $boundary = Utils::generateMultipartBoundary();
         $bodies = [
             [
                 'type' => 'form-data',
@@ -801,7 +801,7 @@ class Client
             [
                 'type' => 'form-data',
                 'name' => '_uuid',
-                'data' => $boundary,
+                'data' => $this->_parent->uuid,
             ],
             [
                 'type' => 'form-data',
@@ -900,7 +900,7 @@ class Client
         // NOTE: NO INTERNAL DATA IS NEEDED HERE YET.
 
         // Prepare payload for the "pre-upload" request.
-        $boundary = $this->_parent->uuid;
+        $boundary = Utils::generateMultipartBoundary();
         $uploadId = Utils::generateUploadId();
         $bodies = [
             [
@@ -916,7 +916,7 @@ class Client
             [
                 'type' => 'form-data',
                 'name' => '_uuid',
-                'data' => $boundary,
+                'data' => $this->_parent->uuid,
             ],
         ];
         if ($targetFeed == 'album') {
@@ -1251,10 +1251,10 @@ class Client
         }
 
         // Prepare payload for the upload request.
-        $boundary = $this->_parent->uuid;
+        $boundary = Utils::generateMultipartBoundary();
         $uData = json_encode([
             '_csrftoken' => $this->_parent->token,
-            '_uuid'      => $boundary,
+            '_uuid'      => $this->_parent->uuid,
             '_uid'       => $this->_parent->account_id,
         ]);
         $bodies = [
@@ -1371,7 +1371,7 @@ class Client
         // SO WE CONSTRUCT THEIR FINAL $bodies STEP BY STEP TO AVOID
         // CODE REPETITION. BUT RECKLESS FUTURE CHANGES BELOW COULD
         // BREAK *ALL* REQUESTS IF YOU ARE NOT *VERY* CAREFUL!!!
-        $boundary = $this->_parent->uuid;
+        $boundary = Utils::generateMultipartBoundary();
         $bodies = [];
         if ($shareType == 'share') {
             $bodies[] = [
