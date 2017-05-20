@@ -37,6 +37,27 @@
         "ext-curl": "*",
         "ext-mbstring": "*",
         "ext-gd": "*",
-        "ext-exif": "*"
-    }
+        "ext-exif": "*",
+        "ext-zlib": "*",
+        "react/event-loop": "^0.4.3",
+        "react/promise": "^2.5",
+        "react/socket-client": "^0.5",
+        "ratchet/pawl": "dev-ping-pull",
+        "binsoul/net-mqtt-client-react": "^0.2.1",
+        "clue/socks-react": "^0.6",
+        "clue/http-proxy-react": "dev-auth-pull"
+    },
+    "suggest": {
+        "ext-event": "Installing PHP's native Event extension enables faster event handling."
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/valga/php-http-proxy-react"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/valga/Pawl"
+        }
+    ]
 }

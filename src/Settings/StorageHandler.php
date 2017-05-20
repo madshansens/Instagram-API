@@ -30,7 +30,22 @@ class StorageHandler
         'uuid', // Universally unique identifier.
         'token', // CSRF token for the logged in session.
         'advertising_id', // Google Play advertising ID.
+        'experiments', // Interesting experiment variables for this account.
         'last_login', // Tracks time elapsed since our last login state refresh.
+        'last_experiments', // Tracks time elapsed since our last experiments refresh.
+    ];
+
+    /**
+     * Whitelist for experiments.
+     *
+     * We will save ONLY the experiments mentioned in this list.
+     *
+     * @const array
+     */
+    const EXPERIMENT_KEYS = [
+        'ig_android_2fac',
+        'ig_android_mqtt_skywalker',
+        'ig_android_skywalker_live_event_start_end',
     ];
 
     /** @var StorageInterface The active storage backend. */
@@ -421,5 +436,77 @@ class StorageHandler
                 'Called user-related function before setting the current storage user.'
             );
         }
+    }
+
+    /**
+     * Process and save experiments.
+     *
+     * @param array $experiments
+     *
+     * @throws \InstagramAPI\Exception\SettingsException
+     *
+     * @return array A list of "good" experiments.
+     */
+    public function setExperiments(
+        array $experiments)
+    {
+        $filtered = [];
+        foreach (self::EXPERIMENT_KEYS as $key) {
+            if (!isset($experiments[$key])) {
+                continue;
+            }
+            $filtered[$key] = $experiments[$key];
+        }
+        $json = json_encode($filtered);
+        $gzipped = base64_encode(zlib_encode($json, ZLIB_ENCODING_DEFLATE, 9));
+        // We must compare gzipped with double encoded JSON.
+        $doubleJson = json_encode($json);
+        if (strlen($gzipped) < strlen($doubleJson)) {
+            $serialized = 'Z'.$gzipped;
+        } else {
+            $serialized = 'J'.$json;
+        }
+        $this->set('experiments', $serialized);
+
+        return $filtered;
+    }
+
+    /**
+     * Return saved experiments.
+     *
+     * @throws \InstagramAPI\Exception\SettingsException
+     *
+     * @return array
+     */
+    public function getExperiments()
+    {
+        $experiments = $this->get('experiments');
+        if ($experiments === null || !strlen($experiments)) {
+            return [];
+        }
+        $format = $experiments[0];
+        $experiments = substr($experiments, 1);
+        switch ($format) {
+            case 'Z':
+                if (($experiments = base64_decode($experiments)) === false
+                    || ($experiments = zlib_decode($experiments)) === false
+                    || ($experiments = json_decode($experiments, true)) === null
+                    || !is_array($experiments)
+                ) {
+                    return [];
+                }
+                break;
+            case 'J':
+                if (($experiments = json_decode($experiments, true)) === null
+                    || !is_array($experiments)
+                ) {
+                    return [];
+                }
+                break;
+            default:
+                $experiments = [];
+        }
+
+        return $experiments;
     }
 }

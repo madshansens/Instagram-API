@@ -31,6 +31,12 @@ class Constants
     const FACEBOOK_OTA_FIELDS = 'update%7Bdownload_uri%2Cdownload_uri_delta_base%2Cversion_code_delta_base%2Cdownload_uri_delta%2Cfallback_to_full_update%2Cfile_size_delta%2Cversion_code%2Cpublished_date%2Cfile_size%2Cota_bundle_type%2Cresources_checksum%7D';
     const FACEBOOK_ORCA_PROTOCOL_VERSION = 20150314;
     const FACEBOOK_ORCA_APPLICATION_ID = '124024574287414';
+    const FACEBOOK_ANALYTICS_APPLICATION_ID = '567067343352427';
+
+    // MQTT Constants.
+    const PLATFORM = 'android';
+    const APPLICATION_NAME = 'InstagramForAndroid';
+    const PACKAGE_NAME = 'com.instagram.android';
 
     // General Constants.
     const SRC_DIR = __DIR__; // Absolute path to the "src" folder.

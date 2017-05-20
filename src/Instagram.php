@@ -20,6 +20,13 @@ namespace InstagramAPI;
 class Instagram
 {
     /**
+     * Experiments refresh interval in sec.
+     *
+     * @const int
+     */
+    const EXPERIMENTS_REFRESH = 7200;
+
+    /**
      * Currently active Instagram username.
      *
      * @var string
@@ -137,6 +144,13 @@ class Instagram
     public $settings;
 
     /**
+     * A list of experiments enabled on per-account basis.
+     *
+     * @var array
+     */
+    public $experiments;
+
+    /**
      * Constructor.
      *
      * @param bool  $debug          Show API queries and responses.
@@ -158,6 +172,7 @@ class Instagram
         // Configure the settings storage and network client.
         $this->settings = Settings\Factory::createHandler($storageConfig);
         $this->client = new Client($this);
+        $this->experiments = [];
     }
 
     /**
@@ -213,6 +228,7 @@ class Instagram
 
             // Clear other params we also need to regenerate for the new device.
             $this->settings->set('advertising_id', '');
+            $this->settings->set('experiments', '');
 
             // Remove the previous hardware's login details to force a relogin.
             $this->settings->set('account_id', '');
@@ -240,6 +256,7 @@ class Instagram
         $this->uuid = $this->settings->get('uuid');
         $this->advertising_id = $this->settings->get('advertising_id');
         $this->device_id = $this->settings->get('device_id');
+        $this->experiments = $this->settings->getExperiments();
 
         // Load the previous session details if we're possibly logged in.
         if (!$resetCookieJar && $this->settings->isMaybeLoggedIn()) {
@@ -567,6 +584,13 @@ class Instagram
                 $this->getRecentActivity();
                 $this->getExplore();
             }
+
+            $lastExperimentsTime = $this->settings->get('last_experiments');
+            if (is_null($lastExperimentsTime) || (time() - $lastExperimentsTime) > self::EXPERIMENTS_REFRESH) {
+                $this->settings->set('last_experiments', time());
+
+                $this->syncFeatures();
+            }
         }
     }
 
@@ -689,6 +713,42 @@ class Instagram
     }
 
     /**
+     * Save experiments.
+     *
+     * @param Response\SyncResponse $syncResponse
+     *
+     * @throws \InstagramAPI\Exception\SettingsException
+     */
+    protected function _saveExperiments(
+        Response\SyncResponse $syncResponse)
+    {
+        $experiments = [];
+        foreach ($syncResponse->experiments as $experiment) {
+            if (!isset($experiment->name)) {
+                continue;
+            }
+
+            $group = $experiment->name;
+            if (!isset($experiments[$group])) {
+                $experiments[$group] = [];
+            }
+
+            if (!isset($experiment->params)) {
+                continue;
+            }
+
+            foreach ($experiment->params as $param) {
+                if (!isset($param->name)) {
+                    continue;
+                }
+
+                $experiments[$group][$param->name] = $param->value;
+            }
+        }
+        $this->experiments = $this->settings->setExperiments($experiments);
+    }
+
+    /**
      * Perform an Instagram "feature synchronization" call.
      *
      * @param bool $prelogin
@@ -707,13 +767,16 @@ class Instagram
             ->addPost('experiments', Constants::LOGIN_EXPERIMENTS)
             ->getResponse(new Response\SyncResponse());
         } else {
-            return $this->request('qe/sync/')
+            $result = $this->request('qe/sync/')
             ->addPost('_uuid', $this->uuid)
             ->addPost('_uid', $this->account_id)
             ->addPost('_csrftoken', $this->token)
             ->addPost('id', $this->account_id)
             ->addPost('experiments', Constants::EXPERIMENTS)
             ->getResponse(new Response\SyncResponse());
+            $this->_saveExperiments($result);
+
+            return $result;
         }
     }
 
