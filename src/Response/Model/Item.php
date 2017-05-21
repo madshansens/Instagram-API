@@ -142,6 +142,10 @@ class Item extends \InstagramAPI\Response
      * @var Injected
      */
     public $injected;
+    /**
+     * @var Placeholder
+     */
+    public $placeholder;
 
     public function setMediaOrAd(
         $params)

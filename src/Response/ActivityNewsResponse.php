@@ -26,4 +26,5 @@ class ActivityNewsResponse extends \InstagramAPI\Response
      */
     public $subscription;
     public $continuation_token;
+    public $ads_manager;
 }
