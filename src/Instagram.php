@@ -3824,6 +3824,108 @@ class Instagram
     }
 
     /**
+     * Get list of users from whom you've hid your stories.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BlockedReelsResponse
+     */
+    public function getBlockedStoryList()
+    {
+        return $this->request("friendships/blocked_reels/")
+        ->setSignedPost(true)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->account_id)
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new Response\BlockedReelsResponse());
+    }
+
+    /**
+     * Mute friend's stories.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FriendshipResponse
+     */
+    public function muteFriendStory(
+        $userId)
+    {
+        return $this->request("friendships/mute_friend_reel/{$userId}/")
+        ->setSignedPost(true)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->account_id)
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new Response\FriendshipResponse());
+    }
+
+    /**
+     * Unmute friend's stories.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FriendshipResponse
+     */
+    public function unmuteFriendStory(
+        $userId)
+    {
+        return $this->request("friendships/unmute_friend_reel/{$userId}/")
+        ->setSignedPost(true)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->account_id)
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new Response\FriendshipResponse());
+    }
+
+    /**
+     * Get story settings.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ReelSettingsResponse
+     */
+    public function getStorySettings()
+    {
+        return $this->request("users/reel_settings/")
+        ->setSignedPost(true)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->account_id)
+        ->addPost('_csrftoken', $this->token)
+        ->getResponse(new Response\ReelSettingsResponse());
+    }
+
+    /**
+     * Set story settings.
+     *
+     * @param string $privacy Privacy story option. Possible options: anyone, following, off.
+     *
+     * @throws \InstagramAPI\Exception\InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ReelSettingsResponse
+     */
+    public function setStorySettings(
+        $privacy)
+    {
+        if (!in_array($privacy, ['anyone', 'following', 'off'])) {
+            throw new \InvalidArgumentException('You must provide a valid privacy type.');
+        }
+
+        return $this->request("users/set_reel_settings/")
+        ->setSignedPost(true)
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->account_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('message_prefs', $privacy)
+        ->getResponse(new Response\ReelSettingsResponse());
+    }
+
+    /**
      * Show a user's friendship status with you.
      *
      * @param string $userId Numerical UserPK ID.
