@@ -3729,6 +3729,24 @@ class Instagram
     }
 
     /**
+     * Discover new people based on FB algorithm.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\DiscoverPeopleResponse
+     */
+    public function discoverPeople()
+    {
+        return $this->request('discover/ayml/')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->account_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('paginate', true)
+        ->addPost('module', 'discover_people')
+        ->getResponse(new Response\DiscoverPeopleResponse());
+    }
+
+    /**
      * Get suggested broadcasts.
      *
      * @throws \InstagramAPI\Exception\InstagramException

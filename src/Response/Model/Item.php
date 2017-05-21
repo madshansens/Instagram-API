@@ -146,6 +146,16 @@ class Item extends \InstagramAPI\Response
      * @var Placeholder
      */
     public $placeholder;
+    public $social_context;
+    public $icon;
+    /**
+     * @var string[]
+     */
+    public $media_ids;
+    public $thumbnail_urls;
+    public $large_urls;
+    public $media_infos;
+    public $value;
 
     public function setMediaOrAd(
         $params)
