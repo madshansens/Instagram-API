@@ -2,11 +2,11 @@
 
 namespace InstagramAPI\Realtime;
 
-use Clue\React\HttpProxy\ProxyConnector as HttpConnectProxy;
 use Clue\React\Socks\Client as SocksProxy;
 use InstagramAPI\Client as HttpClient;
 use InstagramAPI\Instagram;
 use InstagramAPI\Realtime;
+use InstagramAPI\Realtime\Utils\HttpConnectProxy;
 use React\Dns\Resolver\Factory as DnsFactory;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
