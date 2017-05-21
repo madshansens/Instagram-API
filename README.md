@@ -8,7 +8,7 @@ This is Instagram's private API. It has all the features the Instagram app has, 
 
 **Do you like this project? Support it by donating**
 - ![Paypal](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/paypal.png) Paypal: [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5ATYY8H9MC96E)
-- ![btc](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/bitcoin.png) Bitcoin: 1DCEpC9wYXeUGXS58qSsqKzyy7HLTTXNYe 
+- ![btc](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/bitcoin.png) Bitcoin: 1DCEpC9wYXeUGXS58qSsqKzyy7HLTTXNYe
 
 ----------
 ## Installation
@@ -64,7 +64,7 @@ According to [the company](https://instagram.com/about/faq/):
 
 # License
 
-MIT
+Licensed under the GPLv3: http://www.gnu.org/licenses/gpl-3.0.html
 
 # Terms and conditions
 
