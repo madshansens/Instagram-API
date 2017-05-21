@@ -3850,7 +3850,7 @@ class Instagram
      */
     public function getBlockedStoryList()
     {
-        return $this->request("friendships/blocked_reels/")
+        return $this->request('friendships/blocked_reels/')
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
@@ -3909,7 +3909,7 @@ class Instagram
      */
     public function getStorySettings()
     {
-        return $this->request("users/reel_settings/")
+        return $this->request('users/reel_settings/')
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
@@ -3934,7 +3934,7 @@ class Instagram
             throw new \InvalidArgumentException('You must provide a valid privacy type.');
         }
 
-        return $this->request("users/set_reel_settings/")
+        return $this->request('users/set_reel_settings/')
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
