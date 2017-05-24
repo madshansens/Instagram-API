@@ -2026,6 +2026,52 @@ class Instagram
     }
 
     /**
+     * Archives/unarchives a media. Makes media only visible to you or make it public again.
+     *
+     * @param string   $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string   $mediaType   Media type: photo, album or video.
+     * @param bool     $onlyMe      Setting this value to true will archive your media and it will be only
+     *                              visible to you. Setting to false makes it public to everyone again.
+     *
+     * @throws \InstagramAPI\Exception\InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ArchiveMediaResponse
+     */
+    public function archiveMedia(
+        $mediaId,
+        $mediaType,
+        $onlyMe)
+    {
+        switch ($mediaType) {
+            case 'photo':
+                $mediaCode = 1;
+                break;
+            case 'video':
+                $mediaCode = 2;
+                break;
+            case 'album':
+                $mediaCode = 8;
+            default:
+                throw new \InvalidArgumentException('Media type not valid. Use photo, video or album.');
+                break;
+        }
+
+        if ($onlyMe) {
+            $endpoint = 'only_me';
+        } else {
+            $endpoint = 'undo_only_me';
+        }
+
+        return $this->request("media/{$mediaId}/{$endpoint}/?media_type={$mediaCode}")
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_uid', $this->account_id)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('media_id', $mediaId)
+        ->getResponse(new Response\ArchiveMediaResponse());
+    }
+
+    /**
      * Tag a user in a media item.
      *
      * @param string      $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
