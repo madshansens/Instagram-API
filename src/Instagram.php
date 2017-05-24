@@ -3778,6 +3778,26 @@ class Instagram
     }
 
     /**
+     * Hide suggested user.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\SuggestedUsersResponse
+     */
+    public function hideSuggestedUser(
+        $userId)
+    {
+        return $this->request('discover/aysf_dismiss/')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_csrftoken', $this->token)
+        ->addParams('target_id', $userId)
+        ->addParams('algorithm', 'ig_friends_of_friends_from_tao_laser_algorithm')
+        ->getResponse(new Response\SuggestedUsersResponse());
+    }
+
+    /**
      * Discover new people via Facebook's algorithm.
      *
      * @throws \InstagramAPI\Exception\InstagramException
