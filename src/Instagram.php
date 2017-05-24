@@ -2026,12 +2026,15 @@ class Instagram
     }
 
     /**
-     * Archives/unarchives a media. Makes media only visible to you or make it public again.
+     * Archives or unarchives one of your timeline media items.
      *
-     * @param string   $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string   $mediaType   Media type: photo, album or video.
-     * @param bool     $onlyMe      Setting this value to true will archive your media and it will be only
-     *                              visible to you. Setting to false makes it public to everyone again.
+     * Marking media as "archived" will hide it from everyone except yourself.
+     * You can unmark the media again at any time, to make it public again.
+     *
+     * @param string $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string $mediaType Media type ("photo", "album" or "video").
+     * @param bool   $onlyMe    If true, archives your media so that it's only visible to you.
+     *                          Otherwise, if false, makes the media public to everyone again.
      *
      * @throws \InstagramAPI\Exception\InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -2053,7 +2056,7 @@ class Instagram
             case 'album':
                 $mediaCode = 8;
             default:
-                throw new \InvalidArgumentException('Media type not valid. Use photo, video or album.');
+                throw new \InvalidArgumentException('You must provide a valid media type.');
                 break;
         }
 
@@ -3775,7 +3778,7 @@ class Instagram
     }
 
     /**
-     * Discover new people based on FB algorithm.
+     * Discover new people via Facebook's algorithm.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -3846,13 +3849,28 @@ class Instagram
     }
 
     /**
-     * Block a user from viewing your story.
+     * Get a list of all blocked users.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BlockedListResponse
+     */
+    public function getBlockedList()
+    {
+        return $this->request('users/blocked_list/')
+        ->getResponse(new Response\BlockedListResponse());
+    }
+
+    /**
+     * Block a user's ability to see your stories.
      *
      * @param string $userId Numerical UserPK ID.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\FriendshipResponse
+     *
+     * @see muteFriendStory()
      */
     public function blockFriendStory(
         $userId)
@@ -3867,13 +3885,15 @@ class Instagram
     }
 
     /**
-     * Unblock a user from viewing your story.
+     * Unblock a user so that they can see your stories again.
      *
      * @param string $userId Numerical UserPK ID.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\FriendshipResponse
+     *
+     * @see unmuteFriendStory()
      */
     public function unblockFriendStory(
         $userId)
@@ -3888,7 +3908,7 @@ class Instagram
     }
 
     /**
-     * Get list of users from whom you've hid your stories.
+     * Get the list of users who are blocked from seeing your stories.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -3905,13 +3925,17 @@ class Instagram
     }
 
     /**
-     * Mute friend's stories.
+     * Mute a friend's stories, so that you no longer see their stories.
+     *
+     * This does not block them from seeing *your* stories.
      *
      * @param string $userId Numerical UserPK ID.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\FriendshipResponse
+     *
+     * @see blockFriendStory()
      */
     public function muteFriendStory(
         $userId)
@@ -3925,13 +3949,17 @@ class Instagram
     }
 
     /**
-     * Unmute friend's stories.
+     * Unmute a friend's stories, so that you see their stories again.
+     *
+     * This does not unblock them from seeing *your* stories.
      *
      * @param string $userId Numerical UserPK ID.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\FriendshipResponse
+     *
+     * @see unblockFriendStory()
      */
     public function unmuteFriendStory(
         $userId)
@@ -3945,9 +3973,11 @@ class Instagram
     }
 
     /**
-     * Get story settings.
+     * Get your story settings.
      *
-     * @param string $userId Numerical UserPK ID.
+     * This has information such as your story messaging mode (who can reply
+     * to your story), and the list of users you have blocked from seeing your
+     * stories.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -3964,9 +3994,11 @@ class Instagram
     }
 
     /**
-     * Set story settings.
+     * Set your story settings.
      *
-     * @param string $privacy Privacy story option. Possible options: anyone, following, off.
+     * @param string $messagePrefs Who can reply to your story. Valid values are "anyone" (meaning
+     *                             your followers), "following" (followers that you follow back),
+     *                             or "off" (meaning that nobody can reply to your story).
      *
      * @throws \InstagramAPI\Exception\InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -3974,10 +4006,10 @@ class Instagram
      * @return \InstagramAPI\Response\ReelSettingsResponse
      */
     public function setStorySettings(
-        $privacy)
+        $messagePrefs)
     {
-        if (!in_array($privacy, ['anyone', 'following', 'off'])) {
-            throw new \InvalidArgumentException('You must provide a valid privacy type.');
+        if (!in_array($messagePrefs, ['anyone', 'following', 'off'])) {
+            throw new \InvalidArgumentException('You must provide a valid message preference value.');
         }
 
         return $this->request('users/set_reel_settings/')
@@ -3985,7 +4017,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->token)
-        ->addPost('message_prefs', $privacy)
+        ->addPost('message_prefs', $messagePrefs)
         ->getResponse(new Response\ReelSettingsResponse());
     }
 
@@ -4026,19 +4058,6 @@ class Instagram
         ->addPost('user_ids', implode(',', $userList))
         ->addPost('_csrftoken', $this->token)
         ->getResponse(new Response\FriendshipsShowManyResponse());
-    }
-
-    /**
-     * Get a list with all blocked users.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\BlockedListResponse
-     */
-    public function getBlockedList()
-    {
-        return $this->request('users/blocked_list/')
-        ->getResponse(new Response\BlockedListResponse());
     }
 
     /**
