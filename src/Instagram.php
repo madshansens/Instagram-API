@@ -3830,6 +3830,23 @@ class Instagram
     }
 
     /**
+     * Get badge notifications.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BadgeNotificationsResponse
+     */
+    public function getBadgeNotifications()
+    {
+        return $this->request('notifications/badge/')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('users_ids', $this->account_id)
+        ->addPost('device_id', $this->device_id)
+        ->getResponse(new Response\BadgeNotificationsResponse());
+    }
+
+    /**
      * Hide suggested user.
      *
      * @param string $userId Numerical UserPK ID.
