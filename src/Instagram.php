@@ -22,7 +22,7 @@ class Instagram
     /**
      * Experiments refresh interval in sec.
      *
-     * @const int
+     * @var int
      */
     const EXPERIMENTS_REFRESH = 7200;
 

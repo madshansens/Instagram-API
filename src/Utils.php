@@ -7,14 +7,14 @@ class Utils
     /**
      * Used for multipart boundary generation.
      *
-     * @const string
+     * @var string
      */
     const BOUNDARY_CHARS = '-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
     /**
      * Length of generated multipart boundary.
      *
-     * @const int
+     * @var int
      */
     const BOUNDARY_LENGTH = 30;
 
