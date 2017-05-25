@@ -2456,15 +2456,15 @@ class Instagram
     }
 
     /**
-     * Translates comments and/or media captions to your local language.
+     * Translates comments and/or media captions.
      *
-     * The text will be translated to the local language of your account’s country.
+     * Note that the text will be translated to American English (en-US).
      *
      * @param string|string[] $commentIds The IDs of one or more comments and/or media IDs
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\Translate
+     * @return \InstagramAPI\Response\TranslateResponse
      */
     public function translateComments(
         $commentIds)
