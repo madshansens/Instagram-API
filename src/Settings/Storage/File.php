@@ -5,6 +5,7 @@ namespace InstagramAPI\Settings\Storage;
 use InstagramAPI\Constants;
 use InstagramAPI\Exception\SettingsException;
 use InstagramAPI\Settings\StorageInterface;
+use InstagramAPI\Utils;
 
 /**
  * Persistent storage backend which keeps settings in a reliable binary file.
@@ -107,7 +108,7 @@ class File implements StorageInterface
         }
 
         // Delete all files in the old folder, and the folder itself.
-        $this->_deleteTree($oldUser['userFolder']);
+        Utils::deleteTree($oldUser['userFolder']);
     }
 
     /**
@@ -120,7 +121,7 @@ class File implements StorageInterface
     {
         // Delete all files in the user folder, and the folder itself.
         $delUser = $this->_generateUserPaths($username);
-        $this->_deleteTree($delUser['userFolder']);
+        Utils::deleteTree($delUser['userFolder']);
     }
 
     /**
@@ -375,52 +376,11 @@ class File implements StorageInterface
     private function _createFolder(
         $folder)
     {
-        // Test write-permissions for the folder and create/fix if necessary.
-        if ((is_dir($folder) && is_writable($folder))
-            || (!is_dir($folder) && mkdir($folder, 0755, true))
-            || chmod($folder, 0755)) {
-            return;
-        } else {
+        if (!Utils::createFolder($folder)) {
             throw new SettingsException(sprintf(
                 'The "%s" folder is not writable.',
                 $folder
             ));
         }
-    }
-
-    /**
-     * Recursively deletes a file/directory tree.
-     *
-     * @param string $folder         The directory path.
-     * @param bool   $keepRootFolder Whether to keep the top-level folder.
-     *
-     * @return bool TRUE on success, otherwise FALSE.
-     */
-    private function _deleteTree(
-        $folder,
-        $keepRootFolder = false)
-    {
-        // Handle bad arguments.
-        if (empty($folder) || !file_exists($folder)) {
-            return true; // No such file/folder exists.
-        } elseif (is_file($folder) || is_link($folder)) {
-            return @unlink($folder); // Delete file/link.
-        }
-
-        // Delete all children.
-        $files = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($folder, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST
-        );
-
-        foreach ($files as $fileinfo) {
-            $action = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
-            if (!@$action($fileinfo->getRealPath())) {
-                return false; // Abort due to the failure.
-            }
-        }
-
-        // Delete the root folder itself?
-        return !$keepRootFolder ? @rmdir($folder) : true;
     }
 }

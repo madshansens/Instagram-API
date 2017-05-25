@@ -441,4 +441,60 @@ class Utils
 
         return array_search($filter, $filters);
     }
+
+    /**
+     * Creates a folder if missing, or ensures that it is writable.
+     *
+     * @param string $folder The directory path.
+     *
+     * @return bool TRUE if folder exists and is writable, otherwise FALSE.
+     */
+    public static function createFolder(
+        $folder)
+    {
+        // Test write-permissions for the folder and create/fix if necessary.
+        if ((is_dir($folder) && is_writable($folder))
+            || (!is_dir($folder) && mkdir($folder, 0755, true))
+            || chmod($folder, 0755)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Recursively deletes a file/directory tree.
+     *
+     * @param string $folder         The directory path.
+     * @param bool   $keepRootFolder Whether to keep the top-level folder.
+     *
+     * @return bool TRUE on success, otherwise FALSE.
+     */
+    public static function deleteTree(
+        $folder,
+        $keepRootFolder = false)
+    {
+        // Handle bad arguments.
+        if (empty($folder) || !file_exists($folder)) {
+            return true; // No such file/folder exists.
+        } elseif (is_file($folder) || is_link($folder)) {
+            return @unlink($folder); // Delete file/link.
+        }
+
+        // Delete all children.
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($folder, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($files as $fileinfo) {
+            $action = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+            if (!@$action($fileinfo->getRealPath())) {
+                return false; // Abort due to the failure.
+            }
+        }
+
+        // Delete the root folder itself?
+        return !$keepRootFolder ? @rmdir($folder) : true;
+    }
 }
