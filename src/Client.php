@@ -236,8 +236,10 @@ class Client
     /**
      * Tells current settings storage to store cookies if necessary.
      *
-     * There is no need to call this function manually. It's automatically
-     * called by _guzzleRequest()!
+     * NOTE: This Client class is NOT responsible for calling this function!
+     * Instead, our parent "Instagram" instance takes care of it and saves the
+     * cookies "onCloseUser", so that cookies are written to storage in a
+     * single, efficient write when the user's session is finished.
      */
     public function saveCookieJar()
     {
@@ -550,7 +552,10 @@ class Client
         }
 
         // Save the new, most up-to-date cookies.
-        $this->saveCookieJar();
+        // NOTE: This code has been disabled since it was wasteful to constantly
+        // save cookies. Instead, our parent saves our cookies "in bulk" when
+        // the user's session finishes, via SettingsHandler's "onCloseUser".
+        //$this->saveCookieJar();
 
         // The response may still have serious but "valid response" errors, such
         // as "400 Bad Request". But it's up to the CALLER to handle those!

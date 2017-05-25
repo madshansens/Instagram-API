@@ -56,7 +56,7 @@ class StorageHandler
      *   data at the end of a user's session, to avoid constant micro-updates.
      */
     const SUPPORTED_CALLBACKS = [
-        'onCloseUser'
+        'onCloseUser',
     ];
 
     /** @var StorageInterface The active storage backend. */

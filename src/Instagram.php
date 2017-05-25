@@ -170,7 +170,18 @@ class Instagram
         $this->truncatedDebug = $truncatedDebug;
 
         // Configure the settings storage and network client.
-        $this->settings = Settings\Factory::createHandler($storageConfig);
+        $self = $this;
+        $this->settings = Settings\Factory::createHandler(
+            $storageConfig,
+            [
+                // This saves all user session cookies "in bulk" at script exit
+                // or when switching to a different user, so that it only needs
+                // to write cookies to storage ONCE per user session:
+                'onCloseUser' => function ($storage) use ($self) {
+                    $self->client->saveCookieJar();
+                },
+            ]
+        );
         $this->client = new Client($this);
         $this->experiments = [];
     }
@@ -3817,8 +3828,6 @@ class Instagram
         ->addPost('module', 'discover_people')
         ->getResponse(new Response\SuggestedUsersBadgeResponse());
     }
-
-
 
     /**
      * Hide suggested user.
