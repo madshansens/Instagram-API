@@ -204,6 +204,11 @@ class Client
     /**
      * Retrieve the CSRF token from the current cookie jar.
      *
+     * Note that Instagram gives you a 1-year token expiration timestamp when
+     * you log in. But if you log out, they set its timestamp to "0" which means
+     * that the cookie is "expired" and invalid. We ignore token cookies if they
+     * have been logged out, or if they have expired naturally.
+     *
      * @return string|null The token if found and non-expired, otherwise NULL.
      */
     public function getToken()
