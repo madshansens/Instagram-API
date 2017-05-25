@@ -3800,6 +3800,27 @@ class Instagram
     }
 
     /**
+     * Get suggested users via account badge.
+     *
+     * This is the endpoint for when you press the "user icon with
+     * the plus sign" on your own profile in the Instagram app.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\SuggestedUsersBadgeResponse
+     */
+    public function getSuggestedUsersBadge()
+    {
+        return $this->request('discover/profile_su_badge/')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('_csrftoken', $this->token)
+        ->addPost('module', 'discover_people')
+        ->getResponse(new Response\SuggestedUsersBadgeResponse());
+    }
+
+
+
+    /**
      * Hide suggested user.
      *
      * @param string $userId Numerical UserPK ID.
