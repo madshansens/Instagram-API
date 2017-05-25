@@ -2456,6 +2456,28 @@ class Instagram
     }
 
     /**
+     * Translates comments and/or media captions to your local language.
+     *
+     * The text will be translated to the local language of your account’s country.
+     *
+     * @param string|string[] $commentIds The IDs of one or more comments and/or media IDs
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\Translate
+     */
+    public function translateComments(
+        $commentIds)
+    {
+        if (is_array($commentIds)) {
+            $commentIds = implode(',', $commentIds);
+        }
+
+        return $this->request("language/bulk_translate/?comment_ids={$commentIds}")
+        ->getResponse(new Response\TranslateResponse());
+    }
+
+    /**
      * Changes your account's profile picture.
      *
      * @param string $photoFilename The photo filename.
