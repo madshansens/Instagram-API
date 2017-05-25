@@ -144,9 +144,19 @@ class Client
     public function updateFromCurrentSettings(
         $resetCookieJar = false)
     {
+        // Update our internal client state from the new user's settings.
         $this->_userAgent = $this->_parent->device->getUserAgent();
         $this->_cookieJar = null; // Mark old jar for garbage collection.
         $this->loadCookieJar($resetCookieJar);
+
+        // Verify that the jar contains a non-expired csrftoken for the API
+        // domain. Instagram gives us a 1-year csrftoken whenever we log in.
+        // If it's missing, we're definitely NOT logged in! But even if all of
+        // these checks succeed, the cookie may still not be valid. It's just a
+        // preliminary check to detect definitely-invalid session cookies!
+        if ($this->getToken() === null) {
+            $this->_parent->isLoggedIn = false;
+        }
     }
 
     /**
@@ -188,15 +198,6 @@ class Client
 
             // Memory-based cookie jar which must be manually saved later.
             $this->_cookieJar = new CookieJar(false, $restoredCookies);
-        }
-
-        // Verify that the jar contains a non-expired csrftoken for the API
-        // domain. Instagram gives us a 1-year csrftoken whenever we log in.
-        // If it's missing, we're definitely NOT logged in! But even if all of
-        // these checks succeed, the cookie may still not be valid. It's just a
-        // preliminary check to detect definitely-invalid session cookies!
-        if ($this->getToken() === null) {
-            $this->_parent->isLoggedIn = false;
         }
     }
 
