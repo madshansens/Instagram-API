@@ -95,6 +95,38 @@ class Factory
 
             $storageInstance = new Storage\MySQL();
             break;
+        case 'sqlite':
+            // Look for allowed command-line values related to this backend.
+            $cmdOptions = self::getCmdOptions([
+                'settings_dbfilename::',
+                'settings_dbtablename::',
+            ]);
+
+            // These settings are optional, and can be provided regardless of
+            // connection method:
+            $locationConfig = [
+                'dbtablename' => self::getUserConfig('dbtablename', $storageConfig, $cmdOptions),
+            ];
+
+            // These settings are required, but you only have to use one method:
+            if (isset($storageConfig['pdo'])) {
+                // If "pdo" is set in the factory config, assume the user wants
+                // to re-use an existing PDO connection. In that case we ignore
+                // the SQLite filename/connection parameters and use their PDO.
+                // NOTE: Beware that we WILL change attributes on the PDO
+                // connection to suit our needs! Primarily turning all error
+                // reporting into exceptions, and setting the charset to UTF-8.
+                // If you want to re-use a PDO connection, you MUST accept the
+                // fact that WE NEED exceptions and UTF-8 in our PDO! If that is
+                // not acceptable to you then DO NOT re-use your own PDO object!
+                $locationConfig['pdo'] = $storageConfig['pdo'];
+            } else {
+                // Make a new connection. Optional settings for it:
+                $locationConfig['dbfilename'] = self::getUserConfig('dbfilename', $storageConfig, $cmdOptions);
+            }
+
+            $storageInstance = new Storage\SQLite();
+            break;
         case 'memcached':
             // The memcached storage can only be configured via the factory
             // configuration array (not via command line or environment vars).
