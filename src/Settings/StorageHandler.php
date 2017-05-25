@@ -40,7 +40,7 @@ class StorageHandler
      *
      * We will save ONLY the experiments mentioned in this list.
      *
-     * @const array
+     * @var array
      */
     const EXPERIMENT_KEYS = [
         'ig_android_2fac',
@@ -48,8 +48,22 @@ class StorageHandler
         'ig_android_skywalker_live_event_start_end',
     ];
 
+    /**
+     * Complete list of all supported callbacks.
+     *
+     * - "onCloseUser": Triggered before closing a user's storage (at script
+     *   end or when switching to a different user). Can be used for bulk-saving
+     *   data at the end of a user's session, to avoid constant micro-updates.
+     */
+    const SUPPORTED_CALLBACKS = [
+        'onCloseUser'
+    ];
+
     /** @var StorageInterface The active storage backend. */
     private $_storage;
+
+    /** @var array Optional callback functions. */
+    private $_callbacks;
 
     /** @var string Current Instagram username that all settings belong to. */
     private $_username;
@@ -63,12 +77,14 @@ class StorageHandler
      * @param StorageInterface $storageInterface An instance of desired Storage.
      * @param array            $locationConfig   Configuration parameters for
      *                                           the storage backend location.
+     * @param array            $callbacks        Optional callback functions.
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */
     public function __construct(
         $storageInstance,
-        array $locationConfig = [])
+        array $locationConfig = [],
+        array $callbacks = [])
     {
         if (!$storageInstance instanceof StorageInterface) {
             throw new SettingsException(
@@ -80,6 +96,9 @@ class StorageHandler
                 'The storage location configuration must be an array.'
             );
         }
+
+        // Store any user-provided callbacks.
+        $this->_callbacks = $callbacks;
 
         // Connect the storage instance to the user's desired storage location.
         $this->_storage = $storageInstance;
@@ -95,6 +114,7 @@ class StorageHandler
     {
         // The storage handler is being killed, so tell the location to close.
         if ($this->_username !== null) {
+            $this->_triggerCallback('onCloseUser');
             $this->_storage->closeUser();
             $this->_username = null;
         }
@@ -199,6 +219,7 @@ class StorageHandler
         // If we're switching away from a user, tell the backend to close the
         // current user's storage (if it needs to do any special processing).
         if ($this->_username !== null) {
+            $this->_triggerCallback('onCloseUser');
             $this->_storage->closeUser();
         }
 
@@ -381,6 +402,10 @@ class StorageHandler
      * called frequently! But it is ONLY called if a non-"cookiefile" answer
      * was returned by the getCookies() call.
      *
+     * NOTE: It is very important that the owner of this SettingsHandler either
+     * continuously calls "setCookies", or better yet listens to the "closeUser"
+     * callback to save all cookies in bulk to storage at the end of a session.
+     *
      * @param string $rawData An encoded string with all cookie data.
      *
      * @throws \InstagramAPI\Exception\SettingsException
@@ -435,6 +460,41 @@ class StorageHandler
             throw new SettingsException(
                 'Called user-related function before setting the current storage user.'
             );
+        }
+    }
+
+    /**
+     * Internal: Triggers a callback.
+     *
+     * All callback functions are given the storage handler instance as their
+     * one and only argument.
+     *
+     * @param string $cbName The name of the callback.
+     *
+     * @throws \InstagramAPI\Exception\SettingsException
+     */
+    protected function _triggerCallback(
+        $cbName)
+    {
+        // Reject anything that isn't in our list of VALID callbacks.
+        if (!in_array($cbName, self::SUPPORTED_CALLBACKS)) {
+            throw new SettingsException(sprintf(
+                'The string "%s" is not a valid callback name.',
+                $cbName
+            ));
+        }
+
+        // Trigger the callback with a reference to our StorageHandler instance.
+        if (isset($this->_callbacks[$cbName])) {
+            try {
+                $this->_callbacks[$cbName]($this);
+            } catch (\Exception $e) {
+                // Re-wrap anything that isn't already a SettingsException.
+                if (!$e instanceof SettingsException) {
+                    $e = new SettingsException($e->getMessage());
+                }
+                throw $e; // Re-throw;
+            }
         }
     }
 
