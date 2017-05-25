@@ -19,13 +19,15 @@ class Factory
      *
      * @param array $storageConfig Configuration for the desired
      *                             user settings storage backend.
+     * @param array $callbacks     Optional StorageHandler callback functions.
      *
      * @throws \InstagramAPI\Exception\SettingsException
      *
      * @return \InstagramAPI\Settings\StorageHandler
      */
     public static function createHandler(
-        array $storageConfig)
+        array $storageConfig,
+        array $callbacks = [])
     {
         // Resolve the storage backend choice if none provided in array.
         if (!isset($storageConfig['storage'])) {
@@ -185,7 +187,8 @@ class Factory
         // Create the storage handler and connect to the storage location.
         return new StorageHandler(
             $storageInstance,
-            $locationConfig
+            $locationConfig,
+            $callbacks
         );
     }
 
