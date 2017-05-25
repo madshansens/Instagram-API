@@ -92,8 +92,7 @@ class Request
     }
 
     public function getResponse(
-        $baseClass,
-        $includeHeader = false)
+        $baseClass = null)
     {
         if ($this->_params) {
             $endpoint = $this->_url.'?'.http_build_query($this->_params);
@@ -113,12 +112,9 @@ class Request
 
         $response = $this->_parent->client->api($this->_apiVersion, $endpoint, $post, $this->_needsAuth, false);
 
-        $responseObject = $this->_parent->client->getMappedResponseObject(
-            $baseClass,
-            $response[1], // [0] = Token. [1] = The actual server response.
-            ($includeHeader ? $response : null) // null = Reuse $response[1].
-        );
-
-        return $responseObject;
+        // Decode to base class if provided, or otherwise return raw object.
+        return $baseClass !== null
+               ? $this->_parent->client->getMappedResponseObject($baseClass, $response)
+               : $response;
     }
 }

@@ -336,7 +336,7 @@ Once you have the endpoint and necessary parameters, how do you add them to this
         ->setSignedPost(false)
         ->addPost('_uuid', $this->uuid)
         ->addPost('user_ids', implode(',', $userList))
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\AwesomeResponse());
     }
 ```

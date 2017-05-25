@@ -28,7 +28,6 @@ class StorageHandler
         'device_id', // Hardware identifier.
         'phone_id', // Hardware identifier.
         'uuid', // Universally unique identifier.
-        'token', // CSRF token for the logged in session.
         'advertising_id', // Google Play advertising ID.
         'experiments', // Interesting experiment variables for this account.
         'last_login', // Tracks time elapsed since our last login state refresh.
@@ -262,8 +261,7 @@ class StorageHandler
         $this->_throwIfNoActiveUser();
 
         return $this->_storage->hasUserCookies()
-                && !empty($this->get('account_id'))
-                && !empty($this->get('token'));
+                && !empty($this->get('account_id'));
     }
 
     /**

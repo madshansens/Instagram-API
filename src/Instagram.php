@@ -109,13 +109,6 @@ class Instagram
     public $account_id;
 
     /**
-     * csrftoken.
-     *
-     * @var string
-     */
-    public $token;
-
-    /**
      * Session status.
      *
      * @var bool
@@ -243,7 +236,6 @@ class Instagram
 
             // Remove the previous hardware's login details to force a relogin.
             $this->settings->set('account_id', '');
-            $this->settings->set('token', '');
             $this->settings->set('last_login', '0');
 
             // We'll also need to throw out all previous cookies.
@@ -274,12 +266,10 @@ class Instagram
             $this->isLoggedIn = true;
             $this->account_id = $this->settings->get('account_id');
             $this->rank_token = $this->account_id.'_'.$this->uuid;
-            $this->token = $this->settings->get('token');
         } else {
             $this->isLoggedIn = false;
             $this->account_id = null;
             $this->rank_token = null;
-            $this->token = null;
         }
 
         // Configures Client for current user AND updates isLoggedIn state
@@ -367,8 +357,10 @@ class Instagram
     }
 
     /**
-     * Signup challenge is used to get _csrftoken in order to make a successful login or
-     * registration request.
+     * Get signup challenge headers.
+     *
+     * Signup challenge is used to get _csrftoken in order to make a successful
+     * login or registration request.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -380,7 +372,7 @@ class Instagram
         ->setNeedsAuth(false)
         ->addParams('challenge_type', 'signup')
         ->addParams('guid', str_replace('-', '', $this->uuid))
-        ->getResponse(new Response\ChallengeResponse(), true);
+        ->getResponse(new Response\ChallengeResponse());
     }
 
     /**
@@ -414,27 +406,24 @@ class Instagram
         if (!$this->isLoggedIn || $forceLogin) {
             $this->syncFeatures(true);
 
-            $signupChallenge = $this->_getSignupChallenge();
+            // Call login challenge API so a csrftoken is put in our cookie jar.
+            $this->_getSignupChallenge();
 
             try {
                 $response = $this->request('accounts/login/')
                 ->setNeedsAuth(false)
                 ->addPost('phone_id', $this->settings->get('phone_id'))
-                ->addPost('_csrftoken', $signupChallenge->getFullResponse()[0])
+                ->addPost('_csrftoken', $this->client->getToken())
                 ->addPost('username', $this->username)
                 ->addPost('guid', $this->uuid)
                 ->addPost('adid', $this->advertising_id)
                 ->addPost('device_id', $this->device_id)
                 ->addPost('password', $this->password)
                 ->addPost('login_attempt_count', 0)
-                ->getResponse(new Response\LoginResponse(), true);
+                ->getResponse(new Response\LoginResponse());
             } catch (\InstagramAPI\Exception\InstagramException $e) {
                 if ($e->hasResponse() && $e->getResponse()->getTwoFactorRequired()) {
                     // Login failed because two-factor login is required.
-                    // NOTE: We NEED this token in twoFactorLogin() but we'll
-                    // only save it to settings storage AFTER successful login!
-                    $this->token = $e->getResponse()->getFullResponse()[0];
-
                     // Return server response to tell user they need 2-factor.
                     return $e->getResponse();
                 } else {
@@ -476,11 +465,11 @@ class Instagram
         ->setNeedsAuth(false)
         ->addPost('verification_code', $verificationCode)
         ->addPost('two_factor_identifier', $twoFactorIdentifier)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('username', $this->username)
         ->addPost('device_id', $this->device_id)
         ->addPost('password', $this->password)
-        ->getResponse(new Response\LoginResponse(), true);
+        ->getResponse(new Response\LoginResponse());
 
         $this->_updateLoginState($response);
 
@@ -511,8 +500,6 @@ class Instagram
         $this->account_id = $response->getLoggedInUser()->getPk();
         $this->settings->set('account_id', $this->account_id);
         $this->rank_token = $this->account_id.'_'.$this->uuid;
-        $this->token = $response->getFullResponse()[0];
-        $this->settings->set('token', $this->token);
         $this->settings->set('last_login', time());
     }
 
@@ -647,7 +634,7 @@ class Instagram
         return $this->request('accounts/send_two_factor_enable_sms/')
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('device_id', $this->device_id)
         ->addPost('phone_number', $cleanNumber)
         ->getResponse(new Response\RequestTwoFactorResponse());
@@ -675,7 +662,7 @@ class Instagram
         $response = $this->request('accounts/enable_sms_two_factor/')
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('device_id', $this->device_id)
         ->addPost('phone_number', $cleanNumber)
         ->addPost('verification_code', $verificationCode)
@@ -696,7 +683,7 @@ class Instagram
         return $this->request('accounts/disable_sms_two_factor/')
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\DisableTwoFactorResponse());
     }
 
@@ -719,7 +706,7 @@ class Instagram
         return $this->request('accounts/account_security_info/')
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\AccountSecurityInfoResponse());
     }
 
@@ -781,7 +768,7 @@ class Instagram
             $result = $this->request('qe/sync/')
             ->addPost('_uuid', $this->uuid)
             ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->token)
+            ->addPost('_csrftoken', $this->client->getToken())
             ->addPost('id', $this->account_id)
             ->addPost('experiments', Constants::EXPERIMENTS)
             ->getResponse(new Response\SyncResponse());
@@ -843,11 +830,11 @@ class Instagram
             'device_type'          => 'android_mqtt',
             'device_token'         => $deviceToken,
             'is_main_push_channel' => true,
-            '_csrftoken'           => $this->token,
+            '_csrftoken'           => $this->client->getToken(),
             'users'                => $this->account_id,
         ]);
 
-        return $this->client->api(1, 'push/register/?platform=10&device_type=android_mqtt', Signatures::generateSignatureForPost($data))[1];
+        return $this->client->api(1, 'push/register/?platform=10&device_type=android_mqtt', Signatures::generateSignatureForPost($data));
     }
 
     /**
@@ -950,7 +937,7 @@ class Instagram
         ->addPost('reason', '')
         ->addPost('_uuid', $this->uuid)
         ->addPost('device_id', $this->device_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('uuid', md5(time()))
         ->getResponse(new Response\MegaphoneLogResponse());
     }
@@ -1076,7 +1063,7 @@ class Instagram
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
         ->addPost('id', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('experiment', 'ig_android_profile_contextual_feed')
         ->getResponse(new Response\ExposeResponse());
     }
@@ -1196,10 +1183,10 @@ class Instagram
         $data = json_encode([
             '_uuid'      => $this->uuid,
             '_uid'       => $this->account_id,
-            '_csrftoken' => $this->token,
+            '_csrftoken' => $this->client->getToken(),
         ]);
 
-        return $this->client->api(1, "direct_v2/threads/{$threadId}/{$threadAction}/", Signatures::generateSignatureForPost($data))[1];
+        return $this->client->api(1, "direct_v2/threads/{$threadId}/{$threadAction}/", Signatures::generateSignatureForPost($data));
     }
 
     /**
@@ -1569,7 +1556,7 @@ class Instagram
 
         // Build the request...
         $requestData = $this->request($endpoint)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('_uid', $this->account_id)
         ->addPost('_uuid', $this->uuid)
         ->addPost('edits',
@@ -1758,7 +1745,7 @@ class Instagram
                 'source_width'  => $videoDetails['width'],
                 'source_height' => $videoDetails['height'],
             ])
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id);
 
@@ -1970,7 +1957,7 @@ class Instagram
 
         // Build the request...
         $requestData = $this->request($endpoint)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('_uid', $this->account_id)
         ->addPost('_uuid', $this->uuid)
         ->addPost('client_sidecar_id', Utils::generateUploadId())
@@ -2022,14 +2009,14 @@ class Instagram
             return $this->request("media/{$mediaId}/edit_media/")
             ->addPost('_uuid', $this->uuid)
             ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->token)
+            ->addPost('_csrftoken', $this->client->getToken())
             ->addPost('caption_text', $captionText)
             ->getResponse(new Response\EditMediaResponse());
         } else {
             return $this->request("media/{$mediaId}/edit_media/")
             ->addPost('_uuid', $this->uuid)
             ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->token)
+            ->addPost('_csrftoken', $this->client->getToken())
             ->addPost('caption_text', $captionText)
             ->addPost('usertags', $usertags)
             ->getResponse(new Response\EditMediaResponse());
@@ -2080,7 +2067,7 @@ class Instagram
         return $this->request("media/{$mediaId}/{$endpoint}/?media_type={$mediaCode}")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('media_id', $mediaId)
         ->getResponse(new Response\ArchiveMediaResponse());
     }
@@ -2144,7 +2131,7 @@ class Instagram
         return $this->request("media/{$mediaId}/save/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->setSignedPost(true)
         ->getResponse(new Response\SaveAndUnsaveMedia());
     }
@@ -2164,7 +2151,7 @@ class Instagram
         return $this->request("media/{$mediaId}/unsave/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->setSignedPost(true)
         ->getResponse(new Response\SaveAndUnsaveMedia());
     }
@@ -2184,7 +2171,7 @@ class Instagram
         $requestData = $this->request('feed/saved/')
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->setSignedPost(true);
 
         if (!is_null($maxId)) {
@@ -2209,7 +2196,7 @@ class Instagram
         return $this->request("usertags/{$mediaId}/remove/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\MediaResponse());
     }
 
@@ -2228,7 +2215,7 @@ class Instagram
         return $this->request("media/{$mediaId}/info/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('media_id', $mediaId)
         ->getResponse(new Response\MediaInfoResponse());
     }
@@ -2263,7 +2250,7 @@ class Instagram
     {
         return $this->request("live/{$broadcastId}/heartbeat_and_get_viewer_count/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\BroadcastHeartbeatAndViewerCountResponse());
     }
 
@@ -2282,7 +2269,7 @@ class Instagram
         return $this->request("media/{$mediaId}/delete/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('media_id', $mediaId)
         ->getResponse(new Response\MediaDeleteResponse());
     }
@@ -2301,7 +2288,7 @@ class Instagram
     {
         return $this->request("media/{$mediaId}/disable_comments/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->setSignedPost(false)
         ->getResponse(new \InstagramAPI\Response());
     }
@@ -2320,7 +2307,7 @@ class Instagram
     {
         return $this->request("media/{$mediaId}/enable_comments/")
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->setSignedPost(false)
         ->getResponse(new \InstagramAPI\Response());
     }
@@ -2344,7 +2331,7 @@ class Instagram
         ->addPost('idempotence_token', Signatures::generateUUID(true))
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('comment_text', $commentText)
         ->addPost('containermodule', 'comments_feed_timeline')
         ->addPost('radio_type', 'wifi-none')
@@ -2391,7 +2378,7 @@ class Instagram
         return $this->request("media/{$mediaId}/comment/{$commentId}/delete/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\DeleteCommentResponse());
     }
 
@@ -2423,7 +2410,7 @@ class Instagram
         return $this->request("media/{$mediaId}/comment/bulk_delete/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('comment_ids_to_delete', $comment_ids_to_delete)
         ->getResponse(new Response\DeleteCommentResponse());
     }
@@ -2443,7 +2430,7 @@ class Instagram
         return $this->request("media/{$commentId}/comment_like/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\CommentLikeUnlikeResponse());
     }
 
@@ -2462,7 +2449,7 @@ class Instagram
         return $this->request("media/{$commentId}/comment_unlike/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\CommentLikeUnlikeResponse());
     }
 
@@ -2515,7 +2502,7 @@ class Instagram
         return $this->request('accounts/remove_profile_picture/')
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\UserInfoResponse());
     }
 
@@ -2531,7 +2518,7 @@ class Instagram
         return $this->request('accounts/set_private/')
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\UserInfoResponse());
     }
 
@@ -2547,7 +2534,7 @@ class Instagram
         return $this->request('accounts/set_public/')
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\UserInfoResponse());
     }
 
@@ -2564,7 +2551,7 @@ class Instagram
         ->addParams('edit', true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\UserInfoResponse());
     }
 
@@ -2593,7 +2580,7 @@ class Instagram
         return $this->request('accounts/edit_profile/')
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('external_url', $url)
         ->addPost('phone_number', $phone)
         ->addPost('username', $this->username)
@@ -2621,7 +2608,7 @@ class Instagram
         return $this->request('accounts/change_password/')
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('old_password', $oldPassword)
         ->addPost('new_password1', $newPassword)
         ->addPost('new_password2', $newPassword)
@@ -2669,7 +2656,7 @@ class Instagram
         return $this->request('accounts/set_comment_filter/')
             ->addPost('_uuid', $this->uuid)
             ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->token)
+            ->addPost('_csrftoken', $this->client->getToken())
             ->addPost('config_value', $config_value)
             ->setSignedPost(true)
             ->getResponse(new Response\CommentFilterSetResponse());
@@ -2690,7 +2677,7 @@ class Instagram
         return $this->request('accounts/set_comment_filter_keywords/')
             ->addPost('_uuid', $this->uuid)
             ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->token)
+            ->addPost('_csrftoken', $this->client->getToken())
             ->addPost('keywords', $keywords)
             ->setSignedPost(true)
             ->getResponse(new Response\CommentFilterSetResponse());
@@ -2896,7 +2883,7 @@ class Instagram
         return $this->request('address_book/unlink/')
             ->addPost('_uuid', $this->uuid)
             ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->token)
+            ->addPost('_csrftoken', $this->client->getToken())
             ->getResponse(new Response\UnlinkAddressBookResponse());
     }
 
@@ -3151,7 +3138,7 @@ class Instagram
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('reels', $reels)
         ->addPost('nuxes', [])
         ->getResponse(new Response\MediaSeenResponse());
@@ -3489,7 +3476,7 @@ class Instagram
         return $this->request("media/{$mediaId}/like/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('media_id', $mediaId)
         ->getResponse(new \InstagramAPI\Response());
     }
@@ -3509,7 +3496,7 @@ class Instagram
         return $this->request("media/{$mediaId}/unlike/")
          ->addPost('_uuid', $this->uuid)
          ->addPost('_uid', $this->account_id)
-         ->addPost('_csrftoken', $this->token)
+         ->addPost('_csrftoken', $this->client->getToken())
          ->addPost('media_id', $mediaId)
          ->getResponse(new \InstagramAPI\Response());
     }
@@ -3536,7 +3523,7 @@ class Instagram
         return $this->request("live/{$broadcastId}/like/")
          ->addPost('_uuid', $this->uuid)
          ->addPost('_uid', $this->account_id)
-         ->addPost('_csrftoken', $this->token)
+         ->addPost('_csrftoken', $this->client->getToken())
          ->addPost('user_like_count', $likeCount)
          ->getResponse(new Response\BroadcastLikeResponse());
     }
@@ -3617,7 +3604,7 @@ class Instagram
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('first_name', $name)
         ->addPost('phone_number', $phone)
         ->getResponse(new \InstagramAPI\Response());
@@ -3745,7 +3732,7 @@ class Instagram
         return $this->request("friendships/create/{$userId}/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('user_id', $userId)
         ->addPost('radio_type', 'wifi-none')
         ->getResponse(new Response\FriendshipResponse());
@@ -3766,7 +3753,7 @@ class Instagram
         return $this->request("friendships/destroy/{$userId}/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('user_id', $userId)
         ->addPost('radio_type', 'wifi-none')
         ->getResponse(new Response\FriendshipResponse());
@@ -3824,7 +3811,7 @@ class Instagram
     {
         return $this->request('discover/profile_su_badge/')
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('module', 'discover_people')
         ->getResponse(new Response\SuggestedUsersBadgeResponse());
     }
@@ -3840,7 +3827,7 @@ class Instagram
     {
         return $this->request('notifications/badge/')
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('users_ids', $this->account_id)
         ->addPost('device_id', $this->device_id)
         ->getResponse(new Response\BadgeNotificationsResponse());
@@ -3860,7 +3847,7 @@ class Instagram
     {
         return $this->request('discover/aysf_dismiss/')
         ->addPost('_uuid', $this->uuid)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addParams('target_id', $userId)
         ->addParams('algorithm', 'ig_friends_of_friends_from_tao_laser_algorithm')
         ->getResponse(new Response\SuggestedUsersResponse());
@@ -3878,7 +3865,7 @@ class Instagram
         return $this->request('discover/ayml/')
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('paginate', true)
         ->addPost('module', 'discover_people')
         ->getResponse(new Response\DiscoverPeopleResponse());
@@ -3912,7 +3899,7 @@ class Instagram
         return $this->request("friendships/block/{$userId}/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('user_id', $userId)
         ->getResponse(new Response\FriendshipResponse());
     }
@@ -3932,7 +3919,7 @@ class Instagram
         return $this->request("friendships/unblock/{$userId}/")
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('user_id', $userId)
         ->getResponse(new Response\FriendshipResponse());
     }
@@ -3968,7 +3955,7 @@ class Instagram
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('source', 'profile')
         ->getResponse(new Response\FriendshipResponse());
     }
@@ -3991,7 +3978,7 @@ class Instagram
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('source', 'profile')
         ->getResponse(new Response\FriendshipResponse());
     }
@@ -4009,7 +3996,7 @@ class Instagram
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\BlockedReelsResponse());
     }
 
@@ -4033,7 +4020,7 @@ class Instagram
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\FriendshipResponse());
     }
 
@@ -4057,7 +4044,7 @@ class Instagram
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\FriendshipResponse());
     }
 
@@ -4078,7 +4065,7 @@ class Instagram
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\ReelSettingsResponse());
     }
 
@@ -4105,7 +4092,7 @@ class Instagram
         ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->addPost('message_prefs', $messagePrefs)
         ->getResponse(new Response\ReelSettingsResponse());
     }
@@ -4145,7 +4132,7 @@ class Instagram
         ->setSignedPost(false)
         ->addPost('_uuid', $this->uuid)
         ->addPost('user_ids', implode(',', $userList))
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\FriendshipsShowManyResponse());
     }
 
@@ -4196,7 +4183,7 @@ class Instagram
         return $this->request('accounts/send_confirm_email/')
         ->addPost('_uuid', $this->uuid)
         ->addPost('send_source', 'profile_megaphone')
-        ->addPost('_csrftoken', $this->token)
+        ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\SendConfirmEmailResponse());
     }
 

@@ -439,10 +439,6 @@ class Client
      * @param mixed $baseClass    An instance of a class object whose properties
      *                            you want to fill from the $response.
      * @param mixed $response     A decoded JSON response from Instagram's server.
-     * @param mixed $fullResponse The raw response object to provide in the
-     *                            "getFullResponse()" property. Set this to
-     *                            NULL to automatically use $response. That's
-     *                            almost always what you want to do!
      *
      * @throws \InstagramAPI\Exception\InstagramException In case of invalid or
      *                                                    failed API response.
@@ -451,8 +447,7 @@ class Client
      */
     public function getMappedResponseObject(
         $baseClass,
-        $response,
-        $fullResponse = null)
+        $response)
     {
         if (is_null($response)) {
             throw new \InstagramAPI\Exception\EmptyResponseException('No response from server. Either a connection or configuration error.');
@@ -468,10 +463,7 @@ class Client
         $responseObject = $mapper->map($response, $baseClass);
 
         // Save the raw response object as the "getFullResponse()" value.
-        if (is_null($fullResponse)) {
-            $fullResponse = $response;
-        }
-        $responseObject->setFullResponse($fullResponse);
+        $responseObject->setFullResponse($response);
 
         // Throw an exception if the API response was unsuccessful.
         // NOTE: It will contain the full server response object too, which
@@ -773,14 +765,9 @@ class Client
             ]
         );
 
-        // Process cookies to extract the latest token.
-        $csrftoken = $this->getToken();
-
         // Manually decode the JSON response, since we didn't request object decoding
         // above. This lets our caller later map it to any object they want (or none).
-        $result = self::api_body_decode($response['body'], $assoc);
-
-        return [$csrftoken, $result];
+        return self::api_body_decode($response['body'], $assoc);
     }
 
     /**
@@ -841,7 +828,7 @@ class Client
             [
                 'type' => 'form-data',
                 'name' => '_csrftoken',
-                'data' => $this->_parent->token,
+                'data' => $this->getToken(),
             ],
             [
                 'type' => 'form-data',
@@ -946,7 +933,7 @@ class Client
             [
                 'type' => 'form-data',
                 'name' => '_csrftoken',
-                'data' => $this->_parent->token,
+                'data' => $this->getToken(),
             ],
             [
                 'type' => 'form-data',
@@ -1285,7 +1272,7 @@ class Client
         // Prepare payload for the upload request.
         $boundary = Utils::generateMultipartBoundary();
         $uData = json_encode([
-            '_csrftoken' => $this->_parent->token,
+            '_csrftoken' => $this->getToken(),
             '_uuid'      => $this->_parent->uuid,
             '_uid'       => $this->_parent->account_id,
         ]);
