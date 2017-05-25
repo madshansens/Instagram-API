@@ -74,13 +74,13 @@ class MySQL extends PDOStorage
         // Create the database table. Throws in case of failure.
         // NOTE: We store all settings as a JSON blob so that we support all
         // current and future data without having to alter the table schema.
-        $this->_pdo->exec('CREATE TABLE `'.$this->_dbTableName."` (
+        $this->_pdo->exec('CREATE TABLE `'.$this->_dbTableName.'` (
             id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
             username VARCHAR(255) NOT NULL,
             settings MEDIUMBLOB NULL,
             cookies MEDIUMBLOB NULL,
             last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             UNIQUE KEY (username)
-        ) COLLATE='utf8_general_ci' ENGINE=InnoDB;");
+        ) COLLATE="utf8_general_ci" ENGINE=InnoDB;');
     }
 }

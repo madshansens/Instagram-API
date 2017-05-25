@@ -44,7 +44,7 @@ $ig = new \InstagramAPI\Instagram($debug, $truncatedDebug, [
 $ig = new \InstagramAPI\Instagram($debug, $truncatedDebug, [
     'storage'     => 'sqlite',
     'dbfilename'  => 'some/path/foo.db',
-    'dbtablename' => 'mysettings'
+    'dbtablename' => 'mysettings',
 ]);
 
 // 4. If you read src/Settings/Factory.php, you'll notice that you can choose

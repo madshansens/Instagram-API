@@ -86,13 +86,13 @@ class SQLite extends PDOStorage
         // NOTE: We store all settings as a JSON blob so that we support all
         // current and future data without having to alter the table schema.
         // NOTE: SQLite automatically increments "integer primary key" cols.
-        $this->_pdo->exec('CREATE TABLE `'.$this->_dbTableName."` (
+        $this->_pdo->exec('CREATE TABLE `'.$this->_dbTableName.'` (
             id INTEGER PRIMARY KEY NOT NULL,
             username TEXT NOT NULL UNIQUE,
             settings BLOB,
             cookies BLOB,
             last_modified DATETIME DEFAULT CURRENT_TIMESTAMP
-        );");
+        );');
 
         // Set up a trigger to automatically update the modification timestamp.
         // NOTE: The WHEN clause is important to avoid infinite recursive loops,
@@ -102,14 +102,14 @@ class SQLite extends PDOStorage
         // that did NOT change last_modified. So our own UPDATEs of other fields
         // will trigger this automatic UPDATE, which does an UPDATE with a NEW
         // last_modified value, meaning that the trigger won't execute again!
-        $this->_pdo->exec('CREATE TRIGGER IF NOT EXISTS `'.$this->_dbTableName."_update_last_modified`
+        $this->_pdo->exec('CREATE TRIGGER IF NOT EXISTS `'.$this->_dbTableName.'_update_last_modified`
             AFTER UPDATE
-            ON `".$this->_dbTableName."`
+            ON `'.$this->_dbTableName.'`
             FOR EACH ROW
             WHEN NEW.last_modified = OLD.last_modified -- Avoids infinite loop.
             BEGIN
-                UPDATE `".$this->_dbTableName."` SET last_modified=CURRENT_TIMESTAMP WHERE (id=OLD.id);
-            END;"
+                UPDATE `'.$this->_dbTableName.'` SET last_modified=CURRENT_TIMESTAMP WHERE (id=OLD.id);
+            END;'
         );
     }
 }
