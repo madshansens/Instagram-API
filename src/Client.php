@@ -215,7 +215,7 @@ class Client
     {
         $cookie = $this->getCookie('csrftoken', 'i.instagram.com');
         if ($cookie === null || $cookie->getExpires() <= time()) {
-            return null;
+            return; // Ugh, StyleCI doesn't allow "return null;" for clarity. ;)
         }
 
         return $cookie->getValue();
@@ -442,9 +442,9 @@ class Client
     /**
      * Converts a server response to a specific kind of result object.
      *
-     * @param mixed $baseClass    An instance of a class object whose properties
-     *                            you want to fill from the $response.
-     * @param mixed $response     A decoded JSON response from Instagram's server.
+     * @param mixed $baseClass An instance of a class object whose properties
+     *                         you want to fill from the $response.
+     * @param mixed $response  A decoded JSON response from Instagram's server.
      *
      * @throws \InstagramAPI\Exception\InstagramException In case of invalid or
      *                                                    failed API response.
