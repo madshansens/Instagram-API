@@ -543,6 +543,7 @@ class Instagram
         //
         // You have been warned.
         if ($justLoggedIn) {
+            // Perform the "user has just done a full login" API flow.
             $this->syncFeatures();
             $this->getAutoCompleteUserList();
             $this->getReelsTrayFeed();
@@ -567,6 +568,8 @@ class Instagram
                 return $this->login(true, $appRefreshInterval);
             }
 
+            // Perform the "user has returned to their already-logged in app,
+            // so refresh all feeds to check for news" API flow.
             $lastLoginTime = $this->settings->get('last_login');
             if (is_null($lastLoginTime) || (time() - $lastLoginTime) > $appRefreshInterval) {
                 $this->settings->set('last_login', time());
@@ -583,10 +586,10 @@ class Instagram
                 $this->getExplore();
             }
 
+            // Users normally resume their sessions, meaning that their
+            // experiments never get synced and updated. So sync periodically.
             $lastExperimentsTime = $this->settings->get('last_experiments');
             if (is_null($lastExperimentsTime) || (time() - $lastExperimentsTime) > self::EXPERIMENTS_REFRESH) {
-                $this->settings->set('last_experiments', time());
-
                 $this->syncFeatures();
             }
         }
@@ -772,7 +775,10 @@ class Instagram
             ->addPost('id', $this->account_id)
             ->addPost('experiments', Constants::EXPERIMENTS)
             ->getResponse(new Response\SyncResponse());
+
+            // Save the experiments and the last time we refreshed them.
             $this->_saveExperiments($result);
+            $this->settings->set('last_experiments', time());
 
             return $result;
         }
