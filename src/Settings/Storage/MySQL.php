@@ -2,7 +2,6 @@
 
 namespace InstagramAPI\Settings\Storage;
 
-use InstagramAPI\Exception\SettingsException;
 use InstagramAPI\Settings\Storage\Components\PDOStorage;
 use PDO;
 
@@ -38,12 +37,9 @@ class MySQL extends PDOStorage
         $password = ($locationConfig['dbpassword'] ? $locationConfig['dbpassword'] : '');
         $host = ($locationConfig['dbhost'] ? $locationConfig['dbhost'] : 'localhost');
         $dbName = ($locationConfig['dbname'] ? $locationConfig['dbname'] : 'instagram');
-        try {
-            return new PDO("mysql:host={$host};dbname={$dbName}",
-                           $username, $password);
-        } catch (\Exception $e) {
-            throw new SettingsException('MySQL Connection Failed: '.$e->getMessage());
-        }
+
+        return new PDO("mysql:host={$host};dbname={$dbName}",
+                       $username, $password);
     }
 
     /**
@@ -53,7 +49,7 @@ class MySQL extends PDOStorage
      */
     protected function _enableUTF8()
     {
-        $this->_pdo->query('SET NAMES UTF8');
+        $this->_pdo->query('SET NAMES UTF8')->closeCursor();
     }
 
     /**
@@ -63,32 +59,28 @@ class MySQL extends PDOStorage
      */
     protected function _autoCreateTable()
     {
-        try {
-            // Detect the name of the MySQL database that PDO is connected to.
-            $dbName = $this->_pdo->query('SELECT database()')->fetchColumn();
+        // Detect the name of the MySQL database that PDO is connected to.
+        $dbName = $this->_pdo->query('SELECT database()')->fetchColumn();
 
-            // Abort if we already have the necessary table.
-            $sth = $this->_pdo->prepare('SELECT count(*) FROM information_schema.TABLES WHERE (TABLE_SCHEMA = :tableSchema) AND (TABLE_NAME = :tableName)');
-            $sth->execute([':tableSchema' => $dbName, ':tableName' => $this->_dbTableName]);
-            $result = $sth->fetchColumn();
-            $sth->closeCursor();
-            if ($result > 0) {
-                return;
-            }
-
-            // Create the database table. Throws in case of failure.
-            // NOTE: We store all settings as a JSON blob so that we support all
-            // current and future data without having to alter the table schema.
-            $this->_pdo->exec('CREATE TABLE `'.$this->_dbTableName."` (
-                id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                username VARCHAR(255) NOT NULL,
-                settings MEDIUMBLOB NULL,
-                cookies MEDIUMBLOB NULL,
-                last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                UNIQUE KEY (username)
-            ) COLLATE='utf8_general_ci' ENGINE=InnoDB;");
-        } catch (\Exception $e) {
-            throw new SettingsException('MySQL Error: '.$e->getMessage());
+        // Abort if we already have the necessary table.
+        $sth = $this->_pdo->prepare('SELECT count(*) FROM information_schema.TABLES WHERE (TABLE_SCHEMA = :tableSchema) AND (TABLE_NAME = :tableName)');
+        $sth->execute([':tableSchema' => $dbName, ':tableName' => $this->_dbTableName]);
+        $result = $sth->fetchColumn();
+        $sth->closeCursor();
+        if ($result > 0) {
+            return;
         }
+
+        // Create the database table. Throws in case of failure.
+        // NOTE: We store all settings as a JSON blob so that we support all
+        // current and future data without having to alter the table schema.
+        $this->_pdo->exec('CREATE TABLE `'.$this->_dbTableName."` (
+            id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(255) NOT NULL,
+            settings MEDIUMBLOB NULL,
+            cookies MEDIUMBLOB NULL,
+            last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY (username)
+        ) COLLATE='utf8_general_ci' ENGINE=InnoDB;");
     }
 }

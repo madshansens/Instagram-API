@@ -36,7 +36,7 @@ abstract class PDOStorage implements StorageInterface
     /**
      * Constructor.
      *
-     * @param string $backendName The name of the backend, such as "MySQL" or "SQLite".
+     * @param string $backendName Human name of the backend, such as "MySQL" or "SQLite".
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */
@@ -68,11 +68,24 @@ abstract class PDOStorage implements StorageInterface
         } else {
             // We should connect for the user, by creating our own PDO object.
             $this->_isSharedPDO = false;
-            $this->_pdo = $this->_createPDO($locationConfig);
+            try {
+                $this->_pdo = $this->_createPDO($locationConfig);
+            } catch (\Exception $e) {
+                throw new SettingsException($this->_backendName.' Connection Failed: '.$e->getMessage());
+            }
         }
 
-        $this->_configurePDO();
-        $this->_autoCreateTable();
+        try {
+            $this->_configurePDO();
+        } catch (\Exception $e) {
+            throw new SettingsException($this->_backendName.' Configuration Failed: '.$e->getMessage());
+        }
+
+        try {
+            $this->_autoCreateTable();
+        } catch (\Exception $e) {
+            throw new SettingsException($this->_backendName.' Error: '.$e->getMessage());
+        }
     }
 
     /**
@@ -80,7 +93,7 @@ abstract class PDOStorage implements StorageInterface
      *
      * @param array $locationConfig Configuration parameters for the location.
      *
-     * @throws \InstagramAPI\Exception\SettingsException
+     * @throws \Exception
      *
      * @return \PDO The database connection.
      */
@@ -97,30 +110,28 @@ abstract class PDOStorage implements StorageInterface
      * exceptions and UTF-8 in our PDO! If that is not acceptable to you then DO
      * NOT re-use your own PDO object!
      *
-     * @throws \InstagramAPI\Exception\SettingsException
+     * @throws \Exception
      */
     protected function _configurePDO()
     {
-        try {
-            $this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-            $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this->_enableUTF8();
-        } catch (\Exception $e) {
-            throw new SettingsException($this->_backendName.' Configuration Failed: '.$e->getMessage());
-        }
+        $this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->_enableUTF8();
     }
 
     /**
      * Enable UTF-8 encoding on the connection.
      *
      * This is database-specific and usually requires some kind of query.
+     *
+     * @throws \Exception
      */
     abstract protected function _enableUTF8();
 
     /**
      * Automatically create the database table if necessary.
      *
-     * @throws \InstagramAPI\Exception\SettingsException
+     * @throws \Exception
      */
     abstract protected function _autoCreateTable();
 
