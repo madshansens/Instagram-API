@@ -195,18 +195,55 @@ class Client
         // If it's missing, we're definitely NOT logged in! But even if all of
         // these checks succeed, the cookie may still not be valid. It's just a
         // preliminary check to detect definitely-invalid session cookies!
-        $foundCSRFToken = false;
-        foreach ($this->_cookieJar->getIterator() as $cookie) {
-            if ($cookie->getName() == 'csrftoken'
-                && $cookie->getDomain() == 'i.instagram.com'
-                && $cookie->getExpires() > time()) {
-                $foundCSRFToken = true;
-                break;
-            }
-        }
-        if (!$foundCSRFToken) {
+        if ($this->getToken() === null) {
             $this->_parent->isLoggedIn = false;
         }
+    }
+
+    /**
+     * Retrieve the CSRF token from the current cookie jar.
+     *
+     * @return string|null The token if found and non-expired, otherwise NULL.
+     */
+    public function getToken()
+    {
+        $cookie = $this->getCookie('csrftoken', 'i.instagram.com');
+        if ($cookie === null || $cookie->getExpires() <= time()) {
+            return null;
+        }
+
+        return $cookie->getValue();
+    }
+
+    /**
+     * Searches for a specific cookie in the current jar.
+     *
+     * @param string      $name   The name of the cookie.
+     * @param string|null $domain (optional) Require a specific domain match.
+     * @param string|null $path   (optional) Require a specific path match.
+     *
+     * @return \GuzzleHttp\Cookie\SetCookie|null A cookie if found, otherwise NULL.
+     */
+    public function getCookie(
+        $name,
+        $domain = null,
+        $path = null)
+    {
+        $foundCookie = null;
+
+        if ($this->_cookieJar instanceof CookieJar
+            || $this->_cookieJar instanceof FileCookieJar) {
+            foreach ($this->_cookieJar->getIterator() as $cookie) {
+                if ($cookie->getName() == $name
+                    && ($domain === null || $cookie->getDomain() == $domain)
+                    && ($path === null || $cookie->getPath() == $path)) {
+                    $foundCookie = $cookie;
+                    break;
+                }
+            }
+        }
+
+        return $foundCookie;
     }
 
     /**
@@ -737,14 +774,7 @@ class Client
         );
 
         // Process cookies to extract the latest token.
-        $csrftoken = null;
-        $cookies = $this->_cookieJar->getIterator();
-        foreach ($cookies as $cookie) {
-            if ($cookie->getName() == 'csrftoken') {
-                $csrftoken = $cookie->getValue();
-                break;
-            }
-        }
+        $csrftoken = $this->getToken();
 
         // Manually decode the JSON response, since we didn't request object decoding
         // above. This lets our caller later map it to any object they want (or none).
@@ -1036,14 +1066,11 @@ class Client
         // found" error when the final chunk has been uploaded.
         $sessionIDCookie = null;
         if ($targetFeed == 'album') {
-            foreach ($this->_cookieJar->getIterator() as $cookie) {
-                if ($cookie->getName() == 'sessionid'
-                    && $cookie->getDomain() == 'i.instagram.com') {
-                    $sessionIDCookie = $cookie->getValue();
-                    break;
-                }
+            $foundCookie = $this->getCookie('sessionid', 'i.instagram.com');
+            if ($foundCookie !== null) {
+                $sessionIDCookie = $foundCookie->getValue();
             }
-            if ($sessionIDCookie === null) {
+            if ($sessionIDCookie === null) { // Verify value.
                 throw new \InstagramAPI\Exception\UploadFailedException(
                     'Unable to find the necessary SessionID cookie for uploading video album chunks.'
                 );
