@@ -317,11 +317,9 @@ class Mqtt extends Client
      */
     protected function _getMqttPassword()
     {
-        $cookies = json_decode($this->_instagram->client->getCookieJarAsJSON());
-        foreach ($cookies as $cookie) {
-            if ($cookie->Name === 'sessionid') {
-                return sprintf('%s=%s', $cookie->Name, $cookie->Value);
-            }
+        $cookie = $this->_instagram->client->getCookie('sessionid', 'i.instagram.com');
+        if ($cookie !== null) {
+            return sprintf('%s=%s', $cookie->getName(), $cookie->getValue());
         }
         throw new \RuntimeException('No session cookie was found.');
     }
