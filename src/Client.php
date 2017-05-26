@@ -30,6 +30,13 @@ use InstagramAPI\Exception\SettingsException;
 class Client
 {
     /**
+     * How frequently we're allowed to auto-save the cookie jar, in seconds.
+     *
+     * @var int
+     */
+    const COOKIE_AUTOSAVE_INTERVAL = 45;
+
+    /**
      * The Instagram class instance we belong to.
      *
      * @var \InstagramAPI\Instagram
@@ -103,6 +110,16 @@ class Client
      * @var string|null
      */
     private $_settingsCookieFilePath;
+
+    /**
+     * The timestamp of when we last saved our cookie jar to disk.
+     *
+     * Used for automatically saving the jar after any API call, after enough
+     * time has elapsed since our last save.
+     *
+     * @var int
+     */
+    private $_settingsCookieLastSaved;
 
     /**
      * Constructor.
@@ -238,6 +255,10 @@ class Client
 
         // Memory-based cookie jar which must be manually saved later.
         $this->_cookieJar = new CookieJar(false, $restoredCookies);
+
+        // Reset the "last saved" timestamp to the current time to prevent
+        // auto-saving the cookies again immediately after this jar is loaded.
+        $this->_settingsCookieLastSaved = time();
     }
 
     /**
@@ -346,6 +367,9 @@ class Client
                 }
             }
         }
+
+        // Reset the "last saved" timestamp to the current time.
+        $this->_settingsCookieLastSaved = time();
     }
 
     /**
@@ -635,11 +659,11 @@ class Client
         //     break;
         }
 
-        // Save the new, most up-to-date cookies.
-        // NOTE: This code has been disabled since it was wasteful to constantly
-        // save cookies. Instead, our parent saves our cookies "in bulk" when
-        // the user's session finishes, via SettingsHandler's "onCloseUser".
-        //$this->saveCookieJar();
+        // We'll periodically auto-save our cookies at certain intervals. This
+        // complements the "onCloseUser" and "login()/logout()" force-saving.
+        if ((time() - $this->_settingsCookieLastSaved) > self::COOKIE_AUTOSAVE_INTERVAL) {
+            $this->saveCookieJar();
+        }
 
         // The response may still have serious but "valid response" errors, such
         // as "400 Bad Request". But it's up to the CALLER to handle those!

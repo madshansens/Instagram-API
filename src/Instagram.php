@@ -169,9 +169,11 @@ class Instagram
             [
                 // This saves all user session cookies "in bulk" at script exit
                 // or when switching to a different user, so that it only needs
-                // to write cookies to storage ONCE per user session:
+                // to write cookies to storage a few times per user session:
                 'onCloseUser' => function ($storage) use ($self) {
-                    $self->client->saveCookieJar();
+                    if ($self->client instanceof Client) {
+                        $self->client->saveCookieJar();
+                    }
                 },
             ]
         );
@@ -593,6 +595,11 @@ class Instagram
                 $this->syncFeatures();
             }
         }
+
+        // We've now performed a login or resumed a session. Forcibly write our
+        // cookies to the storage, to ensure that the storage doesn't miss them
+        // in case something bad happens to PHP after this moment.
+        $this->client->saveCookieJar();
     }
 
     /**
@@ -612,7 +619,15 @@ class Instagram
      */
     public function logout()
     {
-        return $this->request('accounts/logout/')->getResponse(new Response\LogoutResponse());
+        $response = $this->request('accounts/logout/')
+        ->getResponse(new Response\LogoutResponse());
+
+        // We've now logged out. Forcibly write our cookies to the storage, to
+        // ensure that the storage doesn't miss them in case something bad
+        // happens to PHP after this moment.
+        $this->client->saveCookieJar();
+
+        return $response;
     }
 
     /**
