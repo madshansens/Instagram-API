@@ -539,6 +539,8 @@ class Client
             // API developer debugging? Throws error if class lacks properties.
             $mapper->bExceptionOnUndefinedProperty = true;
         }
+
+        /** @var Response|mixed $responseObject */
         $responseObject = $mapper->map($response, $baseClass);
 
         // Save the raw response object as the "getFullResponse()" value.
@@ -549,9 +551,14 @@ class Client
         // means that the user can look at the full response details via the
         // exception itself.
         if (!$responseObject->isOk()) {
+            if ($responseObject instanceof \InstagramAPI\Response\SendItemResponse) {
+                $message = $responseObject->getPayload()->getMessage();
+            } else {
+                $message = $responseObject->getMessage();
+            }
             ServerMessageThrower::autoThrow(
                 get_class($baseClass),
-                $responseObject->getMessage(),
+                $message,
                 $responseObject
             );
         }
@@ -1411,57 +1418,49 @@ class Client
     }
 
     /**
-     * Perform a direct media share to specific users.
+     * Perform a direct media share with file upload to specific users.
      *
-     * @param string          $shareType  Either "share", "message" or "photo".
-     * @param string[]|string $recipients Either a single recipient or an array
-     *                                    of multiple recipient strings.
-     * @param array           $shareData  Depends on shareType: "share" uses
-     *                                    "text" and "media_id". "message" uses
-     *                                    "text". "photo" uses "text" and "filepath".
+     * @param string $shareType  Only "photo" is supported.
+     * @param array  $recipients An array with "users" or "thread" keys.
+     *                           To start a new thread, provide "users" as an array
+     *                           of numerical UserPK IDs. To use an existing thread
+     *                           instead, provide "thread" with the thread ID.
+     * @param array  $shareData  Depends on shareType: "photo" uses "filepath".
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response
+     * @return \InstagramAPI\Response\SendItemResponse
      */
-    public function directShare(
+    public function directShareFile(
         $shareType,
         $recipients,
-        array $shareData)
+        array $shareData = [])
     {
         $this->_throwIfNotLoggedIn();
 
         // Determine which endpoint to use and validate input.
         switch ($shareType) {
-        case 'share':
-            $endpoint = 'direct_v2/threads/broadcast/media_share/?media_type=photo';
-            if ((!isset($shareData['text']) || is_null($shareData['text']))
-                && (!isset($shareData['media_id']) || is_null($shareData['media_id']))) {
-                throw new \InvalidArgumentException('You must provide either a text message or a media id.');
-            }
-            break;
-        case 'message':
-            $endpoint = 'direct_v2/threads/broadcast/text/';
-            if (!isset($shareData['text']) || is_null($shareData['text'])) {
-                throw new \InvalidArgumentException('No text message provided.');
-            }
-            break;
-        case 'photo':
-            $endpoint = 'direct_v2/threads/broadcast/upload_photo/';
-            if (!isset($shareData['filepath']) || is_null($shareData['filepath'])) {
-                throw new \InvalidArgumentException('No photo path provided.');
-            }
-            break;
-        default:
-            throw new \InvalidArgumentException('Invalid shareType parameter value.');
+            case 'photo':
+                $endpoint = 'direct_v2/threads/broadcast/upload_photo/';
+                if (!isset($shareData['filepath'])) {
+                    throw new \InvalidArgumentException('No photo path provided.');
+                }
+                break;
+            default:
+                throw new \InvalidArgumentException('Unsupported shareType parameter value.');
         }
 
-        // Build the list of direct-share recipients.
-        if (!is_array($recipients)) {
-            $recipients = [$recipients];
+        $recipients = Utils::prepareRecipients($recipients);
+        if (isset($recipients['users'])) {
+            $recipientsName = 'recipient_users';
+            $recipientsData = $recipients['users'];
+        } elseif (isset($recipients['thread'])) {
+            $recipientsName = 'thread_ids';
+            $recipientsData = $recipients['thread'];
+        } else {
+            throw new \InvalidArgumentException('Please provide at least one recipient.');
         }
-        $recipient_users = '"'.implode('","', $recipients).'"';
 
         // Prepare payload for the direct-share request.
         // WARNING: EDIT THIS *VERY CAREFULLY* IN THE FUTURE!
@@ -1470,59 +1469,63 @@ class Client
         // CODE REPETITION. BUT RECKLESS FUTURE CHANGES BELOW COULD
         // BREAK *ALL* REQUESTS IF YOU ARE NOT *VERY* CAREFUL!!!
         $boundary = Utils::generateMultipartBoundary();
-        $bodies = [];
-        if ($shareType == 'share') {
-            $bodies[] = [
+        $bodies = [
+            [
                 'type' => 'form-data',
-                'name' => 'media_id',
-                'data' => $shareData['media_id'],
-            ];
-        }
-        $bodies[] = [
-            'type' => 'form-data',
-            'name' => 'recipient_users',
-            'data' => "[[{$recipient_users}]]",
+                'name' => 'action',
+                'data' => 'send_item',
+            ],
+            [
+                'type' => 'form-data',
+                'name' => $recipientsName,
+                'data' => $recipientsData,
+            ],
+            [
+                'type' => 'form-data',
+                'name' => 'client_context',
+                // WARNING: Must be random every time otherwise we can only
+                // make a single post per direct-discussion thread.
+                'data' => Signatures::generateUUID(true),
+            ],
+            [
+                'type' => 'form-data',
+                'name' => '_csrftoken',
+                'data' => $this->getToken(),
+            ],
+            [
+                'type' => 'form-data',
+                'name' => '_uuid',
+                'data' => $this->_parent->uuid,
+            ],
         ];
-        $bodies[] = [
-            'type' => 'form-data',
-            'name' => 'client_context',
-            // WARNING: Must be random every time otherwise we can only
-            // make a single post per direct-discussion thread.
-            'data' => Signatures::generateUUID(true),
-        ];
-        $bodies[] = [
-            'type' => 'form-data',
-            'name' => 'thread_ids',
-            'data' => '["0"]',
-        ];
-        if ($shareType == 'photo') {
+
+        if ($shareType === 'photo') {
             $bodies[] = [
                 'type'     => 'form-data',
                 'name'     => 'photo',
                 'data'     => file_get_contents($shareData['filepath']),
                 'filename' => 'direct_temp_photo_'.Utils::generateUploadId().'.jpg',
                 'headers'  => [
-                    'Content-Type: '.mime_content_type($shareData['filepath']),
+                    'Content-Type: application/octet-stream',
                     'Content-Transfer-Encoding: binary',
                 ],
             ];
         }
-        $bodies[] = [
-            'type' => 'form-data',
-            'name' => 'text',
-            'data' => (!isset($shareData['text']) || is_null($shareData['text']) ? '' : $shareData['text']),
-        ];
+
         $payload = $this->_buildBody($bodies, $boundary);
 
         // Build the request options.
         $method = 'POST';
         $headers = [
-            'User-Agent'       => $this->_userAgent,
-            'Proxy-Connection' => 'keep-alive',
-            'Connection'       => 'keep-alive',
-            'Accept'           => '*/*',
-            'Content-Type'     => 'multipart/form-data; boundary='.$boundary,
-            'Accept-Language'  => Constants::ACCEPT_LANGUAGE,
+            'User-Agent'            => $this->_userAgent,
+            'Connection'            => 'keep-alive',
+            'Accept'                => '*/*',
+            'X-IG-Capabilities'     => Constants::X_IG_Capabilities,
+            'X-IG-Connection-Type'  => Constants::X_IG_Connection_Type,
+            'X-IG-Connection-Speed' => mt_rand(1000, 3700).'kbps',
+            'X-FB-HTTP-Engine'      => Constants::X_FB_HTTP_Engine,
+            'Content-Type'          => 'multipart/form-data; boundary='.$boundary,
+            'Accept-Language'       => Constants::ACCEPT_LANGUAGE,
         ];
         $options = [
             'headers' => $headers,
@@ -1538,7 +1541,7 @@ class Client
             [
                 'debugUploadedBody'  => false,
                 'debugUploadedBytes' => true,
-                'decodeToObject'     => new \InstagramAPI\Response(),
+                'decodeToObject'     => new \InstagramAPI\Response\SendItemResponse(),
             ]
         );
 

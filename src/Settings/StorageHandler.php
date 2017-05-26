@@ -45,6 +45,7 @@ class StorageHandler
         'ig_android_2fac',
         'ig_android_mqtt_skywalker',
         'ig_android_skywalker_live_event_start_end',
+        'ig_android_unified_inbox',
     ];
 
     /**
