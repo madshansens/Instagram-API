@@ -143,6 +143,9 @@ class Instagram
      */
     public $experiments;
 
+    /** @var Request\Live Collection of Live related functions. */
+    public $live;
+
     /** @var Request\Direct Collection of Direct related functions. */
     public $direct;
 
@@ -175,6 +178,7 @@ class Instagram
         $this->truncatedDebug = $truncatedDebug;
 
         // Load all function collections.
+        $this->live = new Request\Live($this);
         $this->direct = new Request\Direct($this);
         $this->media = new Request\Media($this);
         $this->story = new Request\Story($this);
@@ -997,39 +1001,6 @@ class Instagram
     }
 
     /**
-     * Get top live broadcasts.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\DiscoverTopLiveResponse
-     */
-    public function getDiscoverTopLive()
-    {
-        return $this->request('discover/top_live/')->getResponse(new Response\DiscoverTopLiveResponse());
-    }
-
-    /**
-     * Get status for a list of broadcast ids.
-     *
-     * @param string|string[] $broadcastIds One or more numeric broadcast IDs.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\TopLiveStatusResponse
-     */
-    public function getTopLiveStatus(
-        $broadcastIds)
-    {
-        if (!is_array($broadcastIds)) {
-            $broadcastIds = [$broadcastIds];
-        }
-
-        return $this->request('discover/top_live_status/')
-        ->addPost('broadcast_ids', $broadcastIds)
-        ->getResponse(new Response\TopLiveStatusResponse());
-    }
-
-    /**
      * Expose.
      *
      * @throws \InstagramAPI\Exception\InstagramException
@@ -1652,63 +1623,6 @@ class Instagram
         $configure = $requestData->getResponse(new Response\ConfigureResponse());
 
         return $configure;
-    }
-
-    /**
-     * Get broadcast information.
-     *
-     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\BroadcastInfoResponse
-     */
-    public function getBroadcastInfo(
-        $broadcastId)
-    {
-        return $this->request("live/{$broadcastId}/info/")
-        ->getResponse(new Response\BroadcastInfoResponse());
-    }
-
-    /**
-     * Get a live broadcast's heartbeat and viewer count.
-     *
-     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\BroadcastHeartbeatAndViewerCountResponse
-     */
-    public function getBroadcastHeartbeatAndViewerCount(
-        $broadcastId)
-    {
-        return $this->request("live/{$broadcastId}/heartbeat_and_get_viewer_count/")
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->getResponse(new Response\BroadcastHeartbeatAndViewerCountResponse());
-    }
-
-    /**
-     * Post a comment to a live broadcast.
-     *
-     * @param string $broadcastId The media ID in Instagram's internal format (ie "17854587811139572").
-     * @param string $commentText Your comment text.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\CommentBroadcastResponse
-     */
-    public function commentBroadcast(
-        $broadcastId,
-        $commentText)
-    {
-        return $this->request("live/{$broadcastId}/comment/")
-        ->addPost('user_breadcrumb', Utils::generateUserBreadcrumb(mb_strlen($commentText)))
-        ->addPost('idempotence_token', Signatures::generateUUID(true))
-        ->addPost('comment_text', $commentText)
-        ->addPost('live_or_vod', 1)
-        ->addPost('offset_to_video_start', 0)
-        ->getResponse(new Response\CommentBroadcastResponse());
     }
 
     /**
@@ -2437,71 +2351,6 @@ class Instagram
     }
 
     /**
-     * Like a broadcast.
-     *
-     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param string $likeCount   Number of likes ("hearts") to send (optional).
-     *
-     * @throws \InstagramAPI\Exception\InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\BroadcastLikeResponse
-     */
-    public function likeBroadcast(
-        $broadcastId,
-        $likeCount = 1)
-    {
-        if ($likeCount < 1 || $likeCount > 6) {
-            throw new \InvalidArgumentException('Like count must be a number from 1 to 6.');
-        }
-
-        return $this->request("live/{$broadcastId}/like/")
-         ->addPost('_uuid', $this->uuid)
-         ->addPost('_uid', $this->account_id)
-         ->addPost('_csrftoken', $this->client->getToken())
-         ->addPost('user_like_count', $likeCount)
-         ->getResponse(new Response\BroadcastLikeResponse());
-    }
-
-    /**
-     * Get a live broadcast's like count.
-     *
-     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param string $likeTs      Like timestamp.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\BroadcastLikeCountResponse
-     */
-    public function getBroadcastLikeCount(
-        $broadcastId,
-        $likeTs = 0)
-    {
-        return $this->request("live/{$broadcastId}/get_like_count/")
-         ->addParams('like_ts', $likeTs)
-         ->getResponse(new Response\BroadcastLikeCountResponse());
-    }
-
-    /**
-     * Get broadcast comments.
-     *
-     * @param string $broadcastId   The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param string $lastCommentTs Last comments timestamp (optional).
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\BroadcastCommentsResponse
-     */
-    public function getBroadcastComments(
-        $broadcastId,
-        $lastCommentTs = 0)
-    {
-        return $this->request("live/{$broadcastId}/get_comment/")
-        ->addParams('last_comment_ts', $lastCommentTs)
-        ->getResponse(new Response\BroadcastCommentsResponse());
-    }
-
-    /**
      * Set your account's first name and phone (optional).
      *
      * @param string $name  Your first name.
@@ -2677,19 +2526,6 @@ class Instagram
         ->addPost('paginate', true)
         ->addPost('module', 'discover_people')
         ->getResponse(new Response\DiscoverPeopleResponse());
-    }
-
-    /**
-     * Get suggested broadcasts.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\SuggestedBroadcastsResponse
-     */
-    public function getSuggestedBroadcasts()
-    {
-        return $this->request('live/get_suggested_broadcasts')
-        ->getResponse(new Response\SuggestedBroadcastsResponse());
     }
 
     /**
