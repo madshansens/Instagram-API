@@ -342,7 +342,7 @@ class Client
      * cookies "onCloseUser", so that cookies are written to storage in a
      * single, efficient write when the user's session is finished. We also call
      * it during some important function calls such as login/logout. Client also
-     * automatically calls it when it's been several minutes since last save.
+     * automatically calls it when enough time has elapsed since last save.
      *
      * @throws \InvalidArgumentException                 If the JSON cannot be encoded.
      * @throws \InstagramAPI\Exception\SettingsException
