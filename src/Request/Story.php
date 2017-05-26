@@ -255,5 +255,4 @@ class Story extends RequestCollection
             ->addPost('message_prefs', $messagePrefs)
             ->getResponse(new Response\ReelSettingsResponse());
     }
-
 }

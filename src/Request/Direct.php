@@ -758,5 +758,4 @@ class Direct extends RequestCollection
             ->setSignedPost(false)
             ->getResponse(new \InstagramAPI\Response());
     }
-
 }

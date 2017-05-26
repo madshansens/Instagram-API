@@ -221,7 +221,6 @@ class Media extends RequestCollection
             ->getResponse(new Response\MediaCommentsResponse());
     }
 
-
     /**
      * Post a comment on a media item.
      *
@@ -425,7 +424,6 @@ class Media extends RequestCollection
         ->getResponse(new Response\MediaResponse());
     }
 
-
     /**
      * Save a media item.
      *
@@ -490,5 +488,4 @@ class Media extends RequestCollection
 
         return $requestData->getResponse(new Response\SavedFeedResponse());
     }
-
 }
