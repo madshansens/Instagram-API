@@ -194,7 +194,7 @@ class File implements StorageInterface
         // NOTE: If we had just written directly to settingsPath, the file would
         // have become corrupted if the script was killed mid-write. The atomic
         // write process guarantees that the data is fully written to disk.
-        $this->_atomicWrite($this->_settingsFile, $encodedData);
+        Utils::atomicWrite($this->_settingsFile, $encodedData);
     }
 
     /**
@@ -309,40 +309,6 @@ class File implements StorageInterface
         }
 
         return $loadedSettings;
-    }
-
-    /**
-     * Atomic filewriter.
-     *
-     * Safely writes new contents to a file using an atomic two-step process.
-     * If the script is killed before the write is complete, only the temporary
-     * trash file will be corrupted.
-     *
-     * @param string $filename     Filename to write the data to.
-     * @param string $data         Data to write to file.
-     * @param string $atomicSuffix Lets you optionally provide a different
-     *                             suffix for the temporary file.
-     *
-     * @return mixed Number of bytes written on success, otherwise FALSE.
-     */
-    private function _atomicWrite(
-        $filename,
-        $data,
-        $atomicSuffix = 'atomictmp')
-    {
-        // Perform an exclusive (locked) overwrite to a temporary file.
-        $filenameTmp = sprintf('%s.%s', $filename, $atomicSuffix);
-        $writeResult = @file_put_contents($filenameTmp, $data, LOCK_EX);
-        if ($writeResult !== false) {
-            // Now move the file to its real destination (replaced if exists).
-            $moveResult = @rename($filenameTmp, $filename);
-            if ($moveResult === true) {
-                // Successful write and move. Return number of bytes written.
-                return $writeResult;
-            }
-        }
-
-        return false; // Failed.
     }
 
     /**
