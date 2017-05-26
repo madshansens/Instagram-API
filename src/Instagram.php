@@ -149,6 +149,9 @@ class Instagram
     /** @var Request\Story Collection of Story related functions. */
     public $story;
 
+    /** @var Request\Timeline Collection of Timeline related functions. */
+    public $timeline;
+
     /**
      * Constructor.
      *
@@ -171,6 +174,7 @@ class Instagram
         // Load all function collections.
         $this->direct = new Request\Direct($this);
         $this->story = new Request\Story($this);
+        $this->timeline = new Request\Timeline($this);
 
         // Configure the settings storage and network client.
         $self = $this;
@@ -560,7 +564,7 @@ class Instagram
             $this->getAutoCompleteUserList();
             $this->story->getReelsTrayFeed();
             $this->direct->getRecentRecipients();
-            $this->getTimelineFeed();
+            $this->timeline->getTimelineFeed();
             $this->direct->getRankedRecipients('reshare', true);
             $this->direct->getRankedRecipients('raven', true);
             //push register
@@ -574,7 +578,7 @@ class Instagram
             // Act like a real logged in app client refreshing its news timeline.
             // This also lets us detect if we're still logged in with a valid session.
             try {
-                $this->getTimelineFeed();
+                $this->timeline->getTimelineFeed();
             } catch (\InstagramAPI\Exception\LoginRequiredException $e) {
                 // If our session cookies are expired, we were now told to login,
                 // so handle that by running a forced relogin in that case!
@@ -903,28 +907,6 @@ class Instagram
     }
 
     /**
-     * Get your own timeline feed.
-     *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\TimelineFeedResponse
-     */
-    public function getTimelineFeed(
-        $maxId = null)
-    {
-        $request = $this->request('feed/timeline')
-        ->addParams('rank_token', $this->rank_token)
-        ->addParams('ranked_content', true);
-        if ($maxId) {
-            $request->addParams('max_id', $maxId);
-        }
-
-        return $request->getResponse(new Response\TimelineFeedResponse());
-    }
-
-    /**
      * Get insights.
      *
      * @param $day
@@ -1116,27 +1098,6 @@ class Instagram
     }
 
     /**
-     * Uploads a photo to your Instagram timeline.
-
-     *
-     * @param string $photoFilename    The photo filename.
-     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ConfigureResponse
-     *
-     * @see configureSinglePhoto() for available metadata fields.
-     */
-    public function uploadTimelinePhoto(
-        $photoFilename,
-        array $externalMetadata = [])
-    {
-        return $this->uploadSinglePhoto('timeline', $photoFilename, $externalMetadata);
-    }
-
-    /**
      * INTERNAL. UPLOADS A *SINGLE* VIDEO.
      *
      * @param string $targetFeed       Target feed for this media ("timeline", "story",
@@ -1191,135 +1152,6 @@ class Instagram
 
         // Configure the uploaded video and attach it to our timeline/story.
         $configure = $this->configureSingleVideoWithRetries($targetFeed, $internalMetadata, $externalMetadata);
-
-        return $configure;
-    }
-
-    /**
-     * Uploads a video to your Instagram timeline.
-     *
-     * @param string $videoFilename    The video filename.
-     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
-     * @param int    $maxAttempts      Total attempts to upload all chunks before throwing.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
-     *
-     * @return \InstagramAPI\Response\ConfigureResponse
-     *
-     * @see configureSingleVideo() for available metadata fields.
-     */
-    public function uploadTimelineVideo(
-        $videoFilename,
-        array $externalMetadata = [],
-        $maxAttempts = 10)
-    {
-        return $this->uploadSingleVideo('timeline', $videoFilename, $externalMetadata, $maxAttempts);
-    }
-
-    /**
-     * Uploads an album to your Instagram timeline.
-     *
-     * An album is also known as a "carousel" and "sidecar". They can contain up
-     * to 10 photos or videos (at the moment).
-     *
-     * @param array $media            Array of image/video files and their per-file
-     *                                metadata (type, file, and optionally
-     *                                usertags). The "type" must be "photo" or
-     *                                "video". The "file" must be its disk path.
-     *                                And the optional "usertags" can only be
-     *                                used on PHOTOS, never on videos.
-     * @param array $externalMetadata (optional) User-provided metadata key-value pairs
-     *                                for the album itself (its caption, location, etc).
-     * @param int   $maxAttempts      Total attempts to upload all video chunks before throwing.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
-     *
-     * @return \InstagramAPI\Response\ConfigureResponse
-     *
-     * @see configureTimelineAlbum() for available album metadata fields.
-     */
-    public function uploadTimelineAlbum(
-        array $media,
-        array $externalMetadata = [],
-        $maxAttempts = 10)
-    {
-        if (empty($media)) {
-            throw new \InvalidArgumentException("List of media to upload can't be empty.");
-        }
-        if (count($media) < 2 || count($media) > 10) {
-            throw new \InvalidArgumentException(sprintf('Instagram requires that albums contain 2-10 items. You tried to submit %d.', count($media)));
-        }
-
-        // Figure out the media file details for ALL media in the album.
-        // NOTE: We do this first, since it validates whether the media files are
-        // valid and lets us avoid wasting time uploading totally invalid albums!
-        foreach ($media as $key => $item) {
-            // Verify that the file exists locally.
-            if (!is_file($item['file'])) {
-                throw new \InvalidArgumentException(sprintf('The media file "%s" does not exist on disk.', $item['file']));
-            }
-
-            $media[$key]['internalMetadata'] = [];
-
-            // Pre-process media details and throw if not allowed on Instagram.
-            switch ($item['type']) {
-            case 'photo':
-                // Determine the width and height of the photo.
-                $imagesize = @getimagesize($item['file']);
-                if ($imagesize === false) {
-                    throw new \InvalidArgumentException(sprintf('File "%s" is not an image.', $item['file']));
-                }
-                $media[$key]['internalMetadata']['photoWidth'] = $imagesize[0];
-                $media[$key]['internalMetadata']['photoHeight'] = $imagesize[1];
-
-                // Validate image resolution and aspect ratio.
-                Utils::throwIfIllegalMediaResolution('album', 'photofile', $item['file'],
-                                                     $media[$key]['internalMetadata']['photoWidth'],
-                                                     $media[$key]['internalMetadata']['photoHeight']);
-                break;
-            case 'video':
-                // Determine the video details.
-                $media[$key]['internalMetadata']['videoDetails'] = Utils::getVideoFileDetails($item['file']);
-
-                // Validate those details.
-                Utils::throwIfIllegalVideoDetails('album', $item['file'], $media[$key]['internalMetadata']['videoDetails']);
-                break;
-            default:
-                throw new \InvalidArgumentException(sprintf('Unsupported album media type "%s".', $item['type']));
-            }
-        }
-
-        // Perform all media file uploads.
-        foreach ($media as $key => $item) {
-            if (!file_exists($item['file'])) {
-                throw new \InvalidArgumentException(sprintf('File "%s" does not exist.', $item['file']));
-            }
-
-            switch ($item['type']) {
-            case 'photo':
-                $result = $this->client->uploadPhotoData('album', $item['file']);
-                $media[$key]['internalMetadata']['uploadId'] = $result->getUploadId();
-                break;
-            case 'video':
-                // Request parameters for uploading a new video.
-                $uploadParams = $this->client->requestVideoUploadURL('album');
-                $media[$key]['internalMetadata']['uploadId'] = $uploadParams['uploadId'];
-
-                // Attempt to upload the video data.
-                $this->client->uploadVideoChunks('album', $item['file'], $uploadParams, $maxAttempts);
-
-                // Attempt to upload the thumbnail, associated with our video's ID.
-                $this->client->uploadPhotoData('album', $item['file'], 'videofile', $uploadParams['uploadId']);
-            }
-        }
-
-        // Configure the uploaded album and attach it to our timeline.
-        $internalMetadata = []; // NOTE: NO INTERNAL DATA IS NEEDED HERE YET.
-        $configure = $this->configureTimelineAlbumWithRetries($media, $internalMetadata, $externalMetadata);
 
         return $configure;
     }
@@ -1632,7 +1464,7 @@ class Instagram
      * attempts. Very useful since Instagram sometimes can't configure a newly
      * uploaded video file until a few seconds have passed.
      *
-     * @param array $media            Extended media array coming from uploadTimelineAlbum(),
+     * @param array $media            Extended media array coming from timeline->uploadAlbum(),
      *                                containing the user's per-file metadata,
      *                                and internally generated per-file metadata.
      * @param array $internalMetadata Internal library-generated metadata key-value pairs.
@@ -1679,7 +1511,7 @@ class Instagram
      * IT DO ANYTHING ELSE, TO AVOID ADDING BUGGY AND UNMAINTAINABLE SPIDERWEB
      * CODE!
      *
-     * @param array $media            Extended media array coming from uploadTimelineAlbum(),
+     * @param array $media            Extended media array coming from timeline->uploadAlbum(),
      *                                containing the user's per-file metadata,
      *                                and internally generated per-file metadata.
      * @param array $internalMetadata Internal library-generated metadata key-value pairs.
@@ -1853,55 +1685,6 @@ class Instagram
     }
 
     /**
-     * Archives or unarchives one of your timeline media items.
-     *
-     * Marking media as "archived" will hide it from everyone except yourself.
-     * You can unmark the media again at any time, to make it public again.
-     *
-     * @param string $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string $mediaType Media type ("photo", "album" or "video").
-     * @param bool   $onlyMe    If true, archives your media so that it's only visible to you.
-     *                          Otherwise, if false, makes the media public to everyone again.
-     *
-     * @throws \InstagramAPI\Exception\InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ArchiveMediaResponse
-     */
-    public function archiveMedia(
-        $mediaId,
-        $mediaType,
-        $onlyMe)
-    {
-        switch ($mediaType) {
-            case 'photo':
-                $mediaCode = 1;
-                break;
-            case 'video':
-                $mediaCode = 2;
-                break;
-            case 'album':
-                $mediaCode = 8;
-            default:
-                throw new \InvalidArgumentException('You must provide a valid media type.');
-                break;
-        }
-
-        if ($onlyMe) {
-            $endpoint = 'only_me';
-        } else {
-            $endpoint = 'undo_only_me';
-        }
-
-        return $this->request("media/{$mediaId}/{$endpoint}/?media_type={$mediaCode}")
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('media_id', $mediaId)
-        ->getResponse(new Response\ArchiveMediaResponse());
-    }
-
-    /**
      * Tag a user in a media item.
      *
      * @param string      $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
@@ -1943,71 +1726,6 @@ class Instagram
         $usertag = '{"removed":["'.$userId.'"],"in":[]}';
 
         return $this->editMedia($mediaId, $captionText, $usertag);
-    }
-
-    /**
-     * Save a media item.
-     *
-     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\SaveAndUnsaveMedia
-     */
-    public function saveMedia(
-        $mediaId)
-    {
-        return $this->request("media/{$mediaId}/save/")
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->setSignedPost(true)
-        ->getResponse(new Response\SaveAndUnsaveMedia());
-    }
-
-    /**
-     * Unsave a media item.
-     *
-     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\SaveAndUnsaveMedia
-     */
-    public function unsaveMedia(
-        $mediaId)
-    {
-        return $this->request("media/{$mediaId}/unsave/")
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->setSignedPost(true)
-        ->getResponse(new Response\SaveAndUnsaveMedia());
-    }
-
-    /**
-     * Get saved media items feed.
-     *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\SavedFeedResponse
-     */
-    public function getSavedFeed(
-        $maxId = null)
-    {
-        $requestData = $this->request('feed/saved/')
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->setSignedPost(true);
-
-        if (!is_null($maxId)) {
-            $requestData->addParams('max_id', $maxId);
-        }
-
-        return $requestData->getResponse(new Response\SavedFeedResponse());
     }
 
     /**
@@ -2797,51 +2515,10 @@ class Instagram
     }
 
     /**
-     * Get a user's timeline feed.
-     *
-     * @param string      $userId       Numerical UserPK ID.
-     * @param null|string $maxId        Next "maximum ID", used for pagination.
-     * @param null|int    $minTimestamp Minimum timestamp.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\UserFeedResponse
-     */
-    public function getUserFeed(
-        $userId,
-        $maxId = null,
-        $minTimestamp = null)
-    {
-        return $this->request("feed/user/{$userId}/")
-        ->addParams('rank_token', $this->rank_token)
-        ->addParams('ranked_content', 'true')
-        ->addParams('max_id', (!is_null($maxId) ? $maxId : ''))
-        ->addParams('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
-        ->getResponse(new Response\UserFeedResponse());
-    }
-
-    /**
-     * Get your own timeline feed.
-     *
-     * @param null|string $maxId        Next "maximum ID", used for pagination.
-     * @param null|int    $minTimestamp Minimum timestamp.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\UserFeedResponse
-     */
-    public function getSelfUserFeed(
-        $maxId = null,
-        $minTimestamp = null)
-    {
-        return $this->getUserFeed($this->account_id, $maxId, $minTimestamp);
-    }
-
-    /**
      * Get location based media feed for a user.
      *
-     * Note that you probably want getUserFeed() instead, because the
-     * geographical feed does not contain all of the user's media.
+     * Note that you probably want timeline->getUserFeed() instead, because
+     * the geographical feed does not contain all of the user's media.
      *
      * @param string $userId Numerical UserPK ID.
      *
@@ -3260,100 +2937,6 @@ class Instagram
         ->addPost('first_name', $name)
         ->addPost('phone_number', $phone)
         ->getResponse(new \InstagramAPI\Response());
-    }
-
-    /**
-     * Backup all of your own uploaded photos and videos. :).
-     *
-     * Note that the backup filenames contain the date and time that the media
-     * was uploaded. It uses PHP's timezone to calculate the local time. So be
-     * sure to use date_default_timezone_set() with your local timezone if you
-     * want correct times in the filenames!
-     *
-     * @param string $baseOutputPath (optional) Base-folder for output.
-     *                               Uses "backups/" path in lib dir if null.
-     * @param bool   $printProgress  (optional) Toggles terminal output.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     */
-    public function backup(
-        $baseOutputPath = null,
-        $printProgress = true)
-    {
-        // Decide which path to use.
-        if ($baseOutputPath === null) {
-            $baseOutputPath = Constants::SRC_DIR.'/../backups/';
-        }
-
-        // Recursively create output folders for the current backup.
-        $backupFolder = $baseOutputPath.$this->username.'/'.date('Y-m-d').'/';
-        if (!is_dir($backupFolder)) {
-            mkdir($backupFolder, 0755, true);
-        }
-
-        // Download all media to the output folders.
-        $nextMaxId = null;
-        do {
-            $myTimeline = $this->getSelfUserFeed($nextMaxId);
-
-            // Build a list of all media files on this page.
-            $mediaFiles = []; // Reset queue.
-            foreach ($myTimeline->getItems() as $item) {
-                $itemDate = date('Y-m-d \a\t H.i.s O', $item->getTakenAt());
-                if ($item->media_type == Response\Model\Item::ALBUM) {
-                    // Albums contain multiple items which must all be queued.
-                    // NOTE: We won't name them by their subitem's getIds, since
-                    // those Ids have no meaning outside of the album and they
-                    // would just mean that the album content is spread out with
-                    // wildly varying filenames. Instead, we will name all album
-                    // items after their album's Id, with a position offset in
-                    // their filename to show their position within the album.
-                    $subPosition = 0;
-                    foreach ($item->getCarouselMedia() as $subItem) {
-                        ++$subPosition;
-                        if ($subItem->media_type == Response\Model\CarouselMedia::PHOTO) {
-                            $mediaUrl = $subItem->getImageVersions2()->candidates[0]->getUrl();
-                        } else {
-                            $mediaUrl = $subItem->getVideoVersions()[0]->getUrl();
-                        }
-                        $subItemId = sprintf('%s [%s-%02d]', $itemDate, $item->getId(), $subPosition);
-                        $mediaFiles[$subItemId] = [
-                            'taken_at' => $item->getTakenAt(),
-                            'url'      => $mediaUrl,
-                        ];
-                    }
-                } else {
-                    if ($item->media_type == Response\Model\Item::PHOTO) {
-                        $mediaUrl = $item->getImageVersions2()->candidates[0]->getUrl();
-                    } else {
-                        $mediaUrl = $item->getVideoVersions()[0]->getUrl();
-                    }
-                    $itemId = sprintf('%s [%s]', $itemDate, $item->getId());
-                    $mediaFiles[$itemId] = [
-                        'taken_at' => $item->getTakenAt(),
-                        'url'      => $mediaUrl,
-                    ];
-                }
-            }
-
-            // Download all media files in the current page's file queue.
-            foreach ($mediaFiles as $mediaId => $mediaInfo) {
-                $mediaUrl = $mediaInfo['url'];
-                $fileExtension = pathinfo(parse_url($mediaUrl, PHP_URL_PATH), PATHINFO_EXTENSION);
-                $filePath = $backupFolder.$mediaId.'.'.$fileExtension;
-
-                // Attempt to download the file.
-                if ($printProgress) {
-                    echo sprintf("* Downloading \"%s\" to \"%s\".\n", $mediaUrl, $filePath);
-                }
-                copy($mediaUrl, $filePath);
-
-                // Set the file modification time to the taken_at timestamp.
-                if (is_file($filePath)) {
-                    touch($filePath, $mediaInfo['taken_at']);
-                }
-            }
-        } while (!is_null($nextMaxId = $myTimeline->getNextMaxId()));
     }
 
     /**

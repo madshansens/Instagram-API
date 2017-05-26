@@ -56,7 +56,7 @@ try {
 }
 
 try {
-    $ig->uploadTimelineAlbum($media, ['caption' => $captionText]);
+    $ig->timeline->uploadAlbum($media, ['caption' => $captionText]);
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";
 }

@@ -28,7 +28,7 @@ try {
 }
 
 try {
-    $ig->uploadTimelinePhoto($photoFilename, ['caption' => $captionText]);
+    $ig->timeline->uploadPhoto($photoFilename, ['caption' => $captionText]);
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";
 }
