@@ -857,6 +857,19 @@ class Instagram
     }
 
     /**
+     * Get push preferences.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\PushPreferencesResponse
+     */
+    public function getPushPreferences()
+    {
+        return $this->request('push/all_preferences/')
+        ->getResponse(new Response\PushPreferencesResponse());
+    }
+
+    /**
      * Get Facebook OTA.
      *
      * @throws \InstagramAPI\Exception\InstagramException
