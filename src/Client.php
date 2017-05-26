@@ -4,9 +4,9 @@ namespace InstagramAPI;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Cookie\CookieJar;
-use GuzzleHttp\Cookie\FileCookieJar;
 use GuzzleHttp\HandlerStack;
 use InstagramAPI\Exception\ServerMessageThrower;
+use InstagramAPI\Exception\SettingsException;
 
 /**
  * This class handles core API network communication and file uploads.
@@ -84,7 +84,7 @@ class Client
     private $_clientMiddleware;
 
     /**
-     * @var \GuzzleHttp\Cookie\FileCookieJar|\GuzzleHttp\Cookie\CookieJar
+     * @var \GuzzleHttp\Cookie\CookieJar
      */
     private $_cookieJar;
 
@@ -94,6 +94,15 @@ class Client
      * @var string
      */
     private $_settingsCookieFormat;
+
+    /**
+     * The disk path for file-based cookie jars.
+     *
+     * Only used when the cookieformat is set to "cookiefile".
+     *
+     * @var string|null
+     */
+    private $_settingsCookieFilePath;
 
     /**
      * Constructor.
@@ -140,13 +149,14 @@ class Client
      * Used whenever the user switches setUser(), to configure our internal state.
      *
      * @param bool $resetCookieJar (optional) Whether to clear current cookies.
+     *
+     * @throws \InstagramAPI\Exception\SettingsException
      */
     public function updateFromCurrentSettings(
         $resetCookieJar = false)
     {
         // Update our internal client state from the new user's settings.
         $this->_userAgent = $this->_parent->device->getUserAgent();
-        $this->_cookieJar = null; // Mark old jar for garbage collection.
         $this->loadCookieJar($resetCookieJar);
 
         // Verify that the jar contains a non-expired csrftoken for the API
@@ -163,26 +173,52 @@ class Client
      * Loads all cookies via the current Settings storage.
      *
      * @param bool $resetCookieJar (optional) Whether to clear current cookies.
+     *
+     * @throws \InstagramAPI\Exception\SettingsException
      */
     public function loadCookieJar(
         $resetCookieJar = false)
     {
+        // Mark any previous cookie jar for garbage collection.
+        $this->_cookieJar = null;
+
         // Get all cookies for the currently active user.
         $userCookies = $this->_parent->settings->getCookies();
         $this->_settingsCookieFormat = $userCookies['format'];
+        $this->_settingsCookieFilePath = null;
 
+        // Get the raw cookie string from the storage backend.
+        $cookieString = '';
         if ($userCookies['format'] == 'cookiefile') {
-            $cookieFilePath = $userCookies['data'];
-
-            // Delete existing cookie jar file if this is a reset.
-            if ($resetCookieJar && !empty($cookieFilePath) && is_file($cookieFilePath)) {
-                @unlink($cookieFilePath);
+            $this->_settingsCookieFilePath = $userCookies['data'];
+            if (empty($this->_settingsCookieFilePath)) {
+                throw new SettingsException(
+                    'Cookie file format requested, but no file path provided.'
+                );
             }
 
-            // File-based cookie jar, which also persists temporary session cookies.
-            // The FileCookieJar saves to disk whenever its object is destroyed,
-            // such as at the end of script or when calling updateFromCurrentSettings().
-            $this->_cookieJar = new FileCookieJar($cookieFilePath, true);
+            // Ensure that the whole directory path to the cookie file exists.
+            $cookieDir = dirname($this->_settingsCookieFilePath); // Can be "." in case of CWD.
+            if (!Utils::createFolder($cookieDir)) {
+                throw new SettingsException(sprintf(
+                    'The "%s" cookie folder is not writable.',
+                    $cookieDir
+                ));
+            }
+
+            // Process the existing cookie jar file if it already exists.
+            if (is_file($this->_settingsCookieFilePath)) {
+                if ($resetCookieJar) {
+                    // Delete existing cookie jar since this is a reset.
+                    @unlink($this->_settingsCookieFilePath);
+                } else {
+                    // Read the existing cookies from disk.
+                    $rawData = file_get_contents($this->_settingsCookieFilePath);
+                    if ($rawData !== false) {
+                        $cookieString = $rawData;
+                    }
+                }
+            }
         } else {
             // Delete existing cookie data from the storage if this is a reset.
             if ($resetCookieJar) {
@@ -190,15 +226,18 @@ class Client
                 $this->_parent->settings->setCookies('');
             }
 
-            // Attempt to restore cookies, otherwise create a new, empty jar.
-            $restoredCookies = @json_decode($userCookies['data'], true);
-            if (!is_array($restoredCookies)) {
-                $restoredCookies = [];
-            }
-
-            // Memory-based cookie jar which must be manually saved later.
-            $this->_cookieJar = new CookieJar(false, $restoredCookies);
+            // Read the existing cookies provided by the storage.
+            $cookieString = $userCookies['data'];
         }
+
+        // Attempt to restore the cookies, otherwise create a new, empty jar.
+        $restoredCookies = @json_decode($cookieString, true);
+        if (!is_array($restoredCookies)) {
+            $restoredCookies = [];
+        }
+
+        // Memory-based cookie jar which must be manually saved later.
+        $this->_cookieJar = new CookieJar(false, $restoredCookies);
     }
 
     /**
@@ -236,9 +275,7 @@ class Client
         $path = null)
     {
         $foundCookie = null;
-
-        if ($this->_cookieJar instanceof CookieJar
-            || $this->_cookieJar instanceof FileCookieJar) {
+        if ($this->_cookieJar instanceof CookieJar) {
             foreach ($this->_cookieJar->getIterator() as $cookie) {
                 if ($cookie->getName() == $name
                     && ($domain === null || $cookie->getDomain() == $domain)
@@ -282,20 +319,32 @@ class Client
      * NOTE: This Client class is NOT responsible for calling this function!
      * Instead, our parent "Instagram" instance takes care of it and saves the
      * cookies "onCloseUser", so that cookies are written to storage in a
-     * single, efficient write when the user's session is finished.
+     * single, efficient write when the user's session is finished. We also call
+     * it during some important function calls such as login/logout. Client also
+     * automatically calls it when it's been several minutes since last save.
+     *
+     * @throws \InvalidArgumentException                 If the JSON cannot be encoded.
+     * @throws \InstagramAPI\Exception\SettingsException
      */
     public function saveCookieJar()
     {
-        // If it's a FileCookieJar, we don't have to do anything. They are saved
-        // automatically to disk when that object is destroyed/garbage collected.
-        if ($this->_cookieJar instanceof FileCookieJar) {
-            return;
-        }
-
-        // Tell any non-file settings storages to persist the latest cookies.
+        $newCookies = $this->getCookieJarAsJSON();
         if ($this->_settingsCookieFormat != 'cookiefile') {
-            $newCookies = $this->getCookieJarAsJSON();
+            // Tell non-file settings storage to persist the latest cookies.
             $this->_parent->settings->setCookies($newCookies);
+        } else {
+            // This is a file-based cookie storage. It's our job to write it.
+            if (!empty($this->_settingsCookieFilePath)) {
+                // Perform an atomic diskwrite, which prevents accidental
+                // truncation if the script is ever interrupted mid-write.
+                $written = Utils::atomicWrite($this->_settingsCookieFilePath, $newCookies);
+                if ($written === false) {
+                    throw new SettingsException(sprintf(
+                        'The "%s" cookie file is not writable.',
+                        $this->_settingsCookieFilePath
+                    ));
+                }
+            }
         }
     }
 
