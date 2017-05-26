@@ -143,6 +143,9 @@ class Instagram
      */
     public $experiments;
 
+    /** @var Request\Story Collection of Story related functions. */
+    public $story;
+
     /**
      * Constructor.
      *
@@ -161,6 +164,9 @@ class Instagram
         // Debugging options.
         $this->debug = $debug;
         $this->truncatedDebug = $truncatedDebug;
+
+        // Load all function collections.
+        $this->story = new Request\Story($this);
 
         // Configure the settings storage and network client.
         $self = $this;
@@ -548,7 +554,7 @@ class Instagram
             // Perform the "user has just done a full login" API flow.
             $this->syncFeatures();
             $this->getAutoCompleteUserList();
-            $this->getReelsTrayFeed();
+            $this->story->getReelsTrayFeed();
             $this->getRecentRecipients();
             $this->getTimelineFeed();
             $this->getRankedRecipients('reshare', true);
@@ -578,7 +584,7 @@ class Instagram
                 $this->settings->set('last_login', time());
 
                 $this->getAutoCompleteUserList();
-                $this->getReelsTrayFeed();
+                $this->story->getReelsTrayFeed();
                 $this->getRankedRecipients('reshare', true);
                 $this->getRankedRecipients('raven', true);
                 //push register
@@ -1782,7 +1788,7 @@ class Instagram
      *
      * @see configureSinglePhoto() for available metadata fields.
      */
-    protected function _uploadSinglePhoto(
+    public function uploadSinglePhoto(
         $targetFeed,
         $photoFilename,
         array $externalMetadata = [])
@@ -1839,27 +1845,7 @@ class Instagram
         $photoFilename,
         array $externalMetadata = [])
     {
-        return $this->_uploadSinglePhoto('timeline', $photoFilename, $externalMetadata);
-    }
-
-    /**
-     * Uploads a photo to your Instagram story.
-     *
-     * @param string $photoFilename    The photo filename.
-     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ConfigureResponse
-     *
-     * @see configureSinglePhoto() for available metadata fields.
-     */
-    public function uploadStoryPhoto(
-        $photoFilename,
-        array $externalMetadata = [])
-    {
-        return $this->_uploadSinglePhoto('story', $photoFilename, $externalMetadata);
+        return $this->uploadSinglePhoto('timeline', $photoFilename, $externalMetadata);
     }
 
     /**
@@ -1879,7 +1865,7 @@ class Instagram
      *
      * @see configureSingleVideo() for available metadata fields.
      */
-    protected function _uploadSingleVideo(
+    public function uploadSingleVideo(
         $targetFeed,
         $videoFilename,
         array $externalMetadata = [],
@@ -1941,30 +1927,7 @@ class Instagram
         array $externalMetadata = [],
         $maxAttempts = 10)
     {
-        return $this->_uploadSingleVideo('timeline', $videoFilename, $externalMetadata, $maxAttempts);
-    }
-
-    /**
-     * Uploads a video to your Instagram story.
-     *
-     * @param string $videoFilename    The video filename.
-     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
-     * @param int    $maxAttempts      Total attempts to upload all chunks before throwing.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
-     *
-     * @return \InstagramAPI\Response\ConfigureResponse
-     *
-     * @see configureSingleVideo() for available metadata fields.
-     */
-    public function uploadStoryVideo(
-        $videoFilename,
-        array $externalMetadata = [],
-        $maxAttempts = 10)
-    {
-        return $this->_uploadSingleVideo('story', $videoFilename, $externalMetadata, $maxAttempts);
+        return $this->uploadSingleVideo('timeline', $videoFilename, $externalMetadata, $maxAttempts);
     }
 
     /**
@@ -3570,163 +3533,6 @@ class Instagram
     }
 
     /**
-     * Get the global story feed which contains everyone you follow.
-     *
-     * Note that users will eventually drop out of this list even though they
-     * still have stories. So it's always safer to call getUserStoryFeed() if
-     * a specific user's story feed matters to you.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ReelsTrayFeedResponse
-     *
-     * @see getUserStoryFeed()
-     */
-    public function getReelsTrayFeed()
-    {
-        return $this->request('feed/reels_tray/')->getResponse(new Response\ReelsTrayFeedResponse());
-    }
-
-    /**
-     * Get a specific user's story reel feed.
-     *
-     * This function gets the user's story Reel object directly, which always
-     * exists and contains information about the user and their last story even
-     * if that user doesn't have any active story anymore.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\Model\Reel
-     *
-     * @see getUserStoryFeed()
-     */
-    public function getUserReelMediaFeed(
-        $userId)
-    {
-        return $this->request("feed/user/{$userId}/reel_media/")
-        ->getResponse(new Response\Model\Reel());
-    }
-
-    /**
-     * Get a specific user's story feed with broadcast details.
-     *
-     * This function gets the story in a roundabout way, with some extra details
-     * about the "broadcast". But if there is no story available, this endpoint
-     * gives you an empty response.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\UserStoryFeedResponse
-     *
-     * @see getUserReelMediaFeed()
-     */
-    public function getUserStoryFeed(
-        $userId)
-    {
-        return $this->request("feed/user/{$userId}/story/")
-        ->getResponse(new Response\UserStoryFeedResponse());
-    }
-
-    /**
-     * Get multiple users' story feeds at once.
-     *
-     * @param string|string[] $userList List of numerical UserPK IDs.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ReelsMediaResponse
-     */
-    public function getReelsMediaFeed(
-        $userList)
-    {
-        if (!is_array($userList)) {
-            $userList = [$userList];
-        }
-
-        $userIDs = [];
-        foreach ($userList as $userId) {
-            $userIDs[] = "$userId";
-        }
-
-        return $this->request('feed/reels_media/')
-        ->setSignedPost(true)
-        ->addPost('user_ids', $userIDs)
-        ->getResponse(new Response\ReelsMediaResponse());
-    }
-
-    /**
-     * Mark story media items as seen.
-     *
-     * The various story-related endpoints only give you lists of story media.
-     * They don't actually mark any stories as "seen", so the user doesn't know
-     * that you've seen their story. Actually marking the story as "seen" is
-     * done via this endpoint instead. The official app calls this endpoint
-     * periodically (with 1 or more items at a time) while watching a story.
-     *
-     * Tip: You can pass in the whole "getItems()" array from a user's story
-     * feed (retrieved via any of the other story endpoints), to easily mark
-     * all of that user's story media items as seen.
-     *
-     * @param \InstagramAPI\Response\Model\Item[] $items An array of one or more
-     *                                                   story media Items.
-     *
-     * @throws \InstagramAPI\Exception\InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\MediaSeenResponse
-     */
-    public function markMediaSeen(
-        array $items)
-    {
-        // Build the list of seen media, with human randomization of seen-time.
-        $reels = [];
-        $maxSeenAt = time(); // Get current global UTC timestamp.
-        $seenAt = $maxSeenAt - (3 * count($items)); // Start seenAt in the past.
-        foreach ($items as $item) {
-            if (!$item instanceof Response\Model\Item) {
-                throw new \InvalidArgumentException(
-                    'markMediaSeen(): All items must be instances of \InstagramAPI\Response\Model\Item.'
-                );
-            }
-
-            // Raise "seenAt" if it's somehow older than the item's "takenAt".
-            // NOTE: Can only happen if you see a story instantly when posted.
-            $itemTakenAt = $item->getTakenAt();
-            if ($seenAt < $itemTakenAt) {
-                $seenAt = $itemTakenAt + 2;
-            }
-
-            // Do not let "seenAt" exceed the current global UTC time.
-            if ($seenAt > $maxSeenAt) {
-                $seenAt = $maxSeenAt;
-            }
-
-            // Key Format: "mediaPk_userPk_userPk" (yes, userPK is repeated).
-            $reelId = $item->getId().'_'.$item->getUser()->getPk();
-
-            // Value Format: ["mediaTakenAt_seenAt"] (array with single string).
-            $reels[$reelId] = [$item->getTakenAt().'_'.$seenAt];
-
-            // Randomly add 1-3 seconds to next seenAt timestamp, to act human.
-            $seenAt += rand(1, 3);
-        }
-
-        return $this->request('media/seen/')
-        ->setVersion(2)
-        ->setSignedPost(true)
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('reels', $reels)
-        ->addPost('nuxes', [])
-        ->getResponse(new Response\MediaSeenResponse());
-    }
-
-    /**
      * Get a user's timeline feed.
      *
      * @param string      $userId       Numerical UserPK ID.
@@ -4628,55 +4434,6 @@ class Instagram
         ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->client->getToken())
         ->getResponse(new Response\FriendshipResponse());
-    }
-
-    /**
-     * Get your story settings.
-     *
-     * This has information such as your story messaging mode (who can reply
-     * to your story), and the list of users you have blocked from seeing your
-     * stories.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ReelSettingsResponse
-     */
-    public function getStorySettings()
-    {
-        return $this->request('users/reel_settings/')
-        ->setSignedPost(true)
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->getResponse(new Response\ReelSettingsResponse());
-    }
-
-    /**
-     * Set your story settings.
-     *
-     * @param string $messagePrefs Who can reply to your story. Valid values are "anyone" (meaning
-     *                             your followers), "following" (followers that you follow back),
-     *                             or "off" (meaning that nobody can reply to your story).
-     *
-     * @throws \InstagramAPI\Exception\InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ReelSettingsResponse
-     */
-    public function setStorySettings(
-        $messagePrefs)
-    {
-        if (!in_array($messagePrefs, ['anyone', 'following', 'off'])) {
-            throw new \InvalidArgumentException('You must provide a valid message preference value.');
-        }
-
-        return $this->request('users/set_reel_settings/')
-        ->setSignedPost(true)
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('message_prefs', $messagePrefs)
-        ->getResponse(new Response\ReelSettingsResponse());
     }
 
     /**
