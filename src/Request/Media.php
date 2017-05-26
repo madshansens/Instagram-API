@@ -121,6 +121,22 @@ class Media extends RequestCollection
     }
 
     /**
+     * Get feed of your liked media.
+     *
+     * @param null|string $maxId Next "maximum ID", used for pagination.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\LikeFeedResponse
+     */
+    public function getLikedFeed(
+        $maxId = null)
+    {
+        return $this->ig->request('feed/liked/?'.(!is_null($maxId) ? 'max_id='.$maxId.'&' : ''))
+            ->getResponse(new Response\LikeFeedResponse());
+    }
+
+    /**
      * Get list of users who liked a media item.
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").

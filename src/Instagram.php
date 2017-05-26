@@ -2732,22 +2732,6 @@ class Instagram
     }
 
     /**
-     * Get feed of your liked media.
-     *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\LikeFeedResponse
-     */
-    public function getLikedMedia(
-        $maxId = null)
-    {
-        return $this->request('feed/liked/?'.(!is_null($maxId) ? 'max_id='.$maxId.'&' : ''))
-        ->getResponse(new Response\LikeFeedResponse());
-    }
-
-    /**
      * Search for tags.
      *
      * @param string $query
