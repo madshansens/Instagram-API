@@ -36,7 +36,7 @@ try {
 // can look at the server response (IF one is available).
 
 try {
-    $ig->deleteMedia('123456'); // Invalid media ID, to trigger a server error.
+    $ig->media->delete('123456'); // Invalid media ID, to trigger a server error.
 } catch (\InstagramAPI\Exception\InstagramException $e) {
     echo 'Something went wrong (InstagramException): '.$e->getMessage()."\n";
 
@@ -53,7 +53,7 @@ try {
 // from InstagramException, otherwise it won't have hasResponse()/getResponse()).
 
 try {
-    $ig->deleteMedia('123456'); // Invalid media ID, to trigger a server error.
+    $ig->media->delete('123456'); // Invalid media ID, to trigger a server error.
 } catch (\InstagramAPI\Exception\EndpointException $e) {
     echo 'Something went wrong (EndpointException): '.$e->getMessage()."\n";
 

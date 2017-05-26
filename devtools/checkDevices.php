@@ -113,7 +113,7 @@ foreach ($testDevices as $thisDevice) {
         // Retrieve video info (with 4 total attempts in case of throttling).
         for ($attempt = 1; $attempt <= 4; ++$attempt) {
             try {
-                $mediaInfo = $ig->getMediaInfo($videoId)->getItems()[0];
+                $mediaInfo = $ig->media->getInfo($videoId)->getItems()[0];
                 break;
             } catch (\InstagramAPI\Exception\ThrottledException $e) {
                 if ($attempt < 4) {
