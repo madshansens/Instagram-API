@@ -214,7 +214,7 @@ class WebSocket extends Client
 
     protected function _initSubscription()
     {
-        $inbox = $this->_instagram->getV2Inbox();
+        $inbox = $this->_instagram->direct->getInbox();
         $subscription = $inbox->subscription;
         if (!$subscription instanceof Subscription) {
             throw new \InvalidArgumentException('Can not subscribe to inbox.');
