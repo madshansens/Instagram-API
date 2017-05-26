@@ -812,13 +812,11 @@ class Instagram
     /**
      * Register to the mqtt push server.
      *
-     * TODO: NOT IMPLEMENTED YET!
-     *
      * @param $gcmToken
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return mixed
+     * @return \InstagramAPI\Response\PushRegisterResponse
      */
     public function pushRegister(
         $gcmToken)
@@ -829,18 +827,18 @@ class Instagram
             't' => 'fbns-b64',
         ]);
 
-        $data = json_encode([
-            '_uuid'                => $this->uuid,
-            'guid'                 => $this->uuid,
-            'phone_id'             => $this->settings->get('phone_id'),
-            'device_type'          => 'android_mqtt',
-            'device_token'         => $deviceToken,
-            'is_main_push_channel' => true,
-            '_csrftoken'           => $this->client->getToken(),
-            'users'                => $this->account_id,
-        ]);
-
-        return $this->client->api(1, 'push/register/?platform=10&device_type=android_mqtt', Signatures::generateSignatureForPost($data));
+        return $this->request('push/register/')
+        ->addParams('platform', '10')
+        ->addParams('device_type', 'android_mqtt')
+        ->addPost('_uuid', $this->uuid)
+        ->addPost('guid', $this->uuid)
+        ->addPost('phone_id', $this->settings->get('phone_id'))
+        ->addPost('device_type', 'android_mqtt')
+        ->addPost('device_token', $deviceToken)
+        ->addPost('is_main_push_channel', true)
+        ->addPost('_csrftoken', $this->client->getToken())
+        ->addPost('users', $this->account_id)
+        ->getResponse(new Response\PushRegisterResponse());
     }
 
     /**
