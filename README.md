@@ -7,8 +7,16 @@ This is Instagram's private API. It has all the features the Instagram app has, 
 **Frequently Asked Questions:** [F.A.Q.](https://github.com/mgp25/Instagram-API/wiki/FAQ)
 
 **Do you like this project? Support it by donating**
+
+**mgp25**
+
 - ![Paypal](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/paypal.png) Paypal: [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5ATYY8H9MC96E)
 - ![btc](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/bitcoin.png) Bitcoin: 1DCEpC9wYXeUGXS58qSsqKzyy7HLTTXNYe
+
+**stevejobzniak**
+
+- ![Paypal](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/paypal.png) Paypal: [Donate](stevejobzniak@justarmindale.com)
+- ![btc](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/bitcoin.png) Bitcoin: 1PkCKvzg5knm86PwVLdAvTEiZxTKfF2NnK
 
 ----------
 ## Installation
