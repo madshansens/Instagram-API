@@ -381,22 +381,18 @@ class Instagram
     }
 
     /**
-     * Get signup challenge headers.
-     *
-     * Signup challenge is used to get _csrftoken in order to make a successful
-     * login or registration request.
+     * Registers advertising identifier.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\ChallengeResponse
+     * @return \InstagramAPI\Response
      */
-    protected function _getSignupChallenge()
+    public function logAttribution()
     {
-        return $this->request('si/fetch_headers/')
-        ->setNeedsAuth(false)
-        ->addParams('challenge_type', 'signup')
-        ->addParams('guid', str_replace('-', '', $this->uuid))
-        ->getResponse(new Response\ChallengeResponse());
+        return $this->request('attribution/log_attribution/')
+            ->setNeedsAuth(false)
+            ->addPost('adid', $this->advertising_id)
+            ->getResponse(new Response());
     }
 
     /**
@@ -431,7 +427,7 @@ class Instagram
             $this->syncFeatures(true);
 
             // Call login challenge API so a csrftoken is put in our cookie jar.
-            $this->_getSignupChallenge();
+            $this->logAttribution();
 
             try {
                 $response = $this->request('accounts/login/')
@@ -827,7 +823,7 @@ class Instagram
         if ($prelogin) {
             return $this->request('qe/sync/')
             ->setNeedsAuth(false)
-            ->addPost('id', Signatures::generateUUID(true))
+            ->addPost('id', $this->uuid)
             ->addPost('experiments', Constants::LOGIN_EXPERIMENTS)
             ->getResponse(new Response\SyncResponse());
         } else {
