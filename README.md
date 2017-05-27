@@ -15,7 +15,7 @@ This is Instagram's private API. It has all the features the Instagram app has, 
 
 **stevejobzniak**
 
-- ![Paypal](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/paypal.png) Paypal: [Donate](stevejobzniak@justarmindale.com)
+- ![Paypal](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/paypal.png) Paypal: [Donate](https://www.paypal.me/Armindale/0usd)
 - ![btc](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/bitcoin.png) Bitcoin: 1PkCKvzg5knm86PwVLdAvTEiZxTKfF2NnK
 
 ----------
