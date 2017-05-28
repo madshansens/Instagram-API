@@ -85,6 +85,13 @@ class Utils
     /**
      * Check for ffmpeg/avconv dependencies.
      *
+     * TIP: If your binary isn't findable via the PATH environment locations,
+     * you can manually set the correct path to it. Before calling any functions
+     * that need FFmpeg, you must simply assign a manual value (ONCE) to tell us
+     * where to find your FFmpeg, like this:
+     *
+     * \InstagramAPI\Utils::$ffmpegBin = '/home/exampleuser/ffmpeg/bin/ffmpeg';
+     *
      * @return string|bool Name of the library if present, otherwise FALSE.
      */
     public static function checkFFMPEG()
@@ -109,6 +116,13 @@ class Utils
 
     /**
      * Check for ffprobe dependency.
+     *
+     * TIP: If your binary isn't findable via the PATH environment locations,
+     * you can manually set the correct path to it. Before calling any functions
+     * that need FFprobe, you must simply assign a manual value (ONCE) to tell
+     * us where to find your FFprobe, like this:
+     *
+     * \InstagramAPI\Utils::$ffprobeBin = '/home/exampleuser/ffmpeg/bin/ffprobe';
      *
      * @return string|bool Name of the library if present, otherwise FALSE.
      */
@@ -156,7 +170,7 @@ class Utils
         }
 
         // Load with FFPROBE. Shows details as JSON and exits.
-        $command = $ffprobe.' -v quiet -print_format json -show_format -show_streams '.escapeshellarg($videoFilename);
+        $command = escapeshellarg($ffprobe).' -v quiet -print_format json -show_format -show_streams '.escapeshellarg($videoFilename);
         $jsonInfo = @shell_exec($command);
 
         // Check for processing errors.
@@ -322,7 +336,7 @@ class Utils
 
         try {
             // Capture a video preview snapshot to that file via FFMPEG.
-            $command = $ffmpeg.' -i '.escapeshellarg($videoFilename).' -f singlejpeg -ss 00:00:01 -vframes 1 '.escapeshellarg($tmpFilename).' 2>&1';
+            $command = escapeshellarg($ffmpeg).' -i '.escapeshellarg($videoFilename).' -f singlejpeg -ss 00:00:01 -vframes 1 '.escapeshellarg($tmpFilename).' 2>&1';
             @exec($command, $output, $statusCode);
 
             // Check for processing errors.
