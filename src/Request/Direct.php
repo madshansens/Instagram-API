@@ -22,7 +22,7 @@ class Direct extends RequestCollection
     {
         $request = $this->ig->request('direct_v2/inbox/')
             ->addParams('persistentBadging', 'true');
-        if ($this->ig->hasUnifiedInbox()) {
+        if ($this->hasUnifiedInbox()) {
             $request->addParams('use_unified_inbox', 'true');
         }
         if ($cursorId !== null) {
@@ -70,7 +70,7 @@ class Direct extends RequestCollection
     {
         $request = $this->ig->request('direct_v2/pending_inbox')
                  ->addParams('persistentBadging', 'true');
-        if ($this->ig->hasUnifiedInbox()) {
+        if ($this->hasUnifiedInbox()) {
             $request->addParams('use_unified_inbox', 'true');
         }
 
@@ -94,7 +94,7 @@ class Direct extends RequestCollection
         $request = $this->ig->request('direct_v2/ranked_recipients')
             ->addParams('mode', $mode)
             ->addParams('show_threads', $showThreads ? 'true' : 'false');
-        if ($this->ig->hasUnifiedInbox()) {
+        if ($this->hasUnifiedInbox()) {
             $request->addParams('use_unified_inbox', 'true');
         }
 
@@ -570,7 +570,7 @@ class Direct extends RequestCollection
         if ($cursorId !== null) {
             $request->addParams('cursor', $cursorId);
         }
-        if ($this->ig->hasUnifiedInbox()) {
+        if ($this->hasUnifiedInbox()) {
             $request->addParams('use_unified_inbox', 'true');
         }
 
@@ -704,7 +704,7 @@ class Direct extends RequestCollection
         $threadId)
     {
         $request = $this->ig->request("direct_v2/threads/{$threadId}/hide/");
-        if ($this->ig->hasUnifiedInbox()) {
+        if ($this->hasUnifiedInbox()) {
             $request->addParams('use_unified_inbox', 'true');
         }
 
@@ -751,7 +751,7 @@ class Direct extends RequestCollection
         $threadItemId)
     {
         $request = $this->ig->request("direct_v2/threads/{$threadId}/items/{$threadItemId}/seen/");
-        if ($this->ig->hasUnifiedInbox()) {
+        if ($this->hasUnifiedInbox()) {
             $request->addPost('use_unified_inbox', 'true');
         }
 
@@ -919,5 +919,15 @@ class Direct extends RequestCollection
         }
 
         return $result;
+    }
+
+    /**
+     * Checks if current user has a unified inbox.
+     *
+     * @return bool
+     */
+    public function hasUnifiedInbox()
+    {
+        return $this->ig->isExperimentEnabled('ig_android_unified_inbox', 'is_enabled');
     }
 }

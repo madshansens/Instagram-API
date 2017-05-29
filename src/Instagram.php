@@ -2957,16 +2957,6 @@ class Instagram
     }
 
     /**
-     * Checks if current user has a unified inbox.
-     *
-     * @return bool
-     */
-    public function hasUnifiedInbox()
-    {
-        return $this->isExperimentEnabled('ig_android_unified_inbox', 'is_enabled');
-    }
-
-    /**
      * Create a custom API request.
      *
      * Used internally, but can also be used by end-users if they want
