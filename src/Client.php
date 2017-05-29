@@ -925,10 +925,16 @@ class Client
             $videoExt = 'mp4'; // Fallback.
         }
 
-        // Video upload must be done in exactly 4 chunks; determine chunk size!
-        $numChunks = 4;
+        // Video uploads should be chunked to save RAM; determine chunk size!
         $videoSize = filesize($videoFilename);
-        $maxChunkSize = ceil($videoSize / $numChunks);
+        if ($videoSize < 1) {
+            throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
+                'Upload of "%s" failed. The file is empty.',
+                $videoFilename
+            ));
+        }
+        $numChunks = ceil($videoSize / 524288); // We want <= 512KB per chunk.
+        $maxChunkSize = ceil($videoSize / $numChunks); // Calc actual chunksize.
 
         // Calculate the per-chunk parameters and byte ranges.
         $videoChunks = [];
