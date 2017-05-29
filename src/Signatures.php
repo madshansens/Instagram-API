@@ -4,16 +4,57 @@ namespace InstagramAPI;
 
 class Signatures
 {
+    /**
+     * Generate a keyed hash value using the HMAC method.
+     *
+     * @param string $data
+     *
+     * @return string
+     */
     public static function generateSignature(
         $data)
     {
         return hash_hmac('sha256', $data, Constants::IG_SIG_KEY);
     }
 
+    /**
+     * @deprecated Use signData() instead.
+     *
+     * @param string $data
+     *
+     * @return string
+     */
     public static function generateSignatureForPost(
         $data)
     {
         return 'ig_sig_key_version='.Constants::SIG_KEY_VERSION.'&signed_body='.self::generateSignature($data).'.'.urlencode($data);
+    }
+
+    /**
+     * Generate signed array.
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    public static function signData(
+        array $data)
+    {
+        // Typecast all scalar values to string.
+        foreach ($data as &$value) {
+            if (!is_scalar($value)) {
+                continue;
+            }
+            $value = (string) $value;
+        }
+        unset($value);
+        // Reorder and convert data to JSON string.
+        $data = json_encode(Utils::reorderByHashCode($data));
+        // Return value must be reordered.
+        return Utils::reorderByHashCode([
+            'ig_sig_key_version' => Constants::SIG_KEY_VERSION,
+            'signed_body'        => self::generateSignature($data).'.'.$data,
+        ]);
     }
 
     public static function generateDeviceId()

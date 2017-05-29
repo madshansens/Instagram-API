@@ -118,7 +118,7 @@ class Direct extends RequestCollection
     /**
      * Send a direct message to specific users or thread.
      *
-     * @param string $type       One of: "media_share", "message", "like", "hashtag", "location", "profile".
+     * @param string $type       One of: "media_share", "message", "like", "hashtag", "location", "profile", "photo", "video".
      * @param array  $recipients An array with "users" or "thread" keys.
      *                           To start a new thread, provide "users" as an array
      *                           of numerical UserPK IDs. To use an existing thread
@@ -129,7 +129,9 @@ class Direct extends RequestCollection
      *                           "like" uses nothing;
      *                           "hashtag" uses "hashtag" and "text";
      *                           "location" uses "venue_id" and "text";
-     *                           "profile" uses "profile_user_id" and "text".
+     *                           "profile" uses "profile_user_id" and "text";
+     *                           "photo" uses "filepath";
+     *                           "video" uses "upload_id" and "video_result".
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -144,6 +146,7 @@ class Direct extends RequestCollection
         // Determine which endpoint to use and validate input.
         $post = [];
         $params = [];
+        $files = [];
         switch ($type) {
             case 'media_share':
                 $endpoint = 'direct_v2/threads/broadcast/media_share/';
@@ -210,6 +213,29 @@ class Direct extends RequestCollection
                     $post['text'] = $data['text'];
                 }
                 break;
+            case 'photo':
+                $endpoint = 'direct_v2/threads/broadcast/upload_photo/';
+                // Check and set filepath.
+                if (!isset($data['filepath'])) {
+                    throw new \InvalidArgumentException('No filepath provided.');
+                }
+                $files[] = [
+                    'key'      => 'photo',
+                    'filepath' => $data['filepath'],
+                    'filename' => 'direct_temp_photo_'.Utils::generateUploadId().'.jpg',
+                ];
+                break;
+            case 'video':
+                $endpoint = 'direct_v2/threads/broadcast/configure_video/';
+                // Check and set upload_id.
+                if (!isset($data['upload_id'])) {
+                    throw new \InvalidArgumentException('No upload_id provided.');
+                }
+                $post['upload_id'] = $data['upload_id'];
+                if (isset($data['video_result'])) {
+                    $post['video_result'] = $data['video_result'];
+                }
+                break;
             default:
                 throw new \InvalidArgumentException('Unsupported parameter value for type.');
         }
@@ -234,6 +260,10 @@ class Direct extends RequestCollection
         // Fill post data.
         foreach ($post as $key => $value) {
             $request->addPost($key, $value);
+        }
+        // Fill files.
+        foreach ($files as $file) {
+            $request->addFile($file['key'], $file['filepath'], $file['filename']);
         }
 
         return $request
@@ -323,13 +353,84 @@ class Direct extends RequestCollection
         $recipients,
         $photoFilename)
     {
-        return $this->ig->client->directShareFile(
+        return $this->_sendDirectItem(
             'photo',
             $recipients,
             [
                 'filepath' => $photoFilename,
             ]
         );
+    }
+
+    /**
+     * Send a video via direct message to a user's inbox.
+     *
+     * @param array  $recipients    An array with "users" or "thread" keys.
+     *                              To start a new thread, provide "users" as an array
+     *                              of numerical UserPK IDs. To use an existing thread
+     *                              instead, provide "thread" with the thread ID.
+     * @param string $videoFilename The video filename. Video MUST be square.
+     * @param int    $maxAttempts   (optional) Total attempts to upload all chunks before throwing.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException If the video upload fails.
+     *
+     * @return \InstagramAPI\Response\SendItemResponse
+     */
+    public function sendVideo(
+        $recipients,
+        $videoFilename,
+        $maxAttempts = 10)
+    {
+        // Verify that the file exists locally.
+        if (!is_file($videoFilename)) {
+            throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
+        }
+
+        $internalMetadata = [
+            'videoDetails' => Utils::getVideoFileDetails($videoFilename),
+        ];
+
+        // Validate the video details and throw if Instagram won't allow it.
+        Utils::throwIfIllegalVideoDetails('direct_v2', $videoFilename, $internalMetadata['videoDetails']);
+
+        // Request parameters for uploading a new video.
+        $uploadParams = $this->ig->requestVideoUploadURL('direct_v2', $internalMetadata);
+        $internalMetadata['uploadId'] = $uploadParams['uploadId'];
+
+        // Attempt to upload the video data.
+        $upload = $this->ig->client->uploadVideoChunks('direct_v2', $videoFilename, $uploadParams, $maxAttempts);
+
+        $result = null;
+        // Send the uploaded video to recipients.
+        for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
+            try {
+                // Attempt to configure video parameters (which sends it to the thread).
+                $result = $this->_sendDirectItem(
+                    'video',
+                    $recipients,
+                    [
+                        'upload_id'    => $internalMetadata['uploadId'],
+                        'video_result' => $upload->getResult(),
+                    ]
+                );
+                break; // Success. Exit loop.
+            } catch (\InstagramAPI\Exception\InstagramException $e) {
+                if ($attempt < $maxAttempts && strpos($e->getMessage(), 'Transcode timeout') !== false) {
+                    // Do nothing, since we'll be retrying the failed configure...
+                    sleep(1); // Just wait a little before the next retry.
+                } else {
+                    // Re-throw all unhandled exceptions.
+                    throw $e;
+                }
+            }
+        }
+        if ($result === null) { // Safeguard since _sendDirectItem() may return null in some cases.
+            throw new \InstagramAPI\Exception\UploadFailedException('Failed to configure video for direct_v2.');
+        }
+
+        return $result;
     }
 
     /**

@@ -41,6 +41,65 @@ class Utils
     }
 
     /**
+     * Calculates Java hashCode() for a given string.
+     *
+     * WARNING: This method is not Unicode-aware, so use it only on ANSI strings.
+     *
+     * @param string $string
+     *
+     * @return int
+     *
+     * @see https://en.wikipedia.org/wiki/Java_hashCode()#The_java.lang.String_hash_function
+     */
+    public static function hashCode(
+        $string)
+    {
+        $result = 0;
+        for ($i = 0, $len = strlen($string); $i < $len; $i++) {
+            $result = (-$result + ($result << 5) + ord($string[$i])) & 0xFFFFFFFF;
+        }
+        if (PHP_INT_SIZE > 4) {
+            if ($result > 0x7FFFFFFF) {
+                $result -= 0x100000000;
+            } elseif ($result < -0x80000000) {
+                $result += 0x100000000;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Reorders array by hashCode() of its keys.
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    public static function reorderByHashCode(
+        array $data)
+    {
+        $hashCodes = [];
+        foreach ($data as $key => $value) {
+            $hashCodes[$key] = self::hashCode($key);
+        }
+
+        uksort($data, function ($a, $b) use ($hashCodes) {
+            $a = $hashCodes[$a];
+            $b = $hashCodes[$b];
+            if ($a < $b) {
+                return -1;
+            } elseif ($a > $b) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+
+        return $data;
+    }
+
+    /**
      * Generates random multipart boundary string.
      *
      * @return string
@@ -213,7 +272,7 @@ class Utils
      * Currently all photos and videos everywhere have the exact same rules.
      * We bring in the up-to-date rules from the ImageAutoResizer class.
      *
-     * @param string    $targetFeed    Target feed for this media ("timeline", "story" or "album").
+     * @param string    $targetFeed    Target feed for this media ("timeline", "story", "album" or "direct_v2").
      * @param string    $fileType      Whether the file is a "photofile" or "videofile".
      * @param string    $mediaFilename Filename to display to the user in case of error.
      * @param int|float $width         The media width.
@@ -252,6 +311,10 @@ class Utils
                     $mediaFilename, $width
                 ));
             }
+
+            if ($targetFeed == 'direct_v2' && $width != $height) {
+                throw new \InvalidArgumentException('Instagram Direct only accepts square videos.');
+            }
         }
 
         // Check Aspect Ratio.
@@ -269,7 +332,7 @@ class Utils
     /**
      * Verifies that a video's details follow Instagram's requirements.
      *
-     * @param string $targetFeed    Target feed for this media ("timeline", "story" or "album").
+     * @param string $targetFeed    Target feed for this media ("timeline", "story", "album" or "direct_v2").
      * @param string $videoFilename The video filename.
      * @param array  $videoDetails  An array created by getVideoFileDetails().
      *

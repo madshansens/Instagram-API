@@ -37,7 +37,7 @@ class Timeline extends RequestCollection
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
-     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
+     * @throws \InstagramAPI\Exception\UploadFailedException If the video upload fails.
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
@@ -69,7 +69,7 @@ class Timeline extends RequestCollection
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
-     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
+     * @throws \InstagramAPI\Exception\UploadFailedException If the video upload fails.
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
@@ -134,19 +134,19 @@ class Timeline extends RequestCollection
 
             switch ($item['type']) {
             case 'photo':
-                $result = $this->ig->client->uploadPhotoData('album', $item['file']);
+                $result = $this->ig->uploadPhotoData('album', $item['file']);
                 $media[$key]['internalMetadata']['uploadId'] = $result->getUploadId();
                 break;
             case 'video':
                 // Request parameters for uploading a new video.
-                $uploadParams = $this->ig->client->requestVideoUploadURL('album');
+                $uploadParams = $this->ig->requestVideoUploadURL('album');
                 $media[$key]['internalMetadata']['uploadId'] = $uploadParams['uploadId'];
 
                 // Attempt to upload the video data.
                 $this->ig->client->uploadVideoChunks('album', $item['file'], $uploadParams, $maxAttempts);
 
                 // Attempt to upload the thumbnail, associated with our video's ID.
-                $this->ig->client->uploadPhotoData('album', $item['file'], 'videofile', $uploadParams['uploadId']);
+                $this->ig->uploadPhotoData('album', $item['file'], 'videofile', $uploadParams['uploadId']);
             }
         }
 

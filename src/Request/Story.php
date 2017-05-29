@@ -35,7 +35,7 @@ class Story extends RequestCollection
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
-     * @throws \InstagramAPI\Exception\UploadFailedException If the video-data upload fails.
+     * @throws \InstagramAPI\Exception\UploadFailedException If the video upload fails.
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
