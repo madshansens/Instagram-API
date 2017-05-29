@@ -11,7 +11,7 @@ class Direct extends RequestCollection
     /**
      * Get direct inbox messages for your account.
      *
-     * @param string|null $cursorId
+     * @param string|null $cursorId Next "cursor ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -556,7 +556,7 @@ class Direct extends RequestCollection
      * Get direct message thread.
      *
      * @param string      $threadId Thread ID.
-     * @param string|null $cursorId
+     * @param string|null $cursorId Next "cursor ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
