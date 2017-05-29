@@ -1456,6 +1456,11 @@ class Instagram
             throw new \InvalidArgumentException(sprintf('Bad target feed "%s".', $targetFeed));
         }
 
+        // We require at least 1 attempt, otherwise we can't do anything.
+        if ($maxAttempts < 1) {
+            throw new \InvalidArgumentException('The maxAttempts parameter must be 1 or higher.');
+        }
+
         // Verify that the file exists locally.
         if (!is_file($videoFilename)) {
             throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
@@ -1637,6 +1642,11 @@ class Instagram
         array $externalMetadata = [],
         $maxAttempts = 5)
     {
+        // We require at least 1 attempt, otherwise we can't do anything.
+        if ($maxAttempts < 1) {
+            throw new \InvalidArgumentException('The maxAttempts parameter must be 1 or higher.');
+        }
+
         for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
             try {
                 // Attempt to configure video parameters.
@@ -1816,6 +1826,11 @@ class Instagram
         array $externalMetadata = [],
         $maxAttempts = 5)
     {
+        // We require at least 1 attempt, otherwise we can't do anything.
+        if ($maxAttempts < 1) {
+            throw new \InvalidArgumentException('The maxAttempts parameter must be 1 or higher.');
+        }
+
         for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
             try {
                 // Attempt to configure album parameters.

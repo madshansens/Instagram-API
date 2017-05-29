@@ -889,6 +889,11 @@ class Client
     {
         $this->_throwIfNotLoggedIn();
 
+        // We require at least 1 attempt, otherwise we can't do anything.
+        if ($maxAttempts < 1) {
+            throw new \InvalidArgumentException('The maxAttempts parameter must be 1 or higher.');
+        }
+
         // Verify that the file exists locally.
         if (!is_file($videoFilename)) {
             throw new \InvalidArgumentException(sprintf(

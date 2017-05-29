@@ -84,7 +84,15 @@ class Timeline extends RequestCollection
             throw new \InvalidArgumentException("List of media to upload can't be empty.");
         }
         if (count($media) < 2 || count($media) > 10) {
-            throw new \InvalidArgumentException(sprintf('Instagram requires that albums contain 2-10 items. You tried to submit %d.', count($media)));
+            throw new \InvalidArgumentException(sprintf(
+                'Instagram requires that albums contain 2-10 items. You tried to submit %d.',
+                count($media)
+            ));
+        }
+
+        // We require at least 1 attempt, otherwise we can't do anything.
+        if ($maxAttempts < 1) {
+            throw new \InvalidArgumentException('The maxAttempts parameter must be 1 or higher.');
         }
 
         // Figure out the media file details for ALL media in the album.

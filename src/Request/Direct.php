@@ -383,6 +383,11 @@ class Direct extends RequestCollection
         $videoFilename,
         $maxAttempts = 10)
     {
+        // We require at least 1 attempt, otherwise we can't do anything.
+        if ($maxAttempts < 1) {
+            throw new \InvalidArgumentException('The maxAttempts parameter must be 1 or higher.');
+        }
+
         // Verify that the file exists locally.
         if (!is_file($videoFilename)) {
             throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
@@ -402,8 +407,8 @@ class Direct extends RequestCollection
         // Attempt to upload the video data.
         $upload = $this->ig->client->uploadVideoChunks('direct_v2', $videoFilename, $uploadParams, $maxAttempts);
 
-        $result = null;
         // Send the uploaded video to recipients.
+        $result = null;
         for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
             try {
                 // Attempt to configure video parameters (which sends it to the thread).
