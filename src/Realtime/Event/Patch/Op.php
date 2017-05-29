@@ -7,10 +7,10 @@ use InstagramAPI\Realtime;
 use InstagramAPI\Realtime\Action\Payload as ActionPayload;
 use InstagramAPI\Realtime\Client;
 use InstagramAPI\Realtime\Event\Payload as EventPayload;
-use InstagramAPI\Response\Model\Inbox;
-use InstagramAPI\Response\Model\Thread;
-use InstagramAPI\Response\Model\ThreadItem;
-use InstagramAPI\Response\Model\ThreadLastSeenAt;
+use InstagramAPI\Response\Model\DirectInbox;
+use InstagramAPI\Response\Model\DirectThread;
+use InstagramAPI\Response\Model\DirectThreadItem;
+use InstagramAPI\Response\Model\DirectThreadLastSeenAt;
 
 class Op extends \InstagramAPI\AutoPropertyHandler
 {
@@ -76,8 +76,8 @@ class Op extends \InstagramAPI\AutoPropertyHandler
 
             return;
         }
-        /** @var ThreadItem $threadItem */
-        $threadItem = $this->_client->mapToJson($json, new ThreadItem());
+        /** @var DirectThreadItem $threadItem */
+        $threadItem = $this->_client->mapToJson($json, new DirectThreadItem());
         switch ($this->op) {
             case self::ADD:
                 $this->_rtc->emit('thread-item-created', [$threadId, $threadItemId, $threadItem]);
@@ -107,8 +107,8 @@ class Op extends \InstagramAPI\AutoPropertyHandler
 
             return;
         }
-        /** @var Thread $thread */
-        $thread = $this->_client->mapToJson($json, new Thread());
+        /** @var DirectThread $thread */
+        $thread = $this->_client->mapToJson($json, new DirectThread());
         switch ($this->op) {
             case self::ADD:
                 $this->_rtc->emit('thread-created', [$threadId, $thread]);
@@ -185,8 +185,8 @@ class Op extends \InstagramAPI\AutoPropertyHandler
 
             return;
         }
-        /** @var ThreadItem $threadItem */
-        $threadItem = $this->_client->mapToJson($json, new ThreadItem());
+        /** @var DirectThreadItem $threadItem */
+        $threadItem = $this->_client->mapToJson($json, new DirectThreadItem());
         $this->_rtc->emit('direct-story-updated', [$threadId, $threadItemId, $threadItem]);
     }
 
@@ -240,8 +240,8 @@ class Op extends \InstagramAPI\AutoPropertyHandler
 
             return;
         }
-        /** @var ThreadLastSeenAt $lastSeenAt */
-        $lastSeenAt = $this->_client->mapToJson($json, new ThreadLastSeenAt());
+        /** @var DirectThreadLastSeenAt $lastSeenAt */
+        $lastSeenAt = $this->_client->mapToJson($json, new DirectThreadLastSeenAt());
         $this->_rtc->emit('thread-seen', [$threadId, $userId, $lastSeenAt]);
     }
 
@@ -283,12 +283,12 @@ class Op extends \InstagramAPI\AutoPropertyHandler
 
             return;
         }
-        /** @var Inbox $inbox */
-        $inbox = $this->_client->mapToJson($json, new Inbox());
+        /** @var DirectInbox $inbox */
+        $inbox = $this->_client->mapToJson($json, new DirectInbox());
         if (!isset($inbox->threads) || !count($inbox->threads)) {
             return;
         }
-        /** @var Thread $thread */
+        /** @var DirectThread $thread */
         $thread = reset($inbox->threads);
         $this->_rtc->emit('direct-story-created', [$thread]);
     }

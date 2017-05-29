@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Response;
 
-class V2InboxResponse extends \InstagramAPI\Response
+class DirectV2InboxResponse extends \InstagramAPI\Response
 {
     public $pending_requests_total;
     /**
@@ -14,7 +14,7 @@ class V2InboxResponse extends \InstagramAPI\Response
      */
     public $pending_requests_users;
     /**
-     * @var Model\Inbox
+     * @var Model\DirectInbox
      */
     public $inbox;
     /**

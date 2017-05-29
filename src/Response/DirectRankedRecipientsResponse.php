@@ -2,11 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-class RankedRecipientsResponse extends \InstagramAPI\Response
+class DirectRankedRecipientsResponse extends \InstagramAPI\Response
 {
     public $expires;
     /**
-     * @var Model\RankedRecipient[]
+     * @var Model\DirectRankedRecipient[]
      */
     public $ranked_recipients;
     public $filtered;

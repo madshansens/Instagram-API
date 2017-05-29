@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Response\Model;
 
-class UnseenCount extends \InstagramAPI\Response
+class DirectSeenItemPayload extends \InstagramAPI\Response
 {
     public $count;
     /** @var string */

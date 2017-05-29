@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Response\Model;
 
-class ThreadLastSeenAt extends \InstagramAPI\Response
+class DirectThreadLastSeenAt extends \InstagramAPI\Response
 {
     /**
      * @var string

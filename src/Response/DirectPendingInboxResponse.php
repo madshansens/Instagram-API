@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Response;
 
-class PendingInboxResponse extends \InstagramAPI\Response
+class DirectPendingInboxResponse extends \InstagramAPI\Response
 {
     /**
      * @var string
@@ -10,7 +10,7 @@ class PendingInboxResponse extends \InstagramAPI\Response
     public $seq_id;
     public $pending_requests_total;
     /**
-     * @var Model\Inbox
+     * @var Model\DirectInbox
      */
     public $inbox;
 }

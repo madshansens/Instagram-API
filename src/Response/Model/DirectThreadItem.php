@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Response\Model;
 
-class ThreadItem extends \InstagramAPI\Response
+class DirectThreadItem extends \InstagramAPI\Response
 {
     const PLACEHOLDER = 'placeholder';
     const TEXT = 'text';
@@ -29,7 +29,7 @@ class ThreadItem extends \InstagramAPI\Response
      */
     public $media_share;
     /**
-     * @var ThreadItemMedia
+     * @var DirectThreadItemMedia
      */
     public $media;
     /**

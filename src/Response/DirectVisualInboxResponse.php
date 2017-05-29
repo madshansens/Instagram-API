@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Response;
 
-class VisualInboxResponse extends \InstagramAPI\Response
+class DirectVisualInboxResponse extends \InstagramAPI\Response
 {
     public $unseen_count;
     public $has_more_unread;
@@ -10,7 +10,7 @@ class VisualInboxResponse extends \InstagramAPI\Response
     public $has_more_read;
     public $unread_cursor;
     /**
-     * @var Model\Thread[]
+     * @var Model\DirectThread[]
      */
     public $threads;
 }

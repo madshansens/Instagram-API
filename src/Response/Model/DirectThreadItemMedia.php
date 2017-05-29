@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Response\Model;
 
-class ThreadItemMedia extends \InstagramAPI\Response
+class DirectThreadItemMedia extends \InstagramAPI\Response
 {
     const PHOTO = 1;
     const VIDEO = 2;

@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Response\Model;
 
-class SendItemPayload extends \InstagramAPI\Response
+class DirectSendItemPayload extends \InstagramAPI\Response
 {
     public $client_context;
     public $message;

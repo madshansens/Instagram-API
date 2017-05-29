@@ -2,10 +2,10 @@
 
 namespace InstagramAPI\Response\Model;
 
-class RankedRecipient extends \InstagramAPI\Response
+class DirectRankedRecipient extends \InstagramAPI\Response
 {
     /**
-     * @var Thread
+     * @var DirectThread
      */
     public $thread;
     /**

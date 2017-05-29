@@ -551,7 +551,7 @@ class Client
         // means that the user can look at the full response details via the
         // exception itself.
         if (!$responseObject->isOk()) {
-            if ($responseObject instanceof \InstagramAPI\Response\SendItemResponse && $responseObject->getPayload() !== null) {
+            if ($responseObject instanceof \InstagramAPI\Response\DirectSendItemResponse && $responseObject->getPayload() !== null) {
                 $message = $responseObject->getPayload()->getMessage();
             } else {
                 $message = $responseObject->getMessage();

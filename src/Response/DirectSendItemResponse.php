@@ -2,10 +2,10 @@
 
 namespace InstagramAPI\Response;
 
-class SendItemResponse extends \InstagramAPI\Response
+class DirectSendItemResponse extends \InstagramAPI\Response
 {
     public $action;
     public $status_code;
-    /** @var Model\SendItemPayload */
+    /** @var Model\DirectSendItemPayload */
     public $payload;
 }

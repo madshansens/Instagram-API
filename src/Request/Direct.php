@@ -15,7 +15,7 @@ class Direct extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\V2InboxResponse
+     * @return \InstagramAPI\Response\DirectV2InboxResponse
      */
     public function getInbox(
         $cursorId = null)
@@ -29,7 +29,7 @@ class Direct extends RequestCollection
             $request->addParams('cursor', $cursorId);
         }
 
-        return $request->getResponse(new Response\V2InboxResponse());
+        return $request->getResponse(new Response\DirectV2InboxResponse());
     }
 
     /**
@@ -37,13 +37,13 @@ class Direct extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\VisualInboxResponse
+     * @return \InstagramAPI\Response\DirectVisualInboxResponse
      */
     public function getVisualInbox()
     {
         return $this->ig->request('direct_v2/visual_inbox')
             ->addParams('persistentBadging', 'true')
-            ->getResponse(new Response\VisualInboxResponse());
+            ->getResponse(new Response\DirectVisualInboxResponse());
     }
 
     /**
@@ -64,7 +64,7 @@ class Direct extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\PendingInboxResponse
+     * @return \InstagramAPI\Response\DirectPendingInboxResponse
      */
     public function getPendingInbox()
     {
@@ -74,7 +74,7 @@ class Direct extends RequestCollection
             $request->addParams('use_unified_inbox', 'true');
         }
 
-        return $request->getResponse(new Response\PendingInboxResponse());
+        return $request->getResponse(new Response\DirectPendingInboxResponse());
     }
 
     /**
@@ -85,7 +85,7 @@ class Direct extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\RankedRecipientsResponse
+     * @return \InstagramAPI\Response\DirectRankedRecipientsResponse
      */
     public function getRankedRecipients(
         $mode,
@@ -99,7 +99,7 @@ class Direct extends RequestCollection
         }
 
         return $request
-            ->getResponse(new Response\RankedRecipientsResponse());
+            ->getResponse(new Response\DirectRankedRecipientsResponse());
     }
 
     /**
@@ -107,12 +107,12 @@ class Direct extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\RecentRecipientsResponse
+     * @return \InstagramAPI\Response\DirectRecentRecipientsResponse
      */
     public function getRecentRecipients()
     {
         return $this->ig->request('direct_share/recent_recipients/')
-            ->getResponse(new Response\RecentRecipientsResponse());
+            ->getResponse(new Response\DirectRecentRecipientsResponse());
     }
 
     /**
@@ -136,7 +136,7 @@ class Direct extends RequestCollection
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\SendItemResponse
+     * @return \InstagramAPI\Response\DirectSendItemResponse
      */
     protected function _sendDirectItem(
         $type,
@@ -272,7 +272,7 @@ class Direct extends RequestCollection
             ->addPost('client_context', Signatures::generateUUID(true))
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('_uid', $this->ig->account_id)
-            ->getResponse(new Response\SendItemResponse());
+            ->getResponse(new Response\DirectSendItemResponse());
     }
 
     /**
@@ -289,7 +289,7 @@ class Direct extends RequestCollection
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\SendItemResponse
+     * @return \InstagramAPI\Response\DirectSendItemResponse
      */
     public function sendMedia(
         $recipients,
@@ -320,7 +320,7 @@ class Direct extends RequestCollection
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\SendItemResponse
+     * @return \InstagramAPI\Response\DirectSendItemResponse
      */
     public function sendText(
         $recipients,
@@ -347,7 +347,7 @@ class Direct extends RequestCollection
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\SendItemResponse
+     * @return \InstagramAPI\Response\DirectSendItemResponse
      */
     public function sendPhoto(
         $recipients,
@@ -376,7 +376,7 @@ class Direct extends RequestCollection
      * @throws \InstagramAPI\Exception\InstagramException
      * @throws \InstagramAPI\Exception\UploadFailedException If the video upload fails.
      *
-     * @return \InstagramAPI\Response\SendItemResponse
+     * @return \InstagramAPI\Response\DirectSendItemResponse
      */
     public function sendVideo(
         $recipients,
@@ -448,7 +448,7 @@ class Direct extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\SendItemResponse
+     * @return \InstagramAPI\Response\DirectSendItemResponse
      */
     public function sendLike(
         $recipients)
@@ -472,7 +472,7 @@ class Direct extends RequestCollection
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\SendItemResponse
+     * @return \InstagramAPI\Response\DirectSendItemResponse
      */
     public function sendHashtag(
         $recipients,
@@ -505,7 +505,7 @@ class Direct extends RequestCollection
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\SendItemResponse
+     * @return \InstagramAPI\Response\DirectSendItemResponse
      */
     public function sendLocation(
         $recipients,
@@ -535,7 +535,7 @@ class Direct extends RequestCollection
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\SendItemResponse
+     * @return \InstagramAPI\Response\DirectSendItemResponse
      */
     public function sendProfile(
         $recipients,
@@ -744,7 +744,7 @@ class Direct extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\SeenResponse
+     * @return \InstagramAPI\Response\DirectSeenItemResponse
      */
     public function markItemSeen(
         $threadId,
@@ -762,7 +762,7 @@ class Direct extends RequestCollection
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response\SeenResponse());
+            ->getResponse(new \InstagramAPI\Response\DirectSeenItemResponse());
     }
 
     /**

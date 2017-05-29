@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Thread extends \InstagramAPI\Response
+class DirectThread extends \InstagramAPI\Response
 {
     public $named;
     /**
@@ -29,7 +29,7 @@ class Thread extends \InstagramAPI\Response
     public $left_users;
     public $muted;
     /**
-     * @var ThreadItem[]
+     * @var DirectThreadItem[]
      */
     public $items;
     public $thread_type;
@@ -41,7 +41,7 @@ class Thread extends \InstagramAPI\Response
     public $inviter;
     public $pending;
     /**
-     * @var ThreadLastSeenAt[]
+     * @var DirectThreadLastSeenAt[]
      */
     public $last_seen_at;
 }
