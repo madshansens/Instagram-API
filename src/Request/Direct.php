@@ -249,7 +249,7 @@ class Direct extends RequestCollection
             $request->addParams($key, $value);
         }
         // Add recipients.
-        $recipients = Utils::prepareRecipients($recipients);
+        $recipients = $this->_prepareRecipients($recipients);
         if (isset($recipients['users'])) {
             $request->addPost('recipient_users', $recipients['users']);
         } elseif (isset($recipients['thread'])) {
@@ -865,5 +865,59 @@ class Direct extends RequestCollection
             ->addPost('_uuid', $this->ig->uuid)
             ->setSignedPost(false)
             ->getResponse(new \InstagramAPI\Response());
+    }
+
+    /**
+     * Validate and prepare recipients for direct messaging.
+     *
+     * @param array $recipients An array with "users" or "thread" keys.
+     *                          To start a new thread, provide "users" as an array
+     *                          of numerical UserPK IDs. To use an existing thread
+     *                          instead, provide "thread" with the thread ID.
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return array
+     */
+    protected function _prepareRecipients(
+        array $recipients)
+    {
+        $result = [];
+        // users
+        if (isset($recipients['users'])) {
+            if (!is_array($recipients['users'])) {
+                throw new \InvalidArgumentException('"users" must be an array.');
+            }
+            foreach ($recipients['users'] as $userId) {
+                if (!is_scalar($userId)) {
+                    throw new \InvalidArgumentException('User identifier must be scalar.');
+                } elseif (!ctype_digit($userId) && (!is_int($userId) || $userId < 0)) {
+                    throw new \InvalidArgumentException(sprintf('"%s" is not a valid user identifier.', $userId));
+                }
+            }
+            // Although this is an array of groups, you will get "Only one group is supported." error
+            // if you will try to use more than one group here.
+            // And we can't user json_encode() here, because each user id must be a number.
+            $result['users'] = '[['.implode(',', $recipients['users']).']]';
+        }
+        // thread
+        if (isset($recipients['thread'])) {
+            if (!is_scalar($recipients['thread'])) {
+                throw new \InvalidArgumentException('Thread identifier must be scalar.');
+            } elseif (!ctype_digit($recipients['thread']) && (!is_int($recipients['thread']) || $recipients['thread'] < 0)) {
+                throw new \InvalidArgumentException(sprintf('"%s" is not a valid thread identifier.', $recipients['thread']));
+            }
+            // Although this is an array, you will get "Need to specify thread ID or recipient users." error
+            // if you will try to use more than one thread identifier here.
+            // And we can't user json_encode() here, because thread id must be a number.
+            $result['thread'] = '['.$recipients['thread'].']';
+        }
+        if (!count($result)) {
+            throw new \InvalidArgumentException('Please provide at least one recipient.');
+        } elseif (isset($result['thread']) && isset($result['users'])) {
+            throw new \InvalidArgumentException('You can not mix "users" with "thread".');
+        }
+
+        return $result;
     }
 }
