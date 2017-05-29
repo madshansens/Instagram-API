@@ -42,12 +42,11 @@ class Signatures
     {
         // Typecast all scalar values to string.
         foreach ($data as &$value) {
-            if (!is_scalar($value)) {
-                continue;
+            if (is_scalar($value)) {
+                $value = (string) $value;
             }
-            $value = (string) $value;
         }
-        unset($value);
+        unset($value); // Clear reference.
         // Reorder and convert data to JSON string.
         $data = json_encode(Utils::reorderByHashCode($data));
         // Return value must be reordered.
