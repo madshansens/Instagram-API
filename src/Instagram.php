@@ -2426,8 +2426,9 @@ class Instagram
     /**
      * Get list of who a user is following.
      *
-     * @param string      $userId Numerical UserPK ID.
-     * @param null|string $maxId  Next "maximum ID", used for pagination.
+     * @param string      $userId      Numerical UserPK ID.
+     * @param null|string $searchQuery Limit the userlist to ones matching the query.
+     * @param null|string $maxId       Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -2435,10 +2436,14 @@ class Instagram
      */
     public function getUserFollowings(
         $userId,
+        $searchQuery = null,
         $maxId = null)
     {
         $requestData = $this->request("friendships/{$userId}/following/")
         ->addParams('rank_token', $this->rank_token);
+        if (!is_null($searchQuery)) {
+            $requestData->addParams('query', $searchQuery);
+        }
         if (!is_null($maxId)) {
             $requestData->addParams('max_id', $maxId);
         }
@@ -2449,8 +2454,9 @@ class Instagram
     /**
      * Get list of who a user is followed by.
      *
-     * @param string      $userId Numerical UserPK ID.
-     * @param null|string $maxId  Next "maximum ID", used for pagination.
+     * @param string      $userId      Numerical UserPK ID.
+     * @param null|string $searchQuery Limit the userlist to ones matching the query.
+     * @param null|string $maxId       Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -2458,10 +2464,14 @@ class Instagram
      */
     public function getUserFollowers(
         $userId,
+        $searchQuery = null,
         $maxId = null)
     {
         $requestData = $this->request("friendships/{$userId}/followers/")
         ->addParams('rank_token', $this->rank_token);
+        if (!is_null($searchQuery)) {
+            $requestData->addParams('query', $searchQuery);
+        }
         if (!is_null($maxId)) {
             $requestData->addParams('max_id', $maxId);
         }
