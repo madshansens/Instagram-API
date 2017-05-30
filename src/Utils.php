@@ -399,7 +399,7 @@ class Utils
 
         try {
             // Capture a video preview snapshot to that file via FFMPEG.
-            $command = escapeshellarg($ffmpeg).' -i '.escapeshellarg($videoFilename).' -f singlejpeg -ss 00:00:01 -vframes 1 '.escapeshellarg($tmpFilename).' 2>&1';
+            $command = escapeshellarg($ffmpeg).' -i '.escapeshellarg($videoFilename).' -f mjpeg -ss 00:00:01 -vframes 1 '.escapeshellarg($tmpFilename).' 2>&1';
             @exec($command, $output, $statusCode);
 
             // Check for processing errors.
