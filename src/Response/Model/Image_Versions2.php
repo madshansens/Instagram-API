@@ -5,7 +5,7 @@ namespace InstagramAPI\Response\Model;
 class Image_Versions2 extends \InstagramAPI\Response
 {
     /**
-     * @var HdProfilePicUrlInfo[]
+     * @var ImageCandidate[]
      */
     public $candidates;
 }
