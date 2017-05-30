@@ -72,6 +72,20 @@ class ServerMessageThrower
         $serverMessage,
         Response $serverResponse = null)
     {
+        // Fix the generic "Sorry, there was a problem..." message used by some
+        // errors, by replacing it with their error_type value, if available.
+        // That value contains the actual error reason, such as "sentry_block".
+        // Example server JSON: '{"message": "Sorry, there was a problem with
+        // your request.", "status": "fail", "error_type": "sentry_block"}'.
+        if ($serverMessage == 'Sorry, there was a problem with your request.'
+            && $serverResponse instanceof Response) {
+            $fullResponse = $serverResponse->getFullResponse();
+            if (isset($fullResponse->error_type)
+                && is_string($fullResponse->error_type)) {
+                $serverMessage = $fullResponse->error_type;
+            }
+        }
+
         // Generic "API function exception" if no critical exception is found.
         $exceptionClass = 'EndpointException';
 
