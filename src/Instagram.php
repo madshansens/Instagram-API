@@ -1128,6 +1128,25 @@ class Instagram
     }
 
     /**
+     * Set push preferences.
+     *
+     * @param array $preferences Described in "extradocs/setPushPreferences.txt".
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\PushPreferencesResponse
+     */
+    public function setPushPreferences(
+        array $preferences)
+    {
+        $request = $this->request('push/preferences/');
+        foreach ($preferences as $key => $value) {
+            $request->addPost($key, $value);
+        }
+        $request->getResponse(new Response\PushPreferencesResponse());
+    }
+
+    /**
      * Get Facebook OTA.
      *
      * @throws \InstagramAPI\Exception\InstagramException
