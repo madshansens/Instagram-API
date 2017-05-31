@@ -67,19 +67,19 @@ class Media extends RequestCollection
     {
         if (is_null($usertags)) {
             return $this->ig->request("media/{$mediaId}/edit_media/")
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('caption_text', $captionText)
-            ->getResponse(new Response\EditMediaResponse());
+                ->addPost('_uuid', $this->ig->uuid)
+                ->addPost('_uid', $this->ig->account_id)
+                ->addPost('_csrftoken', $this->ig->client->getToken())
+                ->addPost('caption_text', $captionText)
+                ->getResponse(new Response\EditMediaResponse());
         } else {
             return $this->ig->request("media/{$mediaId}/edit_media/")
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('caption_text', $captionText)
-            ->addPost('usertags', $usertags)
-            ->getResponse(new Response\EditMediaResponse());
+                ->addPost('_uuid', $this->ig->uuid)
+                ->addPost('_uid', $this->ig->account_id)
+                ->addPost('_csrftoken', $this->ig->client->getToken())
+                ->addPost('caption_text', $captionText)
+                ->addPost('usertags', $usertags)
+                ->getResponse(new Response\EditMediaResponse());
         }
     }
 
@@ -96,11 +96,11 @@ class Media extends RequestCollection
         $mediaId)
     {
         return $this->ig->request("media/{$mediaId}/like/")
-        ->addPost('_uuid', $this->ig->uuid)
-        ->addPost('_uid', $this->ig->account_id)
-        ->addPost('_csrftoken', $this->ig->client->getToken())
-        ->addPost('media_id', $mediaId)
-        ->getResponse(new \InstagramAPI\Response());
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('media_id', $mediaId)
+            ->getResponse(new \InstagramAPI\Response());
     }
 
     /**
@@ -116,11 +116,11 @@ class Media extends RequestCollection
         $mediaId)
     {
         return $this->ig->request("media/{$mediaId}/unlike/")
-         ->addPost('_uuid', $this->ig->uuid)
-         ->addPost('_uid', $this->ig->account_id)
-         ->addPost('_csrftoken', $this->ig->client->getToken())
-         ->addPost('media_id', $mediaId)
-         ->getResponse(new \InstagramAPI\Response());
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('media_id', $mediaId)
+            ->getResponse(new \InstagramAPI\Response());
     }
 
     /**
@@ -221,26 +221,6 @@ class Media extends RequestCollection
     }
 
     /**
-     * Get media comments.
-     *
-     * @param string      $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param null|string $maxId   Next "maximum ID", used for pagination.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\MediaCommentsResponse
-     */
-    public function getComments(
-        $mediaId,
-        $maxId = null)
-    {
-        return $this->ig->request("media/{$mediaId}/comments/")
-            ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
-            ->addParams('max_id', $maxId)
-            ->getResponse(new Response\MediaCommentsResponse());
-    }
-
-    /**
      * Post a comment on a media item.
      *
      * @param string $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
@@ -267,6 +247,26 @@ class Media extends RequestCollection
     }
 
     /**
+     * Get media comments.
+     *
+     * @param string      $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param null|string $maxId   Next "maximum ID", used for pagination.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\MediaCommentsResponse
+     */
+    public function getComments(
+        $mediaId,
+        $maxId = null)
+    {
+        return $this->ig->request("media/{$mediaId}/comments/")
+            ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
+            ->addParams('max_id', $maxId)
+            ->getResponse(new Response\MediaCommentsResponse());
+    }
+
+    /**
      * Delete a comment.
      *
      * @param string $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
@@ -281,10 +281,10 @@ class Media extends RequestCollection
         $commentId)
     {
         return $this->ig->request("media/{$mediaId}/comment/{$commentId}/delete/")
-        ->addPost('_uuid', $this->ig->uuid)
-        ->addPost('_uid', $this->ig->account_id)
-        ->addPost('_csrftoken', $this->ig->client->getToken())
-        ->getResponse(new Response\DeleteCommentResponse());
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\DeleteCommentResponse());
     }
 
     /**
@@ -313,11 +313,11 @@ class Media extends RequestCollection
         $comment_ids_to_delete = implode(',', $string);
 
         return $this->ig->request("media/{$mediaId}/comment/bulk_delete/")
-        ->addPost('_uuid', $this->ig->uuid)
-        ->addPost('_uid', $this->ig->account_id)
-        ->addPost('_csrftoken', $this->ig->client->getToken())
-        ->addPost('comment_ids_to_delete', $comment_ids_to_delete)
-        ->getResponse(new Response\DeleteCommentResponse());
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('comment_ids_to_delete', $comment_ids_to_delete)
+            ->getResponse(new Response\DeleteCommentResponse());
     }
 
     /**
@@ -333,10 +333,10 @@ class Media extends RequestCollection
         $commentId)
     {
         return $this->ig->request("media/{$commentId}/comment_like/")
-        ->addPost('_uuid', $this->ig->uuid)
-        ->addPost('_uid', $this->ig->account_id)
-        ->addPost('_csrftoken', $this->ig->client->getToken())
-        ->getResponse(new Response\CommentLikeUnlikeResponse());
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\CommentLikeUnlikeResponse());
     }
 
     /**
@@ -352,10 +352,10 @@ class Media extends RequestCollection
         $commentId)
     {
         return $this->ig->request("media/{$commentId}/comment_unlike/")
-        ->addPost('_uuid', $this->ig->uuid)
-        ->addPost('_uid', $this->ig->account_id)
-        ->addPost('_csrftoken', $this->ig->client->getToken())
-        ->getResponse(new Response\CommentLikeUnlikeResponse());
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\CommentLikeUnlikeResponse());
     }
 
     /**
@@ -377,7 +377,7 @@ class Media extends RequestCollection
         }
 
         return $this->ig->request("language/bulk_translate/?comment_ids={$commentIds}")
-        ->getResponse(new Response\TranslateResponse());
+            ->getResponse(new Response\TranslateResponse());
     }
 
     /**
@@ -437,10 +437,10 @@ class Media extends RequestCollection
         $mediaId)
     {
         return $this->ig->request("usertags/{$mediaId}/remove/")
-        ->addPost('_uuid', $this->ig->uuid)
-        ->addPost('_uid', $this->ig->account_id)
-        ->addPost('_csrftoken', $this->ig->client->getToken())
-        ->getResponse(new Response\MediaResponse());
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\MediaResponse());
     }
 
     /**
