@@ -113,6 +113,25 @@ class Live extends RequestCollection
     }
 
     /**
+     * Get broadcast comments.
+     *
+     * @param string $broadcastId   The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param string $lastCommentTs Last comments timestamp (optional).
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BroadcastCommentsResponse
+     */
+    public function getComments(
+        $broadcastId,
+        $lastCommentTs = 0)
+    {
+        return $this->ig->request("live/{$broadcastId}/get_comment/")
+            ->addParams('last_comment_ts', $lastCommentTs)
+            ->getResponse(new Response\BroadcastCommentsResponse());
+    }
+
+    /**
      * Like a broadcast.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
@@ -156,24 +175,5 @@ class Live extends RequestCollection
         return $this->ig->request("live/{$broadcastId}/get_like_count/")
             ->addParams('like_ts', $likeTs)
             ->getResponse(new Response\BroadcastLikeCountResponse());
-    }
-
-    /**
-     * Get broadcast comments.
-     *
-     * @param string $broadcastId   The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param string $lastCommentTs Last comments timestamp (optional).
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\BroadcastCommentsResponse
-     */
-    public function getComments(
-        $broadcastId,
-        $lastCommentTs = 0)
-    {
-        return $this->ig->request("live/{$broadcastId}/get_comment/")
-            ->addParams('last_comment_ts', $lastCommentTs)
-            ->getResponse(new Response\BroadcastCommentsResponse());
     }
 }
