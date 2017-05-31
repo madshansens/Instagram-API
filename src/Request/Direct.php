@@ -381,6 +381,33 @@ class Direct extends RequestCollection
     }
 
     /**
+     * Send a direct text message to a user's inbox.
+     *
+     * @param array  $recipients An array with "users" or "thread" keys.
+     *                           To start a new thread, provide "users" as an array
+     *                           of numerical UserPK IDs. To use an existing thread
+     *                           instead, provide "thread" with the thread ID.
+     * @param string $text       Text message.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\DirectSendItemResponse
+     */
+    public function sendText(
+        $recipients,
+        $text)
+    {
+        return $this->_sendDirectItem(
+            'message',
+            $recipients,
+            [
+                'text' => $text,
+            ]
+        );
+    }
+
+    /**
      * Share an existing media item via direct message to a user's inbox.
      *
      * @param array  $recipients An array with "users" or "thread" keys.
@@ -409,33 +436,6 @@ class Direct extends RequestCollection
                 'text'       => $text,
                 'media_id'   => $mediaId,
                 'media_type' => $mediaType,
-            ]
-        );
-    }
-
-    /**
-     * Send a direct message to a user's inbox.
-     *
-     * @param array  $recipients An array with "users" or "thread" keys.
-     *                           To start a new thread, provide "users" as an array
-     *                           of numerical UserPK IDs. To use an existing thread
-     *                           instead, provide "thread" with the thread ID.
-     * @param string $text       Text message.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\DirectSendItemResponse
-     */
-    public function sendText(
-        $recipients,
-        $text)
-    {
-        return $this->_sendDirectItem(
-            'message',
-            $recipients,
-            [
-                'text' => $text,
             ]
         );
     }
