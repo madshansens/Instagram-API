@@ -44,4 +44,10 @@ class DirectThread extends \InstagramAPI\Response
      * @var DirectThreadLastSeenAt[]
      */
     public $last_seen_at;
+    public $unseen_count;
+    /**
+     * @var ActionBadge
+     */
+    public $action_badge;
+    public $last_activity_at_secs;
 }
