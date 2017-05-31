@@ -853,7 +853,7 @@ class Instagram
     public function getCurrentUser()
     {
         return $this->request('accounts/current_user/')
-            ->addParams('edit', true)
+            ->addParam('edit', true)
             ->addPost('_uuid', $this->uuid)
             ->addPost('_uid', $this->account_id)
             ->addPost('_csrftoken', $this->client->getToken())
@@ -1067,7 +1067,7 @@ class Instagram
         // Instagram REQUIRES that you wait several minutes between calls to it.
         try {
             $request = $this->request('friendships/autocomplete_user_list/')
-                ->addParams('version', '2');
+                ->addParam('version', '2');
 
             return $request->getResponse(new Response\AutoCompleteUserListResponse());
         } catch (\InstagramAPI\Exception\ThrottledException $e) {
@@ -1098,8 +1098,8 @@ class Instagram
         ]);
 
         return $this->request('push/register/')
-            ->addParams('platform', '10')
-            ->addParams('device_type', 'android_mqtt')
+            ->addParam('platform', '10')
+            ->addParam('device_type', 'android_mqtt')
             ->addPost('_uuid', $this->uuid)
             ->addPost('guid', $this->uuid)
             ->addPost('phone_id', $this->settings->get('phone_id'))
@@ -1153,14 +1153,14 @@ class Instagram
     public function getFacebookOTA()
     {
         return $this->request('facebook_ota/')
-            ->addParams('fields', Constants::FACEBOOK_OTA_FIELDS)
-            ->addParams('custom_user_id', $this->account_id)
-            ->addParams('signed_body', Signatures::generateSignature('').'.')
-            ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
-            ->addParams('version_code', Constants::VERSION_CODE)
-            ->addParams('version_name', Constants::IG_VERSION)
-            ->addParams('custom_app_id', Constants::FACEBOOK_ORCA_APPLICATION_ID)
-            ->addParams('custom_device_id', $this->uuid)
+            ->addParam('fields', Constants::FACEBOOK_OTA_FIELDS)
+            ->addParam('custom_user_id', $this->account_id)
+            ->addParam('signed_body', Signatures::generateSignature('').'.')
+            ->addParam('ig_sig_key_version', Constants::SIG_KEY_VERSION)
+            ->addParam('version_code', Constants::VERSION_CODE)
+            ->addParam('version_name', Constants::IG_VERSION)
+            ->addParam('custom_app_id', Constants::FACEBOOK_ORCA_APPLICATION_ID)
+            ->addParam('custom_device_id', $this->uuid)
             ->getResponse(new Response\FacebookOTAResponse());
     }
 
@@ -1180,8 +1180,8 @@ class Instagram
             $day = date('d');
         }
         $request = $this->request('insights/account_organic_insights')
-            ->addParams('show_promotions_in_landing_page', 'true')
-            ->addParams('first', $day);
+            ->addParam('show_promotions_in_landing_page', 'true')
+            ->addParam('first', $day);
 
         return $request->getResponse(new Response\InsightsResponse());
     }
@@ -1199,7 +1199,7 @@ class Instagram
         $mediaId)
     {
         $request = $this->request("insights/media_organic_insights/{$mediaId}")
-            ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION);
+            ->addParam('ig_sig_key_version', Constants::SIG_KEY_VERSION);
 
         return $request->getResponse(new Response\MediaInsightsResponse());
     }
@@ -1744,7 +1744,7 @@ class Instagram
 
         // Build the request...
         $requestData = $this->request($endpoint)
-            ->addParams('video', 1)
+            ->addParam('video', 1)
             ->addPost('video_result', 'deprecated')
             ->addPost('upload_id', $uploadId)
             ->addPost('poster_frame_index', 0)
@@ -2027,7 +2027,7 @@ class Instagram
     public function getRecentActivity()
     {
         return $this->request('news/inbox/')
-            ->addParams('activity_module', 'all')
+            ->addParam('activity_module', 'all')
             ->getResponse(new Response\ActivityNewsResponse());
     }
 
@@ -2045,7 +2045,7 @@ class Instagram
     {
         $activity = $this->request('news/');
         if (!is_null($maxId)) {
-            $activity->addParams('max_id', $maxId);
+            $activity->addParam('max_id', $maxId);
         }
 
         return $activity->getResponse(new Response\FollowingRecentActivityResponse());
@@ -2068,10 +2068,10 @@ class Instagram
         $minTimestamp = null)
     {
         return $this->request("usertags/{$userId}/feed/")
-            ->addParams('rank_token', $this->rank_token)
-            ->addParams('ranked_content', 'true')
-            ->addParams('max_id', (!is_null($maxId) ? $maxId : ''))
-            ->addParams('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
+            ->addParam('rank_token', $this->rank_token)
+            ->addParam('ranked_content', 'true')
+            ->addParam('max_id', (!is_null($maxId) ? $maxId : ''))
+            ->addParam('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
             ->getResponse(new Response\UsertagsResponse());
     }
 
@@ -2100,9 +2100,9 @@ class Instagram
         $query)
     {
         return $this->request('fbsearch/topsearch/')
-            ->addParams('context', 'blended')
-            ->addParams('query', $query)
-            ->addParams('rank_token', $this->rank_token)
+            ->addParam('context', 'blended')
+            ->addParam('query', $query)
+            ->addParam('rank_token', $this->rank_token)
             ->getResponse(new Response\FBSearchResponse());
     }
 
@@ -2119,10 +2119,10 @@ class Instagram
         $query)
     {
         return $this->request('users/search/')
-            ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
-            ->addParams('is_typeahead', true)
-            ->addParams('query', $query)
-            ->addParams('rank_token', $this->rank_token)
+            ->addParam('ig_sig_key_version', Constants::SIG_KEY_VERSION)
+            ->addParam('is_typeahead', true)
+            ->addParam('query', $query)
+            ->addParam('rank_token', $this->rank_token)
             ->getResponse(new Response\SearchUserResponse());
     }
 
@@ -2239,8 +2239,8 @@ class Instagram
         $tag)
     {
         return $this->request("tags/{$tag}/related")
-            ->addParams('visited', '[{"id":"'.$tag.'","type":"hashtag"}]')
-            ->addParams('related_types', '["hashtag"]')
+            ->addParam('visited', '[{"id":"'.$tag.'","type":"hashtag"}]')
+            ->addParam('related_types', '["hashtag"]')
             ->getResponse(new Response\TagRelatedResponse());
     }
 
@@ -2309,14 +2309,14 @@ class Instagram
         $query = null)
     {
         $locations = $this->request('location_search/')
-            ->addParams('rank_token', $this->rank_token)
-            ->addParams('latitude', $latitude)
-            ->addParams('longitude', $longitude);
+            ->addParam('rank_token', $this->rank_token)
+            ->addParam('latitude', $latitude)
+            ->addParam('longitude', $longitude);
 
         if (is_null($query)) {
-            $locations->addParams('timestamp', time());
+            $locations->addParam('timestamp', time());
         } else {
-            $locations->addParams('search_query', $query);
+            $locations->addParam('search_query', $query);
         }
 
         return $locations->getResponse(new Response\LocationResponse());
@@ -2335,8 +2335,8 @@ class Instagram
         $locationId)
     {
         return $this->request("locations/{$locationId}/related")
-            ->addParams('visited', json_encode(['id' => $locationId, 'type' => 'location']))
-            ->addParams('related_types', json_encode(['location']))
+            ->addParam('visited', json_encode(['id' => $locationId, 'type' => 'location']))
+            ->addParam('related_types', json_encode(['location']))
             ->getResponse(new Response\RelatedLocationResponse());
     }
 
@@ -2355,11 +2355,11 @@ class Instagram
         $count = null)
     {
         $location = $this->request('fbsearch/places/')
-            ->addParams('rank_token', $this->rank_token)
-            ->addParams('query', $query);
+            ->addParam('rank_token', $this->rank_token)
+            ->addParam('query', $query);
 
         if (!is_null($count)) {
-            $location->addParams('count', $count);
+            $location->addParam('count', $count);
         }
 
         return $location->getResponse(new Response\FBLocationResponse());
@@ -2380,9 +2380,9 @@ class Instagram
         $lng)
     {
         return $this->request('fbsearch/places/')
-            ->addParams('rank_token', $this->rank_token)
-            ->addParams('lat', $lat)
-            ->addParams('lng', $lng)
+            ->addParam('rank_token', $this->rank_token)
+            ->addParam('lat', $lat)
+            ->addParam('lng', $lng)
             ->getResponse(new Response\FBLocationResponse());
     }
 
@@ -2402,7 +2402,7 @@ class Instagram
     {
         $locationFeed = $this->request("feed/location/{$locationId}/");
         if (!is_null($maxId)) {
-            $locationFeed->addParams('max_id', $maxId);
+            $locationFeed->addParam('max_id', $maxId);
         }
 
         return $locationFeed->getResponse(new Response\LocationFeedResponse());
@@ -2418,9 +2418,9 @@ class Instagram
     public function getPopularFeed()
     {
         return $this->request('feed/popular/')
-            ->addParams('people_teaser_supported', '1')
-            ->addParams('rank_token', $this->rank_token)
-            ->addParams('ranked_content', 'true')
+            ->addParam('people_teaser_supported', '1')
+            ->addParam('rank_token', $this->rank_token)
+            ->addParam('ranked_content', 'true')
             ->getResponse(new Response\PopularFeedResponse());
     }
 
@@ -2440,7 +2440,7 @@ class Instagram
     {
         $hashtagFeed = $this->request("feed/tag/{$hashtagString}/");
         if (!is_null($maxId)) {
-            $hashtagFeed->addParams('max_id', $maxId);
+            $hashtagFeed->addParam('max_id', $maxId);
         }
 
         return $hashtagFeed->getResponse(new Response\TagFeedResponse());
@@ -2463,12 +2463,12 @@ class Instagram
         $maxId = null)
     {
         $requestData = $this->request("friendships/{$userId}/following/")
-            ->addParams('rank_token', $this->rank_token);
+            ->addParam('rank_token', $this->rank_token);
         if (!is_null($searchQuery)) {
-            $requestData->addParams('query', $searchQuery);
+            $requestData->addParam('query', $searchQuery);
         }
         if (!is_null($maxId)) {
-            $requestData->addParams('max_id', $maxId);
+            $requestData->addParam('max_id', $maxId);
         }
 
         return $requestData->getResponse(new Response\FollowerAndFollowingResponse());
@@ -2491,12 +2491,12 @@ class Instagram
         $maxId = null)
     {
         $requestData = $this->request("friendships/{$userId}/followers/")
-            ->addParams('rank_token', $this->rank_token);
+            ->addParam('rank_token', $this->rank_token);
         if (!is_null($searchQuery)) {
-            $requestData->addParams('query', $searchQuery);
+            $requestData->addParam('query', $searchQuery);
         }
         if (!is_null($maxId)) {
-            $requestData->addParams('max_id', $maxId);
+            $requestData->addParam('max_id', $maxId);
         }
 
         return $requestData->getResponse(new Response\FollowerAndFollowingResponse());
@@ -2622,7 +2622,7 @@ class Instagram
         $userId)
     {
         return $this->request('discover/chaining/')
-            ->addParams('target_id', $userId)
+            ->addParam('target_id', $userId)
             ->getResponse(new Response\SuggestedUsersResponse());
     }
 
@@ -2677,8 +2677,8 @@ class Instagram
         return $this->request('discover/aysf_dismiss/')
             ->addPost('_uuid', $this->uuid)
             ->addPost('_csrftoken', $this->client->getToken())
-            ->addParams('target_id', $userId)
-            ->addParams('algorithm', 'ig_friends_of_friends_from_tao_laser_algorithm')
+            ->addParam('target_id', $userId)
+            ->addParam('algorithm', 'ig_friends_of_friends_from_tao_laser_algorithm')
             ->getResponse(new Response\SuggestedUsersResponse());
     }
 
@@ -2910,9 +2910,9 @@ class Instagram
         $query)
     {
         return $this->request('tags/search/')
-            ->addParams('is_typeahead', true)
-            ->addParams('q', $query)
-            ->addParams('rank_token', $this->rank_token)
+            ->addParam('is_typeahead', true)
+            ->addParam('q', $query)
+            ->addParam('rank_token', $this->rank_token)
             ->getResponse(new Response\SearchTagResponse());
     }
 

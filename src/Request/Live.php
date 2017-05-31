@@ -127,7 +127,7 @@ class Live extends RequestCollection
         $lastCommentTs = 0)
     {
         return $this->ig->request("live/{$broadcastId}/get_comment/")
-            ->addParams('last_comment_ts', $lastCommentTs)
+            ->addParam('last_comment_ts', $lastCommentTs)
             ->getResponse(new Response\BroadcastCommentsResponse());
     }
 
@@ -173,7 +173,7 @@ class Live extends RequestCollection
         $likeTs = 0)
     {
         return $this->ig->request("live/{$broadcastId}/get_like_count/")
-            ->addParams('like_ts', $likeTs)
+            ->addParam('like_ts', $likeTs)
             ->getResponse(new Response\BroadcastLikeCountResponse());
     }
 }

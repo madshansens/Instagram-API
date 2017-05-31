@@ -178,10 +178,10 @@ class Timeline extends RequestCollection
         $maxId = null)
     {
         $request = $this->ig->request('feed/timeline')
-            ->addParams('rank_token', $this->ig->rank_token)
-            ->addParams('ranked_content', true);
+            ->addParam('rank_token', $this->ig->rank_token)
+            ->addParam('ranked_content', true);
         if ($maxId) {
-            $request->addParams('max_id', $maxId);
+            $request->addParam('max_id', $maxId);
         }
 
         return $request->getResponse(new Response\TimelineFeedResponse());
@@ -204,10 +204,10 @@ class Timeline extends RequestCollection
         $minTimestamp = null)
     {
         return $this->ig->request("feed/user/{$userId}/")
-            ->addParams('rank_token', $this->ig->rank_token)
-            ->addParams('ranked_content', 'true')
-            ->addParams('max_id', (!is_null($maxId) ? $maxId : ''))
-            ->addParams('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
+            ->addParam('rank_token', $this->ig->rank_token)
+            ->addParam('ranked_content', 'true')
+            ->addParam('max_id', (!is_null($maxId) ? $maxId : ''))
+            ->addParam('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
             ->getResponse(new Response\UserFeedResponse());
     }
 

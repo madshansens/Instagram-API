@@ -56,7 +56,7 @@ class Request
         return $this;
     }
 
-    public function addParams(
+    public function addParam(
         $key,
         $value)
     {

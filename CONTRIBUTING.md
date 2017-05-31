@@ -362,7 +362,7 @@ Some of the requests are signed. This means there is a hash concatenated to the 
 If the request is a GET request, you can add the GET query parameters like this (instead of using `addPost`):
 
 ```php
-->addParams(key, value)
+->addParam(key, value)
 ```
 
 And finally, we always end with the `getResponse` function call, which will read the response and return an object with all of the server response values:

@@ -261,8 +261,8 @@ class Media extends RequestCollection
         $maxId = null)
     {
         return $this->ig->request("media/{$mediaId}/comments/")
-            ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
-            ->addParams('max_id', $maxId)
+            ->addParam('ig_sig_key_version', Constants::SIG_KEY_VERSION)
+            ->addParam('max_id', $maxId)
             ->getResponse(new Response\MediaCommentsResponse());
     }
 
@@ -499,7 +499,7 @@ class Media extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken());
 
         if (!is_null($maxId)) {
-            $requestData->addParams('max_id', $maxId);
+            $requestData->addParam('max_id', $maxId);
         }
 
         return $requestData->getResponse(new Response\SavedFeedResponse());

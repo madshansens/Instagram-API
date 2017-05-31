@@ -21,12 +21,12 @@ class Direct extends RequestCollection
         $cursorId = null)
     {
         $request = $this->ig->request('direct_v2/inbox/')
-            ->addParams('persistentBadging', 'true');
+            ->addParam('persistentBadging', 'true');
         if ($this->hasUnifiedInbox()) {
-            $request->addParams('use_unified_inbox', 'true');
+            $request->addParam('use_unified_inbox', 'true');
         }
         if ($cursorId !== null) {
-            $request->addParams('cursor', $cursorId);
+            $request->addParam('cursor', $cursorId);
         }
 
         return $request->getResponse(new Response\DirectInboxResponse());
@@ -42,7 +42,7 @@ class Direct extends RequestCollection
     public function getVisualInbox()
     {
         return $this->ig->request('direct_v2/visual_inbox')
-            ->addParams('persistentBadging', 'true')
+            ->addParam('persistentBadging', 'true')
             ->getResponse(new Response\DirectVisualInboxResponse());
     }
 
@@ -69,9 +69,9 @@ class Direct extends RequestCollection
     public function getPendingInbox()
     {
         $request = $this->ig->request('direct_v2/pending_inbox')
-                 ->addParams('persistentBadging', 'true');
+                 ->addParam('persistentBadging', 'true');
         if ($this->hasUnifiedInbox()) {
-            $request->addParams('use_unified_inbox', 'true');
+            $request->addParam('use_unified_inbox', 'true');
         }
 
         return $request->getResponse(new Response\DirectPendingInboxResponse());
@@ -194,10 +194,10 @@ class Direct extends RequestCollection
         $showThreads)
     {
         $request = $this->ig->request('direct_v2/ranked_recipients')
-            ->addParams('mode', $mode)
-            ->addParams('show_threads', $showThreads ? 'true' : 'false');
+            ->addParam('mode', $mode)
+            ->addParam('show_threads', $showThreads ? 'true' : 'false');
         if ($this->hasUnifiedInbox()) {
-            $request->addParams('use_unified_inbox', 'true');
+            $request->addParam('use_unified_inbox', 'true');
         }
 
         return $request
@@ -233,10 +233,10 @@ class Direct extends RequestCollection
     {
         $request = $this->ig->request("direct_v2/threads/$threadId/");
         if ($cursorId !== null) {
-            $request->addParams('cursor', $cursorId);
+            $request->addParam('cursor', $cursorId);
         }
         if ($this->hasUnifiedInbox()) {
-            $request->addParams('use_unified_inbox', 'true');
+            $request->addParam('use_unified_inbox', 'true');
         }
 
         return $request->getResponse(new Response\DirectThreadResponse());
@@ -370,7 +370,7 @@ class Direct extends RequestCollection
     {
         $request = $this->ig->request("direct_v2/threads/{$threadId}/hide/");
         if ($this->hasUnifiedInbox()) {
-            $request->addParams('use_unified_inbox', 'true');
+            $request->addParam('use_unified_inbox', 'true');
         }
 
         return $request
@@ -902,7 +902,7 @@ class Direct extends RequestCollection
             ->addPost('action', 'send_item');
         // Fill query params.
         foreach ($params as $key => $value) {
-            $request->addParams($key, $value);
+            $request->addParam($key, $value);
         }
         // Add recipients.
         $recipients = $this->_prepareRecipients($recipients);
