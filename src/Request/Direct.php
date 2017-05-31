@@ -78,6 +78,108 @@ class Direct extends RequestCollection
     }
 
     /**
+     * Approve pending threads by given identifiers.
+     *
+     * @param array $threads One or more thread identifiers.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response
+     */
+    public function approvePendingThreads(
+        array $threads)
+    {
+        if (!count($threads)) {
+            throw new \InvalidArgumentException('Please provide at least one thread to approve.');
+        }
+        // Validate threads.
+        foreach ($threads as &$thread) {
+            if (!is_scalar($thread)) {
+                throw new \InvalidArgumentException('Thread identifier must be scalar.');
+            } elseif (!ctype_digit($thread) && (!is_int($thread) || $thread < 0)) {
+                throw new \InvalidArgumentException(sprintf('"%s" is not a valid thread identifier.', $thread));
+            }
+            $thread = (string) $thread;
+        }
+        unset($thread);
+        // Choose appropriate endpoint.
+        if (count($threads) > 1) {
+            $request = $this->ig->request('direct_v2/threads/approve_multiple/')
+                ->addPost('thread_ids', json_encode($threads));
+        } else {
+            /** @var string $thread */
+            $thread = reset($threads);
+            $request = $this->ig->request("direct_v2/threads/{$thread}/approve/");
+        }
+
+        return $request
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uuid', $this->ig->uuid)
+            ->setSignedPost(false)
+            ->getResponse(new \InstagramAPI\Response());
+    }
+
+    /**
+     * Decline pending threads by given identifiers.
+     *
+     * @param array $threads One or more thread identifiers.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response
+     */
+    public function declinePendingThreads(
+        array $threads)
+    {
+        if (!count($threads)) {
+            throw new \InvalidArgumentException('Please provide at least one thread to decline.');
+        }
+        // Validate threads.
+        foreach ($threads as &$thread) {
+            if (!is_scalar($thread)) {
+                throw new \InvalidArgumentException('Thread identifier must be scalar.');
+            } elseif (!ctype_digit($thread) && (!is_int($thread) || $thread < 0)) {
+                throw new \InvalidArgumentException(sprintf('"%s" is not a valid thread identifier.', $thread));
+            }
+            $thread = (string) $thread;
+        }
+        unset($thread);
+        // Choose appropriate endpoint.
+        if (count($threads) > 1) {
+            $request = $this->ig->request('direct_v2/threads/decline_multiple/')
+                ->addPost('thread_ids', json_encode($threads));
+        } else {
+            /** @var string $thread */
+            $thread = reset($threads);
+            $request = $this->ig->request("direct_v2/threads/{$thread}/decline/");
+        }
+
+        return $request
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uuid', $this->ig->uuid)
+            ->setSignedPost(false)
+            ->getResponse(new \InstagramAPI\Response());
+    }
+
+    /**
+     * Decline all pending threads.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response
+     */
+    public function declineAllPendingThreads()
+    {
+        return $this->ig->request('direct_v2/threads/decline_all/')
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uuid', $this->ig->uuid)
+            ->setSignedPost(false)
+            ->getResponse(new \InstagramAPI\Response());
+    }
+
+    /**
      * Get ranked list of recipients.
      *
      * @param string $mode        Either "reshare" or "raven".
@@ -116,163 +218,166 @@ class Direct extends RequestCollection
     }
 
     /**
-     * Send a direct message to specific users or thread.
+     * Get direct message thread.
      *
-     * @param string $type       One of: "media_share", "message", "like", "hashtag", "location", "profile", "photo", "video".
-     * @param array  $recipients An array with "users" or "thread" keys.
-     *                           To start a new thread, provide "users" as an array
-     *                           of numerical UserPK IDs. To use an existing thread
-     *                           instead, provide "thread" with the thread ID.
-     * @param array  $data       Depends on $type:
-     *                           "media_share" uses "media_id", "media_type" and "text";
-     *                           "message" uses "text";
-     *                           "like" uses nothing;
-     *                           "hashtag" uses "hashtag" and "text";
-     *                           "location" uses "venue_id" and "text";
-     *                           "profile" uses "profile_user_id" and "text";
-     *                           "photo" uses "filepath";
-     *                           "video" uses "upload_id" and "video_result".
+     * @param string      $threadId Thread ID.
+     * @param string|null $cursorId Next "cursor ID", used for pagination.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\DirectThreadResponse
+     */
+    public function getThread(
+        $threadId,
+        $cursorId = null)
+    {
+        $request = $this->ig->request("direct_v2/threads/$threadId/");
+        if ($cursorId !== null) {
+            $request->addParams('cursor', $cursorId);
+        }
+        if ($this->hasUnifiedInbox()) {
+            $request->addParams('use_unified_inbox', 'true');
+        }
+
+        return $request->getResponse(new Response\DirectThreadResponse());
+    }
+
+    /**
+     * Update thread title.
+     *
+     * @param string $threadId Thread ID.
+     * @param string $title    New title.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\DirectThreadResponse
+     */
+    public function updateThreadTitle(
+        $threadId,
+        $title)
+    {
+        return $this->ig->request("direct_v2/threads/{$threadId}/update_title/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('title', trim($title))
+            ->setSignedPost(false)
+            ->getResponse(new \InstagramAPI\Response\DirectThreadResponse());
+    }
+
+    /**
+     * Mute direct thread.
+     *
+     * @param string $threadId Thread ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response
+     */
+    public function muteThread(
+        $threadId)
+    {
+        return $this->ig->request("direct_v2/threads/{$threadId}/mute/")
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uuid', $this->ig->uuid)
+            ->setSignedPost(false)
+            ->getResponse(new \InstagramAPI\Response());
+    }
+
+    /**
+     * Unmute direct thread.
+     *
+     * @param string $threadId Thread ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response
+     */
+    public function unmuteThread(
+        $threadId)
+    {
+        return $this->ig->request("direct_v2/threads/{$threadId}/unmute/")
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uuid', $this->ig->uuid)
+            ->setSignedPost(false)
+            ->getResponse(new \InstagramAPI\Response());
+    }
+
+    /**
+     * Add users to thread.
+     *
+     * @param string         $threadId Thread ID.
+     * @param string[]|int[] $users    Array of numerical UserPK IDs.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\DirectSendItemResponse
+     * @return \InstagramAPI\Response\DirectThreadResponse
      */
-    protected function _sendDirectItem(
-        $type,
-        $recipients,
-        array $data = [])
+    public function addUsersToThread(
+        $threadId,
+        array $users)
     {
-        // Determine which endpoint to use and validate input.
-        $post = [];
-        $params = [];
-        $files = [];
-        switch ($type) {
-            case 'media_share':
-                $endpoint = 'direct_v2/threads/broadcast/media_share/';
-                // Check and set media_id.
-                if (!isset($data['media_id'])) {
-                    throw new \InvalidArgumentException('You must provide a media id.');
-                }
-                $post['media_id'] = $data['media_id'];
-                // Check and set text.
-                if (isset($data['text'])) {
-                    $post['text'] = $data['text'];
-                }
-                // Check and set media_type.
-                if (isset($data['media_type']) && $data['media_type'] === 'video') {
-                    $params['media_type'] = 'video';
-                } else {
-                    $params['media_type'] = 'photo';
-                }
-                break;
-            case 'message':
-                $endpoint = 'direct_v2/threads/broadcast/text/';
-                // Check and set text.
-                if (!isset($data['text'])) {
-                    throw new \InvalidArgumentException('No text message provided.');
-                }
-                $post['text'] = $data['text'];
-                break;
-            case 'like':
-                $endpoint = 'direct_v2/threads/broadcast/like/';
-                break;
-            case 'hashtag':
-                $endpoint = 'direct_v2/threads/broadcast/hashtag/';
-                // Check and set hashtag.
-                if (!isset($data['hashtag'])) {
-                    throw new \InvalidArgumentException('No hashtag provided.');
-                }
-                $post['hashtag'] = $data['hashtag'];
-                // Check and set text.
-                if (isset($data['text'])) {
-                    $post['text'] = $data['text'];
-                }
-                break;
-            case 'location':
-                $endpoint = 'direct_v2/threads/broadcast/location/';
-                // Check and set venue_id.
-                if (!isset($data['venue_id'])) {
-                    throw new \InvalidArgumentException('No venue_id provided.');
-                }
-                $post['venue_id'] = $data['venue_id'];
-                // Check and set text.
-                if (isset($data['text'])) {
-                    $post['text'] = $data['text'];
-                }
-                break;
-            case 'profile':
-                $endpoint = 'direct_v2/threads/broadcast/profile/';
-                // Check and set profile_user_id.
-                if (!isset($data['profile_user_id'])) {
-                    throw new \InvalidArgumentException('No profile_user_id provided.');
-                }
-                $post['profile_user_id'] = $data['profile_user_id'];
-                // Check and set text.
-                if (isset($data['text'])) {
-                    $post['text'] = $data['text'];
-                }
-                break;
-            case 'photo':
-                $endpoint = 'direct_v2/threads/broadcast/upload_photo/';
-                // Check and set filepath.
-                if (!isset($data['filepath'])) {
-                    throw new \InvalidArgumentException('No filepath provided.');
-                }
-                $files[] = [
-                    'key'      => 'photo',
-                    'filepath' => $data['filepath'],
-                    'filename' => 'direct_temp_photo_'.Utils::generateUploadId().'.jpg',
-                ];
-                break;
-            case 'video':
-                $endpoint = 'direct_v2/threads/broadcast/configure_video/';
-                // Check and set upload_id.
-                if (!isset($data['upload_id'])) {
-                    throw new \InvalidArgumentException('No upload_id provided.');
-                }
-                $post['upload_id'] = $data['upload_id'];
-                if (isset($data['video_result'])) {
-                    $post['video_result'] = $data['video_result'];
-                }
-                break;
-            default:
-                throw new \InvalidArgumentException('Unsupported parameter value for type.');
+        if (!count($users)) {
+            throw new \InvalidArgumentException('Please provide at least one user.');
+        }
+        foreach ($users as &$user) {
+            if (!is_scalar($user)) {
+                throw new \InvalidArgumentException('User identifier must be scalar.');
+            } elseif (!ctype_digit($user) && (!is_int($user) || $user < 0)) {
+                throw new \InvalidArgumentException(sprintf('"%s" is not a valid user identifier.', $user));
+            }
+            $user = (string) $user;
         }
 
-        // Prepare request.
-        $request = $this->ig->request($endpoint)
+        return $this->ig->request("direct_v2/threads/{$threadId}/add_user/")
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('user_ids', json_encode($users))
+            ->addPost('_uuid', $this->ig->uuid)
             ->setSignedPost(false)
-            ->addPost('action', 'send_item');
-        // Fill query params.
-        foreach ($params as $key => $value) {
-            $request->addParams($key, $value);
-        }
-        // Add recipients.
-        $recipients = $this->_prepareRecipients($recipients);
-        if (isset($recipients['users'])) {
-            $request->addPost('recipient_users', $recipients['users']);
-        } elseif (isset($recipients['thread'])) {
-            $request->addPost('thread_ids', $recipients['thread']);
-        } else {
-            throw new \InvalidArgumentException('Please provide at least one recipient.');
-        }
-        // Fill post data.
-        foreach ($post as $key => $value) {
-            $request->addPost($key, $value);
-        }
-        // Fill files.
-        foreach ($files as $file) {
-            $request->addFile($file['key'], $file['filepath'], $file['filename']);
+            ->getResponse(new \InstagramAPI\Response\DirectThreadResponse());
+    }
+
+    /**
+     * Leave direct thread.
+     *
+     * @param string $threadId Thread ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response
+     */
+    public function leaveThread(
+        $threadId)
+    {
+        return $this->ig->request("direct_v2/threads/{$threadId}/leave/")
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uuid', $this->ig->uuid)
+            ->setSignedPost(false)
+            ->getResponse(new \InstagramAPI\Response());
+    }
+
+    /**
+     * Hide direct thread.
+     *
+     * @param string $threadId Thread ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response
+     */
+    public function hideThread(
+        $threadId)
+    {
+        $request = $this->ig->request("direct_v2/threads/{$threadId}/hide/");
+        if ($this->hasUnifiedInbox()) {
+            $request->addParams('use_unified_inbox', 'true');
         }
 
         return $request
-            // WARNING: Must be random every time otherwise we can only
-            // make a single post per direct-discussion thread.
-            ->addPost('client_context', Signatures::generateUUID(true))
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('_uid', $this->ig->account_id)
-            ->getResponse(new Response\DirectSendItemResponse());
+            ->addPost('_uuid', $this->ig->uuid)
+            ->setSignedPost(false)
+            ->getResponse(new \InstagramAPI\Response());
     }
 
     /**
@@ -553,169 +658,6 @@ class Direct extends RequestCollection
     }
 
     /**
-     * Get direct message thread.
-     *
-     * @param string      $threadId Thread ID.
-     * @param string|null $cursorId Next "cursor ID", used for pagination.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\DirectThreadResponse
-     */
-    public function getThread(
-        $threadId,
-        $cursorId = null)
-    {
-        $request = $this->ig->request("direct_v2/threads/$threadId/");
-        if ($cursorId !== null) {
-            $request->addParams('cursor', $cursorId);
-        }
-        if ($this->hasUnifiedInbox()) {
-            $request->addParams('use_unified_inbox', 'true');
-        }
-
-        return $request->getResponse(new Response\DirectThreadResponse());
-    }
-
-    /**
-     * Update thread title.
-     *
-     * @param string $threadId Thread ID.
-     * @param string $title    New title.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\DirectThreadResponse
-     */
-    public function updateThreadTitle(
-        $threadId,
-        $title)
-    {
-        return $this->ig->request("direct_v2/threads/{$threadId}/update_title/")
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('title', trim($title))
-            ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response\DirectThreadResponse());
-    }
-
-    /**
-     * Mute direct thread.
-     *
-     * @param string $threadId Thread ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response
-     */
-    public function muteThread(
-        $threadId)
-    {
-        return $this->ig->request("direct_v2/threads/{$threadId}/mute/")
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('_uuid', $this->ig->uuid)
-            ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
-    }
-
-    /**
-     * Unmute direct thread.
-     *
-     * @param string $threadId Thread ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response
-     */
-    public function unmuteThread(
-        $threadId)
-    {
-        return $this->ig->request("direct_v2/threads/{$threadId}/unmute/")
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('_uuid', $this->ig->uuid)
-            ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
-    }
-
-    /**
-     * Add users to thread.
-     *
-     * @param string         $threadId Thread ID.
-     * @param string[]|int[] $users    Array of numerical UserPK IDs.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\DirectThreadResponse
-     */
-    public function addUsersToThread(
-        $threadId,
-        array $users)
-    {
-        if (!count($users)) {
-            throw new \InvalidArgumentException('Please provide at least one user.');
-        }
-        foreach ($users as &$user) {
-            if (!is_scalar($user)) {
-                throw new \InvalidArgumentException('User identifier must be scalar.');
-            } elseif (!ctype_digit($user) && (!is_int($user) || $user < 0)) {
-                throw new \InvalidArgumentException(sprintf('"%s" is not a valid user identifier.', $user));
-            }
-            $user = (string) $user;
-        }
-
-        return $this->ig->request("direct_v2/threads/{$threadId}/add_user/")
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('user_ids', json_encode($users))
-            ->addPost('_uuid', $this->ig->uuid)
-            ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response\DirectThreadResponse());
-    }
-
-    /**
-     * Leave direct thread.
-     *
-     * @param string $threadId Thread ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response
-     */
-    public function leaveThread(
-        $threadId)
-    {
-        return $this->ig->request("direct_v2/threads/{$threadId}/leave/")
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('_uuid', $this->ig->uuid)
-            ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
-    }
-
-    /**
-     * Hide direct thread.
-     *
-     * @param string $threadId Thread ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response
-     */
-    public function hideThread(
-        $threadId)
-    {
-        $request = $this->ig->request("direct_v2/threads/{$threadId}/hide/");
-        if ($this->hasUnifiedInbox()) {
-            $request->addParams('use_unified_inbox', 'true');
-        }
-
-        return $request
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('_uuid', $this->ig->uuid)
-            ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
-    }
-
-    /**
      * Delete an item from given thread.
      *
      * @param string $threadId     Thread ID.
@@ -766,105 +708,13 @@ class Direct extends RequestCollection
     }
 
     /**
-     * Approve pending threads by given identifiers.
+     * Checks if current user has a unified inbox.
      *
-     * @param array $threads One or more thread identifiers.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response
+     * @return bool
      */
-    public function approvePendingThreads(
-        array $threads)
+    public function hasUnifiedInbox()
     {
-        if (!count($threads)) {
-            throw new \InvalidArgumentException('Please provide at least one thread to approve.');
-        }
-        // Validate threads.
-        foreach ($threads as &$thread) {
-            if (!is_scalar($thread)) {
-                throw new \InvalidArgumentException('Thread identifier must be scalar.');
-            } elseif (!ctype_digit($thread) && (!is_int($thread) || $thread < 0)) {
-                throw new \InvalidArgumentException(sprintf('"%s" is not a valid thread identifier.', $thread));
-            }
-            $thread = (string) $thread;
-        }
-        unset($thread);
-        // Choose appropriate endpoint.
-        if (count($threads) > 1) {
-            $request = $this->ig->request('direct_v2/threads/approve_multiple/')
-                ->addPost('thread_ids', json_encode($threads));
-        } else {
-            /** @var string $thread */
-            $thread = reset($threads);
-            $request = $this->ig->request("direct_v2/threads/{$thread}/approve/");
-        }
-
-        return $request
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('_uuid', $this->ig->uuid)
-            ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
-    }
-
-    /**
-     * Decline pending threads by given identifiers.
-     *
-     * @param array $threads One or more thread identifiers.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response
-     */
-    public function declinePendingThreads(
-        array $threads)
-    {
-        if (!count($threads)) {
-            throw new \InvalidArgumentException('Please provide at least one thread to decline.');
-        }
-        // Validate threads.
-        foreach ($threads as &$thread) {
-            if (!is_scalar($thread)) {
-                throw new \InvalidArgumentException('Thread identifier must be scalar.');
-            } elseif (!ctype_digit($thread) && (!is_int($thread) || $thread < 0)) {
-                throw new \InvalidArgumentException(sprintf('"%s" is not a valid thread identifier.', $thread));
-            }
-            $thread = (string) $thread;
-        }
-        unset($thread);
-        // Choose appropriate endpoint.
-        if (count($threads) > 1) {
-            $request = $this->ig->request('direct_v2/threads/decline_multiple/')
-                ->addPost('thread_ids', json_encode($threads));
-        } else {
-            /** @var string $thread */
-            $thread = reset($threads);
-            $request = $this->ig->request("direct_v2/threads/{$thread}/decline/");
-        }
-
-        return $request
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('_uuid', $this->ig->uuid)
-            ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
-    }
-
-    /**
-     * Decline all pending threads.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response
-     */
-    public function declineAllPendingThreads()
-    {
-        return $this->ig->request('direct_v2/threads/decline_all/')
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('_uuid', $this->ig->uuid)
-            ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
+        return $this->ig->isExperimentEnabled('ig_android_unified_inbox', 'is_enabled');
     }
 
     /**
@@ -922,12 +772,162 @@ class Direct extends RequestCollection
     }
 
     /**
-     * Checks if current user has a unified inbox.
+     * Send a direct message to specific users or thread.
      *
-     * @return bool
+     * @param string $type       One of: "media_share", "message", "like", "hashtag", "location", "profile", "photo", "video".
+     * @param array  $recipients An array with "users" or "thread" keys.
+     *                           To start a new thread, provide "users" as an array
+     *                           of numerical UserPK IDs. To use an existing thread
+     *                           instead, provide "thread" with the thread ID.
+     * @param array  $data       Depends on $type:
+     *                           "media_share" uses "media_id", "media_type" and "text";
+     *                           "message" uses "text";
+     *                           "like" uses nothing;
+     *                           "hashtag" uses "hashtag" and "text";
+     *                           "location" uses "venue_id" and "text";
+     *                           "profile" uses "profile_user_id" and "text";
+     *                           "photo" uses "filepath";
+     *                           "video" uses "upload_id" and "video_result".
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\DirectSendItemResponse
      */
-    public function hasUnifiedInbox()
+    protected function _sendDirectItem(
+        $type,
+        $recipients,
+        array $data = [])
     {
-        return $this->ig->isExperimentEnabled('ig_android_unified_inbox', 'is_enabled');
+        // Determine which endpoint to use and validate input.
+        $post = [];
+        $params = [];
+        $files = [];
+        switch ($type) {
+            case 'media_share':
+                $endpoint = 'direct_v2/threads/broadcast/media_share/';
+                // Check and set media_id.
+                if (!isset($data['media_id'])) {
+                    throw new \InvalidArgumentException('You must provide a media id.');
+                }
+                $post['media_id'] = $data['media_id'];
+                // Check and set text.
+                if (isset($data['text'])) {
+                    $post['text'] = $data['text'];
+                }
+                // Check and set media_type.
+                if (isset($data['media_type']) && $data['media_type'] === 'video') {
+                    $params['media_type'] = 'video';
+                } else {
+                    $params['media_type'] = 'photo';
+                }
+                break;
+            case 'message':
+                $endpoint = 'direct_v2/threads/broadcast/text/';
+                // Check and set text.
+                if (!isset($data['text'])) {
+                    throw new \InvalidArgumentException('No text message provided.');
+                }
+                $post['text'] = $data['text'];
+                break;
+            case 'like':
+                $endpoint = 'direct_v2/threads/broadcast/like/';
+                break;
+            case 'hashtag':
+                $endpoint = 'direct_v2/threads/broadcast/hashtag/';
+                // Check and set hashtag.
+                if (!isset($data['hashtag'])) {
+                    throw new \InvalidArgumentException('No hashtag provided.');
+                }
+                $post['hashtag'] = $data['hashtag'];
+                // Check and set text.
+                if (isset($data['text'])) {
+                    $post['text'] = $data['text'];
+                }
+                break;
+            case 'location':
+                $endpoint = 'direct_v2/threads/broadcast/location/';
+                // Check and set venue_id.
+                if (!isset($data['venue_id'])) {
+                    throw new \InvalidArgumentException('No venue_id provided.');
+                }
+                $post['venue_id'] = $data['venue_id'];
+                // Check and set text.
+                if (isset($data['text'])) {
+                    $post['text'] = $data['text'];
+                }
+                break;
+            case 'profile':
+                $endpoint = 'direct_v2/threads/broadcast/profile/';
+                // Check and set profile_user_id.
+                if (!isset($data['profile_user_id'])) {
+                    throw new \InvalidArgumentException('No profile_user_id provided.');
+                }
+                $post['profile_user_id'] = $data['profile_user_id'];
+                // Check and set text.
+                if (isset($data['text'])) {
+                    $post['text'] = $data['text'];
+                }
+                break;
+            case 'photo':
+                $endpoint = 'direct_v2/threads/broadcast/upload_photo/';
+                // Check and set filepath.
+                if (!isset($data['filepath'])) {
+                    throw new \InvalidArgumentException('No filepath provided.');
+                }
+                $files[] = [
+                    'key'      => 'photo',
+                    'filepath' => $data['filepath'],
+                    'filename' => 'direct_temp_photo_'.Utils::generateUploadId().'.jpg',
+                ];
+                break;
+            case 'video':
+                $endpoint = 'direct_v2/threads/broadcast/configure_video/';
+                // Check and set upload_id.
+                if (!isset($data['upload_id'])) {
+                    throw new \InvalidArgumentException('No upload_id provided.');
+                }
+                $post['upload_id'] = $data['upload_id'];
+                if (isset($data['video_result'])) {
+                    $post['video_result'] = $data['video_result'];
+                }
+                break;
+            default:
+                throw new \InvalidArgumentException('Unsupported parameter value for type.');
+        }
+
+        // Prepare request.
+        $request = $this->ig->request($endpoint)
+            ->setSignedPost(false)
+            ->addPost('action', 'send_item');
+        // Fill query params.
+        foreach ($params as $key => $value) {
+            $request->addParams($key, $value);
+        }
+        // Add recipients.
+        $recipients = $this->_prepareRecipients($recipients);
+        if (isset($recipients['users'])) {
+            $request->addPost('recipient_users', $recipients['users']);
+        } elseif (isset($recipients['thread'])) {
+            $request->addPost('thread_ids', $recipients['thread']);
+        } else {
+            throw new \InvalidArgumentException('Please provide at least one recipient.');
+        }
+        // Fill post data.
+        foreach ($post as $key => $value) {
+            $request->addPost($key, $value);
+        }
+        // Fill files.
+        foreach ($files as $file) {
+            $request->addFile($file['key'], $file['filepath'], $file['filename']);
+        }
+
+        return $request
+            // WARNING: Must be random every time otherwise we can only
+            // make a single post per direct-discussion thread.
+            ->addPost('client_context', Signatures::generateUUID(true))
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uid', $this->ig->account_id)
+            ->getResponse(new Response\DirectSendItemResponse());
     }
 }
