@@ -431,16 +431,16 @@ class Instagram
 
             try {
                 $response = $this->request('accounts/login/')
-                ->setNeedsAuth(false)
-                ->addPost('phone_id', $this->settings->get('phone_id'))
-                ->addPost('_csrftoken', $this->client->getToken())
-                ->addPost('username', $this->username)
-                ->addPost('guid', $this->uuid)
-                ->addPost('adid', $this->advertising_id)
-                ->addPost('device_id', $this->device_id)
-                ->addPost('password', $this->password)
-                ->addPost('login_attempt_count', 0)
-                ->getResponse(new Response\LoginResponse());
+                    ->setNeedsAuth(false)
+                    ->addPost('phone_id', $this->settings->get('phone_id'))
+                    ->addPost('_csrftoken', $this->client->getToken())
+                    ->addPost('username', $this->username)
+                    ->addPost('guid', $this->uuid)
+                    ->addPost('adid', $this->advertising_id)
+                    ->addPost('device_id', $this->device_id)
+                    ->addPost('password', $this->password)
+                    ->addPost('login_attempt_count', 0)
+                    ->getResponse(new Response\LoginResponse());
             } catch (\InstagramAPI\Exception\InstagramException $e) {
                 if ($e->hasResponse() && $e->getResponse()->getTwoFactorRequired()) {
                     // Login failed because two-factor login is required.
@@ -482,14 +482,14 @@ class Instagram
         $verificationCode = trim(str_replace(' ', '', $verificationCode));
 
         $response = $this->request('accounts/two_factor_login/')
-        ->setNeedsAuth(false)
-        ->addPost('verification_code', $verificationCode)
-        ->addPost('two_factor_identifier', $twoFactorIdentifier)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('username', $this->username)
-        ->addPost('device_id', $this->device_id)
-        ->addPost('password', $this->password)
-        ->getResponse(new Response\LoginResponse());
+            ->setNeedsAuth(false)
+            ->addPost('verification_code', $verificationCode)
+            ->addPost('two_factor_identifier', $twoFactorIdentifier)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('username', $this->username)
+            ->addPost('device_id', $this->device_id)
+            ->addPost('password', $this->password)
+            ->getResponse(new Response\LoginResponse());
 
         $this->_updateLoginState($response);
 
@@ -640,7 +640,7 @@ class Instagram
     public function logout()
     {
         $response = $this->request('accounts/logout/')
-        ->getResponse(new Response\LogoutResponse());
+            ->getResponse(new Response\LogoutResponse());
 
         // We've now logged out. Forcibly write our cookies to the storage, to
         // ensure that the storage doesn't miss them in case something bad
@@ -694,12 +694,12 @@ class Instagram
         $cleanNumber = '+'.preg_replace('/[^0-9]/', '', $phoneNumber);
 
         return $this->request('accounts/send_two_factor_enable_sms/')
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('device_id', $this->device_id)
-        ->addPost('phone_number', $cleanNumber)
-        ->getResponse(new Response\RequestTwoFactorResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('device_id', $this->device_id)
+            ->addPost('phone_number', $cleanNumber)
+            ->getResponse(new Response\RequestTwoFactorResponse());
     }
 
     /**
@@ -722,13 +722,13 @@ class Instagram
         $cleanNumber = '+'.preg_replace('/[^0-9]/', '', $phoneNumber);
 
         $response = $this->request('accounts/enable_sms_two_factor/')
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('device_id', $this->device_id)
-        ->addPost('phone_number', $cleanNumber)
-        ->addPost('verification_code', $verificationCode)
-        ->getResponse(new Response\EnableTwoFactorResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('device_id', $this->device_id)
+            ->addPost('phone_number', $cleanNumber)
+            ->addPost('verification_code', $verificationCode)
+            ->getResponse(new Response\EnableTwoFactorResponse());
 
         return $this->getAccountSecurityInfo();
     }
@@ -743,10 +743,10 @@ class Instagram
     public function disableTwoFactor()
     {
         return $this->request('accounts/disable_sms_two_factor/')
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->getResponse(new Response\DisableTwoFactorResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->getResponse(new Response\DisableTwoFactorResponse());
     }
 
     /**
@@ -766,10 +766,10 @@ class Instagram
     public function getAccountSecurityInfo()
     {
         return $this->request('accounts/account_security_info/')
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->getResponse(new Response\AccountSecurityInfoResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->getResponse(new Response\AccountSecurityInfoResponse());
     }
 
     /**
@@ -822,18 +822,18 @@ class Instagram
     {
         if ($prelogin) {
             return $this->request('qe/sync/')
-            ->setNeedsAuth(false)
-            ->addPost('id', $this->uuid)
-            ->addPost('experiments', Constants::LOGIN_EXPERIMENTS)
-            ->getResponse(new Response\SyncResponse());
+                ->setNeedsAuth(false)
+                ->addPost('id', $this->uuid)
+                ->addPost('experiments', Constants::LOGIN_EXPERIMENTS)
+                ->getResponse(new Response\SyncResponse());
         } else {
             $result = $this->request('qe/sync/')
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->addPost('id', $this->account_id)
-            ->addPost('experiments', Constants::EXPERIMENTS)
-            ->getResponse(new Response\SyncResponse());
+                ->addPost('_uuid', $this->uuid)
+                ->addPost('_uid', $this->account_id)
+                ->addPost('_csrftoken', $this->client->getToken())
+                ->addPost('id', $this->account_id)
+                ->addPost('experiments', Constants::EXPERIMENTS)
+                ->getResponse(new Response\SyncResponse());
 
             // Save the experiments and the last time we refreshed them.
             $this->_saveExperiments($result);
@@ -1067,7 +1067,7 @@ class Instagram
         // Instagram REQUIRES that you wait several minutes between calls to it.
         try {
             $request = $this->request('friendships/autocomplete_user_list/')
-            ->addParams('version', '2');
+                ->addParams('version', '2');
 
             return $request->getResponse(new Response\AutoCompleteUserListResponse());
         } catch (\InstagramAPI\Exception\ThrottledException $e) {
@@ -1098,17 +1098,17 @@ class Instagram
         ]);
 
         return $this->request('push/register/')
-        ->addParams('platform', '10')
-        ->addParams('device_type', 'android_mqtt')
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('guid', $this->uuid)
-        ->addPost('phone_id', $this->settings->get('phone_id'))
-        ->addPost('device_type', 'android_mqtt')
-        ->addPost('device_token', $deviceToken)
-        ->addPost('is_main_push_channel', true)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('users', $this->account_id)
-        ->getResponse(new Response\PushRegisterResponse());
+            ->addParams('platform', '10')
+            ->addParams('device_type', 'android_mqtt')
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('guid', $this->uuid)
+            ->addPost('phone_id', $this->settings->get('phone_id'))
+            ->addPost('device_type', 'android_mqtt')
+            ->addPost('device_token', $deviceToken)
+            ->addPost('is_main_push_channel', true)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('users', $this->account_id)
+            ->getResponse(new Response\PushRegisterResponse());
     }
 
     /**
@@ -1121,7 +1121,7 @@ class Instagram
     public function getPushPreferences()
     {
         return $this->request('push/all_preferences/')
-        ->getResponse(new Response\PushPreferencesResponse());
+            ->getResponse(new Response\PushPreferencesResponse());
     }
 
     /**
@@ -1153,15 +1153,15 @@ class Instagram
     public function getFacebookOTA()
     {
         return $this->request('facebook_ota/')
-        ->addParams('fields', Constants::FACEBOOK_OTA_FIELDS)
-        ->addParams('custom_user_id', $this->account_id)
-        ->addParams('signed_body', Signatures::generateSignature('').'.')
-        ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
-        ->addParams('version_code', Constants::VERSION_CODE)
-        ->addParams('version_name', Constants::IG_VERSION)
-        ->addParams('custom_app_id', Constants::FACEBOOK_ORCA_APPLICATION_ID)
-        ->addParams('custom_device_id', $this->uuid)
-        ->getResponse(new Response\FacebookOTAResponse());
+            ->addParams('fields', Constants::FACEBOOK_OTA_FIELDS)
+            ->addParams('custom_user_id', $this->account_id)
+            ->addParams('signed_body', Signatures::generateSignature('').'.')
+            ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
+            ->addParams('version_code', Constants::VERSION_CODE)
+            ->addParams('version_name', Constants::IG_VERSION)
+            ->addParams('custom_app_id', Constants::FACEBOOK_ORCA_APPLICATION_ID)
+            ->addParams('custom_device_id', $this->uuid)
+            ->getResponse(new Response\FacebookOTAResponse());
     }
 
     /**
@@ -1180,8 +1180,8 @@ class Instagram
             $day = date('d');
         }
         $request = $this->request('insights/account_organic_insights')
-        ->addParams('show_promotions_in_landing_page', 'true')
-        ->addParams('first', $day);
+            ->addParams('show_promotions_in_landing_page', 'true')
+            ->addParams('first', $day);
 
         return $request->getResponse(new Response\InsightsResponse());
     }
@@ -1199,7 +1199,7 @@ class Instagram
         $mediaId)
     {
         $request = $this->request("insights/media_organic_insights/{$mediaId}")
-        ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION);
+            ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION);
 
         return $request->getResponse(new Response\MediaInsightsResponse());
     }
@@ -1214,15 +1214,15 @@ class Instagram
     public function getMegaphoneLog()
     {
         return $this->request('megaphone/log/')
-        ->setSignedPost(false)
-        ->addPost('type', 'feed_aysf')
-        ->addPost('action', 'seen')
-        ->addPost('reason', '')
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('device_id', $this->device_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('uuid', md5(time()))
-        ->getResponse(new Response\MegaphoneLogResponse());
+            ->setSignedPost(false)
+            ->addPost('type', 'feed_aysf')
+            ->addPost('action', 'seen')
+            ->addPost('reason', '')
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('device_id', $this->device_id)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('uuid', md5(time()))
+            ->getResponse(new Response\MegaphoneLogResponse());
     }
 
     /**
@@ -1259,12 +1259,12 @@ class Instagram
     public function expose()
     {
         return $this->request('qe/expose/')
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('id', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('experiment', 'ig_android_profile_contextual_feed')
-        ->getResponse(new Response\ExposeResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('id', $this->account_id)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('experiment', 'ig_android_profile_contextual_feed')
+            ->getResponse(new Response\ExposeResponse());
     }
 
     /**
@@ -1568,41 +1568,43 @@ class Instagram
 
         // Build the request...
         $requestData = $this->request($endpoint)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('edits',
-            [
-                'crop_original_size'    => [$photoWidth, $photoHeight],
-                'crop_zoom'             => 1,
-                'crop_center'           => [0.0, -0.0],
-            ])
-        ->addPost('device',
-            [
-                'manufacturer'      => $this->device->getManufacturer(),
-                'model'             => $this->device->getModel(),
-                'android_version'   => $this->device->getAndroidVersion(),
-                'android_release'   => $this->device->getAndroidRelease(),
-            ])
-        ->addPost('extra',
-            [
-                'source_width'  => $photoWidth,
-                'source_height' => $photoHeight,
-            ]);
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('edits',
+                [
+                    'crop_original_size'    => [$photoWidth, $photoHeight],
+                    'crop_zoom'             => 1,
+                    'crop_center'           => [0.0, -0.0],
+                ])
+            ->addPost('device',
+                [
+                    'manufacturer'      => $this->device->getManufacturer(),
+                    'model'             => $this->device->getModel(),
+                    'android_version'   => $this->device->getAndroidVersion(),
+                    'android_release'   => $this->device->getAndroidRelease(),
+                ])
+            ->addPost('extra',
+                [
+                    'source_width'  => $photoWidth,
+                    'source_height' => $photoHeight,
+                ]);
 
         switch ($targetFeed) {
             case 'timeline':
-                $requestData->addPost('caption', $captionText)
-                ->addPost('source_type', 4)
-                ->addPost('media_folder', 'Camera')
-                ->addPost('upload_id', $uploadId);
+                $requestData
+                    ->addPost('caption', $captionText)
+                    ->addPost('source_type', 4)
+                    ->addPost('media_folder', 'Camera')
+                    ->addPost('upload_id', $uploadId);
                 break;
             case 'story':
-                $requestData->addPost('client_shared_at', time())
-                ->addPost('source_type', 3)
-                ->addPost('configure_mode', 1)
-                ->addPost('client_timestamp', time())
-                ->addPost('upload_id', $uploadId);
+                $requestData
+                    ->addPost('client_shared_at', time())
+                    ->addPost('source_type', 3)
+                    ->addPost('configure_mode', 1)
+                    ->addPost('client_timestamp', time())
+                    ->addPost('upload_id', $uploadId);
                 break;
         }
 
@@ -1616,14 +1618,15 @@ class Instagram
                 'external_source'                        => $location->getExternalIdSource(),
             ];
 
-            $requestData->addPost('location', json_encode($loc))
-            ->addPost('geotag_enabled', '1')
-            ->addPost('posting_latitude', $location->getLat())
-            ->addPost('posting_longitude', $location->getLng())
-            ->addPost('media_latitude', $location->getLat())
-            ->addPost('media_longitude', $location->getLng())
-            ->addPost('av_latitude', 0.0)
-            ->addPost('av_longitude', 0.0);
+            $requestData
+                ->addPost('location', json_encode($loc))
+                ->addPost('geotag_enabled', '1')
+                ->addPost('posting_latitude', $location->getLat())
+                ->addPost('posting_longitude', $location->getLng())
+                ->addPost('media_latitude', $location->getLat())
+                ->addPost('media_longitude', $location->getLng())
+                ->addPost('av_latitude', 0.0)
+                ->addPost('av_longitude', 0.0);
         }
 
         $configure = $requestData->getResponse(new Response\ConfigureResponse());
@@ -1741,36 +1744,37 @@ class Instagram
 
         // Build the request...
         $requestData = $this->request($endpoint)
-        ->addParams('video', 1)
-        ->addPost('video_result', 'deprecated')
-        ->addPost('upload_id', $uploadId)
-        ->addPost('poster_frame_index', 0)
-        ->addPost('length', round($videoDetails['duration'], 1))
-        ->addPost('audio_muted', false)
-        ->addPost('filter_type', 0)
-        ->addPost('source_type', 4)
-        ->addPost('video_result', 'deprecated')
-        ->addPost('device',
-            [
-                'manufacturer'      => $this->device->getManufacturer(),
-                'model'             => $this->device->getModel(),
-                'android_version'   => $this->device->getAndroidVersion(),
-                'android_release'   => $this->device->getAndroidRelease(),
-            ])
-        ->addPost('extra',
-            [
-                'source_width'  => $videoDetails['width'],
-                'source_height' => $videoDetails['height'],
-            ])
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id);
+            ->addParams('video', 1)
+            ->addPost('video_result', 'deprecated')
+            ->addPost('upload_id', $uploadId)
+            ->addPost('poster_frame_index', 0)
+            ->addPost('length', round($videoDetails['duration'], 1))
+            ->addPost('audio_muted', false)
+            ->addPost('filter_type', 0)
+            ->addPost('source_type', 4)
+            ->addPost('video_result', 'deprecated')
+            ->addPost('device',
+                [
+                    'manufacturer'      => $this->device->getManufacturer(),
+                    'model'             => $this->device->getModel(),
+                    'android_version'   => $this->device->getAndroidVersion(),
+                    'android_release'   => $this->device->getAndroidRelease(),
+                ])
+            ->addPost('extra',
+                [
+                    'source_width'  => $videoDetails['width'],
+                    'source_height' => $videoDetails['height'],
+                ])
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id);
 
         if ($targetFeed == 'story') {
-            $requestData->addPost('configure_mode', 1) // 1 - REEL_SHARE, 2 - DIRECT_STORY_SHARE
-            ->addPost('story_media_creation_date', time() - mt_rand(10, 20))
-            ->addPost('client_shared_at', time() - mt_rand(3, 10))
-            ->addPost('client_timestamp', time());
+            $requestData
+                ->addPost('configure_mode', 1) // 1 - REEL_SHARE, 2 - DIRECT_STORY_SHARE
+                ->addPost('story_media_creation_date', time() - mt_rand(10, 20))
+                ->addPost('client_shared_at', time() - mt_rand(3, 10))
+                ->addPost('client_timestamp', time());
         }
 
         $requestData->addPost('caption', $captionText);
@@ -1798,14 +1802,15 @@ class Instagram
                 'external_source'                        => $location->getExternalIdSource(),
             ];
 
-            $requestData->addPost('location', json_encode($loc))
-            ->addPost('geotag_enabled', '1')
-            ->addPost('posting_latitude', $location->getLat())
-            ->addPost('posting_longitude', $location->getLng())
-            ->addPost('media_latitude', $location->getLat())
-            ->addPost('media_longitude', $location->getLng())
-            ->addPost('av_latitude', 0.0)
-            ->addPost('av_longitude', 0.0);
+            $requestData
+                ->addPost('location', json_encode($loc))
+                ->addPost('geotag_enabled', '1')
+                ->addPost('posting_latitude', $location->getLat())
+                ->addPost('posting_longitude', $location->getLng())
+                ->addPost('media_latitude', $location->getLat())
+                ->addPost('media_longitude', $location->getLng())
+                ->addPost('av_latitude', 0.0)
+                ->addPost('av_longitude', 0.0);
         }
 
         $configure = $requestData->getResponse(new Response\ConfigureResponse());
@@ -1979,12 +1984,12 @@ class Instagram
 
         // Build the request...
         $requestData = $this->request($endpoint)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('client_sidecar_id', Utils::generateUploadId())
-        ->addPost('caption', $captionText)
-        ->addPost('children_metadata', $childrenMetadata);
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('client_sidecar_id', Utils::generateUploadId())
+            ->addPost('caption', $captionText)
+            ->addPost('children_metadata', $childrenMetadata);
 
         if ($location instanceof Response\Model\Location) {
             $loc = [
@@ -1996,14 +2001,15 @@ class Instagram
                 'external_source'                        => $location->getExternalIdSource(),
             ];
 
-            $requestData->addPost('location', json_encode($loc))
-            ->addPost('geotag_enabled', '1')
-            ->addPost('posting_latitude', $location->getLat())
-            ->addPost('posting_longitude', $location->getLng())
-            ->addPost('media_latitude', $location->getLat())
-            ->addPost('media_longitude', $location->getLng())
-            ->addPost('exif_latitude', 0.0)
-            ->addPost('exif_longitude', 0.0);
+            $requestData
+                ->addPost('location', json_encode($loc))
+                ->addPost('geotag_enabled', '1')
+                ->addPost('posting_latitude', $location->getLat())
+                ->addPost('posting_longitude', $location->getLng())
+                ->addPost('media_latitude', $location->getLat())
+                ->addPost('media_longitude', $location->getLng())
+                ->addPost('exif_latitude', 0.0)
+                ->addPost('exif_longitude', 0.0);
         }
 
         $configure = $requestData->getResponse(new Response\ConfigureResponse());
@@ -2020,7 +2026,9 @@ class Instagram
      */
     public function getRecentActivity()
     {
-        return $this->request('news/inbox/')->addParams('activity_module', 'all')->getResponse(new Response\ActivityNewsResponse());
+        return $this->request('news/inbox/')
+            ->addParams('activity_module', 'all')
+            ->getResponse(new Response\ActivityNewsResponse());
     }
 
     /**
@@ -2060,11 +2068,11 @@ class Instagram
         $minTimestamp = null)
     {
         return $this->request("usertags/{$userId}/feed/")
-        ->addParams('rank_token', $this->rank_token)
-        ->addParams('ranked_content', 'true')
-        ->addParams('max_id', (!is_null($maxId) ? $maxId : ''))
-        ->addParams('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
-        ->getResponse(new Response\UsertagsResponse());
+            ->addParams('rank_token', $this->rank_token)
+            ->addParams('ranked_content', 'true')
+            ->addParams('max_id', (!is_null($maxId) ? $maxId : ''))
+            ->addParams('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
+            ->getResponse(new Response\UsertagsResponse());
     }
 
     /**
@@ -2092,10 +2100,10 @@ class Instagram
         $query)
     {
         return $this->request('fbsearch/topsearch/')
-        ->addParams('context', 'blended')
-        ->addParams('query', $query)
-        ->addParams('rank_token', $this->rank_token)
-        ->getResponse(new Response\FBSearchResponse());
+            ->addParams('context', 'blended')
+            ->addParams('query', $query)
+            ->addParams('rank_token', $this->rank_token)
+            ->getResponse(new Response\FBSearchResponse());
     }
 
     /**
@@ -2111,11 +2119,11 @@ class Instagram
         $query)
     {
         return $this->request('users/search/')
-        ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
-        ->addParams('is_typeahead', true)
-        ->addParams('query', $query)
-        ->addParams('rank_token', $this->rank_token)
-        ->getResponse(new Response\SearchUserResponse());
+            ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION)
+            ->addParams('is_typeahead', true)
+            ->addParams('query', $query)
+            ->addParams('rank_token', $this->rank_token)
+            ->getResponse(new Response\SearchUserResponse());
     }
 
     /**
@@ -2231,9 +2239,9 @@ class Instagram
         $tag)
     {
         return $this->request("tags/{$tag}/related")
-        ->addParams('visited', '[{"id":"'.$tag.'","type":"hashtag"}]')
-        ->addParams('related_types', '["hashtag"]')
-        ->getResponse(new Response\TagRelatedResponse());
+            ->addParams('visited', '[{"id":"'.$tag.'","type":"hashtag"}]')
+            ->addParams('related_types', '["hashtag"]')
+            ->getResponse(new Response\TagRelatedResponse());
     }
 
     /**
@@ -2249,7 +2257,7 @@ class Instagram
         $tag)
     {
         return $this->request("tags/{$tag}/info")
-        ->getResponse(new Response\TagInfoResponse());
+            ->getResponse(new Response\TagInfoResponse());
     }
 
     /**
@@ -2301,9 +2309,9 @@ class Instagram
         $query = null)
     {
         $locations = $this->request('location_search/')
-        ->addParams('rank_token', $this->rank_token)
-        ->addParams('latitude', $latitude)
-        ->addParams('longitude', $longitude);
+            ->addParams('rank_token', $this->rank_token)
+            ->addParams('latitude', $latitude)
+            ->addParams('longitude', $longitude);
 
         if (is_null($query)) {
             $locations->addParams('timestamp', time());
@@ -2327,9 +2335,9 @@ class Instagram
         $locationId)
     {
         return $this->request("locations/{$locationId}/related")
-        ->addParams('visited', json_encode(['id' => $locationId, 'type' => 'location']))
-        ->addParams('related_types', json_encode(['location']))
-        ->getResponse(new Response\RelatedLocationResponse());
+            ->addParams('visited', json_encode(['id' => $locationId, 'type' => 'location']))
+            ->addParams('related_types', json_encode(['location']))
+            ->getResponse(new Response\RelatedLocationResponse());
     }
 
     /**
@@ -2347,8 +2355,8 @@ class Instagram
         $count = null)
     {
         $location = $this->request('fbsearch/places/')
-        ->addParams('rank_token', $this->rank_token)
-        ->addParams('query', $query);
+            ->addParams('rank_token', $this->rank_token)
+            ->addParams('query', $query);
 
         if (!is_null($count)) {
             $location->addParams('count', $count);
@@ -2372,10 +2380,10 @@ class Instagram
         $lng)
     {
         return $this->request('fbsearch/places/')
-        ->addParams('rank_token', $this->rank_token)
-        ->addParams('lat', $lat)
-        ->addParams('lng', $lng)
-        ->getResponse(new Response\FBLocationResponse());
+            ->addParams('rank_token', $this->rank_token)
+            ->addParams('lat', $lat)
+            ->addParams('lng', $lng)
+            ->getResponse(new Response\FBLocationResponse());
     }
 
     /**
@@ -2410,10 +2418,10 @@ class Instagram
     public function getPopularFeed()
     {
         return $this->request('feed/popular/')
-        ->addParams('people_teaser_supported', '1')
-        ->addParams('rank_token', $this->rank_token)
-        ->addParams('ranked_content', 'true')
-        ->getResponse(new Response\PopularFeedResponse());
+            ->addParams('people_teaser_supported', '1')
+            ->addParams('rank_token', $this->rank_token)
+            ->addParams('ranked_content', 'true')
+            ->getResponse(new Response\PopularFeedResponse());
     }
 
     /**
@@ -2455,7 +2463,7 @@ class Instagram
         $maxId = null)
     {
         $requestData = $this->request("friendships/{$userId}/following/")
-        ->addParams('rank_token', $this->rank_token);
+            ->addParams('rank_token', $this->rank_token);
         if (!is_null($searchQuery)) {
             $requestData->addParams('query', $searchQuery);
         }
@@ -2483,7 +2491,7 @@ class Instagram
         $maxId = null)
     {
         $requestData = $this->request("friendships/{$userId}/followers/")
-        ->addParams('rank_token', $this->rank_token);
+            ->addParams('rank_token', $this->rank_token);
         if (!is_null($searchQuery)) {
             $requestData->addParams('query', $searchQuery);
         }
@@ -2551,12 +2559,12 @@ class Instagram
         $userId)
     {
         return $this->request("friendships/create/{$userId}/")
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('user_id', $userId)
-        ->addPost('radio_type', 'wifi-none')
-        ->getResponse(new Response\FriendshipResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('user_id', $userId)
+            ->addPost('radio_type', 'wifi-none')
+            ->getResponse(new Response\FriendshipResponse());
     }
 
     /**
@@ -2572,12 +2580,12 @@ class Instagram
         $userId)
     {
         return $this->request("friendships/destroy/{$userId}/")
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('user_id', $userId)
-        ->addPost('radio_type', 'wifi-none')
-        ->getResponse(new Response\FriendshipResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('user_id', $userId)
+            ->addPost('radio_type', 'wifi-none')
+            ->getResponse(new Response\FriendshipResponse());
     }
 
     /**
@@ -2595,10 +2603,10 @@ class Instagram
         $userId)
     {
         return $this->request('discover/explore_report/')
-        ->addParam('explore_source_token', $exploreSourceToken)
-        ->addParam('m_pk', $this->account_id)
-        ->addParam('a_pk', $userId)
-        ->getResponse(new Response\ReportExploreMediaResponse());
+            ->addParam('explore_source_token', $exploreSourceToken)
+            ->addParam('m_pk', $this->account_id)
+            ->addParam('a_pk', $userId)
+            ->getResponse(new Response\ReportExploreMediaResponse());
     }
 
     /**
@@ -2614,8 +2622,8 @@ class Instagram
         $userId)
     {
         return $this->request('discover/chaining/')
-        ->addParams('target_id', $userId)
-        ->getResponse(new Response\SuggestedUsersResponse());
+            ->addParams('target_id', $userId)
+            ->getResponse(new Response\SuggestedUsersResponse());
     }
 
     /**
@@ -2631,10 +2639,10 @@ class Instagram
     public function getSuggestedUsersBadge()
     {
         return $this->request('discover/profile_su_badge/')
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('module', 'discover_people')
-        ->getResponse(new Response\SuggestedUsersBadgeResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('module', 'discover_people')
+            ->getResponse(new Response\SuggestedUsersBadgeResponse());
     }
 
     /**
@@ -2647,11 +2655,11 @@ class Instagram
     public function getBadgeNotifications()
     {
         return $this->request('notifications/badge/')
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('users_ids', $this->account_id)
-        ->addPost('device_id', $this->device_id)
-        ->getResponse(new Response\BadgeNotificationsResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('users_ids', $this->account_id)
+            ->addPost('device_id', $this->device_id)
+            ->getResponse(new Response\BadgeNotificationsResponse());
     }
 
     /**
@@ -2667,11 +2675,11 @@ class Instagram
         $userId)
     {
         return $this->request('discover/aysf_dismiss/')
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addParams('target_id', $userId)
-        ->addParams('algorithm', 'ig_friends_of_friends_from_tao_laser_algorithm')
-        ->getResponse(new Response\SuggestedUsersResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addParams('target_id', $userId)
+            ->addParams('algorithm', 'ig_friends_of_friends_from_tao_laser_algorithm')
+            ->getResponse(new Response\SuggestedUsersResponse());
     }
 
     /**
@@ -2684,12 +2692,12 @@ class Instagram
     public function discoverPeople()
     {
         return $this->request('discover/ayml/')
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('paginate', true)
-        ->addPost('module', 'discover_people')
-        ->getResponse(new Response\DiscoverPeopleResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('paginate', true)
+            ->addPost('module', 'discover_people')
+            ->getResponse(new Response\DiscoverPeopleResponse());
     }
 
     /**
@@ -2705,11 +2713,11 @@ class Instagram
         $userId)
     {
         return $this->request("friendships/block/{$userId}/")
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('user_id', $userId)
-        ->getResponse(new Response\FriendshipResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('user_id', $userId)
+            ->getResponse(new Response\FriendshipResponse());
     }
 
     /**
@@ -2725,11 +2733,11 @@ class Instagram
         $userId)
     {
         return $this->request("friendships/unblock/{$userId}/")
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('user_id', $userId)
-        ->getResponse(new Response\FriendshipResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('user_id', $userId)
+            ->getResponse(new Response\FriendshipResponse());
     }
 
     /**
@@ -2741,8 +2749,7 @@ class Instagram
      */
     public function getBlockedList()
     {
-        return $this->request('users/blocked_list/')
-        ->getResponse(new Response\BlockedListResponse());
+        return $this->request('users/blocked_list/')->getResponse(new Response\BlockedListResponse());
     }
 
     /**
@@ -2760,11 +2767,11 @@ class Instagram
         $userId)
     {
         return $this->request("friendships/block_friend_reel/{$userId}/")
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('source', 'profile')
-        ->getResponse(new Response\FriendshipResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('source', 'profile')
+            ->getResponse(new Response\FriendshipResponse());
     }
 
     /**
@@ -2782,11 +2789,11 @@ class Instagram
         $userId)
     {
         return $this->request("friendships/unblock_friend_reel/{$userId}/")
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->addPost('source', 'profile')
-        ->getResponse(new Response\FriendshipResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('source', 'profile')
+            ->getResponse(new Response\FriendshipResponse());
     }
 
     /**
@@ -2799,10 +2806,10 @@ class Instagram
     public function getBlockedStoryList()
     {
         return $this->request('friendships/blocked_reels/')
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->getResponse(new Response\BlockedReelsResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->getResponse(new Response\BlockedReelsResponse());
     }
 
     /**
@@ -2822,10 +2829,10 @@ class Instagram
         $userId)
     {
         return $this->request("friendships/mute_friend_reel/{$userId}/")
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->getResponse(new Response\FriendshipResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->getResponse(new Response\FriendshipResponse());
     }
 
     /**
@@ -2845,10 +2852,10 @@ class Instagram
         $userId)
     {
         return $this->request("friendships/unmute_friend_reel/{$userId}/")
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('_uid', $this->account_id)
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->getResponse(new Response\FriendshipResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->getResponse(new Response\FriendshipResponse());
     }
 
     /**
@@ -2883,11 +2890,11 @@ class Instagram
         }
 
         return $this->request('friendships/show_many/')
-        ->setSignedPost(false)
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('user_ids', implode(',', $userList))
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->getResponse(new Response\FriendshipsShowManyResponse());
+            ->setSignedPost(false)
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('user_ids', implode(',', $userList))
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->getResponse(new Response\FriendshipsShowManyResponse());
     }
 
     /**
@@ -2903,10 +2910,10 @@ class Instagram
         $query)
     {
         return $this->request('tags/search/')
-        ->addParams('is_typeahead', true)
-        ->addParams('q', $query)
-        ->addParams('rank_token', $this->rank_token)
-        ->getResponse(new Response\SearchTagResponse());
+            ->addParams('is_typeahead', true)
+            ->addParams('q', $query)
+            ->addParams('rank_token', $this->rank_token)
+            ->getResponse(new Response\SearchTagResponse());
     }
 
     /**
@@ -2919,10 +2926,10 @@ class Instagram
     public function sendConfirmEmail()
     {
         return $this->request('accounts/send_confirm_email/')
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('send_source', 'profile_megaphone')
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->getResponse(new Response\SendConfirmEmailResponse());
+            ->addPost('_uuid', $this->uuid)
+            ->addPost('send_source', 'profile_megaphone')
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->getResponse(new Response\SendConfirmEmailResponse());
     }
 
     /**
@@ -2948,12 +2955,13 @@ class Instagram
         }
 
         $requestData = $this->request('creatives/assets/')
-        ->addPost('type', $stickerType);
+            ->addPost('type', $stickerType);
 
         if (!is_null($location)) {
-            $requestData->addPost('lat', $location['lat'])
-            ->addPost('lng', $location['lat'])
-            ->addPost('horizontalAccuracy', $location['horizontalAccuracy']);
+            $requestData
+                ->addPost('lat', $location['lat'])
+                ->addPost('lng', $location['lat'])
+                ->addPost('horizontalAccuracy', $location['horizontalAccuracy']);
         }
 
         $requestData->getResponse(new Response\StickerAssetsResponse());
