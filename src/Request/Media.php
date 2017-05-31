@@ -459,7 +459,6 @@ class Media extends RequestCollection
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->setSignedPost(true)
             ->getResponse(new Response\SaveAndUnsaveMedia());
     }
 
@@ -479,7 +478,6 @@ class Media extends RequestCollection
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->setSignedPost(true)
             ->getResponse(new Response\SaveAndUnsaveMedia());
     }
 
@@ -498,8 +496,7 @@ class Media extends RequestCollection
         $requestData = $this->ig->request('feed/saved/')
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->setSignedPost(true);
+            ->addPost('_csrftoken', $this->ig->client->getToken());
 
         if (!is_null($maxId)) {
             $requestData->addParams('max_id', $maxId);

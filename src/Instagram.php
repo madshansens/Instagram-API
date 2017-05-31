@@ -911,7 +911,6 @@ class Instagram
         $phone = '')
     {
         return $this->request('accounts/set_phone_and_name/')
-            ->setSignedPost(true)
             ->addPost('_uuid', $this->uuid)
             ->addPost('_uid', $this->account_id)
             ->addPost('_csrftoken', $this->client->getToken())
@@ -1019,7 +1018,6 @@ class Instagram
             ->addPost('_uid', $this->account_id)
             ->addPost('_csrftoken', $this->client->getToken())
             ->addPost('config_value', $config_value)
-            ->setSignedPost(true)
             ->getResponse(new Response\CommentFilterSetResponse());
     }
 
@@ -1053,7 +1051,6 @@ class Instagram
             ->addPost('_uid', $this->account_id)
             ->addPost('_csrftoken', $this->client->getToken())
             ->addPost('keywords', $keywords)
-            ->setSignedPost(true)
             ->getResponse(new Response\CommentFilterSetResponse());
     }
 
@@ -1202,7 +1199,6 @@ class Instagram
         $mediaId)
     {
         $request = $this->request("insights/media_organic_insights/{$mediaId}")
-        ->setSignedPost(true)
         ->addParams('ig_sig_key_version', Constants::SIG_KEY_VERSION);
 
         return $request->getResponse(new Response\MediaInsightsResponse());
@@ -2764,7 +2760,6 @@ class Instagram
         $userId)
     {
         return $this->request("friendships/block_friend_reel/{$userId}/")
-        ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->client->getToken())
@@ -2787,7 +2782,6 @@ class Instagram
         $userId)
     {
         return $this->request("friendships/unblock_friend_reel/{$userId}/")
-        ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->client->getToken())
@@ -2805,7 +2799,6 @@ class Instagram
     public function getBlockedStoryList()
     {
         return $this->request('friendships/blocked_reels/')
-        ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->client->getToken())
@@ -2829,7 +2822,6 @@ class Instagram
         $userId)
     {
         return $this->request("friendships/mute_friend_reel/{$userId}/")
-        ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->client->getToken())
@@ -2853,7 +2845,6 @@ class Instagram
         $userId)
     {
         return $this->request("friendships/unmute_friend_reel/{$userId}/")
-        ->setSignedPost(true)
         ->addPost('_uuid', $this->uuid)
         ->addPost('_uid', $this->account_id)
         ->addPost('_csrftoken', $this->client->getToken())
@@ -2957,7 +2948,6 @@ class Instagram
         }
 
         $requestData = $this->request('creatives/assets/')
-        ->setSignedPost(true)
         ->addPost('type', $stickerType);
 
         if (!is_null($location)) {

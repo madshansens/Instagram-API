@@ -134,7 +134,6 @@ class Story extends RequestCollection
         }
 
         return $this->ig->request('feed/reels_media/')
-            ->setSignedPost(true)
             ->addPost('user_ids', $userIDs)
             ->getResponse(new Response\ReelsMediaResponse());
     }
@@ -198,7 +197,6 @@ class Story extends RequestCollection
 
         return $this->ig->request('media/seen/')
             ->setVersion(2)
-            ->setSignedPost(true)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
@@ -221,7 +219,6 @@ class Story extends RequestCollection
     public function getReelSettings()
     {
         return $this->ig->request('users/reel_settings/')
-            ->setSignedPost(true)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
@@ -248,7 +245,6 @@ class Story extends RequestCollection
         }
 
         return $this->ig->request('users/set_reel_settings/')
-            ->setSignedPost(true)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
