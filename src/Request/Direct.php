@@ -15,7 +15,7 @@ class Direct extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\DirectV2InboxResponse
+     * @return \InstagramAPI\Response\DirectInboxResponse
      */
     public function getInbox(
         $cursorId = null)
@@ -29,7 +29,7 @@ class Direct extends RequestCollection
             $request->addParams('cursor', $cursorId);
         }
 
-        return $request->getResponse(new Response\DirectV2InboxResponse());
+        return $request->getResponse(new Response\DirectInboxResponse());
     }
 
     /**
