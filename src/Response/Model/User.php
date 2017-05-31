@@ -28,6 +28,9 @@ class User extends \InstagramAPI\Response
      * @var FriendshipStatus
      */
     public $friendship_status;
+    /**
+     * @var ImageCandidate[]
+     */
     public $hd_profile_pic_versions;
     public $byline;
     public $search_social_context;
@@ -61,6 +64,9 @@ class User extends \InstagramAPI\Response
     public $show_conversion_edit_entry; // getUserInfoById prop
     public $show_insights_terms; // getUserInfoById prop
     public $can_create_sponsor_tags; // getUserInfoById prop
+    /**
+     * @var ImageCandidate
+     */
     public $hd_profile_pic_url_info; // getUserInfoById prop
     public $usertag_review_enabled; // getUserInfoById prop
     /**
