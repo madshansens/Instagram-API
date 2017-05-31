@@ -156,6 +156,26 @@ class Item extends \InstagramAPI\Response
     public $large_urls;
     public $media_infos;
     public $value;
+    public $collapse_comments;
+    /**
+     * @var AdMetadata[]
+     */
+    public $ad_metadata;
+    public $link;
+    public $link_hint_text;
+    public $iTunesItem;
+    public $ad_link_type;
+    public $ad_header_style;
+    public $dr_ad_type;
+    /**
+     * @var AndroidLinks[]
+     */
+    public $android_links;
+    public $force_overlay;
+    public $hide_nux_text;
+    public $overlay_text;
+    public $overlay_title;
+    public $overlay_subtitle;
 
     public function setMediaOrAd(
         $params)
