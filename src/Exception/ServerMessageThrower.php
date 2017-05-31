@@ -41,15 +41,15 @@ class ServerMessageThrower
         'FeedbackRequiredException'    => ['feedback_required'],
         'IncorrectPasswordException'   => [
             // "The password you entered is incorrect".
-            '/password(.*)incorrect/',
+            '/password(.*?)incorrect/',
         ],
         'AccountDisabledException'     => [
             // "Your account has been disabled for violating our terms"
-            '/account(.*)disabled(.*)violating/',
+            '/account(.*?)disabled(.*?)violating/',
         ],
         'SentryBlockException'         => ['sentry_block'],
         'InvalidUserException'         => ['invalid_user'],
-        'ForcedPasswordResetException' => ['/reset(.*)password/'],
+        'ForcedPasswordResetException' => ['/reset(.*?)password/'],
     ];
 
     /**
