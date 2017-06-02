@@ -572,7 +572,7 @@ class Internal extends RequestCollection
      * IT DO ANYTHING ELSE, TO AVOID ADDING BUGGY AND UNMAINTAINABLE SPIDERWEB
      * CODE!
      *
-     * @param array $media            Extended media array coming from timeline->uploadAlbum(),
+     * @param array $media            Extended media array coming from Timeline::uploadAlbum(),
      *                                containing the user's per-file metadata,
      *                                and internally generated per-file metadata.
      * @param array $internalMetadata Internal library-generated metadata key-value pairs.
@@ -719,7 +719,7 @@ class Internal extends RequestCollection
      * attempts. Very useful since Instagram sometimes can't configure a newly
      * uploaded video file until a few seconds have passed.
      *
-     * @param array $media            Extended media array coming from timeline->uploadAlbum(),
+     * @param array $media            Extended media array coming from Timeline::uploadAlbum(),
      *                                containing the user's per-file metadata,
      *                                and internally generated per-file metadata.
      * @param array $internalMetadata Internal library-generated metadata key-value pairs.

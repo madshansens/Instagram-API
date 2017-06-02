@@ -23,16 +23,16 @@ try {
 }
 
 try {
-    $followers = [];
+    $followings = [];
 
     // Starting at "null" means starting at the first page.
     $maxId = null;
     do {
         // Request the page corresponding to maxId.
-        $response = $ig->getSelfUserFollowers($maxId);
+        $response = $ig->people->getSelfFollowing(null, $maxId);
 
         // In this example we're merging the response array, but we can do anything.
-        $followers = array_merge($followers, $response->getUsers());
+        $followings = array_merge($followings, $response->getUsers());
 
         // Now we must update the maxId variable to the "next page".
         // This will be a null value again when we've reached the last page!
@@ -40,9 +40,9 @@ try {
         $maxId = $response->getNextMaxId();
     } while ($maxId !== null); // Must use "!==" for comparison instead of "!=".
 
-    echo "My followers:\n";
-    foreach ($followers as $follower) {
-        echo '- '.$follower->getUsername().".\n";
+    echo "Who I am following:\n";
+    foreach ($followings as $following) {
+        echo '- '.$following->getUsername().".\n";
     }
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";

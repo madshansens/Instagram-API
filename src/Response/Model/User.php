@@ -52,63 +52,63 @@ class User extends \InstagramAPI\Response
      * @var string
      */
     public $profile_pic_id; // Ranked recipents response prop
-    public $auto_expand_chaining; // getUserInfoById prop
-    public $can_boost_post; // getUserInfoById prop
-    public $is_profile_action_needed; // getUserInfoById prop
-    public $has_chaining; // getUserInfoById prop
-    public $include_direct_blacklist_status; // getUserInfoById prop
-    public $can_see_organic_insights; // getUserInfoById prop
-    public $can_convert_to_business; // getUserInfoById prop
-    public $convert_from_pages; // getUserInfoById prop
-    public $show_business_conversion_icon; // getUserInfoById prop
-    public $show_conversion_edit_entry; // getUserInfoById prop
-    public $show_insights_terms; // getUserInfoById prop
-    public $can_create_sponsor_tags; // getUserInfoById prop
+    public $auto_expand_chaining; // getInfoById prop
+    public $can_boost_post; // getInfoById prop
+    public $is_profile_action_needed; // getInfoById prop
+    public $has_chaining; // getInfoById prop
+    public $include_direct_blacklist_status; // getInfoById prop
+    public $can_see_organic_insights; // getInfoById prop
+    public $can_convert_to_business; // getInfoById prop
+    public $convert_from_pages; // getInfoById prop
+    public $show_business_conversion_icon; // getInfoById prop
+    public $show_conversion_edit_entry; // getInfoById prop
+    public $show_insights_terms; // getInfoById prop
+    public $can_create_sponsor_tags; // getInfoById prop
     /**
      * @var ImageCandidate
      */
-    public $hd_profile_pic_url_info; // getUserInfoById prop
-    public $usertag_review_enabled; // getUserInfoById prop
+    public $hd_profile_pic_url_info; // getInfoById prop
+    public $usertag_review_enabled; // getInfoById prop
     /**
      * @var string[]
      */
-    public $profile_context_mutual_follow_ids; // getUserInfoById prop
+    public $profile_context_mutual_follow_ids; // getInfoById prop
     /**
      * @var Link[]
      */
-    public $profile_context_links_with_user_ids; // getUserInfoById prop
-    public $has_biography_translation; // getUserInfoById prop
-    public $business_contact_method; // getUserInfoById prop
-    public $category; // getUserInfoById prop
-    public $direct_messaging; // getUserInfoById prop
-    public $page_name; //getUserInfoById prop
+    public $profile_context_links_with_user_ids; // getInfoById prop
+    public $has_biography_translation; // getInfoById prop
+    public $business_contact_method; // getInfoById prop
+    public $category; // getInfoById prop
+    public $direct_messaging; // getInfoById prop
+    public $page_name; //getInfoById prop
     /**
      * @var string
      */
-    public $fb_page_call_to_action_id; // getUserInfoById prop
-    public $is_call_to_action_enabled; // getUserInfoById prop
-    public $public_phone_country_code; // getUserInfoById prop
-    public $public_phone_number; // getUserInfoById prop
-    public $contact_phone_number; // getUserInfoById prop
+    public $fb_page_call_to_action_id; // getInfoById prop
+    public $is_call_to_action_enabled; // getInfoById prop
+    public $public_phone_country_code; // getInfoById prop
+    public $public_phone_number; // getInfoById prop
+    public $contact_phone_number; // getInfoById prop
     /**
      * @var float
      */
-    public $latitude; // getUserInfoById prop
+    public $latitude; // getInfoById prop
     /**
      * @var float
      */
-    public $longitude; // getUserInfoById prop
-    public $address_street; // getUserInfoById prop
-    public $zip; // getUserInfoById prop
+    public $longitude; // getInfoById prop
+    public $address_street; // getInfoById prop
+    public $zip; // getInfoById prop
     /**
      * @var string
      */
-    public $city_id; // getUserInfoById prop
-    public $city_name; // getUserInfoById prop
-    public $public_email; // getUserInfoById prop
-    public $is_needy; // getUserInfoById prop
-    public $external_url; // getUserInfoById prop
-    public $external_lynx_url; // getUserInfoById prop
+    public $city_id; // getInfoById prop
+    public $city_name; // getInfoById prop
+    public $public_email; // getInfoById prop
+    public $is_needy; // getInfoById prop
+    public $external_url; // getInfoById prop
+    public $external_lynx_url; // getInfoById prop
     public $email; // getCurrentUser prop
     public $country_code; // getCurrentUser prop
     public $birthday; // getCurrentUser prop
@@ -118,6 +118,6 @@ class User extends \InstagramAPI\Response
     public $needs_email_confirm; // getCurrentUser prop
     public $is_active;
     public $block_at; // getBlockedList prop
-    public $aggregate_promote_engagement; // getSelfUserInfo prop
+    public $aggregate_promote_engagement; // getSelfInfo prop
     public $fbuid;
 }

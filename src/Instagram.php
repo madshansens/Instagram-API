@@ -155,6 +155,8 @@ class Instagram
     public $location;
     /** @var Request\Media Collection of Media related functions. */
     public $media;
+    /** @var Request\People Collection of People related functions. */
+    public $people;
     /** @var Request\Story Collection of Story related functions. */
     public $story;
     /** @var Request\Timeline Collection of Timeline related functions. */
@@ -188,6 +190,7 @@ class Instagram
         $this->live = new Request\Live($this);
         $this->location = new Request\Location($this);
         $this->media = new Request\Media($this);
+        $this->people = new Request\People($this);
         $this->story = new Request\Story($this);
         $this->timeline = new Request\Timeline($this);
         $this->usertag = new Request\Usertag($this);
@@ -573,7 +576,7 @@ class Instagram
         if ($justLoggedIn) {
             // Perform the "user has just done a full login" API flow.
             $this->syncFeatures();
-            $this->getAutoCompleteUserList();
+            $this->people->getAutoCompleteUserList();
             $this->story->getReelsTrayFeed();
             $this->direct->getRecentRecipients();
             $this->timeline->getTimelineFeed();
@@ -581,7 +584,7 @@ class Instagram
             $this->direct->getRankedRecipients('raven', true);
             //push register
             $this->direct->getInbox();
-            $this->getRecentActivity();
+            $this->people->getRecentActivityInbox();
             $this->direct->getVisualInbox();
             //$this->getMegaphoneLog();
             $this->getExplore();
@@ -603,7 +606,7 @@ class Instagram
             if (is_null($lastLoginTime) || (time() - $lastLoginTime) > $appRefreshInterval) {
                 $this->settings->set('last_login', time());
 
-                $this->getAutoCompleteUserList();
+                $this->people->getAutoCompleteUserList();
                 $this->story->getReelsTrayFeed();
                 $this->direct->getRankedRecipients('reshare', true);
                 $this->direct->getRankedRecipients('raven', true);
@@ -612,7 +615,7 @@ class Instagram
                 //push register
                 $this->getMegaphoneLog();
                 $this->direct->getInbox();
-                $this->getRecentActivity();
+                $this->people->getRecentActivityInbox();
                 $this->getExplore();
             }
 
@@ -1063,31 +1066,6 @@ class Instagram
     }
 
     /**
-     * Retrieve list of all friends.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\AutoCompleteUserListResponse|null Will be NULL if throttled by Instagram.
-     */
-    public function getAutoCompleteUserList()
-    {
-        // NOTE: This is a special, very heavily throttled API endpoint.
-        // Instagram REQUIRES that you wait several minutes between calls to it.
-        try {
-            $request = $this->request('friendships/autocomplete_user_list/')
-                ->addParam('version', '2');
-
-            return $request->getResponse(new Response\AutoCompleteUserListResponse());
-        } catch (\InstagramAPI\Exception\ThrottledException $e) {
-            // Throttling is so common that we'll simply return NULL in that case.
-            return;
-        } catch (\InstagramAPI\Exception\InstagramException $e) {
-            // If any other errors happen, we'll still return the server reply.
-            return $e->getResponse();
-        }
-    }
-
-    /**
      * Register to the mqtt push server.
      *
      * @param $gcmToken
@@ -1152,7 +1130,7 @@ class Instagram
     }
 
     /**
-     * Get Facebook OTA.
+     * Get Facebook OTA (Over-The-Air) update information.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -1246,6 +1224,27 @@ class Instagram
     }
 
     /**
+     * Report media in the Explore-feed.
+     *
+     * @param string $exploreSourceToken Token related to the Explore media.
+     * @param string $userId             Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ReportExploreMediaResponse
+     */
+    public function reportExploreMedia(
+        $exploreSourceToken,
+        $userId)
+    {
+        return $this->request('discover/explore_report/')
+            ->addParam('explore_source_token', $exploreSourceToken)
+            ->addParam('m_pk', $this->account_id)
+            ->addParam('a_pk', $userId)
+            ->getResponse(new Response\ReportExploreMediaResponse());
+    }
+
+    /**
      * Get Home channel data.
      *
      * @throws \InstagramAPI\Exception\InstagramException
@@ -1276,179 +1275,6 @@ class Instagram
     }
 
     /**
-     * Get recent activity.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ActivityNewsResponse
-     */
-    public function getRecentActivity()
-    {
-        return $this->request('news/inbox/')
-            ->addParam('activity_module', 'all')
-            ->getResponse(new Response\ActivityNewsResponse());
-    }
-
-    /**
-     * Get news feed with recent activity from all accounts you follow.
-     *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FollowingRecentActivityResponse
-     */
-    public function getFollowingRecentActivity(
-        $maxId = null)
-    {
-        $activity = $this->request('news/');
-        if (!is_null($maxId)) {
-            $activity->addParam('max_id', $maxId);
-        }
-
-        return $activity->getResponse(new Response\FollowingRecentActivityResponse());
-    }
-
-    /**
-     * Facebook user search.
-     *
-     * @param string $query
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FBSearchResponse
-     */
-    public function searchFBUsers(
-        $query)
-    {
-        return $this->request('fbsearch/topsearch/')
-            ->addParam('context', 'blended')
-            ->addParam('query', $query)
-            ->addParam('rank_token', $this->rank_token)
-            ->getResponse(new Response\FBSearchResponse());
-    }
-
-    /**
-     * Search for Instagram users.
-     *
-     * @param string $query
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\SearchUserResponse
-     */
-    public function searchUsers(
-        $query)
-    {
-        return $this->request('users/search/')
-            ->addParam('ig_sig_key_version', Constants::SIG_KEY_VERSION)
-            ->addParam('is_typeahead', true)
-            ->addParam('query', $query)
-            ->addParam('rank_token', $this->rank_token)
-            ->getResponse(new Response\SearchUserResponse());
-    }
-
-    /**
-     * Search for users by linking your address book to Instagram.
-     *
-     * @param array $contacts
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\LinkAddressBookResponse
-     */
-    public function linkAddressBook(
-        $contacts)
-    {
-        return $this->request('address_book/link/?include=extra_display_name,thumbnails')
-            ->setSignedPost(false)
-            ->addPost('contacts', json_encode($contacts, true))
-            ->getResponse(new Response\LinkAddressBookResponse());
-    }
-
-    /**
-     * Unlink your address book from Instagram.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\UnlinkAddressBookResponse
-     */
-    public function unlinkAddressBook()
-    {
-        return $this->request('address_book/unlink/')
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->getResponse(new Response\UnlinkAddressBookResponse());
-    }
-
-    /**
-     * Get details about a specific user via their username.
-     *
-     * @param string $username Username as string (NOT as a numerical ID).
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\UserInfoResponse
-     */
-    public function getUserInfoByName(
-        $username)
-    {
-        return $this->request("users/{$username}/usernameinfo/")->getResponse(new Response\UserInfoResponse());
-    }
-
-    /**
-     * Get details about a specific user via their numerical UserPK ID.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\UserInfoResponse
-     */
-    public function getUserInfoById(
-        $userId)
-    {
-        return $this->request("users/{$userId}/info/")->getResponse(new Response\UserInfoResponse());
-    }
-
-    /**
-     * Get user details about your own account.
-     *
-     * Also try getCurrentUser() instead, for even more details.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\UserInfoResponse
-     *
-     * @see Instagram::getCurrentUser()
-     */
-    public function getSelfUserInfo()
-    {
-        return $this->getUserInfoById($this->account_id);
-    }
-
-    /**
-     * Get the numerical UserPK ID for a specific user via their username.
-     *
-     * This is just a convenient helper function. You may prefer to use
-     * getUserInfoByName() instead, which lets you see more details.
-     *
-     * @param string $username Username as string (NOT as a numerical ID).
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return string Their numerical UserPK ID.
-     *
-     * @see Instagram::getUserInfoByName()
-     */
-    public function getUsernameId(
-        $username)
-    {
-        return $this->getUserInfoByName($username)->getUser()->getPk();
-    }
-
-    /**
      * Get popular feed.
      *
      * @throws \InstagramAPI\Exception\InstagramException
@@ -1462,205 +1288,6 @@ class Instagram
             ->addParam('rank_token', $this->rank_token)
             ->addParam('ranked_content', 'true')
             ->getResponse(new Response\PopularFeedResponse());
-    }
-
-    /**
-     * Get list of who a user is following.
-     *
-     * @param string      $userId      Numerical UserPK ID.
-     * @param null|string $searchQuery Limit the userlist to ones matching the query.
-     * @param null|string $maxId       Next "maximum ID", used for pagination.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FollowerAndFollowingResponse
-     */
-    public function getUserFollowings(
-        $userId,
-        $searchQuery = null,
-        $maxId = null)
-    {
-        $request = $this->request("friendships/{$userId}/following/")
-            ->addParam('rank_token', $this->rank_token);
-        if (!is_null($searchQuery)) {
-            $request->addParam('query', $searchQuery);
-        }
-        if (!is_null($maxId)) {
-            $request->addParam('max_id', $maxId);
-        }
-
-        return $request->getResponse(new Response\FollowerAndFollowingResponse());
-    }
-
-    /**
-     * Get list of who a user is followed by.
-     *
-     * @param string      $userId      Numerical UserPK ID.
-     * @param null|string $searchQuery Limit the userlist to ones matching the query.
-     * @param null|string $maxId       Next "maximum ID", used for pagination.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FollowerAndFollowingResponse
-     */
-    public function getUserFollowers(
-        $userId,
-        $searchQuery = null,
-        $maxId = null)
-    {
-        $request = $this->request("friendships/{$userId}/followers/")
-            ->addParam('rank_token', $this->rank_token);
-        if (!is_null($searchQuery)) {
-            $request->addParam('query', $searchQuery);
-        }
-        if (!is_null($maxId)) {
-            $request->addParam('max_id', $maxId);
-        }
-
-        return $request->getResponse(new Response\FollowerAndFollowingResponse());
-    }
-
-    /**
-     * Get list of who you are following.
-     *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FollowerAndFollowingResponse
-     */
-    public function getSelfUsersFollowing(
-        $maxId = null)
-    {
-        return $this->getUserFollowings($this->account_id, $maxId);
-    }
-
-    /**
-     * Get list of your own followers.
-     *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FollowerAndFollowingResponse
-     */
-    public function getSelfUserFollowers(
-        $maxId = null)
-    {
-        return $this->getUserFollowers($this->account_id, $maxId);
-    }
-
-    /**
-     * Get list of pending friendship requests.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FollowerAndFollowingResponse
-     */
-    public function getPendingFriendshipRequests()
-    {
-        $request = $this->request('friendships/pending/');
-
-        return $request->getResponse(new Response\FollowerAndFollowingResponse());
-    }
-
-    /**
-     * Follow.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FriendshipResponse
-     */
-    public function follow(
-        $userId)
-    {
-        return $this->request("friendships/create/{$userId}/")
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->addPost('user_id', $userId)
-            ->addPost('radio_type', 'wifi-none')
-            ->getResponse(new Response\FriendshipResponse());
-    }
-
-    /**
-     * Unfollow.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FriendshipResponse
-     */
-    public function unfollow(
-        $userId)
-    {
-        return $this->request("friendships/destroy/{$userId}/")
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->addPost('user_id', $userId)
-            ->addPost('radio_type', 'wifi-none')
-            ->getResponse(new Response\FriendshipResponse());
-    }
-
-    /**
-     * Report media in the Explore-feed.
-     *
-     * @param string $exploreSourceToken Token related to the Explore media.
-     * @param string $userId             Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ReportExploreMediaResponse
-     */
-    public function reportExploreMedia(
-        $exploreSourceToken,
-        $userId)
-    {
-        return $this->request('discover/explore_report/')
-            ->addParam('explore_source_token', $exploreSourceToken)
-            ->addParam('m_pk', $this->account_id)
-            ->addParam('a_pk', $userId)
-            ->getResponse(new Response\ReportExploreMediaResponse());
-    }
-
-    /**
-     * Get suggested users.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\SuggestedUsersResponse
-     */
-    public function getSuggestedUsers(
-        $userId)
-    {
-        return $this->request('discover/chaining/')
-            ->addParam('target_id', $userId)
-            ->getResponse(new Response\SuggestedUsersResponse());
-    }
-
-    /**
-     * Get suggested users via account badge.
-     *
-     * This is the endpoint for when you press the "user icon with
-     * the plus sign" on your own profile in the Instagram app.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\SuggestedUsersBadgeResponse
-     */
-    public function getSuggestedUsersBadge()
-    {
-        return $this->request('discover/profile_su_badge/')
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->addPost('module', 'discover_people')
-            ->getResponse(new Response\SuggestedUsersBadgeResponse());
     }
 
     /**
@@ -1678,241 +1305,6 @@ class Instagram
             ->addPost('users_ids', $this->account_id)
             ->addPost('device_id', $this->device_id)
             ->getResponse(new Response\BadgeNotificationsResponse());
-    }
-
-    /**
-     * Hide suggested user.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\SuggestedUsersResponse
-     */
-    public function hideSuggestedUser(
-        $userId)
-    {
-        return $this->request('discover/aysf_dismiss/')
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->addParam('target_id', $userId)
-            ->addParam('algorithm', 'ig_friends_of_friends_from_tao_laser_algorithm')
-            ->getResponse(new Response\SuggestedUsersResponse());
-    }
-
-    /**
-     * Discover new people via Facebook's algorithm.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\DiscoverPeopleResponse
-     */
-    public function discoverPeople()
-    {
-        return $this->request('discover/ayml/')
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->addPost('paginate', true)
-            ->addPost('module', 'discover_people')
-            ->getResponse(new Response\DiscoverPeopleResponse());
-    }
-
-    /**
-     * Block a user.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FriendshipResponse
-     */
-    public function block(
-        $userId)
-    {
-        return $this->request("friendships/block/{$userId}/")
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->addPost('user_id', $userId)
-            ->getResponse(new Response\FriendshipResponse());
-    }
-
-    /**
-     * Unblock a user.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FriendshipResponse
-     */
-    public function unblock(
-        $userId)
-    {
-        return $this->request("friendships/unblock/{$userId}/")
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->addPost('user_id', $userId)
-            ->getResponse(new Response\FriendshipResponse());
-    }
-
-    /**
-     * Get a list of all blocked users.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\BlockedListResponse
-     */
-    public function getBlockedList()
-    {
-        return $this->request('users/blocked_list/')->getResponse(new Response\BlockedListResponse());
-    }
-
-    /**
-     * Block a user's ability to see your stories.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FriendshipResponse
-     *
-     * @see Instagram::muteFriendStory()
-     */
-    public function blockFriendStory(
-        $userId)
-    {
-        return $this->request("friendships/block_friend_reel/{$userId}/")
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->addPost('source', 'profile')
-            ->getResponse(new Response\FriendshipResponse());
-    }
-
-    /**
-     * Unblock a user so that they can see your stories again.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FriendshipResponse
-     *
-     * @see Instagram::unmuteFriendStory()
-     */
-    public function unblockFriendStory(
-        $userId)
-    {
-        return $this->request("friendships/unblock_friend_reel/{$userId}/")
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->addPost('source', 'profile')
-            ->getResponse(new Response\FriendshipResponse());
-    }
-
-    /**
-     * Get the list of users who are blocked from seeing your stories.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\BlockedReelsResponse
-     */
-    public function getBlockedStoryList()
-    {
-        return $this->request('friendships/blocked_reels/')
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->getResponse(new Response\BlockedReelsResponse());
-    }
-
-    /**
-     * Mute a friend's stories, so that you no longer see their stories.
-     *
-     * This does not block them from seeing *your* stories.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FriendshipResponse
-     *
-     * @see Instagram::blockFriendStory()
-     */
-    public function muteFriendStory(
-        $userId)
-    {
-        return $this->request("friendships/mute_friend_reel/{$userId}/")
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->getResponse(new Response\FriendshipResponse());
-    }
-
-    /**
-     * Unmute a friend's stories, so that you see their stories again.
-     *
-     * This does not unblock them from seeing *your* stories.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FriendshipResponse
-     *
-     * @see Instagram::unblockFriendStory()
-     */
-    public function unmuteFriendStory(
-        $userId)
-    {
-        return $this->request("friendships/unmute_friend_reel/{$userId}/")
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('_uid', $this->account_id)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->getResponse(new Response\FriendshipResponse());
-    }
-
-    /**
-     * Show a user's friendship status with you.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\Model\FriendshipStatus
-     */
-    public function getUserFriendship(
-        $userId)
-    {
-        return $this->request("friendships/show/{$userId}/")->getResponse(new Response\Model\FriendshipStatus());
-    }
-
-    /**
-     * Show multiple users' friendship status with you.
-     *
-     * @param string|string[] $userList List of numerical UserPK IDs.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FriendshipsShowManyResponse
-     */
-    public function getUsersFriendship(
-        $userList)
-    {
-        if (!is_array($userList)) {
-            $userList = [$userList];
-        }
-
-        return $this->request('friendships/show_many/')
-            ->setSignedPost(false)
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('user_ids', implode(',', $userList))
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->getResponse(new Response\FriendshipsShowManyResponse());
     }
 
     /**

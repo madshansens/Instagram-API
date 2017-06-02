@@ -37,7 +37,7 @@ $ig->setUser($username, $password);
 $ig->login();
 
 // Code for building video lists (uncomment both lines).
-// $userPk = $ig->getUserInfoByName('selenagomez')->getUser()->getPk();
+// $userPk = $ig->people->getInfoByName('selenagomez')->getUser()->getPk();
 // buildVideoList($ig, $userPk); exit;
 
 // List of good videos and resolutions that we MUST see with a GOOD user agent.
