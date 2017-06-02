@@ -4,6 +4,11 @@ namespace InstagramAPI\Request;
 
 use InstagramAPI\Response;
 
+/**
+ * Functions for managing your story and interacting with other stories.
+ *
+ * @see Media for more functions that let you interact with the media.
+ */
 class Story extends RequestCollection
 {
     /**

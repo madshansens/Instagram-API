@@ -10,7 +10,7 @@ use InstagramAPI\Utils;
 /**
  * Collection of various INTERNAL library functions.
  *
- * THESE FUNCTIONS ARE NOT FOR PUBLIC USE!
+ * THESE FUNCTIONS ARE NOT FOR PUBLIC USE! DO NOT TOUCH!
  */
 class Internal extends RequestCollection
 {

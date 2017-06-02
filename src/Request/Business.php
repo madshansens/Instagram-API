@@ -5,6 +5,11 @@ namespace InstagramAPI\Request;
 use InstagramAPI\Constants;
 use InstagramAPI\Response;
 
+/**
+ * Business-account related functions.
+ *
+ * These only work if you have a Business account.
+ */
 class Business extends RequestCollection
 {
     /**

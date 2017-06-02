@@ -5,6 +5,9 @@ namespace InstagramAPI\Request;
 use InstagramAPI\Constants;
 use InstagramAPI\Response;
 
+/**
+ * Functions related to finding, exploring and managing relations with people.
+ */
 class People extends RequestCollection
 {
     /**

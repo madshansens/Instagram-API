@@ -4,6 +4,9 @@ namespace InstagramAPI\Request;
 
 use InstagramAPI\Response;
 
+/**
+ * Account-related functions, such as profile editing and security.
+ */
 class Account extends RequestCollection
 {
     /**

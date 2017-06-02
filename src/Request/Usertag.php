@@ -4,6 +4,9 @@ namespace InstagramAPI\Request;
 
 use InstagramAPI\Response;
 
+/**
+ * Functions related to managing and exploring user tags in media.
+ */
 class Usertag extends RequestCollection
 {
     /**

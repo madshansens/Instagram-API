@@ -7,6 +7,9 @@ use InstagramAPI\Response;
 use InstagramAPI\Signatures;
 use InstagramAPI\Utils;
 
+/**
+ * Functions for interacting with media items from yourself and others.
+ */
 class Media extends RequestCollection
 {
     /**

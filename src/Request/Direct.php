@@ -6,6 +6,9 @@ use InstagramAPI\Response;
 use InstagramAPI\Signatures;
 use InstagramAPI\Utils;
 
+/**
+ * Instagram Direct messaging functions.
+ */
 class Direct extends RequestCollection
 {
     /**

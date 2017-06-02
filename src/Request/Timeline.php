@@ -6,6 +6,12 @@ use InstagramAPI\Constants;
 use InstagramAPI\Response;
 use InstagramAPI\Utils;
 
+/**
+ * Functions for managing your timeline and interacting with other timelines.
+ *
+ * @see Media for more functions that let you interact with the media.
+ * @see Usertag for functions that let you tag people in media.
+ */
 class Timeline extends RequestCollection
 {
     /**

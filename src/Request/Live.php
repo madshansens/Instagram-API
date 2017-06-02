@@ -6,6 +6,9 @@ use InstagramAPI\Response;
 use InstagramAPI\Signatures;
 use InstagramAPI\Utils;
 
+/**
+ * Functions for exploring and interacting with live broadcasts.
+ */
 class Live extends RequestCollection
 {
     /**

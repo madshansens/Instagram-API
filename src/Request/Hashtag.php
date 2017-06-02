@@ -4,6 +4,9 @@ namespace InstagramAPI\Request;
 
 use InstagramAPI\Response;
 
+/**
+ * Functions related to finding and exploring hashtags.
+ */
 class Hashtag extends RequestCollection
 {
     /**

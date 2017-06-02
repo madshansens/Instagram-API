@@ -4,6 +4,9 @@ namespace InstagramAPI\Request;
 
 use InstagramAPI\Response;
 
+/**
+ * General content discovery functions which don't fit into any better groups.
+ */
 class Discover extends RequestCollection
 {
     /**

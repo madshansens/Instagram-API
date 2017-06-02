@@ -4,6 +4,9 @@ namespace InstagramAPI\Request;
 
 use InstagramAPI\Response;
 
+/**
+ * Functions for managing your push notifications.
+ */
 class Push extends RequestCollection
 {
     /**
