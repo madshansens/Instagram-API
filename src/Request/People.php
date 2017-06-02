@@ -60,13 +60,13 @@ class People extends RequestCollection
     /**
      * Get user details about your own account.
      *
-     * Also try Instagram::getCurrentUser() instead, for even more details.
+     * Also try Account::getCurrentUser() instead, for even more details.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\UserInfoResponse
      *
-     * @see \InstagramAPI\Instagram::getCurrentUser()
+     * @see Account::getCurrentUser()
      */
     public function getSelfInfo()
     {
