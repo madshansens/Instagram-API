@@ -1,5 +1,5 @@
 ===================
-setPushPreferences
+Push::setPreferences
 ===================
 
 Description
@@ -22,8 +22,8 @@ In this context:
 
 ** Warning **
 
-You can only set preferences if you are eligible for them. See getPushPreferences()
-to obtain preferences data.
+You can only set preferences if you are eligible for them. See Push::getPreferences()
+to obtain the values for all of your available preferences.
 
 Preferences and possible options
 ---------------------------------
@@ -87,4 +87,4 @@ $preferences = [
     'comment_likes' => 2
     ];
 
-$ig->setPushPreferences($preferences);
+$ig->push->setPreferences($preferences);
