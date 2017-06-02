@@ -816,7 +816,10 @@ class Instagram
                 $experiments[$group][$param->name] = $param->value;
             }
         }
+
+        // Save the experiments and the last time we refreshed them.
         $this->experiments = $this->settings->setExperiments($experiments);
+        $this->settings->set('last_experiments', time());
     }
 
     /**
@@ -846,9 +849,8 @@ class Instagram
                 ->addPost('experiments', Constants::EXPERIMENTS)
                 ->getResponse(new Response\SyncResponse());
 
-            // Save the experiments and the last time we refreshed them.
+            // Save the updated experiments for this user.
             $this->_saveExperiments($result);
-            $this->settings->set('last_experiments', time());
 
             return $result;
         }
