@@ -163,6 +163,8 @@ class Instagram
     public $media;
     /** @var Request\People Collection of People related functions. */
     public $people;
+    /** @var Request\Push Collection of Push related functions. */
+    public $push;
     /** @var Request\Story Collection of Story related functions. */
     public $story;
     /** @var Request\Timeline Collection of Timeline related functions. */
@@ -200,6 +202,7 @@ class Instagram
         $this->location = new Request\Location($this);
         $this->media = new Request\Media($this);
         $this->people = new Request\People($this);
+        $this->push = new Request\Push($this);
         $this->story = new Request\Story($this);
         $this->timeline = new Request\Timeline($this);
         $this->usertag = new Request\Usertag($this);
