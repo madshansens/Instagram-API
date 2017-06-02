@@ -23,7 +23,7 @@ try {
 }
 
 try {
-    $feed = $ig->getPopularFeed();
+    $feed = $ig->discover->getPopularFeed();
 
     // The getPopularFeed() has an "items" property, which we need.
     $items = $feed->getItems();

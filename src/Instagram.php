@@ -149,6 +149,8 @@ class Instagram
     public $business;
     /** @var Request\Direct Collection of Direct related functions. */
     public $direct;
+    /** @var Request\Discover Collection of Discover related functions. */
+    public $discover;
     /** @var Request\Hashtag Collection of Hashtag related functions. */
     public $hashtag;
     /** @var Request\Internal Collection of Internal (non-public) functions. */
@@ -191,6 +193,7 @@ class Instagram
         $this->account = new Request\Account($this);
         $this->business = new Request\Business($this);
         $this->direct = new Request\Direct($this);
+        $this->discover = new Request\Discover($this);
         $this->hashtag = new Request\Hashtag($this);
         $this->internal = new Request\Internal($this);
         $this->live = new Request\Live($this);
@@ -580,7 +583,7 @@ class Instagram
             $this->people->getRecentActivityInbox();
             $this->internal->getProfileNotice();
             $this->media->getBlockedMedia();
-            $this->getExplore();
+            $this->discover->getExploreFeed();
             //$this->internal->getFacebookOTA();
         } else {
             // Act like a real logged in app client refreshing its news timeline.
@@ -610,7 +613,7 @@ class Instagram
                 $this->direct->getInbox();
                 $this->people->getRecentActivityInbox();
                 $this->internal->getProfileNotice();
-                $this->getExplore();
+                $this->discover->getExploreFeed();
             }
 
             // Users normally resume their sessions, meaning that their
@@ -653,87 +656,6 @@ class Instagram
         $this->client->saveCookieJar();
 
         return $response;
-    }
-
-    /**
-     * Get Explore tab data.
-     *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ExploreResponse
-     */
-    public function getExplore(
-        $maxId = null)
-    {
-        $request = $this->request('discover/explore/');
-        if ($maxId) {
-            $request->addParam('max_id', $maxId);
-        }
-
-        return $request->getResponse(new Response\ExploreResponse());
-    }
-
-    /**
-     * Report media in the Explore-feed.
-     *
-     * @param string $exploreSourceToken Token related to the Explore media.
-     * @param string $userId             Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ReportExploreMediaResponse
-     */
-    public function reportExploreMedia(
-        $exploreSourceToken,
-        $userId)
-    {
-        return $this->request('discover/explore_report/')
-            ->addParam('explore_source_token', $exploreSourceToken)
-            ->addParam('m_pk', $this->account_id)
-            ->addParam('a_pk', $userId)
-            ->getResponse(new Response\ReportExploreMediaResponse());
-    }
-
-    /**
-     * Get Home channel data.
-     *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\DiscoverChannelsResponse
-     */
-    public function getDiscoverChannels(
-        $maxId = null)
-    {
-        $request = $this->request('discover/channels_home/');
-        if ($maxId) {
-            $request->addParam('max_id', $maxId);
-        }
-
-        return $request->getResponse(new Response\DiscoverChannelsResponse());
-    }
-
-    /**
-     * Get popular feed.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\PopularFeedResponse
-     */
-    public function getPopularFeed()
-    {
-        $request = $this->request('feed/popular/')
-            ->addParam('people_teaser_supported', '1')
-            ->addParam('rank_token', $this->rank_token)
-            ->addParam('ranked_content', 'true');
-        // if ($maxId) { // NOTE: Popular feed doesn't properly support max_id.
-        //     $request->addParam('max_id', $maxId);
-        // }
-
-        return $request->getResponse(new Response\PopularFeedResponse());
     }
 
     /**
