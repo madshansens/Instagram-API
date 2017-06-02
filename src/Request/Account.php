@@ -2,10 +2,7 @@
 
 namespace InstagramAPI\Request;
 
-use InstagramAPI\Constants;
 use InstagramAPI\Response;
-use InstagramAPI\Signatures;
-use InstagramAPI\Utils;
 
 class Account extends RequestCollection
 {
@@ -378,5 +375,4 @@ class Account extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\ProfileNoticeResponse());
     }
-
 }
