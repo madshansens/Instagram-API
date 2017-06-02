@@ -1158,24 +1158,6 @@ class Instagram
     }
 
     /**
-     * Expose.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ExposeResponse
-     */
-    public function expose()
-    {
-        return $this->request('qe/expose/')
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('_uid', $this->account_id)
-            ->addPost('id', $this->account_id)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->addPost('experiment', 'ig_android_profile_contextual_feed')
-            ->getResponse(new Response\ExposeResponse());
-    }
-
-    /**
      * Get popular feed.
      *
      * @throws \InstagramAPI\Exception\InstagramException
