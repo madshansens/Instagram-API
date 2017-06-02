@@ -423,7 +423,7 @@ class Internal extends RequestCollection
         /** @var string[]|null Array of numerical UserPK IDs of people tagged in
          * your video. ONLY USED IN STORY VIDEOS! TODO: Actually, it's not even
          * implemented for stories. */
-        $userTags = (isset($externalMetadata['usertags']) && $targetFeed == 'story') ? $externalMetadata['usertags'] : null;
+        $usertags = (isset($externalMetadata['usertags']) && $targetFeed == 'story') ? $externalMetadata['usertags'] : null;
         /** @var Response\Model\Location|null A Location object describing where
          the media was taken. NOT USED FOR STORY MEDIA! */
         $location = (isset($externalMetadata['location']) && $targetFeed != 'story') ? $externalMetadata['location'] : null;
@@ -478,14 +478,14 @@ class Internal extends RequestCollection
 
         if ($targetFeed == 'story') {
             $request->addPost('story_media_creation_date', time());
-            if (!is_null($userTags)) {
+            if (!is_null($usertags)) {
                 // Reel Mention example:
                 // [{\"y\":0.3407772676161919,\"rotation\":0,\"user_id\":\"USER_ID\",\"x\":0.39892578125,\"width\":0.5619921875,\"height\":0.06011525487256372}]
                 // NOTE: The backslashes are just double JSON encoding, ignore
                 // that and just give us an array with these clean values, don't
                 // try to encode it in any way, we do all encoding to match the above.
                 // This post field will get wrapped in another json_encode call during transfer.
-                $request->addPost('reel_mentions', json_encode($userTags));
+                $request->addPost('reel_mentions', json_encode($usertags));
             }
         }
 

@@ -265,7 +265,7 @@ function uploadVideo(...)
 Avoid this kind of function template:
 
 ```php
-function uploadVideo($videoFilename, $filter, $url, $caption, $userTags, $hashTags);
+function uploadVideo($videoFilename, $filter, $url, $caption, $usertags, $hashtags);
 ```
 
 Make such multi-argument functions take future-extensible option-arrays instead, especially if you expect that more properties may be added in the future.
@@ -278,7 +278,7 @@ So the above would instead be PROPERLY designed as follows:
 function uploadTimelineVideo($videoFilename, array $metadata);
 ```
 
-Now users can just say `uploadTimelineVideo($videoFilename, ['hashtags'=>$hashTags]);`, and we can easily add more metadata fields in the future without ever breaking backwards-compatibility with projects that are using our function! And since the function name is good and _specific_, it also means that we can easily add _other_ kinds of "video" upload functions for any _future features_ Instagram introduces, simply by creating new functions such as `uploadStoryVideo`, which gives us total freedom to implement Instagram's new features without breaking backwards-compatibility with anyone using the _other_ functions.
+Now users can just say `uploadTimelineVideo($videoFilename, ['hashtags'=>$hashtags]);`, and we can easily add more metadata fields in the future without ever breaking backwards-compatibility with projects that are using our function! And since the function name is good and _specific_, it also means that we can easily add _other_ kinds of "video" upload functions for any _future features_ Instagram introduces, simply by creating new functions such as `uploadStoryVideo`, which gives us total freedom to implement Instagram's new features without breaking backwards-compatibility with anyone using the _other_ functions.
 
 ### Function Documentation
 
