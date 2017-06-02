@@ -359,4 +359,23 @@ class Account extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\SendConfirmEmailResponse());
     }
+
+    /**
+     * Get account badge notifications.
+     *
+     * TODO: We have no idea what this does. The response is always empty.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BadgeNotificationsResponse
+     */
+    public function getBadgeNotifications()
+    {
+        return $this->ig->request('notifications/badge/')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('users_ids', $this->ig->account_id)
+            ->addPost('device_id', $this->ig->device_id)
+            ->getResponse(new Response\BadgeNotificationsResponse());
+    }
 }

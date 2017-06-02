@@ -737,23 +737,6 @@ class Instagram
     }
 
     /**
-     * Get badge notifications.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\BadgeNotificationsResponse
-     */
-    public function getBadgeNotifications()
-    {
-        return $this->request('notifications/badge/')
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->addPost('users_ids', $this->account_id)
-            ->addPost('device_id', $this->device_id)
-            ->getResponse(new Response\BadgeNotificationsResponse());
-    }
-
-    /**
      * Get sticker assets.
      *
      * @param string     $stickerType Type of sticker (currently only "static_stickers").
