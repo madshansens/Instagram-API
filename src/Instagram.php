@@ -145,24 +145,20 @@ class Instagram
 
     /** @var Request\Live Collection of Live related functions. */
     public $live;
-
     /** @var Request\Direct Collection of Direct related functions. */
     public $direct;
-
     /** @var Request\Hashtag Collection of Hashtag related functions. */
     public $hashtag;
-
     /** @var Request\Internal Collection of Internal (non-public) functions. */
     public $internal;
-
     /** @var Request\Media Collection of Media related functions. */
     public $media;
-
     /** @var Request\Story Collection of Story related functions. */
     public $story;
-
     /** @var Request\Timeline Collection of Timeline related functions. */
     public $timeline;
+    /** @var Request\Usertag Collection of Usertag related functions. */
+    public $usertag;
 
     /**
      * Constructor.
@@ -191,6 +187,7 @@ class Instagram
         $this->media = new Request\Media($this);
         $this->story = new Request\Story($this);
         $this->timeline = new Request\Timeline($this);
+        $this->usertag = new Request\Usertag($this);
 
         // Configure the settings storage and network client.
         $self = $this;
@@ -1307,42 +1304,6 @@ class Instagram
         }
 
         return $activity->getResponse(new Response\FollowingRecentActivityResponse());
-    }
-
-    /**
-     * Get user taggings for a user.
-     *
-     * @param string      $userId       Numerical UserPK ID.
-     * @param null|string $maxId        Next "maximum ID", used for pagination.
-     * @param null|int    $minTimestamp Minimum timestamp.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\UsertagsResponse
-     */
-    public function getUserTags(
-        $userId,
-        $maxId = null,
-        $minTimestamp = null)
-    {
-        return $this->request("usertags/{$userId}/feed/")
-            ->addParam('rank_token', $this->rank_token)
-            ->addParam('ranked_content', 'true')
-            ->addParam('max_id', (!is_null($maxId) ? $maxId : ''))
-            ->addParam('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
-            ->getResponse(new Response\UsertagsResponse());
-    }
-
-    /**
-     * Get user taggings for your own account.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\UsertagsResponse
-     */
-    public function getSelfUserTags()
-    {
-        return $this->getUserTags($this->account_id);
     }
 
     /**

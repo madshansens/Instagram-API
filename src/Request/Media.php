@@ -381,69 +381,6 @@ class Media extends RequestCollection
     }
 
     /**
-     * Tag a user in a media item.
-     *
-     * @param string      $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string      $userId      Numerical UserPK ID.
-     * @param array|float $position    Position relative to image where the tag should sit. Example: [0.4890625,0.6140625]
-     * @param string      $captionText Caption text.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\EditMediaResponse
-     */
-    public function tagUser(
-        $mediaId,
-        $userId,
-        $position,
-        $captionText = '')
-    {
-        $usertag = '{"removed":[],"in":[{"position":['.$position[0].','.$position[1].'],"user_id":"'.$userId.'"}]}';
-
-        return $this->edit($mediaId, $captionText, $usertag);
-    }
-
-    /**
-     * Untag a user from a media item.
-     *
-     * @param string $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string $userId      Numerical UserPK ID.
-     * @param string $captionText Caption text.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\EditMediaResponse
-     */
-    public function untagUser(
-        $mediaId,
-        $userId,
-        $captionText = '')
-    {
-        $usertag = '{"removed":["'.$userId.'"],"in":[]}';
-
-        return $this->edit($mediaId, $captionText, $usertag);
-    }
-
-    /**
-     * Remove yourself from a tagged media item.
-     *
-     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\MediaResponse
-     */
-    public function removeSelfTag(
-        $mediaId)
-    {
-        return $this->ig->request("usertags/{$mediaId}/remove/")
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->getResponse(new Response\MediaResponse());
-    }
-
-    /**
      * Save a media item.
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
