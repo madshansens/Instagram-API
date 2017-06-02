@@ -137,7 +137,7 @@ class Live extends RequestCollection
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
      * @param string $likeCount   Number of likes ("hearts") to send (optional).
      *
-     * @throws \InstagramAPI\Exception\InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\BroadcastLikeResponse

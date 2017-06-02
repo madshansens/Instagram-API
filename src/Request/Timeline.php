@@ -241,7 +241,7 @@ class Timeline extends RequestCollection
      * @param bool   $onlyMe    If true, archives your media so that it's only visible to you.
      *                          Otherwise, if false, makes the media public to everyone again.
      *
-     * @throws \InstagramAPI\Exception\InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\ArchiveMediaResponse

@@ -154,7 +154,7 @@ class Story extends RequestCollection
      * @param \InstagramAPI\Response\Model\Item[] $items An array of one or more
      *                                                   story media Items.
      *
-     * @throws \InstagramAPI\Exception\InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\MediaSeenResponse
@@ -232,7 +232,7 @@ class Story extends RequestCollection
      *                             your followers), "following" (followers that you follow back),
      *                             or "off" (meaning that nobody can reply to your story).
      *
-     * @throws \InstagramAPI\Exception\InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\ReelSettingsResponse
