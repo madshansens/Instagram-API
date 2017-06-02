@@ -140,36 +140,4 @@ class Location extends RequestCollection
 
         return $locationFeed->getResponse(new Response\LocationFeedResponse());
     }
-
-    /**
-     * Get location based media feed for a user.
-     *
-     * Note that you probably want Timeline::getUserFeed() instead, because
-     * the geographical feed does not contain all of the user's media.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\GeoMediaResponse
-     *
-     * @see Timeline::getUserFeed()
-     */
-    public function getUserMapFeed(
-        $userId)
-    {
-        return $this->ig->request("maps/user/{$userId}/")->getResponse(new Response\GeoMediaResponse());
-    }
-
-    /**
-     * Get location based media feed for your own account.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\GeoMediaResponse
-     */
-    public function getSelfUserMapFeed()
-    {
-        return $this->getUserMapFeed($this->ig->account_id);
-    }
 }
