@@ -427,6 +427,12 @@ class Instagram
         $forceLogin = false,
         $appRefreshInterval = 1800)
     {
+        if (empty($this->username)) {
+            throw new \InstagramAPI\Exception\LoginRequiredException(
+                'You must provide a username and password to setUser() before attempting to login.'
+            );
+        }
+
         // Perform a full relogin if necessary.
         if (!$this->isLoggedIn || $forceLogin) {
             $this->internal->syncFeatures(true);
@@ -484,6 +490,12 @@ class Instagram
         $verificationCode,
         $twoFactorIdentifier)
     {
+        if (empty($this->username)) {
+            throw new \InstagramAPI\Exception\LoginRequiredException(
+                'You must provide a username and password to setUser() before attempting to login.'
+            );
+        }
+
         $verificationCode = trim(str_replace(' ', '', $verificationCode));
 
         $response = $this->request('accounts/two_factor_login/')
@@ -659,7 +671,7 @@ class Instagram
     }
 
     /**
-     * Checks if param is enabled in the given experiment.
+     * Checks if a parameter is enabled in the given experiment.
      *
      * @param string $experiment
      * @param string $param
