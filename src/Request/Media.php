@@ -52,35 +52,34 @@ class Media extends RequestCollection
     /**
      * Edit media.
      *
-     * @param string   $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string   $captionText Caption text.
-     * @param string[] $userTags    Array of numerical UserPK IDs of people tagged in your media.
+     * @param string      $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string      $captionText Caption text.
+     * @param null|string $usertags    (optional) Special JSON string with user tagging instructions,
+     *                                 if you want to modify the user tags.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\EditMediaResponse
+     *
+     * @see Usertag::tagMedia() for an example of proper $usertags parameter formatting.
+     * @see Usertag::untagMedia() for an example of proper $usertags parameter formatting.
      */
     public function edit(
         $mediaId,
         $captionText = '',
         $usertags = null)
     {
-        if (is_null($usertags)) {
-            return $this->ig->request("media/{$mediaId}/edit_media/")
-                ->addPost('_uuid', $this->ig->uuid)
-                ->addPost('_uid', $this->ig->account_id)
-                ->addPost('_csrftoken', $this->ig->client->getToken())
-                ->addPost('caption_text', $captionText)
-                ->getResponse(new Response\EditMediaResponse());
-        } else {
-            return $this->ig->request("media/{$mediaId}/edit_media/")
-                ->addPost('_uuid', $this->ig->uuid)
-                ->addPost('_uid', $this->ig->account_id)
-                ->addPost('_csrftoken', $this->ig->client->getToken())
-                ->addPost('caption_text', $captionText)
-                ->addPost('usertags', $usertags)
-                ->getResponse(new Response\EditMediaResponse());
+        $request = $this->ig->request("media/{$mediaId}/edit_media/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('caption_text', $captionText);
+
+        if (!is_null($usertags)) {
+            $request->addPost('usertags', $usertags);
         }
+
+        return $request->getResponse(new Response\EditMediaResponse());
     }
 
     /**
