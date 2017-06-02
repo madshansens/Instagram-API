@@ -362,4 +362,21 @@ class Account extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\SendConfirmEmailResponse());
     }
+
+    /**
+     * Get profile notice.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ProfileNoticeResponse
+     */
+    public function getProfileNotice()
+    {
+        return $this->ig->request('users/profile_notice/')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\ProfileNoticeResponse());
+    }
+
 }
