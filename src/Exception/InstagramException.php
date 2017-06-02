@@ -32,7 +32,7 @@ class InstagramException extends \RuntimeException
      * @return \InstagramAPI\Response|null The full response if one exists,
      *                                     otherwise NULL.
      *
-     * @see hasResponse()
+     * @see InstagramException::hasResponse()
      */
     public function getResponse()
     {

@@ -226,7 +226,7 @@ class ImageAutoResizer
      *
      * @return string The path to the image file.
      *
-     * @see _shouldProcess() For the criteria that determines processing.
+     * @see ImageAutoResizer::_shouldProcess() For the criteria that determines processing.
      */
     public function getFile()
     {

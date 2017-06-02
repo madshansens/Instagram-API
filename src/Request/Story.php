@@ -17,7 +17,7 @@ class Story extends RequestCollection
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
-     * @see \InstagramAPI\Request\Internal::configureSinglePhoto() for available metadata fields.
+     * @see Internal::configureSinglePhoto() for available metadata fields.
      */
     public function uploadPhoto(
         $photoFilename,
@@ -39,7 +39,7 @@ class Story extends RequestCollection
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
-     * @see \InstagramAPI\Request\Internal::configureSingleVideo() for available metadata fields.
+     * @see Internal::configureSingleVideo() for available metadata fields.
      */
     public function uploadVideo(
         $videoFilename,
@@ -60,7 +60,7 @@ class Story extends RequestCollection
      *
      * @return \InstagramAPI\Response\ReelsTrayFeedResponse
      *
-     * @see getUserStoryFeed()
+     * @see Story::getUserStoryFeed()
      */
     public function getReelsTrayFeed()
     {
@@ -81,7 +81,7 @@ class Story extends RequestCollection
      *
      * @return \InstagramAPI\Response\Model\Reel
      *
-     * @see getUserStoryFeed()
+     * @see Story::getUserStoryFeed()
      */
     public function getUserReelMediaFeed(
         $userId)
@@ -103,7 +103,7 @@ class Story extends RequestCollection
      *
      * @return \InstagramAPI\Response\UserStoryFeedResponse
      *
-     * @see getUserReelMediaFeed()
+     * @see Story::getUserReelMediaFeed()
      */
     public function getUserStoryFeed(
         $userId)

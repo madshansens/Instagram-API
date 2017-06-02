@@ -363,7 +363,7 @@ class Instagram
      * Only works if Guzzle is using the cURL backend. But that's
      * almost always the case, on most PHP installations.
      *
-     * @see CURLOPT_INTERFACE (http://php.net/curl_setopt)
+     * @see http://php.net/curl_setopt CURLOPT_INTERFACE
      *
      * @var string|null Interface name, IP address or hostname, or NULL to
      *                  disable override and let Guzzle use any interface.
@@ -639,7 +639,7 @@ class Instagram
      *
      * @return \InstagramAPI\Response\LogoutResponse
      *
-     * @see login()
+     * @see Instagram::login()
      */
     public function logout()
     {
@@ -690,7 +690,7 @@ class Instagram
      *
      * @return \InstagramAPI\Response\RequestTwoFactorResponse
      *
-     * @see enableTwoFactor()
+     * @see Instagram::enableTwoFactor()
      */
     public function requestTwoFactor(
         $phoneNumber)
@@ -716,8 +716,8 @@ class Instagram
      *
      * @return \InstagramAPI\Response\AccountSecurityInfoResponse
      *
-     * @see requestTwoFactor()
-     * @see getAccountSecurityInfo()
+     * @see Instagram::requestTwoFactor()
+     * @see Instagram::getAccountSecurityInfo()
      */
     public function enableTwoFactor(
         $phoneNumber,
@@ -765,7 +765,7 @@ class Instagram
      *
      * @return \InstagramAPI\Response\AccountSecurityInfoResponse
      *
-     * @see enableTwoFactor()
+     * @see Instagram::enableTwoFactor()
      */
     public function getAccountSecurityInfo()
     {
@@ -1453,7 +1453,7 @@ class Instagram
      *
      * @return \InstagramAPI\Response\UserInfoResponse
      *
-     * @see getCurrentUser()
+     * @see Instagram::getCurrentUser()
      */
     public function getSelfUserInfo()
     {
@@ -1472,7 +1472,7 @@ class Instagram
      *
      * @return string Their numerical UserPK ID.
      *
-     * @see getUserInfoByName()
+     * @see Instagram::getUserInfoByName()
      */
     public function getUsernameId(
         $username)
@@ -1567,7 +1567,7 @@ class Instagram
      *
      * @return \InstagramAPI\Response\GeoMediaResponse
      *
-     * @see getUserFeed()
+     * @see Instagram::getUserFeed()
      */
     public function getGeoMedia(
         $userId)
@@ -2034,7 +2034,7 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FriendshipResponse
      *
-     * @see muteFriendStory()
+     * @see Instagram::muteFriendStory()
      */
     public function blockFriendStory(
         $userId)
@@ -2056,7 +2056,7 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FriendshipResponse
      *
-     * @see unmuteFriendStory()
+     * @see Instagram::unmuteFriendStory()
      */
     public function unblockFriendStory(
         $userId)
@@ -2096,7 +2096,7 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FriendshipResponse
      *
-     * @see blockFriendStory()
+     * @see Instagram::blockFriendStory()
      */
     public function muteFriendStory(
         $userId)
@@ -2119,7 +2119,7 @@ class Instagram
      *
      * @return \InstagramAPI\Response\FriendshipResponse
      *
-     * @see unblockFriendStory()
+     * @see Instagram::unblockFriendStory()
      */
     public function unmuteFriendStory(
         $userId)

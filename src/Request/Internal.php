@@ -25,7 +25,7 @@ class Internal extends RequestCollection
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
-     * @see configureSinglePhoto() for available metadata fields.
+     * @see Internal::configureSinglePhoto() for available metadata fields.
      */
     public function uploadSinglePhoto(
         $targetFeed,
@@ -265,7 +265,7 @@ class Internal extends RequestCollection
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
-     * @see configureSingleVideo() for available metadata fields.
+     * @see Internal::configureSingleVideo() for available metadata fields.
      */
     public function uploadSingleVideo(
         $targetFeed,
@@ -533,7 +533,7 @@ class Internal extends RequestCollection
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
-     * @see configureSingleVideo() for available metadata fields.
+     * @see Internal::configureSingleVideo() for available metadata fields.
      */
     public function configureSingleVideoWithRetries(
         $targetFeed,
@@ -732,7 +732,7 @@ class Internal extends RequestCollection
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
-     * @see configureTimelineAlbum() for available metadata fields.
+     * @see Internal::configureTimelineAlbum() for available metadata fields.
      */
     public function configureTimelineAlbumWithRetries(
         array $media,

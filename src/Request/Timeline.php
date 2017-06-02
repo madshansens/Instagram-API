@@ -19,7 +19,7 @@ class Timeline extends RequestCollection
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
-     * @see \InstagramAPI\Request\Internal::configureSinglePhoto() for available metadata fields.
+     * @see Internal::configureSinglePhoto() for available metadata fields.
      */
     public function uploadPhoto(
         $photoFilename,
@@ -41,7 +41,7 @@ class Timeline extends RequestCollection
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
-     * @see \InstagramAPI\Request\Internal::configureSingleVideo() for available metadata fields.
+     * @see Internal::configureSingleVideo() for available metadata fields.
      */
     public function uploadVideo(
         $videoFilename,
@@ -73,7 +73,7 @@ class Timeline extends RequestCollection
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
-     * @see \InstagramAPI\Request\Internal::configureTimelineAlbum() for available album metadata fields.
+     * @see Internal::configureTimelineAlbum() for available album metadata fields.
      */
     public function uploadAlbum(
         array $media,

@@ -74,7 +74,7 @@ class Client
      * Only works if Guzzle is using the cURL backend. But that's
      * almost always the case, on most PHP installations.
      *
-     * @see CURLOPT_INTERFACE (http://php.net/curl_setopt)
+     * @see http://php.net/curl_setopt CURLOPT_INTERFACE
      *
      * @var string|null
      */
@@ -428,7 +428,7 @@ class Client
      * Only works if Guzzle is using the cURL backend. But that's
      * almost always the case, on most PHP installations.
      *
-     * @see CURLOPT_INTERFACE (http://php.net/curl_setopt)
+     * @see http://php.net/curl_setopt CURLOPT_INTERFACE
      *
      * @var string|null Interface name, IP address or hostname, or NULL to
      *                  disable override and let Guzzle use any interface.
