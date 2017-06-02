@@ -35,9 +35,28 @@ class Item extends \InstagramAPI\Response
     public $view_count;
     public $viewer_count;
     public $organic_tracking_token;
+    public $comment_count;
     public $has_more_comments;
     public $max_num_visible_preview_comments;
+    /**
+     * Preview of comments via feed replies.
+     *
+     * If "has_more_comments" is FALSE, then this has ALL of the comments.
+     * Otherwise, you'll need to get all comments by querying the media.
+     *
+     * @var Comment[]
+     */
     public $preview_comments;
+    /**
+     * Comments for the item.
+     *
+     * TODO: As of mid-2017, this field seems to no longer be used for timeline
+     * feed items? They now use "preview_comments" instead. But we won't delete
+     * it, since some other feed MAY use this property for ITS Item object.
+     *
+     * @var Comment[]
+     */
+    public $comments;
     public $comments_disabled;
     public $reel_mentions;
     public $story_cta;
@@ -52,11 +71,6 @@ class Item extends \InstagramAPI\Response
      * @var CarouselMedia[]
      */
     public $carousel_media;
-    /**
-     * @var Comment[]
-     */
-    public $comments;
-    public $comment_count;
     /**
      * @var Caption
      */
