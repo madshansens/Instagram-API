@@ -67,7 +67,7 @@ class Internal extends RequestCollection
     }
 
     /**
-     * Uploads a photo to Instagram.
+     * Upload the data for a photo to Instagram.
      *
      * @param string $targetFeed    Target feed for this media ("timeline", "story" or "album").
      * @param string $photoFilename The photo filename.

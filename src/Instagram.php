@@ -149,7 +149,7 @@ class Instagram
     /** @var Request\Direct Collection of Direct related functions. */
     public $direct;
 
-    /** @var Request\Internal Collection of Internal related functions. */
+    /** @var Request\Internal Collection of Internal (non-public) functions. */
     public $internal;
 
     /** @var Request\Media Collection of Media related functions. */
