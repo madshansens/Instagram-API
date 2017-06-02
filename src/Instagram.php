@@ -1481,7 +1481,29 @@ class Instagram
     }
 
     /**
-     * Get related tags.
+     * Get the feed for a hashtag.
+     *
+     * @param string      $hashtag The hashtag, not including the "#".
+     * @param null|string $maxId   Next "maximum ID", used for pagination.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\TagFeedResponse
+     */
+    public function getHashtagFeed(
+        $hashtag,
+        $maxId = null)
+    {
+        $hashtagFeed = $this->request("feed/tag/{$hashtag}/");
+        if (!is_null($maxId)) {
+            $hashtagFeed->addParam('max_id', $maxId);
+        }
+
+        return $hashtagFeed->getResponse(new Response\TagFeedResponse());
+    }
+
+    /**
+     * Get related hashtags.
      *
      * @param string $tag
      *
@@ -1499,7 +1521,26 @@ class Instagram
     }
 
     /**
-     * Get detailed tag information.
+     * Search for hashtags.
+     *
+     * @param string $query
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\SearchTagResponse
+     */
+    public function searchTags(
+        $query)
+    {
+        return $this->request('tags/search/')
+            ->addParam('is_typeahead', true)
+            ->addParam('q', $query)
+            ->addParam('rank_token', $this->rank_token)
+            ->getResponse(new Response\SearchTagResponse());
+    }
+
+    /**
+     * Get detailed hashtag information.
      *
      * @param string $tag
      *
@@ -1676,28 +1717,6 @@ class Instagram
             ->addParam('rank_token', $this->rank_token)
             ->addParam('ranked_content', 'true')
             ->getResponse(new Response\PopularFeedResponse());
-    }
-
-    /**
-     * Get hashtag feed.
-     *
-     * @param string      $hashtagString Hashtag string, not including the "#".
-     * @param null|string $maxId         Next "maximum ID", used for pagination.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\TagFeedResponse
-     */
-    public function getHashtagFeed(
-        $hashtagString,
-        $maxId = null)
-    {
-        $hashtagFeed = $this->request("feed/tag/{$hashtagString}/");
-        if (!is_null($maxId)) {
-            $hashtagFeed->addParam('max_id', $maxId);
-        }
-
-        return $hashtagFeed->getResponse(new Response\TagFeedResponse());
     }
 
     /**
@@ -2149,25 +2168,6 @@ class Instagram
             ->addPost('user_ids', implode(',', $userList))
             ->addPost('_csrftoken', $this->client->getToken())
             ->getResponse(new Response\FriendshipsShowManyResponse());
-    }
-
-    /**
-     * Search for tags.
-     *
-     * @param string $query
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\SearchTagResponse
-     */
-    public function searchTags(
-        $query)
-    {
-        return $this->request('tags/search/')
-            ->addParam('is_typeahead', true)
-            ->addParam('q', $query)
-            ->addParam('rank_token', $this->rank_token)
-            ->getResponse(new Response\SearchTagResponse());
     }
 
     /**
