@@ -19,13 +19,13 @@ class Timeline extends RequestCollection
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
-     * @see configureSinglePhoto() for available metadata fields.
+     * @see \InstagramAPI\Request\Internal::configureSinglePhoto() for available metadata fields.
      */
     public function uploadPhoto(
         $photoFilename,
         array $externalMetadata = [])
     {
-        return $this->ig->uploadSinglePhoto('timeline', $photoFilename, $externalMetadata);
+        return $this->ig->internal->uploadSinglePhoto('timeline', $photoFilename, $externalMetadata);
     }
 
     /**
@@ -41,14 +41,14 @@ class Timeline extends RequestCollection
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
-     * @see configureSingleVideo() for available metadata fields.
+     * @see \InstagramAPI\Request\Internal::configureSingleVideo() for available metadata fields.
      */
     public function uploadVideo(
         $videoFilename,
         array $externalMetadata = [],
         $maxAttempts = 10)
     {
-        return $this->ig->uploadSingleVideo('timeline', $videoFilename, $externalMetadata, $maxAttempts);
+        return $this->ig->internal->uploadSingleVideo('timeline', $videoFilename, $externalMetadata, $maxAttempts);
     }
 
     /**
@@ -73,7 +73,7 @@ class Timeline extends RequestCollection
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
-     * @see configureTimelineAlbum() for available album metadata fields.
+     * @see \InstagramAPI\Request\Internal::configureTimelineAlbum() for available album metadata fields.
      */
     public function uploadAlbum(
         array $media,
@@ -142,25 +142,25 @@ class Timeline extends RequestCollection
 
             switch ($item['type']) {
             case 'photo':
-                $result = $this->ig->uploadPhotoData('album', $item['file']);
+                $result = $this->ig->internal->uploadPhotoData('album', $item['file']);
                 $media[$key]['internalMetadata']['uploadId'] = $result->getUploadId();
                 break;
             case 'video':
                 // Request parameters for uploading a new video.
-                $uploadParams = $this->ig->requestVideoUploadURL('album');
+                $uploadParams = $this->ig->internal->requestVideoUploadURL('album');
                 $media[$key]['internalMetadata']['uploadId'] = $uploadParams['uploadId'];
 
                 // Attempt to upload the video data.
                 $this->ig->client->uploadVideoChunks('album', $item['file'], $uploadParams, $maxAttempts);
 
                 // Attempt to upload the thumbnail, associated with our video's ID.
-                $this->ig->uploadPhotoData('album', $item['file'], 'videofile', $uploadParams['uploadId']);
+                $this->ig->internal->uploadPhotoData('album', $item['file'], 'videofile', $uploadParams['uploadId']);
             }
         }
 
         // Configure the uploaded album and attach it to our timeline.
         $internalMetadata = []; // NOTE: NO INTERNAL DATA IS NEEDED HERE YET.
-        $configure = $this->ig->configureTimelineAlbumWithRetries($media, $internalMetadata, $externalMetadata);
+        $configure = $this->ig->internal->configureTimelineAlbumWithRetries($media, $internalMetadata, $externalMetadata);
 
         return $configure;
     }

@@ -17,13 +17,13 @@ class Story extends RequestCollection
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
-     * @see configureSinglePhoto() for available metadata fields.
+     * @see \InstagramAPI\Request\Internal::configureSinglePhoto() for available metadata fields.
      */
     public function uploadPhoto(
         $photoFilename,
         array $externalMetadata = [])
     {
-        return $this->ig->uploadSinglePhoto('story', $photoFilename, $externalMetadata);
+        return $this->ig->internal->uploadSinglePhoto('story', $photoFilename, $externalMetadata);
     }
 
     /**
@@ -39,14 +39,14 @@ class Story extends RequestCollection
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
-     * @see configureSingleVideo() for available metadata fields.
+     * @see \InstagramAPI\Request\Internal::configureSingleVideo() for available metadata fields.
      */
     public function uploadVideo(
         $videoFilename,
         array $externalMetadata = [],
         $maxAttempts = 10)
     {
-        return $this->ig->uploadSingleVideo('story', $videoFilename, $externalMetadata, $maxAttempts);
+        return $this->ig->internal->uploadSingleVideo('story', $videoFilename, $externalMetadata, $maxAttempts);
     }
 
     /**

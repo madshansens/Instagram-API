@@ -506,7 +506,7 @@ class Direct extends RequestCollection
         Utils::throwIfIllegalVideoDetails('direct_v2', $videoFilename, $internalMetadata['videoDetails']);
 
         // Request parameters for uploading a new video.
-        $uploadParams = $this->ig->requestVideoUploadURL('direct_v2', $internalMetadata);
+        $uploadParams = $this->ig->internal->requestVideoUploadURL('direct_v2', $internalMetadata);
         $internalMetadata['uploadId'] = $uploadParams['uploadId'];
 
         // Attempt to upload the video data.

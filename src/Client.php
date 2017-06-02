@@ -872,7 +872,7 @@ class Client
      *
      * @param string $targetFeed    Target feed for this media ("timeline", "story", "album" or "direct_v2").
      * @param string $videoFilename The video filename.
-     * @param array  $uploadParams  An array created by requestVideoUploadURL()!
+     * @param array  $uploadParams  An array created by Request\Internal::requestVideoUploadURL()!
      * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
      *
      * @throws \InvalidArgumentException
