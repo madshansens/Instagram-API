@@ -143,6 +143,8 @@ class Instagram
      */
     public $experiments;
 
+    /** @var Request\Business Collection of Business related functions. */
+    public $business;
     /** @var Request\Direct Collection of Direct related functions. */
     public $direct;
     /** @var Request\Hashtag Collection of Hashtag related functions. */
@@ -184,6 +186,7 @@ class Instagram
         $this->truncatedDebug = $truncatedDebug;
 
         // Load all function collections.
+        $this->business = new Request\Business($this);
         $this->direct = new Request\Direct($this);
         $this->hashtag = new Request\Hashtag($this);
         $this->internal = new Request\Internal($this);
@@ -1150,46 +1153,6 @@ class Instagram
             ->addParam('custom_app_id', Constants::FACEBOOK_ORCA_APPLICATION_ID)
             ->addParam('custom_device_id', $this->uuid)
             ->getResponse(new Response\FacebookOTAResponse());
-    }
-
-    /**
-     * Get insights.
-     *
-     * @param $day
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\InsightsResponse
-     */
-    public function getInsights(
-        $day = null)
-    {
-        if (empty($day)) {
-            $day = date('d');
-        }
-        $request = $this->request('insights/account_organic_insights')
-            ->addParam('show_promotions_in_landing_page', 'true')
-            ->addParam('first', $day);
-
-        return $request->getResponse(new Response\InsightsResponse());
-    }
-
-    /**
-     * Get media insights.
-     *
-     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\MediaInsightsResponse
-     */
-    public function getMediaInsights(
-        $mediaId)
-    {
-        $request = $this->request("insights/media_organic_insights/{$mediaId}")
-            ->addParam('ig_sig_key_version', Constants::SIG_KEY_VERSION);
-
-        return $request->getResponse(new Response\MediaInsightsResponse());
     }
 
     /**
