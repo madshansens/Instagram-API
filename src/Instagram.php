@@ -143,14 +143,16 @@ class Instagram
      */
     public $experiments;
 
-    /** @var Request\Live Collection of Live related functions. */
-    public $live;
     /** @var Request\Direct Collection of Direct related functions. */
     public $direct;
     /** @var Request\Hashtag Collection of Hashtag related functions. */
     public $hashtag;
     /** @var Request\Internal Collection of Internal (non-public) functions. */
     public $internal;
+    /** @var Request\Live Collection of Live related functions. */
+    public $live;
+    /** @var Request\Location Collection of Location related functions. */
+    public $location;
     /** @var Request\Media Collection of Media related functions. */
     public $media;
     /** @var Request\Story Collection of Story related functions. */
@@ -180,10 +182,11 @@ class Instagram
         $this->truncatedDebug = $truncatedDebug;
 
         // Load all function collections.
-        $this->live = new Request\Live($this);
         $this->direct = new Request\Direct($this);
         $this->hashtag = new Request\Hashtag($this);
         $this->internal = new Request\Internal($this);
+        $this->live = new Request\Live($this);
+        $this->location = new Request\Location($this);
         $this->media = new Request\Media($this);
         $this->story = new Request\Story($this);
         $this->timeline = new Request\Timeline($this);
@@ -1446,154 +1449,6 @@ class Instagram
     }
 
     /**
-     * Get location based media feed for a user.
-     *
-     * Note that you probably want timeline->getUserFeed() instead, because
-     * the geographical feed does not contain all of the user's media.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\GeoMediaResponse
-     *
-     * @see Instagram::getUserFeed()
-     */
-    public function getGeoMedia(
-        $userId)
-    {
-        return $this->request("maps/user/{$userId}/")->getResponse(new Response\GeoMediaResponse());
-    }
-
-    /**
-     * Get location based media feed for your own account.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\GeoMediaResponse
-     */
-    public function getSelfGeoMedia()
-    {
-        return $this->getGeoMedia($this->account_id);
-    }
-
-    /**
-     * Search for nearby Instagram locations by geographical coordinates.
-     *
-     * @param string      $latitude
-     * @param string      $longitude
-     * @param null|string $query
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\LocationResponse
-     */
-    public function searchLocation(
-        $latitude,
-        $longitude,
-        $query = null)
-    {
-        $locations = $this->request('location_search/')
-            ->addParam('rank_token', $this->rank_token)
-            ->addParam('latitude', $latitude)
-            ->addParam('longitude', $longitude);
-
-        if (is_null($query)) {
-            $locations->addParam('timestamp', time());
-        } else {
-            $locations->addParam('search_query', $query);
-        }
-
-        return $locations->getResponse(new Response\LocationResponse());
-    }
-
-    /**
-     * Search for related locations by location ID.
-     *
-     * @param string $locationId
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\RelatedLocationResponse
-     */
-    public function searchRelatedLocation(
-        $locationId)
-    {
-        return $this->request("locations/{$locationId}/related")
-            ->addParam('visited', json_encode(['id' => $locationId, 'type' => 'location']))
-            ->addParam('related_types', json_encode(['location']))
-            ->getResponse(new Response\RelatedLocationResponse());
-    }
-
-    /**
-     * Search for Facebook locations by name.
-     *
-     * @param string $query
-     * @param int    $count (optional) Facebook will return up to this many results.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FBLocationResponse
-     */
-    public function searchFBLocation(
-        $query,
-        $count = null)
-    {
-        $location = $this->request('fbsearch/places/')
-            ->addParam('rank_token', $this->rank_token)
-            ->addParam('query', $query);
-
-        if (!is_null($count)) {
-            $location->addParam('count', $count);
-        }
-
-        return $location->getResponse(new Response\FBLocationResponse());
-    }
-
-    /**
-     * Search for Facebook locations by geographical location.
-     *
-     * @param string $lat Latitude.
-     * @param string $lng Longitude.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FBLocationResponse
-     */
-    public function searchFBLocationByPoint(
-        $lat,
-        $lng)
-    {
-        return $this->request('fbsearch/places/')
-            ->addParam('rank_token', $this->rank_token)
-            ->addParam('lat', $lat)
-            ->addParam('lng', $lng)
-            ->getResponse(new Response\FBLocationResponse());
-    }
-
-    /**
-     * Get location feed.
-     *
-     * @param string      $locationId
-     * @param null|string $maxId      Next "maximum ID", used for pagination.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\LocationFeedResponse
-     */
-    public function getLocationFeed(
-        $locationId,
-        $maxId = null)
-    {
-        $locationFeed = $this->request("feed/location/{$locationId}/");
-        if (!is_null($maxId)) {
-            $locationFeed->addParam('max_id', $maxId);
-        }
-
-        return $locationFeed->getResponse(new Response\LocationFeedResponse());
-    }
-
-    /**
      * Get popular feed.
      *
      * @throws \InstagramAPI\Exception\InstagramException
@@ -2079,8 +1934,8 @@ class Instagram
     /**
      * Get sticker assets.
      *
-     * @param string $stickerType Type of sticker (currently only "static_stickers").
-     * @param array  $location    Array containing lat, lng and horizontalAccuracy.
+     * @param string     $stickerType Type of sticker (currently only "static_stickers").
+     * @param null|array $location    (optional) Array containing lat, lng and horizontalAccuracy.
      *
      * @throws \InstagramAPI\Exception\InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
