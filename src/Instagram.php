@@ -571,13 +571,15 @@ class Instagram
             $this->story->getReelsTrayFeed();
             $this->direct->getRecentRecipients();
             $this->timeline->getTimelineFeed();
+            //push register
             $this->direct->getRankedRecipients('reshare', true);
             $this->direct->getRankedRecipients('raven', true);
-            //push register
             $this->direct->getInbox();
-            $this->people->getRecentActivityInbox();
             $this->direct->getVisualInbox();
             //$this->internal->getMegaphoneLog();
+            $this->people->getRecentActivityInbox();
+            $this->account->getProfileNotice();
+            $this->media->getBlockedMedia();
             $this->getExplore();
             //$this->internal->getFacebookOTA();
         } else {
@@ -604,9 +606,10 @@ class Instagram
                 //push register
                 $this->direct->getRecentRecipients();
                 //push register
-                $this->internal->getMegaphoneLog();
+                //$this->internal->getMegaphoneLog();
                 $this->direct->getInbox();
                 $this->people->getRecentActivityInbox();
+                $this->account->getProfileNotice();
                 $this->getExplore();
             }
 
