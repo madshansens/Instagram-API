@@ -609,7 +609,7 @@ class Instagram
                 //$this->internal->getMegaphoneLog();
                 $this->direct->getInbox();
                 $this->people->getRecentActivityInbox();
-                $this->account->getProfileNotice();
+                $this->internal->getProfileNotice();
                 $this->getExplore();
             }
 

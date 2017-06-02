@@ -897,7 +897,10 @@ class Internal extends RequestCollection
     }
 
     /**
-     * Get profile notice.
+     * Get profile "notices".
+     *
+     * This is just for some internal state information, such as
+     * "has_change_password_megaphone". It's not for public use.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
