@@ -658,13 +658,21 @@ class Instagram
     /**
      * Get Explore tab data.
      *
+     * @param null|string $maxId Next "maximum ID", used for pagination.
+     *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\ExploreResponse
      */
-    public function getExplore()
+    public function getExplore(
+        $maxId = null)
     {
-        return $this->request('discover/explore/')->getResponse(new Response\ExploreResponse());
+        $request = $this->request('discover/explore/');
+        if ($maxId) {
+            $request->addParam('max_id', $maxId);
+        }
+
+        return $request->getResponse(new Response\ExploreResponse());
     }
 
     /**
@@ -691,13 +699,21 @@ class Instagram
     /**
      * Get Home channel data.
      *
+     * @param null|string $maxId Next "maximum ID", used for pagination.
+     *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\DiscoverChannelsResponse
      */
-    public function getDiscoverChannels()
+    public function getDiscoverChannels(
+        $maxId = null)
     {
-        return $this->request('discover/channels_home/')->getResponse(new Response\DiscoverChannelsResponse());
+        $request = $this->request('discover/channels_home/');
+        if ($maxId) {
+            $request->addParam('max_id', $maxId);
+        }
+
+        return $request->getResponse(new Response\DiscoverChannelsResponse());
     }
 
     /**
@@ -709,11 +725,15 @@ class Instagram
      */
     public function getPopularFeed()
     {
-        return $this->request('feed/popular/')
+        $request = $this->request('feed/popular/')
             ->addParam('people_teaser_supported', '1')
             ->addParam('rank_token', $this->rank_token)
-            ->addParam('ranked_content', 'true')
-            ->getResponse(new Response\PopularFeedResponse());
+            ->addParam('ranked_content', 'true');
+        // if ($maxId) { // NOTE: Popular feed doesn't properly support max_id.
+        //     $request->addParam('max_id', $maxId);
+        // }
+
+        return $request->getResponse(new Response\PopularFeedResponse());
     }
 
     /**
