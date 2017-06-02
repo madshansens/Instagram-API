@@ -737,41 +737,6 @@ class Instagram
     }
 
     /**
-     * Get sticker assets.
-     *
-     * @param string     $stickerType Type of sticker (currently only "static_stickers").
-     * @param null|array $location    (optional) Array containing lat, lng and horizontalAccuracy.
-     *
-     * @throws \InstagramAPI\Exception\InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\StickerAssetsResponse
-     */
-    public function getStickerAssets(
-        $stickerType = 'static_stickers',
-        $location = null)
-    {
-        if ($stickerType != 'static_stickers') {
-            throw new \InvalidArgumentException('You must provide a valid sticker type.');
-        }
-        if (!is_null($location) && (!isset($location['lat']) || !isset($location['lng']) || !isset($location['horizontalAccuracy']))) {
-            throw new \InvalidArgumentException('Your location array must contain keys for "lat", "lng" and "horizontalAccuracy".');
-        }
-
-        $request = $this->request('creatives/assets/')
-            ->addPost('type', $stickerType);
-
-        if (!is_null($location)) {
-            $request
-                ->addPost('lat', $location['lat'])
-                ->addPost('lng', $location['lat'])
-                ->addPost('horizontalAccuracy', $location['horizontalAccuracy']);
-        }
-
-        $request->getResponse(new Response\StickerAssetsResponse());
-    }
-
-    /**
      * Checks if param is enabled in the given experiment.
      *
      * @param string $experiment
