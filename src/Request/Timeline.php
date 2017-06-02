@@ -166,7 +166,9 @@ class Timeline extends RequestCollection
     }
 
     /**
-     * Get your own timeline feed.
+     * Get your "home screen" timeline feed.
+     *
+     * This is the feed of recent timeline posts from people you follow.
      *
      * @param null|string $maxId Next "maximum ID", used for pagination.
      *
@@ -177,7 +179,7 @@ class Timeline extends RequestCollection
     public function getTimelineFeed(
         $maxId = null)
     {
-        $request = $this->ig->request('feed/timeline')
+        $request = $this->ig->request('feed/timeline/')
             ->addParam('rank_token', $this->ig->rank_token)
             ->addParam('ranked_content', true);
         if ($maxId) {
