@@ -578,7 +578,7 @@ class Instagram
             $this->direct->getVisualInbox();
             //$this->internal->getMegaphoneLog();
             $this->people->getRecentActivityInbox();
-            $this->account->getProfileNotice();
+            $this->internal->getProfileNotice();
             $this->media->getBlockedMedia();
             $this->getExplore();
             //$this->internal->getFacebookOTA();

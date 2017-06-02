@@ -895,4 +895,20 @@ class Internal extends RequestCollection
             ->addParam('custom_device_id', $this->ig->uuid)
             ->getResponse(new Response\FacebookOTAResponse());
     }
+
+    /**
+     * Get profile notice.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ProfileNoticeResponse
+     */
+    public function getProfileNotice()
+    {
+        return $this->ig->request('users/profile_notice/')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\ProfileNoticeResponse());
+    }
 }
