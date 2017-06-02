@@ -1716,16 +1716,16 @@ class Instagram
         $searchQuery = null,
         $maxId = null)
     {
-        $requestData = $this->request("friendships/{$userId}/following/")
+        $request = $this->request("friendships/{$userId}/following/")
             ->addParam('rank_token', $this->rank_token);
         if (!is_null($searchQuery)) {
-            $requestData->addParam('query', $searchQuery);
+            $request->addParam('query', $searchQuery);
         }
         if (!is_null($maxId)) {
-            $requestData->addParam('max_id', $maxId);
+            $request->addParam('max_id', $maxId);
         }
 
-        return $requestData->getResponse(new Response\FollowerAndFollowingResponse());
+        return $request->getResponse(new Response\FollowerAndFollowingResponse());
     }
 
     /**
@@ -1744,16 +1744,16 @@ class Instagram
         $searchQuery = null,
         $maxId = null)
     {
-        $requestData = $this->request("friendships/{$userId}/followers/")
+        $request = $this->request("friendships/{$userId}/followers/")
             ->addParam('rank_token', $this->rank_token);
         if (!is_null($searchQuery)) {
-            $requestData->addParam('query', $searchQuery);
+            $request->addParam('query', $searchQuery);
         }
         if (!is_null($maxId)) {
-            $requestData->addParam('max_id', $maxId);
+            $request->addParam('max_id', $maxId);
         }
 
-        return $requestData->getResponse(new Response\FollowerAndFollowingResponse());
+        return $request->getResponse(new Response\FollowerAndFollowingResponse());
     }
 
     /**
@@ -1795,9 +1795,9 @@ class Instagram
      */
     public function getPendingFriendshipRequests()
     {
-        $requestData = $this->request('friendships/pending/');
+        $request = $this->request('friendships/pending/');
 
-        return $requestData->getResponse(new Response\FollowerAndFollowingResponse());
+        return $request->getResponse(new Response\FollowerAndFollowingResponse());
     }
 
     /**
@@ -2208,17 +2208,17 @@ class Instagram
             throw new \InvalidArgumentException('Your location array must contain keys for "lat", "lng" and "horizontalAccuracy".');
         }
 
-        $requestData = $this->request('creatives/assets/')
+        $request = $this->request('creatives/assets/')
             ->addPost('type', $stickerType);
 
         if (!is_null($location)) {
-            $requestData
+            $request
                 ->addPost('lat', $location['lat'])
                 ->addPost('lng', $location['lat'])
                 ->addPost('horizontalAccuracy', $location['horizontalAccuracy']);
         }
 
-        $requestData->getResponse(new Response\StickerAssetsResponse());
+        $request->getResponse(new Response\StickerAssetsResponse());
     }
 
     /**

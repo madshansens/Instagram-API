@@ -493,15 +493,15 @@ class Media extends RequestCollection
     public function getSavedFeed(
         $maxId = null)
     {
-        $requestData = $this->ig->request('feed/saved/')
+        $request = $this->ig->request('feed/saved/')
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken());
 
         if (!is_null($maxId)) {
-            $requestData->addParam('max_id', $maxId);
+            $request->addParam('max_id', $maxId);
         }
 
-        return $requestData->getResponse(new Response\SavedFeedResponse());
+        return $request->getResponse(new Response\SavedFeedResponse());
     }
 }
