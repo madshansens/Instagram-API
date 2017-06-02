@@ -149,6 +149,9 @@ class Instagram
     /** @var Request\Direct Collection of Direct related functions. */
     public $direct;
 
+    /** @var Request\Hashtag Collection of Hashtag related functions. */
+    public $hashtag;
+
     /** @var Request\Internal Collection of Internal (non-public) functions. */
     public $internal;
 
@@ -183,6 +186,7 @@ class Instagram
         // Load all function collections.
         $this->live = new Request\Live($this);
         $this->direct = new Request\Direct($this);
+        $this->hashtag = new Request\Hashtag($this);
         $this->internal = new Request\Internal($this);
         $this->media = new Request\Media($this);
         $this->story = new Request\Story($this);
@@ -1478,81 +1482,6 @@ class Instagram
         $username)
     {
         return $this->getUserInfoByName($username)->getUser()->getPk();
-    }
-
-    /**
-     * Get the feed for a hashtag.
-     *
-     * @param string      $hashtag The hashtag, not including the "#".
-     * @param null|string $maxId   Next "maximum ID", used for pagination.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\TagFeedResponse
-     */
-    public function getHashtagFeed(
-        $hashtag,
-        $maxId = null)
-    {
-        $hashtagFeed = $this->request("feed/tag/{$hashtag}/");
-        if (!is_null($maxId)) {
-            $hashtagFeed->addParam('max_id', $maxId);
-        }
-
-        return $hashtagFeed->getResponse(new Response\TagFeedResponse());
-    }
-
-    /**
-     * Get related hashtags.
-     *
-     * @param string $tag
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\TagRelatedResponse
-     */
-    public function getTagRelated(
-        $tag)
-    {
-        return $this->request("tags/{$tag}/related")
-            ->addParam('visited', '[{"id":"'.$tag.'","type":"hashtag"}]')
-            ->addParam('related_types', '["hashtag"]')
-            ->getResponse(new Response\TagRelatedResponse());
-    }
-
-    /**
-     * Search for hashtags.
-     *
-     * @param string $query
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\SearchTagResponse
-     */
-    public function searchTags(
-        $query)
-    {
-        return $this->request('tags/search/')
-            ->addParam('is_typeahead', true)
-            ->addParam('q', $query)
-            ->addParam('rank_token', $this->rank_token)
-            ->getResponse(new Response\SearchTagResponse());
-    }
-
-    /**
-     * Get detailed hashtag information.
-     *
-     * @param string $tag
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\TagInfoResponse
-     */
-    public function getTagInfo(
-        $tag)
-    {
-        return $this->request("tags/{$tag}/info")
-            ->getResponse(new Response\TagInfoResponse());
     }
 
     /**
