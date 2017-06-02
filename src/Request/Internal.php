@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Request;
 
+use InstagramAPI\Constants;
 use InstagramAPI\Response;
+use InstagramAPI\Signatures;
 use InstagramAPI\Utils;
 
 /**
@@ -762,5 +764,135 @@ class Internal extends RequestCollection
         }
 
         return $configure; // ConfigureResponse
+    }
+
+    /**
+     * Saves active experiments.
+     *
+     * @param Response\SyncResponse $syncResponse
+     *
+     * @throws \InstagramAPI\Exception\SettingsException
+     */
+    protected function _saveExperiments(
+        Response\SyncResponse $syncResponse)
+    {
+        $experiments = [];
+        foreach ($syncResponse->experiments as $experiment) {
+            if (!isset($experiment->name)) {
+                continue;
+            }
+
+            $group = $experiment->name;
+            if (!isset($experiments[$group])) {
+                $experiments[$group] = [];
+            }
+
+            if (!isset($experiment->params)) {
+                continue;
+            }
+
+            foreach ($experiment->params as $param) {
+                if (!isset($param->name)) {
+                    continue;
+                }
+
+                $experiments[$group][$param->name] = $param->value;
+            }
+        }
+
+        // Save the experiments and the last time we refreshed them.
+        $this->ig->experiments = $this->ig->settings->setExperiments($experiments);
+        $this->ig->settings->set('last_experiments', time());
+    }
+
+    /**
+     * Perform an Instagram "feature synchronization" call.
+     *
+     * @param bool $prelogin
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\SyncResponse
+     */
+    public function syncFeatures(
+        $prelogin = false)
+    {
+        if ($prelogin) {
+            return $this->ig->request('qe/sync/')
+                ->setNeedsAuth(false)
+                ->addPost('id', $this->ig->uuid)
+                ->addPost('experiments', Constants::LOGIN_EXPERIMENTS)
+                ->getResponse(new Response\SyncResponse());
+        } else {
+            $result = $this->ig->request('qe/sync/')
+                ->addPost('_uuid', $this->ig->uuid)
+                ->addPost('_uid', $this->ig->account_id)
+                ->addPost('_csrftoken', $this->ig->client->getToken())
+                ->addPost('id', $this->ig->account_id)
+                ->addPost('experiments', Constants::EXPERIMENTS)
+                ->getResponse(new Response\SyncResponse());
+
+            // Save the updated experiments for this user.
+            $this->_saveExperiments($result);
+
+            return $result;
+        }
+    }
+
+    /**
+     * Registers advertising identifier.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response
+     */
+    public function logAttribution()
+    {
+        return $this->ig->request('attribution/log_attribution/')
+            ->setNeedsAuth(false)
+            ->addPost('adid', $this->ig->advertising_id)
+            ->getResponse(new Response());
+    }
+
+    /**
+     * Get megaphone log.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\MegaphoneLogResponse
+     */
+    public function getMegaphoneLog()
+    {
+        return $this->ig->request('megaphone/log/')
+            ->setSignedPost(false)
+            ->addPost('type', 'feed_aysf')
+            ->addPost('action', 'seen')
+            ->addPost('reason', '')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('device_id', $this->ig->device_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('uuid', md5(time()))
+            ->getResponse(new Response\MegaphoneLogResponse());
+    }
+
+    /**
+     * Get Facebook OTA (Over-The-Air) update information.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FacebookOTAResponse
+     */
+    public function getFacebookOTA()
+    {
+        return $this->ig->request('facebook_ota/')
+            ->addParam('fields', Constants::FACEBOOK_OTA_FIELDS)
+            ->addParam('custom_user_id', $this->ig->account_id)
+            ->addParam('signed_body', Signatures::generateSignature('').'.')
+            ->addParam('ig_sig_key_version', Constants::SIG_KEY_VERSION)
+            ->addParam('version_code', Constants::VERSION_CODE)
+            ->addParam('version_name', Constants::IG_VERSION)
+            ->addParam('custom_app_id', Constants::FACEBOOK_ORCA_APPLICATION_ID)
+            ->addParam('custom_device_id', $this->ig->uuid)
+            ->getResponse(new Response\FacebookOTAResponse());
     }
 }

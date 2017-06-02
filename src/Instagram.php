@@ -221,6 +221,83 @@ class Instagram
     }
 
     /**
+     * Controls the SSL verification behavior of the Client.
+     *
+     * @see http://docs.guzzlephp.org/en/latest/request-options.html#verify
+     *
+     * @param bool|string $state TRUE to verify using PHP's default CA bundle,
+     *                           FALSE to disable SSL verification (this is
+     *                           insecure!), String to verify using this path to
+     *                           a custom CA bundle file.
+     */
+    public function setVerifySSL(
+        $state)
+    {
+        $this->client->setVerifySSL($state);
+    }
+
+    /**
+     * Gets the current SSL verification behavior of the Client.
+     *
+     * @return bool|string
+     */
+    public function getVerifySSL()
+    {
+        return $this->client->getVerifySSL();
+    }
+
+    /**
+     * Set the proxy to use for requests.
+     *
+     * @see http://docs.guzzlephp.org/en/latest/request-options.html#proxy
+     *
+     * @param string|array|null $value String or Array specifying a proxy in
+     *                                 Guzzle format, or NULL to disable proxying.
+     */
+    public function setProxy(
+        $value)
+    {
+        $this->client->setProxy($value);
+    }
+
+    /**
+     * Gets the current proxy used for requests.
+     *
+     * @return string|array|null
+     */
+    public function getProxy()
+    {
+        return $this->client->getProxy();
+    }
+
+    /**
+     * Sets the network interface override to use.
+     *
+     * Only works if Guzzle is using the cURL backend. But that's
+     * almost always the case, on most PHP installations.
+     *
+     * @see http://php.net/curl_setopt CURLOPT_INTERFACE
+     *
+     * @var string|null Interface name, IP address or hostname, or NULL to
+     *                  disable override and let Guzzle use any interface.
+     */
+    public function setOutputInterface(
+        $value)
+    {
+        $this->client->setOutputInterface($value);
+    }
+
+    /**
+     * Gets the current network interface override used for requests.
+     *
+     * @return string|null
+     */
+    public function getOutputInterface()
+    {
+        return $this->client->getOutputInterface();
+    }
+
+    /**
      * Set the active account for the class instance.
      *
      * You can call this multiple times to switch between multiple accounts.
@@ -321,98 +398,6 @@ class Instagram
     }
 
     /**
-     * Controls the SSL verification behavior of the Client.
-     *
-     * @see http://docs.guzzlephp.org/en/latest/request-options.html#verify
-     *
-     * @param bool|string $state TRUE to verify using PHP's default CA bundle,
-     *                           FALSE to disable SSL verification (this is
-     *                           insecure!), String to verify using this path to
-     *                           a custom CA bundle file.
-     */
-    public function setVerifySSL(
-        $state)
-    {
-        $this->client->setVerifySSL($state);
-    }
-
-    /**
-     * Gets the current SSL verification behavior of the Client.
-     *
-     * @return bool|string
-     */
-    public function getVerifySSL()
-    {
-        return $this->client->getVerifySSL();
-    }
-
-    /**
-     * Set the proxy to use for requests.
-     *
-     * @see http://docs.guzzlephp.org/en/latest/request-options.html#proxy
-     *
-     * @param string|array|null $value String or Array specifying a proxy in
-     *                                 Guzzle format, or NULL to disable proxying.
-     */
-    public function setProxy(
-        $value)
-    {
-        $this->client->setProxy($value);
-    }
-
-    /**
-     * Gets the current proxy used for requests.
-     *
-     * @return string|array|null
-     */
-    public function getProxy()
-    {
-        return $this->client->getProxy();
-    }
-
-    /**
-     * Sets the network interface override to use.
-     *
-     * Only works if Guzzle is using the cURL backend. But that's
-     * almost always the case, on most PHP installations.
-     *
-     * @see http://php.net/curl_setopt CURLOPT_INTERFACE
-     *
-     * @var string|null Interface name, IP address or hostname, or NULL to
-     *                  disable override and let Guzzle use any interface.
-     */
-    public function setOutputInterface(
-        $value)
-    {
-        $this->client->setOutputInterface($value);
-    }
-
-    /**
-     * Gets the current network interface override used for requests.
-     *
-     * @return string|null
-     */
-    public function getOutputInterface()
-    {
-        return $this->client->getOutputInterface();
-    }
-
-    /**
-     * Registers advertising identifier.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response
-     */
-    public function logAttribution()
-    {
-        return $this->request('attribution/log_attribution/')
-            ->setNeedsAuth(false)
-            ->addPost('adid', $this->advertising_id)
-            ->getResponse(new Response());
-    }
-
-    /**
      * Login to Instagram or automatically resume and refresh previous session.
      *
      * WARNING: You MUST run this function EVERY time your script runs! It handles automatic session
@@ -441,10 +426,10 @@ class Instagram
     {
         // Perform a full relogin if necessary.
         if (!$this->isLoggedIn || $forceLogin) {
-            $this->syncFeatures(true);
+            $this->internal->syncFeatures(true);
 
-            // Call login challenge API so a csrftoken is put in our cookie jar.
-            $this->logAttribution();
+            // Call log attribution API so a csrftoken is put in our cookie jar.
+            $this->internal->logAttribution();
 
             try {
                 $response = $this->request('accounts/login/')
@@ -581,7 +566,7 @@ class Instagram
         // You have been warned.
         if ($justLoggedIn) {
             // Perform the "user has just done a full login" API flow.
-            $this->syncFeatures();
+            $this->internal->syncFeatures();
             $this->people->getAutoCompleteUserList();
             $this->story->getReelsTrayFeed();
             $this->direct->getRecentRecipients();
@@ -592,9 +577,9 @@ class Instagram
             $this->direct->getInbox();
             $this->people->getRecentActivityInbox();
             $this->direct->getVisualInbox();
-            //$this->getMegaphoneLog();
+            //$this->internal->getMegaphoneLog();
             $this->getExplore();
-            //$this->getFacebookOTA();
+            //$this->internal->getFacebookOTA();
         } else {
             // Act like a real logged in app client refreshing its news timeline.
             // This also lets us detect if we're still logged in with a valid session.
@@ -619,7 +604,7 @@ class Instagram
                 //push register
                 $this->direct->getRecentRecipients();
                 //push register
-                $this->getMegaphoneLog();
+                $this->internal->getMegaphoneLog();
                 $this->direct->getInbox();
                 $this->people->getRecentActivityInbox();
                 $this->getExplore();
@@ -629,7 +614,7 @@ class Instagram
             // experiments never get synced and updated. So sync periodically.
             $lastExperimentsTime = $this->settings->get('last_experiments');
             if (is_null($lastExperimentsTime) || (time() - $lastExperimentsTime) > self::EXPERIMENTS_REFRESH) {
-                $this->syncFeatures();
+                $this->internal->syncFeatures();
             }
         }
 
@@ -665,121 +650,6 @@ class Instagram
         $this->client->saveCookieJar();
 
         return $response;
-    }
-
-    /**
-     * Save experiments.
-     *
-     * @param Response\SyncResponse $syncResponse
-     *
-     * @throws \InstagramAPI\Exception\SettingsException
-     */
-    protected function _saveExperiments(
-        Response\SyncResponse $syncResponse)
-    {
-        $experiments = [];
-        foreach ($syncResponse->experiments as $experiment) {
-            if (!isset($experiment->name)) {
-                continue;
-            }
-
-            $group = $experiment->name;
-            if (!isset($experiments[$group])) {
-                $experiments[$group] = [];
-            }
-
-            if (!isset($experiment->params)) {
-                continue;
-            }
-
-            foreach ($experiment->params as $param) {
-                if (!isset($param->name)) {
-                    continue;
-                }
-
-                $experiments[$group][$param->name] = $param->value;
-            }
-        }
-
-        // Save the experiments and the last time we refreshed them.
-        $this->experiments = $this->settings->setExperiments($experiments);
-        $this->settings->set('last_experiments', time());
-    }
-
-    /**
-     * Perform an Instagram "feature synchronization" call.
-     *
-     * @param bool $prelogin
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\SyncResponse
-     */
-    public function syncFeatures(
-        $prelogin = false)
-    {
-        if ($prelogin) {
-            return $this->request('qe/sync/')
-                ->setNeedsAuth(false)
-                ->addPost('id', $this->uuid)
-                ->addPost('experiments', Constants::LOGIN_EXPERIMENTS)
-                ->getResponse(new Response\SyncResponse());
-        } else {
-            $result = $this->request('qe/sync/')
-                ->addPost('_uuid', $this->uuid)
-                ->addPost('_uid', $this->account_id)
-                ->addPost('_csrftoken', $this->client->getToken())
-                ->addPost('id', $this->account_id)
-                ->addPost('experiments', Constants::EXPERIMENTS)
-                ->getResponse(new Response\SyncResponse());
-
-            // Save the updated experiments for this user.
-            $this->_saveExperiments($result);
-
-            return $result;
-        }
-    }
-
-    /**
-     * Get Facebook OTA (Over-The-Air) update information.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FacebookOTAResponse
-     */
-    public function getFacebookOTA()
-    {
-        return $this->request('facebook_ota/')
-            ->addParam('fields', Constants::FACEBOOK_OTA_FIELDS)
-            ->addParam('custom_user_id', $this->account_id)
-            ->addParam('signed_body', Signatures::generateSignature('').'.')
-            ->addParam('ig_sig_key_version', Constants::SIG_KEY_VERSION)
-            ->addParam('version_code', Constants::VERSION_CODE)
-            ->addParam('version_name', Constants::IG_VERSION)
-            ->addParam('custom_app_id', Constants::FACEBOOK_ORCA_APPLICATION_ID)
-            ->addParam('custom_device_id', $this->uuid)
-            ->getResponse(new Response\FacebookOTAResponse());
-    }
-
-    /**
-     * Get megaphone log.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\MegaphoneLogResponse
-     */
-    public function getMegaphoneLog()
-    {
-        return $this->request('megaphone/log/')
-            ->setSignedPost(false)
-            ->addPost('type', 'feed_aysf')
-            ->addPost('action', 'seen')
-            ->addPost('reason', '')
-            ->addPost('_uuid', $this->uuid)
-            ->addPost('device_id', $this->device_id)
-            ->addPost('_csrftoken', $this->client->getToken())
-            ->addPost('uuid', md5(time()))
-            ->getResponse(new Response\MegaphoneLogResponse());
     }
 
     /**
@@ -896,7 +766,7 @@ class Instagram
     }
 
     /**
-     * Checks if param is enabled in given experiment.
+     * Checks if param is enabled in the given experiment.
      *
      * @param string $experiment
      * @param string $param
