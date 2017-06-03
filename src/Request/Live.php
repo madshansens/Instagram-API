@@ -54,7 +54,7 @@ class Live extends RequestCollection
         }
 
         return $this->ig->request('discover/top_live_status/')
-            ->addPost('broadcast_ids', $broadcastIds)
+            ->addPost('broadcast_ids', $broadcastIds) // Must be string[] array.
             ->getResponse(new Response\TopLiveStatusResponse());
     }
 
