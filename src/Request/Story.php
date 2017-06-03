@@ -133,13 +133,13 @@ class Story extends RequestCollection
             $userList = [$userList];
         }
 
-        $userIDs = [];
-        foreach ($userList as $userId) {
-            $userIDs[] = (string) $userId;
+        foreach ($userList as &$value) {
+            $value = (string) $value;
         }
+        unset($value); // Clear reference.
 
         return $this->ig->request('feed/reels_media/')
-            ->addPost('user_ids', $userIDs)
+            ->addPost('user_ids', $userList) // Must be string[] array.
             ->getResponse(new Response\ReelsMediaResponse());
     }
 

@@ -53,6 +53,11 @@ class Live extends RequestCollection
             $broadcastIds = [$broadcastIds];
         }
 
+        foreach ($broadcastIds as &$value) {
+            $value = (string) $value;
+        }
+        unset($value); // Clear reference.
+
         return $this->ig->request('discover/top_live_status/')
             ->addPost('broadcast_ids', $broadcastIds) // Must be string[] array.
             ->getResponse(new Response\TopLiveStatusResponse());
