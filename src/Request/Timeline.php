@@ -257,6 +257,7 @@ class Timeline extends RequestCollection
         $mediaType,
         $onlyMe)
     {
+        $endpoint = $onlyMe ? 'only_me' : 'undo_only_me';
         switch ($mediaType) {
             case 'photo':
                 $mediaCode = 1;
@@ -269,12 +270,6 @@ class Timeline extends RequestCollection
             default:
                 throw new \InvalidArgumentException('You must provide a valid media type.');
                 break;
-        }
-
-        if ($onlyMe) {
-            $endpoint = 'only_me';
-        } else {
-            $endpoint = 'undo_only_me';
         }
 
         return $this->ig->request("media/{$mediaId}/{$endpoint}/?media_type={$mediaCode}")
