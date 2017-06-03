@@ -167,14 +167,14 @@ class People extends RequestCollection
     public function getFriendships(
         $userList)
     {
-        if (!is_array($userList)) {
-            $userList = [$userList];
+        if (is_array($userList)) {
+            $userList = implode(',', $userList);
         }
 
         return $this->ig->request('friendships/show_many/')
             ->setSignedPost(false)
             ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('user_ids', implode(',', $userList))
+            ->addPost('user_ids', $userList)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\FriendshipsShowManyResponse());
     }
