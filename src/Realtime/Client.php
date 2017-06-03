@@ -59,6 +59,9 @@ abstract class Client
     /** @var bool */
     protected $_debug;
 
+    /** @var \JsonMapper */
+    protected $_mapper;
+
     /**
      * Handle client-specific params.
      *
@@ -90,6 +93,10 @@ abstract class Client
         $this->_isConnected = false;
         $this->_debug = $rtc->debug;
         $this->_handleParams($params);
+
+        // Create our JSON object mapper and set global default options.
+        $this->_mapper = new \JsonMapper();
+        $this->_mapper->bStrictNullTypes = false; // Allow NULL values.
     }
 
     /**
@@ -134,13 +141,11 @@ abstract class Client
         $data,
         $reference)
     {
-        $mapper = new \JsonMapper();
-        $mapper->bStrictNullTypes = false;
-        if ($this->_instagram->apiDeveloperDebug) {
-            // API developer debugging? Throws error if class lacks properties.
-            $mapper->bExceptionOnUndefinedProperty = true;
-        }
-        $result = $mapper->map($data, $reference);
+        // Use API developer debugging? Throws if class lacks properties.
+        $this->_mapper->bExceptionOnUndefinedProperty = $this->_instagram->apiDeveloperDebug;
+
+        // Perform mapping of all object properties.
+        $result = $this->_mapper->map($data, $reference);
 
         return $result;
     }
