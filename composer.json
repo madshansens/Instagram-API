@@ -1,7 +1,7 @@
 {
     "name": "mgp25/instagram-api",
-    "description": "Instagram private API PHP",
-    "license": "MIT",
+    "description": "Instagram's private API for PHP",
+    "license": "GPL-3.0",
     "keywords": [
         "Instagram",
         "Private",
@@ -48,6 +48,6 @@
         "clue/http-proxy-react": "^0.1.0"
     },
     "suggest": {
-        "ext-event": "Installing PHP's native Event extension enables faster event handling."
+        "ext-event": "Installing PHP's native Event extension enables faster Realtime class event handling."
     }
 }
