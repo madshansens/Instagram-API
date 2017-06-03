@@ -292,8 +292,8 @@ class Media extends RequestCollection
     /**
      * Delete multiple comments.
      *
-     * @param string $mediaId    The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string $commentIds List of comment IDs to delete.
+     * @param string          $mediaId    The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string|string[] $commentIds The IDs of one or more comments to delete.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -303,22 +303,15 @@ class Media extends RequestCollection
         $mediaId,
         $commentIds)
     {
-        if (!is_array($commentIds)) {
-            $commentIds = [$commentIds];
+        if (is_array($commentIds)) {
+            $commentIds = implode(',', $commentIds);
         }
-
-        $string = [];
-        foreach ($commentIds as $commentId) {
-            $string[] = "$commentId";
-        }
-
-        $comment_ids_to_delete = implode(',', $string);
 
         return $this->ig->request("media/{$mediaId}/comment/bulk_delete/")
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('comment_ids_to_delete', $comment_ids_to_delete)
+            ->addPost('comment_ids_to_delete', $commentIds)
             ->getResponse(new Response\DeleteCommentResponse());
     }
 
