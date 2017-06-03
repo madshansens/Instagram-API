@@ -122,6 +122,17 @@ class Client
     private $_settingsCookieLastSaved;
 
     /**
+     * Our JSON object mapper instance.
+     *
+     * This object must be globally preserved and always re-used, so that its
+     * runtime class analysis cache stays in memory, otherwise it wastes time
+     * analyzing our class source code every time it has to map a class again.
+     *
+     * @var \JsonMapper
+     */
+    private $_mapper;
+
+    /**
      * Constructor.
      *
      * @param \InstagramAPI\Instagram $parent
@@ -158,6 +169,10 @@ class Client
             // We'll instead MANUALLY be throwing on certain other HTTP codes.
             'http_errors'     => false,
         ]);
+
+        // Create our JSON object mapper and set global default options.
+        $this->_mapper = new \JsonMapper();
+        $this->_mapper->bStrictNullTypes = false; // Allow NULL values.
     }
 
     /**
@@ -532,16 +547,12 @@ class Client
             throw new \InstagramAPI\Exception\EmptyResponseException('No response from server. Either a connection or configuration error.');
         }
 
-        // Perform mapping of all response properties.
-        $mapper = new \JsonMapper();
-        $mapper->bStrictNullTypes = false;
-        if ($this->_parent->apiDeveloperDebug) {
-            // API developer debugging? Throws error if class lacks properties.
-            $mapper->bExceptionOnUndefinedProperty = true;
-        }
+        // Use API developer debugging? Throws if class lacks properties.
+        $this->_mapper->bExceptionOnUndefinedProperty = $this->_parent->apiDeveloperDebug;
 
+        // Perform mapping of all response properties.
         /** @var Response|mixed $responseObject */
-        $responseObject = $mapper->map($response, $baseClass);
+        $responseObject = $this->_mapper->map($response, $baseClass);
 
         // Save the raw response object as the "getFullResponse()" value.
         $responseObject->setFullResponse($response);
