@@ -292,6 +292,7 @@ class Timeline extends RequestCollection
      *                               Uses "backups/" path in lib dir if null.
      * @param bool   $printProgress  (optional) Toggles terminal output.
      *
+     * @throws \RuntimeException
      * @throws \InstagramAPI\Exception\InstagramException
      */
     public function backup(
@@ -303,10 +304,13 @@ class Timeline extends RequestCollection
             $baseOutputPath = Constants::SRC_DIR.'/../backups/';
         }
 
-        // Recursively create output folders for the current backup.
+        // Ensure that the whole directory path for the backup exists.
         $backupFolder = $baseOutputPath.$this->ig->username.'/'.date('Y-m-d').'/';
-        if (!is_dir($backupFolder)) {
-            mkdir($backupFolder, 0755, true);
+        if (!Utils::createFolder($backupFolder)) {
+            throw new \RuntimeException(sprintf(
+                'The "%s" backup folder is not writable.',
+                $backupFolder
+            ));
         }
 
         // Download all media to the output folders.
