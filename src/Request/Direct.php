@@ -413,20 +413,20 @@ class Direct extends RequestCollection
     /**
      * Share an existing media item via direct message to a user's inbox.
      *
-     * @param array  $recipients An array with "users" or "thread" keys.
-     *                           To start a new thread, provide "users" as an array
-     *                           of numerical UserPK IDs. To use an existing thread
-     *                           instead, provide "thread" with the thread ID.
-     * @param string $mediaId    The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string $text       Text message.
-     * @param string $mediaType  Either "photo" or "video".
+     * @param array       $recipients An array with "users" or "thread" keys.
+     *                                To start a new thread, provide "users" as an array
+     *                                of numerical UserPK IDs. To use an existing thread
+     *                                instead, provide "thread" with the thread ID.
+     * @param string      $mediaId    The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param null|string $text       Text message, optional.
+     * @param string      $mediaType  Either "photo" or "video".
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\DirectSendItemResponse
      */
-    public function sendMedia(
+    public function sendShare(
         $recipients,
         $mediaId,
         $text = null,
@@ -444,7 +444,7 @@ class Direct extends RequestCollection
     }
 
     /**
-     * Send a photo via direct message to a user's inbox.
+     * Send a photo (upload) via direct message to a user's inbox.
      *
      * @param array  $recipients    An array with "users" or "thread" keys.
      *                              To start a new thread, provide "users" as an array
@@ -471,7 +471,7 @@ class Direct extends RequestCollection
     }
 
     /**
-     * Send a video via direct message to a user's inbox.
+     * Send a video (upload) via direct message to a user's inbox.
      *
      * @param array  $recipients    An array with "users" or "thread" keys.
      *                              To start a new thread, provide "users" as an array
