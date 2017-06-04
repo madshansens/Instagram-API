@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Suggestion extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Suggestion extends AutoPropertyHandler
 {
     public $media_infos;
     public $social_context;

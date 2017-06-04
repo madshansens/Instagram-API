@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class PhoneVerificationSettings extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class PhoneVerificationSettings extends AutoPropertyHandler
 {
     public $resend_sms_delay_sec;
     public $max_sms_count;

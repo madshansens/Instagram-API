@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class DirectThreadLastSeenAt extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class DirectThreadLastSeenAt extends AutoPropertyHandler
 {
     /**
      * @var string

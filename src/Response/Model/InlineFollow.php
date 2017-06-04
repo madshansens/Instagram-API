@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class InlineFollow extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class InlineFollow extends AutoPropertyHandler
 {
     /**
      * @var User

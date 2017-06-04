@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Usertag extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Usertag extends AutoPropertyHandler
 {
     /**
      * @var In[]

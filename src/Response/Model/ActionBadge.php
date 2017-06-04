@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class ActionBadge extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class ActionBadge extends AutoPropertyHandler
 {
     public $action_type;
     public $action_count;

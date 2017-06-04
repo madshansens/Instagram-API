@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Attribution extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Attribution extends AutoPropertyHandler
 {
     public $name;
 }

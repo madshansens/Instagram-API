@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class User extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class User extends AutoPropertyHandler
 {
     public $username;
     public $has_anonymous_profile_picture;

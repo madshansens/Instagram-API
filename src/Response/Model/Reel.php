@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Reel extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Reel extends AutoPropertyHandler
 {
     /**
      * @var string

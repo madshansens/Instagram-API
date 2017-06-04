@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class SuggestedUsers extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class SuggestedUsers extends AutoPropertyHandler
 {
     /**
      * @var string

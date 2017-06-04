@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class DirectSendItemPayload extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class DirectSendItemPayload extends AutoPropertyHandler
 {
     public $client_context;
     public $message;

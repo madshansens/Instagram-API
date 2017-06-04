@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class VideoVersions extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class VideoVersions extends AutoPropertyHandler
 {
     public $url;
     public $type;

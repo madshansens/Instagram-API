@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Channel extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Channel extends AutoPropertyHandler
 {
     /**
      * @var string

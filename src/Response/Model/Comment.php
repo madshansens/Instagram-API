@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Comment extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Comment extends AutoPropertyHandler
 {
     public $status;
     /**

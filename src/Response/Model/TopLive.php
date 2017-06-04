@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class TopLive extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class TopLive extends AutoPropertyHandler
 {
     /**
      * @var BroadcastOwner[]

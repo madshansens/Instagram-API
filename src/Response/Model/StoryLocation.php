@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class StoryLocation extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class StoryLocation extends AutoPropertyHandler
 {
     /**
      * @var float

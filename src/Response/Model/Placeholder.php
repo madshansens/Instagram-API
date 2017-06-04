@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Placeholder extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Placeholder extends AutoPropertyHandler
 {
     public $is_linked;
     public $title;

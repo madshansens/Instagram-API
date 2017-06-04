@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class DirectRankedRecipient extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class DirectRankedRecipient extends AutoPropertyHandler
 {
     /**
      * @var DirectThread

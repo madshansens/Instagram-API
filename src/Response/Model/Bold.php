@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Bold extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Bold extends AutoPropertyHandler
 {
     public $start;
     public $end;

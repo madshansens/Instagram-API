@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Experiment extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Experiment extends AutoPropertyHandler
 {
     /**
      * @var Param[]

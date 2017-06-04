@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Stories extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Stories extends AutoPropertyHandler
 {
     public $is_portrait;
     /**

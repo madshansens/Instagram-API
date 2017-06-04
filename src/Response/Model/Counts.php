@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Counts extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Counts extends AutoPropertyHandler
 {
     public $relationships;
     public $requests;

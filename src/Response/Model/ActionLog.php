@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class ActionLog extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class ActionLog extends AutoPropertyHandler
 {
     /**
      * @var Bold[]

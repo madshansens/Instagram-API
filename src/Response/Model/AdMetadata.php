@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class AdMetadata extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class AdMetadata extends AutoPropertyHandler
 {
     public $value;
     public $type;

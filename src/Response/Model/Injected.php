@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Injected extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Injected extends AutoPropertyHandler
 {
     public $label;
     public $show_icon;

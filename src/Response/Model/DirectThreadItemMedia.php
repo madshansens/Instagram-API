@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class DirectThreadItemMedia extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class DirectThreadItemMedia extends AutoPropertyHandler
 {
     const PHOTO = 1;
     const VIDEO = 2;

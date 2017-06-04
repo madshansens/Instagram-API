@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Tag extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Tag extends AutoPropertyHandler
 {
     public $media_count;
     public $name;

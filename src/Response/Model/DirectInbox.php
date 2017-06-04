@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class DirectInbox extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class DirectInbox extends AutoPropertyHandler
 {
     public $unseen_count;
     public $has_older;

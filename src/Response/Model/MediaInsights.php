@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class MediaInsights extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class MediaInsights extends AutoPropertyHandler
 {
     /**
      * @var string[]

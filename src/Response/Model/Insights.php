@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Insights extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Insights extends AutoPropertyHandler
 {
     public $instagram_insights;
 }

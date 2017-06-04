@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Media extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Media extends AutoPropertyHandler
 {
     public $image;
     /**

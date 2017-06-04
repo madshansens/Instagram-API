@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class FriendshipStatus extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class FriendshipStatus extends AutoPropertyHandler
 {
     public $following;
     public $followed_by;

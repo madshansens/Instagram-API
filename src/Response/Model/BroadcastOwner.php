@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class BroadcastOwner extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class BroadcastOwner extends AutoPropertyHandler
 {
     /**
      * @var string

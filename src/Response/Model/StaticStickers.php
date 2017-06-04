@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class StaticStickers extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class StaticStickers extends AutoPropertyHandler
 {
     public $include_in_recent;
     /**

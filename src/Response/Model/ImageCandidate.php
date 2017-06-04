@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class ImageCandidate extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class ImageCandidate extends AutoPropertyHandler
 {
     public $url;
     public $width;

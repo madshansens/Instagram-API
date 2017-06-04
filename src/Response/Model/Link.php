@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Link extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Link extends AutoPropertyHandler
 {
     public $start;
     public $end;

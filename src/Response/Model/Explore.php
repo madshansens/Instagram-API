@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Explore extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Explore extends AutoPropertyHandler
 {
     public $explanation;
     /**

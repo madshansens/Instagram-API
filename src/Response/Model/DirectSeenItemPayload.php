@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class DirectSeenItemPayload extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class DirectSeenItemPayload extends AutoPropertyHandler
 {
     public $count;
     /** @var string */

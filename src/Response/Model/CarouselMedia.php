@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class CarouselMedia extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class CarouselMedia extends AutoPropertyHandler
 {
     const PHOTO = 1;
     const VIDEO = 2;

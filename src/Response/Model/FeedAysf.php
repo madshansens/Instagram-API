@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class FeedAysf extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class FeedAysf extends AutoPropertyHandler
 {
     public $landing_site_type;
     /**

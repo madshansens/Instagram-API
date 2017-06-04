@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Groups extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Groups extends AutoPropertyHandler
 {
     public $type;
     /**

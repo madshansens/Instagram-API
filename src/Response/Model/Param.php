@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Param extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Param extends AutoPropertyHandler
 {
     public $name;
     public $value;

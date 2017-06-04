@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Gating extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Gating extends AutoPropertyHandler
 {
     public $gating_type;
     public $description;

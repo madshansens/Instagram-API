@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Story extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Story extends AutoPropertyHandler
 {
     /**
      * @var string

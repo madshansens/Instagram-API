@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Item extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Item extends AutoPropertyHandler
 {
     const PHOTO = 1;
     const VIDEO = 2;

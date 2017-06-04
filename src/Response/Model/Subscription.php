@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Subscription extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Subscription extends AutoPropertyHandler
 {
     public $topic;
     public $url;

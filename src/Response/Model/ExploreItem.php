@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class ExploreItem extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class ExploreItem extends AutoPropertyHandler
 {
     /**
      * @var Item

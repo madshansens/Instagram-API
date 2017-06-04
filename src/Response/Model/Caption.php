@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Caption extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Caption extends AutoPropertyHandler
 {
     public $status;
     /**

@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class BroadcastStatusItem extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class BroadcastStatusItem extends AutoPropertyHandler
 {
     public $broadcast_status;
     public $has_reduced_visibility;

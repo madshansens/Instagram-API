@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class TwoFactorInfo extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class TwoFactorInfo extends AutoPropertyHandler
 {
     public $username;
     public $two_factor_identifier;

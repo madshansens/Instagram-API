@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class DirectThreadItem extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class DirectThreadItem extends AutoPropertyHandler
 {
     const PLACEHOLDER = 'placeholder';
     const TEXT = 'text';

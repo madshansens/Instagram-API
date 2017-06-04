@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Stickers extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Stickers extends AutoPropertyHandler
 {
     /**
      * @var string

@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class CommentTranslations extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class CommentTranslations extends AutoPropertyHandler
 {
     /**
      * @var string

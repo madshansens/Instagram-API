@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class AndroidLinks extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class AndroidLinks extends AutoPropertyHandler
 {
     public $linkType;
     public $webUri;

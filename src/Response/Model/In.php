@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class In extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class In extends AutoPropertyHandler
 {
     /*
      * @var Position

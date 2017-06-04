@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class LocationItem extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class LocationItem extends AutoPropertyHandler
 {
     public $media_bundles;
     public $subtitle;

@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Args extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Args extends AutoPropertyHandler
 {
     /**
      * @var Media[]

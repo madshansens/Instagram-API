@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class PushSettings extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class PushSettings extends AutoPropertyHandler
 {
     public $name;
     public $eligible;

@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Users extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Users extends AutoPropertyHandler
 {
     public $position;
     /**

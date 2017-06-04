@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class _Message extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class _Message extends AutoPropertyHandler
 {
     public $key;
     public $time;

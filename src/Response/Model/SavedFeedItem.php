@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class SavedFeedItem extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class SavedFeedItem extends AutoPropertyHandler
 {
     /**
      * @var Item

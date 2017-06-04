@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Location extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Location extends AutoPropertyHandler
 {
     public $name;
     /**

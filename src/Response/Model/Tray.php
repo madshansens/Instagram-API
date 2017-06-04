@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Response\Model;
 
-class Tray extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Tray extends AutoPropertyHandler
 {
     /**
      * @var string
