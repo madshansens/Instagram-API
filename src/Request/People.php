@@ -91,6 +91,7 @@ class People extends RequestCollection
     {
         return $this->ig->request('news/inbox/')
             ->addParam('activity_module', 'all')
+            ->addParam('show_su', 'true')
             ->getResponse(new Response\ActivityNewsResponse());
     }
 
