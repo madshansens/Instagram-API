@@ -2,30 +2,48 @@
 
 namespace InstagramAPI;
 
-class Response extends AutoPropertyHandler
+/**
+ * Standard implementation traits for ResponseInterface.
+ *
+ * Remember that all response-classes must "extend AutoPropertyHandler",
+ * "implements ResponseInterface", and "use ResponseTrait", otherwise they
+ * won't work properly.
+ */
+trait ResponseTrait
 {
-    const STATUS_OK = 'ok';
-    const STATUS_FAIL = 'fail';
-
+    /** @var string */
     public $status;
+    /** @var string */
     public $message;
+    /** @var mixed */
     public $fullResponse;
 
-    public function __construct()
-    {
-    }
-
+    /**
+     * Sets the status.
+     *
+     * @param string|null $status
+     */
     public function setStatus(
         $status)
     {
         $this->status = $status;
     }
 
+    /**
+     * Gets the status.
+     *
+     * @return string|null
+     */
     public function getStatus()
     {
         return $this->status;
     }
 
+    /**
+     * Sets the message.
+     *
+     * @param string|null $message
+     */
     public function setMessage(
         $message)
     {
@@ -71,19 +89,34 @@ class Response extends AutoPropertyHandler
         }
     }
 
+    /**
+     * Sets the full response.
+     *
+     * @param mixed $response
+     */
     public function setFullResponse(
         $response)
     {
         $this->fullResponse = $response;
     }
 
+    /**
+     * Gets the full response.
+     *
+     * @return mixed
+     */
     public function getFullResponse()
     {
         return $this->fullResponse;
     }
 
+    /**
+     * Checks if the response was successful.
+     *
+     * @return bool
+     */
     public function isOk()
     {
-        return $this->getStatus() == self::STATUS_OK;
+        return $this->getStatus() == 'ok'; // Can be: 'ok', 'fail'
     }
 }
