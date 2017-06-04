@@ -401,7 +401,9 @@ The `$items` property will contain an array of Suggestion model objects. And `sr
 
 namespace InstagramAPI\Response\Model;
 
-class Suggestion extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+
+class Suggestion extends AutoPropertyHandler
 {
     public $media_infos;
     public $social_context;
@@ -436,8 +438,14 @@ Lastly, our `src/Response/AwesomeResponse.php` should look as follows:
 
 namespace InstagramAPI\Response;
 
-class AwesomeResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class AwesomeResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     /**
      * @var Model\Suggestion[]
      */
@@ -452,7 +460,7 @@ $a = $i->getAwesome();
 var_dump($a); // this will print the response object
 ```
 
-And finally, how do you access the object's data? Via the magical `AutoPropertyHandler` which you inherited from thanks to always extending from the `\InstagramAPI\Response` object. It automatically creates getters and setters for all properties.
+And finally, how do you access the object's data? Via the magical `AutoPropertyHandler` which you inherited. It automatically creates getters and setters for all properties.
 
 ```php
 $items = $a->getItems();
