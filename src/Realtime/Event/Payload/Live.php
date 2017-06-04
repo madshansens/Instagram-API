@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Realtime\Event\Payload;
 
-class Live extends \InstagramAPI\AutoPropertyHandler
+use InstagramAPI\AutoPropertyHandler;
+
+class Live extends AutoPropertyHandler
 {
     /** @var \InstagramAPI\Response\Model\User */
     public $user;

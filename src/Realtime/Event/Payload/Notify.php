@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Realtime\Event\Payload;
 
-class Notify extends \InstagramAPI\AutoPropertyHandler
+use InstagramAPI\AutoPropertyHandler;
+
+class Notify extends AutoPropertyHandler
 {
     /** @var string */
     public $user_id;

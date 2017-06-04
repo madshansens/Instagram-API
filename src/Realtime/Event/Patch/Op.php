@@ -2,6 +2,7 @@
 
 namespace InstagramAPI\Realtime\Event\Patch;
 
+use InstagramAPI\AutoPropertyHandler;
 use InstagramAPI\Client as HttpClient;
 use InstagramAPI\Realtime;
 use InstagramAPI\Realtime\Action\Payload as ActionPayload;
@@ -12,7 +13,7 @@ use InstagramAPI\Response\Model\DirectThread;
 use InstagramAPI\Response\Model\DirectThreadItem;
 use InstagramAPI\Response\Model\DirectThreadLastSeenAt;
 
-class Op extends \InstagramAPI\AutoPropertyHandler
+class Op extends AutoPropertyHandler
 {
     const ADD = 'add';
     const REMOVE = 'remove';

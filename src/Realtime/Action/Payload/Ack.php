@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Realtime\Action\Payload;
 
-class Ack extends \InstagramAPI\AutoPropertyHandler
+use InstagramAPI\AutoPropertyHandler;
+
+class Ack extends AutoPropertyHandler
 {
     public $activity_status;
     public $client_context;

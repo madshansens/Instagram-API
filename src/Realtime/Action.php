@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Realtime;
 
-abstract class Action extends \InstagramAPI\AutoPropertyHandler
+use InstagramAPI\AutoPropertyHandler;
+
+abstract class Action extends AutoPropertyHandler
 {
     const ACK = 'item_ack';
     const UNSEEN_COUNT = 'inbox_unseen_count';

@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Realtime\Event\Payload;
 
-class StoryAction extends \InstagramAPI\AutoPropertyHandler
+use InstagramAPI\AutoPropertyHandler;
+
+class StoryAction extends AutoPropertyHandler
 {
     const DELIVERED = 'raven_delivered';
     const SENT = 'raven_sent';

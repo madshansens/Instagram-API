@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Realtime\Event\Payload;
 
-class Screenshot extends \InstagramAPI\AutoPropertyHandler
+use InstagramAPI\AutoPropertyHandler;
+
+class Screenshot extends AutoPropertyHandler
 {
     /** @var \InstagramAPI\Response\Model\User */
     public $action_user_dict;

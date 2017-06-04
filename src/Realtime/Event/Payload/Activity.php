@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Realtime\Event\Payload;
 
-class Activity extends \InstagramAPI\AutoPropertyHandler
+use InstagramAPI\AutoPropertyHandler;
+
+class Activity extends AutoPropertyHandler
 {
     public $timestamp;
     /** @var string */

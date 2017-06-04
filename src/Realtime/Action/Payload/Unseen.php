@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Realtime\Action\Payload;
 
-class Unseen extends \InstagramAPI\AutoPropertyHandler
+use InstagramAPI\AutoPropertyHandler;
+
+class Unseen extends AutoPropertyHandler
 {
     public $timestamp;
     public $count;

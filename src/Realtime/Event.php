@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Realtime;
 
-abstract class Event extends \InstagramAPI\AutoPropertyHandler
+use InstagramAPI\AutoPropertyHandler;
+
+abstract class Event extends AutoPropertyHandler
 {
     const SUBSCRIBED = 'subscribed';
     const UNSUBSCRIBED = 'unsubscribed';
