@@ -70,7 +70,7 @@ class Account extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function setNameAndPhone(
         $name = '',
@@ -82,7 +82,7 @@ class Account extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('first_name', $name)
             ->addPost('phone_number', $phone)
-            ->getResponse(new \InstagramAPI\Response());
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**

@@ -88,7 +88,7 @@ class Direct extends RequestCollection
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function approvePendingThreads(
         array $threads)
@@ -120,7 +120,7 @@ class Direct extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('_uuid', $this->ig->uuid)
             ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**
@@ -131,7 +131,7 @@ class Direct extends RequestCollection
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function declinePendingThreads(
         array $threads)
@@ -163,7 +163,7 @@ class Direct extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('_uuid', $this->ig->uuid)
             ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**
@@ -171,7 +171,7 @@ class Direct extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function declineAllPendingThreads()
     {
@@ -179,7 +179,7 @@ class Direct extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('_uuid', $this->ig->uuid)
             ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**
@@ -274,7 +274,7 @@ class Direct extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function muteThread(
         $threadId)
@@ -283,7 +283,7 @@ class Direct extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('_uuid', $this->ig->uuid)
             ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**
@@ -293,7 +293,7 @@ class Direct extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function unmuteThread(
         $threadId)
@@ -302,7 +302,7 @@ class Direct extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('_uuid', $this->ig->uuid)
             ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**
@@ -347,7 +347,7 @@ class Direct extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function leaveThread(
         $threadId)
@@ -356,7 +356,7 @@ class Direct extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('_uuid', $this->ig->uuid)
             ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**
@@ -366,7 +366,7 @@ class Direct extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function hideThread(
         $threadId)
@@ -380,7 +380,7 @@ class Direct extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('_uuid', $this->ig->uuid)
             ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**
@@ -670,7 +670,7 @@ class Direct extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function deleteItem(
         $threadId,
@@ -680,7 +680,7 @@ class Direct extends RequestCollection
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**

@@ -92,7 +92,7 @@ class Media extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function like(
         $mediaId)
@@ -102,7 +102,7 @@ class Media extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('media_id', $mediaId)
-            ->getResponse(new \InstagramAPI\Response());
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**
@@ -112,7 +112,7 @@ class Media extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function unlike(
         $mediaId)
@@ -122,7 +122,7 @@ class Media extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('media_id', $mediaId)
-            ->getResponse(new \InstagramAPI\Response());
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**
@@ -191,7 +191,7 @@ class Media extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function enableComments(
         $mediaId)
@@ -200,7 +200,7 @@ class Media extends RequestCollection
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**
@@ -210,7 +210,7 @@ class Media extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function disableComments(
         $mediaId)
@@ -219,7 +219,7 @@ class Media extends RequestCollection
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->setSignedPost(false)
-            ->getResponse(new \InstagramAPI\Response());
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**

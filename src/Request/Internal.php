@@ -844,14 +844,14 @@ class Internal extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function logAttribution()
     {
         return $this->ig->request('attribution/log_attribution/')
             ->setNeedsAuth(false)
             ->addPost('adid', $this->ig->advertising_id)
-            ->getResponse(new Response());
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**
