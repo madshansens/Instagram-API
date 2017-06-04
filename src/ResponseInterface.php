@@ -27,6 +27,13 @@ interface ResponseInterface
     public function getStatus();
 
     /**
+     * Checks if a status value exists.
+     *
+     * @return bool
+     */
+    public function isStatus();
+
+    /**
      * Sets the message.
      *
      * @param string|null $message
@@ -44,6 +51,13 @@ interface ResponseInterface
     public function getMessage();
 
     /**
+     * Checks if a message value exists.
+     *
+     * @return bool
+     */
+    public function isMessage();
+
+    /**
      * Sets the full response.
      *
      * @param mixed $response
@@ -57,6 +71,13 @@ interface ResponseInterface
      * @return mixed
      */
     public function getFullResponse();
+
+    /**
+     * Checks if a FullResponse value exists.
+     *
+     * @return bool
+     */
+    public function isFullResponse();
 
     /**
      * Checks if the response was successful.

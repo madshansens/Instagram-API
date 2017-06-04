@@ -40,6 +40,16 @@ trait ResponseTrait
     }
 
     /**
+     * Checks if a status value exists.
+     *
+     * @return bool
+     */
+    public function isStatus()
+    {
+        return $this->status !== null;
+    }
+
+    /**
      * Sets the message.
      *
      * @param string|null $message
@@ -90,6 +100,16 @@ trait ResponseTrait
     }
 
     /**
+     * Checks if a message value exists.
+     *
+     * @return bool
+     */
+    public function isMessage()
+    {
+        return $this->message !== null;
+    }
+
+    /**
      * Sets the full response.
      *
      * @param mixed $response
@@ -111,12 +131,22 @@ trait ResponseTrait
     }
 
     /**
+     * Checks if a full response value exists.
+     *
+     * @return bool
+     */
+    public function isFullResponse()
+    {
+        return $this->fullResponse !== null;
+    }
+
+    /**
      * Checks if the response was successful.
      *
      * @return bool
      */
     public function isOk()
     {
-        return $this->getStatus() == 'ok'; // Can be: 'ok', 'fail'
+        return $this->getStatus() === 'ok'; // Can be: 'ok', 'fail'
     }
 }
