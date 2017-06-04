@@ -2,7 +2,13 @@
 
 namespace InstagramAPI\Response;
 
-class ChallengeResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class ChallengeResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $status;
 }

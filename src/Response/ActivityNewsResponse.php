@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class ActivityNewsResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class ActivityNewsResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     /**
      * @var Model\Story[]
      */

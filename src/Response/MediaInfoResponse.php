@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class MediaInfoResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class MediaInfoResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $auto_load_more_enabled;
     public $status;
     public $num_results;

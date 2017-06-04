@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class SavedFeedResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class SavedFeedResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     /**
      * @var Model\SavedFeedItem[]
      */

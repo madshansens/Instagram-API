@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class DirectRankedRecipientsResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class DirectRankedRecipientsResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $expires;
     /**
      * @var Model\DirectRankedRecipient[]

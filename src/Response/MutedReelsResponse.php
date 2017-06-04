@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class MutedReelsResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class MutedReelsResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     /**
      * @var Model\User[]
      */

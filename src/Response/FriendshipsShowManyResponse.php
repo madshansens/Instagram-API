@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class FriendshipsShowManyResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class FriendshipsShowManyResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     /**
      * @var Model\FriendshipStatus[]
      */

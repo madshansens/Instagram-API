@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class AccountCreateResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class AccountCreateResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $account_created;
     /**
      * @var Model\User

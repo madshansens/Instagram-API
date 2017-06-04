@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class FollowerAndFollowingResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class FollowerAndFollowingResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     /**
      * @var Model\User[]
      */

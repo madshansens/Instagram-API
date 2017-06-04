@@ -2,6 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-class UnlinkAddressBookResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class UnlinkAddressBookResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
 }

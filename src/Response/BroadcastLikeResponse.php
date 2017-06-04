@@ -2,7 +2,13 @@
 
 namespace InstagramAPI\Response;
 
-class BroadcastLikeResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class BroadcastLikeResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $likes;
 }

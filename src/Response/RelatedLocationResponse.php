@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class RelatedLocationResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class RelatedLocationResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     /**
      * @var Model\Location[]
      */

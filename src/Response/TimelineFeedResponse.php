@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class TimelineFeedResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class TimelineFeedResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $num_results;
     public $is_direct_v2_enabled;
     public $auto_load_more_enabled;

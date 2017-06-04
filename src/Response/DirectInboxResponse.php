@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class DirectInboxResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class DirectInboxResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $pending_requests_total;
     /**
      * @var string

@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class UploadJobVideoResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class UploadJobVideoResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     /**
      * @var string
      */

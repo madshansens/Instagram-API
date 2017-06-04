@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class DiscoverPeopleResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class DiscoverPeopleResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     /**
      * @var Model\Groups[]
      */

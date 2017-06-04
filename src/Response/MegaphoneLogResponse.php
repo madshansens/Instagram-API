@@ -2,7 +2,13 @@
 
 namespace InstagramAPI\Response;
 
-class MegaphoneLogResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class MegaphoneLogResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $success;
 }

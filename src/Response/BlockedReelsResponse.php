@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class BlockedReelsResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class BlockedReelsResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     /**
      * @var Model\User[]
      */

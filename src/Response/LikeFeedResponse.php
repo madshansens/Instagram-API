@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class LikeFeedResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class LikeFeedResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $auto_load_more_enabled;
     /**
      * @var Model\Item[]

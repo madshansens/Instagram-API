@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class TagFeedResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class TagFeedResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $num_results;
     /**
      * @var Model\Item[]

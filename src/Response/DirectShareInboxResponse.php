@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class DirectShareInboxResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class DirectShareInboxResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $shares;
     /**
      * @var string

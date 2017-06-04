@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class StickerAssetsResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class StickerAssetsResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $version;
     /**
      * @var Model\StaticStickers[]

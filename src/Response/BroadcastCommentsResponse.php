@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class BroadcastCommentsResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class BroadcastCommentsResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     /**
      * @var Model\Comment[]
      */

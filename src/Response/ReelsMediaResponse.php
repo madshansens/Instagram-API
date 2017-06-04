@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class ReelsMediaResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class ReelsMediaResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     /**
      * @var Model\Reel[]
      */

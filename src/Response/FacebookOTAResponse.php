@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class FacebookOTAResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class FacebookOTAResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $bundles;
     /**
      * @var string

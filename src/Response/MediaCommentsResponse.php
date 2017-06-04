@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class MediaCommentsResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class MediaCommentsResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     /**
      * @var Model\Comment[]
      */

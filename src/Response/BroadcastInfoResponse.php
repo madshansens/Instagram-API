@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class BroadcastInfoResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class BroadcastInfoResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     /**
      * @var string
      */

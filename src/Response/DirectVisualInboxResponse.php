@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class DirectVisualInboxResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class DirectVisualInboxResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $unseen_count;
     public $has_more_unread;
     public $read_cursor;

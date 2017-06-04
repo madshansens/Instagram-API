@@ -2,7 +2,13 @@
 
 namespace InstagramAPI\Response;
 
-class CommentFilterKeywordsResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class CommentFilterKeywordsResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $keywords;
 }

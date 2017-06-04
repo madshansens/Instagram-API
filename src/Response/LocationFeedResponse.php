@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class LocationFeedResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class LocationFeedResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $media_count;
     public $num_results;
     public $auto_load_more_enabled;

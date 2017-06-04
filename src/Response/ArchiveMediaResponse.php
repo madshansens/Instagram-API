@@ -2,6 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-class ArchiveMediaResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class ArchiveMediaResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
 }

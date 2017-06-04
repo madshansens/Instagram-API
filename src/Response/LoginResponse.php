@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class LoginResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class LoginResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $username;
     public $has_anonymous_profile_picture;
     public $profile_pic_url;

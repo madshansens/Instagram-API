@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class LinkAddressBookResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class LinkAddressBookResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     /**
      * @var Model\Suggestion[]
      */

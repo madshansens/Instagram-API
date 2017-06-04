@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class RequestTwoFactorResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class RequestTwoFactorResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     /**
      * @var Model\PhoneVerificationSettings
      */

@@ -2,8 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-class DiscoverChannelsResponse extends \InstagramAPI\Response
+use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\ResponseInterface;
+use InstagramAPI\ResponseTrait;
+
+class DiscoverChannelsResponse extends AutoPropertyHandler implements ResponseInterface
 {
+    use ResponseTrait;
+
     public $auto_load_more_enabled;
     /**
      * @var Model\Item[]
