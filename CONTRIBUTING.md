@@ -467,4 +467,6 @@ $items = $a->getItems();
 $user = $items[0]->getUser();
 ```
 
+Lastly, you may sometimes be implementing an endpoint which uses a nearly empty response with just the standard "status" and/or "message" fields, and no other fields. In that case, there's already a pre-made response which you should use: "GenericResponse". Search the source code for that word and you'll find many endpoints where we use that basic response. Use it to easily add new endpoint implementations whenever there's no extra data to extract!
+
 Hope you find this useful. :smile:

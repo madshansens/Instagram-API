@@ -9,5 +9,4 @@ use InstagramAPI\ResponseTrait;
 class ArchiveMediaResponse extends AutoPropertyHandler implements ResponseInterface
 {
     use ResponseTrait;
-
 }
