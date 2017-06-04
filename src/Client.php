@@ -530,17 +530,18 @@ class Client
     /**
      * Converts a server response to a specific kind of result object.
      *
-     * @param mixed $baseClass An instance of a class object whose properties
-     *                         you want to fill from the $response.
-     * @param mixed $response  A decoded JSON response from Instagram's server.
+     * @param ResponseInterface $baseClass An instance of a class object whose
+     *                                     properties to fill with the response.
+     * @param mixed             $response  A decoded JSON response from
+     *                                     Instagram's server.
      *
      * @throws \InstagramAPI\Exception\InstagramException In case of invalid or
      *                                                    failed API response.
      *
-     * @return mixed
+     * @return ResponseInterface
      */
     public function getMappedResponseObject(
-        $baseClass,
+        ResponseInterface $baseClass,
         $response)
     {
         if (is_null($response)) {
@@ -551,7 +552,7 @@ class Client
         $this->_mapper->bExceptionOnUndefinedProperty = $this->_parent->apiDeveloperDebug;
 
         // Perform mapping of all response properties.
-        /** @var Response|mixed $responseObject */
+        /** @var ResponseInterface $responseObject */
         $responseObject = $this->_mapper->map($response, $baseClass);
 
         // Save the raw response object as the "getFullResponse()" value.

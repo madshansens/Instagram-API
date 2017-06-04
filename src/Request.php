@@ -3,7 +3,7 @@
 namespace InstagramAPI;
 
 /**
- * Bridge between Instagram Client calls, the object mapper & Response objects.
+ * Bridge between Instagram Client calls, the object mapper & response objects.
  */
 class Request
 {
@@ -256,8 +256,20 @@ class Request
         return $result;
     }
 
+    /**
+     * Perform the request and get its response object.
+     *
+     * @param ResponseInterface|null $baseClass An instance of a class object whose
+     *                                          properties to fill with the response,
+     *                                          or NULL to get a standard object.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return ResponseInterface|object An instance of baseClass if provided,
+     *                                  otherwise a standard PHP object.
+     */
     public function getResponse(
-        $baseClass = null)
+        ResponseInterface $baseClass = null)
     {
         // Generate the final endpoint URL, by adding any custom query params.
         if (count($this->_params)) {

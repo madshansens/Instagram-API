@@ -3,6 +3,7 @@
 namespace InstagramAPI\Exception;
 
 use InstagramAPI\Response;
+use InstagramAPI\ResponseInterface;
 
 /**
  * Parses Instagram's API error messages and throws an appropriate exception.
@@ -57,20 +58,20 @@ class ServerMessageThrower
      *
      * Uses the generic EndpointException if no other exceptions match.
      *
-     * @param string|null   $prefixString   What prefix to use for the message in
-     *                                      the final exception. Should be something
-     *                                      helpful such as the name of the class or
-     *                                      function which threw. Can be NULL.
-     * @param string        $serverMessage  The failure string from Instagram's API.
-     * @param Response|null $serverResponse The complete server response object,
-     *                                      if one is available (optional).
+     * @param string|null       $prefixString   What prefix to use for the message in
+     *                                          the final exception. Should be something
+     *                                          helpful such as the name of the class or
+     *                                          function which threw. Can be NULL.
+     * @param string            $serverMessage  The failure string from Instagram's API.
+     * @param ResponseInterface $serverResponse The complete server response object,
+     *                                          if one is available (optional).
      *
      * @throws InstagramException The appropriate exception.
      */
     public static function autoThrow(
         $prefixString,
         $serverMessage,
-        Response $serverResponse = null)
+        ResponseInterface $serverResponse = null)
     {
         // Fix the generic "Sorry, there was a problem..." message used by some
         // errors, by replacing it with their error_type value, if available.
@@ -78,7 +79,7 @@ class ServerMessageThrower
         // Example server JSON: '{"message": "Sorry, there was a problem with
         // your request.", "status": "fail", "error_type": "sentry_block"}'.
         if ($serverMessage == 'Sorry, there was a problem with your request.'
-            && $serverResponse instanceof Response) {
+            && $serverResponse instanceof ResponseInterface) {
             $fullResponse = $serverResponse->getFullResponse();
             if (isset($fullResponse->error_type)
                 && is_string($fullResponse->error_type)) {
@@ -123,7 +124,7 @@ class ServerMessageThrower
 
         // Attach the server response to the exception, IF a response exists.
         // NOTE: Only possible on exceptions derived from InstagramException.
-        if ($serverResponse instanceof Response
+        if ($serverResponse instanceof ResponseInterface
             && $e instanceof \InstagramAPI\Exception\InstagramException) {
             $e->setResponse($serverResponse);
         }

@@ -2,6 +2,8 @@
 
 namespace InstagramAPI\Exception;
 
+use InstagramAPI\ResponseInterface;
+
 /**
  * The core exception that ALL other library exceptions derive from.
  *
@@ -12,7 +14,7 @@ class InstagramException extends \RuntimeException
     /**
      * The full response that triggered the exception, if available.
      *
-     * @var \InstagramAPI\Response|null
+     * @var ResponseInterface|null
      */
     private $_response = null;
 
@@ -29,8 +31,8 @@ class InstagramException extends \RuntimeException
     /**
      * Get the full server response.
      *
-     * @return \InstagramAPI\Response|null The full response if one exists,
-     *                                     otherwise NULL.
+     * @return ResponseInterface|null The full response if one exists,
+     *                                otherwise NULL.
      *
      * @see InstagramException::hasResponse()
      */
@@ -42,10 +44,10 @@ class InstagramException extends \RuntimeException
     /**
      * Internal. Sets the value of the full server response.
      *
-     * @param \InstagramAPI\Response|null $response The response value.
+     * @param ResponseInterface|null $response The response value.
      */
     public function setResponse(
-        \InstagramAPI\Response $response = null)
+        ResponseInterface $response = null)
     {
         $this->_response = $response;
     }
