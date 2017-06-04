@@ -84,7 +84,7 @@ class Story extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\Model\Reel
+     * @return \InstagramAPI\Response\UserReelMediaFeedResponse
      *
      * @see Story::getUserStoryFeed()
      */
@@ -92,7 +92,7 @@ class Story extends RequestCollection
         $userId)
     {
         return $this->ig->request("feed/user/{$userId}/reel_media/")
-            ->getResponse(new Response\Model\Reel());
+            ->getResponse(new Response\UserReelMediaFeedResponse());
     }
 
     /**

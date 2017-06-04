@@ -2,22 +2,18 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
 use InstagramAPI\ResponseInterface;
 use InstagramAPI\ResponseTrait;
 
-class BlockedReelsResponse extends AutoPropertyHandler implements ResponseInterface
+class BlockedReelsResponse extends Model\BlockedReels implements ResponseInterface
 {
     use ResponseTrait;
 
-    /**
-     * @var Model\User[]
-     */
-    public $users;
+    // NOTE: This is a special response object which extends
+    // Model\BlockedReels to inherit all of its properties!
+
     /**
      * @var string
      */
     public $next_max_id;
-    public $page_size;
-    public $big_list;
 }

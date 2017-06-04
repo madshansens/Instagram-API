@@ -12,7 +12,7 @@ class ReelSettingsResponse extends AutoPropertyHandler implements ResponseInterf
 
     public $message_prefs;
     /**
-     * @var BlockedReelsResponse
+     * @var Model\BlockedReels
      */
     public $blocked_reels;
 }

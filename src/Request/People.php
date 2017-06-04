@@ -150,12 +150,12 @@ class People extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\Model\FriendshipStatus
+     * @return \InstagramAPI\Response\FriendshipsShowResponse
      */
     public function getFriendship(
         $userId)
     {
-        return $this->ig->request("friendships/show/{$userId}/")->getResponse(new Response\Model\FriendshipStatus());
+        return $this->ig->request("friendships/show/{$userId}/")->getResponse(new Response\FriendshipsShowResponse());
     }
 
     /**
