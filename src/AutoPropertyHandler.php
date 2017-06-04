@@ -129,13 +129,18 @@ class AutoPropertyHandler
             $chunk = lcfirst($chunk); // Only first letter may be uppercase.
         }
 
-        // If there are 2+ chunks and the first (the function type) ends with a
-        // trailing underscore, it means that they wanted to access a property
-        // beginning with an underscore, so move it to the start of the 2nd
+        // If there are 2+ chunks and the first (the function type) ends with
+        // trailing underscores, it means that they wanted to access a property
+        // beginning with underscores, so move those to the start of the 2nd
         // ("property name") chunk instead.
-        if (count($chunks) >= 2 && substr($chunks[0], -1) == '_') {
-            $chunks[0] = substr($chunks[0], 0, -1); // "get_" => "get".
-            $chunks[1] = '_'.$chunks[1]; // "messages" => "_messages".
+        if (count($chunks) >= 2) {
+            $oldLen = strlen($chunks[0]);
+            $chunks[0] = rtrim($chunks[0], '_'); // "get_" => "get".
+            $lenDiff = $oldLen - strlen($chunks[0]);
+            if ($lenDiff > 0) {
+                // Move all underscores to prop: "messages" => "_messages":
+                $chunks[1] = str_repeat('_', $lenDiff).$chunks[1];
+            }
         }
 
         return $chunks;
