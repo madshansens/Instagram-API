@@ -37,7 +37,9 @@ class People extends RequestCollection
     public function getInfoById(
         $userId)
     {
-        return $this->ig->request("users/{$userId}/info/")->getResponse(new Response\UserInfoResponse());
+        return $this->ig->request("users/{$userId}/info/")
+            ->addParam('device_id', $this->ig->device_id)
+            ->getResponse(new Response\UserInfoResponse());
     }
 
     /**
