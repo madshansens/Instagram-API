@@ -19,7 +19,7 @@ namespace InstagramAPI;
  *
  * Examples (rare properties with a leading underscore):
  * public $_messages; = get_Messages(); is_Messages(); set_Messages();
- * public $_the_url; = get_TheUrl(); is_TheUrl(); setTheUrl();
+ * public $_the_url; = get_TheUrl(); is_TheUrl(); set_TheUrl();
  *
  * Examples (rare camelcase properties):
  * public $iTunesItem; = getITunesItem(); isITunesItem(); setITunesItem();
