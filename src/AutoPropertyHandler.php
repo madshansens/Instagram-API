@@ -33,7 +33,7 @@ class AutoPropertyHandler
      * __CALL is invoked when attempting to access missing functions.
      *
      * This handler auto-maps setters and getters for object properties.
-     * 
+     *
      * NOTE: Don't worry about performance. This whole function takes about
      * 0.025 MILLIseconds per property, which actually compares very favorably
      * to native accessor functions (which take about 0.002 MILLIseconds per
@@ -69,7 +69,7 @@ class AutoPropertyHandler
             // Make word 2 and higher start with uppercase ("i,Tunes,Item").
             // NOTE: Instagram's rule so far is that the first word is always
             // lowercase when they use camelcase.
-            for ($i = 1, $len = count($chunks); $i < $len; ++$i) {
+            for ($i = 1; $i < $len; ++$i) {
                 $chunks[$i] = ucfirst($chunks[$i]);
             }
             $camelPropertyName = implode('', $chunks); // "iTunesItem"
@@ -92,7 +92,7 @@ class AutoPropertyHandler
             $this->{$propertyName} = $arguments[0];
             break;
         case 'is':
-            return $this->{$propertyName} ? true : false;
+            return (bool) $this->{$propertyName};
             break;
         default:
             // Unknown function type prefix...
