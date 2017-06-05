@@ -5,6 +5,16 @@ date_default_timezone_set('UTC');
 
 require __DIR__.'/../vendor/autoload.php';
 
+/*
+ * This tool must be executed periodically. Run it every time a response or
+ * model changes or is added.
+ *
+ * It automatically builds up-to-date class documentation for all classes that
+ * derive from AutoPropertyHandler, and documents their getters, setters and
+ * is-ers via adding "@method" declarations to the PHPdoc. That documentation is
+ * necessary for things like code analysis tools and IDE autocomplete!
+ */
+
 $autodoc = new autodoc(__DIR__.'/../src/');
 $autodoc->run();
 
@@ -20,7 +30,8 @@ class autodoc
      *
      * @param string $dir
      */
-    public function __construct($dir)
+    public function __construct(
+        $dir)
     {
         $this->_dir = realpath($dir);
         if ($this->_dir === false) {
@@ -35,7 +46,8 @@ class autodoc
      *
      * @return string
      */
-    private function _extractClassName($filePath)
+    private function _extractClassName(
+        $filePath)
     {
         return '\InstagramAPI'.str_replace('/', '\\', substr($filePath, strlen($this->_dir), -4));
     }
@@ -47,7 +59,8 @@ class autodoc
      *
      * @return string
      */
-    private function _getType(ReflectionProperty $property)
+    private function _getType(
+        ReflectionProperty $property)
     {
         $phpDoc = $property->getDocComment();
         if ($phpDoc === false || !preg_match('#@var\s+([^\s]+)#i', $phpDoc, $matches)) {
@@ -66,7 +79,8 @@ class autodoc
      *
      * @return string
      */
-    private function _camelCase($property)
+    private function _camelCase(
+        $property)
     {
         // Trim any leading underscores and save their count, because it's a special case.
         $result = ltrim($property, '_');
@@ -94,7 +108,8 @@ class autodoc
      *
      * @return string
      */
-    private function _documentMagicMethods(ReflectionClass $reflection)
+    private function _documentMagicMethods(
+        ReflectionClass $reflection)
     {
         $result = [];
         $properties = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
@@ -137,7 +152,8 @@ class autodoc
      *
      * @return string
      */
-    private function _cleanClassDoc($doc)
+    private function _cleanClassDoc(
+        $doc)
     {
         // Strip leading /** and trailing */ from PHPDoc.
         $doc = trim(substr($doc, 3, -2));
@@ -170,7 +186,9 @@ class autodoc
      * @param string          $filePath
      * @param ReflectionClass $reflection
      */
-    private function _processFile($filePath, ReflectionClass $reflection)
+    private function _processFile(
+        $filePath,
+        ReflectionClass $reflection)
     {
         $classDoc = $reflection->getDocComment();
         $methods = $this->_documentMagicMethods($reflection);
