@@ -5,10 +5,11 @@ namespace InstagramAPI\Realtime\Event\Patch;
 use InstagramAPI\AutoPropertyHandler;
 use InstagramAPI\Client as HttpClient;
 use InstagramAPI\Realtime;
-use InstagramAPI\Realtime\Action\Payload as ActionPayload;
 use InstagramAPI\Realtime\Client;
 use InstagramAPI\Realtime\Event\Payload as EventPayload;
+use InstagramAPI\Response\Model\ActionBadge;
 use InstagramAPI\Response\Model\DirectInbox;
+use InstagramAPI\Response\Model\DirectSeenItemPayload;
 use InstagramAPI\Response\Model\DirectThread;
 use InstagramAPI\Response\Model\DirectThreadItem;
 use InstagramAPI\Response\Model\DirectThreadLastSeenAt;
@@ -235,7 +236,7 @@ class Op extends AutoPropertyHandler
      */
     protected function _updateUnseenCount()
     {
-        $payload = new ActionPayload\Unseen();
+        $payload = new DirectSeenItemPayload();
         $payload->count = (int) $this->value;
         $payload->timestamp = $this->ts;
         $this->_rtc->emit('unseen-count-update', [$payload]);
@@ -328,8 +329,8 @@ class Op extends AutoPropertyHandler
 
             return;
         }
-        /** @var EventPayload\StoryAction $storyAction */
-        $storyAction = $this->_client->mapToJson($json, new EventPayload\StoryAction());
+        /** @var ActionBadge $storyAction */
+        $storyAction = $this->_client->mapToJson($json, new ActionBadge());
         $this->_rtc->emit('direct-story-action', [$threadId, $storyAction]);
     }
 

@@ -30,37 +30,37 @@ $rtc->init()->then(function (\InstagramAPI\Realtime $rtc) use ($loop) {
     $rtc->on('live-stopped', function (\InstagramAPI\Realtime\Event\Payload\Live $live) {
         printf('[RTC] Live broadcast %s has been stopped%s', $live->broadcast_id, PHP_EOL);
     });
-    $rtc->on('direct-story-created', function (\InstagramAPI\Response\Model\Thread $thread) {
+    $rtc->on('direct-story-created', function (\InstagramAPI\Response\Model\DirectThread $thread) {
         printf('[RTC] Story %s has been created%s', $thread->thread_id, PHP_EOL);
     });
-    $rtc->on('direct-story-updated', function ($threadId, $threadItemId, \InstagramAPI\Response\Model\ThreadItem $threadItem) {
+    $rtc->on('direct-story-updated', function ($threadId, $threadItemId, \InstagramAPI\Response\Model\DirectThreadItem $threadItem) {
         printf('[RTC] Item %s has been created in story %s%s', $threadItemId, $threadId, PHP_EOL);
     });
     $rtc->on('direct-story-screenshot', function ($threadId, \InstagramAPI\Realtime\Event\Payload\Screenshot $screenshot) {
         printf('[RTC] %s has taken screenshot of story %s%s', $screenshot->action_user_dict->username, $threadId, PHP_EOL);
     });
-    $rtc->on('direct-story-action', function ($threadId, \InstagramAPI\Realtime\Event\Payload\StoryAction $storyAction) {
+    $rtc->on('direct-story-action', function ($threadId, \InstagramAPI\Response\Model\ActionBadge $storyAction) {
         printf('[RTC] Story has badge %s%s', $threadId, $storyAction->action_type, PHP_EOL);
     });
-    $rtc->on('thread-created', function ($threadId, \InstagramAPI\Response\Model\Thread $thread) {
+    $rtc->on('thread-created', function ($threadId, \InstagramAPI\Response\Model\DirectThread $thread) {
         printf('[RTC] Thread %s has been created%s', $threadId, PHP_EOL);
     });
-    $rtc->on('thread-updated', function ($threadId, \InstagramAPI\Response\Model\Thread $thread) {
+    $rtc->on('thread-updated', function ($threadId, \InstagramAPI\Response\Model\DirectThread $thread) {
         printf('[RTC] Thread %s has been updated%s', $threadId, PHP_EOL);
     });
     $rtc->on('thread-notify', function ($threadId, $threadItemId, \InstagramAPI\Realtime\Event\Payload\Notify $notify) {
         printf('[RTC] Thread %s has notification from %s%s', $threadId, $notify->user_id, PHP_EOL);
     });
-    $rtc->on('thread-seen', function ($threadId, $userId, \InstagramAPI\Response\Model\ThreadLastSeenAt $seenAt) {
+    $rtc->on('thread-seen', function ($threadId, $userId, \InstagramAPI\Response\Model\DirectThreadLastSeenAt $seenAt) {
         printf('[RTC] Thread %s has been checked by %s%s', $threadId, $userId, PHP_EOL);
     });
     $rtc->on('thread-activity', function ($threadId, \InstagramAPI\Realtime\Event\Payload\Activity $activity) {
         printf('[RTC] Thread %s has some activity made by %s%s', $threadId, $activity->sender_id, PHP_EOL);
     });
-    $rtc->on('thread-item-created', function ($threadId, $threadItemId, \InstagramAPI\Response\Model\ThreadItem $threadItem) {
+    $rtc->on('thread-item-created', function ($threadId, $threadItemId, \InstagramAPI\Response\Model\DirectThreadItem $threadItem) {
         printf('[RTC] Item %s has been created in thread %s%s', $threadItemId, $threadId, PHP_EOL);
     });
-    $rtc->on('thread-item-updated', function ($threadId, $threadItemId, \InstagramAPI\Response\Model\ThreadItem $threadItem) {
+    $rtc->on('thread-item-updated', function ($threadId, $threadItemId, \InstagramAPI\Response\Model\DirectThreadItem $threadItem) {
         printf('[RTC] Item %s has been updated in thread %s%s', $threadItemId, $threadId, PHP_EOL);
     });
     $rtc->on('thread-item-removed', function ($threadId, $threadItemId) {
@@ -69,7 +69,7 @@ $rtc->init()->then(function (\InstagramAPI\Realtime $rtc) use ($loop) {
     $rtc->on('client-context-ack', function (\InstagramAPI\Realtime\Action\Ack $ack) {
         printf('[RTC] Received ACK for %s with status %s%s', $ack->payload->client_context, $ack->status, PHP_EOL);
     });
-    $rtc->on('unseen-count-update', function (\InstagramAPI\Realtime\Action\Payload\Unseen $payload) {
+    $rtc->on('unseen-count-update', function (\InstagramAPI\Response\Model\DirectSeenItemPayload $payload) {
         printf('[RTC] Updating unseen count to %d%s', $payload->count, PHP_EOL);
     });
     $rtc->on('error', function (\Exception $e) use ($rtc, $loop) {

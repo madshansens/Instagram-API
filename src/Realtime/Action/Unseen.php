@@ -5,14 +5,14 @@ namespace InstagramAPI\Realtime\Action;
 use InstagramAPI\Realtime\Client;
 
 /**
- * @method \InstagramAPI\Realtime\Action\Payload\Unseen getPayload()
+ * @method \InstagramAPI\Response\Model\DirectSeenItemPayload getPayload()
  * @method bool isPayload()
- * @method setPayload(\InstagramAPI\Realtime\Action\Payload\Unseen $value)
+ * @method setPayload(\InstagramAPI\Response\Model\DirectSeenItemPayload $value)
  */
 class Unseen extends \InstagramAPI\Realtime\Action
 {
     /**
-     * @var \InstagramAPI\Realtime\Action\Payload\Unseen
+     * @var \InstagramAPI\Response\Model\DirectSeenItemPayload
      */
     public $payload;
 

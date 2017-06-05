@@ -13,6 +13,12 @@
  * $ curl -i 'http://127.0.0.1:1307/activity?threadId=123&flag=1'
  * # send some message to thread 123
  * $ curl -i 'http://127.0.0.1:1307/message?threadId=123&text=Hi!'
+ * # like item 456 from thread 123
+ * $ curl -i 'http://127.0.0.1:1307/likeItem?threadId=123&threadItemId=456'
+ * # unlike item 456 from thread 123
+ * $ curl -i 'http://127.0.0.1:1307/unlikeItem?threadId=123&threadItemId=456'
+ * # send like to thread 123
+ * $ curl -i 'http://127.0.0.1:1307/like?threadId=123'
  * # remove typing notification from thread 123
  * $ curl -i 'http://127.0.0.1:1307/activity?threadId=123&flag=0'
  * # ping realtime http server
@@ -213,6 +219,8 @@ class RealtimeHttpServer
         \React\Http\Request $request,
         \React\Http\Response $response)
     {
+        // Params validation is up to you.
+        $params = $request->getQueryParams();
         // Treat request path as command.
         switch ($request->getPath()) {
             case '/ping':
@@ -223,9 +231,7 @@ class RealtimeHttpServer
                 $this->_stop();
                 break;
             case '/seen':
-                // Params validation is up to you.
-                $params = $request->getQueryParams();
-                $context = $this->_rtc->markDirectThreadItemSeen($params['threadId'], $params['threadItemId']);
+                $context = $this->_rtc->markDirectItemSeen($params['threadId'], $params['threadItemId']);
                 if ($context) {
                     $this->_handleSuccess($response);
                 } else {
@@ -233,9 +239,7 @@ class RealtimeHttpServer
                 }
                 break;
             case '/activity':
-                // Params validation is up to you (again).
-                $params = $request->getQueryParams();
-                $context = $this->_rtc->indicateDirectThreadActivity($params['threadId'], (bool) $params['flag']);
+                $context = $this->_rtc->indicateActivityInDirectThread($params['threadId'], (bool) $params['flag']);
                 if ($context !== false) {
                     $this->_handleClientContext($context, $response);
                 } else {
@@ -243,9 +247,31 @@ class RealtimeHttpServer
                 }
                 break;
             case '/message':
-                // Params validation is up to you (and again).
-                $params = $request->getQueryParams();
-                $context = $this->_rtc->sendDirectText($params['threadId'], $params['text']);
+                $context = $this->_rtc->sendTextToDirect($params['threadId'], $params['text']);
+                if ($context !== false) {
+                    $this->_handleClientContext($context, $response);
+                } else {
+                    $this->_handleSendingFail($response);
+                }
+                break;
+            case '/like':
+                $context = $this->_rtc->sendLikeToDirect($params['threadId']);
+                if ($context !== false) {
+                    $this->_handleClientContext($context, $response);
+                } else {
+                    $this->_handleSendingFail($response);
+                }
+                break;
+            case '/likeItem':
+                $context = $this->_rtc->sendReactionToDirect($params['threadId'], $params['threadItemId'], 'like');
+                if ($context !== false) {
+                    $this->_handleClientContext($context, $response);
+                } else {
+                    $this->_handleSendingFail($response);
+                }
+                break;
+            case '/unlikeItem':
+                $context = $this->_rtc->deleteReactionFromDirect($params['threadId'], $params['threadItemId'], 'like');
                 if ($context !== false) {
                     $this->_handleClientContext($context, $response);
                 } else {

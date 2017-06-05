@@ -17,10 +17,11 @@ class Internal extends RequestCollection
     /**
      * UPLOADS A *SINGLE* PHOTO.
      *
-     * @param string $targetFeed       Target feed for this media ("timeline", "story",
+     * @param string $targetFeed       Target feed for this media ("timeline", "story", "direct_story"
      *                                 but NOT "album", they are handled elsewhere).
      * @param string $photoFilename    The photo filename.
      * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
+     * @param array  $internalMetadata (optional) Internal metadata key-value pairs.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -32,10 +33,11 @@ class Internal extends RequestCollection
     public function uploadSinglePhoto(
         $targetFeed,
         $photoFilename,
-        array $externalMetadata = [])
+        array $externalMetadata = [],
+        array $internalMetadata = [])
     {
         // Make sure we only allow these particular feeds for this function.
-        if ($targetFeed != 'timeline' && $targetFeed != 'story') {
+        if ($targetFeed != 'timeline' && $targetFeed != 'story' && $targetFeed != 'direct_story') {
             throw new \InvalidArgumentException(sprintf('Bad target feed "%s".', $targetFeed));
         }
 
@@ -58,11 +60,11 @@ class Internal extends RequestCollection
         $upload = $this->uploadPhotoData($targetFeed, $photoFilename);
 
         // Configure the uploaded image and attach it to our timeline/story.
-        $internalMetadata = [
+        $internalMetadata = array_merge($internalMetadata, [
             'uploadId'      => $upload->getUploadId(),
             'photoWidth'    => $photoWidth,
             'photoHeight'   => $photoHeight,
-        ];
+        ]);
         $configure = $this->configureSinglePhoto($targetFeed, $internalMetadata, $externalMetadata);
 
         return $configure;
@@ -71,7 +73,7 @@ class Internal extends RequestCollection
     /**
      * Upload the data for a photo to Instagram.
      *
-     * @param string $targetFeed    Target feed for this media ("timeline", "story" or "album").
+     * @param string $targetFeed    Target feed for this media ("timeline", "story", "direct_story" or "album").
      * @param string $photoFilename The photo filename.
      * @param string $fileType      Whether the file is a "photofile" or "videofile".
      *                              In case of videofile we'll generate a thumbnail from it.
@@ -134,7 +136,7 @@ class Internal extends RequestCollection
      * GIVE THEM THEIR OWN FUNCTION LIKE WE DID WITH "configureTimelineAlbum()",
      * TO AVOID ADDING BUGGY AND UNMAINTAINABLE SPIDERWEB CODE!
      *
-     * @param string $targetFeed       Target feed for this media ("timeline", "story",
+     * @param string $targetFeed       Target feed for this media ("timeline", "story", "direct_story"
      *                                 but NOT "album", they are handled elsewhere).
      * @param array  $internalMetadata Internal library-generated metadata key-value pairs.
      * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
@@ -154,6 +156,7 @@ class Internal extends RequestCollection
         case 'timeline':
             $endpoint = 'media/configure/';
             break;
+        case 'direct_story':
         case 'story':
             $endpoint = 'media/configure_to_story/';
             break;
@@ -212,16 +215,26 @@ class Internal extends RequestCollection
             case 'timeline':
                 $request
                     ->addPost('caption', $captionText)
-                    ->addPost('source_type', 4)
+                    ->addPost('source_type', '4')
                     ->addPost('media_folder', 'Camera')
                     ->addPost('upload_id', $uploadId);
                 break;
             case 'story':
                 $request
-                    ->addPost('client_shared_at', time())
-                    ->addPost('source_type', 3)
-                    ->addPost('configure_mode', 1)
-                    ->addPost('client_timestamp', time())
+                    ->addPost('client_shared_at', (string) time())
+                    ->addPost('source_type', '3')
+                    ->addPost('configure_mode', '1')
+                    ->addPost('client_timestamp', (string) (time() - mt_rand(3, 10)))
+                    ->addPost('upload_id', $uploadId);
+                break;
+            case 'direct_story':
+                $request
+                    ->addPost('recipient_users', $internalMetadata['recipient_users'])
+                    ->addPost('thread_ids', $internalMetadata['thread_ids'])
+                    ->addPost('client_shared_at', (string) time())
+                    ->addPost('source_type', '3')
+                    ->addPost('configure_mode', '2')
+                    ->addPost('client_timestamp', (string) (time() - mt_rand(3, 10)))
                     ->addPost('upload_id', $uploadId);
                 break;
         }
@@ -255,10 +268,11 @@ class Internal extends RequestCollection
     /**
      * UPLOADS A *SINGLE* VIDEO.
      *
-     * @param string $targetFeed       Target feed for this media ("timeline", "story",
+     * @param string $targetFeed       Target feed for this media ("timeline", "story", "direct_story",
      *                                 but NOT "album", they are handled elsewhere).
      * @param string $videoFilename    The video filename.
      * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
+     * @param array  $internalMetadata (optional) Internal metadata key-value pairs.
      * @param int    $maxAttempts      (optional) Total attempts to upload all chunks before throwing.
      *
      * @throws \InvalidArgumentException
@@ -273,10 +287,11 @@ class Internal extends RequestCollection
         $targetFeed,
         $videoFilename,
         array $externalMetadata = [],
+        array $internalMetadata = [],
         $maxAttempts = 10)
     {
         // Make sure we only allow these particular feeds for this function.
-        if ($targetFeed != 'timeline' && $targetFeed != 'story') {
+        if ($targetFeed != 'timeline' && $targetFeed != 'story' && $targetFeed != 'direct_story') {
             throw new \InvalidArgumentException(sprintf('Bad target feed "%s".', $targetFeed));
         }
 
@@ -289,8 +304,6 @@ class Internal extends RequestCollection
         if (!is_file($videoFilename)) {
             throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
         }
-
-        $internalMetadata = [];
 
         // Figure out the video file details.
         // NOTE: We do this first, since it validates whether the video file is
@@ -392,7 +405,7 @@ class Internal extends RequestCollection
      * GIVE THEM THEIR OWN FUNCTION LIKE WE DID WITH "configureTimelineAlbum()",
      * TO AVOID ADDING BUGGY AND UNMAINTAINABLE SPIDERWEB CODE!
      *
-     * @param string $targetFeed       Target feed for this media ("timeline", "story",
+     * @param string $targetFeed       Target feed for this media ("timeline", "story", "direct_story"
      *                                 but NOT "album", they are handled elsewhere).
      * @param array  $internalMetadata Internal library-generated metadata key-value pairs.
      * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
@@ -412,6 +425,7 @@ class Internal extends RequestCollection
         case 'timeline':
             $endpoint = 'media/configure/';
             break;
+        case 'direct_story':
         case 'story':
             $endpoint = 'media/configure_to_story/';
             break;
@@ -468,12 +482,23 @@ class Internal extends RequestCollection
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id);
 
-        if ($targetFeed == 'story') {
-            $request
-                ->addPost('configure_mode', 1) // 1 - REEL_SHARE, 2 - DIRECT_STORY_SHARE
-                ->addPost('story_media_creation_date', time() - mt_rand(10, 20))
-                ->addPost('client_shared_at', time() - mt_rand(3, 10))
-                ->addPost('client_timestamp', time());
+        switch ($targetFeed) {
+            case 'story':
+                $request
+                    ->addPost('configure_mode', 1) // 1 - REEL_SHARE
+                    ->addPost('story_media_creation_date', time() - mt_rand(10, 20))
+                    ->addPost('client_shared_at', time() - mt_rand(3, 10))
+                    ->addPost('client_timestamp', time());
+                break;
+            case 'direct_story':
+                $request
+                    ->addPost('configure_mode', 2) // 2 - DIRECT_STORY_SHARE
+                    ->addPost('recipient_users', $internalMetadata['recipient_users'])
+                    ->addPost('thread_ids', $internalMetadata['thread_ids'])
+                    ->addPost('story_media_creation_date', time() - mt_rand(10, 20))
+                    ->addPost('client_shared_at', time() - mt_rand(3, 10))
+                    ->addPost('client_timestamp', time());
+                break;
         }
 
         $request->addPost('caption', $captionText);
@@ -524,7 +549,7 @@ class Internal extends RequestCollection
      * useful since Instagram sometimes can't configure a newly uploaded video
      * file until a few seconds have passed.
      *
-     * @param string $targetFeed       Target feed for this media ("timeline", "story",
+     * @param string $targetFeed       Target feed for this media ("timeline", "story", "direct_story"
      *                                 but NOT "album", they are handled elsewhere).
      * @param array  $internalMetadata Internal library-generated metadata key-value pairs.
      * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.

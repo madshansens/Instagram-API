@@ -5,17 +5,17 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyHandler;
 
 /**
- * @method ActionBadge getActionBadge()
+ * @method \InstagramAPI\Response\Model\ActionBadge getActionBadge()
  * @method mixed getCanonical()
  * @method mixed getHasNewer()
  * @method mixed getHasOlder()
- * @method User getInviter()
+ * @method \InstagramAPI\Response\Model\User getInviter()
  * @method mixed getIsSpam()
- * @method DirectThreadItem[] getItems()
+ * @method \InstagramAPI\Response\Model\DirectThreadItem[] getItems()
  * @method mixed getLastActivityAt()
  * @method mixed getLastActivityAtSecs()
- * @method DirectThreadLastSeenAt[] getLastSeenAt()
- * @method User[] getLeftUsers()
+ * @method \InstagramAPI\Response\Model\DirectThreadLastSeenAt[] getLastSeenAt()
+ * @method \InstagramAPI\Response\Model\User[] getLeftUsers()
  * @method mixed getMuted()
  * @method mixed getNamed()
  * @method mixed getNewestCursor()
@@ -25,7 +25,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getThreadTitle()
  * @method mixed getThreadType()
  * @method mixed getUnseenCount()
- * @method User[] getUsers()
+ * @method \InstagramAPI\Response\Model\User[] getUsers()
  * @method string getViewerId()
  * @method bool isActionBadge()
  * @method bool isCanonical()
@@ -49,17 +49,17 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isUnseenCount()
  * @method bool isUsers()
  * @method bool isViewerId()
- * @method setActionBadge(ActionBadge $value)
+ * @method setActionBadge(\InstagramAPI\Response\Model\ActionBadge $value)
  * @method setCanonical(mixed $value)
  * @method setHasNewer(mixed $value)
  * @method setHasOlder(mixed $value)
- * @method setInviter(User $value)
+ * @method setInviter(\InstagramAPI\Response\Model\User $value)
  * @method setIsSpam(mixed $value)
- * @method setItems(DirectThreadItem[] $value)
+ * @method setItems(\InstagramAPI\Response\Model\DirectThreadItem[] $value)
  * @method setLastActivityAt(mixed $value)
  * @method setLastActivityAtSecs(mixed $value)
- * @method setLastSeenAt(DirectThreadLastSeenAt[] $value)
- * @method setLeftUsers(User[] $value)
+ * @method setLastSeenAt(\InstagramAPI\Response\Model\DirectThreadLastSeenAt[] $value)
+ * @method setLeftUsers(\InstagramAPI\Response\Model\User[] $value)
  * @method setMuted(mixed $value)
  * @method setNamed(mixed $value)
  * @method setNewestCursor(mixed $value)
@@ -69,14 +69,18 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setThreadTitle(mixed $value)
  * @method setThreadType(mixed $value)
  * @method setUnseenCount(mixed $value)
- * @method setUsers(User[] $value)
+ * @method setUsers(\InstagramAPI\Response\Model\User[] $value)
  * @method setViewerId(string $value)
  */
 class DirectThread extends AutoPropertyHandler
 {
+    // NOTE: We must use full paths to all model objects in THIS class, because
+    // "DirectVisualThreadResponse" re-uses this object and JSONMapper won't be
+    // able to find these sub-objects if the paths aren't absolute!
+
     public $named;
     /**
-     * @var User[]
+     * @var \InstagramAPI\Response\Model\User[]
      */
     public $users;
     public $has_newer;
@@ -94,29 +98,29 @@ class DirectThread extends AutoPropertyHandler
     public $has_older;
     public $oldest_cursor;
     /**
-     * @var User[]
+     * @var \InstagramAPI\Response\Model\User[]
      */
     public $left_users;
     public $muted;
     /**
-     * @var DirectThreadItem[]
+     * @var \InstagramAPI\Response\Model\DirectThreadItem[]
      */
     public $items;
     public $thread_type;
     public $thread_title;
     public $canonical;
     /**
-     * @var User
+     * @var \InstagramAPI\Response\Model\User
      */
     public $inviter;
     public $pending;
     /**
-     * @var DirectThreadLastSeenAt[]
+     * @var \InstagramAPI\Response\Model\DirectThreadLastSeenAt[]
      */
     public $last_seen_at;
     public $unseen_count;
     /**
-     * @var ActionBadge
+     * @var \InstagramAPI\Response\Model\ActionBadge
      */
     public $action_badge;
     public $last_activity_at_secs;

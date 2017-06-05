@@ -72,6 +72,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getPhotoOfYou()
  * @method string getPk()
  * @method Placeholder getPlaceholder()
+ * @method mixed getPlaybackDurationSecs()
  * @method mixed getPreview()
  * @method Comment[] getPreviewComments()
  * @method mixed getReelMentions()
@@ -84,6 +85,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getTakenAt()
  * @method mixed getThumbnailUrls()
  * @method mixed getTopLikers()
+ * @method mixed getUrlExpireAtSecs()
  * @method User getUser()
  * @method Usertag getUsertags()
  * @method mixed getValue()
@@ -159,6 +161,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isPhotoOfYou()
  * @method bool isPk()
  * @method bool isPlaceholder()
+ * @method bool isPlaybackDurationSecs()
  * @method bool isPreview()
  * @method bool isPreviewComments()
  * @method bool isReelMentions()
@@ -171,6 +174,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isTakenAt()
  * @method bool isThumbnailUrls()
  * @method bool isTopLikers()
+ * @method bool isUrlExpireAtSecs()
  * @method bool isUser()
  * @method bool isUsertags()
  * @method bool isValue()
@@ -245,6 +249,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setPhotoOfYou(mixed $value)
  * @method setPk(string $value)
  * @method setPlaceholder(Placeholder $value)
+ * @method setPlaybackDurationSecs(mixed $value)
  * @method setPreview(mixed $value)
  * @method setPreviewComments(Comment[] $value)
  * @method setReelMentions(mixed $value)
@@ -257,6 +262,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setTakenAt(mixed $value)
  * @method setThumbnailUrls(mixed $value)
  * @method setTopLikers(mixed $value)
+ * @method setUrlExpireAtSecs(mixed $value)
  * @method setUser(User $value)
  * @method setUsertags(Usertag $value)
  * @method setValue(mixed $value)
@@ -454,6 +460,8 @@ class Item extends AutoPropertyHandler
     public $overlay_text;
     public $overlay_title;
     public $overlay_subtitle;
+    public $playback_duration_secs;
+    public $url_expire_at_secs;
 
     public function setMediaOrAd(
         $params)

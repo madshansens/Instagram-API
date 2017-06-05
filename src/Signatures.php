@@ -64,6 +64,22 @@ class Signatures
         return 'android-'.substr($megaRandomHash, 16);
     }
 
+    /**
+     * Checks whether supplied UUID is valid or not.
+     *
+     * @param string $uuid UUID to check.
+     *
+     * @return bool
+     */
+    public static function isValidUUID($uuid)
+    {
+        if (!is_string($uuid)) {
+            return false;
+        }
+
+        return (bool) preg_match('#^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$#D', $uuid);
+    }
+
     public static function generateUUID(
         $keepDashes = true)
     {

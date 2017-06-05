@@ -255,7 +255,7 @@ class Realtime implements EventEmitterInterface
      *
      * @return bool
      */
-    public function markDirectThreadItemSeen(
+    public function markDirectItemSeen(
         $threadId,
         $threadItemId)
     {
@@ -274,7 +274,7 @@ class Realtime implements EventEmitterInterface
      *
      * @return bool|string Client context or false if sending is unavailable.
      */
-    public function indicateDirectThreadActivity(
+    public function indicateActivityInDirectThread(
         $threadId,
         $activityFlag)
     {
@@ -292,39 +292,175 @@ class Realtime implements EventEmitterInterface
     /**
      * Common method for all direct messages.
      *
-     * @param array $params
+     * @param array $options
      *
      * @return bool|string Client context or false if sending is unavailable.
      */
-    protected function _sendDirectMessage(
-        array $params)
+    protected function _sendItemToDirect(
+        array $options)
     {
-        $context = Signatures::generateUUID(true);
-        $result = $this->_sendCommand($params + [
-            'client_context'  => $context,
-            'action'          => 'send_item',
-        ]);
+        // Init command.
+        $command = [
+            'action' => 'send_item',
+        ];
+        // Handle client_context.
+        if (!isset($options['client_context'])) {
+            $command['client_context'] = Signatures::generateUUID(true);
+        } elseif (!Signatures::isValidUUID($options['client_context'])) {
+            return false;
+        } else {
+            $command['client_context'] = $options['client_context'];
+        }
+        // Handle thread_id.
+        if (!isset($options['thread_id'])) {
+            return false;
+        } elseif (!ctype_digit($options['thread_id']) && (!is_int($options['thread_id']) || $options['thread_id'] < 0)) {
+            return false;
+        } else {
+            $command['thread_id'] = $options['thread_id'];
+        }
+        // Handle item_type specifics.
+        if (!isset($options['item_type'])) {
+            return false;
+        }
+        switch ($options['item_type']) {
+            case 'text':
+                if (!isset($options['text'])) {
+                    return false;
+                }
+                $command['text'] = $options['text'];
+                break;
+            case 'like':
+                // Nothing here.
+                break;
+            case 'reaction':
+                // Handle item_id.
+                if (!isset($options['item_id'])) {
+                    return false;
+                } elseif (!ctype_digit($options['item_id']) && (!is_int($options['item_id']) || $options['item_id'] < 0)) {
+                    return false;
+                } else {
+                    $command['item_id'] = $options['item_id'];
+                    $command['node_type'] = 'item';
+                }
+                // Handle reaction_type.
+                if (!isset($options['reaction_type'])) {
+                    return false;
+                } elseif (!in_array($options['reaction_type'], ['like'], true)) {
+                    return false;
+                } else {
+                    $command['reaction_type'] = $options['reaction_type'];
+                }
+                // Handle reaction_status.
+                if (!isset($options['reaction_status'])) {
+                    return false;
+                } elseif (!in_array($options['reaction_status'], ['created', 'deleted'], true)) {
+                    return false;
+                } else {
+                    $command['reaction_status'] = $options['reaction_status'];
+                }
+                break;
+            default:
+                return false;
+        }
+        $command['item_type'] = $options['item_type'];
+        // Reorder command to simplify comparing against commands created by an application.
+        $command = $this->reorderFieldsByWeight($command, $this->getSendItemWeights());
 
-        return $result ? $context : false;
+        return $this->_sendCommand($command) ? $command['client_context'] : false;
     }
 
     /**
      * Sends text message to a given direct thread.
      *
-     * @param string $threadId
-     * @param string $message
+     * @param string $threadId Thread ID.
+     * @param string $message  Text message.
+     * @param array  $options  An associative array of optional parameters, including:
+     *                         "client_context" - predefined UUID used to prevent double-posting;
      *
      * @return bool|string Client context or false if sending is unavailable.
      */
-    public function sendDirectText(
+    public function sendTextToDirect(
         $threadId,
-        $message)
+        $message,
+        array $options = [])
     {
-        return $this->_sendDirectMessage([
+        return $this->_sendItemToDirect(array_merge($options, [
             'thread_id' => $threadId,
             'item_type' => 'text',
             'text'      => $message,
-        ]);
+        ]));
+    }
+
+    /**
+     * Sends like to a given direct thread.
+     *
+     * @param string $threadId Thread ID.
+     * @param array  $options  An associative array of optional parameters, including:
+     *                         "client_context" - predefined UUID used to prevent double-posting;
+     *
+     * @return bool|string Client context or false if sending is unavailable.
+     */
+    public function sendLikeToDirect(
+        $threadId,
+        array $options = [])
+    {
+        return $this->_sendItemToDirect(array_merge($options, [
+            'thread_id' => $threadId,
+            'item_type' => 'like',
+        ]));
+    }
+
+    /**
+     * Sends reaction to a given direct thread item.
+     *
+     * @param string $threadId     Thread ID.
+     * @param string $threadItemId Thread ID.
+     * @param string $reactionType One of: "like".
+     * @param array  $options      An associative array of optional parameters, including:
+     *                             "client_context" - predefined UUID used to prevent double-posting;
+     *
+     * @return bool|string Client context or false if sending is unavailable.
+     */
+    public function sendReactionToDirect(
+        $threadId,
+        $threadItemId,
+        $reactionType,
+        array $options = [])
+    {
+        return $this->_sendItemToDirect(array_merge($options, [
+            'thread_id'       => $threadId,
+            'item_type'       => 'reaction',
+            'reaction_status' => 'created',
+            'reaction_type'   => $reactionType,
+            'item_id'         => $threadItemId,
+        ]));
+    }
+
+    /**
+     * Removes reaction to a given direct thread item.
+     *
+     * @param string $threadId     Thread ID.
+     * @param string $threadItemId Thread ID.
+     * @param string $reactionType One of: "like".
+     * @param array  $options      An associative array of optional parameters, including:
+     *                             "client_context" - predefined UUID used to prevent double-posting;
+     *
+     * @return bool|string Client context or false if sending is unavailable.
+     */
+    public function deleteReactionFromDirect(
+        $threadId,
+        $threadItemId,
+        $reactionType,
+        array $options = [])
+    {
+        return $this->_sendItemToDirect(array_merge($options, [
+            'thread_id'       => $threadId,
+            'item_type'       => 'reaction',
+            'reaction_status' => 'deleted',
+            'reaction_type'   => $reactionType,
+            'item_id'         => $threadItemId,
+        ]));
     }
 
     /**
@@ -338,5 +474,57 @@ class Realtime implements EventEmitterInterface
         $data)
     {
         return json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Reorders an array of fields by weights to simplify debugging.
+     *
+     * @param array $fields
+     * @param array $weights
+     *
+     * @return array
+     */
+    public function reorderFieldsByWeight(
+        array $fields,
+        array $weights)
+    {
+        uksort($fields, function ($a, $b) use ($weights) {
+            $a = isset($weights[$a]) ? $weights[$a] : PHP_INT_MAX;
+            $b = isset($weights[$b]) ? $weights[$b] : PHP_INT_MAX;
+            if ($a < $b) {
+                return -1;
+            } elseif ($a > $b) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+
+        return $fields;
+    }
+
+    /**
+     * Returns an array of weights for ordering fields.
+     *
+     * @return array
+     */
+    public function getSendItemWeights()
+    {
+        return [
+            'thread_id'       => 10,
+            'item_type'       => 15,
+            'text'            => 20,
+            'client_context'  => 25,
+            'activity_status' => 30,
+            'reaction_type'   => 35,
+            'reaction_status' => 40,
+            'item_id'         => 45,
+            'node_type'       => 50,
+            'action'          => 55,
+            'profile_user_id' => 60,
+            'hashtag'         => 65,
+            'venue_id'        => 70,
+            'media_id'        => 75,
+        ];
     }
 }
