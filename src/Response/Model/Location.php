@@ -35,4 +35,9 @@ class Location extends AutoPropertyHandler
      */
     public $pk;
     public $short_name;
+    /**
+     * @var string
+     */
+    public $facebook_events_id;
+    public $start_time;
 }
