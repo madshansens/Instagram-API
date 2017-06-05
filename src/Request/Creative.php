@@ -81,7 +81,7 @@ class Creative extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('sdk_version', 14)
-            ->addPost('supported_capabilities', ["PVR_COMPRESSION"])
+            ->addPost('supported_capabilities', ['PVR_COMPRESSION'])
             ->getResponse(new Response\FaceEffectsResponse());
     }
 }
