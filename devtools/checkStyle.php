@@ -76,7 +76,7 @@ class styleChecker
     /**
      * Process single file.
      *
-     * @param string          $filePath
+     * @param string $filePath
      */
     private function _processFile(
         $filePath)
@@ -96,8 +96,8 @@ class styleChecker
                 $trail = $matches[3];
                 $params = explode(', ', $params);
 
-                $outputLines[] = $funcstart .'('. PHP_EOL;
-                for ($i=0,$len=count($params); $i<$len; ++$i) {
+                $outputLines[] = $funcstart.'('.PHP_EOL;
+                for ($i = 0, $len = count($params); $i < $len; ++$i) {
                     $newline = '        '.$params[$i];
                     if ($i == ($len - 1)) {
                         $newline .= ')'.PHP_EOL;
