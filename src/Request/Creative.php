@@ -66,4 +66,22 @@ class Creative extends RequestCollection
             ->addPost('facetracker_model_version', 11)
             ->getResponse(new Response\FaceModelsResponse());
     }
+
+    /**
+     * Get face effects to customize photo or video.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FaceEffectsResponse
+     */
+    public function getFaceEffects()
+    {
+        return $this->ig->request('creatives/face_effects/')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('sdk_version', 14)
+            ->addPost('supported_capabilities', ["PVR_COMPRESSION"])
+            ->getResponse(new Response\FaceEffectsResponse());
+    }
 }
