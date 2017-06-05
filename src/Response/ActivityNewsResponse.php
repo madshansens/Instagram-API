@@ -33,4 +33,8 @@ class ActivityNewsResponse extends AutoPropertyHandler implements ResponseInterf
     public $subscription;
     public $continuation_token;
     public $ads_manager;
+    /**
+     * @var Model\Aymf
+     */
+    public $aymf;
 }
