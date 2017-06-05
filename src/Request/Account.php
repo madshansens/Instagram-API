@@ -358,6 +358,7 @@ class Account extends RequestCollection
     {
         return $this->ig->request('accounts/send_confirm_email/')
             ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
             ->addPost('send_source', 'profile_megaphone')
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\SendConfirmEmailResponse());
