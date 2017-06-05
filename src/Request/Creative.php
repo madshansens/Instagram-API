@@ -49,4 +49,21 @@ class Creative extends RequestCollection
 
         return $request->getResponse(new Response\StickerAssetsResponse());
     }
+
+    /**
+     * Get face models to customize photo or video.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FaceModelsResponse
+     */
+    public function getFaceModels()
+    {
+        return $this->ig->request('creatives/face_models/')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('facetracker_model_version', 11)
+            ->getResponse(new Response\FaceModelsResponse());
+    }
 }
