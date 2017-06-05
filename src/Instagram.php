@@ -147,6 +147,8 @@ class Instagram
     public $account;
     /** @var Request\Business Collection of Business related functions. */
     public $business;
+    /** @var Request\Creative Collection of Creative related functions. */
+    public $creative;
     /** @var Request\Direct Collection of Direct related functions. */
     public $direct;
     /** @var Request\Discover Collection of Discover related functions. */
@@ -194,6 +196,7 @@ class Instagram
         // Load all function collections.
         $this->account = new Request\Account($this);
         $this->business = new Request\Business($this);
+        $this->creative = new Request\Creative($this);
         $this->direct = new Request\Direct($this);
         $this->discover = new Request\Discover($this);
         $this->hashtag = new Request\Hashtag($this);
