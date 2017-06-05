@@ -6,6 +6,11 @@ use InstagramAPI\AutoPropertyHandler;
 use InstagramAPI\ResponseInterface;
 use InstagramAPI\ResponseTrait;
 
+/**
+ * @method Model\FaceModels getFaceModels()
+ * @method bool isFaceModels()
+ * @method setFaceModels(Model\FaceModels $value)
+ */
 class FaceModelsResponse extends AutoPropertyHandler implements ResponseInterface
 {
     use ResponseTrait;
