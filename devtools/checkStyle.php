@@ -22,9 +22,13 @@ require __DIR__.'/../vendor/autoload.php';
  * is named in Instagram's server reply), but the leading underscore implies
  * that it should be private/protected. Just review those false positives
  * manually and leave them alone, since they're supposed to be like that.
+ *
+ * Tip: Execute this script with ANY extra argument, to hide all valid files and
+ * focus only on the files with problems.
+ * For example: "php devtools/checkStyle.php x".
  */
 
-$onlyShowInvalidFiles = false;
+$onlyShowInvalidFiles = isset($argv[1]); // Hide valid files if argv[1] is set.
 $styleChecker = new styleChecker(
     __DIR__.'/../',
     [ // List of all subfolders to inspect.
