@@ -13,6 +13,23 @@ use InstagramAPI\Response\Model\DirectThread;
 use InstagramAPI\Response\Model\DirectThreadItem;
 use InstagramAPI\Response\Model\DirectThreadLastSeenAt;
 
+/**
+ * @method mixed getDoublePublish()
+ * @method mixed getOp()
+ * @method mixed getPath()
+ * @method mixed getTs()
+ * @method mixed getValue()
+ * @method bool isDoublePublish()
+ * @method bool isOp()
+ * @method bool isPath()
+ * @method bool isTs()
+ * @method bool isValue()
+ * @method setDoublePublish(mixed $value)
+ * @method setOp(mixed $value)
+ * @method setPath(mixed $value)
+ * @method setTs(mixed $value)
+ * @method setValue(mixed $value)
+ */
 class Op extends AutoPropertyHandler
 {
     const ADD = 'add';

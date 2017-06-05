@@ -4,6 +4,38 @@ namespace InstagramAPI\Response\Model;
 
 use InstagramAPI\AutoPropertyHandler;
 
+/**
+ * @method ActionLog getActionLog()
+ * @method mixed getClientContext()
+ * @method mixed getHideInThread()
+ * @method string getItemId()
+ * @method mixed getItemType()
+ * @method DirectThreadItemMedia getMedia()
+ * @method Item getMediaShare()
+ * @method mixed getText()
+ * @method mixed getTimestamp()
+ * @method string getUserId()
+ * @method bool isActionLog()
+ * @method bool isClientContext()
+ * @method bool isHideInThread()
+ * @method bool isItemId()
+ * @method bool isItemType()
+ * @method bool isMedia()
+ * @method bool isMediaShare()
+ * @method bool isText()
+ * @method bool isTimestamp()
+ * @method bool isUserId()
+ * @method setActionLog(ActionLog $value)
+ * @method setClientContext(mixed $value)
+ * @method setHideInThread(mixed $value)
+ * @method setItemId(string $value)
+ * @method setItemType(mixed $value)
+ * @method setMedia(DirectThreadItemMedia $value)
+ * @method setMediaShare(Item $value)
+ * @method setText(mixed $value)
+ * @method setTimestamp(mixed $value)
+ * @method setUserId(string $value)
+ */
 class DirectThreadItem extends AutoPropertyHandler
 {
     const PLACEHOLDER = 'placeholder';

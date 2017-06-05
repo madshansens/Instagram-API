@@ -5,6 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\ResponseInterface;
 use InstagramAPI\ResponseTrait;
 
+/**
+ * @method string getNextMaxId()
+ * @method bool isNextMaxId()
+ * @method setNextMaxId(string $value)
+ */
 class BlockedReelsResponse extends Model\BlockedReels implements ResponseInterface
 {
     use ResponseTrait;

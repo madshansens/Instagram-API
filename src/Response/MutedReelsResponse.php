@@ -6,6 +6,20 @@ use InstagramAPI\AutoPropertyHandler;
 use InstagramAPI\ResponseInterface;
 use InstagramAPI\ResponseTrait;
 
+/**
+ * @method mixed getBigList()
+ * @method string getNextMaxId()
+ * @method mixed getPageSize()
+ * @method Model\User[] getUsers()
+ * @method bool isBigList()
+ * @method bool isNextMaxId()
+ * @method bool isPageSize()
+ * @method bool isUsers()
+ * @method setBigList(mixed $value)
+ * @method setNextMaxId(string $value)
+ * @method setPageSize(mixed $value)
+ * @method setUsers(Model\User[] $value)
+ */
 class MutedReelsResponse extends AutoPropertyHandler implements ResponseInterface
 {
     use ResponseTrait;

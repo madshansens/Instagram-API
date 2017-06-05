@@ -6,6 +6,11 @@ use InstagramAPI\AutoPropertyHandler;
 use InstagramAPI\ResponseInterface;
 use InstagramAPI\ResponseTrait;
 
+/**
+ * @method Model\Insights[] getInstagramUser()
+ * @method bool isInstagramUser()
+ * @method setInstagramUser(Model\Insights[] $value)
+ */
 class InsightsResponse extends AutoPropertyHandler implements ResponseInterface
 {
     use ResponseTrait;

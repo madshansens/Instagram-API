@@ -4,6 +4,17 @@ namespace InstagramAPI\Realtime\Event\Payload;
 
 use InstagramAPI\AutoPropertyHandler;
 
+/**
+ * @method mixed getActionCount()
+ * @method mixed getActionTimestamp()
+ * @method mixed getActionType()
+ * @method bool isActionCount()
+ * @method bool isActionTimestamp()
+ * @method bool isActionType()
+ * @method setActionCount(mixed $value)
+ * @method setActionTimestamp(mixed $value)
+ * @method setActionType(mixed $value)
+ */
 class StoryAction extends AutoPropertyHandler
 {
     const DELIVERED = 'raven_delivered';

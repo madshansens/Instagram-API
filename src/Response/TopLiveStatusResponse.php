@@ -6,6 +6,11 @@ use InstagramAPI\AutoPropertyHandler;
 use InstagramAPI\ResponseInterface;
 use InstagramAPI\ResponseTrait;
 
+/**
+ * @method Model\BroadcastStatusItem[] getBroadcastStatusItems()
+ * @method bool isBroadcastStatusItems()
+ * @method setBroadcastStatusItems(Model\BroadcastStatusItem[] $value)
+ */
 class TopLiveStatusResponse extends AutoPropertyHandler implements ResponseInterface
 {
     use ResponseTrait;

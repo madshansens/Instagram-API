@@ -6,6 +6,11 @@ use InstagramAPI\AutoPropertyHandler;
 use InstagramAPI\ResponseInterface;
 use InstagramAPI\ResponseTrait;
 
+/**
+ * @method mixed getBadgePayload()
+ * @method bool isBadgePayload()
+ * @method setBadgePayload(mixed $value)
+ */
 class BadgeNotificationsResponse extends AutoPropertyHandler implements ResponseInterface
 {
     use ResponseTrait;

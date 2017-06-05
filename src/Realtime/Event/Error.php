@@ -4,6 +4,14 @@ namespace InstagramAPI\Realtime\Event;
 
 use InstagramAPI\Realtime\Client;
 
+/**
+ * @method mixed getCode()
+ * @method mixed getMessage()
+ * @method bool isCode()
+ * @method bool isMessage()
+ * @method setCode(mixed $value)
+ * @method setMessage(mixed $value)
+ */
 class Error extends \InstagramAPI\Realtime\Event
 {
     public $code;

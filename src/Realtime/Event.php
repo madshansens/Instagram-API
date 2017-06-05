@@ -4,6 +4,11 @@ namespace InstagramAPI\Realtime;
 
 use InstagramAPI\AutoPropertyHandler;
 
+/**
+ * @method mixed getEvent()
+ * @method bool isEvent()
+ * @method setEvent(mixed $value)
+ */
 abstract class Event extends AutoPropertyHandler
 {
     const SUBSCRIBED = 'subscribed';

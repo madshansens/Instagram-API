@@ -6,6 +6,20 @@ use InstagramAPI\AutoPropertyHandler;
 use InstagramAPI\ResponseInterface;
 use InstagramAPI\ResponseTrait;
 
+/**
+ * @method mixed getAutoLoadMoreEnabled()
+ * @method Model\Item[] getItems()
+ * @method mixed getMoreAvailable()
+ * @method string getNextMaxId()
+ * @method bool isAutoLoadMoreEnabled()
+ * @method bool isItems()
+ * @method bool isMoreAvailable()
+ * @method bool isNextMaxId()
+ * @method setAutoLoadMoreEnabled(mixed $value)
+ * @method setItems(Model\Item[] $value)
+ * @method setMoreAvailable(mixed $value)
+ * @method setNextMaxId(string $value)
+ */
 class DiscoverChannelsResponse extends AutoPropertyHandler implements ResponseInterface
 {
     use ResponseTrait;
