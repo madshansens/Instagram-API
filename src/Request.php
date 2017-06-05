@@ -171,7 +171,9 @@ class Request
      *
      * @return self
      */
-    public function addHeader($key, $value)
+    public function addHeader(
+        $key,
+        $value)
     {
         $this->_headers[$key] = $value;
 
