@@ -509,6 +509,38 @@ class People extends RequestCollection
     }
 
     /**
+     * Toggle high priority for a user you are following.
+     *
+     * When you mark someone as favorite, you will receive app push notifications
+     * when that user uploads media, and their shared media will get higher visibility.
+     * For instance, their stories will be placed at the front of your reels-tray, and
+     * their timeline posts will stay visible for longer on your homescreen.
+     *
+     * @param string $userId Numerical UserPK ID.
+     * @param bool   $favorite
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FavoriteResponse
+     */
+    public function setFavorite(
+        $userId,
+        $favorite)
+    {
+        if ($favorite) {
+            $endpoint = 'favorite';
+        } else {
+            $endpoint = 'unfavorite';
+        }
+
+        return $this->ig->request("friendships/{$endpoint}/{$userId}/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\FriendshipResponse());
+    }
+
+    /**
      * Block a user.
      *
      * @param string $userId Numerical UserPK ID.
