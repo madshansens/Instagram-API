@@ -509,35 +509,47 @@ class People extends RequestCollection
     }
 
     /**
-     * Toggle high priority for a user you are following.
+     * Enable high priority for a user you are following.
      *
-     * When you mark someone as favorite, you will receive app push notifications
-     * when that user uploads media, and their shared media will get higher visibility.
-     * For instance, their stories will be placed at the front of your reels-tray, and
-     * their timeline posts will stay visible for longer on your homescreen.
+     * When you mark someone as favorite, you will receive app push
+     * notifications when that user uploads media, and their shared
+     * media will get higher visibility. For instance, their stories
+     * will be placed at the front of your reels-tray, and their
+     * timeline posts will stay visible for longer on your homescreen.
      *
      * @param string $userId Numerical UserPK ID.
-     * @param bool   $favorite
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\FavoriteResponse
      */
-    public function setFavorite(
-        $userId,
-        $favorite)
+    public function favorite(
+        $userId)
     {
-        if ($favorite) {
-            $endpoint = 'favorite';
-        } else {
-            $endpoint = 'unfavorite';
-        }
-
-        return $this->ig->request("friendships/{$endpoint}/{$userId}/")
+        return $this->ig->request("friendships/favorite/{$userId}/")
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->getResponse(new Response\FriendshipResponse());
+            ->getResponse(new Response\FavoriteResponse());
+    }
+
+    /**
+     * Disable high priority for a user you are following.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FavoriteResponse
+     */
+    public function unfavorite(
+        $userId)
+    {
+        return $this->ig->request("friendships/unfavorite/{$userId}/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\FavoriteResponse());
     }
 
     /**
