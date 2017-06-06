@@ -185,9 +185,9 @@ class Direct extends RequestCollection
     /**
      * Get ranked list of recipients.
      *
-     * @param string $mode        Either "reshare" or "raven".
-     * @param bool   $showThreads Whether to include existing threads into response.
-     * @param string $query       Substring to search.
+     * @param string      $mode        Either "reshare" or "raven".
+     * @param bool        $showThreads Whether to include existing threads into response.
+     * @param null|string $query       (optional) The user to search for.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
