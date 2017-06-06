@@ -899,18 +899,21 @@ class Direct extends RequestCollection
     /**
      * Marks visual items from given thread as seen.
      *
-     * @param string $threadId      Thread ID.
-     * @param array  $threadItemIds List of one or more thread item IDs.
+     * @param string          $threadId      Thread ID.
+     * @param string|string[] $threadItemIds One or more thread item IDs.
      *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\GenericResponse
      */
     public function markVisualItemsSeen(
         $threadId,
-        array $threadItemIds)
+        $threadItemIds)
     {
-        if (!count($threadItemIds)) {
+        if (!is_array($threadItemIds)) {
+            $threadItemIds = [$threadItemIds];
+        } elseif (!count($threadItemIds)) {
             throw new \InvalidArgumentException('Please provide at least one thread item ID.');
         }
 
