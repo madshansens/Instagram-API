@@ -633,7 +633,7 @@ class Direct extends RequestCollection
      *
      * @return \InstagramAPI\Response\ConfigureResponse
      *
-     * @see Internal::configureSinglePhoto() for available metadata fields.
+     * @see Internal::configureSingleVideo() for available metadata fields.
      */
     public function sendDisappearingVideo(
         $recipients,
