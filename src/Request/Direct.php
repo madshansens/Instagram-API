@@ -534,7 +534,7 @@ class Direct extends RequestCollection
     {
         $internalMetadata = $this->_addRecipientsToMetadata($recipients, []);
 
-        return $this->ig->internal->uploadSinglePhoto('direct_story', $photoFilename, $externalMetadata, $internalMetadata);
+        return $this->ig->internal->uploadSinglePhoto('direct_story', $photoFilename, $internalMetadata, $externalMetadata);
     }
 
     /**
@@ -643,7 +643,7 @@ class Direct extends RequestCollection
     {
         $internalMetadata = $this->_addRecipientsToMetadata($recipients, []);
 
-        return $this->ig->internal->uploadSingleVideo('direct_story', $videoFilename, $externalMetadata, $internalMetadata, $maxAttempts);
+        return $this->ig->internal->uploadSingleVideo('direct_story', $videoFilename, $internalMetadata, $externalMetadata, $maxAttempts);
     }
 
     /**

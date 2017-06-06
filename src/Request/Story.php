@@ -28,7 +28,7 @@ class Story extends RequestCollection
         $photoFilename,
         array $externalMetadata = [])
     {
-        return $this->ig->internal->uploadSinglePhoto('story', $photoFilename, $externalMetadata);
+        return $this->ig->internal->uploadSinglePhoto('story', $photoFilename, [], $externalMetadata);
     }
 
     /**
@@ -51,7 +51,7 @@ class Story extends RequestCollection
         array $externalMetadata = [],
         $maxAttempts = 10)
     {
-        return $this->ig->internal->uploadSingleVideo('story', $videoFilename, $externalMetadata, [], $maxAttempts);
+        return $this->ig->internal->uploadSingleVideo('story', $videoFilename, [], $externalMetadata, $maxAttempts);
     }
 
     /**

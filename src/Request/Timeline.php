@@ -31,7 +31,7 @@ class Timeline extends RequestCollection
         $photoFilename,
         array $externalMetadata = [])
     {
-        return $this->ig->internal->uploadSinglePhoto('timeline', $photoFilename, $externalMetadata);
+        return $this->ig->internal->uploadSinglePhoto('timeline', $photoFilename, [], $externalMetadata);
     }
 
     /**
@@ -54,7 +54,7 @@ class Timeline extends RequestCollection
         array $externalMetadata = [],
         $maxAttempts = 10)
     {
-        return $this->ig->internal->uploadSingleVideo('timeline', $videoFilename, $externalMetadata, [], $maxAttempts);
+        return $this->ig->internal->uploadSingleVideo('timeline', $videoFilename, [], $externalMetadata, $maxAttempts);
     }
 
     /**

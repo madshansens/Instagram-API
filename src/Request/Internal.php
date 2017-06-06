@@ -20,8 +20,8 @@ class Internal extends RequestCollection
      * @param string $targetFeed       Target feed for this media ("timeline", "story", "direct_story"
      *                                 but NOT "album", they are handled elsewhere).
      * @param string $photoFilename    The photo filename.
+     * @param array  $internalMetadata (optional) Internal library-generated metadata key-value pairs.
      * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
-     * @param array  $internalMetadata (optional) Internal metadata key-value pairs.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -33,8 +33,8 @@ class Internal extends RequestCollection
     public function uploadSinglePhoto(
         $targetFeed,
         $photoFilename,
-        array $externalMetadata = [],
-        array $internalMetadata = [])
+        array $internalMetadata = [],
+        array $externalMetadata = [])
     {
         // Make sure we only allow these particular feeds for this function.
         if ($targetFeed != 'timeline' && $targetFeed != 'story' && $targetFeed != 'direct_story') {
@@ -271,8 +271,8 @@ class Internal extends RequestCollection
      * @param string $targetFeed       Target feed for this media ("timeline", "story", "direct_story",
      *                                 but NOT "album", they are handled elsewhere).
      * @param string $videoFilename    The video filename.
+     * @param array  $internalMetadata (optional) Internal library-generated metadata key-value pairs.
      * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
-     * @param array  $internalMetadata (optional) Internal metadata key-value pairs.
      * @param int    $maxAttempts      (optional) Total attempts to upload all chunks before throwing.
      *
      * @throws \InvalidArgumentException
@@ -286,8 +286,8 @@ class Internal extends RequestCollection
     public function uploadSingleVideo(
         $targetFeed,
         $videoFilename,
-        array $externalMetadata = [],
         array $internalMetadata = [],
+        array $externalMetadata = [],
         $maxAttempts = 10)
     {
         // Make sure we only allow these particular feeds for this function.
