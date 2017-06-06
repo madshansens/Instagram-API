@@ -349,21 +349,34 @@ class Utils
         // Validate video length.
         // NOTE: Instagram has no disk size limit, but this length validation
         // also ensures we can only upload small files exactly as intended.
-        if ($targetFeed === 'story') {
+        switch ($targetFeed) {
+        case 'story':
             // Instagram only allows 3-15 seconds for stories.
             if ($videoDetails['duration'] < 3 || $videoDetails['duration'] > 15) {
-                throw new \InvalidArgumentException(sprintf('Instagram only accepts story videos that are between 3 and 15 seconds long. Your story video "%s" is %.3f seconds long.', $videoFilename, $videoDetails['duration']));
+                throw new \InvalidArgumentException(sprintf(
+                    'Instagram only accepts story videos that are between 3 and 15 seconds long. Your story video "%s" is %.3f seconds long.',
+                    $videoFilename, $videoDetails['duration']
+                ));
             }
-        } elseif ($targetFeed === 'direct_v2' || $targetFeed === 'direct_story') {
+            break;
+        case 'direct_v2':
+        case 'direct_story':
             // Instagram only allows 0.1-15 seconds for direct messages.
             if ($videoDetails['duration'] < 0.1 || $videoDetails['duration'] > 15) {
-                throw new \InvalidArgumentException(sprintf('Instagram only accepts direct videos that are between 0.1 and 15 seconds long. Your direct video "%s" is %.3f seconds long.', $videoFilename, $videoDetails['duration']));
+                throw new \InvalidArgumentException(sprintf(
+                    'Instagram only accepts direct videos that are between 0.1 and 15 seconds long. Your direct video "%s" is %.3f seconds long.',
+                    $videoFilename, $videoDetails['duration']
+                ));
             }
-        } else {
+            break;
+        default: // timeline
             // Validate video length. Instagram only allows 3-60 seconds.
             // SEE: https://help.instagram.com/270963803047681
             if ($videoDetails['duration'] < 3 || $videoDetails['duration'] > 60) {
-                throw new \InvalidArgumentException(sprintf('Instagram only accepts videos that are between 3 and 60 seconds long. Your video "%s" is %.3f seconds long.', $videoFilename, $videoDetails['duration']));
+                throw new \InvalidArgumentException(sprintf(
+                    'Instagram only accepts videos that are between 3 and 60 seconds long. Your video "%s" is %.3f seconds long.',
+                    $videoFilename, $videoDetails['duration']
+                ));
             }
         }
 
