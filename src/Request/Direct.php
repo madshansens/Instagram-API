@@ -441,7 +441,7 @@ class Direct extends RequestCollection
     }
 
     /**
-     * Share an existing media item via direct message to a user's inbox.
+     * Share an existing media post via direct message to a user's inbox.
      *
      * @param array  $recipients An array with "users" or "thread" keys.
      *                           To start a new thread, provide "users" as an array
@@ -457,6 +457,8 @@ class Direct extends RequestCollection
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\DirectSendItemResponse
+     *
+     * @see https://help.instagram.com/1209246439090858 For more information.
      */
     public function sendPost(
         $recipients,

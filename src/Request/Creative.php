@@ -51,7 +51,10 @@ class Creative extends RequestCollection
     }
 
     /**
-     * Get face models to customize photo or video.
+     * Get face models that can be used to customize photos or videos.
+     *
+     * NOTE: The files are some strange binary format that only the Instagram
+     * app understands. If anyone figures out the format, please contact us.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -68,7 +71,12 @@ class Creative extends RequestCollection
     }
 
     /**
-     * Get face effects to customize photo or video.
+     * Get face overlay effects to customize photos or videos.
+     *
+     * These are effects such as "bunny ears" and similar overlays.
+     *
+     * NOTE: The files are some strange binary format that only the Instagram
+     * app understands. If anyone figures out the format, please contact us.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
