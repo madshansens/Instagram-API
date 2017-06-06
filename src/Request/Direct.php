@@ -968,10 +968,10 @@ class Direct extends RequestCollection
             // Although this is an array of groups, you will get "Only one group is supported." error
             // if you will try to use more than one group here.
             if (!$useQuotes) {
-                // We can't user json_encode() here, because each user id must be a number.
+                // We can't use json_encode() here, because each user id must be a number.
                 $result['users'] = '[['.implode(',', $recipients['users']).']]';
             } else {
-                // We can't user json_encode() here, because each user id must be a string.
+                // We can't use json_encode() here, because each user id must be a string.
                 $result['users'] = '[["'.implode('","', $recipients['users']).'"]]';
             }
         }
@@ -985,10 +985,10 @@ class Direct extends RequestCollection
             // Although this is an array, you will get "Need to specify thread ID or recipient users." error
             // if you will try to use more than one thread identifier here.
             if (!$useQuotes) {
-                // We can't user json_encode() here, because thread id must be a number.
+                // We can't use json_encode() here, because thread id must be a number.
                 $result['thread'] = '['.$recipients['thread'].']';
             } else {
-                // We can't user json_encode() here, because thread id must be a string.
+                // We can't use json_encode() here, because thread id must be a string.
                 $result['thread'] = '["'.$recipients['thread'].'"]';
             }
         }
