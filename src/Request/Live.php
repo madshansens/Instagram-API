@@ -100,7 +100,7 @@ class Live extends RequestCollection
     /**
      * Post a comment to a live broadcast.
      *
-     * @param string $broadcastId The media ID in Instagram's internal format (ie "17854587811139572").
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
      * @param string $commentText Your comment text.
      *
      * @throws \InstagramAPI\Exception\InstagramException
