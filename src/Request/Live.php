@@ -20,7 +20,7 @@ class Live extends RequestCollection
      */
     public function getSuggestedBroadcasts()
     {
-        return $this->ig->request('live/get_suggested_broadcasts')
+        return $this->ig->request('live/get_suggested_broadcasts/')
             ->getResponse(new Response\SuggestedBroadcastsResponse());
     }
 

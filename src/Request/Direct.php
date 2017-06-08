@@ -44,7 +44,7 @@ class Direct extends RequestCollection
      */
     public function getVisualInbox()
     {
-        return $this->ig->request('direct_v2/visual_inbox')
+        return $this->ig->request('direct_v2/visual_inbox/')
             ->addParam('persistentBadging', 'true')
             ->getResponse(new Response\DirectVisualInboxResponse());
     }
@@ -71,7 +71,7 @@ class Direct extends RequestCollection
      */
     public function getPendingInbox()
     {
-        $request = $this->ig->request('direct_v2/pending_inbox')
+        $request = $this->ig->request('direct_v2/pending_inbox/')
                  ->addParam('persistentBadging', 'true');
         if ($this->hasUnifiedInbox()) {
             $request->addParam('use_unified_inbox', 'true');
@@ -198,7 +198,7 @@ class Direct extends RequestCollection
         $showThreads,
         $query = null)
     {
-        $request = $this->ig->request('direct_v2/ranked_recipients')
+        $request = $this->ig->request('direct_v2/ranked_recipients/')
             ->addParam('mode', $mode)
             ->addParam('show_threads', $showThreads ? 'true' : 'false');
         if ($this->hasUnifiedInbox()) {
