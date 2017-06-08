@@ -9,6 +9,8 @@ use InstagramAPI\Utils;
 
 /**
  * Functions for interacting with media items from yourself and others.
+ *
+ * @see Usertag for functions that let you tag people in media.
  */
 class Media extends RequestCollection
 {
