@@ -9,6 +9,8 @@ use InstagramAPI\Utils;
 
 /**
  * Functions for interacting with media items from yourself and others.
+ *
+ * @see Usertag for functions that let you tag people in media.
  */
 class Media extends RequestCollection
 {
@@ -137,8 +139,12 @@ class Media extends RequestCollection
     public function getLikedFeed(
         $maxId = null)
     {
-        return $this->ig->request('feed/liked/?'.(!is_null($maxId) ? 'max_id='.$maxId.'&' : ''))
-            ->getResponse(new Response\LikeFeedResponse());
+        $request = $this->ig->request('feed/liked/');
+        if (!is_null($maxId)) {
+            $request->addParam('max_id', $maxId);
+        }
+
+        return $request->getResponse(new Response\LikeFeedResponse());
     }
 
     /**
