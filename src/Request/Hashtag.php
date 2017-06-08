@@ -21,7 +21,8 @@ class Hashtag extends RequestCollection
     public function getInfo(
         $hashtag)
     {
-        return $this->ig->request("tags/{$hashtag}/info")
+        $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
+        return $this->ig->request("tags/{$urlHashtag}/info/")
             ->getResponse(new Response\TagInfoResponse());
     }
 
@@ -58,7 +59,8 @@ class Hashtag extends RequestCollection
         $hashtag,
         $maxId = null)
     {
-        $hashtagFeed = $this->ig->request("feed/tag/{$hashtag}/");
+        $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
+        $hashtagFeed = $this->ig->request("feed/tag/{$urlHashtag}/");
         if (!is_null($maxId)) {
             $hashtagFeed->addParam('max_id', $maxId);
         }
@@ -78,7 +80,8 @@ class Hashtag extends RequestCollection
     public function getRelated(
         $hashtag)
     {
-        return $this->ig->request("tags/{$hashtag}/related")
+        $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
+        return $this->ig->request("tags/{$urlHashtag}/related/")
             ->addParam('visited', '[{"id":"'.$hashtag.'","type":"hashtag"}]')
             ->addParam('related_types', '["hashtag"]')
             ->getResponse(new Response\TagRelatedResponse());
