@@ -1,8 +1,8 @@
 # ![logo](/examples/assets/instagram.png) Instagram PHP [![Latest Stable Version](https://poser.pugx.org/mgp25/instagram-php/v/stable)](https://packagist.org/packages/mgp25/instagram-php) [![Total Downloads](https://poser.pugx.org/mgp25/instagram-php/downloads)](https://packagist.org/packages/mgp25/instagram-php) ![compatible](https://img.shields.io/badge/PHP%207-Compatible-brightgreen.svg) [![License](https://poser.pugx.org/mgp25/instagram-php/license)](https://packagist.org/packages/mgp25/instagram-php)
 
-This is Instagram's private API. It has all the features the Instagram app has, including media upload.
+This is Instagram's private API. It has almost all the features the Instagram app has, including media upload, direct messaging, stories and more.
 
-**Read the [wiki](https://github.com/mgp25/Instagram-API/wiki)** and previous issues before opening a new one! Maybe your issue is already answered.
+**Read the [wiki](https://github.com/mgp25/Instagram-API/wiki)** and previous issues before opening a new one! Maybe your issue has already been answered.
 
 **Frequently Asked Questions:** [F.A.Q.](https://github.com/mgp25/Instagram-API/wiki/FAQ)
 
@@ -21,7 +21,7 @@ This is Instagram's private API. It has all the features the Instagram app has, 
 ----------
 ## Installation
 
-### Via Composer
+### Using Composer
 
 ```sh
 composer require mgp25/instagram-php
@@ -40,7 +40,7 @@ composer require mgp25/instagram-php dev-master
 ```
 
 
-### Don't have Composer?
+### I don't have Composer
 
 You can download it [here](https://getcomposer.org/download/).
 
@@ -54,16 +54,16 @@ This project adheres to the Contributor Covenant [code of conduct](CODE_OF_CONDU
 By participating, you are expected to uphold this code.
 Please report any unacceptable behavior.
 
-## Contributing
+## How do I contribute
 
 If you would like to contribute to this project, please feel free to submit a pull request.
 
 Before you do, take a look at the [contributing guide](https://github.com/mgp25/Instagram-API/blob/master/CONTRIBUTING.md).
 
-## Motivations
+## Why did I make this API?
 
-After legal measures, Facebook, WhatsApp and Instagram blocked my accounts. In order to use Instagram
- on my phone I needed a new phone, as they banned my UDID, so that is basically why I made this API.
+After legal measures, Facebook, WhatsApp and Instagram blocked my accounts. 
+In order to use Instagram on my phone I needed a new phone, as they banned my UDID, so that is basically why I made this API.
 
 ### What is Instagram?
 According to [the company](https://instagram.com/about/faq/):
