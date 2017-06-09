@@ -25,7 +25,6 @@ class MediaInfoResponse extends AutoPropertyHandler implements ResponseInterface
     use ResponseTrait;
 
     public $auto_load_more_enabled;
-    public $status;
     public $num_results;
     public $more_available;
     /**
