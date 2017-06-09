@@ -30,5 +30,4 @@ class UploadVideoResponse extends AutoPropertyHandler implements ResponseInterfa
      */
     public $configure_delay_ms;
     public $result;
-    public $message;
 }
