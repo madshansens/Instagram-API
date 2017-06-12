@@ -13,6 +13,7 @@ use InstagramAPI\ResponseTrait;
  * @method mixed getErrorType()
  * @method mixed getFullName()
  * @method mixed getHasAnonymousProfilePicture()
+ * @method mixed getHelpUrl()
  * @method mixed getInvalidCredentials()
  * @method mixed getIsPrivate()
  * @method mixed getLock()
@@ -30,6 +31,7 @@ use InstagramAPI\ResponseTrait;
  * @method bool isErrorType()
  * @method bool isFullName()
  * @method bool isHasAnonymousProfilePicture()
+ * @method bool isHelpUrl()
  * @method bool isInvalidCredentials()
  * @method bool isIsPrivate()
  * @method bool isLock()
@@ -47,6 +49,7 @@ use InstagramAPI\ResponseTrait;
  * @method setErrorType(mixed $value)
  * @method setFullName(mixed $value)
  * @method setHasAnonymousProfilePicture(mixed $value)
+ * @method setHelpUrl(mixed $value)
  * @method setInvalidCredentials(mixed $value)
  * @method setIsPrivate(mixed $value)
  * @method setLock(mixed $value)
@@ -95,4 +98,5 @@ class LoginResponse extends AutoPropertyHandler implements ResponseInterface
     public $two_factor_info;
     public $checkpoint_url;
     public $lock;
+    public $help_url;
 }
