@@ -47,6 +47,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method Injected getInjected()
  * @method mixed getIsDashEligible()
  * @method mixed getIsReelMedia()
+ * @method mixed getIsSidecarChild()
  * @method mixed getLargeUrls()
  * @method float getLat()
  * @method mixed getLikeCount()
@@ -136,6 +137,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isInjected()
  * @method bool isIsDashEligible()
  * @method bool isIsReelMedia()
+ * @method bool isIsSidecarChild()
  * @method bool isLargeUrls()
  * @method bool isLat()
  * @method bool isLikeCount()
@@ -225,6 +227,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setInjected(Injected $value)
  * @method setIsDashEligible(mixed $value)
  * @method setIsReelMedia(mixed $value)
+ * @method setIsSidecarChild(mixed $value)
  * @method setLargeUrls(mixed $value)
  * @method setLat(float $value)
  * @method setLikeCount(mixed $value)
@@ -462,6 +465,7 @@ class Item extends AutoPropertyHandler
     public $overlay_subtitle;
     public $playback_duration_secs;
     public $url_expire_at_secs;
+    public $is_sidecar_child;
 
     public function setMediaOrAd(
         $params)
