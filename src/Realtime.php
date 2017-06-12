@@ -4,8 +4,7 @@ namespace InstagramAPI;
 
 use Evenement\EventEmitterInterface;
 use Evenement\EventEmitterTrait;
-use InstagramAPI\Realtime\Client;
-use InstagramAPI\Realtime\Event;
+use InstagramAPI\Realtime\Client as RealtimeClient;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use React\Promise\FulfilledPromise;
@@ -39,10 +38,10 @@ class Realtime implements EventEmitterInterface
     const LOGIN_INTERVAL_MIN = 1800;
     const LOGIN_INTERVAL_MAX = 3600;
 
-    /** @var Client\WebSocket */
+    /** @var RealtimeClient\WebSocket */
     protected $_wsClient;
 
-    /** @var Client\Mqtt */
+    /** @var RealtimeClient\Mqtt */
     protected $_mqttClient;
 
     /** @var Instagram */
@@ -193,12 +192,12 @@ class Realtime implements EventEmitterInterface
         $experiments = $this->_instagram->experiments;
         $mqttFeatures = isset($experiments['ig_android_mqtt_skywalker'])
             ? $experiments['ig_android_mqtt_skywalker'] : [];
-        $this->_mqttEnabled = Client::isFeatureEnabled($mqttFeatures, 'is_enabled');
-        $this->_mqttSendEnabled = $this->_mqttEnabled && Client::isFeatureEnabled($mqttFeatures, 'is_send_enabled');
-        $this->_mqttReceiveEnabled = $this->_mqttEnabled && Client::isFeatureEnabled($mqttFeatures, 'is_receive_enabled');
+        $this->_mqttEnabled = RealtimeClient::isFeatureEnabled($mqttFeatures, 'is_enabled');
+        $this->_mqttSendEnabled = $this->_mqttEnabled && RealtimeClient::isFeatureEnabled($mqttFeatures, 'is_send_enabled');
+        $this->_mqttReceiveEnabled = $this->_mqttEnabled && RealtimeClient::isFeatureEnabled($mqttFeatures, 'is_receive_enabled');
         // WebSocket Client.
         $this->debug('[rtc] starting websocket client');
-        $this->_wsClient = new Client\WebSocket('webs', $this, $this->_instagram, [
+        $this->_wsClient = new RealtimeClient\WebSocket('webs', $this, $this->_instagram, [
             'isMqttReceiveEnabled' => $this->_mqttReceiveEnabled,
         ]);
         // MQTT Client.
@@ -206,10 +205,10 @@ class Realtime implements EventEmitterInterface
             $mqttLiveFeatures = isset($experiments['ig_android_skywalker_live_event_start_end'])
                 ? $experiments['ig_android_skywalker_live_event_start_end'] : [];
             $this->debug('[rtc] starting mqtt client');
-            $this->_mqttClient = new Client\Mqtt('mqtt', $this, $this->_instagram, [
+            $this->_mqttClient = new RealtimeClient\Mqtt('mqtt', $this, $this->_instagram, [
                 'isMqttReceiveEnabled' => $this->_mqttReceiveEnabled,
-                'isMqttAckEnabled'     => Client::isFeatureEnabled($mqttFeatures, 'is_ack_delivery_enabled'),
-                'isMqttLiveEnabled'    => Client::isFeatureEnabled($mqttLiveFeatures, 'is_enabled'),
+                'isMqttAckEnabled'     => RealtimeClient::isFeatureEnabled($mqttFeatures, 'is_ack_delivery_enabled'),
+                'isMqttLiveEnabled'    => RealtimeClient::isFeatureEnabled($mqttLiveFeatures, 'is_enabled'),
                 'mqttRoute'            => isset($mqttFeatures['mqtt_route']) ? $mqttFeatures['mqtt_route'] : null,
             ]);
         }
