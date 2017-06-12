@@ -46,7 +46,25 @@ class Media extends RequestCollection
     public function delete(
         $mediaId)
     {
+        $mediaCode = $this->getInfo($mediaId)->getItems()[0]->getMediaType();
+
+        switch ($mediaCode) {
+            case 1:
+                $mediaType = 'PHOTO';
+                break;
+            case 2:
+                $mediaType = 'VIDEO';
+                break;
+            case 8:
+                $mediaType = 'ALBUM';
+                break;
+            default:
+                $mediaType = 'PHOTO';
+                break;
+        }
+
         return $this->ig->request("media/{$mediaId}/delete/")
+            ->addParam('media_type', $mediaType)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
