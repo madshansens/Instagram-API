@@ -4,6 +4,7 @@ namespace InstagramAPI\Request;
 
 use InstagramAPI\Constants;
 use InstagramAPI\Response;
+use InstagramAPI\Response\Model\Item;
 use InstagramAPI\Signatures;
 use InstagramAPI\Utils;
 
@@ -37,30 +38,30 @@ class Media extends RequestCollection
     /**
      * Delete a media item.
      *
-     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string $mediaType The type of the media item you are deleting. One of: "PHOTO", "VIDEO"
+     *                          "ALBUM", or the raw value of the Item's "getMediaType()" function.
      *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\MediaDeleteResponse
      */
     public function delete(
-        $mediaId)
+        $mediaId,
+        $mediaType = 'PHOTO')
     {
-        $mediaCode = $this->getInfo($mediaId)->getItems()[0]->getMediaType();
-
-        switch ($mediaCode) {
-            case 1:
+        if (ctype_digit($mediaType) || is_int($mediaType)) {
+            if ($mediaType == Item::PHOTO) {
                 $mediaType = 'PHOTO';
-                break;
-            case 2:
+            } elseif ($mediaType == Item::VIDEO) {
                 $mediaType = 'VIDEO';
-                break;
-            case 8:
+            } elseif ($mediaType == Item::ALBUM) {
                 $mediaType = 'ALBUM';
-                break;
-            default:
-                $mediaType = 'PHOTO';
-                break;
+            }
+        }
+        if (!in_array($mediaType, ['PHOTO', 'VIDEO', 'ALBUM'], true)) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not a valid media type.', $mediaType));
         }
 
         return $this->ig->request("media/{$mediaId}/delete/")
