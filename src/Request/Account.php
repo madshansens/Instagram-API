@@ -12,9 +12,13 @@ class Account extends RequestCollection
     /**
      * Get details about the currently logged in account.
      *
+     * Also try People::getSelfInfo() instead, for some different information.
+     *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\UserInfoResponse
+     *
+     * @see People::getSelfInfo()
      */
     public function getCurrentUser()
     {

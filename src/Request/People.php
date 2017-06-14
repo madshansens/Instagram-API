@@ -65,7 +65,7 @@ class People extends RequestCollection
     /**
      * Get user details about your own account.
      *
-     * Also try Account::getCurrentUser() instead, for even more details.
+     * Also try Account::getCurrentUser() instead, for account details.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
