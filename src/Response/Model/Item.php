@@ -23,6 +23,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getCollapseComments()
  * @method mixed getCommentCount()
  * @method mixed getCommentLikesEnabled()
+ * @method mixed getCommentThreadingEnabled()
  * @method Comment[] getComments()
  * @method mixed getCommentsDisabled()
  * @method mixed getDeviceTimestamp()
@@ -113,6 +114,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isCollapseComments()
  * @method bool isCommentCount()
  * @method bool isCommentLikesEnabled()
+ * @method bool isCommentThreadingEnabled()
  * @method bool isComments()
  * @method bool isCommentsDisabled()
  * @method bool isDeviceTimestamp()
@@ -203,6 +205,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setCollapseComments(mixed $value)
  * @method setCommentCount(mixed $value)
  * @method setCommentLikesEnabled(mixed $value)
+ * @method setCommentThreadingEnabled(mixed $value)
  * @method setComments(Comment[] $value)
  * @method setCommentsDisabled(mixed $value)
  * @method setDeviceTimestamp(mixed $value)
@@ -466,6 +469,7 @@ class Item extends AutoPropertyHandler
     public $playback_duration_secs;
     public $url_expire_at_secs;
     public $is_sidecar_child;
+    public $comment_threading_enabled;
 
     public function setMediaOrAd(
         $params)
