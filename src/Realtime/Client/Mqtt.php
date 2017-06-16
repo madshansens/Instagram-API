@@ -179,7 +179,7 @@ class Mqtt extends Client
     {
         $device = $this->_instagram->device;
         list($width, $height) = explode('x', $device->getResolution());
-        $density = round($device->getDPI() / 160, 1);
+        $density = round(str_replace('dpi', '', $device->getDPI()) / 160, 1);
         $result = [
             'FBAN' => Constants::APPLICATION_NAME,
             'FBAV' => Constants::IG_VERSION,
