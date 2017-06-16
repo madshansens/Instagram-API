@@ -5,22 +5,22 @@ namespace InstagramAPI\Request;
 use InstagramAPI\Response;
 
 /**
- * Functions related to collections and lists of media.
+ * Functions related to collections of media.
  */
 class Collection extends RequestCollection
 {
     /**
-     * Creates a collection list to help organize bookmarked (saved) medias.
+     * Creates a collection to help organize bookmarked (saved) medias.
      *
-     * @param string     $name       Name of the list.
-     * @param null|array $mediaIds   (optional) Array containing media ids that will be saved in the list.
-     * @param string     $moduleName From which module (page) have you created the list.
+     * @param string     $name       Name of the collection.
+     * @param null|array $mediaIds   (optional) Array containing media ids that will be saved in the collection.
+     * @param string     $moduleName From which module (page) have you created the collection.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\CreateListResponse
+     * @return \InstagramAPI\Response\CreateCollectionResponse
      */
-    public function createList(
+    public function createCollection(
         $name,
         array $mediaIds = [],
         $moduleName = 'feed_contextual_post')
@@ -32,21 +32,40 @@ class Collection extends RequestCollection
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->getResponse(new Response\CreateListResponse());
+            ->getResponse(new Response\CreateCollectionResponse());
     }
 
     /**
-     * Gets all collection lists.
+     * Delete a collection.
+     *
+     * @param string     $collectionId ID of the collection.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\GetListsResponse
+     * @return \InstagramAPI\Response\DeleteCollectionResponse
      */
-    public function getLists()
+    public function deleteCollection(
+        $collectionId)
+    {
+        return $this->ig->request("collections/{$collectionId}/delete/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\DeleteCollectionResponse());
+    }
+
+    /**
+     * Gets collection list.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GetCollectionsResponse
+     */
+    public function getCollections()
     {
 
         return $this->ig->request('collections/list/')
-            ->getResponse(new Response\GetListsResponse());
+            ->getResponse(new Response\GetCollectionsResponse());
     }
 
 
