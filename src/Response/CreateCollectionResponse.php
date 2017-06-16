@@ -14,7 +14,7 @@ use InstagramAPI\ResponseTrait;
  * @method setCollectionId(string $value)
  * @method setCollectionName(mixed $value)
  */
-class CreateListResponse extends AutoPropertyHandler implements ResponseInterface
+class CreateCollectionResponse extends AutoPropertyHandler implements ResponseInterface
 {
     use ResponseTrait;
 

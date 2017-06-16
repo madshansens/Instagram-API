@@ -17,7 +17,7 @@ use InstagramAPI\ResponseTrait;
  * @method setItems(Model\Item[] $value)
  * @method setMoreAvailable(mixed $value)
  */
-class GetListsResponse extends AutoPropertyHandler implements ResponseInterface
+class GetCollectionsResponse extends AutoPropertyHandler implements ResponseInterface
 {
     use ResponseTrait;
 
