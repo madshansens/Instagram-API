@@ -34,4 +34,20 @@ class Collection extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\CreateListResponse());
     }
+
+    /**
+     * Gets all collection lists.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GetListsResponse
+     */
+    public function getLists()
+    {
+
+        return $this->ig->request('collections/list/')
+            ->getResponse(new Response\GetListsResponse());
+    }
+
+
 }

@@ -21,11 +21,14 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getClientCacheKey()
  * @method mixed getCode()
  * @method mixed getCollapseComments()
+ * @method string getCollectionId()
+ * @method mixed getCollectionName()
  * @method mixed getCommentCount()
  * @method mixed getCommentLikesEnabled()
  * @method mixed getCommentThreadingEnabled()
  * @method Comment[] getComments()
  * @method mixed getCommentsDisabled()
+ * @method CoverMedia getCoverMedia()
  * @method mixed getDeviceTimestamp()
  * @method mixed getDrAdType()
  * @method mixed getExpiringAt()
@@ -112,11 +115,14 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isClientCacheKey()
  * @method bool isCode()
  * @method bool isCollapseComments()
+ * @method bool isCollectionId()
+ * @method bool isCollectionName()
  * @method bool isCommentCount()
  * @method bool isCommentLikesEnabled()
  * @method bool isCommentThreadingEnabled()
  * @method bool isComments()
  * @method bool isCommentsDisabled()
+ * @method bool isCoverMedia()
  * @method bool isDeviceTimestamp()
  * @method bool isDrAdType()
  * @method bool isExpiringAt()
@@ -203,11 +209,14 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setClientCacheKey(mixed $value)
  * @method setCode(mixed $value)
  * @method setCollapseComments(mixed $value)
+ * @method setCollectionId(string $value)
+ * @method setCollectionName(mixed $value)
  * @method setCommentCount(mixed $value)
  * @method setCommentLikesEnabled(mixed $value)
  * @method setCommentThreadingEnabled(mixed $value)
  * @method setComments(Comment[] $value)
  * @method setCommentsDisabled(mixed $value)
+ * @method setCoverMedia(CoverMedia $value)
  * @method setDeviceTimestamp(mixed $value)
  * @method setDrAdType(mixed $value)
  * @method setExpiringAt(mixed $value)
@@ -470,6 +479,15 @@ class Item extends AutoPropertyHandler
     public $url_expire_at_secs;
     public $is_sidecar_child;
     public $comment_threading_enabled;
+    /**
+     * @var string
+     */
+    public $collection_id;
+    public $collection_name;
+    /**
+     * @var CoverMedia
+     */
+    public $cover_media;
 
     public function setMediaOrAd(
         $params)
