@@ -20,6 +20,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getSecondProfileImage()
  * @method mixed getText()
  * @method mixed getTimestamp()
+ * @method mixed getTuuid()
  * @method bool isActionUrl()
  * @method bool isCommentId()
  * @method bool isCommentIds()
@@ -35,6 +36,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isSecondProfileImage()
  * @method bool isText()
  * @method bool isTimestamp()
+ * @method bool isTuuid()
  * @method setActionUrl(mixed $value)
  * @method setCommentId(string $value)
  * @method setCommentIds(string[] $value)
@@ -50,6 +52,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setSecondProfileImage(mixed $value)
  * @method setText(mixed $value)
  * @method setTimestamp(mixed $value)
+ * @method setTuuid(mixed $value)
  */
 class Args extends AutoPropertyHandler
 {
@@ -89,4 +92,5 @@ class Args extends AutoPropertyHandler
     public $second_profile_id;
     public $second_profile_image;
     public $profile_image_destination;
+    public $tuuid;
 }
