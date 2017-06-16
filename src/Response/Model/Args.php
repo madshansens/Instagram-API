@@ -6,6 +6,7 @@ use InstagramAPI\AutoPropertyHandler;
 
 /**
  * @method mixed getActionUrl()
+ * @method mixed getClicked()
  * @method string getCommentId()
  * @method string[] getCommentIds()
  * @method mixed getDestination()
@@ -22,6 +23,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getTimestamp()
  * @method mixed getTuuid()
  * @method bool isActionUrl()
+ * @method bool isClicked()
  * @method bool isCommentId()
  * @method bool isCommentIds()
  * @method bool isDestination()
@@ -38,6 +40,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isTimestamp()
  * @method bool isTuuid()
  * @method setActionUrl(mixed $value)
+ * @method setClicked(mixed $value)
  * @method setCommentId(string $value)
  * @method setCommentIds(string[] $value)
  * @method setDestination(mixed $value)
