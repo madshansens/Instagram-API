@@ -93,4 +93,5 @@ class Args extends AutoPropertyHandler
     public $second_profile_image;
     public $profile_image_destination;
     public $tuuid;
+    public $clicked;
 }
