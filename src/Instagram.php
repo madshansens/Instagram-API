@@ -149,6 +149,8 @@ class Instagram
     public $business;
     /** @var Request\Creative Collection of Creative related functions. */
     public $creative;
+    /** @var Request\Collection Collection of Collections related functions. */
+    public $collection;
     /** @var Request\Direct Collection of Direct related functions. */
     public $direct;
     /** @var Request\Discover Collection of Discover related functions. */
@@ -197,6 +199,7 @@ class Instagram
         $this->account = new Request\Account($this);
         $this->business = new Request\Business($this);
         $this->creative = new Request\Creative($this);
+        $this->collection = new Request\Collection($this);
         $this->direct = new Request\Direct($this);
         $this->discover = new Request\Discover($this);
         $this->hashtag = new Request\Hashtag($this);
@@ -601,6 +604,7 @@ class Instagram
             $this->people->getRecentActivityInbox();
             $this->internal->getProfileNotice();
             $this->media->getBlockedMedia();
+            $this->internal->getQPFetch();
             $this->discover->getExploreFeed();
             //$this->internal->getFacebookOTA();
         } else {
