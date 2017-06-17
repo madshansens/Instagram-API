@@ -6,6 +6,14 @@ use InstagramAPI\AutoPropertyHandler;
 use InstagramAPI\ResponseInterface;
 use InstagramAPI\ResponseTrait;
 
+/**
+ * @method string getCollectionId()
+ * @method mixed getCollectionName()
+ * @method bool isCollectionId()
+ * @method bool isCollectionName()
+ * @method setCollectionId(string $value)
+ * @method setCollectionName(mixed $value)
+ */
 class EditCollectionResponse extends AutoPropertyHandler implements ResponseInterface
 {
     use ResponseTrait;

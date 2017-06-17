@@ -81,6 +81,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getPreview()
  * @method Comment[] getPreviewComments()
  * @method mixed getReelMentions()
+ * @method string[] getSavedCollectionIds()
  * @method mixed getSocialContext()
  * @method Stories getStories()
  * @method mixed getStoryCta()
@@ -175,6 +176,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isPreview()
  * @method bool isPreviewComments()
  * @method bool isReelMentions()
+ * @method bool isSavedCollectionIds()
  * @method bool isSocialContext()
  * @method bool isStories()
  * @method bool isStoryCta()
@@ -268,6 +270,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setPreview(mixed $value)
  * @method setPreviewComments(Comment[] $value)
  * @method setReelMentions(mixed $value)
+ * @method setSavedCollectionIds(string[] $value)
  * @method setSocialContext(mixed $value)
  * @method setStories(Stories $value)
  * @method setStoryCta(mixed $value)
@@ -488,6 +491,10 @@ class Item extends AutoPropertyHandler
      * @var CoverMedia
      */
     public $cover_media;
+    /**
+     * @var string[]
+     */
+    public $saved_collection_ids;
 
     public function setMediaOrAd(
         $params)
