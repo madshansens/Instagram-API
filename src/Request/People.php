@@ -510,6 +510,27 @@ class People extends RequestCollection
     }
 
     /**
+     * Ignore a follow request.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FriendshipResponse
+     */
+    public function ignore(
+        $userId)
+    {
+        return $this->ig->request("friendships/ignore/{$userId}/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('user_id', $userId)
+            ->addPost('radio_type', 'wifi-none')
+            ->getResponse(new Response\FriendshipResponse());
+    }
+
+    /**
      * Enable high priority for a user you are following.
      *
      * When you mark someone as favorite, you will receive app push
