@@ -41,7 +41,6 @@
         "ext-zlib": "*",
         "react/event-loop": "^0.4.3",
         "react/promise": "^2.5",
-        "react/http": "^0.5",
         "react/socket-client": "^0.5",
         "ratchet/pawl": "^0.2.3",
         "binsoul/net-mqtt-client-react": "^0.2.1",
