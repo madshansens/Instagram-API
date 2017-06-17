@@ -25,7 +25,7 @@ class Collection extends RequestCollection
      *
      * @return \InstagramAPI\Response\CreateCollectionResponse
      */
-    public function createCollection(
+    public function create(
         $name,
         array $mediaIds = [],
         $moduleName = 'feed_contextual_post')
@@ -49,7 +49,7 @@ class Collection extends RequestCollection
      *
      * @return \InstagramAPI\Response\DeleteCollectionResponse
      */
-    public function deleteCollection(
+    public function delete(
         $collectionId)
     {
         return $this->ig->request("collections/{$collectionId}/delete/")
@@ -64,12 +64,12 @@ class Collection extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\GetCollectionsResponse
+     * @return \InstagramAPI\Response\GetCollectionsListResponse
      */
-    public function getCollections()
+    public function getList()
     {
         return $this->ig->request('collections/list/')
-            ->getResponse(new Response\GetCollectionsResponse());
+            ->getResponse(new Response\GetCollectionsListResponse());
     }
 
     /**
@@ -82,7 +82,7 @@ class Collection extends RequestCollection
      *
      * @return \InstagramAPI\Response\EditCollectionResponse
      */
-    public function editCollection(
+    public function edit(
         $collectionId,
         $name)
     {
@@ -105,7 +105,7 @@ class Collection extends RequestCollection
      *
      * @return \InstagramAPI\Response\EditCollectionResponse
      */
-    public function addSavedMediaToCollection(
+    public function addMedia(
         $collectionId,
         array $mediaIds = [],
         $moduleName = 'feed_saved_add_to_collection')
@@ -134,7 +134,7 @@ class Collection extends RequestCollection
      *
      * @return \InstagramAPI\Response\EditCollectionResponse
      */
-    public function removeMediaFromCollection(
+    public function removeMedia(
         array $collectionIds,
         $mediaId,
         $moduleName = 'feed_contextual_saved_collections')
