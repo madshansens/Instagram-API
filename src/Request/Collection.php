@@ -15,7 +15,20 @@ use InstagramAPI\Response;
 class Collection extends RequestCollection
 {
     /**
-     * Create a collection to help organize your bookmarked (saved) media.
+     * Get a list of all of your collections.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GetCollectionsListResponse
+     */
+    public function getList()
+    {
+        return $this->ig->request('collections/list/')
+            ->getResponse(new Response\GetCollectionsListResponse());
+    }
+
+    /**
+     * Create a new collection of your bookmarked (saved) media.
      *
      * @param string   $name       Name of the collection.
      * @param string[] $mediaIds   (optional) Array with one or more media IDs in Instagram's internal format (ie ["3482384834_43294"]).
@@ -57,19 +70,6 @@ class Collection extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\DeleteCollectionResponse());
-    }
-
-    /**
-     * Get a list of all of your collections.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\GetCollectionsListResponse
-     */
-    public function getList()
-    {
-        return $this->ig->request('collections/list/')
-            ->getResponse(new Response\GetCollectionsListResponse());
     }
 
     /**
