@@ -126,7 +126,7 @@ class Collection extends RequestCollection
      *
      * @return \InstagramAPI\Response\EditCollectionResponse
      */
-    public function RemoveMediaFromCollection(
+    public function removeMediaFromCollection(
         array $collectionIds,
         $mediaId,
         $moduleName = 'feed_contextual_saved_collections')
