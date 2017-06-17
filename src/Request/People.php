@@ -240,8 +240,7 @@ class People extends RequestCollection
         $searchQuery = null,
         $maxId = null)
     {
-        $request = $this->ig->request("friendships/{$userId}/followers/")
-            ->addParam('rank_token', $this->ig->rank_token);
+        $request = $this->ig->request("friendships/{$userId}/followers/");
         if (!is_null($searchQuery)) {
             $request->addParam('query', $searchQuery);
         }
