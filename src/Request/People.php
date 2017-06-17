@@ -197,6 +197,48 @@ class People extends RequestCollection
     }
 
     /**
+     * Approve a friendship request.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FriendshipResponse
+     */
+    public function approveFriendship(
+        $userId)
+    {
+        return $this->ig->request("friendships/approve/{$userId}/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('user_id', $userId)
+            ->addPost('radio_type', 'wifi-none')
+            ->getResponse(new Response\FriendshipResponse());
+    }
+
+    /**
+     * Reject a friendship request.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FriendshipResponse
+     */
+    public function rejectFriendship(
+        $userId)
+    {
+        return $this->ig->request("friendships/ignore/{$userId}/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('user_id', $userId)
+            ->addPost('radio_type', 'wifi-none')
+            ->getResponse(new Response\FriendshipResponse());
+    }
+
+    /**
      * Get list of who a user is following.
      *
      * Note that Instagram will return a big blob of up to a few thousand users.
@@ -241,7 +283,8 @@ class People extends RequestCollection
         $userId,
         $searchQuery = null)
     {
-        $request = $this->ig->request("friendships/{$userId}/followers/");
+        $request = $this->ig->request("friendships/{$userId}/followers/")
+            ->addParam('rank_token', $this->ig->rank_token);
         if (!is_null($searchQuery)) {
             $request->addParam('query', $searchQuery);
         }
@@ -501,27 +544,6 @@ class People extends RequestCollection
         $userId)
     {
         return $this->ig->request("friendships/destroy/{$userId}/")
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('user_id', $userId)
-            ->addPost('radio_type', 'wifi-none')
-            ->getResponse(new Response\FriendshipResponse());
-    }
-
-    /**
-     * Ignore a follow request.
-     *
-     * @param string $userId Numerical UserPK ID.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\FriendshipResponse
-     */
-    public function ignore(
-        $userId)
-    {
-        return $this->ig->request("friendships/ignore/{$userId}/")
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
