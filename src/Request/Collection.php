@@ -27,7 +27,7 @@ class Collection extends RequestCollection
     {
         return $this->ig->request('collections/create/')
             ->addPost('module_name', $moduleName)
-            ->addPost('added_media_ids', json_encode($mediaIds, true))
+            ->addPost('added_media_ids', json_encode($mediaIds))
             ->addPost('name', $name)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
@@ -107,7 +107,7 @@ class Collection extends RequestCollection
     {
         return $this->ig->request("collections/{$collectionId}/edit/")
             ->addPost('module_name', $moduleName)
-            ->addPost('added_media_ids', json_encode($mediaIds, true))
+            ->addPost('added_media_ids', json_encode($mediaIds))
             ->addPost('radio_type', 'wifi-none')
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
@@ -133,7 +133,7 @@ class Collection extends RequestCollection
     {
         return $this->ig->request("media/{$mediaId}/save/")
             ->addPost('module_name', $moduleName)
-            ->addPost('removed_collection_ids', json_encode($collectionIds, true))
+            ->addPost('removed_collection_ids', json_encode($collectionIds))
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('radio_type', 'wifi-none')
