@@ -199,9 +199,12 @@ class People extends RequestCollection
     /**
      * Get list of who a user is following.
      *
+     * Note that Instagram will return a big blob of up to a few thousand users.
+     * There is NO way to paginate to get more users beyond whatever amount this
+     * endpoint returns! You can use the search parameter to limit the results.
+     *
      * @param string      $userId      Numerical UserPK ID.
      * @param null|string $searchQuery Limit the userlist to ones matching the query.
-     * @param null|string $maxId       Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -209,16 +212,12 @@ class People extends RequestCollection
      */
     public function getFollowing(
         $userId,
-        $searchQuery = null,
-        $maxId = null)
+        $searchQuery = null)
     {
         $request = $this->ig->request("friendships/{$userId}/following/")
             ->addParam('rank_token', $this->ig->rank_token);
         if (!is_null($searchQuery)) {
             $request->addParam('query', $searchQuery);
-        }
-        if (!is_null($maxId)) {
-            $request->addParam('max_id', $maxId);
         }
 
         return $request->getResponse(new Response\FollowerAndFollowingResponse());
@@ -227,9 +226,12 @@ class People extends RequestCollection
     /**
      * Get list of who a user is followed by.
      *
+     * Note that Instagram will return a big blob of up to a few thousand users.
+     * There is NO way to paginate to get more users beyond whatever amount this
+     * endpoint returns! You can use the search parameter to limit the results.
+     *
      * @param string      $userId      Numerical UserPK ID.
      * @param null|string $searchQuery Limit the userlist to ones matching the query.
-     * @param null|string $maxId       Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -237,15 +239,11 @@ class People extends RequestCollection
      */
     public function getFollowers(
         $userId,
-        $searchQuery = null,
-        $maxId = null)
+        $searchQuery = null)
     {
         $request = $this->ig->request("friendships/{$userId}/followers/");
         if (!is_null($searchQuery)) {
             $request->addParam('query', $searchQuery);
-        }
-        if (!is_null($maxId)) {
-            $request->addParam('max_id', $maxId);
         }
 
         return $request->getResponse(new Response\FollowerAndFollowingResponse());
@@ -254,35 +252,39 @@ class People extends RequestCollection
     /**
      * Get list of who you are following.
      *
+     * Note that Instagram will return a big blob of up to a few thousand users.
+     * There is NO way to paginate to get more users beyond whatever amount this
+     * endpoint returns! You can use the search parameter to limit the results.
+     *
      * @param null|string $searchQuery Limit the userlist to ones matching the query.
-     * @param null|string $maxId       Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\FollowerAndFollowingResponse
      */
     public function getSelfFollowing(
-        $searchQuery = null,
-        $maxId = null)
+        $searchQuery = null)
     {
-        return $this->getFollowing($this->ig->account_id, $searchQuery, $maxId);
+        return $this->getFollowing($this->ig->account_id, $searchQuery);
     }
 
     /**
      * Get list of your own followers.
      *
+     * Note that Instagram will return a big blob of up to a few thousand users.
+     * There is NO way to paginate to get more users beyond whatever amount this
+     * endpoint returns! You can use the search parameter to limit the results.
+     *
      * @param null|string $searchQuery Limit the userlist to ones matching the query.
-     * @param null|string $maxId       Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\FollowerAndFollowingResponse
      */
     public function getSelfFollowers(
-        $searchQuery = null,
-        $maxId = null)
+        $searchQuery = null)
     {
-        return $this->getFollowers($this->ig->account_id, $searchQuery, $maxId);
+        return $this->getFollowers($this->ig->account_id, $searchQuery);
     }
 
     /**
