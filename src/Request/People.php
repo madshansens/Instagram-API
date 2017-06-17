@@ -220,6 +220,9 @@ class People extends RequestCollection
     /**
      * Reject a friendship request.
      *
+     * Note that the user can simply send you a new request again, after your
+     * rejection. If they're harassing you, use People::block() instead.
+     *
      * @param string $userId Numerical UserPK ID.
      *
      * @throws \InstagramAPI\Exception\InstagramException
