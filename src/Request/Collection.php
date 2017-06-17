@@ -38,7 +38,7 @@ class Collection extends RequestCollection
     /**
      * Delete a collection.
      *
-     * @param string     $collectionId ID of the collection.
+     * @param string $collectionId ID of the collection.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -63,7 +63,6 @@ class Collection extends RequestCollection
      */
     public function getCollections()
     {
-
         return $this->ig->request('collections/list/')
             ->getResponse(new Response\GetCollectionsResponse());
     }
@@ -71,8 +70,8 @@ class Collection extends RequestCollection
     /**
      * Edit name of the collection.
      *
-     * @param string     $collectionId ID of the collection.
-     * @param string     $name       Name of the collection.
+     * @param string $collectionId ID of the collection.
+     * @param string $name         Name of the collection.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -93,9 +92,9 @@ class Collection extends RequestCollection
     /**
      * Add saved media to collection.
      *
-     * @param string     $collectionId ID of the collection.
-     * @param array      $mediaIds   Array containing media ids that will be saved in the collection.
-     * @param string     $moduleName From which module (page) have you created the collection.
+     * @param string $collectionId ID of the collection.
+     * @param array  $mediaIds     Array containing media ids that will be saved in the collection.
+     * @param string $moduleName   From which module (page) have you created the collection.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -119,9 +118,9 @@ class Collection extends RequestCollection
     /**
      * Remove media from collection.
      *
-     * @param array     $collectionId ID of the collection.
-     * @param string      $mediaId   Array containing media ids that will be saved in the collection.
-     * @param string     $moduleName From which module (page) have you created the collection.
+     * @param array  $collectionId ID of the collection.
+     * @param string $mediaId      Array containing media ids that will be saved in the collection.
+     * @param string $moduleName   From which module (page) have you created the collection.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -141,6 +140,4 @@ class Collection extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\EditCollectionResponse());
     }
-
-
 }
