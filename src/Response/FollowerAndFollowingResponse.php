@@ -27,4 +27,5 @@ class FollowerAndFollowingResponse extends AutoPropertyHandler implements Respon
     public $users;
     public $page_size;
     public $big_list;
+    public $next_max_id;
 }
