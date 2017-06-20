@@ -9,6 +9,7 @@ class Constants
         1 => 'https://i.instagram.com/api/v1/',
         2 => 'https://i.instagram.com/api/v2/',
     ];
+    const GRAPH_URL = 'https://graph.instagram.com/';
     const IG_VERSION = '10.15.0';
     const VERSION_CODE = '54119071';
     const IG_SIG_KEY = 'b03e0daaf2ab17cda2a569cace938d639d1288a1197f9ecf97efd0a4ec0874d7';
