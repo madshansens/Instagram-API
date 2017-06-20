@@ -242,6 +242,27 @@ class People extends RequestCollection
     }
 
     /**
+     * Remove follower.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FriendshipResponse
+     */
+    public function removeFollower(
+        $userId)
+    {
+        return $this->ig->request("friendships/remove_follower/{$userId}/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('user_id', $userId)
+            ->addPost('radio_type', 'wifi-none')
+            ->getResponse(new Response\FriendshipResponse());
+    }
+
+    /**
      * Get list of who a user is following.
      *
      * @param string      $userId      Numerical UserPK ID.
