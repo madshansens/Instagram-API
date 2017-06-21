@@ -12,6 +12,8 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getAlgorithm()
  * @method AndroidLinks[] getAndroidLinks()
  * @method Attribution getAttribution()
+ * @method mixed getBoostUnavailableReason()
+ * @method mixed getBoostedStatus()
  * @method mixed getCanViewerSave()
  * @method Caption getCaption()
  * @method mixed getCaptionIsEdited()
@@ -67,6 +69,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getMediaInfos()
  * @method mixed getMediaOrAd()
  * @method mixed getMediaType()
+ * @method mixed getMultiAuthorReelNames()
  * @method string getNextMaxId()
  * @method mixed getOrganicTrackingToken()
  * @method mixed getOriginalHeight()
@@ -81,6 +84,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getPreview()
  * @method Comment[] getPreviewComments()
  * @method mixed getReelMentions()
+ * @method ReelShare getReelShare()
  * @method string[] getSavedCollectionIds()
  * @method mixed getSocialContext()
  * @method Stories getStories()
@@ -91,6 +95,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getTakenAt()
  * @method mixed getThumbnailUrls()
  * @method mixed getTopLikers()
+ * @method mixed getTotalViewerCount()
  * @method mixed getUrlExpireAtSecs()
  * @method User getUser()
  * @method Usertag getUsertags()
@@ -100,6 +105,8 @@ use InstagramAPI\AutoPropertyHandler;
  * @method VideoVersions[] getVideoVersions()
  * @method mixed getViewCount()
  * @method mixed getViewerCount()
+ * @method mixed getViewerCursor()
+ * @method User[] getViewers()
  * @method bool isAdAction()
  * @method bool isAdHeaderStyle()
  * @method bool isAdLinkType()
@@ -107,6 +114,8 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isAlgorithm()
  * @method bool isAndroidLinks()
  * @method bool isAttribution()
+ * @method bool isBoostUnavailableReason()
+ * @method bool isBoostedStatus()
  * @method bool isCanViewerSave()
  * @method bool isCaption()
  * @method bool isCaptionIsEdited()
@@ -162,6 +171,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isMediaInfos()
  * @method bool isMediaOrAd()
  * @method bool isMediaType()
+ * @method bool isMultiAuthorReelNames()
  * @method bool isNextMaxId()
  * @method bool isOrganicTrackingToken()
  * @method bool isOriginalHeight()
@@ -176,6 +186,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isPreview()
  * @method bool isPreviewComments()
  * @method bool isReelMentions()
+ * @method bool isReelShare()
  * @method bool isSavedCollectionIds()
  * @method bool isSocialContext()
  * @method bool isStories()
@@ -186,6 +197,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isTakenAt()
  * @method bool isThumbnailUrls()
  * @method bool isTopLikers()
+ * @method bool isTotalViewerCount()
  * @method bool isUrlExpireAtSecs()
  * @method bool isUser()
  * @method bool isUsertags()
@@ -195,6 +207,8 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isVideoVersions()
  * @method bool isViewCount()
  * @method bool isViewerCount()
+ * @method bool isViewerCursor()
+ * @method bool isViewers()
  * @method setAdAction(mixed $value)
  * @method setAdHeaderStyle(mixed $value)
  * @method setAdLinkType(mixed $value)
@@ -202,6 +216,8 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setAlgorithm(mixed $value)
  * @method setAndroidLinks(AndroidLinks[] $value)
  * @method setAttribution(Attribution $value)
+ * @method setBoostUnavailableReason(mixed $value)
+ * @method setBoostedStatus(mixed $value)
  * @method setCanViewerSave(mixed $value)
  * @method setCaption(Caption $value)
  * @method setCaptionIsEdited(mixed $value)
@@ -256,6 +272,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setMediaIds(string[] $value)
  * @method setMediaInfos(mixed $value)
  * @method setMediaType(mixed $value)
+ * @method setMultiAuthorReelNames(mixed $value)
  * @method setNextMaxId(string $value)
  * @method setOrganicTrackingToken(mixed $value)
  * @method setOriginalHeight(mixed $value)
@@ -270,6 +287,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setPreview(mixed $value)
  * @method setPreviewComments(Comment[] $value)
  * @method setReelMentions(mixed $value)
+ * @method setReelShare(ReelShare $value)
  * @method setSavedCollectionIds(string[] $value)
  * @method setSocialContext(mixed $value)
  * @method setStories(Stories $value)
@@ -280,6 +298,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setTakenAt(mixed $value)
  * @method setThumbnailUrls(mixed $value)
  * @method setTopLikers(mixed $value)
+ * @method setTotalViewerCount(mixed $value)
  * @method setUrlExpireAtSecs(mixed $value)
  * @method setUser(User $value)
  * @method setUsertags(Usertag $value)
@@ -289,6 +308,8 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setVideoVersions(VideoVersions[] $value)
  * @method setViewCount(mixed $value)
  * @method setViewerCount(mixed $value)
+ * @method setViewerCursor(mixed $value)
+ * @method setViewers(User[] $value)
  */
 class Item extends AutoPropertyHandler
 {
@@ -495,6 +516,19 @@ class Item extends AutoPropertyHandler
      * @var string[]
      */
     public $saved_collection_ids;
+    public $boosted_status;
+    public $boost_unavailable_reason;
+    /**
+     * @var User[]
+     */
+    public $viewers;
+    public $viewer_cursor;
+    public $total_viewer_count;
+    public $multi_author_reel_names;
+    /**
+     * @var ReelShare
+     */
+    public $reel_share;
 
     public function setMediaOrAd(
         $params)

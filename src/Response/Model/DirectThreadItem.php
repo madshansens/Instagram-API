@@ -16,6 +16,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method Item getMediaShare()
  * @method Item getRavenMedia()
  * @method DirectReactions getReactions()
+ * @method ReelShare getReelShare()
  * @method array getSeenUserIds()
  * @method mixed getText()
  * @method mixed getTimestamp()
@@ -31,6 +32,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isMediaShare()
  * @method bool isRavenMedia()
  * @method bool isReactions()
+ * @method bool isReelShare()
  * @method bool isSeenUserIds()
  * @method bool isText()
  * @method bool isTimestamp()
@@ -46,6 +48,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setMediaShare(Item $value)
  * @method setRavenMedia(Item $value)
  * @method setReactions(DirectReactions $value)
+ * @method setReelShare(ReelShare $value)
  * @method setSeenUserIds(array $value)
  * @method setText(mixed $value)
  * @method setTimestamp(mixed $value)
@@ -112,4 +115,8 @@ class DirectThreadItem extends AutoPropertyHandler
      * @var DirectExpiringSummary
      */
     public $expiring_media_action_summary;
+    /**
+     * @var ReelShare
+     */
+    public $reel_share;
 }

@@ -59,6 +59,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getMutualFollowersCount()
  * @method mixed getNationalNumber()
  * @method mixed getNeedsEmailConfirm()
+ * @method string getPageId()
  * @method mixed getPageName()
  * @method mixed getPhoneNumber()
  * @method string getPk()
@@ -136,6 +137,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isMutualFollowersCount()
  * @method bool isNationalNumber()
  * @method bool isNeedsEmailConfirm()
+ * @method bool isPageId()
  * @method bool isPageName()
  * @method bool isPhoneNumber()
  * @method bool isPk()
@@ -213,6 +215,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setMutualFollowersCount(mixed $value)
  * @method setNationalNumber(mixed $value)
  * @method setNeedsEmailConfirm(mixed $value)
+ * @method setPageId(string $value)
  * @method setPageName(mixed $value)
  * @method setPhoneNumber(mixed $value)
  * @method setPk(string $value)
@@ -355,4 +358,8 @@ class User extends AutoPropertyHandler
     public $block_at; // getBlockedList prop
     public $aggregate_promote_engagement; // getSelfInfo prop
     public $fbuid;
+    /**
+     * @var string
+     */
+    public $page_id;
 }
