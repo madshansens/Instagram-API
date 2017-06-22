@@ -38,18 +38,26 @@ class ServerMessageThrower
      */
     const EXCEPTION_MAP = [
         'LoginRequiredException'       => ['login_required'],
-        'CheckpointRequiredException'  => ['checkpoint_required'],
+        'CheckpointRequiredException'  => [
+            'checkpoint_required', // message
+            'checkpoint_challenge_required', // error_type
+        ],
         'FeedbackRequiredException'    => ['feedback_required'],
         'IncorrectPasswordException'   => [
             // "The password you entered is incorrect".
-            '/password(.*?)incorrect/',
+            '/password(.*?)incorrect/', // message
+            'bad_password', // error_type
         ],
         'AccountDisabledException'     => [
             // "Your account has been disabled for violating our terms"
             '/account(.*?)disabled(.*?)violating/',
         ],
         'SentryBlockException'         => ['sentry_block'],
-        'InvalidUserException'         => ['invalid_user'],
+        'InvalidUserException'         => [
+            // "The username you entered doesn't appear to belong to an account"
+            '/username(.*?)doesn\'t(.*?)belong/', // message
+            'invalid_user', // error_type
+        ],
         'ForcedPasswordResetException' => ['/reset(.*?)password/'],
     ];
 
@@ -73,17 +81,12 @@ class ServerMessageThrower
         $serverMessage,
         ResponseInterface $serverResponse = null)
     {
-        // Fix the generic "Sorry, there was a problem..." message used by some
-        // errors, by replacing it with their error_type value, if available.
-        // That value contains the actual error reason, such as "sentry_block".
-        // Example server JSON: '{"message": "Sorry, there was a problem with
-        // your request.", "status": "fail", "error_type": "sentry_block"}'.
-        if ($serverMessage == 'Sorry, there was a problem with your request.'
-            && $serverResponse instanceof ResponseInterface) {
+        $messages = [$serverMessage];
+        if ($serverResponse instanceof ResponseInterface) {
             $fullResponse = $serverResponse->getFullResponse();
             if (isset($fullResponse->error_type)
                 && is_string($fullResponse->error_type)) {
-                $serverMessage = $fullResponse->error_type;
+                $messages[] = $fullResponse->error_type;
             }
         }
 
@@ -91,19 +94,21 @@ class ServerMessageThrower
         $exceptionClass = 'EndpointException';
 
         // Now check if the server message is in our CRITICAL exception table.
-        foreach (self::EXCEPTION_MAP as $className => $patterns) {
-            foreach ($patterns as $pattern) {
-                if ($pattern[0] == '/') {
-                    // Regex check.
-                    if (preg_match($pattern, $serverMessage)) {
-                        $exceptionClass = $className;
-                        break 2;
-                    }
-                } else {
-                    // Regular string search.
-                    if (strpos($serverMessage, $pattern) !== false) {
-                        $exceptionClass = $className;
-                        break 2;
+        foreach ($messages as $message) {
+            foreach (self::EXCEPTION_MAP as $className => $patterns) {
+                foreach ($patterns as $pattern) {
+                    if ($pattern[0] == '/') {
+                        // Regex check.
+                        if (preg_match($pattern, $message)) {
+                            $exceptionClass = $className;
+                            break 2;
+                        }
+                    } else {
+                        // Regular string search.
+                        if (strpos($message, $pattern) !== false) {
+                            $exceptionClass = $className;
+                            break 2;
+                        }
                     }
                 }
             }
