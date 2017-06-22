@@ -242,7 +242,7 @@ class People extends RequestCollection
     }
 
     /**
-     * Remove follower.
+     * Remove one of your followers.
      *
      * @param string $userId Numerical UserPK ID.
      *
