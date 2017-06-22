@@ -831,7 +831,7 @@ class Internal extends RequestCollection
     }
 
     /**
-     * Perform an Instagram "feature synchronization" call.
+     * Perform an Instagram "feature synchronization" call for device.
      *
      * @param bool $prelogin
      *
@@ -839,29 +839,45 @@ class Internal extends RequestCollection
      *
      * @return \InstagramAPI\Response\SyncResponse
      */
-    public function syncFeatures(
+    public function syncDeviceFeatures(
         $prelogin = false)
     {
+        $request = $this->ig->request('qe/sync/')
+            ->addPost('id', $this->ig->uuid)
+            ->addPost('experiments', Constants::LOGIN_EXPERIMENTS);
         if ($prelogin) {
-            return $this->ig->request('qe/sync/')
-                ->setNeedsAuth(false)
-                ->addPost('id', $this->ig->uuid)
-                ->addPost('experiments', Constants::LOGIN_EXPERIMENTS)
-                ->getResponse(new Response\SyncResponse());
+            $request->setNeedsAuth(false);
         } else {
-            $result = $this->ig->request('qe/sync/')
+            $request
                 ->addPost('_uuid', $this->ig->uuid)
                 ->addPost('_uid', $this->ig->account_id)
-                ->addPost('_csrftoken', $this->ig->client->getToken())
-                ->addPost('id', $this->ig->account_id)
-                ->addPost('experiments', Constants::EXPERIMENTS)
-                ->getResponse(new Response\SyncResponse());
-
-            // Save the updated experiments for this user.
-            $this->_saveExperiments($result);
-
-            return $result;
+                ->addPost('_csrftoken', $this->ig->client->getToken());
         }
+
+        return $request->getResponse(new Response\SyncResponse());
+    }
+
+    /**
+     * Perform an Instagram "feature synchronization" call for account.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\SyncResponse
+     */
+    public function syncUserFeatures()
+    {
+        $result = $this->ig->request('qe/sync/')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('id', $this->ig->account_id)
+            ->addPost('experiments', Constants::EXPERIMENTS)
+            ->getResponse(new Response\SyncResponse());
+
+        // Save the updated experiments for this user.
+        $this->_saveExperiments($result);
+
+        return $result;
     }
 
     /**

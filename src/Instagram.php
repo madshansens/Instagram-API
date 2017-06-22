@@ -444,7 +444,7 @@ class Instagram
 
         // Perform a full relogin if necessary.
         if (!$this->isLoggedIn || $forceLogin) {
-            $this->internal->syncFeatures(true);
+            $this->internal->syncDeviceFeatures(true);
 
             // Call log attribution API so a csrftoken is put in our cookie jar.
             $this->internal->logAttribution();
@@ -590,7 +590,7 @@ class Instagram
         // You have been warned.
         if ($justLoggedIn) {
             // Perform the "user has just done a full login" API flow.
-            $this->internal->syncFeatures();
+            $this->internal->syncUserFeatures();
             $this->people->getAutoCompleteUserList();
             $this->story->getReelsTrayFeed();
             $this->direct->getRecentRecipients();
@@ -642,7 +642,8 @@ class Instagram
             // experiments never get synced and updated. So sync periodically.
             $lastExperimentsTime = $this->settings->get('last_experiments');
             if (is_null($lastExperimentsTime) || (time() - $lastExperimentsTime) > self::EXPERIMENTS_REFRESH) {
-                $this->internal->syncFeatures();
+                $this->internal->syncUserFeatures();
+                $this->internal->syncDeviceFeatures();
             }
         }
 
