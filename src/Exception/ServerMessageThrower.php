@@ -106,13 +106,13 @@ class ServerMessageThrower
                         // Regex check.
                         if (preg_match($pattern, $message)) {
                             $exceptionClass = $className;
-                            break 2;
+                            break 3;
                         }
                     } else {
                         // Regular string search.
                         if (strpos($message, $pattern) !== false) {
                             $exceptionClass = $className;
-                            break 2;
+                            break 3;
                         }
                     }
                 }
