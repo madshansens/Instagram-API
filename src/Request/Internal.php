@@ -896,6 +896,56 @@ class Internal extends RequestCollection
     }
 
     /**
+     * Reads MSISDN header.
+     *
+     * WARNING. DON'T USE. UNDER RESEARCH.
+     *
+     * @param string $subnoKey Encoded subscriber number.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\MsisdnHeaderResponse
+     *
+     * @since 10.24.0 app version.
+     */
+    public function readMsisdnHeader(
+        $subnoKey = null)
+    {
+        $request = $this->ig->request('accounts/read_msisdn_header/')
+            ->setNeedsAuth(false)
+            // UUID is used as device_id intentionally.
+            ->addPost('device_id', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken());
+        if ($subnoKey !== null) {
+            $request->addPost('subno_key', $subnoKey);
+        }
+
+        return $request->getResponse(new Response\MsisdnHeaderResponse());
+    }
+
+    /**
+     * Bootstraps MSISDN header.
+     *
+     * WARNING. DON'T USE. UNDER RESEARCH.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\MsisdnHeaderResponse
+     *
+     * @since 10.24.0 app version.
+     */
+    public function bootstrapMsisdnHeader()
+    {
+        $request = $this->ig->request('accounts/msisdn_header_bootstrap/')
+            ->setNeedsAuth(false)
+            // UUID is used as device_id intentionally.
+            ->addPost('device_id', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken());
+
+        return $request->getResponse(new Response\MsisdnHeaderResponse());
+    }
+
+    /**
      * Get megaphone log.
      *
      * @throws \InstagramAPI\Exception\InstagramException
