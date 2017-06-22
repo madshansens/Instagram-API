@@ -48,6 +48,11 @@ class ServerMessageThrower
             '/password(.*?)incorrect/', // message
             'bad_password', // error_type
         ],
+        'InvalidSmsCodeException'      => [
+            // ""Please check the security code we sent you and try again".
+            '/check(.*?)security(.*?)code/', // message
+            'sms_code_validation_code_invalid', // error_type
+        ],
         'AccountDisabledException'     => [
             // "Your account has been disabled for violating our terms"
             '/account(.*?)disabled(.*?)violating/',

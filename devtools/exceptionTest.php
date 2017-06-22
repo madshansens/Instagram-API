@@ -19,6 +19,7 @@ $exceptionsToTest = [
     'InstagramAPI\\Exception\\AccountDisabledException'    => '{"message":"Your account has been disabled for violating our terms. Learn how you may be able to restore your account."}',
     'InstagramAPI\\Exception\\InvalidUserException'        => '{"message":"The username you entered doesn\'t appear to belong to an account. Please check your username and try again.","invalid_credentials":true,"error_title":"Incorrect Username","buttons":[{"title":"Try Again","action":"dismiss"}],"status":"fail","error_type":"invalid_user"}',
     'InstagramAPI\\Exception\\SentryBlockException'        => '{"message":"Sorry, there was a problem with your request.","status":"fail","error_type":"sentry_block"}',
+    'InstagramAPI\\Exception\\InvalidSmsCodeException'     => '{"message":"Please check the security code we sent you and try again.","status":"fail","error_type":"sms_code_validation_code_invalid"}',
 ];
 
 $mapper = new \JsonMapper();
