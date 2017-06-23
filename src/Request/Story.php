@@ -144,6 +144,22 @@ class Story extends RequestCollection
     }
 
     /**
+     * Get list of users who have seen a story.
+     *
+     * @param string $storyPk Numerical storyPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ReelMediaViewerResponse
+     */
+    public function getStoryViewers(
+        $storyPk)
+    {
+        return $this->ig->request("media/{$storyPk}/list_reel_media_viewer/")
+            ->getResponse(new Response\ReelMediaViewerResponse());
+    }
+
+    /**
      * Mark story media items as seen.
      *
      * The various story-related endpoints only give you lists of story media.
