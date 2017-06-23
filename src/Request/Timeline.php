@@ -176,20 +176,92 @@ class Timeline extends RequestCollection
      *
      * This is the feed of recent timeline posts from people you follow.
      *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param null|string $maxId   Next "maximum ID", used for pagination.
+     * @param null|array  $options An associative array with following keys (all of them are optional):
+     *                             "latest_story_pk" The media ID in Instagram's internal format (ie "3482384834_43294").
+     *                             "seen_posts" One or more seen media IDs.
+     *                             "unseen_posts" One or more unseen media IDs.
+     *                             "is_pull_to_refresh" Whether this call was triggered by refresh.
+     *                             "push_disabled" Whether user has disabled PUSH.
+     *                             "recovered_from_crash" Whether app has recovered from crash.
+     *                             "feed_view_info" DON'T USE IT YET.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\TimelineFeedResponse
      */
     public function getTimelineFeed(
-        $maxId = null)
+        $maxId = null,
+        array $options = null)
     {
         $request = $this->ig->request('feed/timeline/')
-            ->addParam('rank_token', $this->ig->rank_token)
-            ->addParam('ranked_content', true);
+            ->setSignedPost(false)
+            ->addHeader('X-Ads-Opt-Out', '0')
+            ->addHeader('X-Google-AD-ID', $this->ig->advertising_id)
+            ->addHeader('X-DEVICE-ID', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('is_prefetch', '0')
+            ->addPost('phone_id', $this->ig->settings->get('phone_id'))
+            ->addPost('battery_level', '100')
+            ->addPost('is_charging', '1')
+            ->addPost('timezone_offset', date('Z'));
+
+        if (isset($options['latest_story_pk'])) {
+            $request->addPost('latest_story_pk', $options['latest_story_pk']);
+        }
+
+        if (isset($options['is_pull_to_refresh'])) {
+            $request->addPost('is_pull_to_refresh', $options['is_pull_to_refresh'] ? '1' : '0');
+        } else {
+            $request->addPost('is_pull_to_refresh', '0');
+        }
+
+        if (isset($options['seen_posts'])) {
+            if (is_array($options['seen_posts'])) {
+                $request->addPost('seen_posts', implode(',', $options['seen_posts']));
+            } else {
+                $request->addPost('seen_posts', $options['seen_posts']);
+            }
+        } elseif ($maxId === null) {
+            $request->addPost('seen_posts', '');
+        }
+
+        if (isset($options['unseen_posts'])) {
+            if (is_array($options['unseen_posts'])) {
+                $request->addPost('unseen_posts', implode(',', $options['unseen_posts']));
+            } else {
+                $request->addPost('unseen_posts', $options['unseen_posts']);
+            }
+        } elseif ($maxId === null) {
+            $request->addPost('unseen_posts', '');
+        }
+
+        if (isset($options['feed_view_info'])) {
+            if (is_array($options['feed_view_info'])) {
+                $request->addPost('feed_view_info', json_encode($options['feed_view_info']));
+            } else {
+                $request->addPost('feed_view_info', json_encode([$options['feed_view_info']]));
+            }
+        } elseif ($maxId === null) {
+            $request->addPost('feed_view_info', '');
+        }
+
+        if (isset($options['push_disabled']) && $options['push_disabled']) {
+            $request->addPost('push_disabled', 'true');
+        }
+
+        if (isset($options['recovered_from_crash']) && $options['recovered_from_crash']) {
+            $request->addPost('recovered_from_crash', '1');
+        }
+
         if ($maxId) {
-            $request->addParam('max_id', $maxId);
+            $request->addPost('max_id', $maxId);
+        } else {
+            $request->addHeader('X-IG-INSTALLED-APPS', base64_encode(json_encode([
+                '1' => 0, // com.instagram.boomerang
+                '2' => 0, // com.instagram.layout
+            ])));
         }
 
         return $request->getResponse(new Response\TimelineFeedResponse());

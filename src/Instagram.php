@@ -444,10 +444,13 @@ class Instagram
 
         // Perform a full relogin if necessary.
         if (!$this->isLoggedIn || $forceLogin) {
-            $this->internal->syncFeatures(true);
+            $this->internal->syncDeviceFeatures(true);
 
             // Call log attribution API so a csrftoken is put in our cookie jar.
             $this->internal->logAttribution();
+
+            // Uncomment this call when IG_VERSION >= 10.24.0
+            //$this->internal->readMsisdnHeader();
 
             try {
                 $response = $this->request('accounts/login/')
@@ -590,7 +593,7 @@ class Instagram
         // You have been warned.
         if ($justLoggedIn) {
             // Perform the "user has just done a full login" API flow.
-            $this->internal->syncFeatures();
+            $this->internal->syncUserFeatures();
             $this->people->getAutoCompleteUserList();
             $this->story->getReelsTrayFeed();
             $this->direct->getRecentRecipients();
@@ -611,7 +614,9 @@ class Instagram
             // Act like a real logged in app client refreshing its news timeline.
             // This also lets us detect if we're still logged in with a valid session.
             try {
-                $this->timeline->getTimelineFeed();
+                $this->timeline->getTimelineFeed(null, [
+                    'is_pull_to_refresh' => mt_rand(1, 3) < 3,
+                ]);
             } catch (\InstagramAPI\Exception\LoginRequiredException $e) {
                 // If our session cookies are expired, we were now told to login,
                 // so handle that by running a forced relogin in that case!
@@ -642,7 +647,8 @@ class Instagram
             // experiments never get synced and updated. So sync periodically.
             $lastExperimentsTime = $this->settings->get('last_experiments');
             if (is_null($lastExperimentsTime) || (time() - $lastExperimentsTime) > self::EXPERIMENTS_REFRESH) {
-                $this->internal->syncFeatures();
+                $this->internal->syncUserFeatures();
+                $this->internal->syncDeviceFeatures();
             }
         }
 

@@ -831,7 +831,7 @@ class Internal extends RequestCollection
     }
 
     /**
-     * Perform an Instagram "feature synchronization" call.
+     * Perform an Instagram "feature synchronization" call for device.
      *
      * @param bool $prelogin
      *
@@ -839,29 +839,45 @@ class Internal extends RequestCollection
      *
      * @return \InstagramAPI\Response\SyncResponse
      */
-    public function syncFeatures(
+    public function syncDeviceFeatures(
         $prelogin = false)
     {
+        $request = $this->ig->request('qe/sync/')
+            ->addPost('id', $this->ig->uuid)
+            ->addPost('experiments', Constants::LOGIN_EXPERIMENTS);
         if ($prelogin) {
-            return $this->ig->request('qe/sync/')
-                ->setNeedsAuth(false)
-                ->addPost('id', $this->ig->uuid)
-                ->addPost('experiments', Constants::LOGIN_EXPERIMENTS)
-                ->getResponse(new Response\SyncResponse());
+            $request->setNeedsAuth(false);
         } else {
-            $result = $this->ig->request('qe/sync/')
+            $request
                 ->addPost('_uuid', $this->ig->uuid)
                 ->addPost('_uid', $this->ig->account_id)
-                ->addPost('_csrftoken', $this->ig->client->getToken())
-                ->addPost('id', $this->ig->account_id)
-                ->addPost('experiments', Constants::EXPERIMENTS)
-                ->getResponse(new Response\SyncResponse());
-
-            // Save the updated experiments for this user.
-            $this->_saveExperiments($result);
-
-            return $result;
+                ->addPost('_csrftoken', $this->ig->client->getToken());
         }
+
+        return $request->getResponse(new Response\SyncResponse());
+    }
+
+    /**
+     * Perform an Instagram "feature synchronization" call for account.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\SyncResponse
+     */
+    public function syncUserFeatures()
+    {
+        $result = $this->ig->request('qe/sync/')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('id', $this->ig->account_id)
+            ->addPost('experiments', Constants::EXPERIMENTS)
+            ->getResponse(new Response\SyncResponse());
+
+        // Save the updated experiments for this user.
+        $this->_saveExperiments($result);
+
+        return $result;
     }
 
     /**
@@ -877,6 +893,56 @@ class Internal extends RequestCollection
             ->setNeedsAuth(false)
             ->addPost('adid', $this->ig->advertising_id)
             ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
+     * Reads MSISDN header.
+     *
+     * WARNING. DON'T USE. UNDER RESEARCH.
+     *
+     * @param string $subnoKey Encoded subscriber number.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\MsisdnHeaderResponse
+     *
+     * @since 10.24.0 app version.
+     */
+    public function readMsisdnHeader(
+        $subnoKey = null)
+    {
+        $request = $this->ig->request('accounts/read_msisdn_header/')
+            ->setNeedsAuth(false)
+            // UUID is used as device_id intentionally.
+            ->addPost('device_id', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken());
+        if ($subnoKey !== null) {
+            $request->addPost('subno_key', $subnoKey);
+        }
+
+        return $request->getResponse(new Response\MsisdnHeaderResponse());
+    }
+
+    /**
+     * Bootstraps MSISDN header.
+     *
+     * WARNING. DON'T USE. UNDER RESEARCH.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\MsisdnHeaderResponse
+     *
+     * @since 10.24.0 app version.
+     */
+    public function bootstrapMsisdnHeader()
+    {
+        $request = $this->ig->request('accounts/msisdn_header_bootstrap/')
+            ->setNeedsAuth(false)
+            // UUID is used as device_id intentionally.
+            ->addPost('device_id', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken());
+
+        return $request->getResponse(new Response\MsisdnHeaderResponse());
     }
 
     /**
