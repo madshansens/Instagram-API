@@ -615,7 +615,7 @@ class Instagram
             // This also lets us detect if we're still logged in with a valid session.
             try {
                 $this->timeline->getTimelineFeed(null, [
-                    'is_pull_to_refresh' => true,
+                    'is_pull_to_refresh' => mt_rand(1, 3) < 3,
                 ]);
             } catch (\InstagramAPI\Exception\LoginRequiredException $e) {
                 // If our session cookies are expired, we were now told to login,
