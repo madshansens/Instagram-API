@@ -53,6 +53,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getIsProfileActionNeeded()
  * @method mixed getIsUnpublished()
  * @method mixed getIsVerified()
+ * @method string getLatestReelMedia()
  * @method float getLatitude()
  * @method float getLongitude()
  * @method mixed getMediaCount()
@@ -131,6 +132,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isIsProfileActionNeeded()
  * @method bool isIsUnpublished()
  * @method bool isIsVerified()
+ * @method bool isLatestReelMedia()
  * @method bool isLatitude()
  * @method bool isLongitude()
  * @method bool isMediaCount()
@@ -209,6 +211,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setIsProfileActionNeeded(mixed $value)
  * @method setIsUnpublished(mixed $value)
  * @method setIsVerified(mixed $value)
+ * @method setLatestReelMedia(string $value)
  * @method setLatitude(float $value)
  * @method setLongitude(float $value)
  * @method setMediaCount(mixed $value)
@@ -362,4 +365,8 @@ class User extends AutoPropertyHandler
      * @var string
      */
     public $page_id;
+    /**
+     * @var string
+     */
+    public $latest_reel_media;
 }
