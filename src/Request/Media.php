@@ -401,6 +401,26 @@ class Media extends RequestCollection
     }
 
     /**
+     * Validate URL.
+     *
+     * @param string $url URL you want to validate.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ValidateURLResponse
+     */
+    public function validateURL(
+        $url)
+    {
+        return $this->ig->request('media/validate_reel_url/')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('url', $url)
+            ->getResponse(new Response\ValidateURLResponse());
+    }
+
+    /**
      * Save a media item.
      *
      * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
