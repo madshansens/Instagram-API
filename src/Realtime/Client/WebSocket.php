@@ -39,9 +39,13 @@ class WebSocket extends Client
             $this->_isMqttReceiveEnabled = false;
         }
 
-        // Init subscription.
+        // Subscription.
+        if (!isset($params['subscription']) || !$params['subscription'] instanceof Subscription) {
+            throw new \InvalidArgumentException('Please provide a valid subscription model.');
+        }
+        $this->_subscription = $params['subscription'];
+
         $this->_isSubscribed = false;
-        $this->_initSubscription();
     }
 
     /**
@@ -212,16 +216,6 @@ class WebSocket extends Client
         $this->debug('Sequence for topic "%s" is updated to "%s"', $topic, $this->_subscription->sequence);
     }
 
-    protected function _initSubscription()
-    {
-        $inbox = $this->_instagram->direct->getInbox();
-        $subscription = $inbox->subscription;
-        if (!$subscription instanceof Subscription) {
-            throw new \InvalidArgumentException('Can not subscribe to inbox.');
-        }
-        $this->_subscription = $subscription;
-    }
-
     /**
      * Refresh subscription.
      */
@@ -229,7 +223,12 @@ class WebSocket extends Client
     {
         $this->_isSubscribed = false;
         $this->_unsubscribe($this->_subscription->topic);
-        $this->_initSubscription();
+        $inbox = $this->_instagram->direct->getInbox();
+        $subscription = $inbox->subscription;
+        if (!$subscription instanceof Subscription) {
+            throw new \InvalidArgumentException('Can not subscribe to inbox.');
+        }
+        $this->_subscription = $subscription;
     }
 
     /** {@inheritdoc} */
