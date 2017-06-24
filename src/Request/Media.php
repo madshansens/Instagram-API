@@ -401,9 +401,12 @@ class Media extends RequestCollection
     }
 
     /**
-     * Validate URL.
+     * Validate a web URL for acceptable use as external link.
      *
-     * @param string $url URL you want to validate.
+     * This endpoint lets you check if the URL is allowed by Instagram, and is
+     * helpful to call before you try to use a web URL in your media links.
+     *
+     * @param string $url The URL you want to validate.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
