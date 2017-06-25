@@ -335,8 +335,8 @@ class Direct extends RequestCollection
     /**
      * Create group thread.
      *
-     * @param string[]|int[] $userIds    Array of numerical UserPK IDs.
-     * @param string $threadTitle Name of the group thread.
+     * @param string[]|int[] $userIds     Array of numerical UserPK IDs.
+     * @param string         $threadTitle Name of the group thread.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -360,7 +360,7 @@ class Direct extends RequestCollection
             $user = (string) $user;
         }
 
-        $request = $this->ig->request("direct_v2/create_group_thread/")
+        $request = $this->ig->request('direct_v2/create_group_thread/')
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('recipient_users', json_encode($userIds))
