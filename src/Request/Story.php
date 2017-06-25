@@ -149,8 +149,8 @@ class Story extends RequestCollection
      * Note that this only works for your own story items. Instagram doesn't
      * allow you to see the viewer list for other people's stories!
      *
-     * @param string $storyPk    The story media item's PK in Instagram's internal format (ie "3482384834").
-     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param string      $storyPk The story media item's PK in Instagram's internal format (ie "3482384834").
+     * @param null|string $maxId   Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
