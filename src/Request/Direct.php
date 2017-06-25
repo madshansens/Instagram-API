@@ -333,6 +333,47 @@ class Direct extends RequestCollection
     }
 
     /**
+     * Create group thread.
+     *
+     * @param string[]|int[] $userIds    Array of numerical UserPK IDs.
+     * @param string $threadTitle Name of the group thread.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CreateGroupThreadResponse
+     */
+    public function createGroupThread(
+        array $userIds,
+        $threadTitle)
+    {
+        if (count($userIds) < 2) {
+            throw new \InvalidArgumentException('Group must have at least 2 users.');
+        }
+
+        foreach ($userIds as &$user) {
+            if (!is_scalar($user)) {
+                throw new \InvalidArgumentException('User identifier must be scalar.');
+            } elseif (!ctype_digit($user) && (!is_int($user) || $user < 0)) {
+                throw new \InvalidArgumentException(sprintf('"%s" is not a valid user identifier.', $user));
+            }
+            $user = (string) $user;
+        }
+
+        $request = $this->ig->request("direct_v2/create_group_thread/")
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('recipient_users', json_encode($userIds))
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('thread_title', $threadTitle);
+
+        if ($this->hasUnifiedInbox()) {
+            $request->addParam('use_unified_inbox', 'true');
+        }
+        $request->getResponse(new Response\CreateGroupThreadResponse());
+    }
+
+    /**
      * Add users to thread.
      *
      * @param string         $threadId Thread ID.
