@@ -333,7 +333,12 @@ class Direct extends RequestCollection
     }
 
     /**
-     * Create group thread.
+     * Create a private story sharing group.
+     *
+     * NOTE: In the official app, when you create a story, you can choose to
+     * send it privately. And from there you can create a new group thread. So
+     * this group creation endpoint is only meant to be used for "direct
+     * stories" at the moment.
      *
      * @param string[]|int[] $userIds     Array of numerical UserPK IDs.
      * @param string         $threadTitle Name of the group thread.
@@ -348,9 +353,8 @@ class Direct extends RequestCollection
         $threadTitle)
     {
         if (count($userIds) < 2) {
-            throw new \InvalidArgumentException('Group must have at least 2 users.');
+            throw new \InvalidArgumentException('You must invite at least 2 users to create a group.');
         }
-
         foreach ($userIds as &$user) {
             if (!is_scalar($user)) {
                 throw new \InvalidArgumentException('User identifier must be scalar.');
@@ -366,11 +370,11 @@ class Direct extends RequestCollection
             ->addPost('recipient_users', json_encode($userIds))
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('thread_title', $threadTitle);
-
         if ($this->hasUnifiedInbox()) {
             $request->addParam('use_unified_inbox', 'true');
         }
-        $request->getResponse(new Response\DirectCreateGroupThreadResponse());
+
+        return $request->getResponse(new Response\DirectCreateGroupThreadResponse());
     }
 
     /**
