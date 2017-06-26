@@ -56,7 +56,7 @@ use InstagramAPI\ResponseTrait;
  * @method setUsers(\InstagramAPI\Response\Model\User[] $value)
  * @method setViewerId(string $value)
  */
-class CreateGroupThreadResponse extends AutoPropertyHandler implements ResponseInterface
+class DirectCreateGroupThreadResponse extends AutoPropertyHandler implements ResponseInterface
 {
     use ResponseTrait;
 

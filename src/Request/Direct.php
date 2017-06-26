@@ -341,7 +341,7 @@ class Direct extends RequestCollection
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\CreateGroupThreadResponse
+     * @return \InstagramAPI\Response\DirectCreateGroupThreadResponse
      */
     public function createGroupThread(
         array $userIds,
@@ -370,7 +370,7 @@ class Direct extends RequestCollection
         if ($this->hasUnifiedInbox()) {
             $request->addParam('use_unified_inbox', 'true');
         }
-        $request->getResponse(new Response\CreateGroupThreadResponse());
+        $request->getResponse(new Response\DirectCreateGroupThreadResponse());
     }
 
     /**
