@@ -288,12 +288,10 @@ class Request
         // Call the API endpoint and get the response.
         $response = $this->_parent->client->api(
             $this->_apiVersion, $endpoint, $this->_headers,
-            $postData, $this->_needsAuth, false
+            $postData, $this->_needsAuth, false, $baseClass
         );
 
         // Decode to base class if provided, or otherwise return raw object.
-        return $baseClass !== null
-               ? $this->_parent->client->getMappedResponseObject($baseClass, $response)
-               : $response;
+        return $response;
     }
 }

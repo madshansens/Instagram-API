@@ -2,8 +2,8 @@
 
 namespace InstagramAPI\Exception;
 
-use InstagramAPI\Response;
 use InstagramAPI\ResponseInterface;
+use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
 
 /**
  * Parses Instagram's API error messages and throws an appropriate exception.
@@ -71,20 +71,22 @@ class ServerMessageThrower
      *
      * Uses the generic EndpointException if no other exceptions match.
      *
-     * @param string|null       $prefixString   What prefix to use for the message in
-     *                                          the final exception. Should be something
-     *                                          helpful such as the name of the class or
-     *                                          function which threw. Can be NULL.
-     * @param string            $serverMessage  The failure string from Instagram's API.
-     * @param ResponseInterface $serverResponse The complete server response object,
-     *                                          if one is available (optional).
+     * @param string|null                $prefixString   What prefix to use for the message in
+     *                                                   the final exception. Should be something
+     *                                                   helpful such as the name of the class or
+     *                                                   function which threw. Can be NULL.
+     * @param string                     $serverMessage  The failure string from Instagram's API.
+     * @param ResponseInterface|null     $serverResponse The complete server response object,
+     *                                                   if one is available (optional).
+     * @param HttpResponseInterface|null $httpResponse   The HTTP response object (if available).
      *
      * @throws InstagramException The appropriate exception.
      */
     public static function autoThrow(
         $prefixString,
         $serverMessage,
-        ResponseInterface $serverResponse = null)
+        ResponseInterface $serverResponse = null,
+        HttpResponseInterface $httpResponse = null)
     {
         $messages = [$serverMessage];
         if ($serverResponse instanceof ResponseInterface) {
@@ -95,10 +97,9 @@ class ServerMessageThrower
             }
         }
 
-        // Generic "API function exception" if no critical exception is found.
-        $exceptionClass = 'EndpointException';
+        $exceptionClass = null;
 
-        // Now check if the server message is in our CRITICAL exception table.
+        // Check if the server message is in our CRITICAL exception table.
         foreach ($messages as $message) {
             foreach (self::EXCEPTION_MAP as $className => $patterns) {
                 foreach ($patterns as $pattern) {
@@ -116,6 +117,21 @@ class ServerMessageThrower
                         }
                     }
                 }
+            }
+        }
+
+        // Check HTTP status code if no critical exception is found.
+        if ($exceptionClass === null) {
+            $httpStatusCode = $httpResponse !== null ? $httpResponse->getStatusCode() : null;
+            switch ($httpStatusCode) {
+                case 400:
+                    $exceptionClass = 'BadRequestException';
+                    break;
+                case 404:
+                    $exceptionClass = 'NotFoundException';
+                    break;
+                default:
+                    $exceptionClass = 'EndpointException';
             }
         }
 

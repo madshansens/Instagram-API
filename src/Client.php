@@ -7,6 +7,7 @@ use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\HandlerStack;
 use InstagramAPI\Exception\ServerMessageThrower;
 use InstagramAPI\Exception\SettingsException;
+use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
 
 /**
  * This class handles core API network communication and file uploads.
@@ -530,10 +531,11 @@ class Client
     /**
      * Converts a server response to a specific kind of result object.
      *
-     * @param ResponseInterface $baseClass An instance of a class object whose
-     *                                     properties to fill with the response.
-     * @param mixed             $response  A decoded JSON response from
-     *                                     Instagram's server.
+     * @param ResponseInterface          $baseClass    An instance of a class object whose
+     *                                                 properties to fill with the response.
+     * @param mixed                      $response     A decoded JSON response from
+     *                                                 Instagram's server.
+     * @param HttpResponseInterface|null $httpResponse HTTP Response object (if available).
      *
      * @throws \InstagramAPI\Exception\InstagramException In case of invalid or
      *                                                    failed API response.
@@ -542,10 +544,19 @@ class Client
      */
     public function getMappedResponseObject(
         ResponseInterface $baseClass,
-        $response)
+        $response,
+        HttpResponseInterface $httpResponse = null)
     {
         if (is_null($response)) {
-            throw new \InstagramAPI\Exception\EmptyResponseException('No response from server. Either a connection or configuration error.');
+            $httpStatusCode = $httpResponse !== null ? $httpResponse->getStatusCode() : 0;
+            switch ($httpStatusCode) {
+                case 400:
+                    throw new \InstagramAPI\Exception\BadRequestException('Invalid request options.');
+                case 404:
+                    throw new \InstagramAPI\Exception\NotFoundException('Requested resource does not exist.');
+                default:
+                    throw new \InstagramAPI\Exception\EmptyResponseException('No response from server. Either a connection or configuration error.');
+            }
         }
 
         // Use API developer debugging? Throws if class lacks properties.
@@ -571,7 +582,8 @@ class Client
             ServerMessageThrower::autoThrow(
                 get_class($baseClass),
                 $message,
-                $responseObject
+                $responseObject,
+                $httpResponse
             );
         }
 
@@ -664,18 +676,8 @@ class Client
         case 429: // "429 Too Many Requests"
             throw new \InstagramAPI\Exception\ThrottledException('Throttled by Instagram because of too many API requests.');
             break;
-        // NOTE: Detecting "404" errors was intended to help us detect when API
-        // endpoints change. But it turns out that A) Instagram uses "valid" 404
-        // status codes in actual API replies to indicate "user not found" and
-        // similar states for various lookup functions. So we can't die on 404,
-        // since "404" API calls actually succeeded in most cases. And B) Their
-        // API doesn't 404 if you try an invalid endpoint URL. Instead, it just
-        // redirects you to their official homepage. So catching 404 is both
-        // pointless and harmful. This is a warning to future contributors!
-        // ---
-        // case 404: // "404 Not Found"
-        //     die("The requested URL was not found (\"{$uri}\").");
-        //     break;
+        // NOTE: Do not detect 404 errors here, because we catch them at higher level
+        // after checking for critical errors. This is a warning to future contributors!
         }
 
         // We'll periodically auto-save our cookies at certain intervals. This
@@ -789,7 +791,8 @@ class Client
             // Check for API response success and attempt to decode it to the desired class.
             $result['object'] = $this->getMappedResponseObject(
                 $libraryOptions['decodeToObject'],
-                self::api_body_decode($body) // Important: Special JSON decoder.
+                self::api_body_decode($body), // Important: Special JSON decoder.
+                $guzzleResponse
             );
         }
 
@@ -799,18 +802,21 @@ class Client
     /**
      * Perform an Instagram API call.
      *
-     * @param int         $apiVersion The Instagram API version to call (1, 2, etc).
-     * @param string      $endpoint   Relative API endpoint, such as "media/seen/",
-     *                                but can also be a full URI starting with "http:"
-     *                                or "https:", which is then used as-provided
-     *                                (and apiVersion will be ignored).
-     * @param array       $headers    An associative array of custom request headers.
-     *                                They'll take precedence over any clashing defaults.
-     * @param string|null $postData   Optional string of POST-parameters, to do a
-     *                                POST request instead of a GET.
-     * @param bool        $needsAuth  Whether this API call needs authorization.
-     * @param bool        $assoc      Whether to decode to associative array,
-     *                                otherwise we decode to object.
+     * @param int                    $apiVersion The Instagram API version to call (1, 2, etc).
+     * @param string                 $endpoint   Relative API endpoint, such as "media/seen/",
+     *                                           but can also be a full URI starting with "http:"
+     *                                           or "https:", which is then used as-provided
+     *                                           (and apiVersion will be ignored).
+     * @param array                  $headers    An associative array of custom request headers.
+     *                                           They'll take precedence over any clashing defaults.
+     * @param string|null            $postData   Optional string of POST-parameters, to do a
+     *                                           POST request instead of a GET.
+     * @param bool                   $needsAuth  Whether this API call needs authorization.
+     * @param bool                   $assoc      Whether to decode to associative array,
+     *                                           otherwise we decode to object.
+     * @param ResponseInterface|null $baseClass  An instance of a class object whose
+     *                                           properties to fill with the response,
+     *                                           or NULL to get a standard object.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -822,7 +828,8 @@ class Client
         $headers = [],
         $postData = null,
         $needsAuth = true,
-        $assoc = true)
+        $assoc = true,
+        ResponseInterface $baseClass = null)
     {
         if ($needsAuth) {
             // Throw if this requires authentication and we're not logged in.
@@ -864,13 +871,13 @@ class Client
             [
                 'debugUploadedBody'  => !$isMultipart,
                 'debugUploadedBytes' => $isMultipart,
-                'decodeToObject'     => false,
+                'decodeToObject'     => $baseClass !== null ? $baseClass : false,
             ]
         );
 
-        // Manually decode the JSON response, since we didn't request object decoding
+        // Manually decode the JSON response, if we didn't request object decoding
         // above. This lets our caller later map it to any object they want (or none).
-        return self::api_body_decode($response['body'], $assoc);
+        return $baseClass !== null ? $response['object'] : self::api_body_decode($response['body'], $assoc);
     }
 
     /**
