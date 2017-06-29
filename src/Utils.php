@@ -439,6 +439,53 @@ class Utils
         }
     }
 
+    /**
+     * Verifies an array of media usertags.
+     *
+     * Ensures that the input strictly contains the exact keys necessary for
+     * usertags, and with proper values for them. We cannot validate that the
+     * user-id's actually exist, but that's the job of the library user!
+     *
+     * @param array $usertags The array of usertags, optionally with the "in" or
+     *                        "removed" top-level keys holding the usertags. Example:
+     *                        ['in'=>[['position'=>[0.5,0.5],'user_id'=>'123'], ...]].
+     *
+     * @throws \InvalidArgumentException If any tags are invalid.
+     */
+    public static function throwIfInvalidUsertags(
+        array $usertags)
+    {
+        if (count($usertags) < 1) {
+            throw new \InvalidArgumentException('Empty usertags array.');
+        }
+
+        foreach ($usertags as $k => $v) {
+            if ($k === 'in' || $k === 'removed') {
+                if (!is_array($v) || count($v) < 1) {
+                    throw new \InvalidArgumentException(sprintf(
+                        'Invalid usertags array, has no entries for "%s" section.', $k
+                    ));
+                }
+
+                // Handle ['in'=>[...], 'removed'=>[...]] top-level keys since
+                // this input contained top-level array keys containing the usertags.
+                self::throwIfInvalidUsertags($v);
+            } else {
+                // Verify this usertag entry, ensuring that the entry is format
+                // ['position'=>[0.0,1.0],'user_id'=>'123'] and nothing else.
+                if (!is_array($v) || count($v) != 2 || !isset($v['position'])
+                    || !is_array($v['position']) || count($v['position']) != 2
+                    || !isset($v['position'][0]) || !isset($v['position'][1])
+                    || !is_float($v['position'][0]) || !is_float($v['position'][1])
+                    || $v['position'][0] < 0.0 || $v['position'][1] > 1.0
+                    || !isset($v['user_id']) || !is_scalar($v['user_id'])
+                    || (!ctype_digit($v['user_id']) && (!is_int($v['user_id']) || $v['user_id'] < 0))) {
+                    throw new \InvalidArgumentException('Invalid user entry in usertags array.');
+                }
+            }
+        }
+    }
+
     public static function formatBytes(
         $bytes,
         $precision = 2)
