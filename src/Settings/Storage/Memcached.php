@@ -48,7 +48,7 @@ class Memcached implements StorageInterface
                 );
 
                 // Enable SASL authentication if credentials were provided.
-                // NOTE: PHP's Memcache API doesn't support individual
+                // NOTE: PHP's Memcached API doesn't support individual
                 // authentication credentials per-server!
                 if (isset($locationConfig['sasl_username'])
                     && isset($locationConfig['sasl_password'])) {
