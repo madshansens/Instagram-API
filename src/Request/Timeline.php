@@ -112,6 +112,11 @@ class Timeline extends RequestCollection
 
             $media[$key]['internalMetadata'] = [];
 
+            // If usertags are provided, verify that the entries are valid.
+            if (isset($item['usertags'])) {
+                Utils::throwIfInvalidUsertags($item['usertags']);
+            }
+
             // Pre-process media details and throw if not allowed on Instagram.
             switch ($item['type']) {
             case 'photo':
