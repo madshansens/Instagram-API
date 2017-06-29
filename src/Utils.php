@@ -469,7 +469,17 @@ class Utils
 
                 // Handle ['in'=>[...], 'removed'=>[...]] top-level keys since
                 // this input contained top-level array keys containing the usertags.
-                self::throwIfInvalidUsertags($v);
+                if ($k === 'in') {
+                    // Check the array of usertags to insert.
+                    self::throwIfInvalidUsertags($v);
+                } else { // 'removed'
+                    // Check the array of userids to remove.
+                    foreach ($v as $userId) {
+                        if (!ctype_digit($userId) && (!is_int($userId) || $userId < 0)) {
+                            throw new \InvalidArgumentException('Invalid user ID in usertags "removed" array.');
+                        }
+                    }
+                }
             } else {
                 // Verify this usertag entry, ensuring that the entry is format
                 // ['position'=>[0.0,1.0],'user_id'=>'123'] and nothing else.
