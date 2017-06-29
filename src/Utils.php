@@ -468,7 +468,9 @@ class Utils
                 }
 
                 // Skip the section if it's empty.
-                if (count($v) < 1) { continue; }
+                if (count($v) < 1) {
+                    continue;
+                }
 
                 // Handle ['in'=>[...], 'removed'=>[...]] top-level keys since
                 // this input contained top-level array keys containing the usertags.

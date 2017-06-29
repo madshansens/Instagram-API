@@ -57,7 +57,7 @@ class Usertag extends RequestCollection
     {
         $usertags = [
             'removed' => [
-                $userId
+                $userId,
             ],
             'in'      => [],
         ];
