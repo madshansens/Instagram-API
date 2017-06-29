@@ -491,7 +491,8 @@ class Utils
                     || !isset($v['position'][0]) || !isset($v['position'][1])
                     || (!is_int($v['position'][0]) && !is_float($v['position'][0]))
                     || (!is_int($v['position'][1]) && !is_float($v['position'][1]))
-                    || $v['position'][0] < 0.0 || $v['position'][1] > 1.0
+                    || $v['position'][0] < 0.0 || $v['position'][0] > 1.0
+                    || $v['position'][1] < 0.0 || $v['position'][1] > 1.0
                     || !isset($v['user_id']) || !is_scalar($v['user_id'])
                     || (!ctype_digit($v['user_id']) && (!is_int($v['user_id']) || $v['user_id'] < 0))) {
                     throw new \InvalidArgumentException('Invalid user entry in usertags array.');
