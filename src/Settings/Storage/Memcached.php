@@ -47,7 +47,24 @@ class Memcached implements StorageInterface
                     : 'instagram'
                 );
 
+                // Enable SASL authentication if credentials were provided.
+                // NOTE: PHP's Memcache API doesn't support individual
+                // authentication credentials per-server!
+                if (isset($locationConfig['sasl_username'])
+                    && isset($locationConfig['sasl_password'])) {
+                    // When SASL is used, the servers almost always NEED binary
+                    // protocol, but if that doesn't work with the user's server
+                    // then then the user can manually override this default by
+                    // providing the "false" option via "memcached_options".
+                    $this->_memcached->setOption(PHPMemcached::OPT_BINARY_PROTOCOL, true);
+                    $this->_memcached->setSaslAuthData(
+                        $locationConfig['sasl_username'],
+                        $locationConfig['sasl_password']
+                    );
+                }
+
                 // Apply any custom options the user has provided.
+                // NOTE: This is where "OPT_BINARY_PROTOCOL" can be overridden.
                 if (is_array($locationConfig['memcached_options'])) {
                     $this->_memcached->setOptions($locationConfig['memcached_options']);
                 }

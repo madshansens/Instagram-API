@@ -157,6 +157,17 @@ class Factory
                     'servers' => (isset($storageConfig['servers'])
                                   ? $storageConfig['servers']
                                   : null),
+                    // SASL username and password to be used for SASL
+                    // authentication with all of the memcache servers.
+                    // NOTE: PHP's Memcache API doesn't support individual
+                    // authentication credentials per-server, so these values
+                    // apply to all of your servers if you use this feature!
+                    'sasl_username' => (isset($storageConfig['sasl_username'])
+                                        ? $storageConfig['sasl_username']
+                                        : null),
+                    'sasl_password' => (isset($storageConfig['sasl_password'])
+                                        ? $storageConfig['sasl_password']
+                                        : null),
                 ];
             }
 
