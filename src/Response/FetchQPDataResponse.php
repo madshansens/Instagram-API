@@ -24,4 +24,5 @@ class FetchQPDataResponse extends AutoPropertyHandler implements ResponseInterfa
     public $qp_data;
     public $request_status;
     public $extra_info;
+    public $error_msg;
 }
