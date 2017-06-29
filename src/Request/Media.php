@@ -76,11 +76,12 @@ class Media extends RequestCollection
     /**
      * Edit media.
      *
-     * @param string      $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string      $captionText Caption text.
-     * @param null|string $usertags    (optional) Special JSON string with user tagging instructions,
-     *                                 if you want to modify the user tags.
+     * @param string     $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string     $captionText Caption text.
+     * @param null|array $usertags    (optional) Special array with user tagging instructions,
+     *                                if you want to modify the user tags.
      *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\EditMediaResponse
@@ -91,7 +92,7 @@ class Media extends RequestCollection
     public function edit(
         $mediaId,
         $captionText = '',
-        $usertags = null)
+        array $usertags = null)
     {
         $request = $this->ig->request("media/{$mediaId}/edit_media/")
             ->addPost('_uuid', $this->ig->uuid)
@@ -100,7 +101,8 @@ class Media extends RequestCollection
             ->addPost('caption_text', $captionText);
 
         if (!is_null($usertags)) {
-            $request->addPost('usertags', $usertags);
+            Utils::throwIfInvalidUsertags($usertags);
+            $request->addPost('usertags', json_encode($usertags));
         }
 
         return $request->getResponse(new Response\EditMediaResponse());
