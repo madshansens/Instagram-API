@@ -17,6 +17,7 @@ class Usertag extends RequestCollection
      * @param float[] $position    Position relative to image where the tag should sit. Example: [0.4890625,0.6140625]
      * @param string  $captionText Caption text.
      *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\EditMediaResponse
@@ -24,12 +25,17 @@ class Usertag extends RequestCollection
     public function tagMedia(
         $mediaId,
         $userId,
-        $position,
+        array $position,
         $captionText = '')
     {
-        $usertag = '{"removed":[],"in":[{"position":['.$position[0].','.$position[1].'],"user_id":"'.$userId.'"}]}';
+        $usertags = [
+            'removed' => [],
+            'in'      => [
+                ['position' => $position, 'user_id' => $userId],
+            ],
+        ];
 
-        return $this->ig->media->edit($mediaId, $captionText, $usertag);
+        return $this->ig->media->edit($mediaId, $captionText, $usertags);
     }
 
     /**
@@ -39,6 +45,7 @@ class Usertag extends RequestCollection
      * @param string $userId      Numerical UserPK ID.
      * @param string $captionText Caption text.
      *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\EditMediaResponse
@@ -48,9 +55,14 @@ class Usertag extends RequestCollection
         $userId,
         $captionText = '')
     {
-        $usertag = '{"removed":["'.$userId.'"],"in":[]}';
+        $usertags = [
+            'removed' => [
+                $userId
+            ],
+            'in'      => [],
+        ];
 
-        return $this->ig->media->edit($mediaId, $captionText, $usertag);
+        return $this->ig->media->edit($mediaId, $captionText, $usertags);
     }
 
     /**
