@@ -285,13 +285,13 @@ class Request
         /** @var string|null $postData The POST body contents; is NULL if GET request instead. */
         $postData = $this->_getRequestBody();
 
-        // Call the API endpoint and get the response.
+        // Call the API endpoint and get the response object (mapped to the
+        // desired base class if provided, otherwise as a standard object).
         $response = $this->_parent->client->api(
             $this->_apiVersion, $endpoint, $this->_headers,
             $postData, $this->_needsAuth, false, $baseClass
         );
 
-        // Decode to base class if provided, or otherwise return raw object.
         return $response;
     }
 }

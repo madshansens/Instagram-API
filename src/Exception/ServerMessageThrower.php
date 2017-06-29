@@ -120,8 +120,11 @@ class ServerMessageThrower
             }
         }
 
-        // Check HTTP status code if no critical exception is found.
+        // Check the HTTP status code if no critical exception has been found.
         if ($exceptionClass === null) {
+            // NOTE FOR CONTRIBUTORS: All HTTP status exceptions below MUST be
+            // derived from EndpointException, since all HTTP errors are
+            // endpoint-error-related responses and MUST be easily catchable!
             $httpStatusCode = $httpResponse !== null ? $httpResponse->getStatusCode() : null;
             switch ($httpStatusCode) {
                 case 400:
@@ -131,6 +134,8 @@ class ServerMessageThrower
                     $exceptionClass = 'NotFoundException';
                     break;
                 default:
+                    // No critical exceptions and no HTTP code exceptions have
+                    // been found, so use the generic "API function exception"!
                     $exceptionClass = 'EndpointException';
             }
         }

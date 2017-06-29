@@ -531,11 +531,11 @@ class Client
     /**
      * Converts a server response to a specific kind of result object.
      *
-     * @param ResponseInterface          $baseClass    An instance of a class object whose
-     *                                                 properties to fill with the response.
-     * @param mixed                      $response     A decoded JSON response from
-     *                                                 Instagram's server.
-     * @param HttpResponseInterface|null $httpResponse HTTP Response object (if available).
+     * @param ResponseInterface          $baseClass      An instance of a class object whose
+     *                                                   properties to fill with the response.
+     * @param mixed                      $serverResponse A decoded JSON response from
+     *                                                   Instagram's server.
+     * @param HttpResponseInterface|null $httpResponse   HTTP response object (if available).
      *
      * @throws \InstagramAPI\Exception\InstagramException In case of invalid or
      *                                                    failed API response.
@@ -544,11 +544,13 @@ class Client
      */
     public function getMappedResponseObject(
         ResponseInterface $baseClass,
-        $response,
+        $serverResponse,
         HttpResponseInterface $httpResponse = null)
     {
-        if (is_null($response)) {
-            $httpStatusCode = $httpResponse !== null ? $httpResponse->getStatusCode() : 0;
+        // If the server response is NULL, it means that JSON decoding failed.
+        // So analyze the HTTP status code (if available) to see what happened.
+        if (is_null($serverResponse)) {
+            $httpStatusCode = $httpResponse !== null ? $httpResponse->getStatusCode() : null;
             switch ($httpStatusCode) {
                 case 400:
                     throw new \InstagramAPI\Exception\BadRequestException('Invalid request options.');
@@ -564,10 +566,10 @@ class Client
 
         // Perform mapping of all response properties.
         /** @var ResponseInterface $responseObject */
-        $responseObject = $this->_mapper->map($response, $baseClass);
+        $responseObject = $this->_mapper->map($serverResponse, $baseClass);
 
         // Save the raw response object as the "getFullResponse()" value.
-        $responseObject->setFullResponse($response);
+        $responseObject->setFullResponse($serverResponse);
 
         // Throw an exception if the API response was unsuccessful.
         // NOTE: It will contain the full server response object too, which
@@ -676,8 +678,9 @@ class Client
         case 429: // "429 Too Many Requests"
             throw new \InstagramAPI\Exception\ThrottledException('Throttled by Instagram because of too many API requests.');
             break;
-        // NOTE: Do not detect 404 errors here, because we catch them at higher level
-        // after checking for critical errors. This is a warning to future contributors!
+        // WARNING: Do NOT detect 404 and other higher-level HTTP errors here,
+        // since we catch those later during steps like getMappedResponseObject
+        // and autoThrow. This is a warning to future contributors!
         }
 
         // We'll periodically auto-save our cookies at certain intervals. This
@@ -813,10 +816,12 @@ class Client
      *                                           POST request instead of a GET.
      * @param bool                   $needsAuth  Whether this API call needs authorization.
      * @param bool                   $assoc      Whether to decode to associative array,
-     *                                           otherwise we decode to object.
+     *                                           otherwise we decode to standard object.
+     *                                           Note that this parameter should be FALSE
+     *                                           if you are providing the baseClass param!
      * @param ResponseInterface|null $baseClass  An instance of a class object whose
      *                                           properties to fill with the response,
-     *                                           or NULL to get a standard object.
+     *                                           or NULL to get a standard object/array.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -834,6 +839,12 @@ class Client
         if ($needsAuth) {
             // Throw if this requires authentication and we're not logged in.
             $this->_throwIfNotLoggedIn();
+        }
+
+        // Disable "assoc" if a base-class was provided, since we need to map
+        // between a pure standard object and the target class in that case.
+        if ($baseClass !== null) {
+            $assoc = false;
         }
 
         // Build request options.
@@ -1121,7 +1132,8 @@ class Client
         // Manually decode the final API response and check for successful chunked upload.
         $upload = $this->getMappedResponseObject(
             new Response\UploadVideoResponse(),
-            self::api_body_decode($response['body']) // Important: Special JSON decoder.
+            self::api_body_decode($response['body']), // Important: Special JSON decoder.
+            isset($response['response']) ? $response['response'] : null
         );
 
         return $upload;
