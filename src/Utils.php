@@ -461,11 +461,14 @@ class Utils
 
         foreach ($usertags as $k => $v) {
             if ($k === 'in' || $k === 'removed') {
-                if (!is_array($v) || count($v) < 1) {
+                if (!is_array($v)) {
                     throw new \InvalidArgumentException(sprintf(
-                        'Invalid usertags array, has no entries for "%s" section.', $k
+                        'Invalid usertags array. The value for key "%s" must be an array.', $k
                     ));
                 }
+
+                // Skip the section if it's empty.
+                if (count($v) < 1) { continue; }
 
                 // Handle ['in'=>[...], 'removed'=>[...]] top-level keys since
                 // this input contained top-level array keys containing the usertags.
@@ -486,7 +489,8 @@ class Utils
                 if (!is_array($v) || count($v) != 2 || !isset($v['position'])
                     || !is_array($v['position']) || count($v['position']) != 2
                     || !isset($v['position'][0]) || !isset($v['position'][1])
-                    || !is_float($v['position'][0]) || !is_float($v['position'][1])
+                    || (!is_int($v['position'][0]) && !is_float($v['position'][0]))
+                    || (!is_int($v['position'][1]) && !is_float($v['position'][1]))
                     || $v['position'][0] < 0.0 || $v['position'][1] > 1.0
                     || !isset($v['user_id']) || !is_scalar($v['user_id'])
                     || (!ctype_digit($v['user_id']) && (!is_int($v['user_id']) || $v['user_id'] < 0))) {
