@@ -170,6 +170,9 @@ class Internal extends RequestCollection
         /** @var Response\Model\Location|null A Location object describing where
          the media was taken. NOT USED FOR STORY MEDIA! */
         $location = (isset($externalMetadata['location']) && $targetFeed != 'story') ? $externalMetadata['location'] : null;
+        /** @var array|null Array of usertagging instructions, in the format
+         [['position'=>[0.5,0.5], 'user_id'=>'123'], ...]. ONLY FOR TIMELINE PHOTOS! */
+        $usertags = (isset($externalMetadata['usertags']) && $targetFeed == 'timeline') ? $externalMetadata['usertags'] : null;
         /** @var void Photo filter. THIS DOES NOTHING! All real filters are done in the mobile app. */
         // $filter = isset($externalMetadata['filter']) ? $externalMetadata['filter'] : null;
         $filter = null; // COMMENTED OUT SO USERS UNDERSTAND THEY CAN'T USE THIS!
@@ -218,6 +221,12 @@ class Internal extends RequestCollection
                     ->addPost('source_type', '4')
                     ->addPost('media_folder', 'Camera')
                     ->addPost('upload_id', $uploadId);
+
+                if ($usertags !== null) {
+                    $usertags = ['in' => $usertags]; // Wrap in container array.
+                    Utils::throwIfInvalidUsertags($usertags);
+                    $request->addPost('usertags', json_encode($usertags));
+                }
                 break;
             case 'story':
                 $request
