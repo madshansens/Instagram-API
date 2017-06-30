@@ -13,6 +13,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getLatestReelMedia()
  * @method Location getLocation()
  * @method mixed getMuted()
+ * @method Owner getOwner()
  * @method mixed getPrefetchCount()
  * @method mixed getRankedPosition()
  * @method mixed getSeen()
@@ -28,6 +29,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isLatestReelMedia()
  * @method bool isLocation()
  * @method bool isMuted()
+ * @method bool isOwner()
  * @method bool isPrefetchCount()
  * @method bool isRankedPosition()
  * @method bool isSeen()
@@ -43,6 +45,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setLatestReelMedia(mixed $value)
  * @method setLocation(Location $value)
  * @method setMuted(mixed $value)
+ * @method setOwner(Owner $value)
  * @method setPrefetchCount(mixed $value)
  * @method setRankedPosition(mixed $value)
  * @method setSeen(mixed $value)
@@ -80,4 +83,8 @@ class Tray extends AutoPropertyHandler
      */
     public $location;
     public $source_token;
+    /**
+     * @var Owner
+     */
+    public $owner;
 }

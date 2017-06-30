@@ -14,10 +14,14 @@ use InstagramAPI\AutoPropertyHandler;
  * @method string getFacebookPlacesId()
  * @method float getLat()
  * @method float getLng()
+ * @method Location getLocationDict()
  * @method mixed getName()
  * @method string getPk()
+ * @method mixed getProfilePicUrl()
+ * @method mixed getProfilePicUsername()
  * @method mixed getShortName()
  * @method mixed getStartTime()
+ * @method mixed getType()
  * @method bool isAddress()
  * @method bool isCity()
  * @method bool isExternalId()
@@ -27,10 +31,14 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isFacebookPlacesId()
  * @method bool isLat()
  * @method bool isLng()
+ * @method bool isLocationDict()
  * @method bool isName()
  * @method bool isPk()
+ * @method bool isProfilePicUrl()
+ * @method bool isProfilePicUsername()
  * @method bool isShortName()
  * @method bool isStartTime()
+ * @method bool isType()
  * @method setAddress(mixed $value)
  * @method setCity(mixed $value)
  * @method setExternalId(string $value)
@@ -40,10 +48,14 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setFacebookPlacesId(string $value)
  * @method setLat(float $value)
  * @method setLng(float $value)
+ * @method setLocationDict(Location $value)
  * @method setName(mixed $value)
  * @method setPk(string $value)
+ * @method setProfilePicUrl(mixed $value)
+ * @method setProfilePicUsername(mixed $value)
  * @method setShortName(mixed $value)
  * @method setStartTime(mixed $value)
+ * @method setType(mixed $value)
  */
 class Location extends AutoPropertyHandler
 {
@@ -81,4 +93,11 @@ class Location extends AutoPropertyHandler
      */
     public $facebook_events_id;
     public $start_time;
+    /**
+     * @var Location
+     */
+    public $location_dict;
+    public $type;
+    public $profile_pic_url;
+    public $profile_pic_username;
 }

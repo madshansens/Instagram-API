@@ -5,18 +5,21 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyHandler;
 
 /**
+ * @method Attribution getAttribution()
  * @method float getHeight()
  * @method Location getLocation()
  * @method float getRotation()
  * @method float getWidth()
  * @method float getX()
  * @method float getY()
+ * @method bool isAttribution()
  * @method bool isHeight()
  * @method bool isLocation()
  * @method bool isRotation()
  * @method bool isWidth()
  * @method bool isX()
  * @method bool isY()
+ * @method setAttribution(Attribution $value)
  * @method setHeight(float $value)
  * @method setLocation(Location $value)
  * @method setRotation(float $value)
@@ -50,4 +53,8 @@ class StoryLocation extends AutoPropertyHandler
      * @var Location
      */
     public $location;
+    /**
+     * @var Attribution
+     */
+    public $attribution;
 }
