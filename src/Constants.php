@@ -26,7 +26,7 @@ class Constants
     const CONTENT_TYPE = 'application/x-www-form-urlencoded; charset=UTF-8';
     const X_FB_HTTP_Engine = 'Liger';
     const X_IG_Connection_Type = 'WIFI';
-    const X_IG_Capabilities = '3boBAA==';
+    const X_IG_Capabilities = '3boDAA==';
 
     // Facebook Constants.
     const FACEBOOK_OTA_FIELDS = 'update%7Bdownload_uri%2Cdownload_uri_delta_base%2Cversion_code_delta_base%2Cdownload_uri_delta%2Cfallback_to_full_update%2Cfile_size_delta%2Cversion_code%2Cpublished_date%2Cfile_size%2Cota_bundle_type%2Cresources_checksum%7D';
@@ -38,6 +38,10 @@ class Constants
     const PLATFORM = 'android';
     const APPLICATION_NAME = 'InstagramForAndroid';
     const PACKAGE_NAME = 'com.instagram.android';
+
+    // Instagram Analytics.
+    const ANALYTICS_ACCESS_TOKEN = '567067343352427|f249176f09e26ce54212b472dbab8fa8';
+    const SURFACE_PARAM = 4715;
 
     // General Constants.
     const SRC_DIR = __DIR__; // Absolute path to the "src" folder.
