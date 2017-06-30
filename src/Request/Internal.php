@@ -1019,8 +1019,6 @@ class Internal extends RequestCollection
     /**
      * Fetch qp data.
      *
-     * WARNING. DON'T USE. UNDER RESEARCH.
-     *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\FetchQPDataResponse
@@ -1036,5 +1034,28 @@ class Internal extends RequestCollection
             ->addPost('version', 1)
             ->addPost('query', 'viewer() {\n  eligible_promotions.surface_nux_id(<surface>).external_gating_permitted_qps(<external_gating_permitted_qps>) {\n    edges {\n      priority,\n      time_range {\n        start,\n        end\n      },\n      node {\n        id,\n        promotion_id,\n        max_impressions,\n        triggers,\n        creatives {\n          title {\n            text\n          },\n          content {\n            text\n          },\n          footer {\n            text\n          },\n          social_context {\n            text\n          },\n          primary_action{\n            title {\n              text\n            },\n            url,\n            limit,\n            dismiss_promotion\n          },\n          secondary_action{\n            title {\n              text\n            },\n            url,\n            limit,\n            dismiss_promotion\n          },\n          dismiss_action{\n            title {\n              text\n            },\n            url,\n            limit,\n            dismiss_promotion\n          },\n          image {\n            uri\n          }\n        }\n      }\n    }\n  }\n}\n')
             ->getResponse(new Response\FetchQPDataResponse());
+    }
+
+    /**
+     * Send analytics and events to Instagram Analytics Server.
+     *
+     * @param string $data Analytics and event data encoded in json.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ClientEventLogsResponse
+     */
+    public function sendClientEventLogs(
+        $data)
+    {
+        $message = base64_encode(gzcompress($data));
+        $message = str_replace('/', '%2F', str_replace('+', '%2B', $message));
+
+        return $this->ig->request(Constants::GRAPH_URL.'logging_client_events')
+            ->addPost('message', $message)
+            ->addPost('compressed', '1')
+            ->addPost('access_token', Constants::ANALYTICS_ACCESS_TOKEN)
+            ->addPost('format', 'json')
+            ->getResponse(new Response\ClientEventLogsResponse());
     }
 }
