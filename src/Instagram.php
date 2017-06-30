@@ -607,7 +607,8 @@ class Instagram
             $this->people->getRecentActivityInbox();
             $this->internal->getProfileNotice();
             $this->media->getBlockedMedia();
-            $this->internal->getQPFetch();
+            // Researching...
+            //$this->internal->getQPFetch();
             $this->discover->getExploreFeed();
             //$this->internal->getFacebookOTA();
         } else {
