@@ -13,4 +13,5 @@ class ClientEventLogsResponse extends AutoPropertyHandler implements ResponseInt
     public $checksum;
     public $config;
     public $app_data;
+    public $error;
 }
