@@ -119,4 +119,8 @@ class DirectThreadItem extends AutoPropertyHandler
      * @var ReelShare
      */
     public $reel_share;
+    /**
+     * @var Placeholder
+     */
+    public $placeholder;
 }
