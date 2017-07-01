@@ -23,7 +23,13 @@ use InstagramAPI\AutoPropertyHandler;
  */
 class PermanentItem extends AutoPropertyHandler
 {
+    /**
+     * @var string
+     */
     public $item_id;
+    /**
+     * @var string
+     */
     public $user_id;
     public $timestamp;
     public $item_type;
