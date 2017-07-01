@@ -14,6 +14,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method \InstagramAPI\Response\Model\DirectThreadItem[] getItems()
  * @method mixed getLastActivityAt()
  * @method mixed getLastActivityAtSecs()
+ * @method \InstagramAPI\Response\Model\PermanentItem getLastPermanentItem()
  * @method \InstagramAPI\Response\Model\DirectThreadLastSeenAt[] getLastSeenAt()
  * @method \InstagramAPI\Response\Model\User[] getLeftUsers()
  * @method mixed getMuted()
@@ -36,6 +37,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isItems()
  * @method bool isLastActivityAt()
  * @method bool isLastActivityAtSecs()
+ * @method bool isLastPermanentItem()
  * @method bool isLastSeenAt()
  * @method bool isLeftUsers()
  * @method bool isMuted()
@@ -58,6 +60,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setItems(\InstagramAPI\Response\Model\DirectThreadItem[] $value)
  * @method setLastActivityAt(mixed $value)
  * @method setLastActivityAtSecs(mixed $value)
+ * @method setLastPermanentItem(\InstagramAPI\Response\Model\PermanentItem $value)
  * @method setLastSeenAt(\InstagramAPI\Response\Model\DirectThreadLastSeenAt[] $value)
  * @method setLeftUsers(\InstagramAPI\Response\Model\User[] $value)
  * @method setMuted(mixed $value)
@@ -124,4 +127,8 @@ class DirectThread extends AutoPropertyHandler
      */
     public $action_badge;
     public $last_activity_at_secs;
+    /**
+     * @var \InstagramAPI\Response\Model\PermanentItem
+     */
+    public $last_permanent_item;
 }
