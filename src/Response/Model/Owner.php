@@ -5,8 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyHandler;
 
 /**
- * @method mixed getLat()
- * @method mixed getLng()
+ * @method float getLat()
+ * @method float getLng()
  * @method Location getLocationDict()
  * @method mixed getName()
  * @method string getPk()
@@ -23,8 +23,8 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isProfilePicUsername()
  * @method bool isShortName()
  * @method bool isType()
- * @method setLat(mixed $value)
- * @method setLng(mixed $value)
+ * @method setLat(float $value)
+ * @method setLng(float $value)
  * @method setLocationDict(Location $value)
  * @method setName(mixed $value)
  * @method setPk(string $value)
@@ -44,8 +44,14 @@ class Owner extends AutoPropertyHandler
     public $profile_pic_url;
     public $profile_pic_username;
     public $short_name;
-    public $lng;
+    /**
+     * @var float
+     */
     public $lat;
+    /**
+     * @var float
+     */
+    public $lng;
     /**
      * @var Location
      */
