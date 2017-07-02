@@ -14,7 +14,6 @@ use InstagramAPI\ResponseTrait;
  * @method mixed getMoreAvailable()
  * @method string getNextMaxId()
  * @method mixed getNumResults()
- * @method Model\_Message[] get_Messages()
  * @method bool isAutoLoadMoreEnabled()
  * @method bool isFeedItems()
  * @method bool isIsDirectV2Enabled()
@@ -22,7 +21,6 @@ use InstagramAPI\ResponseTrait;
  * @method bool isMoreAvailable()
  * @method bool isNextMaxId()
  * @method bool isNumResults()
- * @method bool is_Messages()
  * @method setAutoLoadMoreEnabled(mixed $value)
  * @method setFeedItems(Model\Item[] $value)
  * @method setIsDirectV2Enabled(mixed $value)
@@ -30,7 +28,6 @@ use InstagramAPI\ResponseTrait;
  * @method setMoreAvailable(mixed $value)
  * @method setNextMaxId(string $value)
  * @method setNumResults(mixed $value)
- * @method set_Messages(Model\_Message[] $value)
  */
 class TimelineFeedResponse extends AutoPropertyHandler implements ResponseInterface
 {
@@ -44,10 +41,6 @@ class TimelineFeedResponse extends AutoPropertyHandler implements ResponseInterf
      * @var string
      */
     public $next_max_id;
-    /**
-     * @var Model\_Message[]
-     */
-    public $_messages;
     /**
      * @var Model\Item[]
      */

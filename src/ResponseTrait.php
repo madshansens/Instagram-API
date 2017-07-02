@@ -15,8 +15,20 @@ trait ResponseTrait
     public $status;
     /** @var string */
     public $message;
+    /** @var Response\Model\_Message[] */
+    public $_messages;
     /** @var mixed */
     public $fullResponse;
+
+    /**
+     * Checks if the response was successful.
+     *
+     * @return bool
+     */
+    public function isOk()
+    {
+        return $this->status === 'ok'; // Can be: 'ok', 'fail'
+    }
 
     /**
      * Sets the status.
@@ -110,6 +122,41 @@ trait ResponseTrait
     }
 
     /**
+     * Sets the special API status messages.
+     *
+     * @param Response\Model\_Message[]|null $_messages
+     */
+    public function set_Messages(
+        $_messages)
+    {
+        $this->_messages = $_messages;
+    }
+
+    /**
+     * Gets the special API status messages.
+     *
+     * This can exist in any Instagram API response, and carries special status
+     * information. Known messages: "fb_needs_reauth", "vkontakte_needs_reauth",
+     * "twitter_needs_reauth", "ameba_needs_reauth", "update_push_token".
+     *
+     * @return Response\Model\_Message[]|null Messages if any, otherwise NULL.
+     */
+    public function get_Messages()
+    {
+        return $this->_messages;
+    }
+
+    /**
+     * Checks if any API status messages value exists.
+     *
+     * @return bool
+     */
+    public function is_Messages()
+    {
+        return $this->_messages !== null;
+    }
+
+    /**
      * Sets the full response.
      *
      * @param mixed $response
@@ -138,15 +185,5 @@ trait ResponseTrait
     public function isFullResponse()
     {
         return $this->fullResponse !== null;
-    }
-
-    /**
-     * Checks if the response was successful.
-     *
-     * @return bool
-     */
-    public function isOk()
-    {
-        return $this->getStatus() === 'ok'; // Can be: 'ok', 'fail'
     }
 }
