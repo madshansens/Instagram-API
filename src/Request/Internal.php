@@ -1039,16 +1039,16 @@ class Internal extends RequestCollection
     /**
      * Send analytics and events to Instagram's Analytics Server.
      *
-     * @param string $data Analytics and event data encoded as JSON.
+     * @param array $data Analytics and event data array.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\ClientEventLogsResponse
      */
     public function sendClientEventLogs(
-        $data)
+        array $data)
     {
-        $message = base64_encode(gzcompress($data));
+        $message = base64_encode(gzcompress(json_encode($data)));
         $message = urlencode($message); // Yep, we must URL-encode this data!
 
         return $this->ig->request(Constants::GRAPH_URL.'logging_client_events')
