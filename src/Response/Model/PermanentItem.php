@@ -5,21 +5,21 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyHandler;
 
 /**
- * @method mixed getItemId()
+ * @method string getItemId()
  * @method mixed getItemType()
  * @method mixed getText()
  * @method mixed getTimestamp()
- * @method mixed getUserId()
+ * @method string getUserId()
  * @method bool isItemId()
  * @method bool isItemType()
  * @method bool isText()
  * @method bool isTimestamp()
  * @method bool isUserId()
- * @method setItemId(mixed $value)
+ * @method setItemId(string $value)
  * @method setItemType(mixed $value)
  * @method setText(mixed $value)
  * @method setTimestamp(mixed $value)
- * @method setUserId(mixed $value)
+ * @method setUserId(string $value)
  */
 class PermanentItem extends AutoPropertyHandler
 {
