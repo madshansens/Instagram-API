@@ -80,8 +80,10 @@ class Media extends RequestCollection
      * @param string     $captionText Caption to use for the media.
      * @param null|array $metadata    (optional) Associative array of optional metadata to edit:
      *                                "usertags" - special array with user tagging instructions,
-     *                                             if you want to modify the user tags;
-     *                                "location" - change the location of the media.
+     *                                if you want to modify the user tags;
+     *                                "location" - a Location model object to set the media location,
+     *                                or boolean FALSE to remove any location from the media.
+     * @param string     $mediaType   What type of media you are editing (possible values: "default", "album").
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -94,7 +96,8 @@ class Media extends RequestCollection
     public function edit(
         $mediaId,
         $captionText = '',
-        array $metadata = null)
+        array $metadata = null,
+        $mediaType = 'default')
     {
         $request = $this->ig->request("media/{$mediaId}/edit_media/")
             ->addPost('_uuid', $this->ig->uuid)
@@ -108,7 +111,46 @@ class Media extends RequestCollection
         }
 
         if (isset($metadata['location'])) {
-            // TODO: NOT IMPLEMENTED!!!
+            if ($metadata['location'] === false) {
+                // The user wants to remove the current location from the media.
+                die('TODO: IMPLEMENT THE CORRECT PARAMS TO REMOVE THE LOCATION.');
+            } else {
+                // The user wants to add/change the location of the media.
+                if (!$metadata['location'] instanceof Response\Model\Location) {
+                    throw new \InvalidArgumentException('The "location" metadata value must be an instance of \InstagramAPI\Response\Model\Location.');
+                }
+
+                // TODO: THIS WORKS. BUT WE SHOULD VERIFY ALL OF THE PARAMETERS
+                // BELOW TO BE SURE THEY ARE REALLY THE CORRECT WAY TO EDIT
+                // LOCATION WHEN EDITING MEDIA!
+
+                $loc = [
+                    $metadata['location']->getExternalIdSource().'_id' => $metadata['location']->getExternalId(),
+                    'name'                                             => $metadata['location']->getName(),
+                    'lat'                                              => $metadata['location']->getLat(),
+                    'lng'                                              => $metadata['location']->getLng(),
+                    'address'                                          => $metadata['location']->getAddress(),
+                    'external_source'                                  => $metadata['location']->getExternalIdSource(),
+                ];
+
+                $request
+                    ->addPost('location', json_encode($loc))
+                    ->addPost('geotag_enabled', '1')
+                    ->addPost('posting_latitude', $metadata['location']->getLat())
+                    ->addPost('posting_longitude', $metadata['location']->getLng())
+                    ->addPost('media_latitude', $metadata['location']->getLat())
+                    ->addPost('media_longitude', $metadata['location']->getLng());
+
+                if ($mediaType === 'album') { // Albums need special handling.
+                    $request
+                        ->addPost('exif_latitude', 0.0)
+                        ->addPost('exif_longitude', 0.0);
+                } else { // All other types of media use "av_" instead of "exif_".
+                    $request
+                        ->addPost('av_latitude', 0.0)
+                        ->addPost('av_longitude', 0.0);
+                }
+            }
         }
 
         return $request->getResponse(new Response\EditMediaResponse());
