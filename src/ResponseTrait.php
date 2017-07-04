@@ -15,8 +15,8 @@ trait ResponseTrait
     public $status;
     /** @var string */
     public $message;
-    /** @var Response\Model\_Message[] */
-    public $_messages;
+    /** @var \InstagramAPI\Response\Model\_Message[] */
+    public $_messages; // NOTE: Full classpath is needed above for JSONMapper!
     /** @var mixed */
     public $fullResponse;
 
