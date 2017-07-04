@@ -4,7 +4,6 @@ namespace InstagramAPI\Request;
 
 use InstagramAPI\Constants;
 use InstagramAPI\Response;
-use InstagramAPI\Response\Model\Item;
 use InstagramAPI\Signatures;
 use InstagramAPI\Utils;
 
@@ -38,9 +37,9 @@ class Media extends RequestCollection
     /**
      * Delete a media item.
      *
-     * @param string $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string $mediaType The type of the media item you are deleting. One of: "PHOTO", "VIDEO"
-     *                          "ALBUM", or the raw value of the Item's "getMediaType()" function.
+     * @param string     $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string|int $mediaType The type of the media item you are deleting. One of: "PHOTO", "VIDEO"
+     *                              "ALBUM", or the raw value of the Item's "getMediaType()" function.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -51,18 +50,7 @@ class Media extends RequestCollection
         $mediaId,
         $mediaType = 'PHOTO')
     {
-        if (ctype_digit($mediaType) || is_int($mediaType)) {
-            if ($mediaType == Item::PHOTO) {
-                $mediaType = 'PHOTO';
-            } elseif ($mediaType == Item::VIDEO) {
-                $mediaType = 'VIDEO';
-            } elseif ($mediaType == Item::ALBUM) {
-                $mediaType = 'ALBUM';
-            }
-        }
-        if (!in_array($mediaType, ['PHOTO', 'VIDEO', 'ALBUM'], true)) {
-            throw new \InvalidArgumentException(sprintf('"%s" is not a valid media type.', $mediaType));
-        }
+        $mediaType = Utils::checkMediaType($mediaType);
 
         return $this->ig->request("media/{$mediaId}/delete/")
             ->addParam('media_type', $mediaType)
@@ -83,7 +71,8 @@ class Media extends RequestCollection
      *                                if you want to modify the user tags;
      *                                "location" - a Location model object to set the media location,
      *                                or boolean FALSE to remove any location from the media.
-     * @param string     $mediaType   What type of media you are editing (possible values: "default", "album").
+     * @param string|int $mediaType   The type of the media item you are editing. One of: "PHOTO", "VIDEO"
+     *                                "ALBUM", or the raw value of the Item's "getMediaType()" function.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -97,8 +86,10 @@ class Media extends RequestCollection
         $mediaId,
         $captionText = '',
         array $metadata = null,
-        $mediaType = 'default')
+        $mediaType = 'PHOTO')
     {
+        $mediaType = Utils::checkMediaType($mediaType);
+
         $request = $this->ig->request("media/{$mediaId}/edit_media/")
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
@@ -141,7 +132,7 @@ class Media extends RequestCollection
                     ->addPost('media_latitude', $metadata['location']->getLat())
                     ->addPost('media_longitude', $metadata['location']->getLng());
 
-                if ($mediaType === 'album') { // Albums need special handling.
+                if ($mediaType === 'ALBUM') { // Albums need special handling.
                     $request
                         ->addPost('exif_latitude', 0.0)
                         ->addPost('exif_longitude', 0.0);
