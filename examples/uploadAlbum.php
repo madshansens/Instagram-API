@@ -42,7 +42,7 @@ $media = [ // Albums can contain between 2 and 10 photos/videos.
         'file'     => '', // Path to the video file.
     ],
 ];
-$captionText = ''; // Caption text to use for the album.
+$captionText = ''; // Caption to use for the album.
 //////////////////////
 
 $ig = new \InstagramAPI\Instagram($debug, $truncatedDebug);

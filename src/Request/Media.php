@@ -77,7 +77,7 @@ class Media extends RequestCollection
      * Edit media.
      *
      * @param string     $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string     $captionText Caption text.
+     * @param string     $captionText Caption to use for the media.
      * @param null|array $usertags    (optional) Special array with user tagging instructions,
      *                                if you want to modify the user tags.
      *

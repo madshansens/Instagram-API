@@ -15,7 +15,7 @@ class Usertag extends RequestCollection
      * @param string  $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param string  $userId      Numerical UserPK ID.
      * @param float[] $position    Position relative to image where the tag should sit. Example: [0.4890625,0.6140625]
-     * @param string  $captionText Caption text.
+     * @param string  $captionText Caption to use for the media.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -43,7 +43,7 @@ class Usertag extends RequestCollection
      *
      * @param string $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param string $userId      Numerical UserPK ID.
-     * @param string $captionText Caption text.
+     * @param string $captionText Caption to use for the media.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
