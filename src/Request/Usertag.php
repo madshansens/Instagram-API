@@ -35,7 +35,7 @@ class Usertag extends RequestCollection
             ],
         ];
 
-        return $this->ig->media->edit($mediaId, $captionText, $usertags);
+        return $this->ig->media->edit($mediaId, $captionText, ['usertags' => $usertags]);
     }
 
     /**
@@ -62,7 +62,7 @@ class Usertag extends RequestCollection
             'in'      => [],
         ];
 
-        return $this->ig->media->edit($mediaId, $captionText, $usertags);
+        return $this->ig->media->edit($mediaId, $captionText, ['usertags' => $usertags]);
     }
 
     /**

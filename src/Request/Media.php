@@ -78,21 +78,23 @@ class Media extends RequestCollection
      *
      * @param string     $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param string     $captionText Caption to use for the media.
-     * @param null|array $usertags    (optional) Special array with user tagging instructions,
-     *                                if you want to modify the user tags.
+     * @param null|array $metadata    (optional) Associative array of optional metadata to edit:
+     *                                "usertags" - special array with user tagging instructions,
+     *                                             if you want to modify the user tags;
+     *                                "location" - change the location of the media.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\EditMediaResponse
      *
-     * @see Usertag::tagMedia() for an example of proper $usertags parameter formatting.
-     * @see Usertag::untagMedia() for an example of proper $usertags parameter formatting.
+     * @see Usertag::tagMedia() for an example of proper "usertags" metadata formatting.
+     * @see Usertag::untagMedia() for an example of proper "usertags" metadata formatting.
      */
     public function edit(
         $mediaId,
         $captionText = '',
-        array $usertags = null)
+        array $metadata = null)
     {
         $request = $this->ig->request("media/{$mediaId}/edit_media/")
             ->addPost('_uuid', $this->ig->uuid)
@@ -100,9 +102,13 @@ class Media extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('caption_text', $captionText);
 
-        if (!is_null($usertags)) {
-            Utils::throwIfInvalidUsertags($usertags);
-            $request->addPost('usertags', json_encode($usertags));
+        if (isset($metadata['usertags'])) {
+            Utils::throwIfInvalidUsertags($metadata['usertags']);
+            $request->addPost('usertags', json_encode($metadata['usertags']));
+        }
+
+        if (isset($metadata['location'])) {
+            // TODO: NOT IMPLEMENTED!!!
         }
 
         return $request->getResponse(new Response\EditMediaResponse());
