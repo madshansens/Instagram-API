@@ -2,6 +2,8 @@
 
 namespace InstagramAPI;
 
+use InstagramAPI\Response\Model\Item;
+
 class Utils
 {
     /**
@@ -501,6 +503,35 @@ class Utils
                 }
             }
         }
+    }
+
+    /**
+     * Checks and validates a media item's type.
+     *
+     * @param string|int $mediaType The type of the media item. One of: "PHOTO", "VIDEO"
+     *                              "ALBUM", or the raw value of the Item's "getMediaType()" function.
+     *
+     * @throws \InvalidArgumentException If the type is invalid.
+     *
+     * @return string The verified final type; either "PHOTO", "VIDEO" or "ALBUM".
+     */
+    public static function checkMediaType(
+        $mediaType)
+    {
+        if (ctype_digit($mediaType) || is_int($mediaType)) {
+            if ($mediaType == Item::PHOTO) {
+                $mediaType = 'PHOTO';
+            } elseif ($mediaType == Item::VIDEO) {
+                $mediaType = 'VIDEO';
+            } elseif ($mediaType == Item::ALBUM) {
+                $mediaType = 'ALBUM';
+            }
+        }
+        if (!in_array($mediaType, ['PHOTO', 'VIDEO', 'ALBUM'], true)) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not a valid media type.', $mediaType));
+        }
+
+        return $mediaType;
     }
 
     public static function formatBytes(
