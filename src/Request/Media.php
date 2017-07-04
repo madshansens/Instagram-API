@@ -113,7 +113,7 @@ class Media extends RequestCollection
         if (isset($metadata['location'])) {
             if ($metadata['location'] === false) {
                 // The user wants to remove the current location from the media.
-                die('TODO: IMPLEMENT THE CORRECT PARAMS TO REMOVE THE LOCATION.');
+                $request->addPost('location', '{}');
             } else {
                 // The user wants to add/change the location of the media.
                 if (!$metadata['location'] instanceof Response\Model\Location) {
