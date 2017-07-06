@@ -48,5 +48,8 @@
     },
     "suggest": {
         "ext-event": "Installing PHP's native Event extension enables faster Realtime class event handling."
+    },
+    "require-dev": {
+        "react/http": "^0.7.2"
     }
 }

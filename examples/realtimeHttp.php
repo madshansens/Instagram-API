@@ -3,8 +3,7 @@
 /*
  * IMPORTANT!
  * You need https://github.com/reactphp/http in order to run this example.
- * $ composer require react/socket "^0.5"
- * $ composer require react/http "^0.6"
+ * $ composer require react/http "^0.7"
  *
  * Usage:
  * # mark item 456 in thread 123 as seen
@@ -154,37 +153,17 @@ class RealtimeHttpServer
     }
 
     /**
-     * @param \React\Http\Response $response
-     * @param string|null          $data
-     */
-    protected function _handleSuccess(
-        \React\Http\Response $response,
-        $data = null)
-    {
-        // Reply with 200 OK.
-        $response->writeHead(200);
-        $response->end($data);
-    }
-
-    /**
-     * @param \React\Http\Response $response
-     */
-    protected function _handleSendingFail(
-        \React\Http\Response $response)
-    {
-        // If we are not able to send command, reply with 503 Service Unavailable.
-        $response->writeHead(503);
-        $response->end();
-    }
-
-    /**
-     * @param string               $context
-     * @param \React\Http\Response $response
+     * @param string|bool $context
+     *
+     * @return \React\Http\Response|\React\Promise\PromiseInterface
      */
     protected function _handleClientContext(
-        $context,
-        \React\Http\Response $response)
+        $context)
     {
+        // Reply with 503 Service Unavailable.
+        if ($context === false) {
+            return new \React\Http\Response(503);
+        }
         // Set up deferred object.
         $deferred = new \React\Promise\Deferred();
         $this->_contexts[$context] = $deferred;
@@ -194,94 +173,54 @@ class RealtimeHttpServer
             unset($this->_contexts[$context]);
         });
         // Set up promise.
-        $deferred->promise()
-            ->then(function (\InstagramAPI\Realtime\Action\Ack $ack) use ($timeout, $response) {
+        return $deferred->promise()
+            ->then(function (\InstagramAPI\Realtime\Action\Ack $ack) use ($timeout) {
                 // Cancel reject timer.
                 $timeout->cancel();
                 // Reply with info from $ack.
-                $response->writeHead($ack->status_code, ['Content-Type' => 'text/json']);
-                $response->end(json_encode($ack->payload));
+                return new \React\Http\Response($ack->status_code, ['Content-Type' => 'text/json'], json_encode($ack->payload));
             })
-            ->otherwise(function () use ($response) {
+            ->otherwise(function () {
                 // Called by reject timer. Reply with 504 Gateway Time-out.
-                $response->writeHead(504);
-                $response->end();
+                return new \React\Http\Response(504);
             });
     }
 
     /**
      * Handler for incoming HTTP requests.
      *
-     * @param \React\Http\Request  $request
-     * @param \React\Http\Response $response
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return \React\Http\Response|\React\Promise\PromiseInterface
      */
     public function onHttpRequest(
-        \React\Http\Request $request,
-        \React\Http\Response $response)
+        \Psr\Http\Message\ServerRequestInterface $request)
     {
         // Params validation is up to you.
         $params = $request->getQueryParams();
         // Treat request path as command.
-        switch ($request->getPath()) {
+        switch ($request->getUri()->getPath()) {
             case '/ping':
-                $this->_handleSuccess($response, 'pong');
-                break;
+                return new \React\Http\Response(200, [], 'pong');
             case '/stop':
-                $this->_handleSuccess($response);
                 $this->_stop();
-                break;
+                return new \React\Http\Response(200);
             case '/seen':
                 $context = $this->_rtc->markDirectItemSeen($params['threadId'], $params['threadItemId']);
-                if ($context) {
-                    $this->_handleSuccess($response);
-                } else {
-                    $this->_handleSendingFail($response);
-                }
-                break;
+                return new \React\Http\Response($context !== false ? 200 : 503);
             case '/activity':
-                $context = $this->_rtc->indicateActivityInDirectThread($params['threadId'], (bool) $params['flag']);
-                if ($context !== false) {
-                    $this->_handleClientContext($context, $response);
-                } else {
-                    $this->_handleSendingFail($response);
-                }
-                break;
+                return $this->_handleClientContext($this->_rtc->indicateActivityInDirectThread($params['threadId'], (bool) $params['flag']));
             case '/message':
-                $context = $this->_rtc->sendTextToDirect($params['threadId'], $params['text']);
-                if ($context !== false) {
-                    $this->_handleClientContext($context, $response);
-                } else {
-                    $this->_handleSendingFail($response);
-                }
-                break;
+                return $this->_handleClientContext($this->_rtc->sendTextToDirect($params['threadId'], $params['text']));
             case '/like':
-                $context = $this->_rtc->sendLikeToDirect($params['threadId']);
-                if ($context !== false) {
-                    $this->_handleClientContext($context, $response);
-                } else {
-                    $this->_handleSendingFail($response);
-                }
-                break;
+                return $this->_handleClientContext($this->_rtc->sendLikeToDirect($params['threadId']));
             case '/likeItem':
-                $context = $this->_rtc->sendReactionToDirect($params['threadId'], $params['threadItemId'], 'like');
-                if ($context !== false) {
-                    $this->_handleClientContext($context, $response);
-                } else {
-                    $this->_handleSendingFail($response);
-                }
-                break;
+                return $this->_handleClientContext($this->_rtc->sendReactionToDirect($params['threadId'], $params['threadItemId'], 'like'));
             case '/unlikeItem':
-                $context = $this->_rtc->deleteReactionFromDirect($params['threadId'], $params['threadItemId'], 'like');
-                if ($context !== false) {
-                    $this->_handleClientContext($context, $response);
-                } else {
-                    $this->_handleSendingFail($response);
-                }
-                break;
+                return $this->_handleClientContext($this->_rtc->deleteReactionFromDirect($params['threadId'], $params['threadItemId'], 'like'));
             default:
                 // If command is unknown, reply with 404 Not Found.
-                $response->writeHead(404);
-                $response->end();
+                return new \React\Http\Response(404);
         }
     }
 
@@ -294,7 +233,7 @@ class RealtimeHttpServer
         $socket = new \React\Socket\Server(self::HOST.':'.self::PORT, $this->_loop);
         printf('[RTC] Listening on http://%s%s', $socket->getAddress(), PHP_EOL);
         // Bind HTTP server on server socket.
-        $this->_server = new \React\Http\Server($socket);
-        $this->_server->on('request', [$this, 'onHttpRequest']);
+        $this->_server = new \React\Http\Server([$this, 'onHttpRequest']);
+        $this->_server->listen($socket);
     }
 }
