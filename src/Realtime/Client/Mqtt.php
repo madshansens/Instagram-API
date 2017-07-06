@@ -6,28 +6,36 @@ use BinSoul\Net\Mqtt\Client\React\ReactMqttClient;
 use BinSoul\Net\Mqtt\DefaultConnection;
 use BinSoul\Net\Mqtt\DefaultMessage;
 use BinSoul\Net\Mqtt\Message;
+use InstagramAPI\Client as HttpClient;
 use InstagramAPI\Constants;
 use InstagramAPI\Devices\GoodDevices;
 use InstagramAPI\Realtime;
 use InstagramAPI\Realtime\Client;
 use InstagramAPI\Realtime\Client\Mqtt\Connector;
 use InstagramAPI\Realtime\Event;
-use InstagramAPI\Utils;
 
 class Mqtt extends Client
 {
+    /* PubSub topics */
     const DIRECT_TOPIC_TEMPLATE = 'ig/u/v1/%s';
     const LIVE_TOPIC_TEMPLATE = 'ig/live_notification_subscribe/%s';
 
+    /* GraphQL subscription topics */
+    const TYPING_TOPIC_TEMPLATE = '1/graphqlsubscriptions/17867973967082385/{"input_data": {"user_id":%s}}';
+
+    /* MQTT server options */
     const DEFAULT_HOST = 'edge-mqtt.facebook.com';
     const DEFAULT_PORT = 443;
 
+    /** MQTT protocol options */
     const MQTT_KEEPALIVE = 900;
     const MQTT_VERSION = 3;
 
+    /** MQTT QoS */
     const FIRE_AND_FORGET = 0;
     const ACKNOWLEDGED_DELIVERY = 1;
 
+    /** Topic+ID pairs */
     const PUBSUB_TOPIC = '/pubsub';
     const PUBSUB_TOPIC_ID = '88';
 
@@ -46,10 +54,18 @@ class Mqtt extends Client
     const MESSAGE_SYNC_TOPIC = '/ig_message_sync';
     const MESSAGE_SYNC_TOPIC_ID = '146';
 
+    const REALTIME_SUB_TOPIC = '/ig_realtime_sub';
+    const REALTIME_SUB_TOPIC_ID = '149';
+
+    const GRAPHQL_TOPIC = '/graphql';
+    const GRAPHQL_TOPIC_ID = '9';
+
+    /** MQTT client options */
     const NETWORK_TYPE_WIFI = 1;
     const CLIENT_TYPE = 'cookie_auth';
     const PUBLISH_FORMAT = 'jz';
 
+    /** MQTT client capabilities */
     const CP_ACKNOWLEDGED_DELIVERY = 0;
     const CP_PROCESSING_LASTACTIVE_PRESENCEINFO = 1;
     const CP_EXACT_KEEPALIVE = 2;
@@ -63,11 +79,15 @@ class Mqtt extends Client
     const CP_DATA_SAVING_MODE = 10;
     const CP_TYPING_OFF_WHEN_SENDING_MESSAGE = 11;
 
+    const INVALID_SEQUENCE_ID = -1;
+
     /** @var int */
     protected $_capabilities;
 
     /** @var string[] */
-    protected $_topics;
+    protected $_pubsubTopics;
+    /** @var string[] */
+    protected $_graphqlTopics;
 
     /** @var ReactMqttClient */
     protected $_connection;
@@ -84,6 +104,10 @@ class Mqtt extends Client
     protected $_irisEnabled;
     /** @var string|null */
     protected $_msgTypeBlacklist;
+    /** @var bool */
+    protected $_graphQlEnabled;
+    /** @var int */
+    protected $_sequenceId;
 
     /** {@inheritdoc} */
     protected function _handleParams(
@@ -116,17 +140,30 @@ class Mqtt extends Client
         if (isset($params['msgTypeBlacklist'])) {
             $this->_msgTypeBlacklist = $params['msgTypeBlacklist'];
         }
+        if (isset($params['isGraphQlEnabled'])) {
+            $this->_graphQlEnabled = (bool) $params['isGraphQlEnabled'];
+        } else {
+            $this->_graphQlEnabled = false;
+        }
+        if (isset($params['sequenceId'])) {
+            $this->_sequenceId = (int) $params['sequenceId'];
+        } else {
+            $this->_sequenceId = self::INVALID_SEQUENCE_ID;
+        }
 
-        // Set topics.
-        $this->_topics = [];
-        if ($this->_mqttReceiveEnabled) {
-            $this->_topics[] = sprintf(self::DIRECT_TOPIC_TEMPLATE, $this->_instagram->account_id);
-        }
+        // Set up PubSub topics.
+        $this->_pubsubTopics = [];
         if ($this->_mqttLiveEnabled) {
-            $this->_topics[] = sprintf(self::LIVE_TOPIC_TEMPLATE, $this->_instagram->account_id);
+            $this->_pubsubTopics[] = sprintf(self::LIVE_TOPIC_TEMPLATE, $this->_instagram->account_id);
         }
-        // TODO find out why topics are in reversed order.
-        $this->_topics = array_reverse($this->_topics);
+        if ($this->_mqttReceiveEnabled) {
+            $this->_pubsubTopics[] = sprintf(self::DIRECT_TOPIC_TEMPLATE, $this->_instagram->account_id);
+        }
+        // Set up GraphQL topics.
+        $this->_graphqlTopics = [];
+        if ($this->_graphQlEnabled) {
+            $this->_graphqlTopics[] = sprintf(self::TYPING_TOPIC_TEMPLATE, $this->_instagram->account_id);
+        }
     }
 
     /** {@inheritdoc} */
@@ -135,6 +172,7 @@ class Mqtt extends Client
         if ($this->_connection === null) {
             return;
         }
+        $this->_unsubscribe();
         $this->_connection->disconnect();
     }
 
@@ -264,12 +302,26 @@ class Mqtt extends Client
             'capabilities'    => Constants::X_IG_Capabilities,
             'User-Agent'      => $this->_instagram->device->getUserAgent(),
         ];
+        // MQTT route.
         if ($this->_mqttRoute !== null && strlen($this->_mqttRoute)) {
             $result['ig_mqtt_route'] = $this->_mqttRoute;
         }
+        // PubSub message type blacklist.
+        $msgTypeBlacklist = '';
         if ($this->_msgTypeBlacklist !== null && strlen($this->_msgTypeBlacklist)) {
-            $result['pubsub_msg_type_blacklist'] = $this->_msgTypeBlacklist;
+            $msgTypeBlacklist = $this->_msgTypeBlacklist;
         }
+        if ($this->_graphQlEnabled) {
+            if (strlen($msgTypeBlacklist)) {
+                $msgTypeBlacklist .= ', typing_type';
+            } else {
+                $msgTypeBlacklist = 'typing_type';
+            }
+        }
+        if (strlen($msgTypeBlacklist)) {
+            $result['pubsub_msg_type_blacklist'] = $msgTypeBlacklist;
+        }
+        // Accept-Language should be last one.
         $result['Accept-Language'] = Constants::ACCEPT_LANGUAGE;
 
         return $result;
@@ -288,8 +340,11 @@ class Mqtt extends Client
         $randNum = mt_rand(1000000, 9999999);
         $topics = [
             self::PUBSUB_TOPIC,
-            self::SEND_MESSAGE_RESPONSE_TOPIC,
         ];
+        if ($this->_graphQlEnabled) {
+            $topics[] = self::REALTIME_SUB_TOPIC;
+        }
+        $topics[] = self::SEND_MESSAGE_RESPONSE_TOPIC;
         if ($this->_irisEnabled) {
             $topics[] = self::IRIS_SUB_RESPONSE_TOPIC;
             $topics[] = self::MESSAGE_SYNC_TOPIC;
@@ -461,15 +516,79 @@ class Mqtt extends Client
     }
 
     /**
+     * Subscribe to Iris.
+     */
+    protected function _subscribeToIris()
+    {
+        if (!$this->_irisEnabled || $this->_sequenceId === self::INVALID_SEQUENCE_ID) {
+            return;
+        }
+        $this->debug('Subscribing to iris with sequence %d', $this->_sequenceId);
+        $command = [
+            'seq_id' => $this->_sequenceId,
+        ];
+        $this->_publish(self::IRIS_SUB_TOPIC, Realtime::jsonEncode($command), self::ACKNOWLEDGED_DELIVERY);
+    }
+
+    /**
+     * Update Iris sequence ID.
+     *
+     * @param int $sequenceId
+     */
+    public function updateSequenceId(
+        $sequenceId)
+    {
+        if ($sequenceId === null || $sequenceId === self::INVALID_SEQUENCE_ID || $this->_sequenceId == $sequenceId) {
+            return;
+        }
+        $this->_sequenceId = $sequenceId;
+        $this->debug('Sequence updated to %d', $this->_sequenceId);
+        if ($this->_isConnected) {
+            $this->_subscribeToIris();
+        }
+    }
+
+    /**
      * Subscribe to all topics.
      */
     protected function _subscribe()
     {
-        $this->debug('Subscribing to topics %s', implode(', ', $this->_topics));
-        $command = [
-            'sub' => $this->_topics,
-        ];
-        $this->_publish(self::PUBSUB_TOPIC, Realtime::jsonEncode($command), self::ACKNOWLEDGED_DELIVERY);
+        if (count($this->_pubsubTopics)) {
+            $this->debug('Subscribing to pubsub topics %s', implode(', ', $this->_pubsubTopics));
+            $command = [
+                'sub' => $this->_pubsubTopics,
+            ];
+            $this->_publish(self::PUBSUB_TOPIC, Realtime::jsonEncode($command), self::ACKNOWLEDGED_DELIVERY);
+        }
+        $this->_subscribeToIris();
+        if (count($this->_graphqlTopics)) {
+            $this->debug('Subscribing to graphql topics %s', implode(', ', $this->_graphqlTopics));
+            $command = [
+                'sub' => $this->_graphqlTopics,
+            ];
+            $this->_publish(self::REALTIME_SUB_TOPIC, Realtime::jsonEncode($command), self::ACKNOWLEDGED_DELIVERY);
+        }
+    }
+
+    /**
+     * Unsubscribe from all topics.
+     */
+    protected function _unsubscribe()
+    {
+        if (count($this->_pubsubTopics)) {
+            $this->debug('Unsubscribing from pubsub topics %s', implode(', ', $this->_pubsubTopics));
+            $command = [
+                'unsub' => $this->_pubsubTopics,
+            ];
+            $this->_publish(self::PUBSUB_TOPIC, Realtime::jsonEncode($command), self::ACKNOWLEDGED_DELIVERY);
+        }
+        if (count($this->_graphqlTopics)) {
+            $this->debug('Unsubscribing from graphql topics %s', implode(', ', $this->_graphqlTopics));
+            $command = [
+                'unsub' => $this->_graphqlTopics,
+            ];
+            $this->_publish(self::REALTIME_SUB_TOPIC, Realtime::jsonEncode($command), self::ACKNOWLEDGED_DELIVERY);
+        }
     }
 
     /**
@@ -486,6 +605,8 @@ class Mqtt extends Client
             self::IRIS_SUB_TOPIC              => self::IRIS_SUB_TOPIC_ID,
             self::IRIS_SUB_RESPONSE_TOPIC     => self::IRIS_SUB_RESPONSE_TOPIC_ID,
             self::MESSAGE_SYNC_TOPIC          => self::MESSAGE_SYNC_TOPIC_ID,
+            self::REALTIME_SUB_TOPIC          => self::REALTIME_SUB_TOPIC_ID,
+            self::GRAPHQL_TOPIC               => self::GRAPHQL_TOPIC_ID,
         ];
     }
 
@@ -544,17 +665,47 @@ class Mqtt extends Client
             case self::PUBSUB_TOPIC_ID:
                 $skywalker = new Client\Mqtt\Skywalker($payload);
                 if (!in_array($skywalker->getType(), [Client\Mqtt\Skywalker::TYPE_DIRECT, Client\Mqtt\Skywalker::TYPE_LIVE])) {
-                    $this->debug('Received skywalker message with unknown type %d', $skywalker->getType());
+                    $this->debug('Received skywalker message with unsupported type %d', $skywalker->getType());
 
                     return;
                 }
                 $payload = $skywalker->getPayload();
                 break;
+            case self::GRAPHQL_TOPIC:
+            case self::GRAPHQL_TOPIC_ID:
+            case self::REALTIME_SUB_TOPIC:
+            case self::REALTIME_SUB_TOPIC_ID:
+                $json = HttpClient::api_body_decode($payload);
+                if (!is_object($json)) {
+                    $this->debug('Failed to decode GraphQL JSON: %s', json_last_error_msg());
+
+                    return;
+                }
+                /** @var Client\Mqtt\GraphQl $graphQl */
+                $graphQl = $this->mapToJson($json, new Client\Mqtt\GraphQl());
+                $payload = $graphQl->getPayload();
+                break;
+            case self::IRIS_SUB_RESPONSE_TOPIC:
+            case self::IRIS_SUB_RESPONSE_TOPIC_ID:
+                $json = HttpClient::api_body_decode($payload);
+                if (!is_object($json)) {
+                    $this->debug('Failed to decode Iris JSON: %s', json_last_error_msg());
+
+                    return;
+                }
+                /** @var Client\Mqtt\Iris $iris */
+                $iris = $this->mapToJson($json, new Client\Mqtt\Iris());
+                if (!$iris->isSucceeded()) {
+                    $this->debug('Failed to subscribe to Iris (%d): %s', $iris->getErrorType(), $iris->getErrorMessage());
+                }
+                return;
             case self::SEND_MESSAGE_RESPONSE_TOPIC:
             case self::SEND_MESSAGE_RESPONSE_TOPIC_ID:
+            case self::MESSAGE_SYNC_TOPIC:
+            case self::MESSAGE_SYNC_TOPIC_ID:
                 break;
             default:
-                $this->debug('Received message from unknown topic "%s"', $topic);
+                $this->debug('Received message from unsupported topic "%s"', $topic);
 
                 return;
         }

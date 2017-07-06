@@ -216,6 +216,8 @@ class Realtime implements EventEmitterInterface
         if ($this->_mqttEnabled) {
             $mqttLiveFeatures = isset($experiments['ig_android_skywalker_live_event_start_end'])
                 ? $experiments['ig_android_skywalker_live_event_start_end'] : [];
+            $graphqlFeatures = isset($experiments['ig_android_gqls_typing_indicator'])
+                ? $experiments['ig_android_gqls_typing_indicator'] : [];
             $this->debug('[rtc] starting mqtt client');
             $this->_mqttClient = new RealtimeClient\Mqtt('mqtt', $this, $this->_instagram, [
                 'isMqttReceiveEnabled' => $this->_mqttReceiveEnabled,
@@ -224,6 +226,8 @@ class Realtime implements EventEmitterInterface
                 'mqttRoute'            => isset($mqttFeatures['mqtt_route']) ? $mqttFeatures['mqtt_route'] : null,
                 'isIrisEnabled'        => RealtimeClient::isFeatureEnabled($mqttLiveFeatures, 'is_direct_over_iris_enabled'),
                 'msgTypeBlacklist'     => isset($mqttFeatures['pubsub_msg_type_blacklist']) ? $mqttFeatures['pubsub_msg_type_blacklist'] : null,
+                'isGraphQlEnabled'     => RealtimeClient::isFeatureEnabled($graphqlFeatures, 'is_enabled'),
+                'sequenceId'           => $inbox->seq_id,
             ]);
         }
 
@@ -545,5 +549,18 @@ class Realtime implements EventEmitterInterface
             'venue_id'        => 70,
             'media_id'        => 75,
         ];
+    }
+
+    /**
+     * Update Iris sequence ID.
+     *
+     * @param int $sequenceId
+     */
+    public function updateSequenceId(
+        $sequenceId)
+    {
+        if ($this->_mqttClient !== null) {
+            $this->_mqttClient->updateSequenceId($sequenceId);
+        }
     }
 }

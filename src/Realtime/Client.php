@@ -625,6 +625,24 @@ abstract class Client
     }
 
     /**
+     * Process single incoming message.
+     *
+     * @param mixed $message
+     */
+    protected function _processSingleMessage(
+        $message
+    )
+    {
+        if (isset($message->event)) {
+            $this->_processEvent($message);
+        } elseif (isset($message->action)) {
+            $this->_processAction($message);
+        } else {
+            $this->debug('Invalid message (both event and action are missing)');
+        }
+    }
+
+    /**
      * Process incoming message.
      *
      * @param string $message
@@ -634,12 +652,12 @@ abstract class Client
     {
         $this->debug('Received message %s', $message);
         $message = HttpClient::api_body_decode($message);
-        if (isset($message->event)) {
-            $this->_processEvent($message);
-        } elseif (isset($message->action)) {
-            $this->_processAction($message);
+        if (!is_array($message)) {
+            $this->_processSingleMessage($message);
         } else {
-            $this->debug('Invalid message (both event and action are missing)');
+            foreach ($message as $singleMessage) {
+                $this->_processSingleMessage($singleMessage);
+            }
         }
     }
 }
