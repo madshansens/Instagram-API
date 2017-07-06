@@ -2,25 +2,48 @@
 
 namespace InstagramAPI\Realtime\Client\Mqtt;
 
-use InstagramAPI\AutoPropertyHandler;
-
-/**
- * @method string getPayload()
- * @method string getSubtopic()
- * @method string getTopic()
- * @method bool isPayload()
- * @method bool isSubtopic()
- * @method bool isTopic()
- * @method setPayload(string $value)
- * @method setSubtopic(string $value)
- * @method setTopic(string $value)
- */
-class GraphQl extends AutoPropertyHandler
+class GraphQl extends Thrift
 {
+    const TOPIC_DIRECT = 'direct';
+    
+    const FIELD_TOPIC = 1;
+    const FIELD_PAYLOAD = 2;
+
     /** @var string */
-    public $topic;
+    protected $_topic;
     /** @var string */
-    public $subtopic;
-    /** @var string */
-    public $payload;
+    protected $_payload;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function _handleField(
+        $field,
+        $value)
+    {
+        switch ($field) {
+            case self::FIELD_TOPIC:
+                $this->_topic = (string) $value;
+                break;
+            case self::FIELD_PAYLOAD:
+                $this->_payload = (string) $value;
+                break;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getTopic()
+    {
+        return $this->_topic;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPayload()
+    {
+        return $this->_payload;
+    }
 }

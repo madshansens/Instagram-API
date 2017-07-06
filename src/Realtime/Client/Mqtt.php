@@ -675,14 +675,12 @@ class Mqtt extends Client
             case self::GRAPHQL_TOPIC_ID:
             case self::REALTIME_SUB_TOPIC:
             case self::REALTIME_SUB_TOPIC_ID:
-                $json = HttpClient::api_body_decode($payload);
-                if (!is_object($json)) {
-                    $this->debug('Failed to decode GraphQL JSON: %s', json_last_error_msg());
+                $graphQl = new Client\Mqtt\GraphQl($payload);
+                if (!in_array($graphQl->getTopic(), [Client\Mqtt\GraphQl::TOPIC_DIRECT])) {
+                    $this->debug('Received graphql message with unsupported topic %s', $graphQl->getTopic());
 
                     return;
                 }
-                /** @var Client\Mqtt\GraphQl $graphQl */
-                $graphQl = $this->mapToJson($json, new Client\Mqtt\GraphQl());
                 $payload = $graphQl->getPayload();
                 break;
             case self::IRIS_SUB_RESPONSE_TOPIC:
