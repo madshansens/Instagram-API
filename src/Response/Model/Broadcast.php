@@ -10,7 +10,10 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getBroadcastStatus()
  * @method mixed getCoverFrameUrl()
  * @method mixed getDashAbrPlaybackUrl()
+ * @method mixed getDashManifest()
  * @method mixed getDashPlaybackUrl()
+ * @method mixed getEncodingTag()
+ * @method mixed getExpireAt()
  * @method string getId()
  * @method string getMediaId()
  * @method mixed getMuted()
@@ -25,7 +28,10 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isBroadcastStatus()
  * @method bool isCoverFrameUrl()
  * @method bool isDashAbrPlaybackUrl()
+ * @method bool isDashManifest()
  * @method bool isDashPlaybackUrl()
+ * @method bool isEncodingTag()
+ * @method bool isExpireAt()
  * @method bool isId()
  * @method bool isMediaId()
  * @method bool isMuted()
@@ -40,7 +46,10 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setBroadcastStatus(mixed $value)
  * @method setCoverFrameUrl(mixed $value)
  * @method setDashAbrPlaybackUrl(mixed $value)
+ * @method setDashManifest(mixed $value)
  * @method setDashPlaybackUrl(mixed $value)
+ * @method setEncodingTag(mixed $value)
+ * @method setExpireAt(mixed $value)
  * @method setId(string $value)
  * @method setMediaId(string $value)
  * @method setMuted(mixed $value)
@@ -77,4 +86,7 @@ class Broadcast extends AutoPropertyHandler
     public $organic_tracking_token;
     public $seen_ranked_position;
     public $viewer_count;
+    public $dash_manifest;
+    public $expire_at;
+    public $encoding_tag;
 }
