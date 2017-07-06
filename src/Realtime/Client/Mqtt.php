@@ -12,6 +12,7 @@ use InstagramAPI\Realtime;
 use InstagramAPI\Realtime\Client;
 use InstagramAPI\Realtime\Client\Mqtt\Connector;
 use InstagramAPI\Realtime\Event;
+use InstagramAPI\Utils;
 
 class Mqtt extends Client
 {
@@ -35,6 +36,15 @@ class Mqtt extends Client
 
     const SEND_MESSAGE_RESPONSE_TOPIC = '/ig_send_message_response';
     const SEND_MESSAGE_RESPONSE_TOPIC_ID = '133';
+
+    const IRIS_SUB_TOPIC = '/ig_sub_iris';
+    const IRIS_SUB_TOPIC_ID = '134';
+
+    const IRIS_SUB_RESPONSE_TOPIC = '/ig_sub_iris_response';
+    const IRIS_SUB_RESPONSE_TOPIC_ID = '135';
+
+    const MESSAGE_SYNC_TOPIC = '/ig_message_sync';
+    const MESSAGE_SYNC_TOPIC_ID = '146';
 
     const NETWORK_TYPE_WIFI = 1;
     const CLIENT_TYPE = 'cookie_auth';
@@ -70,6 +80,10 @@ class Mqtt extends Client
     protected $_mqttLiveEnabled;
     /** @var string|null */
     protected $_mqttRoute;
+    /** @var bool */
+    protected $_irisEnabled;
+    /** @var string|null */
+    protected $_msgTypeBlacklist;
 
     /** {@inheritdoc} */
     protected function _handleParams(
@@ -93,6 +107,14 @@ class Mqtt extends Client
         }
         if (isset($params['mqttRoute'])) {
             $this->_mqttRoute = $params['mqttRoute'];
+        }
+        if (isset($params['isIrisEnabled'])) {
+            $this->_irisEnabled = (bool) $params['isIrisEnabled'];
+        } else {
+            $this->_irisEnabled = false;
+        }
+        if (isset($params['msgTypeBlacklist'])) {
+            $this->_msgTypeBlacklist = $params['msgTypeBlacklist'];
         }
 
         // Set topics.
@@ -241,11 +263,14 @@ class Mqtt extends Client
             'app_version'     => Constants::IG_VERSION,
             'capabilities'    => Constants::X_IG_Capabilities,
             'User-Agent'      => $this->_instagram->device->getUserAgent(),
-            'Accept-Language' => Constants::ACCEPT_LANGUAGE,
         ];
         if ($this->_mqttRoute !== null && strlen($this->_mqttRoute)) {
             $result['ig_mqtt_route'] = $this->_mqttRoute;
         }
+        if ($this->_msgTypeBlacklist !== null && strlen($this->_msgTypeBlacklist)) {
+            $result['pubsub_msg_type_blacklist'] = $this->_msgTypeBlacklist;
+        }
+        $result['Accept-Language'] = Constants::ACCEPT_LANGUAGE;
 
         return $result;
     }
@@ -261,6 +286,14 @@ class Mqtt extends Client
         $sessionId = (microtime(true) - strtotime('Last Monday')) * 1000;
         // Random buster-string to avoid clashing with other data.
         $randNum = mt_rand(1000000, 9999999);
+        $topics = [
+            self::PUBSUB_TOPIC,
+            self::SEND_MESSAGE_RESPONSE_TOPIC,
+        ];
+        if ($this->_irisEnabled) {
+            $topics[] = self::IRIS_SUB_RESPONSE_TOPIC;
+            $topics[] = self::MESSAGE_SYNC_TOPIC;
+        }
         $result = json_encode([
             // USER_ID
             'u'                 => '%ACCOUNT_ID_'.$randNum.'%',
@@ -293,7 +326,7 @@ class Mqtt extends Client
             // APP_ID
             'aid'               => Constants::FACEBOOK_ANALYTICS_APPLICATION_ID,
             // SUBSCRIBE_TOPICS
-            'st'                => [self::PUBSUB_TOPIC, self::SEND_MESSAGE_RESPONSE_TOPIC],
+            'st'                => $topics,
             // CLIENT_STACK
             'clientStack'       => 3,
             // APP_SPECIFIC_INFO
@@ -450,6 +483,9 @@ class Mqtt extends Client
             self::PUBSUB_TOPIC                => self::PUBSUB_TOPIC_ID,
             self::SEND_MESSAGE_TOPIC          => self::SEND_MESSAGE_TOPIC_ID,
             self::SEND_MESSAGE_RESPONSE_TOPIC => self::SEND_MESSAGE_RESPONSE_TOPIC_ID,
+            self::IRIS_SUB_TOPIC              => self::IRIS_SUB_TOPIC_ID,
+            self::IRIS_SUB_RESPONSE_TOPIC     => self::IRIS_SUB_RESPONSE_TOPIC_ID,
+            self::MESSAGE_SYNC_TOPIC          => self::MESSAGE_SYNC_TOPIC_ID,
         ];
     }
 

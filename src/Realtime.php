@@ -222,6 +222,8 @@ class Realtime implements EventEmitterInterface
                 'isMqttAckEnabled'     => RealtimeClient::isFeatureEnabled($mqttFeatures, 'is_ack_delivery_enabled'),
                 'isMqttLiveEnabled'    => RealtimeClient::isFeatureEnabled($mqttLiveFeatures, 'is_enabled'),
                 'mqttRoute'            => isset($mqttFeatures['mqtt_route']) ? $mqttFeatures['mqtt_route'] : null,
+                'isIrisEnabled'        => RealtimeClient::isFeatureEnabled($mqttLiveFeatures, 'is_direct_over_iris_enabled'),
+                'msgTypeBlacklist'     => isset($mqttFeatures['pubsub_msg_type_blacklist']) ? $mqttFeatures['pubsub_msg_type_blacklist'] : null,
             ]);
         }
 
