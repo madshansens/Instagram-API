@@ -11,17 +11,14 @@ use InstagramAPI\ResponseTrait;
  * @method mixed getPendingRequestsTotal()
  * @method Model\User[] getPendingRequestsUsers()
  * @method string getSeqId()
- * @method Model\Subscription getSubscription()
  * @method bool isInbox()
  * @method bool isPendingRequestsTotal()
  * @method bool isPendingRequestsUsers()
  * @method bool isSeqId()
- * @method bool isSubscription()
  * @method setInbox(Model\DirectInbox $value)
  * @method setPendingRequestsTotal(mixed $value)
  * @method setPendingRequestsUsers(Model\User[] $value)
  * @method setSeqId(string $value)
- * @method setSubscription(Model\Subscription $value)
  */
 class DirectInboxResponse extends AutoPropertyHandler implements ResponseInterface
 {
@@ -40,8 +37,4 @@ class DirectInboxResponse extends AutoPropertyHandler implements ResponseInterfa
      * @var Model\DirectInbox
      */
     public $inbox;
-    /**
-     * @var Model\Subscription
-     */
-    public $subscription;
 }

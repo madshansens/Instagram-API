@@ -42,7 +42,6 @@
         "react/event-loop": "^0.4.3",
         "react/promise": "^2.5",
         "react/socket-client": "^0.5",
-        "ratchet/pawl": "^0.2.3",
         "binsoul/net-mqtt-client-react": "^0.2.1",
         "clue/socks-react": "^0.6",
         "clue/http-proxy-react": "^0.1.0"

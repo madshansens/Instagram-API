@@ -5,7 +5,6 @@ namespace InstagramAPI;
 use Evenement\EventEmitterInterface;
 use Evenement\EventEmitterTrait;
 use InstagramAPI\Realtime\Client as RealtimeClient;
-use InstagramAPI\Response\Model\Subscription;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use React\Promise\FulfilledPromise;
@@ -39,9 +38,6 @@ class Realtime implements EventEmitterInterface
     const LOGIN_INTERVAL_MIN = 1800;
     const LOGIN_INTERVAL_MAX = 3600;
 
-    /** @var RealtimeClient\WebSocket */
-    protected $_wsClient;
-
     /** @var RealtimeClient\Mqtt */
     protected $_mqttClient;
 
@@ -53,16 +49,6 @@ class Realtime implements EventEmitterInterface
 
     /** @var TimerInterface */
     protected $_reloginTimer;
-
-    /** @var bool */
-    protected $_wsEnabled;
-
-    /** @var bool */
-    protected $_mqttEnabled;
-    /** @var bool */
-    protected $_mqttReceiveEnabled;
-    /** @var bool */
-    protected $_mqttSendEnabled;
 
     /** @var bool */
     public $debug;
@@ -161,9 +147,6 @@ class Realtime implements EventEmitterInterface
     public function start()
     {
         $this->onReloginTimer(false);
-        if ($this->_wsClient !== null) {
-            $this->_wsClient->connect();
-        }
         if ($this->_mqttClient !== null) {
             $this->_mqttClient->connect();
         }
@@ -178,9 +161,6 @@ class Realtime implements EventEmitterInterface
             $this->debug('[rtc] Login timer is cancelled');
             $this->_reloginTimer->cancel();
         }
-        if ($this->_wsClient !== null) {
-            $this->_wsClient->shutdown();
-        }
         if ($this->_mqttClient !== null) {
             $this->_mqttClient->shutdown();
         }
@@ -191,49 +171,24 @@ class Realtime implements EventEmitterInterface
      */
     protected function _init()
     {
+        // Refresh state.
         $this->_instagram->login();
-        // Fetch inbox for subscription and sequence ID.
-        $inbox = $this->_instagram->direct->getInbox();
-        // Check for MQTT experiments.
+        // Init MQTT client.
         $experiments = $this->_instagram->experiments;
         $mqttFeatures = isset($experiments['ig_android_mqtt_skywalker'])
             ? $experiments['ig_android_mqtt_skywalker'] : [];
-        $this->_wsEnabled = RealtimeClient::isFeatureEnabled($mqttFeatures, 'is_telegraph_enabled');
-        $this->_mqttEnabled = RealtimeClient::isFeatureEnabled($mqttFeatures, 'is_enabled');
-        $this->_mqttSendEnabled = $this->_mqttEnabled && RealtimeClient::isFeatureEnabled($mqttFeatures, 'is_send_enabled');
-        $this->_mqttReceiveEnabled = $this->_mqttEnabled && RealtimeClient::isFeatureEnabled($mqttFeatures, 'is_receive_enabled');
-        // WebSocket Client.
-        if ($this->_wsEnabled && $inbox->subscription instanceof Subscription) {
-            $this->debug('[rtc] starting websocket client');
-            $this->_wsClient = new RealtimeClient\WebSocket('webs', $this, $this->_instagram, [
-                'subscription'         => $inbox->subscription,
-                'isMqttReceiveEnabled' => $this->_mqttReceiveEnabled,
-            ]);
-        } elseif ($this->_wsEnabled) {
-            $this->debug('[rtc] telegraph is enabled without subscription, skipping it');
-        }
-        // MQTT Client.
-        if ($this->_mqttEnabled) {
-            $mqttLiveFeatures = isset($experiments['ig_android_skywalker_live_event_start_end'])
-                ? $experiments['ig_android_skywalker_live_event_start_end'] : [];
-            $graphqlFeatures = isset($experiments['ig_android_gqls_typing_indicator'])
-                ? $experiments['ig_android_gqls_typing_indicator'] : [];
-            $this->debug('[rtc] starting mqtt client');
-            $this->_mqttClient = new RealtimeClient\Mqtt('mqtt', $this, $this->_instagram, [
-                'isMqttReceiveEnabled' => $this->_mqttReceiveEnabled,
-                'isMqttAckEnabled'     => RealtimeClient::isFeatureEnabled($mqttFeatures, 'is_ack_delivery_enabled'),
-                'isMqttLiveEnabled'    => RealtimeClient::isFeatureEnabled($mqttLiveFeatures, 'is_enabled'),
-                'mqttRoute'            => isset($mqttFeatures['mqtt_route']) ? $mqttFeatures['mqtt_route'] : null,
-                'isIrisEnabled'        => RealtimeClient::isFeatureEnabled($mqttLiveFeatures, 'is_direct_over_iris_enabled'),
-                'msgTypeBlacklist'     => isset($mqttFeatures['pubsub_msg_type_blacklist']) ? $mqttFeatures['pubsub_msg_type_blacklist'] : null,
-                'isGraphQlEnabled'     => RealtimeClient::isFeatureEnabled($graphqlFeatures, 'is_enabled'),
-                'sequenceId'           => $inbox->seq_id,
-            ]);
-        }
-
-        if ($this->_wsClient === null && $this->_mqttClient === null) {
-            throw new \RuntimeException('Both MQTT and WS are disabled');
-        }
+        $mqttLiveFeatures = isset($experiments['ig_android_skywalker_live_event_start_end'])
+            ? $experiments['ig_android_skywalker_live_event_start_end'] : [];
+        $graphqlFeatures = isset($experiments['ig_android_gqls_typing_indicator'])
+            ? $experiments['ig_android_gqls_typing_indicator'] : [];
+        $this->debug('[rtc] starting mqtt client');
+        $this->_mqttClient = new RealtimeClient\Mqtt('mqtt', $this, $this->_instagram, [
+            'isMqttLiveEnabled' => RealtimeClient::isFeatureEnabled($mqttLiveFeatures, 'is_enabled'),
+            'isIrisEnabled'     => RealtimeClient::isFeatureEnabled($mqttFeatures, 'is_direct_over_iris_enabled'),
+            'msgTypeBlacklist'  => isset($mqttFeatures['pubsub_msg_type_blacklist']) ? $mqttFeatures['pubsub_msg_type_blacklist'] : null,
+            'isGraphQlEnabled'  => RealtimeClient::isFeatureEnabled($graphqlFeatures, 'is_enabled'),
+            'sequenceId'        => $this->_instagram->direct->getInbox()->getSeqId(),
+        ]);
     }
 
     /**
@@ -261,9 +216,7 @@ class Realtime implements EventEmitterInterface
         array $command)
     {
         $command = static::jsonEncode($command);
-        if ($this->_wsClient !== null && !$this->_mqttSendEnabled) {
-            return $this->_wsClient->sendCommand('X'.$command);
-        } elseif ($this->_mqttClient !== null) {
+        if ($this->_mqttClient !== null) {
             return $this->_mqttClient->sendCommand($command);
         } else {
             return false;

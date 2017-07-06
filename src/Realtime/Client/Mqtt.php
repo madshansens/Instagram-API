@@ -12,7 +12,6 @@ use InstagramAPI\Devices\GoodDevices;
 use InstagramAPI\Realtime;
 use InstagramAPI\Realtime\Client;
 use InstagramAPI\Realtime\Client\Mqtt\Connector;
-use InstagramAPI\Realtime\Event;
 
 class Mqtt extends Client
 {
@@ -93,13 +92,7 @@ class Mqtt extends Client
     protected $_connection;
 
     /** @var bool */
-    protected $_mqttReceiveEnabled;
-    /** @var bool */
-    protected $_mqttAckEnabled;
-    /** @var bool */
     protected $_mqttLiveEnabled;
-    /** @var string|null */
-    protected $_mqttRoute;
     /** @var bool */
     protected $_irisEnabled;
     /** @var string|null */
@@ -114,23 +107,10 @@ class Mqtt extends Client
         array $params)
     {
         // MQTT params.
-        if (isset($params['isMqttReceiveEnabled'])) {
-            $this->_mqttReceiveEnabled = (bool) $params['isMqttReceiveEnabled'];
-        } else {
-            $this->_mqttReceiveEnabled = false;
-        }
-        if (isset($params['isMqttAckEnabled'])) {
-            $this->_mqttAckEnabled = (bool) $params['isMqttAckEnabled'];
-        } else {
-            $this->_mqttAckEnabled = false;
-        }
         if (isset($params['isMqttLiveEnabled'])) {
             $this->_mqttLiveEnabled = (bool) $params['isMqttLiveEnabled'];
         } else {
             $this->_mqttLiveEnabled = false;
-        }
-        if (isset($params['mqttRoute'])) {
-            $this->_mqttRoute = $params['mqttRoute'];
         }
         if (isset($params['isIrisEnabled'])) {
             $this->_irisEnabled = (bool) $params['isIrisEnabled'];
@@ -150,15 +130,12 @@ class Mqtt extends Client
         } else {
             $this->_sequenceId = self::INVALID_SEQUENCE_ID;
         }
-
         // Set up PubSub topics.
         $this->_pubsubTopics = [];
         if ($this->_mqttLiveEnabled) {
             $this->_pubsubTopics[] = sprintf(self::LIVE_TOPIC_TEMPLATE, $this->_instagram->account_id);
         }
-        if ($this->_mqttReceiveEnabled) {
-            $this->_pubsubTopics[] = sprintf(self::DIRECT_TOPIC_TEMPLATE, $this->_instagram->account_id);
-        }
+        $this->_pubsubTopics[] = sprintf(self::DIRECT_TOPIC_TEMPLATE, $this->_instagram->account_id);
         // Set up GraphQL topics.
         $this->_graphqlTopics = [];
         if ($this->_graphQlEnabled) {
@@ -174,34 +151,6 @@ class Mqtt extends Client
         }
         $this->_unsubscribe();
         $this->_connection->disconnect();
-    }
-
-    /** {@inheritdoc} */
-    public function onRefreshRequested()
-    {
-        // Do nothing.
-    }
-
-    /** {@inheritdoc} */
-    public function onUpdateSequence(
-        $topic,
-        $sequence)
-    {
-        // Do nothing.
-    }
-
-    /** {@inheritdoc} */
-    public function onUnsubscribedFrom(
-        $topic)
-    {
-        // Do nothing.
-    }
-
-    /** {@inheritdoc} */
-    public function onSubscribedTo(
-        $topic)
-    {
-        // Do nothing.
     }
 
     /**
@@ -297,15 +246,12 @@ class Mqtt extends Client
     protected function _getAppSpecificInfo()
     {
         $result = [
-            'platform'        => Constants::PLATFORM,
-            'app_version'     => Constants::IG_VERSION,
-            'capabilities'    => Constants::X_IG_Capabilities,
-            'User-Agent'      => $this->_instagram->device->getUserAgent(),
+            'platform'      => Constants::PLATFORM,
+            'app_version'   => Constants::IG_VERSION,
+            'capabilities'  => Constants::X_IG_Capabilities,
+            'User-Agent'    => $this->_instagram->device->getUserAgent(),
+            'ig_mqtt_route' => 'django',
         ];
-        // MQTT route.
-        if ($this->_mqttRoute !== null && strlen($this->_mqttRoute)) {
-            $result['ig_mqtt_route'] = $this->_mqttRoute;
-        }
         // PubSub message type blacklist.
         $msgTypeBlacklist = '';
         if ($this->_msgTypeBlacklist !== null && strlen($this->_msgTypeBlacklist)) {
@@ -714,24 +660,8 @@ class Mqtt extends Client
     protected function _sendCommand(
         $command)
     {
-        $qosLevel = $this->_mqttAckEnabled ? self::ACKNOWLEDGED_DELIVERY : self::FIRE_AND_FORGET;
-        $this->_publish(self::SEND_MESSAGE_TOPIC, $command, $qosLevel);
+        $this->_publish(self::SEND_MESSAGE_TOPIC, $command, self::FIRE_AND_FORGET);
 
         return true;
-    }
-
-    /**
-     * Override parent method to handle PATCH events only.
-     *
-     * @param Event $event
-     */
-    protected function _handleEvent(
-        Event $event)
-    {
-        if ($event instanceof Event\Patch) {
-            parent::_handleEvent($event);
-        } else {
-            $this->debug('Skipping non-PATCH event "%s"', $event->event);
-        }
     }
 }

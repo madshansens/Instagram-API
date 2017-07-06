@@ -186,8 +186,6 @@ abstract class Client
 
     /**
      * Emit onKeepaliveTimer event.
-     *
-     * @param string $pool
      */
     public function emitKeepaliveTimer()
     {
@@ -317,37 +315,6 @@ abstract class Client
         $this->_shutdown = true;
         $this->_disconnect();
     }
-
-    /**
-     * Update sequence for given topic.
-     *
-     * @param string $topic
-     * @param string $sequence
-     */
-    abstract public function onUpdateSequence(
-        $topic,
-        $sequence);
-
-    /**
-     * Handle requested refresh.
-     */
-    abstract public function onRefreshRequested();
-
-    /**
-     * Handle subscribed event.
-     *
-     * @param string $topic
-     */
-    abstract public function onSubscribedTo(
-        $topic);
-
-    /**
-     * Handle unsubscribed event.
-     *
-     * @param string $topic
-     */
-    abstract public function onUnsubscribedFrom(
-        $topic);
 
     /**
      * @param string $host
@@ -592,29 +559,9 @@ abstract class Client
     {
         $this->debug('Received event "%s"', $message->event);
         switch ($message->event) {
-            case Event::SUBSCRIBED:
-                /** @var Event\Subscribed $event */
-                $event = $this->mapToJson($message, new Event\Subscribed());
-                break;
-            case Event::UNSUBSCRIBED:
-                /** @var Event\Unsubscribed $event */
-                $event = $this->mapToJson($message, new Event\Unsubscribed());
-                break;
-            case Event::KEEPALIVE:
-                /** @var Event\Keepalive $event */
-                $event = $this->mapToJson($message, new Event\Keepalive());
-                break;
             case Event::PATCH:
                 /** @var Event\Patch $event */
                 $event = $this->mapToJson($message, new Event\Patch());
-                break;
-            case Event::BROADCAST_ACK:
-                /** @var Event\BroadcastAck $event */
-                $event = $this->mapToJson($message, new Event\BroadcastAck());
-                break;
-            case Event::ERROR:
-                /** @var Event\Error $event */
-                $event = $this->mapToJson($message, new Event\Error());
                 break;
             default:
                 $this->debug('Event "%s" is ignored (unknown type)', $message->event);
