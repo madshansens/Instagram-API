@@ -7,6 +7,19 @@ use InstagramAPI\Response\Model\Item;
 class Utils
 {
     /**
+     * Override for the default temp path used by various class functions.
+     *
+     * If this value is non-null, we'll use it. Otherwise we'll use the default
+     * system tmp folder.
+     *
+     * TIP: If your default system temp folder isn't writable, it's NECESSARY
+     * for you to set this value to another, writable path, like this:
+     *
+     * \InstagramAPI\Utils::$defaultTmpPath = '/home/example/foo/';
+     */
+    public static $defaultTmpPath = null;
+
+    /**
      * Used for multipart boundary generation.
      *
      * @var string
@@ -415,7 +428,10 @@ class Utils
         }
 
         // Generate a temp thumbnail filename and delete if file already exists.
-        $tmpFilename = sys_get_temp_dir().'/'.md5($videoFilename).'.jpg';
+        $tmpPath = self::$defaultTmpPath !== null
+                   ? self::$defaultTmpPath
+                   : sys_get_temp_dir();
+        $tmpFilename = $tmpPath.'/'.md5($videoFilename).'.jpg';
         if (is_file($tmpFilename)) {
             @unlink($tmpFilename);
         }
