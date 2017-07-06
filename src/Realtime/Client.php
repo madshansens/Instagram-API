@@ -2,19 +2,19 @@
 
 namespace InstagramAPI\Realtime;
 
+use Clue\React\HttpProxy\ProxyConnector as HttpConnectProxy;
 use Clue\React\Socks\Client as SocksProxy;
 use InstagramAPI\Client as HttpClient;
 use InstagramAPI\Instagram;
 use InstagramAPI\Realtime;
-use InstagramAPI\Realtime\Utils\HttpConnectProxy;
 use React\Dns\Resolver\Factory as DnsFactory;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
-use React\SocketClient\ConnectorInterface;
-use React\SocketClient\DnsConnector;
-use React\SocketClient\SecureConnector;
-use React\SocketClient\TcpConnector;
-use React\SocketClient\TimeoutConnector;
+use React\Socket\ConnectorInterface;
+use React\Socket\DnsConnector;
+use React\Socket\SecureConnector;
+use React\Socket\TcpConnector;
+use React\Socket\TimeoutConnector;
 
 abstract class Client
 {

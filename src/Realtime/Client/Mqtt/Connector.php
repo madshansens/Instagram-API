@@ -4,7 +4,7 @@ namespace InstagramAPI\Realtime\Client\Mqtt;
 
 use BinSoul\Net\Mqtt\Client\React\ReactMqttClient;
 use React\EventLoop\LoopInterface;
-use React\SocketClient\ConnectorInterface;
+use React\Socket\ConnectorInterface;
 
 class Connector
 {

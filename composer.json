@@ -41,10 +41,10 @@
         "ext-zlib": "*",
         "react/event-loop": "^0.4.3",
         "react/promise": "^2.5",
-        "react/socket-client": "^0.5",
-        "binsoul/net-mqtt-client-react": "^0.2.1",
-        "clue/socks-react": "^0.6",
-        "clue/http-proxy-react": "^0.1.0"
+        "react/socket": "^0.8",
+        "binsoul/net-mqtt-client-react": "^0.3.1",
+        "clue/socks-react": "^0.8.2",
+        "clue/http-proxy-react": "^1.1.0"
     },
     "suggest": {
         "ext-event": "Installing PHP's native Event extension enables faster Realtime class event handling."
