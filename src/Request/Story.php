@@ -102,6 +102,10 @@ class Story extends RequestCollection
      * about the "broadcast". But if there is no story available, this endpoint
      * gives you an empty response.
      *
+     * NOTE: At least AT THIS MOMENT, this endpoint and the reels-tray endpoint
+     * are the only ones that will give you people's "post_live" fields (their
+     * saved Instagram Live Replays). The other "get user stories" funcs don't!
+     *
      * @param string $userId Numerical UserPK ID.
      *
      * @throws \InstagramAPI\Exception\InstagramException
