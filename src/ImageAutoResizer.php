@@ -74,6 +74,19 @@ class ImageAutoResizer
      */
     const JPEG_QUALITY = 95;
 
+    /**
+     * Override for the default temp path used by all class instances.
+     *
+     * If you don't provide any tmpPath to the constructor, we'll use this value
+     * instead (if non-null). Otherwise we'll use the default system tmp folder.
+     *
+     * TIP: If your default system temp folder isn't writable, it's NECESSARY
+     * for you to set this value to another, writable path, like this:
+     *
+     * \InstagramAPI\ImageAutoResizer::$defaultTmpPath = '/home/example/foo/';
+     */
+    public static $defaultTmpPath = null;
+
     /** @var string Input file path. */
     protected $_inputFile;
 
@@ -171,7 +184,9 @@ class ImageAutoResizer
 
         // Temporary directory path.
         if ($tmpPath === null) {
-            $tmpPath = sys_get_temp_dir();
+            $tmpPath = self::$defaultTmpPath !== null
+                       ? self::$defaultTmpPath
+                       : sys_get_temp_dir();
         }
         if (!is_dir($tmpPath) || !is_writable($tmpPath)) {
             throw new \InvalidArgumentException(sprintf('Directory %s does not exist or is not writable.', $tmpPath));
