@@ -577,8 +577,7 @@ abstract class Client
      * @param mixed $message
      */
     protected function _processSingleMessage(
-        $message
-    )
+        $message)
     {
         if (isset($message->event)) {
             $this->_processEvent($message);

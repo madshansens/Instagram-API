@@ -57,14 +57,13 @@ abstract class Thrift
                 case self::COMPACT_STOP:
                     return;
             }
-
         }
     }
 
     /**
      * Handle field.
      *
-     * @param int $field
+     * @param int   $field
      * @param mixed $value
      */
     abstract protected function _handleField(
@@ -111,6 +110,7 @@ abstract class Thrift
     {
         $result = substr($this->_buffer, $this->_position, $length);
         $this->_position += $length;
+
         return $result;
     }
 }

@@ -204,9 +204,11 @@ class RealtimeHttpServer
                 return new \React\Http\Response(200, [], 'pong');
             case '/stop':
                 $this->_stop();
+
                 return new \React\Http\Response(200);
             case '/seen':
                 $context = $this->_rtc->markDirectItemSeen($params['threadId'], $params['threadItemId']);
+
                 return new \React\Http\Response($context !== false ? 200 : 503);
             case '/activity':
                 return $this->_handleClientContext($this->_rtc->indicateActivityInDirectThread($params['threadId'], (bool) $params['flag']));

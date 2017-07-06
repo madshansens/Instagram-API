@@ -642,6 +642,7 @@ class Mqtt extends Client
                 if (!$iris->isSucceeded()) {
                     $this->debug('Failed to subscribe to Iris (%d): %s', $iris->getErrorType(), $iris->getErrorMessage());
                 }
+
                 return;
             case self::SEND_MESSAGE_RESPONSE_TOPIC:
             case self::SEND_MESSAGE_RESPONSE_TOPIC_ID:

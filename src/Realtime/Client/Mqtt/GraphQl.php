@@ -5,7 +5,7 @@ namespace InstagramAPI\Realtime\Client\Mqtt;
 class GraphQl extends Thrift
 {
     const TOPIC_DIRECT = 'direct';
-    
+
     const FIELD_TOPIC = 1;
     const FIELD_PAYLOAD = 2;
 
