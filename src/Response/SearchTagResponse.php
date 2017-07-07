@@ -23,4 +23,5 @@ class SearchTagResponse extends AutoPropertyHandler implements ResponseInterface
      * @var Model\Tag[]
      */
     public $results;
+    public $rank_token;
 }
