@@ -8,10 +8,13 @@ use InstagramAPI\ResponseTrait;
 
 /**
  * @method mixed getHasMore()
+ * @method mixed getRankToken()
  * @method Model\Tag[] getResults()
  * @method bool isHasMore()
+ * @method bool isRankToken()
  * @method bool isResults()
  * @method setHasMore(mixed $value)
+ * @method setRankToken(mixed $value)
  * @method setResults(Model\Tag[] $value)
  */
 class SearchTagResponse extends AutoPropertyHandler implements ResponseInterface

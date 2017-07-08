@@ -9,6 +9,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getContentType()
  * @method mixed getCreatedAt()
  * @method mixed getCreatedAtUtc()
+ * @method mixed getDidReportAsSpam()
  * @method mixed getHasTranslation()
  * @method string getMediaId()
  * @method string getPk()
@@ -21,6 +22,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isContentType()
  * @method bool isCreatedAt()
  * @method bool isCreatedAtUtc()
+ * @method bool isDidReportAsSpam()
  * @method bool isHasTranslation()
  * @method bool isMediaId()
  * @method bool isPk()
@@ -33,6 +35,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setContentType(mixed $value)
  * @method setCreatedAt(mixed $value)
  * @method setCreatedAtUtc(mixed $value)
+ * @method setDidReportAsSpam(mixed $value)
  * @method setHasTranslation(mixed $value)
  * @method setMediaId(string $value)
  * @method setPk(string $value)
@@ -68,4 +71,5 @@ class Caption extends AutoPropertyHandler
     public $pk;
     public $type;
     public $has_translation;
+    public $did_report_as_spam;
 }
