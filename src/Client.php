@@ -14,9 +14,11 @@ use function GuzzleHttp\Psr7\modify_request;
 /**
  * This class handles core API network communication.
  *
- * WARNING TO CONTRIBUTORS: This class is a wrapper for underlying HTTP client,
- * so it is all about network, cookies, HTTP requests and responses. Don't put anything
- * related to high level API functions, such as file uploads and stuff here.
+ * WARNING TO CONTRIBUTORS: This class is a wrapper for the HTTP client, and
+ * handles raw networking, cookies, HTTP requests and responses. Don't put
+ * anything related to high level API functions (such as file uploads) here.
+ * Most of the higher level code belongs in either the Request class or in the
+ * individual endpoint functions.
  *
  * @author mgp25: Founder, Reversing, Project Leader (https://github.com/mgp25)
  * @author SteveJobzniak (https://github.com/SteveJobzniak)
@@ -523,8 +525,9 @@ class Client
         $serverResponse,
         HttpResponseInterface $httpResponse = null)
     {
-        // If the server response is not an object, it means that JSON decoding failed or something bad happened.
-        // So analyze the HTTP status code (if available) to see what really happened.
+        // If the server response is not an object, it means that JSON decoding
+        // failed or some other bad thing happened. So analyze the HTTP status
+        // code (if available) to see what really happened.
         if (!is_object($serverResponse)) {
             $httpStatusCode = $httpResponse !== null ? $httpResponse->getStatusCode() : null;
             switch ($httpStatusCode) {
@@ -623,7 +626,8 @@ class Client
      * _apiRequest() instead. An even higher-level handler which takes care of
      * debugging, server response checking and response decoding!
      *
-     * @param HttpRequestInterface $request HTTP request to send.
+     * @param HttpRequestInterface $request       HTTP request to send.
+     * @param array                $guzzleOptions Extra Guzzle options for this request.
      *
      * @throws \InstagramAPI\Exception\NetworkException   For any network/socket related errors.
      * @throws \InstagramAPI\Exception\ThrottledException When we're throttled by server.
@@ -631,10 +635,11 @@ class Client
      * @return \Psr\Http\Message\ResponseInterface
      */
     protected function _guzzleRequest(
-        HttpRequestInterface $request)
+        HttpRequestInterface $request,
+        array $guzzleOptions = [])
     {
         // Add critically important options for authenticating the request.
-        $guzzleOptions = $this->_buildGuzzleOptions();
+        $guzzleOptions = $this->_buildGuzzleOptions($guzzleOptions);
 
         // Attempt the request. Will throw in case of socket errors!
         try {
@@ -686,8 +691,9 @@ class Client
      *   the uploaded body data. Should ALWAYS be TRUE when uploading binary data.
      *
      * @param HttpRequestInterface $request        HTTP request to send.
+     * @param array                $guzzleOptions  Extra Guzzle options for this request.
      * @param array                $libraryOptions Additional options for controlling Library features
-     *                                             such as the debugging output and response decoding.
+     *                                             such as the debugging output.
      *
      * @throws \InstagramAPI\Exception\NetworkException   For any network/socket related errors.
      * @throws \InstagramAPI\Exception\ThrottledException When we're throttled by server.
@@ -696,10 +702,11 @@ class Client
      */
     protected function _apiRequest(
         HttpRequestInterface $request,
+        array $guzzleOptions = [],
         array $libraryOptions = [])
     {
         // Perform the API request and retrieve the raw HTTP response body.
-        $guzzleResponse = $this->_guzzleRequest($request);
+        $guzzleResponse = $this->_guzzleRequest($request, $guzzleOptions);
 
         // Debugging (must be shown before possible decoding error).
         if ($this->_parent->debug && (!isset($libraryOptions['noDebug']) || !$libraryOptions['noDebug'])) {
@@ -736,14 +743,16 @@ class Client
     /**
      * Perform an Instagram API call.
      *
-     * @param HttpRequestInterface $request HTTP request to send.
+     * @param HttpRequestInterface $request       HTTP request to send.
+     * @param array                $guzzleOptions Extra Guzzle options for this request.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return HttpResponseInterface
      */
     public function api(
-        HttpRequestInterface $request)
+        HttpRequestInterface $request,
+        array $guzzleOptions = [])
     {
         // Set up headers that are required for every request.
         $request = modify_request($request, [
@@ -758,11 +767,13 @@ class Client
                 'Accept-Language'  => Constants::ACCEPT_LANGUAGE,
             ],
         ]);
-        // Check Content-Type header for debugging.
+
+        // Check the Content-Type header for debugging.
         $contentType = $request->getHeader('Content-Type');
         $isFormData = count($contentType) && reset($contentType) === Constants::CONTENT_TYPE;
+
         // Perform the API request.
-        $response = $this->_apiRequest($request, [
+        $response = $this->_apiRequest($request, $guzzleOptions, [
             'debugUploadedBody'  => $isFormData,
             'debugUploadedBytes' => !$isFormData,
         ]);
@@ -791,7 +802,7 @@ class Client
     }
 
     /**
-     * Return client middleware.
+     * Get the client middleware instance.
      *
      * @return ClientMiddleware
      */

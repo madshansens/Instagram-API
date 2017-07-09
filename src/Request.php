@@ -29,7 +29,7 @@ class Request
     protected $_apiVersion;
 
     /**
-     * Endpoint to request.
+     * Endpoint URL (absolute or relative) for this request.
      *
      * @var string
      */
@@ -57,18 +57,25 @@ class Request
     protected $_body;
 
     /**
-     * An array of files (data) to upload.
+     * An array of files to upload.
      *
      * @var array
      */
     protected $_files;
 
     /**
-     * An array of HTTP headers.
+     * An array of HTTP headers to add to the request.
      *
      * @var string[]
      */
     protected $_headers;
+
+    /**
+     * Whether to add the default headers.
+     *
+     * @var bool
+     */
+    protected $_defaultHeaders;
 
     /**
      * Whether this API call needs authorization.
@@ -80,20 +87,13 @@ class Request
     protected $_needsAuth;
 
     /**
-     * Whether this API call needs signing POST data.
+     * Whether this API call needs signing of the POST data.
      *
      * On by default since most calls require it.
      *
      * @var bool
      */
     protected $_signedPost;
-
-    /**
-     * Cached HTTP response object.
-     *
-     * @var HttpResponseInterface
-     */
-    protected $_httpResponse;
 
     /**
      * Opened file handles.
@@ -103,11 +103,18 @@ class Request
     protected $_handles;
 
     /**
-     * Whether to append default headers.
+     * Extra Guzzle options for this request.
      *
-     * @var bool
+     * @var array
      */
-    protected $_defaultHeaders;
+    protected $_guzzleOptions;
+
+    /**
+     * Cached HTTP response object.
+     *
+     * @var HttpResponseInterface
+     */
+    protected $_httpResponse;
 
     /**
      * Constructor.
@@ -128,6 +135,8 @@ class Request
         $this->_params = [];
         $this->_posts = [];
         $this->_files = [];
+        $this->_handles = [];
+        $this->_guzzleOptions = [];
         $this->_needsAuth = true;
         $this->_signedPost = true;
         $this->_defaultHeaders = true;
@@ -305,7 +314,7 @@ class Request
     }
 
     /**
-     * Add headers used by most of API requests.
+     * Add headers used by most API requests.
      *
      * @return self
      */
@@ -321,16 +330,31 @@ class Request
     }
 
     /**
-     * Set default headers flag.
+     * Set the "add default headers" flag.
      *
      * @param bool $flag
      *
-     * @return $this
+     * @return self
      */
     public function setAddDefaultHeaders(
         $flag)
     {
         $this->_defaultHeaders = $flag;
+
+        return $this;
+    }
+
+    /**
+     * Set the extra Guzzle options for this request.
+     *
+     * @param array $guzzleOptions Extra Guzzle options for this request.
+     *
+     * @return self
+     */
+    public function setGuzzleOptions(
+        array $guzzleOptions)
+    {
+        $this->_guzzleOptions = $guzzleOptions;
 
         return $this;
     }
@@ -380,7 +404,7 @@ class Request
     }
 
     /**
-     * Return Stream for given file data.
+     * Get a Stream for the given file.
      *
      * @param array $file
      *
@@ -568,7 +592,7 @@ class Request
 
             $this->_resetHandles();
             try {
-                $this->_httpResponse = $this->_parent->client->api($this->_buildHttpRequest());
+                $this->_httpResponse = $this->_parent->client->api($this->_buildHttpRequest(), $this->_guzzleOptions);
             } finally {
                 $this->_closeHandles();
             }
