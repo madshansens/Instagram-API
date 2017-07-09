@@ -162,7 +162,7 @@ class Timeline extends RequestCollection
                 $media[$key]['internalMetadata']['uploadId'] = $uploadParams['uploadId'];
 
                 // Attempt to upload the video data.
-                $this->ig->client->uploadVideoChunks('album', $item['file'], $uploadParams, $maxAttempts);
+                $this->ig->internal->uploadVideoChunks('album', $item['file'], $uploadParams, $maxAttempts);
 
                 // Attempt to upload the thumbnail, associated with our video's ID.
                 $this->ig->internal->uploadPhotoData('album', $item['file'], 'videofile', $uploadParams['uploadId']);

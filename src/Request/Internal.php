@@ -2,10 +2,13 @@
 
 namespace InstagramAPI\Request;
 
+use InstagramAPI\Client;
 use InstagramAPI\Constants;
+use InstagramAPI\Request;
 use InstagramAPI\Response;
 use InstagramAPI\Signatures;
 use InstagramAPI\Utils;
+use function GuzzleHttp\Psr7\stream_for;
 
 /**
  * Collection of various INTERNAL library functions.
@@ -327,7 +330,7 @@ class Internal extends RequestCollection
         $internalMetadata['uploadId'] = $uploadParams['uploadId'];
 
         // Attempt to upload the video data.
-        $upload = $this->ig->client->uploadVideoChunks($targetFeed, $videoFilename, $uploadParams, $maxAttempts);
+        $upload = $this->ig->internal->uploadVideoChunks($targetFeed, $videoFilename, $uploadParams, $maxAttempts);
 
         // Attempt to upload the thumbnail, associated with our video's ID.
         $this->uploadPhotoData($targetFeed, $videoFilename, 'videofile', $uploadParams['uploadId']);
@@ -1057,5 +1060,250 @@ class Internal extends RequestCollection
             ->addPost('access_token', Constants::ANALYTICS_ACCESS_TOKEN)
             ->addPost('format', 'json')
             ->getResponse(new Response\ClientEventLogsResponse());
+    }
+
+    /**
+     * Performs a chunked upload of a video file, with support for retries.
+     *
+     * Note that chunk uploads often get dropped when their server is overloaded
+     * at peak hours, which is why the "max attempts" parameter exists. We will
+     * try that many times to upload all chunks. The retries will only re-upload
+     * the exact chunks that have been dropped from their server, and it won't
+     * waste time with chunks that are already successfully uploaded.
+     *
+     * @param string $targetFeed    Target feed for this media ("timeline", "story", "album" or "direct_v2").
+     * @param string $videoFilename The video filename.
+     * @param array  $uploadParams  An array created by Request\Internal::requestVideoUploadURL()!
+     * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException If the upload fails.
+     *
+     * @return \InstagramAPI\Response\UploadVideoResponse
+     */
+    public function uploadVideoChunks(
+        $targetFeed,
+        $videoFilename,
+        array $uploadParams,
+        $maxAttempts = 10)
+    {
+        // We require at least 1 attempt, otherwise we can't do anything.
+        if ($maxAttempts < 1) {
+            throw new \InvalidArgumentException('The maxAttempts parameter must be 1 or higher.');
+        }
+
+        // Verify that the file exists locally.
+        if (!is_file($videoFilename)) {
+            throw new \InvalidArgumentException(sprintf(
+                'The video file "%s" does not exist on disk.',
+                $videoFilename
+            ));
+        }
+
+        // To support video uploads to albums, we MUST fake-inject the
+        // "sessionid" cookie from "i.instagram" into our "upload.instagram"
+        // request, otherwise the server will reply with a "StagedUpload not
+        // found" error when the final chunk has been uploaded.
+        $sessionIDCookie = null;
+        if ($targetFeed == 'album') {
+            $foundCookie = $this->ig->client->getCookie('sessionid', 'i.instagram.com');
+            if ($foundCookie !== null) {
+                $sessionIDCookie = $foundCookie->getValue();
+            }
+            if ($sessionIDCookie === null) { // Verify value.
+                throw new \InstagramAPI\Exception\UploadFailedException(
+                    'Unable to find the necessary SessionID cookie for uploading video album chunks.'
+                );
+            }
+        }
+
+        // Determine correct file extension for the video format.
+        $videoExt = pathinfo($videoFilename, PATHINFO_EXTENSION);
+        if (strlen($videoExt) == 0) {
+            $videoExt = 'mp4'; // Fallback.
+        }
+
+        // Video uploads should be chunked to save RAM; determine chunk size!
+        $videoSize = filesize($videoFilename);
+        if ($videoSize < 1) {
+            throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
+                'Upload of "%s" failed. The file is empty.',
+                $videoFilename
+            ));
+        }
+        $numChunks = ceil($videoSize / 524288); // We want <= 512KB per chunk.
+        $maxChunkSize = ceil($videoSize / $numChunks); // Calc actual chunksize.
+
+        // Calculate the per-chunk parameters and byte ranges.
+        $videoChunks = [];
+        $remainingBytes = $videoSize; // Tracks remaining bytes in video file.
+        $rangeStart = 0;
+        for ($chunkIdx = 1; $chunkIdx <= $numChunks; ++$chunkIdx) {
+            // Use "max chunk size" OR remaining bytes, whichever is smaller.
+            $chunkSize = $chunkIdx >= $numChunks
+                ? $remainingBytes // Final chunk uses remaining bytes.
+                : min($remainingBytes, $maxChunkSize); // Smallest num.
+            if ($chunkSize <= 0) {
+                break; // Prevent empty chunks.
+            }
+
+            // Track how many bytes now remain in the file after this chunk.
+            $remainingBytes -= $chunkSize;
+
+            // Calculate where the current byte range will end.
+            // NOTE: Range is 0-indexed, and Start is the first byte of the
+            // new chunk we're uploading, hence we MUST subtract 1 from End.
+            // And our FINAL chunk's End must be 1 less than the filesize!
+            $rangeEnd = $rangeStart + ($chunkSize - 1);
+
+            // Add the current chunk's parameters to the list.
+            $videoChunks[] = [
+                'fileOffset' => $rangeStart, // fseek offsets are 0-indexed too!
+                'chunkSize'  => $chunkSize, // Size (in bytes) of this chunk.
+                'rangeStart' => $rangeStart, // Start offset for the HTTP chunk.
+                'rangeEnd'   => $rangeEnd, // End offset for the HTTP chunk.
+            ];
+
+            // Update the range's Start for the next iteration.
+            // NOTE: It's the End-byte of the previous range, plus one.
+            $rangeStart = $rangeEnd + 1;
+        }
+
+        // Read and upload each individual chunk, doing retries when necessary.
+        $handle = fopen($videoFilename, 'r');
+        $httpResponse = null;
+        try {
+            $uploadedRanges = [];
+            for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
+                // Upload all missing chunks to the server for this attempt.
+                foreach ($videoChunks as $chunk) {
+                    // Skip this chunk if the server already has it.
+                    foreach ($uploadedRanges as $serverRange) {
+                        if ($serverRange['start'] <= $chunk['rangeStart']
+                            && $serverRange['end'] >= $chunk['rangeEnd']) {
+                            continue 2; // Iterate to the next chunk.
+                        }
+                    }
+
+                    // Seek to the exact file byte-offset of this chunk.
+                    $result = fseek($handle, $chunk['fileOffset'], SEEK_SET);
+                    if ($result !== 0) {
+                        throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
+                            'Upload of "%s" failed. Unable to seek to the %d byte offset.',
+                            $videoFilename, $chunk['fileOffset']
+                        ));
+                    }
+
+                    // Attempt to read the exact bytes we need for this chunk.
+                    $chunkData = fread($handle, $chunk['chunkSize']);
+                    if (strlen($chunkData) != $chunk['chunkSize']) {
+                        throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
+                            'Upload of "%s" failed. Unable to read %d bytes from file.',
+                            $videoFilename, $chunk['chunkSize']
+                        ));
+                    }
+
+                    // Prepare request.
+                    $request = new Request($this->ig, $uploadParams['uploadUrl']);
+                    $request
+                        ->setAddDefaultHeaders(false)
+                        ->addHeader('Content-Type', 'application/octet-stream')
+                        ->addHeader('Session-ID', $uploadParams['uploadId'])
+                        ->addHeader('Content-Disposition', 'attachment; filename="video.mov"')
+                        ->addHeader('Content-Range', 'bytes '.$chunk['rangeStart'].'-'.$chunk['rangeEnd'].'/'.$videoSize)
+                        ->addHeader('job', $uploadParams['job'])
+                        ->setBody(stream_for($chunkData));
+
+                    // When uploading videos to albums, we must fake-inject the
+                    // "sessionid" cookie (the official app fake-injects it too).
+                    if ($targetFeed == 'album' && $sessionIDCookie !== null) {
+                        // We'll add it with the default options ("single use")
+                        // so the fake cookie is only added to THIS request.
+                        $this->ig->client->getMiddleware()->addFakeCookie('sessionid', $sessionIDCookie);
+                    }
+
+                    // Perform the upload of the current chunk.
+                    $httpResponse = $request->getHttpResponse();
+
+                    // Process the server response...
+                    switch ($httpResponse->getStatusCode()) {
+                        case 200:
+                            // All chunks are uploaded. Break out of our main upload-loop.
+                            break 3;
+                        case 201:
+                            // The server has given us a regular reply. We expect it
+                            // to be a range-reply, such as "0-3912399/23929393".
+                            // Their server often drops chunks during peak hours,
+                            // and in that case the first range may not start at
+                            // zero, or there may be gaps or multiple ranges, such
+                            // as "0-4076155/8152310,6114234-8152309/8152310". We'll
+                            // handle that by re-uploading whatever they've dropped.
+                            $range = $httpResponse->getHeaderLine('Range');
+                            if (!strlen($range)) {
+                                // Fail if the response contains no byte ranges!
+                                throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
+                                    "Upload of \"%s\" failed. Instagram's server returned empty range.",
+                                    $videoFilename, $range
+                                ));
+                            }
+                            preg_match_all('/(?<start>\d+)-(?<end>\d+)\/(?<total>\d+)/', $range, $matches, PREG_SET_ORDER);
+                            if (count($matches) == 0) {
+                                // Fail if the response contains invalid byte ranges!
+                                throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
+                                    "Upload of \"%s\" failed. Instagram's server returned an unexpected range (\"%s\").",
+                                    $videoFilename, $range
+                                ));
+                            }
+
+                            // Keep track of which range(s) the server has received,
+                            // so that we will re-upload their missing ranges.
+                            $uploadedRanges = [];
+                            foreach ($matches as $match) {
+                                $uploadedRanges[] = [
+                                    'start' => $match['start'],
+                                    'end'   => $match['end'],
+                                ];
+                            }
+                            break;
+                        default:
+                            // TODO add more status codes (such as 400, 403, 422, 503, 511 ...)
+                    }
+                }
+            }
+        } finally {
+            // Guaranteed to release handle even if something bad happens above!
+            fclose($handle);
+        }
+
+        // NOTE: $httpResponse below refers to the final chunk's result!
+        if ($httpResponse === null) {
+            throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
+                'Upload of \"%s\" failed. No response from server.',
+                $videoFilename
+            ));
+        }
+
+        // Protection against Instagram's upload server being bugged out!
+        // NOTE: When their server is bugging out, the final chunk result will
+        // still be yet another range specifier such as "328600-657199/657200",
+        // instead of a "{...}" JSON object. Because their server will have
+        // dropped some chunks when they bug out (due to overload or w/e).
+        if (substr($httpResponse->getBody(), 0, 1) !== '{') {
+            throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
+                "Upload of \"%s\" failed. Instagram's server returned an unexpected reply and is probably overloaded.",
+                $videoFilename
+            ));
+        }
+
+        // Manually decode the final API response and check for successful chunked upload.
+        /** @var Response\UploadVideoResponse $upload */
+        $upload = $this->ig->client->getMappedResponseObject(
+            new Response\UploadVideoResponse(),
+            Client::api_body_decode((string) $httpResponse->getBody()), // Important: Special JSON decoder.
+            $httpResponse
+        );
+
+        return $upload;
     }
 }

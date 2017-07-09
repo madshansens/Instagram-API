@@ -7,23 +7,16 @@ use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\HandlerStack;
 use InstagramAPI\Exception\ServerMessageThrower;
 use InstagramAPI\Exception\SettingsException;
+use Psr\Http\Message\RequestInterface as HttpRequestInterface;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
+use function GuzzleHttp\Psr7\modify_request;
 
 /**
- * This class handles core API network communication and file uploads.
+ * This class handles core API network communication.
  *
- * WARNING TO CONTRIBUTORS: Do NOT build ANY monolithic multi-step functions
- * within this class! Every function here MUST be a tiny, individual unit of
- * work, such as "request upload URL" or "upload data to a URL". NOT "request
- * upload URL, upload data, configure its location, post it to a timeline, call
- * your grandmother and make some tea". Because that would be unmaintainable and
- * would lock us into unmodifiable, bloated behaviors!
- *
- * Such larger multi-step algorithms MUST be implemented in Instagram.php
- * instead, and MUST simply use individual functions from this class to
- * accomplish their larger jobs.
- *
- * Thank you, for not writing spaghetti code! ;-)
+ * WARNING TO CONTRIBUTORS: This class is a wrapper for underlying HTTP client,
+ * so it is all about network, cookies, HTTP requests and responses. Don't put anything
+ * related to high level API functions, such as file uploads and stuff here.
  *
  * @author mgp25: Founder, Reversing, Project Leader (https://github.com/mgp25)
  * @author SteveJobzniak (https://github.com/SteveJobzniak)
@@ -512,23 +505,6 @@ class Client
     }
 
     /**
-     * Helper which throws an error if not logged in.
-     *
-     * Remember to ALWAYS call this function at the top of any API request that
-     * requires the user to be logged in!
-     *
-     * @throws \InstagramAPI\Exception\LoginRequiredException
-     */
-    protected function _throwIfNotLoggedIn()
-    {
-        // Check the cached login state. May not reflect what will happen on the
-        // server. But it's the best we can check without trying the actual request!
-        if (!$this->_parent->isLoggedIn) {
-            throw new \InstagramAPI\Exception\LoginRequiredException('User not logged in. Please call login() and then try again.');
-        }
-    }
-
-    /**
      * Converts a server response to a specific kind of result object.
      *
      * @param ResponseInterface          $baseClass      An instance of a class object whose
@@ -547,9 +523,9 @@ class Client
         $serverResponse,
         HttpResponseInterface $httpResponse = null)
     {
-        // If the server response is NULL, it means that JSON decoding failed.
-        // So analyze the HTTP status code (if available) to see what happened.
-        if (is_null($serverResponse)) {
+        // If the server response is not an object, it means that JSON decoding failed or something bad happened.
+        // So analyze the HTTP status code (if available) to see what really happened.
+        if (!is_object($serverResponse)) {
             $httpStatusCode = $httpResponse !== null ? $httpResponse->getStatusCode() : null;
             switch ($httpStatusCode) {
                 case 400:
@@ -604,7 +580,7 @@ class Client
      * @return array A guzzle options array.
      */
     protected function _buildGuzzleOptions(
-        array $guzzleOptions)
+        array $guzzleOptions = [])
     {
         $criticalOptions = [
             'cookies' => ($this->_cookieJar instanceof CookieJar ? $this->_cookieJar : false),
@@ -647,9 +623,7 @@ class Client
      * _apiRequest() instead. An even higher-level handler which takes care of
      * debugging, server response checking and response decoding!
      *
-     * @param string $method        HTTP method.
-     * @param string $uri           Full URI string.
-     * @param array  $guzzleOptions Request options to apply.
+     * @param HttpRequestInterface $request HTTP request to send.
      *
      * @throws \InstagramAPI\Exception\NetworkException   For any network/socket related errors.
      * @throws \InstagramAPI\Exception\ThrottledException When we're throttled by server.
@@ -657,16 +631,14 @@ class Client
      * @return \Psr\Http\Message\ResponseInterface
      */
     protected function _guzzleRequest(
-        $method,
-        $uri,
-        array $guzzleOptions = [])
+        HttpRequestInterface $request)
     {
         // Add critically important options for authenticating the request.
-        $guzzleOptions = $this->_buildGuzzleOptions($guzzleOptions);
+        $guzzleOptions = $this->_buildGuzzleOptions();
 
         // Attempt the request. Will throw in case of socket errors!
         try {
-            $response = $this->_guzzleClient->request($method, $uri, $guzzleOptions);
+            $response = $this->_guzzleClient->send($request, $guzzleOptions);
         } catch (\Exception $e) {
             // Re-wrap Guzzle's exception using our own NetworkException.
             throw new \InstagramAPI\Exception\NetworkException($e);
@@ -712,58 +684,31 @@ class Client
      *   uploaded binary data, since printing those bytes would kill the terminal!
      * - 'debugUploadedBytes': Set to TRUE to make debugging display the size of
      *   the uploaded body data. Should ALWAYS be TRUE when uploading binary data.
-     * - 'decodeToObject': If this option is provided, it MUST either be an instance
-     *   of a new class object, or FALSE to signify that you don't want us to do any
-     *   object decoding. Omitting this option entirely is the same as FALSE, but
-     *   it is highly recommended to ALWAYS include this option (even if FALSE),
-     *   for code clarity about what you intend to do with this function's response!
      *
-     * @param string $method         HTTP method ("GET" or "POST").
-     * @param int    $apiVersion     The Instagram API version to call (1, 2, etc).
-     * @param string $endpoint       Relative API endpoint, such as "upload/photo/",
-     *                               but can also be a full URI starting with "http:"
-     *                               or "https:", which is then used as-provided
-     *                               (and apiVersion will be ignored).
-     * @param array  $guzzleOptions  Guzzle request() options to apply to the HTTP request.
-     * @param array  $libraryOptions Additional options for controlling Library features
-     *                               such as the debugging output and response decoding.
+     * @param HttpRequestInterface $request        HTTP request to send.
+     * @param array                $libraryOptions Additional options for controlling Library features
+     *                                             such as the debugging output and response decoding.
      *
      * @throws \InstagramAPI\Exception\NetworkException   For any network/socket related errors.
      * @throws \InstagramAPI\Exception\ThrottledException When we're throttled by server.
-     * @throws \InstagramAPI\Exception\InstagramException When "decodeToObject"
-     *                                                    was requested and the
-     *                                                    API response was
-     *                                                    invalid or failed or
-     *                                                    class decode failed.
-     * @throws \InvalidArgumentException                  If no object provided.
      *
-     * @return array An array with the Guzzle "response" object, and the raw
-     *               non-decoded HTTP "body" of the request, and the "object" if
-     *               the "decodeToObject" library option was used.
+     * @return HttpResponseInterface
      */
     protected function _apiRequest(
-        $method,
-        $apiVersion,
-        $endpoint,
-        array $guzzleOptions = [],
+        HttpRequestInterface $request,
         array $libraryOptions = [])
     {
-        // Determine the URI to use (it's either relative to API, or a full URI).
-        if (strncmp($endpoint, 'http:', 5) === 0 || strncmp($endpoint, 'https:', 6) === 0) {
-            $uri = $endpoint;
-        } else {
-            $uri = Constants::API_URLS[$apiVersion].$endpoint;
-        }
-
         // Perform the API request and retrieve the raw HTTP response body.
-        $guzzleResponse = $this->_guzzleRequest($method, $uri, $guzzleOptions);
-        $body = $guzzleResponse->getBody()->getContents();
+        $guzzleResponse = $this->_guzzleRequest($request);
 
         // Debugging (must be shown before possible decoding error).
         if ($this->_parent->debug && (!isset($libraryOptions['noDebug']) || !$libraryOptions['noDebug'])) {
             // Determine whether we should display the contents of the UPLOADED body.
             if (isset($libraryOptions['debugUploadedBody']) && $libraryOptions['debugUploadedBody']) {
-                $uploadedBody = isset($guzzleOptions['body']) ? $guzzleOptions['body'] : null;
+                $uploadedBody = (string) $request->getBody();
+                if (!strlen($uploadedBody)) {
+                    $uploadedBody = null;
+                }
             } else {
                 $uploadedBody = null; // Don't display.
             }
@@ -771,372 +716,58 @@ class Client
             // Determine whether we should display the size of the UPLOADED body.
             if (isset($libraryOptions['debugUploadedBytes']) && $libraryOptions['debugUploadedBytes']) {
                 // Calculate the uploaded bytes by looking at request's body size, if it exists.
-                $uploadedBytes = isset($guzzleOptions['body']) ? strlen($guzzleOptions['body']) : null;
+                $uploadedBytes = $request->getBody()->getSize();
             } else {
                 $uploadedBytes = null; // Don't display.
             }
 
-            $this->_printDebug($method, $endpoint, $uploadedBody, $uploadedBytes, $guzzleResponse, $body);
+            $this->_printDebug(
+                $request->getMethod(),
+                (string) $request->getUri(),
+                $uploadedBody,
+                $uploadedBytes,
+                $guzzleResponse,
+                (string) $guzzleResponse->getBody());
         }
 
-        // Begin building the result array.
-        $result = [
-            'response' => $guzzleResponse,
-            'body'     => $body,
-        ];
-
-        // Perform optional API response decoding and success validation.
-        if (isset($libraryOptions['decodeToObject']) && $libraryOptions['decodeToObject'] !== false) {
-            if (!is_object($libraryOptions['decodeToObject'])) {
-                throw new \InvalidArgumentException('Object decoding requested, but no object instance provided.');
-            }
-
-            // Check for API response success and attempt to decode it to the desired class.
-            $result['object'] = $this->getMappedResponseObject(
-                $libraryOptions['decodeToObject'],
-                self::api_body_decode($body), // Important: Special JSON decoder.
-                $guzzleResponse
-            );
-        }
-
-        return $result;
+        return $guzzleResponse;
     }
 
     /**
      * Perform an Instagram API call.
      *
-     * @param int                    $apiVersion The Instagram API version to call (1, 2, etc).
-     * @param string                 $endpoint   Relative API endpoint, such as "media/seen/",
-     *                                           but can also be a full URI starting with "http:"
-     *                                           or "https:", which is then used as-provided
-     *                                           (and apiVersion will be ignored).
-     * @param array                  $headers    An associative array of custom request headers.
-     *                                           They'll take precedence over any clashing defaults.
-     * @param string|null            $postData   Optional string of POST-parameters, to do a
-     *                                           POST request instead of a GET.
-     * @param bool                   $needsAuth  Whether this API call needs authorization.
-     * @param bool                   $assoc      Whether to decode to associative array,
-     *                                           otherwise we decode to standard object.
-     *                                           Note that this parameter should be FALSE
-     *                                           if you are providing the baseClass param!
-     * @param ResponseInterface|null $baseClass  An instance of a class object whose
-     *                                           properties to fill with the response,
-     *                                           or NULL to get a standard object/array.
+     * @param HttpRequestInterface $request HTTP request to send.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return mixed An object or associative array.
+     * @return HttpResponseInterface
      */
     public function api(
-        $apiVersion,
-        $endpoint,
-        $headers = [],
-        $postData = null,
-        $needsAuth = true,
-        $assoc = true,
-        ResponseInterface $baseClass = null)
+        HttpRequestInterface $request)
     {
-        if ($needsAuth) {
-            // Throw if this requires authentication and we're not logged in.
-            $this->_throwIfNotLoggedIn();
-        }
-
-        // Disable "assoc" if a base-class was provided, since we need to map
-        // between a pure standard object and the target class in that case.
-        if ($baseClass !== null) {
-            $assoc = false;
-        }
-
-        // Build request options.
-        // NOTE: Custom header overrides are given precedence over defaults.
-        $headers = array_merge([
-            'User-Agent'            => $this->_userAgent,
-            // Keep the API's HTTPS connection alive in Guzzle for future
-            // re-use, to greatly speed up all further queries after this.
-            'Connection'            => 'keep-alive',
-            'Accept'                => '*/*',
-            'Accept-Encoding'       => Constants::ACCEPT_ENCODING,
-            'X-IG-Capabilities'     => Constants::X_IG_Capabilities,
-            'X-IG-Connection-Type'  => Constants::X_IG_Connection_Type,
-            'X-IG-Connection-Speed' => mt_rand(1000, 3700).'kbps',
-            'X-FB-HTTP-Engine'      => Constants::X_FB_HTTP_Engine,
-            'Content-Type'          => Constants::CONTENT_TYPE,
-            'Accept-Language'       => Constants::ACCEPT_LANGUAGE,
-        ], $headers);
-        $options = [
-            'headers' => $headers,
-        ];
-        $method = 'GET';
-        if ($postData) {
-            $method = 'POST';
-            $options['body'] = $postData;
-        }
-        $isMultipart = isset($headers['Content-Type']) && strpos($headers['Content-Type'], 'multipart/form-data') === 0;
-
+        // Set up headers that are required for every request.
+        $request = modify_request($request, [
+            'set_headers' => [
+                'User-Agent'       => $this->_userAgent,
+                // Keep the API's HTTPS connection alive in Guzzle for future
+                // re-use, to greatly speed up all further queries after this.
+                'Connection'       => 'Keep-Alive',
+                'X-FB-HTTP-Engine' => Constants::X_FB_HTTP_Engine,
+                'Accept'           => '*/*',
+                'Accept-Encoding'  => Constants::ACCEPT_ENCODING,
+                'Accept-Language'  => Constants::ACCEPT_LANGUAGE,
+            ],
+        ]);
+        // Check Content-Type header for debugging.
+        $contentType = $request->getHeader('Content-Type');
+        $isFormData = count($contentType) && reset($contentType) === Constants::CONTENT_TYPE;
         // Perform the API request.
-        $response = $this->_apiRequest(
-            $method,
-            $apiVersion,
-            $endpoint,
-            $options,
-            [
-                'debugUploadedBody'  => !$isMultipart,
-                'debugUploadedBytes' => $isMultipart,
-                'decodeToObject'     => $baseClass !== null ? $baseClass : false,
-            ]
-        );
+        $response = $this->_apiRequest($request, [
+            'debugUploadedBody'  => $isFormData,
+            'debugUploadedBytes' => !$isFormData,
+        ]);
 
-        // Manually decode the JSON response, if we didn't request object decoding
-        // above. This lets our caller later map it to any object they want (or none).
-        return $baseClass !== null ? $response['object'] : self::api_body_decode($response['body'], $assoc);
-    }
-
-    /**
-     * Performs a chunked upload of a video file, with support for retries.
-     *
-     * Note that chunk uploads often get dropped when their server is overloaded
-     * at peak hours, which is why the "max attempts" parameter exists. We will
-     * try that many times to upload all chunks. The retries will only re-upload
-     * the exact chunks that have been dropped from their server, and it won't
-     * waste time with chunks that are already successfully uploaded.
-     *
-     * @param string $targetFeed    Target feed for this media ("timeline", "story", "album" or "direct_v2").
-     * @param string $videoFilename The video filename.
-     * @param array  $uploadParams  An array created by Request\Internal::requestVideoUploadURL()!
-     * @param int    $maxAttempts   Total attempts to upload all chunks before throwing.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     * @throws \InstagramAPI\Exception\UploadFailedException If the upload fails.
-     *
-     * @return \InstagramAPI\Response\UploadVideoResponse
-     */
-    public function uploadVideoChunks(
-        $targetFeed,
-        $videoFilename,
-        array $uploadParams,
-        $maxAttempts = 10)
-    {
-        $this->_throwIfNotLoggedIn();
-
-        // We require at least 1 attempt, otherwise we can't do anything.
-        if ($maxAttempts < 1) {
-            throw new \InvalidArgumentException('The maxAttempts parameter must be 1 or higher.');
-        }
-
-        // Verify that the file exists locally.
-        if (!is_file($videoFilename)) {
-            throw new \InvalidArgumentException(sprintf(
-                'The video file "%s" does not exist on disk.',
-                $videoFilename
-            ));
-        }
-
-        // To support video uploads to albums, we MUST fake-inject the
-        // "sessionid" cookie from "i.instagram" into our "upload.instagram"
-        // request, otherwise the server will reply with a "StagedUpload not
-        // found" error when the final chunk has been uploaded.
-        $sessionIDCookie = null;
-        if ($targetFeed == 'album') {
-            $foundCookie = $this->getCookie('sessionid', 'i.instagram.com');
-            if ($foundCookie !== null) {
-                $sessionIDCookie = $foundCookie->getValue();
-            }
-            if ($sessionIDCookie === null) { // Verify value.
-                throw new \InstagramAPI\Exception\UploadFailedException(
-                    'Unable to find the necessary SessionID cookie for uploading video album chunks.'
-                );
-            }
-        }
-
-        // Determine correct file extension for the video format.
-        $videoExt = pathinfo($videoFilename, PATHINFO_EXTENSION);
-        if (strlen($videoExt) == 0) {
-            $videoExt = 'mp4'; // Fallback.
-        }
-
-        // Video uploads should be chunked to save RAM; determine chunk size!
-        $videoSize = filesize($videoFilename);
-        if ($videoSize < 1) {
-            throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
-                'Upload of "%s" failed. The file is empty.',
-                $videoFilename
-            ));
-        }
-        $numChunks = ceil($videoSize / 524288); // We want <= 512KB per chunk.
-        $maxChunkSize = ceil($videoSize / $numChunks); // Calc actual chunksize.
-
-        // Calculate the per-chunk parameters and byte ranges.
-        $videoChunks = [];
-        $remainingBytes = $videoSize; // Tracks remaining bytes in video file.
-        $rangeStart = 0;
-        for ($chunkIdx = 1; $chunkIdx <= $numChunks; ++$chunkIdx) {
-            // Use "max chunk size" OR remaining bytes, whichever is smaller.
-            $chunkSize = $chunkIdx >= $numChunks
-                         ? $remainingBytes // Final chunk uses remaining bytes.
-                         : min($remainingBytes, $maxChunkSize); // Smallest num.
-            if ($chunkSize <= 0) {
-                break; // Prevent empty chunks.
-            }
-
-            // Track how many bytes now remain in the file after this chunk.
-            $remainingBytes -= $chunkSize;
-
-            // Calculate where the current byte range will end.
-            // NOTE: Range is 0-indexed, and Start is the first byte of the
-            // new chunk we're uploading, hence we MUST subtract 1 from End.
-            // And our FINAL chunk's End must be 1 less than the filesize!
-            $rangeEnd = $rangeStart + ($chunkSize - 1);
-
-            // Add the current chunk's parameters to the list.
-            $videoChunks[] = [
-                'fileOffset' => $rangeStart, // fseek offsets are 0-indexed too!
-                'chunkSize'  => $chunkSize, // Size (in bytes) of this chunk.
-                'rangeStart' => $rangeStart, // Start offset for the HTTP chunk.
-                'rangeEnd'   => $rangeEnd, // End offset for the HTTP chunk.
-            ];
-
-            // Update the range's Start for the next iteration.
-            // NOTE: It's the End-byte of the previous range, plus one.
-            $rangeStart = $rangeEnd + 1;
-        }
-
-        // Read and upload each individual chunk, doing retries when necessary.
-        $handle = fopen($videoFilename, 'r');
-        $response = ['body' => '']; // Initialize with an empty server response.
-        try {
-            $uploadedRanges = [];
-            for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
-                // Upload all missing chunks to the server for this attempt.
-                foreach ($videoChunks as $chunk) {
-                    // Skip this chunk if the server already has it.
-                    foreach ($uploadedRanges as $serverRange) {
-                        if ($serverRange['start'] <= $chunk['rangeStart']
-                            && $serverRange['end'] >= $chunk['rangeEnd']) {
-                            continue 2; // Iterate to the next chunk.
-                        }
-                    }
-
-                    // Seek to the exact file byte-offset of this chunk.
-                    $result = fseek($handle, $chunk['fileOffset'], SEEK_SET);
-                    if ($result !== 0) {
-                        throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
-                            'Upload of "%s" failed. Unable to seek to the %d byte offset.',
-                            $videoFilename, $chunk['fileOffset']
-                        ));
-                    }
-
-                    // Attempt to read the exact bytes we need for this chunk.
-                    $chunkData = fread($handle, $chunk['chunkSize']);
-                    if (strlen($chunkData) != $chunk['chunkSize']) {
-                        throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
-                            'Upload of "%s" failed. Unable to read %d bytes from file.',
-                            $videoFilename, $chunk['chunkSize']
-                        ));
-                    }
-
-                    // Build the current chunk's request options.
-                    $method = 'POST';
-                    $headers = [
-                        'User-Agent'          => $this->_userAgent,
-                        'Connection'          => 'keep-alive',
-                        'Accept'              => '*/*',
-                        'Cookie2'             => '$Version=1',
-                        'Accept-Encoding'     => 'gzip, deflate',
-                        'Content-Type'        => 'application/octet-stream',
-                        'Session-ID'          => $uploadParams['uploadId'],
-                        'Accept-Language'     => Constants::ACCEPT_LANGUAGE,
-                        'Content-Disposition' => "attachment; filename=\"video.{$videoExt}\"",
-                        'Content-Range'       => 'bytes '.$chunk['rangeStart'].'-'.$chunk['rangeEnd'].'/'.$videoSize,
-                        'job'                 => $uploadParams['job'],
-                    ];
-                    $options = [
-                        'headers' => $headers,
-                        'body'    => $chunkData,
-                    ];
-
-                    // When uploading videos to albums, we must fake-inject the
-                    // "sessionid" cookie (the official app fake-injects it too).
-                    if ($targetFeed == 'album' && $sessionIDCookie !== null) {
-                        // We'll add it with the default options ("single use")
-                        // so the fake cookie is only added to THIS request.
-                        $this->_clientMiddleware->addFakeCookie('sessionid', $sessionIDCookie);
-                    }
-
-                    // Perform the upload of the current chunk.
-                    $response = $this->_apiRequest(
-                        $method,
-                        1, // API Version.
-                        $uploadParams['uploadUrl'],
-                        $options,
-                        [
-                            'debugUploadedBody'  => false,
-                            'debugUploadedBytes' => true,
-                            'decodeToObject'     => false,
-                        ]
-                    );
-
-                    // Process the server response...
-                    if (substr($response['body'], 0, 1) === '{') {
-                        // All chunks are uploaded and the server has given us
-                        // a JSON reply. Break out of our main upload-loop.
-                        break 2;
-                    } else {
-                        // The server has given us a regular reply. We expect it
-                        // to be a range-reply, such as "0-3912399/23929393".
-                        // Their server often drops chunks during peak hours,
-                        // and in that case the first range may not start at
-                        // zero, or there may be gaps or multiple ranges, such
-                        // as "0-4076155/8152310,6114234-8152309/8152310". We'll
-                        // handle that by re-uploading whatever they've dropped.
-                        preg_match_all('/(?<start>\d+)-(?<end>\d+)\/(?<total>\d+)/', $response['body'], $matches, PREG_SET_ORDER);
-                        if (count($matches) == 0) {
-                            // Fail if the response contains no byte ranges!
-                            throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
-                                "Upload of \"%s\" failed. Instagram's server returned an unexpected reply (\"%s\").",
-                                $videoFilename, $response['body']
-                            ));
-                        }
-
-                        // Keep track of which range(s) the server has received,
-                        // so that we will re-upload their missing ranges.
-                        $uploadedRanges = [];
-                        foreach ($matches as $match) {
-                            $uploadedRanges[] = [
-                                'start' => $match['start'],
-                                'end'   => $match['end'],
-                            ];
-                        }
-                    }
-                }
-            }
-        } finally {
-            // Guaranteed to release handle even if something bad happens above!
-            fclose($handle);
-        }
-
-        // NOTE: $response below refers to the final chunk's result!
-
-        // Protection against Instagram's upload server being bugged out!
-        // NOTE: When their server is bugging out, the final chunk result will
-        // still be yet another range specifier such as "328600-657199/657200",
-        // instead of a "{...}" JSON object. Because their server will have
-        // dropped some chunks when they bug out (due to overload or w/e).
-        if (substr($response['body'], 0, 1) !== '{') {
-            throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
-                "Upload of \"%s\" failed. Instagram's server returned an unexpected reply and is probably overloaded.",
-                $videoFilename
-            ));
-        }
-
-        // Manually decode the final API response and check for successful chunked upload.
-        $upload = $this->getMappedResponseObject(
-            new Response\UploadVideoResponse(),
-            self::api_body_decode($response['body']), // Important: Special JSON decoder.
-            isset($response['response']) ? $response['response'] : null
-        );
-
-        return $upload;
+        return $response;
     }
 
     /**
@@ -1157,5 +788,15 @@ class Client
         $assoc = false)
     {
         return json_decode($json, $assoc, 512, JSON_BIGINT_AS_STRING);
+    }
+
+    /**
+     * Return client middleware.
+     *
+     * @return ClientMiddleware
+     */
+    public function getMiddleware()
+    {
+        return $this->_clientMiddleware;
     }
 }

@@ -627,7 +627,7 @@ class Direct extends RequestCollection
         $internalMetadata['uploadId'] = $uploadParams['uploadId'];
 
         // Attempt to upload the video data.
-        $upload = $this->ig->client->uploadVideoChunks('direct_v2', $videoFilename, $uploadParams, $maxAttempts);
+        $upload = $this->ig->internal->uploadVideoChunks('direct_v2', $videoFilename, $uploadParams, $maxAttempts);
 
         // We must use the same client_context for all attempts to prevent double-posting.
         if (!isset($options['client_context'])) {
