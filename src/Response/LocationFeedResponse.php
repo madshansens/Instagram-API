@@ -9,25 +9,31 @@ use InstagramAPI\ResponseTrait;
 /**
  * @method mixed getAutoLoadMoreEnabled()
  * @method Model\Item[] getItems()
+ * @method Model\Location getLocation()
  * @method mixed getMediaCount()
  * @method mixed getMoreAvailable()
  * @method string getNextMaxId()
  * @method mixed getNumResults()
  * @method Model\Item[] getRankedItems()
+ * @method Model\StoryItem getStory()
  * @method bool isAutoLoadMoreEnabled()
  * @method bool isItems()
+ * @method bool isLocation()
  * @method bool isMediaCount()
  * @method bool isMoreAvailable()
  * @method bool isNextMaxId()
  * @method bool isNumResults()
  * @method bool isRankedItems()
+ * @method bool isStory()
  * @method setAutoLoadMoreEnabled(mixed $value)
  * @method setItems(Model\Item[] $value)
+ * @method setLocation(Model\Location $value)
  * @method setMediaCount(mixed $value)
  * @method setMoreAvailable(mixed $value)
  * @method setNextMaxId(string $value)
  * @method setNumResults(mixed $value)
  * @method setRankedItems(Model\Item[] $value)
+ * @method setStory(Model\StoryItem $value)
  */
 class LocationFeedResponse extends AutoPropertyHandler implements ResponseInterface
 {
@@ -45,6 +51,14 @@ class LocationFeedResponse extends AutoPropertyHandler implements ResponseInterf
      */
     public $ranked_items;
     public $more_available;
+    /**
+     * @var Model\StoryItem
+     */
+    public $story;
+    /**
+     * @var Model\Location
+     */
+    public $location;
     /**
      * @var string
      */
