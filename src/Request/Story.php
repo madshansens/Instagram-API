@@ -235,7 +235,9 @@ class Story extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('reels', $reels)
-            ->addPost('nuxes', [])
+            ->addPost('live_vods', [])
+            ->addParam('reel', 1)
+            ->addParam('live_vod', 0)
             ->getResponse(new Response\MediaSeenResponse());
     }
 
