@@ -2,6 +2,7 @@
 
 namespace InstagramAPI\Request;
 
+use InstagramAPI\Request\Metadata\Internal as InternalMetadata;
 use InstagramAPI\Response;
 use InstagramAPI\Signatures;
 use InstagramAPI\Utils;
@@ -566,6 +567,7 @@ class Direct extends RequestCollection
      * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\ConfigureResponse
@@ -577,7 +579,8 @@ class Direct extends RequestCollection
         $photoFilename,
         array $externalMetadata = [])
     {
-        $internalMetadata = $this->_addRecipientsToMetadata($recipients, []);
+        $internalMetadata = new InternalMetadata();
+        $internalMetadata->setDirectRecipients($this->_prepareRecipients($recipients, true));
 
         return $this->ig->internal->uploadSinglePhoto('direct_story', $photoFilename, $internalMetadata, $externalMetadata);
     }
@@ -591,10 +594,10 @@ class Direct extends RequestCollection
      *                              instead, provide "thread" with the thread ID.
      * @param string $videoFilename The video filename. Video MUST be square.
      * @param array  $options       An associative array of optional parameters, including:
-     *                              "client_context" - predefined UUID used to prevent double-posting;
-     *                              "max_attempts" - total attempts to upload all chunks before throwing.
+     *                              "client_context" - predefined UUID used to prevent double-posting.
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      * @throws \InstagramAPI\Exception\InstagramException
      * @throws \InstagramAPI\Exception\UploadFailedException If the video upload fails.
      *
@@ -605,29 +608,10 @@ class Direct extends RequestCollection
         $videoFilename,
         array $options = [])
     {
-        if (!is_file($videoFilename) || !is_readable($videoFilename)) {
-            throw new \InvalidArgumentException(sprintf('File "%s" is not available for reading.'));
-        }
-
-        $maxAttempts = isset($options['max_attempts']) ? (int) $options['max_attempts'] : 10;
-        // We require at least 1 attempt, otherwise we can't do anything.
-        if ($maxAttempts < 1) {
-            throw new \InvalidArgumentException('The maxAttempts parameter must be 1 or higher.');
-        }
-
-        $internalMetadata = [
-            'videoDetails' => Utils::getVideoFileDetails($videoFilename),
-        ];
-
-        // Validate the video details and throw if Instagram won't allow it.
-        Utils::throwIfIllegalVideoDetails('direct_v2', $videoFilename, $internalMetadata['videoDetails']);
-
-        // Request parameters for uploading a new video.
-        $uploadParams = $this->ig->internal->requestVideoUploadURL('direct_v2', $internalMetadata);
-        $internalMetadata['uploadId'] = $uploadParams['uploadId'];
-
+        // Direct videos use different upload IDs.
+        $internalMetadata = new InternalMetadata(Utils::generateUploadId(true));
         // Attempt to upload the video data.
-        $upload = $this->ig->internal->uploadVideoChunks('direct_v2', $videoFilename, $uploadParams, $maxAttempts);
+        $internalMetadata = $this->ig->internal->uploadVideo('direct_v2', $videoFilename, $internalMetadata);
 
         // We must use the same client_context for all attempts to prevent double-posting.
         if (!isset($options['client_context'])) {
@@ -636,16 +620,16 @@ class Direct extends RequestCollection
 
         // Send the uploaded video to recipients.
         $result = null;
-        for ($attempt = 1; $attempt <= $maxAttempts; ++$attempt) {
+        for ($attempt = 1; $attempt <= Internal::MAX_CONFIGURE_RETRIES; ++$attempt) {
             try {
                 // Attempt to configure video parameters (which sends it to the thread).
                 $result = $this->_sendDirectItem('video', $recipients, array_merge($options, [
-                    'upload_id'    => $internalMetadata['uploadId'],
-                    'video_result' => $upload->getResult(),
+                    'upload_id'    => $internalMetadata->getUploadId(),
+                    'video_result' => $internalMetadata->getVideoUploadResponse()->getResult(),
                 ]));
                 break; // Success. Exit loop.
             } catch (\InstagramAPI\Exception\InstagramException $e) {
-                if ($attempt < $maxAttempts && strpos($e->getMessage(), 'Transcode timeout') !== false) {
+                if ($attempt < Internal::MAX_CONFIGURE_RETRIES && strpos($e->getMessage(), 'Transcode timeout') !== false) {
                     // Do nothing, since we'll be retrying the failed configure...
                     sleep(1); // Just wait a little before the next retry.
                 } else {
@@ -670,9 +654,9 @@ class Direct extends RequestCollection
      *                                 instead, provide "thread" with the thread ID.
      * @param string $videoFilename    The video filename.
      * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
-     * @param int    $maxAttempts      (optional) Total attempts to upload all chunks before throwing.
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      * @throws \InstagramAPI\Exception\InstagramException
      * @throws \InstagramAPI\Exception\UploadFailedException If the video upload fails.
      *
@@ -683,12 +667,12 @@ class Direct extends RequestCollection
     public function sendDisappearingVideo(
         $recipients,
         $videoFilename,
-        array $externalMetadata = [],
-        $maxAttempts = 10)
+        array $externalMetadata = [])
     {
-        $internalMetadata = $this->_addRecipientsToMetadata($recipients, []);
+        $internalMetadata = new InternalMetadata();
+        $internalMetadata->setDirectRecipients($this->_prepareRecipients($recipients, true));
 
-        return $this->ig->internal->uploadSingleVideo('direct_story', $videoFilename, $internalMetadata, $externalMetadata, $maxAttempts);
+        return $this->ig->internal->uploadSingleVideo('direct_story', $videoFilename, $internalMetadata, $externalMetadata);
     }
 
     /**
@@ -1267,33 +1251,5 @@ class Direct extends RequestCollection
             'item_id'         => $threadItemId,
             'node_type'       => 'item',
         ]));
-    }
-
-    /**
-     * Add recipients to metadata.
-     *
-     * @param array $recipients
-     * @param array $metadata
-     *
-     * @throws \InvalidArgumentException
-     *
-     * @return array
-     */
-    protected function _addRecipientsToMetadata(
-        array $recipients,
-        array $metadata)
-    {
-        $recipients = $this->_prepareRecipients($recipients, true);
-        if (isset($recipients['users'])) {
-            $metadata['recipient_users'] = $recipients['users'];
-            $metadata['thread_ids'] = '["0"]';
-        } elseif (isset($recipients['thread'])) {
-            $metadata['recipient_users'] = '[]';
-            $metadata['thread_ids'] = $recipients['thread'];
-        } else {
-            throw new \InvalidArgumentException('Please provide at least one recipient.');
-        }
-
-        return $metadata;
     }
 }

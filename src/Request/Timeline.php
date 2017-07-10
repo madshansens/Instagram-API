@@ -3,6 +3,7 @@
 namespace InstagramAPI\Request;
 
 use InstagramAPI\Constants;
+use InstagramAPI\Request\Metadata\Internal as InternalMetadata;
 use InstagramAPI\Response;
 use InstagramAPI\Utils;
 
@@ -21,6 +22,7 @@ class Timeline extends RequestCollection
      * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\ConfigureResponse
@@ -31,7 +33,7 @@ class Timeline extends RequestCollection
         $photoFilename,
         array $externalMetadata = [])
     {
-        return $this->ig->internal->uploadSinglePhoto('timeline', $photoFilename, [], $externalMetadata);
+        return $this->ig->internal->uploadSinglePhoto('timeline', $photoFilename, null, $externalMetadata);
     }
 
     /**
@@ -39,7 +41,6 @@ class Timeline extends RequestCollection
      *
      * @param string $videoFilename    The video filename.
      * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
-     * @param int    $maxAttempts      Total attempts to upload all chunks before throwing.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -51,10 +52,9 @@ class Timeline extends RequestCollection
      */
     public function uploadVideo(
         $videoFilename,
-        array $externalMetadata = [],
-        $maxAttempts = 10)
+        array $externalMetadata = [])
     {
-        return $this->ig->internal->uploadSingleVideo('timeline', $videoFilename, [], $externalMetadata, $maxAttempts);
+        return $this->ig->internal->uploadSingleVideo('timeline', $videoFilename, null, $externalMetadata);
     }
 
     /**
@@ -71,9 +71,9 @@ class Timeline extends RequestCollection
      *                                used on PHOTOS, never on videos.
      * @param array $externalMetadata (optional) User-provided metadata key-value pairs
      *                                for the album itself (its caption, location, etc).
-     * @param int   $maxAttempts      Total attempts to upload all video chunks before throwing.
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      * @throws \InstagramAPI\Exception\InstagramException
      * @throws \InstagramAPI\Exception\UploadFailedException If the video upload fails.
      *
@@ -83,8 +83,7 @@ class Timeline extends RequestCollection
      */
     public function uploadAlbum(
         array $media,
-        array $externalMetadata = [],
-        $maxAttempts = 10)
+        array $externalMetadata = [])
     {
         if (empty($media)) {
             throw new \InvalidArgumentException("List of media to upload can't be empty.");
@@ -96,21 +95,18 @@ class Timeline extends RequestCollection
             ));
         }
 
-        // We require at least 1 attempt, otherwise we can't do anything.
-        if ($maxAttempts < 1) {
-            throw new \InvalidArgumentException('The maxAttempts parameter must be 1 or higher.');
-        }
-
         // Figure out the media file details for ALL media in the album.
         // NOTE: We do this first, since it validates whether the media files are
         // valid and lets us avoid wasting time uploading totally invalid albums!
         foreach ($media as $key => $item) {
-            // Verify that the file exists locally.
-            if (!is_file($item['file'])) {
-                throw new \InvalidArgumentException(sprintf('The media file "%s" does not exist on disk.', $item['file']));
+            if (!isset($item['file']) || !isset($item['type'])) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Media at index "%s" does not have "file" or "type".',
+                    $key
+                ));
             }
 
-            $media[$key]['internalMetadata'] = [];
+            $internalMetadata = new InternalMetadata();
 
             // If usertags are provided, verify that the entries are valid.
             if (isset($item['usertags'])) {
@@ -120,58 +116,44 @@ class Timeline extends RequestCollection
             // Pre-process media details and throw if not allowed on Instagram.
             switch ($item['type']) {
             case 'photo':
-                // Determine the width and height of the photo.
-                $imagesize = @getimagesize($item['file']);
-                if ($imagesize === false) {
-                    throw new \InvalidArgumentException(sprintf('File "%s" is not an image.', $item['file']));
-                }
-                $media[$key]['internalMetadata']['photoWidth'] = $imagesize[0];
-                $media[$key]['internalMetadata']['photoHeight'] = $imagesize[1];
-
-                // Validate image resolution and aspect ratio.
-                Utils::throwIfIllegalMediaResolution('album', 'photofile', $item['file'],
-                                                     $media[$key]['internalMetadata']['photoWidth'],
-                                                     $media[$key]['internalMetadata']['photoHeight']);
+                // Determine the photo details.
+                $internalMetadata->setPhotoDetails('album', $item['file']);
                 break;
             case 'video':
                 // Determine the video details.
-                $media[$key]['internalMetadata']['videoDetails'] = Utils::getVideoFileDetails($item['file']);
-
-                // Validate those details.
-                Utils::throwIfIllegalVideoDetails('album', $item['file'], $media[$key]['internalMetadata']['videoDetails']);
+                $internalMetadata->setVideoDetails('album', $item['file']);
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('Unsupported album media type "%s".', $item['type']));
             }
+
+            $media[$key]['internalMetadata'] = $internalMetadata;
         }
 
         // Perform all media file uploads.
         foreach ($media as $key => $item) {
-            if (!file_exists($item['file'])) {
-                throw new \InvalidArgumentException(sprintf('File "%s" does not exist.', $item['file']));
-            }
+            /** @var InternalMetadata $internalMetadata */
+            $internalMetadata = $media[$key]['internalMetadata'];
 
             switch ($item['type']) {
             case 'photo':
-                $result = $this->ig->internal->uploadPhotoData('album', $item['file']);
-                $media[$key]['internalMetadata']['uploadId'] = $result->getUploadId();
+                $internalMetadata->setPhotoUploadResponse($this->ig->internal->uploadPhotoData('album', $internalMetadata));
                 break;
             case 'video':
-                // Request parameters for uploading a new video.
-                $uploadParams = $this->ig->internal->requestVideoUploadURL('album');
-                $media[$key]['internalMetadata']['uploadId'] = $uploadParams['uploadId'];
-
                 // Attempt to upload the video data.
-                $this->ig->internal->uploadVideoChunks('album', $item['file'], $uploadParams, $maxAttempts);
+                $internalMetadata = $this->ig->internal->uploadVideo('album', $item['file'], $internalMetadata);
 
                 // Attempt to upload the thumbnail, associated with our video's ID.
-                $this->ig->internal->uploadPhotoData('album', $item['file'], 'videofile', $uploadParams['uploadId']);
+                $internalMetadata->setPhotoUploadResponse($this->ig->internal->uploadPhotoData('album', $internalMetadata));
             }
+
+            $media[$key]['internalMetadata'] = $internalMetadata;
         }
 
+        // Lock uploadId for album.
+        $albumInternalMetadata = new InternalMetadata();
         // Configure the uploaded album and attach it to our timeline.
-        $internalMetadata = []; // NOTE: NO INTERNAL DATA IS NEEDED HERE YET.
-        $configure = $this->ig->internal->configureTimelineAlbumWithRetries($media, $internalMetadata, $externalMetadata);
+        $configure = $this->ig->internal->configureTimelineAlbumWithRetries($media, $albumInternalMetadata, $externalMetadata);
 
         return $configure;
     }

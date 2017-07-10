@@ -2,6 +2,9 @@
 
 namespace InstagramAPI;
 
+use InstagramAPI\Request\Metadata\MediaDetails;
+use InstagramAPI\Request\Metadata\PhotoDetails;
+use InstagramAPI\Request\Metadata\VideoDetails;
 use InstagramAPI\Response\Model\Item;
 
 class Utils
@@ -48,11 +51,38 @@ class Utils
     public static $ffprobeBin = null;
 
     /**
+     * Last uploadId generated with microtime().
+     *
+     * @var string|null
+     */
+    protected static $_lastUploadId = null;
+
+    /**
+     * @param bool $useNano Whether to return result in usec instead of msec.
+     *
      * @return string
      */
-    public static function generateUploadId()
+    public static function generateUploadId(
+        $useNano = false)
     {
-        return number_format(round(microtime(true) * 1000), 0, '', '');
+        if (!$useNano) {
+            $result = number_format(round(microtime(true) * 1000), 0, '', '');
+            if (self::$_lastUploadId !== null && $result === self::$_lastUploadId) {
+                // NOTE: Fast machines can process files too quick (< 0.001 sec), which leads to
+                // identical upload IDs, which leads to "500 Oops, an error occurred" errors.
+                // So we sleep 0.001 sec to ensure that we will get different upload IDs per each call.
+                usleep(1000);
+                $result = number_format(round(microtime(true) * 1000), 0, '', '');
+            }
+            self::$_lastUploadId = $result;
+        } else {
+            // Emulate System.nanoTime().
+            $result = number_format(microtime(true) - strtotime('Last Monday'), 6, '', '');
+            // Append nanoseconds.
+            $result .= str_pad((string) mt_rand(1, 999), 3, '0', STR_PAD_LEFT);
+        }
+
+        return $result;
     }
 
     /**
@@ -216,6 +246,36 @@ class Utils
     }
 
     /**
+     * Get detailed information about a photo file.
+     *
+     * @param string $photoFilename Path to the photo file.
+     *
+     * @throws \InvalidArgumentException If the photo file is missing or invalid.
+     *
+     * @return array Int image type, width and height.
+     */
+    public static function getPhotoFileDetails(
+        $photoFilename)
+    {
+        // Check if input file exists.
+        if (empty($photoFilename) || !is_file($photoFilename)) {
+            throw new \InvalidArgumentException(sprintf('The photo file "%s" does not exist on disk.', $photoFilename));
+        }
+
+        // Get image details.
+        $result = @getimagesize($photoFilename);
+        if ($result === false) {
+            throw new \InvalidArgumentException(sprintf('The photo file "%s" is not a valid image.', $photoFilename));
+        }
+
+        return [
+            'width'  => $result[0],
+            'height' => $result[1],
+            'type'   => $result[2],
+        ];
+    }
+
+    /**
      * Get detailed information about a video file.
      *
      * This also validates that a file is actually a video, since FFmpeg will
@@ -225,7 +285,6 @@ class Utils
      *
      * @throws \InvalidArgumentException If the video file is missing.
      * @throws \RuntimeException         If FFmpeg isn't working properly.
-     * @throws \Exception                In case of various processing errors.
      *
      * @return array Video codec name, float duration, int width and height.
      */
@@ -287,11 +346,8 @@ class Utils
      * Currently all photos and videos everywhere have the exact same rules.
      * We bring in the up-to-date rules from the ImageAutoResizer class.
      *
-     * @param string    $targetFeed    Target feed for this media ("timeline", "story", "direct_story", "album" or "direct_v2").
-     * @param string    $fileType      Whether the file is a "photofile" or "videofile".
-     * @param string    $mediaFilename Filename to display to the user in case of error.
-     * @param int|float $width         The media width.
-     * @param int|float $height        The media height.
+     * @param string       $targetFeed   Target feed for this media ("timeline", "story", "direct_story", "album" or "direct_v2").
+     * @param MediaDetails $mediaDetails Media details.
      *
      * @throws \InvalidArgumentException If Instagram won't allow this file.
      *
@@ -299,16 +355,15 @@ class Utils
      */
     public static function throwIfIllegalMediaResolution(
         $targetFeed,
-        $fileType,
-        $mediaFilename,
-        $width,
-        $height)
+        MediaDetails $mediaDetails)
     {
+        $width = $mediaDetails->getWidth();
+        $height = $mediaDetails->getHeight();
         // WARNING TO CONTRIBUTORS: $mediaFilename is for ERROR DISPLAY to
         // users. Do NOT use it to read from the hard disk!
-
+        $mediaFilename = $mediaDetails->getFilename();
         // Check Resolution.
-        if ($fileType == 'photofile') {
+        if ($mediaDetails instanceof PhotoDetails) {
             // Validate photo resolution.
             if ($width > ImageAutoResizer::MAX_WIDTH || $height > ImageAutoResizer::MAX_HEIGHT) {
                 throw new \InvalidArgumentException(sprintf(
@@ -316,7 +371,7 @@ class Utils
                     ImageAutoResizer::MAX_WIDTH, ImageAutoResizer::MAX_HEIGHT, $mediaFilename, $width, $height
                 ));
             }
-        } else {
+        } elseif ($mediaDetails instanceof VideoDetails) {
             // Validate video resolution. Instagram allows between 320px-1080px width.
             // NOTE: They have height-limits too, but we automatically enforce
             // those when validating the aspect ratio further down.
@@ -350,53 +405,77 @@ class Utils
     /**
      * Verifies that a video's details follow Instagram's requirements.
      *
-     * @param string $targetFeed    Target feed for this media ("timeline", "story", "direct_story", "album" or "direct_v2").
-     * @param string $videoFilename The video filename.
-     * @param array  $videoDetails  An array created by getVideoFileDetails().
+     * @param string       $targetFeed   Target feed for this media ("timeline", "story", "direct_story", "album" or "direct_v2").
+     * @param VideoDetails $videoDetails Video details.
      *
      * @throws \InvalidArgumentException If Instagram won't allow this video.
      */
     public static function throwIfIllegalVideoDetails(
         $targetFeed,
-        $videoFilename,
-        array $videoDetails)
+        VideoDetails $videoDetails)
     {
+        $videoFilename = $videoDetails->getFilename();
         // Validate video length.
         // NOTE: Instagram has no disk size limit, but this length validation
         // also ensures we can only upload small files exactly as intended.
+        $duration = $videoDetails->getDuration();
         switch ($targetFeed) {
         case 'story':
             // Instagram only allows 3-15 seconds for stories.
-            if ($videoDetails['duration'] < 3 || $videoDetails['duration'] > 15) {
+            if ($duration < 3 || $duration > 15) {
                 throw new \InvalidArgumentException(sprintf(
                     'Instagram only accepts story videos that are between 3 and 15 seconds long. Your story video "%s" is %.3f seconds long.',
-                    $videoFilename, $videoDetails['duration']
+                    $videoFilename, $duration
                 ));
             }
             break;
         case 'direct_v2':
         case 'direct_story':
             // Instagram only allows 0.1-15 seconds for direct messages.
-            if ($videoDetails['duration'] < 0.1 || $videoDetails['duration'] > 15) {
+            if ($duration < 0.1 || $duration > 15) {
                 throw new \InvalidArgumentException(sprintf(
                     'Instagram only accepts direct videos that are between 0.1 and 15 seconds long. Your direct video "%s" is %.3f seconds long.',
-                    $videoFilename, $videoDetails['duration']
+                    $videoFilename, $duration
                 ));
             }
             break;
         default: // timeline
             // Validate video length. Instagram only allows 3-60 seconds.
             // SEE: https://help.instagram.com/270963803047681
-            if ($videoDetails['duration'] < 3 || $videoDetails['duration'] > 60) {
+            if ($duration < 3 || $duration > 60) {
                 throw new \InvalidArgumentException(sprintf(
                     'Instagram only accepts videos that are between 3 and 60 seconds long. Your video "%s" is %.3f seconds long.',
-                    $videoFilename, $videoDetails['duration']
+                    $videoFilename, $duration
                 ));
             }
         }
 
         // Validate video resolution and aspect ratio.
-        self::throwIfIllegalMediaResolution($targetFeed, 'videofile', $videoFilename, $videoDetails['width'], $videoDetails['height']);
+        self::throwIfIllegalMediaResolution($targetFeed, $videoDetails);
+    }
+
+    /**
+     * Verifies that a photo's details follow Instagram's requirements.
+     *
+     * @param string       $targetFeed   Target feed for this photo ("timeline", "story", "direct_story", "album" or "direct_v2").
+     * @param PhotoDetails $photoDetails Photo details.
+     *
+     * @throws \InvalidArgumentException If Instagram won't allow this photo.
+     */
+    public static function throwIfIllegalPhotoDetails(
+        $targetFeed,
+        PhotoDetails $photoDetails)
+    {
+        $photoFilename = $photoDetails->getFilename();
+        // Validate image type.
+        // NOTE: It is confirmed that Instagram accepts only JPEG.
+        $type = $photoDetails->getType();
+        if ($type !== IMAGETYPE_JPEG) {
+            throw new \InvalidArgumentException(sprintf('The photo file "%s" is not JPEG.', $photoFilename));
+        }
+
+        // Validate photo resolution and aspect ratio.
+        self::throwIfIllegalMediaResolution($targetFeed, $photoDetails);
     }
 
     /**
@@ -409,7 +488,6 @@ class Utils
      *
      * @throws \InvalidArgumentException If the video file is missing.
      * @throws \RuntimeException         If FFmpeg isn't working properly.
-     * @throws \Exception                In case of various processing errors.
      *
      * @return string The JPEG binary data for the generated thumbnail.
      */

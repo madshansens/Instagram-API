@@ -8,11 +8,11 @@ use InstagramAPI\ResponseTrait;
 
 /**
  * @method string getUploadId()
- * @method mixed getVideoUploadUrls()
+ * @method Model\VideoUploadUrl[] getVideoUploadUrls()
  * @method bool isUploadId()
  * @method bool isVideoUploadUrls()
  * @method setUploadId(string $value)
- * @method setVideoUploadUrls(mixed $value)
+ * @method setVideoUploadUrls(Model\VideoUploadUrl[] $value)
  */
 class UploadJobVideoResponse extends AutoPropertyHandler implements ResponseInterface
 {
@@ -22,5 +22,6 @@ class UploadJobVideoResponse extends AutoPropertyHandler implements ResponseInte
      * @var string
      */
     public $upload_id;
+    /** @var Model\VideoUploadUrl[] */
     public $video_upload_urls;
 }

@@ -18,6 +18,7 @@ class Story extends RequestCollection
      * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\ConfigureResponse
@@ -28,7 +29,7 @@ class Story extends RequestCollection
         $photoFilename,
         array $externalMetadata = [])
     {
-        return $this->ig->internal->uploadSinglePhoto('story', $photoFilename, [], $externalMetadata);
+        return $this->ig->internal->uploadSinglePhoto('story', $photoFilename, null, $externalMetadata);
     }
 
     /**
@@ -36,9 +37,9 @@ class Story extends RequestCollection
      *
      * @param string $videoFilename    The video filename.
      * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
-     * @param int    $maxAttempts      Total attempts to upload all chunks before throwing.
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      * @throws \InstagramAPI\Exception\InstagramException
      * @throws \InstagramAPI\Exception\UploadFailedException If the video upload fails.
      *
@@ -48,10 +49,9 @@ class Story extends RequestCollection
      */
     public function uploadVideo(
         $videoFilename,
-        array $externalMetadata = [],
-        $maxAttempts = 10)
+        array $externalMetadata = [])
     {
-        return $this->ig->internal->uploadSingleVideo('story', $videoFilename, [], $externalMetadata, $maxAttempts);
+        return $this->ig->internal->uploadSingleVideo('story', $videoFilename, null, $externalMetadata);
     }
 
     /**
