@@ -205,6 +205,19 @@ class Account extends RequestCollection
     }
 
     /**
+     * Get if comment category filter is disabled.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CommentCategoryFilterResponse
+     */
+    public function getCommentCategoryFilterDisabled()
+    {
+        return $this->ig->request('accounts/get_comment_category_filter_disabled/')
+            ->getResponse(new Response\CommentCategoryFilterResponse());
+    }
+
+    /**
      * Set account spam filter keywords.
      *
      * @param string $keywords List of blocked words, separated by comma.
