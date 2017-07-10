@@ -10,6 +10,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getContentType()
  * @method mixed getCreatedAt()
  * @method mixed getCreatedAtUtc()
+ * @method mixed getDidReportAsSpam()
  * @method mixed getHasLikedComment()
  * @method mixed getHasTranslation()
  * @method string getMediaId()
@@ -24,6 +25,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isContentType()
  * @method bool isCreatedAt()
  * @method bool isCreatedAtUtc()
+ * @method bool isDidReportAsSpam()
  * @method bool isHasLikedComment()
  * @method bool isHasTranslation()
  * @method bool isMediaId()
@@ -38,6 +40,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setContentType(mixed $value)
  * @method setCreatedAt(mixed $value)
  * @method setCreatedAtUtc(mixed $value)
+ * @method setDidReportAsSpam(mixed $value)
  * @method setHasLikedComment(mixed $value)
  * @method setHasTranslation(mixed $value)
  * @method setMediaId(string $value)
@@ -76,4 +79,5 @@ class Comment extends AutoPropertyHandler
     public $comment_like_count;
     public $has_liked_comment;
     public $has_translation;
+    public $did_report_as_spam;
 }
