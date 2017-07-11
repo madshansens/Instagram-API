@@ -13,18 +13,21 @@ use InstagramAPI\ResponseTrait;
  * @method string getNextMaxId()
  * @method mixed getNumResults()
  * @method Model\Item[] getRankedItems()
+ * @method Model\StoryItem getStory()
  * @method bool isAutoLoadMoreEnabled()
  * @method bool isItems()
  * @method bool isMoreAvailable()
  * @method bool isNextMaxId()
  * @method bool isNumResults()
  * @method bool isRankedItems()
+ * @method bool isStory()
  * @method setAutoLoadMoreEnabled(mixed $value)
  * @method setItems(Model\Item[] $value)
  * @method setMoreAvailable(mixed $value)
  * @method setNextMaxId(string $value)
  * @method setNumResults(mixed $value)
  * @method setRankedItems(Model\Item[] $value)
+ * @method setStory(Model\StoryItem $value)
  */
 class TagFeedResponse extends AutoPropertyHandler implements ResponseInterface
 {
@@ -40,6 +43,10 @@ class TagFeedResponse extends AutoPropertyHandler implements ResponseInterface
      * @var Model\Item[]
      */
     public $items;
+    /**
+     * @var Model\StoryItem
+     */
+    public $story;
     public $more_available;
     /**
      * @var string
