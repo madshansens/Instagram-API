@@ -205,7 +205,7 @@ class Account extends RequestCollection
     }
 
     /**
-     * Get if comment category filter is disabled.
+     * Get whether the comment category filter is disabled.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
