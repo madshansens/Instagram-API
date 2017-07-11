@@ -11,7 +11,7 @@ use InstagramAPI\ResponseTrait;
  * @method Model\PostLive getPostLive()
  * @method mixed getStickerVersion()
  * @method mixed getStoryRankingToken()
- * @method Model\Tray[] getTray()
+ * @method Model\StoryTray[] getTray()
  * @method bool isBroadcasts()
  * @method bool isPostLive()
  * @method bool isStickerVersion()
@@ -21,14 +21,14 @@ use InstagramAPI\ResponseTrait;
  * @method setPostLive(Model\PostLive $value)
  * @method setStickerVersion(mixed $value)
  * @method setStoryRankingToken(mixed $value)
- * @method setTray(Model\Tray[] $value)
+ * @method setTray(Model\StoryTray[] $value)
  */
 class ReelsTrayFeedResponse extends AutoPropertyHandler implements ResponseInterface
 {
     use ResponseTrait;
 
     /**
-     * @var Model\Tray[]
+     * @var Model\StoryTray[]
      */
     public $tray;
     /**

@@ -54,7 +54,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setSourceToken(mixed $value)
  * @method setUser(User $value)
  */
-class Tray extends AutoPropertyHandler
+class StoryTray extends AutoPropertyHandler
 {
     /**
      * @var string

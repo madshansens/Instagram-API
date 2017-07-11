@@ -8,7 +8,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method string getId()
  * @method mixed getIsPortrait()
  * @method TopLive getTopLive()
- * @method Tray[] getTray()
+ * @method StoryTray[] getTray()
  * @method bool isId()
  * @method bool isIsPortrait()
  * @method bool isTopLive()
@@ -16,13 +16,13 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setId(string $value)
  * @method setIsPortrait(mixed $value)
  * @method setTopLive(TopLive $value)
- * @method setTray(Tray[] $value)
+ * @method setTray(StoryTray[] $value)
  */
 class Stories extends AutoPropertyHandler
 {
     public $is_portrait;
     /**
-     * @var Tray[]
+     * @var StoryTray[]
      */
     public $tray;
     /**
