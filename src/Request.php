@@ -420,7 +420,7 @@ class Request
         } elseif (isset($file['filepath'])) {
             $handle = fopen($file['filepath'], 'rb');
             if ($handle === false) {
-                throw new \RuntimeException(sprintf('Can not open file "%s" for reading.', $file['filepath']));
+                throw new \RuntimeException(sprintf('Could not open file "%s" for reading.', $file['filepath']));
             }
             $this->_handles[] = $handle;
             $result = stream_for($handle);

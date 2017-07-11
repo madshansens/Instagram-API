@@ -101,12 +101,12 @@ class Timeline extends RequestCollection
         foreach ($media as $key => $item) {
             if (!isset($item['file']) || !isset($item['type'])) {
                 throw new \InvalidArgumentException(sprintf(
-                    'Media at index "%s" does not have "file" or "type".',
+                    'Media at index "%s" does not have the required "file" and "type" keys.',
                     $key
                 ));
             }
 
-            $internalMetadata = new InternalMetadata();
+            $itemInternalMetadata = new InternalMetadata();
 
             // If usertags are provided, verify that the entries are valid.
             if (isset($item['usertags'])) {
@@ -117,40 +117,40 @@ class Timeline extends RequestCollection
             switch ($item['type']) {
             case 'photo':
                 // Determine the photo details.
-                $internalMetadata->setPhotoDetails('album', $item['file']);
+                $itemInternalMetadata->setPhotoDetails('album', $item['file']);
                 break;
             case 'video':
                 // Determine the video details.
-                $internalMetadata->setVideoDetails('album', $item['file']);
+                $itemInternalMetadata->setVideoDetails('album', $item['file']);
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('Unsupported album media type "%s".', $item['type']));
             }
 
-            $media[$key]['internalMetadata'] = $internalMetadata;
+            $media[$key]['internalMetadata'] = $itemInternalMetadata;
         }
 
         // Perform all media file uploads.
         foreach ($media as $key => $item) {
-            /** @var InternalMetadata $internalMetadata */
-            $internalMetadata = $media[$key]['internalMetadata'];
+            /** @var InternalMetadata $itemInternalMetadata */
+            $itemInternalMetadata = $media[$key]['internalMetadata'];
 
             switch ($item['type']) {
             case 'photo':
-                $internalMetadata->setPhotoUploadResponse($this->ig->internal->uploadPhotoData('album', $internalMetadata));
+                $itemInternalMetadata->setPhotoUploadResponse($this->ig->internal->uploadPhotoData('album', $itemInternalMetadata));
                 break;
             case 'video':
                 // Attempt to upload the video data.
-                $internalMetadata = $this->ig->internal->uploadVideo('album', $item['file'], $internalMetadata);
+                $itemInternalMetadata = $this->ig->internal->uploadVideo('album', $item['file'], $itemInternalMetadata);
 
                 // Attempt to upload the thumbnail, associated with our video's ID.
-                $internalMetadata->setPhotoUploadResponse($this->ig->internal->uploadPhotoData('album', $internalMetadata));
+                $itemInternalMetadata->setPhotoUploadResponse($this->ig->internal->uploadPhotoData('album', $itemInternalMetadata));
             }
 
-            $media[$key]['internalMetadata'] = $internalMetadata;
+            $media[$key]['internalMetadata'] = $itemInternalMetadata;
         }
 
-        // Lock uploadId for album.
+        // Generate an uploadId (via internal metadata) for the album.
         $albumInternalMetadata = new InternalMetadata();
         // Configure the uploaded album and attach it to our timeline.
         $configure = $this->ig->internal->configureTimelineAlbumWithRetries($media, $albumInternalMetadata, $externalMetadata);

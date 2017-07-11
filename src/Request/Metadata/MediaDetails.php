@@ -4,19 +4,13 @@ namespace InstagramAPI\Request\Metadata;
 
 abstract class MediaDetails
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $_filename;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $_width;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $_height;
 
     /**

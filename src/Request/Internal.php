@@ -101,7 +101,7 @@ class Internal extends RequestCollection
             $photoData = Utils::createVideoIcon($internalMetadata->getVideoDetails()->getFilename());
             $isVideoThumbnail = true;
         } else {
-            throw new \InvalidArgumentException('Can not find photo file source (neither photoDetails or videoDetails are set).');
+            throw new \InvalidArgumentException('Could not find any photo file to upload (the photoDetails and videoDetails are both unset).');
         }
 
         // Prepare payload for the upload request.
@@ -354,7 +354,7 @@ class Internal extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException If the request fails.
      *
-     * @return Response\UploadJobVideoResponse
+     * @return \InstagramAPI\Response\UploadJobVideoResponse
      */
     protected function _requestVideoUploadURL(
         $targetFeed,
@@ -601,7 +601,7 @@ class Internal extends RequestCollection
      * @param array            $media            Extended media array coming from Timeline::uploadAlbum(),
      *                                           containing the user's per-file metadata,
      *                                           and internally generated per-file metadata.
-     * @param InternalMetadata $internalMetadata Internal metadata for album.
+     * @param InternalMetadata $internalMetadata Internal library-generated metadata object for the album itself.
      * @param array            $externalMetadata (optional) User-provided metadata key-value pairs
      *                                           for the album itself (its caption, location, etc).
      *
@@ -635,10 +635,10 @@ class Internal extends RequestCollection
         $date = date('Y:m:d H:i:s');
         $childrenMetadata = [];
         foreach ($media as $item) {
-            /** @var InternalMetadata $internalMetadata */
-            $internalMetadata = $item['internalMetadata'];
+            /** @var InternalMetadata $itemInternalMetadata */
+            $itemInternalMetadata = $item['internalMetadata'];
             // Get all of the common, INTERNAL per-file metadata.
-            $uploadId = $internalMetadata->getUploadId();
+            $uploadId = $itemInternalMetadata->getUploadId();
 
             switch ($item['type']) {
             case 'photo':
@@ -661,7 +661,7 @@ class Internal extends RequestCollection
 
                 // This usertag per-file EXTERNAL metadata is only supported for PHOTOS!
                 if (isset($item['usertags'])) {
-                    // NOTE: These usertags are validated in Timeline::uploadAlbum.
+                    // NOTE: These usertags were validated in Timeline::uploadAlbum.
                     $photoConfig['usertags'] = json_encode(['in' => $item['usertags']]);
                 }
 
@@ -669,7 +669,7 @@ class Internal extends RequestCollection
                 break;
             case 'video':
                 // Get all of the INTERNAL per-VIDEO metadata.
-                $videoDetails = $internalMetadata->getVideoDetails();
+                $videoDetails = $itemInternalMetadata->getVideoDetails();
 
                 // Build this item's configuration.
                 $videoConfig = [
@@ -1037,7 +1037,7 @@ class Internal extends RequestCollection
     }
 
     /**
-     * Return first missing range (start-end) from HTTP "Range" header.
+     * Get the first missing range (start-end) from a HTTP "Range" header.
      *
      * @param string $ranges
      *
@@ -1075,8 +1075,8 @@ class Internal extends RequestCollection
      * Performs a chunked upload of a video file, with support for retries.
      *
      * Note that chunk uploads often get dropped when their server is overloaded
-     * at peak hours, which is why the "max attempts" parameter exists. We will
-     * try that many times to upload all chunks. The retries will only re-upload
+     * at peak hours, which is why our chunk-retry mechanism exists. We will
+     * try several times to upload all chunks. The retries will only re-upload
      * the exact chunks that have been dropped from their server, and it won't
      * waste time with chunks that are already successfully uploaded.
      *
@@ -1120,7 +1120,7 @@ class Internal extends RequestCollection
             }
         }
 
-        // Verify upload urls.
+        // Verify the upload URLs.
         $uploadUrls = $internalMetadata->getVideoUploadUrls();
         if (!is_array($uploadUrls) || !count($uploadUrls)) {
             throw new \InstagramAPI\Exception\UploadFailedException('No video upload URLs found.');
@@ -1143,10 +1143,10 @@ class Internal extends RequestCollection
             ));
         }
         try {
-            // Create a stream for opened file handle.
+            // Create a stream for the opened file handle.
             $stream = new Stream($handle);
             while (true) {
-                // Check for retries limit and switch to another server.
+                // Check for this server's max retry-limit, and switch server?
                 if (++$attempt > self::MAX_CHUNK_RETRIES) {
                     $uploadUrl = null;
                 }
@@ -1154,15 +1154,15 @@ class Internal extends RequestCollection
                 // Try to switch to another server.
                 if ($uploadUrl === null) {
                     $uploadUrl = array_shift($uploadUrls);
-                    // Fail if no upload URL left.
+                    // Fail if there are no upload URLs left.
                     if ($uploadUrl === null) {
                         throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
-                            'Upload of "%s" failed. Out of upload URLs.',
+                            'Upload of "%s" failed. There are no more upload URLs.',
                             $videoFilename
                         ));
                     }
                     // Reset state.
-                    $attempt = 0;
+                    $attempt = 1; // As if "++$attempt" had ran once, above.
                     $offset = 0;
                     $chunk = min($length, self::MIN_CHUNK_SIZE);
                 }
@@ -1197,7 +1197,7 @@ class Internal extends RequestCollection
 
                 // Determine new chunk size based on upload duration.
                 $newChunkSize = (int) ($chunk / (microtime(true) - $start) * 5);
-                // Ensure that new chunk size is in valid range.
+                // Ensure that the new chunk size is in valid range.
                 $newChunkSize = min(self::MAX_CHUNK_SIZE, max(self::MIN_CHUNK_SIZE, $newChunkSize));
 
                 $result = null;
@@ -1217,12 +1217,14 @@ class Internal extends RequestCollection
                 // Process the server response...
                 switch ($httpResponse->getStatusCode()) {
                     case 200:
-                        // All chunks are uploaded.
+                        // All chunks are uploaded, but if we don't have a
+                        // response-result now then we must retry a new server.
                         if ($result === null) {
                             $uploadUrl = null;
                             break;
                         }
 
+                        // SUCCESS! :-)
                         return $result;
                     case 201:
                         // The server has given us a regular reply. We expect it
@@ -1256,7 +1258,7 @@ class Internal extends RequestCollection
                         ));
                     case 422:
                         throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
-                            "Upload of \"%s\" failed. Instagram's server says that video is corrupt.",
+                            "Upload of \"%s\" failed. Instagram's server says that the video is corrupt.",
                             $videoFilename, $httpResponse->getStatusCode()
                         ));
                     default:
@@ -1268,7 +1270,7 @@ class Internal extends RequestCollection
         }
 
         throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
-            'Upload of \"%s\" failed',
+            'Upload of \"%s\" failed.',
             $videoFilename
         ));
     }

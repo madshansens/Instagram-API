@@ -10,34 +10,22 @@ use InstagramAPI\Utils;
 
 final class Internal
 {
-    /**
-     * @var PhotoDetails
-     */
+    /** @var PhotoDetails */
     private $_photoDetails;
 
-    /**
-     * @var VideoDetails
-     */
+    /** @var VideoDetails */
     private $_videoDetails;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $_uploadId;
 
-    /**
-     * @var VideoUploadUrl[]
-     */
+    /** @var VideoUploadUrl[] */
     private $_videoUploadUrls;
 
-    /**
-     * @var UploadVideoResponse
-     */
+    /** @var UploadVideoResponse */
     private $_videoUploadResponse;
 
-    /**
-     * @var UploadPhotoResponse
-     */
+    /** @var UploadPhotoResponse */
     private $_photoUploadResponse;
 
     /** @var string */
@@ -78,7 +66,7 @@ final class Internal
     }
 
     /**
-     * Set video details from given filename.
+     * Set video details from the given filename.
      *
      * @param string $targetFeed
      * @param string $videoFilename
@@ -104,7 +92,7 @@ final class Internal
     }
 
     /**
-     * Set photo details from filename.
+     * Set photo details from the given filename.
      *
      * @param string $targetFeed
      * @param string $photoFilename
@@ -138,7 +126,7 @@ final class Internal
     }
 
     /**
-     * Set upload URLs from UploadJobVideoResponse response.
+     * Set upload URLs from a UploadJobVideoResponse response.
      *
      * @param UploadJobVideoResponse $response
      *

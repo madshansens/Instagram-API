@@ -28,14 +28,10 @@ try {
 }
 
 try {
-    // Note that this performs a few automatic chunk upload retries by default,
-    // in case of failing to upload the video chunks to Instagram's server!
+    // Note that all video upload functions perform some automatic chunk upload
+    // retries, in case of failing to upload all video chunks to Instagram's
+    // server! Uploads therefore take longer when their server is overloaded.
     $ig->timeline->uploadVideo($videoFilename, ['caption' => $captionText]);
-
-    // or...
-
-    // Example of using 8 retries instead of the default amount:
-    // $ig->timeline->uploadVideo($videoFilename, ['caption' => $captionText], 8);
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";
 }

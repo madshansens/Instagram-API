@@ -4,9 +4,7 @@ namespace InstagramAPI\Request\Metadata;
 
 class PhotoDetails extends MediaDetails
 {
-    /**
-     * @var int
-     */
+    /** @var int */
     private $_type;
 
     /**

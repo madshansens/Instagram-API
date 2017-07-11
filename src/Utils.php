@@ -65,16 +65,21 @@ class Utils
     public static function generateUploadId(
         $useNano = false)
     {
+        $result = null;
         if (!$useNano) {
-            $result = number_format(round(microtime(true) * 1000), 0, '', '');
-            if (self::$_lastUploadId !== null && $result === self::$_lastUploadId) {
-                // NOTE: Fast machines can process files too quick (< 0.001 sec), which leads to
-                // identical upload IDs, which leads to "500 Oops, an error occurred" errors.
-                // So we sleep 0.001 sec to ensure that we will get different upload IDs per each call.
-                usleep(1000);
+            while (true) {
                 $result = number_format(round(microtime(true) * 1000), 0, '', '');
+                if (self::$_lastUploadId !== null && $result === self::$_lastUploadId) {
+                    // NOTE: Fast machines can process files too quick (< 0.001
+                    // sec), which leads to identical upload IDs, which leads to
+                    // "500 Oops, an error occurred" errors. So we sleep 0.001
+                    // sec to guarantee different upload IDs per each call.
+                    usleep(1000);
+                } else { // OK!
+                    self::$_lastUploadId = $result;
+                    break;
+                }
             }
-            self::$_lastUploadId = $result;
         } else {
             // Emulate System.nanoTime().
             $result = number_format(microtime(true) - strtotime('Last Monday'), 6, '', '');
@@ -468,10 +473,10 @@ class Utils
     {
         $photoFilename = $photoDetails->getFilename();
         // Validate image type.
-        // NOTE: It is confirmed that Instagram accepts only JPEG.
+        // NOTE: It is confirmed that Instagram only accepts JPEG files.
         $type = $photoDetails->getType();
         if ($type !== IMAGETYPE_JPEG) {
-            throw new \InvalidArgumentException(sprintf('The photo file "%s" is not JPEG.', $photoFilename));
+            throw new \InvalidArgumentException(sprintf('The photo file "%s" is not a JPEG file.', $photoFilename));
         }
 
         // Validate photo resolution and aspect ratio.

@@ -4,14 +4,10 @@ namespace InstagramAPI\Request\Metadata;
 
 class VideoDetails extends MediaDetails
 {
-    /**
-     * @var float
-     */
+    /** @var float */
     private $_duration;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $_codec;
 
     /**
