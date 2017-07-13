@@ -257,7 +257,7 @@ class Utils
      *
      * @throws \InvalidArgumentException If the photo file is missing or invalid.
      *
-     * @return array Int image type, width and height.
+     * @return array Int file size, image type, width and height.
      */
     public static function getPhotoFileDetails(
         $photoFilename)
@@ -267,6 +267,15 @@ class Utils
             throw new \InvalidArgumentException(sprintf('The photo file "%s" does not exist on disk.', $photoFilename));
         }
 
+        // Determine photo file size and throw when the file is empty.
+        $filesize = filesize($photoFilename);
+        if ($filesize < 1) {
+            throw new \InvalidArgumentException(sprintf(
+                'The photo file "%s" is empty.',
+                $photoFilename
+            ));
+        }
+
         // Get image details.
         $result = @getimagesize($photoFilename);
         if ($result === false) {
@@ -274,9 +283,10 @@ class Utils
         }
 
         return [
-            'width'  => $result[0],
-            'height' => $result[1],
-            'type'   => $result[2],
+            'filesize' => $filesize,
+            'width'    => $result[0],
+            'height'   => $result[1],
+            'type'     => $result[2],
         ];
     }
 
@@ -291,11 +301,20 @@ class Utils
      * @throws \InvalidArgumentException If the video file is missing.
      * @throws \RuntimeException         If FFmpeg isn't working properly.
      *
-     * @return array Video codec name, float duration, int width and height.
+     * @return array Video codec name, float duration, int width, height and filesize.
      */
     public static function getVideoFileDetails(
         $videoFilename)
     {
+        // Determine video file size and throw when the file is empty.
+        $filesize = filesize($videoFilename);
+        if ($filesize < 1) {
+            throw new \InvalidArgumentException(sprintf(
+                'The video "%s" is empty.',
+                $videoFilename
+            ));
+        }
+
         // The user must have FFprobe.
         $ffprobe = self::checkFFPROBE();
         if ($ffprobe === false) {
@@ -327,6 +346,7 @@ class Utils
         $videoDetails = [];
         foreach ($probeResult['streams'] as $streamIdx => $streamInfo) {
             if ($streamInfo['codec_type'] == 'video') {
+                $videoDetails['filesize'] = $filesize;
                 $videoDetails['codec'] = $streamInfo['codec_name']; // string
                 $videoDetails['width'] = intval($streamInfo['width'], 10);
                 $videoDetails['height'] = intval($streamInfo['height'], 10);

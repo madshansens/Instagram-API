@@ -622,10 +622,11 @@ class Direct extends RequestCollection
         $result = null;
         for ($attempt = 1; $attempt <= Internal::MAX_CONFIGURE_RETRIES; ++$attempt) {
             try {
+                $videoUploadResponse = $internalMetadata->getVideoUploadResponse();
                 // Attempt to configure video parameters (which sends it to the thread).
                 $result = $this->_sendDirectItem('video', $recipients, array_merge($options, [
                     'upload_id'    => $internalMetadata->getUploadId(),
-                    'video_result' => $internalMetadata->getVideoUploadResponse()->getResult(),
+                    'video_result' => $videoUploadResponse !== null ? $videoUploadResponse->getResult() : '',
                 ]));
                 break; // Success. Exit loop.
             } catch (\InstagramAPI\Exception\InstagramException $e) {
@@ -1142,7 +1143,7 @@ class Direct extends RequestCollection
                 }
                 $request->addPost('upload_id', $options['upload_id']);
                 // Set video_result if provided.
-                if (isset($options['video_result']) && strlen($options['video_result'])) {
+                if (isset($options['video_result'])) {
                     $request->addPost('video_result', $options['video_result']);
                 }
                 break;

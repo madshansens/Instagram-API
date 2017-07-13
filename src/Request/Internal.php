@@ -9,6 +9,7 @@ use InstagramAPI\Exception\CheckpointRequiredException;
 use InstagramAPI\Exception\FeedbackRequiredException;
 use InstagramAPI\Exception\LoginRequiredException;
 use InstagramAPI\Exception\NetworkException;
+use InstagramAPI\Exception\ThrottledException;
 use InstagramAPI\Request;
 use InstagramAPI\Request\Metadata\Internal as InternalMetadata;
 use InstagramAPI\Response;
@@ -24,6 +25,9 @@ class Internal extends RequestCollection
 {
     /** @var int Number of retries for each video chunk. */
     const MAX_CHUNK_RETRIES = 5;
+
+    /** @var int Number of retries for resumable uploader. */
+    const MAX_RESUMABLE_RETRIES = 15;
 
     /** @var int Number of retries for each media configuration. */
     const MAX_CONFIGURE_RETRIES = 5;
@@ -296,11 +300,43 @@ class Internal extends RequestCollection
             $internalMetadata->setVideoDetails($targetFeed, $videoFilename);
         }
 
-        // Request parameters for uploading a new video.
-        $internalMetadata->setVideoUploadUrls($this->_requestVideoUploadURL($targetFeed, $internalMetadata));
+        switch ($targetFeed) {
+            case 'album':
+                $useResumableUploader = false;
+                break;
+            case 'timeline':
+                $useResumableUploader = $this->ig->isExperimentEnabled(
+                    'ig_android_upload_reliability_universe',
+                    'is_enabled_fbupload_followers_share');
+                break;
+            case 'direct_v2':
+                $useResumableUploader = $this->ig->isExperimentEnabled(
+                    'ig_android_upload_reliability_universe',
+                    'is_enabled_fbupload_direct_share');
+                break;
+            case 'story':
+                $useResumableUploader = $this->ig->isExperimentEnabled(
+                    'ig_android_upload_reliability_universe',
+                    'is_enabled_fbupload_reel_share');
+                break;
+            case 'direct_story':
+                $useResumableUploader = $this->ig->isExperimentEnabled(
+                    'ig_android_upload_reliability_universe',
+                    'is_enabled_fbupload_story_share');
+                break;
+            default:
+                $useResumableUploader = false;
+        }
 
-        // Attempt to upload the video data.
-        $internalMetadata->setVideoUploadResponse($this->_uploadVideoChunks($targetFeed, $internalMetadata));
+        if ($useResumableUploader) {
+            $this->_uploadResumableVideo($targetFeed, $internalMetadata);
+        } else {
+            // Request parameters for uploading a new video.
+            $internalMetadata->setVideoUploadUrls($this->_requestVideoUploadURL($targetFeed, $internalMetadata));
+
+            // Attempt to upload the video data.
+            $internalMetadata->setVideoUploadResponse($this->_uploadVideoChunks($targetFeed, $internalMetadata));
+        }
 
         return $internalMetadata;
     }
@@ -1094,14 +1130,6 @@ class Internal extends RequestCollection
         InternalMetadata $internalMetadata)
     {
         $videoFilename = $internalMetadata->getVideoDetails()->getFilename();
-        // Determine video file size and throw when the file is empty.
-        $length = filesize($videoFilename);
-        if ($length < 1) {
-            throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
-                'Upload of "%s" failed. The file is empty.',
-                $videoFilename
-            ));
-        }
 
         // To support video uploads to albums, we MUST fake-inject the
         // "sessionid" cookie from "i.instagram" into our "upload.instagram"
@@ -1127,6 +1155,7 @@ class Internal extends RequestCollection
         }
 
         // Init state.
+        $length = $internalMetadata->getVideoDetails()->getFilesize();
         $uploadId = $internalMetadata->getUploadId();
         $sessionId = sprintf('%s-%d', $uploadId, Utils::hashCode($videoFilename));
         $uploadUrl = array_shift($uploadUrls);
@@ -1262,6 +1291,130 @@ class Internal extends RequestCollection
                             $videoFilename, $httpResponse->getStatusCode()
                         ));
                     default:
+                }
+            }
+        } finally {
+            // Guaranteed to release handle even if something bad happens above!
+            fclose($handle);
+        }
+
+        throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
+            'Upload of \"%s\" failed.',
+            $videoFilename
+        ));
+    }
+
+    /**
+     * Performs a resumable upload of a video file, with support for retries.
+     *
+     * @param string           $targetFeed       Target feed for this media ("timeline", "story", "direct_story",
+     *                                           "direct_v2", but NOT "album", they are handled elsewhere).
+     * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException If the upload fails.
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    protected function _uploadResumableVideo(
+        $targetFeed,
+        InternalMetadata $internalMetadata)
+    {
+        $videoFilename = $internalMetadata->getVideoDetails()->getFilename();
+
+        $rurCookie = $this->ig->client->getCookie('rur', 'i.instagram.com');
+        if ($rurCookie === null || !strlen($rurCookie->getValue())) {
+            throw new \InstagramAPI\Exception\UploadFailedException(
+                'Unable to find the necessary "rur" cookie for uploading video.'
+            );
+        }
+
+        $endpoint = sprintf('https://i.instagram.com/rupload_igvideo/%s_%d_%d?target=%s',
+            $internalMetadata->getUploadId(),
+            0,
+            Utils::hashCode($videoFilename),
+            $rurCookie->getValue()
+        );
+
+        $videoDetails = $internalMetadata->getVideoDetails();
+        $uploadParams = [
+            'upload_media_height'      => (string) $videoDetails->getHeight(),
+            'upload_media_width'       => (string) $videoDetails->getWidth(),
+            'upload_media_duration_ms' => (string) $videoDetails->getDurationInMsec(),
+            'upload_id'                => (string) $internalMetadata->getUploadId(),
+            'media_type'               => (string) Response\Model\Item::VIDEO,
+        ];
+        if ($targetFeed === 'direct_v2') {
+            $uploadParams['direct_v2'] = '1';
+            $uploadParams['rotate'] = '0';
+            $uploadParams['hflip'] = 'false';
+        }
+        $uploadParams = Utils::reorderByHashCode($uploadParams);
+
+        $offsetTemplate = new Request($this->ig, $endpoint);
+        $offsetTemplate
+            ->setAddDefaultHeaders(false)
+            // TODO Store waterfall ID in internalMetadata?
+            ->addHeader('X_FB_VIDEO_WATERFALL_ID', Signatures::generateUUID(true))
+            ->addHeader('X-Instagram-Rupload-Params', json_encode($uploadParams));
+
+        $length = $videoDetails->getFilesize();
+        $uploadTemplate = clone $offsetTemplate;
+        $uploadTemplate
+            ->addHeader('X-Entity-Type', 'video/mp4')
+            ->addHeader('X-Entity-Name', basename(parse_url($endpoint, PHP_URL_PATH)))
+            ->addHeader('X-Entity-Length', $length);
+
+        $attempt = 0;
+
+        // Open file handle.
+        $handle = fopen($videoFilename, 'rb');
+        if ($handle === false) {
+            throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
+                'Failed to open "%s" for reading.',
+                $videoFilename
+            ));
+        }
+        try {
+            // Create a stream for the opened file handle.
+            $stream = new Stream($handle);
+
+            while (true) {
+                // Check for max retry-limit, and throw if we went out of it.
+                if (++$attempt > self::MAX_RESUMABLE_RETRIES) {
+                    throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
+                        'Upload of "%s" failed. There are no more retries left.',
+                        $videoFilename
+                    ));
+                }
+
+                try {
+                    // Get current offset.
+                    $offsetRequest = clone $offsetTemplate;
+                    /** @var Response\ResumableOffsetResponse $offsetResponse */
+                    $offsetResponse = $offsetRequest->getResponse(new Response\ResumableOffsetResponse());
+                    $offset = $offsetResponse->getOffset();
+
+                    // Resume upload from given offset.
+                    $uploadRequest = clone $uploadTemplate;
+                    $uploadRequest
+                        ->addHeader('Offset', $offset)
+                        ->setBody(new LimitStream($stream, $length - $offset, $offset));
+                    /** @var Response\GenericResponse $response */
+                    $response = $uploadRequest->getResponse(new Response\GenericResponse());
+
+                    return $response;
+                } catch (ThrottledException $e) {
+                    throw $e;
+                } catch (LoginRequiredException $e) {
+                    throw $e;
+                } catch (FeedbackRequiredException $e) {
+                    throw $e;
+                } catch (CheckpointRequiredException $e) {
+                    throw $e;
+                } catch (\Exception $e) {
+                    // Ignore everything else.
                 }
             }
         } finally {

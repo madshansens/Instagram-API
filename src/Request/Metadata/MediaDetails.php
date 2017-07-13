@@ -4,6 +4,9 @@ namespace InstagramAPI\Request\Metadata;
 
 abstract class MediaDetails
 {
+    /** @var int */
+    private $_filesize;
+
     /** @var string */
     private $_filename;
 
@@ -38,6 +41,14 @@ abstract class MediaDetails
     }
 
     /**
+     * @return int
+     */
+    public function getFilesize()
+    {
+        return $this->_filesize;
+    }
+
+    /**
      * Constructor.
      *
      * @param string $filename
@@ -53,6 +64,9 @@ abstract class MediaDetails
         }
         if (isset($details['width'])) {
             $this->_width = $details['width'];
+        }
+        if (isset($details['filesize'])) {
+            $this->_filesize = $details['filesize'];
         }
     }
 }
