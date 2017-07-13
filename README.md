@@ -72,7 +72,38 @@ According to [the company](https://instagram.com/about/faq/):
 
 # License
 
-Licensed under the AGPLv3: https://www.gnu.org/licenses/agpl-3.0.html
+In order help ensure fairness and sharing, this library is dual-licensed. Be
+aware that _all_ usage, unless otherwise specified, is under the **RPL-1.5**
+license!
+
+- Reciprocal Public License 1.5 (RPL-1.5): https://opensource.org/licenses/RPL-1.5
+
+You should read the _entire_ license; especially the `PREAMBLE` at the beginning.
+In short, the license _requires_ that you open-source _all_ of your own source
+code for _any_ project which uses this library!
+
+Furthermore, the library is _also_ available _to certain entities_ under a
+modified version of the RPL-1.5, which has been modified to allow you to use the
+library _without_ open-sourcing your own project. The modified license (see
+`LICENSE_PREMIUM`) is granted to certain entities, at _our_ discretion, and for
+a _limited_ period of time (unless otherwise agreed), pursuant to our terms.
+Currently, we are granting this license to all "premium subscribers" for the
+duration of their subscriptions. You can become a premium subscriber by either
+contributing substantial amounts of high-quality code, or by subscribing for a
+fee. This licensing ensures fairness and stimulates the continued growth of this
+library through both code contributions and the financial support it needs.
+
+You are not required to accept this License since you have not signed it,
+however _nothing else_ grants you permission to _use_, copy, distribute, modify,
+or create derivatives of either the Software (this library) or any Extensions
+created by a Contributor. These actions are prohibited by law if you do not
+accept this License. Therefore, by performing any of these actions You indicate
+Your acceptance of this License and Your agreement to be bound by all its terms
+and conditions. IF YOU DO NOT AGREE WITH ALL THE TERMS AND CONDITIONS OF THIS
+LICENSE DO NOT USE, MODIFY, CREATE DERIVATIVES, OR DISTRIBUTE THE SOFTWARE. IF
+IT IS IMPOSSIBLE FOR YOU TO COMPLY WITH ALL THE TERMS AND CONDITIONS OF THIS
+LICENSE THEN YOU CAN NOT USE, MODIFY, CREATE DERIVATIVES, OR DISTRIBUTE THE
+SOFTWARE.
 
 # Terms and conditions
 
