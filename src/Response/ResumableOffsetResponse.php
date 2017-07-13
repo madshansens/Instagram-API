@@ -31,7 +31,7 @@ class ResumableOffsetResponse extends AutoPropertyHandler implements ResponseInt
         } else {
             // Set a nice message for exceptions.
             if ($this->getMessage() === null) {
-                $this->setMessage('Offset for resumable uploaders is missing or invalid.');
+                $this->setMessage('Offset for resumable uploader is missing or invalid.');
             }
 
             return false;

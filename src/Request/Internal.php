@@ -1381,10 +1381,10 @@ class Internal extends RequestCollection
             $stream = new Stream($handle);
 
             while (true) {
-                // Check for max retry-limit, and throw if we went out of it.
+                // Check for max retry-limit, and throw if we exceeded it.
                 if (++$attempt > self::MAX_RESUMABLE_RETRIES) {
                     throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
-                        'Upload of "%s" failed. There are no more retries left.',
+                        'Upload of "%s" failed. All retries have failed.',
                         $videoFilename
                     ));
                 }
