@@ -84,10 +84,11 @@ code for _any_ project which uses this library!
 
 Furthermore, the library is _also_ available _to certain entities_ under a
 modified version of the RPL-1.5, which has been modified to allow you to use the
-library _without_ open-sourcing your own project. The modified license (see
-`LICENSE_PREMIUM`) is granted to certain entities, at _our_ discretion, and for
-a _limited_ period of time (unless otherwise agreed), pursuant to our terms.
-Currently, we are granting this license to all
+library _without_ open-sourcing your own project. The modified license
+(see [LICENSE_PREMIUM](https://github.com/mgp25/Instagram-API/blob/master/LICENSE_PREMIUM))
+is granted to certain entities, at _our_ discretion, and for a _limited_ period
+of time (unless otherwise agreed), pursuant to our terms. Currently, we are
+granting this license to all
 "[premium subscribers](https://github.com/mgp25/Instagram-API/issues/1231)" for
 the duration of their subscriptions. You can become a premium subscriber by
 either contributing substantial amounts of high-quality code, or by subscribing
