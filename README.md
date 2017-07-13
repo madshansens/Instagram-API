@@ -87,11 +87,13 @@ modified version of the RPL-1.5, which has been modified to allow you to use the
 library _without_ open-sourcing your own project. The modified license (see
 `LICENSE_PREMIUM`) is granted to certain entities, at _our_ discretion, and for
 a _limited_ period of time (unless otherwise agreed), pursuant to our terms.
-Currently, we are granting this license to all "premium subscribers" for the
-duration of their subscriptions. You can become a premium subscriber by either
-contributing substantial amounts of high-quality code, or by subscribing for a
-fee. This licensing ensures fairness and stimulates the continued growth of this
-library through both code contributions and the financial support it needs.
+Currently, we are granting this license to all
+"[premium subscribers](https://github.com/mgp25/Instagram-API/issues/1231)" for
+the duration of their subscriptions. You can become a premium subscriber by
+either contributing substantial amounts of high-quality code, or by subscribing
+for a fee. This licensing ensures fairness and stimulates the continued growth
+of this library through both code contributions and the financial support it
+needs.
 
 You are not required to accept this License since you have not signed it,
 however _nothing else_ grants you permission to _use_, copy, distribute, modify,
