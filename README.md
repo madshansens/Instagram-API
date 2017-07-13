@@ -62,7 +62,7 @@ Before you do, take a look at the [contributing guide](https://github.com/mgp25/
 
 ## Why did I make this API?
 
-After legal measures, Facebook, WhatsApp and Instagram blocked my accounts. 
+After legal measures, Facebook, WhatsApp and Instagram blocked my accounts.
 In order to use Instagram on my phone I needed a new phone, as they banned my UDID, so that is basically why I made this API.
 
 ### What is Instagram?
@@ -72,7 +72,7 @@ According to [the company](https://instagram.com/about/faq/):
 
 # License
 
-Licensed under the GPLv3: http://www.gnu.org/licenses/gpl-3.0.html
+Licensed under the AGPLv3: https://www.gnu.org/licenses/agpl-3.0.html
 
 # Terms and conditions
 
