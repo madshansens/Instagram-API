@@ -102,7 +102,12 @@ class Internal extends RequestCollection
             $photoData = file_get_contents($internalMetadata->getPhotoDetails()->getFilename());
         } elseif ($internalMetadata->getVideoDetails() !== null) {
             // Generate a thumbnail from a video file.
-            $photoData = Utils::createVideoIcon($internalMetadata->getVideoDetails()->getFilename());
+            try {
+                $photoData = Utils::createVideoIcon($internalMetadata->getVideoDetails()->getFilename());
+            } catch(\Exception $e) {
+                // Re-package as InternalException, but keep the stack trace.
+                throw new \InstagramAPI\Exception\InternalException($e->getMessage(), 0, $e);
+            }
             $isVideoThumbnail = true;
         } else {
             throw new \InvalidArgumentException('Could not find any photo file to upload (the photoDetails and videoDetails are both unset).');

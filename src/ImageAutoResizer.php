@@ -140,7 +140,7 @@ class ImageAutoResizer
      * @param float|null  $maxAspectRatio Maximum allowed aspect ratio, uses
      *                                    self::MAX_RATIO if not set.
      * @param string|null $tmpPath        Path to temp directory, uses system
-     *                                    temp location if not set.
+     *                                    temp location or class-default if not set.
      *
      * @throws \InvalidArgumentException
      */
@@ -165,13 +165,13 @@ class ImageAutoResizer
 
         // Aspect ratios.
         if ($minAspectRatio !== null && ($minAspectRatio < self::MIN_RATIO || $minAspectRatio > self::MAX_RATIO)) {
-            throw new \InvalidArgumentException(sprintf('Minimum aspect ratio should be between %.2f and %.2f.',
+            throw new \InvalidArgumentException(sprintf('Minimum aspect ratio must be between %.2f and %.2f.',
                 self::MIN_RATIO, self::MAX_RATIO));
         } elseif ($minAspectRatio === null) {
             $minAspectRatio = self::MIN_RATIO;
         }
         if ($maxAspectRatio !== null && ($maxAspectRatio < self::MIN_RATIO || $maxAspectRatio > self::MAX_RATIO)) {
-            throw new \InvalidArgumentException(sprintf('Maximum aspect ratio should be between %.2f and %.2f.',
+            throw new \InvalidArgumentException(sprintf('Maximum aspect ratio must be between %.2f and %.2f.',
                 self::MIN_RATIO, self::MAX_RATIO));
         } elseif ($maxAspectRatio === null) {
             $maxAspectRatio = self::MAX_RATIO;
@@ -238,6 +238,9 @@ class ImageAutoResizer
      *
      * If the input file already fits all of the specifications, we simply
      * return the input path instead, without any need to re-process it.
+     *
+     * @throws \Exception
+     * @throws \RuntimeException
      *
      * @return string The path to the image file.
      *
@@ -468,6 +471,7 @@ class ImageAutoResizer
     /**
      * @param resource $resource
      *
+     * @throws \Exception
      * @throws \RuntimeException
      */
     protected function _processResource(
@@ -555,6 +559,7 @@ class ImageAutoResizer
     }
 
     /**
+     * @throws \Exception
      * @throws \RuntimeException
      */
     protected function _process()

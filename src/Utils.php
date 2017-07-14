@@ -514,7 +514,9 @@ class Utils
      * @param string $videoFilename Path to the video file.
      *
      * @throws \InvalidArgumentException If the video file is missing.
-     * @throws \RuntimeException         If FFmpeg isn't working properly.
+     * @throws \RuntimeException         If FFmpeg isn't working properly, or
+     *                                   thumbnail ImageAutoResizer failed.
+     * @throws \Exception                If ImageAutoResizer failed.
      *
      * @return string The JPEG binary data for the generated thumbnail.
      */
