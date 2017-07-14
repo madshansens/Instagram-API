@@ -104,7 +104,7 @@ class Internal extends RequestCollection
             // Generate a thumbnail from a video file.
             try {
                 $photoData = Utils::createVideoIcon($internalMetadata->getVideoDetails()->getFilename());
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 // Re-package as InternalException, but keep the stack trace.
                 throw new \InstagramAPI\Exception\InternalException($e->getMessage(), 0, $e);
             }
