@@ -6,6 +6,7 @@ use InstagramAPI\AutoPropertyHandler;
 
 /**
  * @method mixed getCanReply()
+ * @method DismissCard getDismissCard()
  * @method mixed getExpiringAt()
  * @method string getId()
  * @method mixed getIsNux()
@@ -13,6 +14,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getLatestReelMedia()
  * @method Location getLocation()
  * @method mixed getMuted()
+ * @method string getNuxId()
  * @method Owner getOwner()
  * @method mixed getPrefetchCount()
  * @method mixed getRankedPosition()
@@ -22,6 +24,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getSourceToken()
  * @method User getUser()
  * @method bool isCanReply()
+ * @method bool isDismissCard()
  * @method bool isExpiringAt()
  * @method bool isId()
  * @method bool isIsNux()
@@ -29,6 +32,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isLatestReelMedia()
  * @method bool isLocation()
  * @method bool isMuted()
+ * @method bool isNuxId()
  * @method bool isOwner()
  * @method bool isPrefetchCount()
  * @method bool isRankedPosition()
@@ -38,6 +42,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isSourceToken()
  * @method bool isUser()
  * @method setCanReply(mixed $value)
+ * @method setDismissCard(DismissCard $value)
  * @method setExpiringAt(mixed $value)
  * @method setId(string $value)
  * @method setIsNux(mixed $value)
@@ -45,6 +50,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setLatestReelMedia(mixed $value)
  * @method setLocation(Location $value)
  * @method setMuted(mixed $value)
+ * @method setNuxId(string $value)
  * @method setOwner(Owner $value)
  * @method setPrefetchCount(mixed $value)
  * @method setRankedPosition(mixed $value)
@@ -87,4 +93,12 @@ class StoryTray extends AutoPropertyHandler
      * @var Owner
      */
     public $owner;
+    /**
+     * @var string
+     */
+    public $nux_id;
+    /**
+     * @var DismissCard
+     */
+    public $dismiss_card;
 }
