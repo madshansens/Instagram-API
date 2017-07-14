@@ -8,13 +8,13 @@ use InstagramAPI\ResponseTrait;
 
 /**
  * @method mixed getLikeTs()
- * @method User[] getLikers()
+ * @method Model\User[] getLikers()
  * @method mixed getLikes()
  * @method bool isLikeTs()
  * @method bool isLikers()
  * @method bool isLikes()
  * @method setLikeTs(mixed $value)
- * @method setLikers(User[] $value)
+ * @method setLikers(Model\User[] $value)
  * @method setLikes(mixed $value)
  */
 class BroadcastLikeCountResponse extends AutoPropertyHandler implements ResponseInterface
@@ -24,7 +24,7 @@ class BroadcastLikeCountResponse extends AutoPropertyHandler implements Response
     public $like_ts;
     public $likes;
     /**
-     * @var User[]
+     * @var Model\User[]
      */
     public $likers;
 }
