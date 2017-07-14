@@ -529,6 +529,7 @@ class Item extends AutoPropertyHandler
      * @var ReelShare
      */
     public $reel_share;
+    public $story_polls;
 
     public function setMediaOrAd(
         $params)
