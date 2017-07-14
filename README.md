@@ -78,9 +78,10 @@ license!
 
 - Reciprocal Public License 1.5 (RPL-1.5): https://opensource.org/licenses/RPL-1.5
 
-You should read the _entire_ license; especially the `PREAMBLE` at the beginning.
-In short, the license _requires_ that you open-source _all_ of your own source
-code for _any_ project which uses this library!
+You should read the _entire_ license; especially the `PREAMBLE` at the
+beginning. In short, the word `reciprocal` means "giving something back in
+return for what you are getting". This license _requires_ that you open-source
+_all_ of your own source code for _any_ project which uses this library!
 
 Furthermore, the library is _also_ available _to certain entities_ under a
 modified version of the RPL-1.5, which has been modified to allow you to use the
