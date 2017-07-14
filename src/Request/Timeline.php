@@ -326,6 +326,7 @@ class Timeline extends RequestCollection
                 break;
             case 'album':
                 $mediaCode = 8;
+                break;
             default:
                 throw new \InvalidArgumentException('You must provide a valid media type.');
                 break;
