@@ -72,7 +72,7 @@ class Usertag extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\MediaResponse
+     * @return \InstagramAPI\Response\MediaInfoResponse
      */
     public function removeSelfTag(
         $mediaId)
@@ -81,7 +81,7 @@ class Usertag extends RequestCollection
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->getResponse(new Response\MediaResponse());
+            ->getResponse(new Response\MediaInfoResponse());
     }
 
     /**
