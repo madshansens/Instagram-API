@@ -35,6 +35,9 @@ class File implements StorageInterface
     /** @var string Path to the current user's cookie jar file. */
     private $_cookiesFile;
 
+    /** @var string The current user's username. */
+    private $_username;
+
     /**
      * Connect to a storage location and perform necessary startup preparations.
      *
@@ -132,6 +135,7 @@ class File implements StorageInterface
     public function openUser(
         $username)
     {
+        $this->_username = $username;
         $userPaths = $this->_generateUserPaths($username);
         $this->_userFolder = $userPaths['userFolder'];
         $this->_settingsFile = $userPaths['settingsFile'];
@@ -239,6 +243,7 @@ class File implements StorageInterface
         $this->_userFolder = null;
         $this->_settingsFile = null;
         $this->_cookiesFile = null;
+        $this->_username = null;
     }
 
     /**
