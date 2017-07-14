@@ -35,7 +35,7 @@ class File implements StorageInterface
     /** @var string Path to the current user's cookie jar file. */
     private $_cookiesFile;
 
-    /** @var string The current user's username. */
+    /** @var string Current Instagram username that all settings belong to. */
     private $_username;
 
     /**
