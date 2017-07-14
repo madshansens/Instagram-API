@@ -76,10 +76,10 @@ class StorageHandler
     /**
      * Constructor.
      *
-     * @param StorageInterface $storageInterface An instance of desired Storage.
-     * @param array            $locationConfig   Configuration parameters for
-     *                                           the storage backend location.
-     * @param array            $callbacks        Optional callback functions.
+     * @param StorageInterface $storageInstance An instance of desired Storage.
+     * @param array            $locationConfig  Configuration parameters for
+     *                                          the storage backend location.
+     * @param array            $callbacks       Optional callback functions.
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */

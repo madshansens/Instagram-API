@@ -168,6 +168,8 @@ class Utils
     /**
      * Generates user breadcrumb for use when posting a comment.
      *
+     * @param int $size
+     *
      * @return string
      */
     public static function generateUserBreadcrumb(

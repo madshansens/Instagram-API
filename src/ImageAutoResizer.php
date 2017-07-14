@@ -387,6 +387,7 @@ class ImageAutoResizer
      * @param int      $dst_w
      * @param int      $dst_h
      *
+     * @throws \Exception
      * @throws \RuntimeException
      */
     protected function _cropAndResize(

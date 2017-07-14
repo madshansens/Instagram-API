@@ -124,7 +124,7 @@ class Live extends RequestCollection
      * Get broadcast comments.
      *
      * @param string $broadcastId   The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param string $lastCommentTs Last comments timestamp (optional).
+     * @param int    $lastCommentTs Last comments timestamp (optional).
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -143,7 +143,7 @@ class Live extends RequestCollection
      * Like a broadcast.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param string $likeCount   Number of likes ("hearts") to send (optional).
+     * @param int    $likeCount   Number of likes ("hearts") to send (optional).
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -170,7 +170,7 @@ class Live extends RequestCollection
      * Get a live broadcast's like count.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param string $likeTs      Like timestamp.
+     * @param int    $likeTs      Like timestamp.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
