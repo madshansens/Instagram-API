@@ -483,16 +483,13 @@ class ImageAutoResizer
 
         // Check aspect ratio and crop if needed.
         if ($this->_minAspectRatio !== null && $this->_aspectRatio < $this->_minAspectRatio) {
-            // We need to make an image "wider" in any case, so floor is used intentionally.
+            // We need to limit the height, so floor is used intentionally to
+            // AVOID rounding height upwards to a still-illegal aspect ratio.
             $height = floor($this->_width / $this->_minAspectRatio);
             $aspectRatio = $this->_minAspectRatio;
 
             // Crop vertical images from top by default, to keep faces, etc.
-            if ($this->_cropFocus === null) {
-                $cropFocus = -50;
-            } else {
-                $cropFocus = $this->_cropFocus;
-            }
+            $cropFocus = $this->_cropFocus !== null ? $this->_cropFocus : -50;
 
             // Apply fix for flipped images.
             if ($this->_isVerFlipped) {
@@ -504,16 +501,13 @@ class ImageAutoResizer
             $y1 = round($diff * (50 + $cropFocus) / 100);
             $y2 = $y2 - ($diff - $y1);
         } elseif ($this->_maxAspectRatio !== null && $this->_aspectRatio > $this->_maxAspectRatio) {
-            // We need to make an image "narrower".
+            // We need to limit the width. We use floor to guarantee cutting
+            // enough pixels, since our width exceeds the maximum allowed ratio.
             $width = floor($this->_height * $this->_maxAspectRatio);
             $aspectRatio = $this->_maxAspectRatio;
 
             // Crop horizontal images from center by default.
-            if ($this->_cropFocus === null) {
-                $cropFocus = 0;
-            } else {
-                $cropFocus = $this->_cropFocus;
-            }
+            $cropFocus = $this->_cropFocus !== null ? $this->_cropFocus : 0;
 
             // Apply fix for flipped images.
             if ($this->_isHorFlipped) {
@@ -525,12 +519,13 @@ class ImageAutoResizer
             $x1 = round($diff * (50 + $cropFocus) / 100);
             $x2 = $x2 - ($diff - $x1);
         } else {
+            // The image's aspect ratio is already within the legal range.
             $aspectRatio = $this->_aspectRatio;
         }
 
-        // Calculate final image dimensions at the desired aspect ratio.
+        // Handle square target ratios or too-large target dimensions.
         if ($aspectRatio == 1) {
-            // Square.
+            // Ratio = 1: Square.
             // NOTE: Our square will be the size of the shortest side, or the
             // maximum allowed image width by Instagram, whichever is smallest.
             $squareWidth = $width < $height ? $width : $height;
@@ -539,15 +534,22 @@ class ImageAutoResizer
             }
             $width = $height = $squareWidth;
         } else {
-            // If > 1: Landscape (wider than tall). Limit by width.
-            // If < 1: Portrait (taller than wide). Limit by width.
+            // All other ratios: Ensure the target width fits Instagram's limit.
+            // If ratio > 1: Landscape (wider than tall). Limit by width.
+            // If ratio < 1: Portrait (taller than wide). Limit by width.
             // NOTE: Maximum "allowed" height is 1350, which is EXACTLY what you
             // get with a maxwidth of 1080 / 0.8 (4:5 aspect ratio). Instagram
-            // enforces width & aspect ratio, which in turn auto-decides height.
+            // enforces width & aspect ratio, which in turn auto-limits height.
             if ($width > self::MAX_WIDTH) {
+                // Target exceeds Instagram's pixel-limit. Set width to max.
                 $width = self::MAX_WIDTH;
+                // Re-calculate the target height via our chosen aspect ratio.
+                // NOTE: Must use ceil() if aspect ratio is above 1 (landscape),
+                // otherwise result may not be tall enough to get a legal ratio!
+                // This is safe since the height will always be lower than its
+                // original even via ceil(), since we've reduced the width.
+                $height = $aspectRatio > 1 ? ceil($width / $aspectRatio) : floor($width / $aspectRatio);
             }
-            $height = floor($width / $aspectRatio);
         }
 
         // Do the crop & resize (coordinates are swapped for rotated images).
