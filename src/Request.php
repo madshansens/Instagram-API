@@ -163,7 +163,7 @@ class Request
     public function setVersion(
         $apiVersion)
     {
-        if (!isset(Constants::API_URLS[$apiVersion])) {
+        if (!array_key_exists($apiVersion, Constants::API_URLS)) {
             throw new \InvalidArgumentException(sprintf('"%d" is not a supported API version.', $apiVersion));
         }
         $this->_apiVersion = $apiVersion;
