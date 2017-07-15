@@ -2,6 +2,8 @@
 
 namespace InstagramAPI;
 
+use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
+
 /**
  * Standard implementation traits for ResponseInterface.
  *
@@ -19,6 +21,8 @@ trait ResponseTrait
     public $_messages; // NOTE: Full classpath is needed above for JSONMapper!
     /** @var mixed */
     public $fullResponse;
+    /** @var HttpResponseInterface */
+    public $httpResponse;
 
     /**
      * Checks if the response was successful.
@@ -185,5 +189,36 @@ trait ResponseTrait
     public function isFullResponse()
     {
         return $this->fullResponse !== null;
+    }
+
+    /**
+     * Gets the HTTP response.
+     *
+     * @return HttpResponseInterface
+     */
+    public function getHttpResponse()
+    {
+        return $this->httpResponse;
+    }
+
+    /**
+     * Sets the HTTP response.
+     *
+     * @param HttpResponseInterface $response
+     */
+    public function setHttpResponse(
+        HttpResponseInterface $response)
+    {
+        $this->httpResponse = $response;
+    }
+
+    /**
+     * Checks if an HTTP response value exists.
+     *
+     * @return bool
+     */
+    public function isHttpResponse()
+    {
+        return $this->httpResponse !== null;
     }
 }

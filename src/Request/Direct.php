@@ -619,29 +619,18 @@ class Direct extends RequestCollection
         }
 
         // Send the uploaded video to recipients.
-        $result = null;
-        for ($attempt = 1; $attempt <= Internal::MAX_CONFIGURE_RETRIES; ++$attempt) {
-            try {
+        /** @var \InstagramAPI\Response\DirectSendItemResponse $result */
+        $result = $this->ig->internal->configureWithRetries(
+            $videoFilename,
+            function () use ($internalMetadata, $recipients, $options) {
                 $videoUploadResponse = $internalMetadata->getVideoUploadResponse();
                 // Attempt to configure video parameters (which sends it to the thread).
-                $result = $this->_sendDirectItem('video', $recipients, array_merge($options, [
+                return $this->_sendDirectItem('video', $recipients, array_merge($options, [
                     'upload_id'    => $internalMetadata->getUploadId(),
                     'video_result' => $videoUploadResponse !== null ? $videoUploadResponse->getResult() : '',
                 ]));
-                break; // Success. Exit loop.
-            } catch (\InstagramAPI\Exception\InstagramException $e) {
-                if ($attempt < Internal::MAX_CONFIGURE_RETRIES && strpos($e->getMessage(), 'Transcode timeout') !== false) {
-                    // Do nothing, since we'll be retrying the failed configure...
-                    sleep(1); // Just wait a little before the next retry.
-                } else {
-                    // Re-throw all unhandled exceptions.
-                    throw $e;
-                }
             }
-        }
-        if ($result === null) { // Safeguard since _sendDirectItem() may return null in some cases.
-            throw new \InstagramAPI\Exception\UploadFailedException('Failed to configure video for direct_v2.');
-        }
+        );
 
         return $result;
     }

@@ -509,11 +509,11 @@ class Client
     /**
      * Converts a server response to a specific kind of result object.
      *
-     * @param ResponseInterface          $baseClass      An instance of a class object whose
-     *                                                   properties to fill with the response.
-     * @param mixed                      $serverResponse A decoded JSON response from
-     *                                                   Instagram's server.
-     * @param HttpResponseInterface|null $httpResponse   HTTP response object (if available).
+     * @param ResponseInterface     $baseClass      An instance of a class object whose
+     *                                              properties to fill with the response.
+     * @param mixed                 $serverResponse A decoded JSON response from
+     *                                              Instagram's server.
+     * @param HttpResponseInterface $httpResponse   HTTP response object.
      *
      * @throws \InstagramAPI\Exception\InstagramException In case of invalid or
      *                                                    failed API response.
@@ -523,7 +523,7 @@ class Client
     public function getMappedResponseObject(
         ResponseInterface $baseClass,
         $serverResponse,
-        HttpResponseInterface $httpResponse = null)
+        HttpResponseInterface $httpResponse)
     {
         // If the server response is not an object, it means that JSON decoding
         // failed or some other bad thing happened. So analyze the HTTP status
@@ -549,6 +549,9 @@ class Client
 
         // Save the raw response object as the "getFullResponse()" value.
         $responseObject->setFullResponse($serverResponse);
+
+        // Save the HTTP response object as the "getHttpResponse()" value.
+        $responseObject->setHttpResponse($httpResponse);
 
         // Throw an exception if the API response was unsuccessful.
         // NOTE: It will contain the full server response object too, which

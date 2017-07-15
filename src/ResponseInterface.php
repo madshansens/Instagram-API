@@ -2,6 +2,8 @@
 
 namespace InstagramAPI;
 
+use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
+
 /**
  * The interface that all response-classes must implement.
  *
@@ -111,4 +113,26 @@ interface ResponseInterface
      * @return bool
      */
     public function isFullResponse();
+
+    /**
+     * Sets the HTTP response.
+     *
+     * @param HttpResponseInterface $response
+     */
+    public function setHttpResponse(
+        HttpResponseInterface $response);
+
+    /**
+     * Gets the HTTP response.
+     *
+     * @return HttpResponseInterface
+     */
+    public function getHttpResponse();
+
+    /**
+     * Checks if an HTTP response value exists.
+     *
+     * @return bool
+     */
+    public function isHttpResponse();
 }

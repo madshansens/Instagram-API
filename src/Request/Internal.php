@@ -7,12 +7,14 @@ use GuzzleHttp\Psr7\Stream;
 use InstagramAPI\Constants;
 use InstagramAPI\Exception\CheckpointRequiredException;
 use InstagramAPI\Exception\FeedbackRequiredException;
+use InstagramAPI\Exception\InstagramException;
 use InstagramAPI\Exception\LoginRequiredException;
 use InstagramAPI\Exception\NetworkException;
 use InstagramAPI\Exception\ThrottledException;
 use InstagramAPI\Request;
 use InstagramAPI\Request\Metadata\Internal as InternalMetadata;
 use InstagramAPI\Response;
+use InstagramAPI\ResponseInterface;
 use InstagramAPI\Signatures;
 use InstagramAPI\Utils;
 
@@ -382,7 +384,14 @@ class Internal extends RequestCollection
         $internalMetadata->setPhotoUploadResponse($this->uploadPhotoData($targetFeed, $internalMetadata));
 
         // Configure the uploaded video and attach it to our timeline/story.
-        $configure = $this->configureSingleVideoWithRetries($targetFeed, $internalMetadata, $externalMetadata);
+        /** @var \InstagramAPI\Response\ConfigureResponse $configure */
+        $configure = $this->ig->internal->configureWithRetries(
+            $videoFilename,
+            function () use ($targetFeed, $internalMetadata, $externalMetadata) {
+                // Attempt to configure video parameters.
+                return $this->configureSingleVideo($targetFeed, $internalMetadata, $externalMetadata);
+            }
+        );
 
         return $configure;
     }
@@ -590,49 +599,6 @@ class Internal extends RequestCollection
     }
 
     /**
-     * Helper function for reliably configuring videos.
-     *
-     * Exactly the same as configureSingleVideo() but performs multiple attempts. Very
-     * useful since Instagram sometimes can't configure a newly uploaded video
-     * file until a few seconds have passed.
-     *
-     * @param string           $targetFeed       Target feed for this media ("timeline", "story", "direct_story"
-     *                                           but NOT "album", they are handled elsewhere).
-     * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
-     * @param array            $externalMetadata (optional) User-provided metadata key-value pairs.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ConfigureResponse
-     *
-     * @see Internal::configureSingleVideo() for available metadata fields.
-     */
-    public function configureSingleVideoWithRetries(
-        $targetFeed,
-        InternalMetadata $internalMetadata,
-        array $externalMetadata = [])
-    {
-        for ($attempt = 1; $attempt <= self::MAX_CONFIGURE_RETRIES; ++$attempt) {
-            try {
-                // Attempt to configure video parameters.
-                $configure = $this->configureSingleVideo($targetFeed, $internalMetadata, $externalMetadata);
-                break; // Success. Exit loop.
-            } catch (\InstagramAPI\Exception\InstagramException $e) {
-                if ($attempt < self::MAX_CONFIGURE_RETRIES && strpos($e->getMessage(), 'Transcode timeout') !== false) {
-                    // Do nothing, since we'll be retrying the failed configure...
-                    sleep(1); // Just wait a little before the next retry.
-                } else {
-                    // Re-throw all unhandled exceptions.
-                    throw $e;
-                }
-            }
-        }
-
-        return $configure; // ConfigureResponse
-    }
-
-    /**
      * Configures parameters for a whole album of uploaded media files.
      *
      * WARNING TO CONTRIBUTORS: THIS IS ONLY FOR *TIMELINE ALBUMS*. DO NOT MAKE
@@ -772,51 +738,6 @@ class Internal extends RequestCollection
         $configure = $request->getResponse(new Response\ConfigureResponse());
 
         return $configure;
-    }
-
-    /**
-     * Helper function for reliably configuring albums.
-     *
-     * Exactly the same as configureTimelineAlbum() but performs multiple
-     * attempts. Very useful since Instagram sometimes can't configure a newly
-     * uploaded video file until a few seconds have passed.
-     *
-     * @param array            $media            Extended media array coming from Timeline::uploadAlbum(),
-     *                                           containing the user's per-file metadata,
-     *                                           and internally generated per-file metadata.
-     * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
-     * @param array            $externalMetadata (optional) User-provided metadata key-value pairs
-     *                                           for the album itself (its caption, location, etc).
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\ConfigureResponse
-     *
-     * @see Internal::configureTimelineAlbum() for available metadata fields.
-     */
-    public function configureTimelineAlbumWithRetries(
-        array $media,
-        InternalMetadata $internalMetadata,
-        array $externalMetadata = [])
-    {
-        for ($attempt = 1; $attempt <= self::MAX_CONFIGURE_RETRIES; ++$attempt) {
-            try {
-                // Attempt to configure album parameters.
-                $configure = $this->configureTimelineAlbum($media, $internalMetadata, $externalMetadata);
-                break; // Success. Exit loop.
-            } catch (\InstagramAPI\Exception\InstagramException $e) {
-                if ($attempt < self::MAX_CONFIGURE_RETRIES && strpos($e->getMessage(), 'Transcode timeout') !== false) {
-                    // Do nothing, since we'll be retrying the failed configure...
-                    sleep(1); // Just wait a little before the next retry.
-                } else {
-                    // Re-throw all unhandled exceptions.
-                    throw $e;
-                }
-            }
-        }
-
-        return $configure; // ConfigureResponse
     }
 
     /**
@@ -1075,6 +996,93 @@ class Internal extends RequestCollection
             ->addPost('access_token', Constants::ANALYTICS_ACCESS_TOKEN)
             ->addPost('format', 'json')
             ->getResponse(new Response\ClientEventLogsResponse());
+    }
+
+    /**
+     * Configure media entity (album, video, ...) with retries.
+     *
+     * @param string   $entity       Entity to display in error messages.
+     * @param callable $configurator Configurator function.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \InstagramAPI\Exception\UploadFailedException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return ResponseInterface
+     */
+    public function configureWithRetries(
+        $entity,
+        callable $configurator)
+    {
+        $attempt = 0;
+        while (true) {
+            // Check for max retry-limit, and throw if we exceeded it.
+            if (++$attempt > self::MAX_CONFIGURE_RETRIES) {
+                throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
+                    'Configuration of "%s" failed. All retries have failed.',
+                    $entity
+                ));
+            }
+
+            $result = null;
+            try {
+                /** @var ResponseInterface $result */
+                $result = call_user_func($configurator);
+            } catch (ThrottledException $e) {
+                throw $e;
+            } catch (LoginRequiredException $e) {
+                throw $e;
+            } catch (FeedbackRequiredException $e) {
+                throw $e;
+            } catch (CheckpointRequiredException $e) {
+                throw $e;
+            } catch (InstagramException $e) {
+                if ($e->hasResponse()) {
+                    $result = $e->getResponse();
+                }
+            } catch (\Exception $e) {
+                // Ignore everything else.
+            }
+
+            // We had a network error or something like that, let's continue to the next attempt.
+            if ($result === null) {
+                sleep(1);
+                continue;
+            }
+
+            $httpResponse = $result->getHttpResponse();
+            $fullResponse = $result->getFullResponse();
+            $delay = 1;
+            switch ($httpResponse->getStatusCode()) {
+                case 200:
+                    // Instagram uses "ok" status for this error, so we need to check it first:
+                    // {"message": "media_needs_reupload", "error_title": "staged_position_not_found", "status": "ok"}
+                    if (strtolower($result->getMessage()) === 'media_needs_reupload') {
+                        throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
+                            'Configuration of "%s" failed. You need to reupload the media (%s).',
+                            $entity,
+                            (isset($fullResponse->error_title) ? $fullResponse->error_title : 'unknown error')
+                        ));
+                    } elseif ($result->isOk()) {
+                        return $result;
+                    }
+                    // Continue to the next attempt.
+                    break;
+                case 202:
+                    if (isset($fullResponse->cooldown_time_in_seconds)) {
+                        $delay = max((int) $fullResponse->cooldown_time_in_seconds, 1);
+                    }
+                    break;
+                default:
+            }
+            sleep($delay);
+        }
+
+        throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
+            'Configuration of "%s" failed.',
+            $entity
+        ));
     }
 
     /**

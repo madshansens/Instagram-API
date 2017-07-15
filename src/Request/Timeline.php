@@ -153,7 +153,13 @@ class Timeline extends RequestCollection
         // Generate an uploadId (via internal metadata) for the album.
         $albumInternalMetadata = new InternalMetadata();
         // Configure the uploaded album and attach it to our timeline.
-        $configure = $this->ig->internal->configureTimelineAlbumWithRetries($media, $albumInternalMetadata, $externalMetadata);
+        /** @var \InstagramAPI\Response\ConfigureResponse $configure */
+        $configure = $this->ig->internal->configureWithRetries(
+            'album',
+            function () use ($media, $albumInternalMetadata, $externalMetadata) {
+                return $this->ig->internal->configureTimelineAlbum($media, $albumInternalMetadata, $externalMetadata);
+            }
+        );
 
         return $configure;
     }
