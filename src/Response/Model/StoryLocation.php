@@ -7,6 +7,7 @@ use InstagramAPI\AutoPropertyHandler;
 /**
  * @method Attribution getAttribution()
  * @method float getHeight()
+ * @method mixed getIsPinned()
  * @method Location getLocation()
  * @method float getRotation()
  * @method float getWidth()
@@ -14,6 +15,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method float getY()
  * @method bool isAttribution()
  * @method bool isHeight()
+ * @method bool isIsPinned()
  * @method bool isLocation()
  * @method bool isRotation()
  * @method bool isWidth()
@@ -21,6 +23,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isY()
  * @method setAttribution(Attribution $value)
  * @method setHeight(float $value)
+ * @method setIsPinned(mixed $value)
  * @method setLocation(Location $value)
  * @method setRotation(float $value)
  * @method setWidth(float $value)
@@ -57,4 +60,5 @@ class StoryLocation extends AutoPropertyHandler
      * @var Attribution
      */
     public $attribution;
+    public $is_pinned;
 }
