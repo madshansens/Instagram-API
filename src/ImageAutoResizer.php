@@ -68,7 +68,13 @@ class ImageAutoResizer
     /**
      * Output JPEG quality.
      *
-     * This value was chosen because 100 is very wasteful.
+     * This value was chosen because 100 is very wasteful. And don't tweak this
+     * number, because the JPEG quality number is actually totally meaningless
+     * (it is non-standardized) and Instagram can't even read it from the file.
+     * They have no idea what quality we've used, and it can be harmful to go
+     * lower since different JPEG compressors (like PHP's implementation) use
+     * different quality scales and are often awful at lower qualities! We know
+     * that PHP's JPEG quality at 95 is great, so there's no reason to lower it.
      *
      * @var int
      */
