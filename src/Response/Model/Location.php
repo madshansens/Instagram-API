@@ -7,6 +7,7 @@ use InstagramAPI\AutoPropertyHandler;
 /**
  * @method mixed getAddress()
  * @method mixed getCity()
+ * @method mixed getEndTime()
  * @method string getExternalId()
  * @method string getExternalIdSource()
  * @method mixed getExternalSource()
@@ -24,6 +25,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getType()
  * @method bool isAddress()
  * @method bool isCity()
+ * @method bool isEndTime()
  * @method bool isExternalId()
  * @method bool isExternalIdSource()
  * @method bool isExternalSource()
@@ -41,6 +43,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isType()
  * @method setAddress(mixed $value)
  * @method setCity(mixed $value)
+ * @method setEndTime(mixed $value)
  * @method setExternalId(string $value)
  * @method setExternalIdSource(string $value)
  * @method setExternalSource(mixed $value)
@@ -93,6 +96,7 @@ class Location extends AutoPropertyHandler
      */
     public $facebook_events_id;
     public $start_time;
+    public $end_time;
     /**
      * @var Location
      */
