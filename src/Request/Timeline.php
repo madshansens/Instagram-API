@@ -302,6 +302,19 @@ class Timeline extends RequestCollection
     }
 
     /**
+     * Get archived media feed.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ArchivedMediaFeedResponse
+     */
+    public function getArchivedMediaFeed()
+    {
+        return $this->ig->request("feed/only_me_feed/")
+            ->getResponse(new Response\UserFeedResponse());
+    }
+
+    /**
      * Archives or unarchives one of your timeline media items.
      *
      * Marking media as "archived" will hide it from everyone except yourself.
