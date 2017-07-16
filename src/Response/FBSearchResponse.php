@@ -10,14 +10,17 @@ use InstagramAPI\ResponseTrait;
  * @method mixed getHasMore()
  * @method mixed getHashtags()
  * @method mixed getPlaces()
+ * @method mixed getRankToken()
  * @method mixed getUsers()
  * @method bool isHasMore()
  * @method bool isHashtags()
  * @method bool isPlaces()
+ * @method bool isRankToken()
  * @method bool isUsers()
  * @method setHasMore(mixed $value)
  * @method setHashtags(mixed $value)
  * @method setPlaces(mixed $value)
+ * @method setRankToken(mixed $value)
  * @method setUsers(mixed $value)
  */
 class FBSearchResponse extends AutoPropertyHandler implements ResponseInterface
@@ -28,4 +31,5 @@ class FBSearchResponse extends AutoPropertyHandler implements ResponseInterface
     public $hashtags;
     public $users;
     public $places;
+    public $rank_token;
 }
