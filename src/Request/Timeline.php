@@ -306,7 +306,7 @@ class Timeline extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\ArchivedMediaFeedResponse
+     * @return \InstagramAPI\Response\UserFeedResponse
      */
     public function getArchivedMediaFeed()
     {
