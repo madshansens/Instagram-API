@@ -569,7 +569,7 @@ class ImageAutoResizer
                 // We need to expand the height with top/bottom borders. We use
                 // ceil to guarantee that the final image is tall enough to be
                 // below the maximum allowed aspect ratio.
-                // NOTE: Beware that it may actually be below maxAspectRatio if
+                // NOTE: Beware that it may actually be below minAspectRatio if
                 // their values are very close to each other! For example with
                 // 600x450 input and min/max aspect of 0.8625, it'll create a
                 // 600x696 expanded image (ratio 0.86206). That's unavoidable.
