@@ -593,21 +593,22 @@ class Instagram
         // You have been warned.
         if ($justLoggedIn) {
             // Perform the "user has just done a full login" API flow.
-            $this->internal->syncUserFeatures();
             $this->people->getAutoCompleteUserList();
             $this->story->getReelsTrayFeed();
-            $this->direct->getRecentRecipients();
             $this->timeline->getTimelineFeed();
-            //push register
+            $this->direct->getRecentRecipients();
+            $this->internal->syncUserFeatures();
+            //$this->push->register();
             $this->direct->getRankedRecipients('reshare', true);
             $this->direct->getRankedRecipients('raven', true);
             $this->direct->getInbox();
             $this->direct->getVisualInbox();
+            // bootstrap users
+            $this->internal->getProfileNotice();
             //$this->internal->getMegaphoneLog();
             $this->people->getRecentActivityInbox();
-            $this->internal->getProfileNotice();
-            $this->media->getBlockedMedia();
             $this->internal->getQPFetch();
+            $this->media->getBlockedMedia();
             $this->discover->getExploreFeed();
             //$this->internal->getFacebookOTA();
         } else {
