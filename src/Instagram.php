@@ -449,7 +449,7 @@ class Instagram
             // Call log attribution API so a csrftoken is put in our cookie jar.
             $this->internal->logAttribution();
 
-            // Uncomment this call when IG_VERSION >= 10.24.0
+            // Not required, at least for now. Last check 10.30.0.
             //$this->internal->readMsisdnHeader();
 
             try {
