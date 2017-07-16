@@ -105,6 +105,9 @@ class ImageAutoResizer
     /** @var int Crop focus position (-50 .. 50). */
     protected $_cropFocus;
 
+    /** @var array Background color [R, G, B] for the final image. */
+    protected $_bgColor;
+
     /** @var string Path to a tmp directory. */
     protected $_tmpPath;
 
@@ -143,6 +146,7 @@ class ImageAutoResizer
      *                          "cropFocus" (int) - Crop focus position (-50 .. 50), uses intelligent guess if not set;
      *                          "minAspectRatio" (float) - Minimum allowed aspect ratio, uses self::MIN_RATIO if not set;
      *                          "maxAspectRatio" (float) - Maximum allowed aspect ratio, uses self::MAX_RATIO if not set;
+     *                          "bgColor" (array) - Array with 3 color components [R, G, B] (0-255/0x00-0xFF) for the background, uses white if not set;
      *                          "tmpPath" (string) - Path to temp directory, uses system temp location or class-default if not set.
      *
      * @throws \InvalidArgumentException
@@ -155,6 +159,7 @@ class ImageAutoResizer
         $cropFocus = isset($options['cropFocus']) ? $options['cropFocus'] : null;
         $minAspectRatio = isset($options['minAspectRatio']) ? $options['minAspectRatio'] : null;
         $maxAspectRatio = isset($options['maxAspectRatio']) ? $options['maxAspectRatio'] : null;
+        $bgColor = isset($options['bgColor']) ? $options['bgColor'] : null;
         $tmpPath = isset($options['tmpPath']) ? $options['tmpPath'] : null;
 
         // Input file.
@@ -187,6 +192,14 @@ class ImageAutoResizer
         }
         $this->_minAspectRatio = $minAspectRatio;
         $this->_maxAspectRatio = $maxAspectRatio;
+
+        // Background color.
+        if ($bgColor !== null && (!is_array($bgColor) || count($bgColor) != 3 || !isset($bgColor[0]) || !isset($bgColor[1]) || !isset($bgColor[2]))) {
+            throw new \InvalidArgumentException('The background color must be a 3-element array [R, G, B].');
+        } elseif ($bgColor === null) {
+            $bgColor = [255, 255, 255]; // White.
+        }
+        $this->_bgColor = $bgColor;
 
         // Temporary directory path.
         if ($tmpPath === null) {
@@ -413,14 +426,15 @@ class ImageAutoResizer
             throw new \RuntimeException('Failed to create output image.');
         }
         try {
-            // Create an output canvas with a white background.
-            // NOTE: This is just to have a nice white background in the
-            // resulting JPG if a transparent image was used as input.
-            $white = imagecolorallocate($output, 255, 255, 255);
-            if ($white === false) {
-                throw new \RuntimeException('Failed to allocate color.');
+            // Create an output canvas with our background color.
+            // NOTE: If cropping, this is just to have a nice background in the
+            // resulting JPG if a transparent image was used as input. If
+            // expanding, this will be the color of the border as well.
+            $bgColor = imagecolorallocate($output, $this->_bgColor[0], $this->_bgColor[1], $this->_bgColor[2]);
+            if ($bgColor === false) {
+                throw new \RuntimeException('Failed to allocate background color.');
             }
-            if (imagefilledrectangle($output, 0, 0, $dst_w - 1, $dst_h - 1, $white) === false) {
+            if (imagefilledrectangle($output, 0, 0, $dst_w - 1, $dst_h - 1, $bgColor) === false) {
                 throw new \RuntimeException('Failed to fill image with default color.');
             }
 
@@ -432,25 +446,25 @@ class ImageAutoResizer
             // Handle image rotation.
             switch ($this->_imageOrientation) {
                 case 2:
-                    $output = $this->_rotateResource($output, 0, $white, IMG_FLIP_HORIZONTAL);
+                    $output = $this->_rotateResource($output, 0, $bgColor, IMG_FLIP_HORIZONTAL);
                     break;
                 case 3:
-                    $output = $this->_rotateResource($output, 0, $white, IMG_FLIP_BOTH);
+                    $output = $this->_rotateResource($output, 0, $bgColor, IMG_FLIP_BOTH);
                     break;
                 case 4:
-                    $output = $this->_rotateResource($output, 0, $white, IMG_FLIP_VERTICAL);
+                    $output = $this->_rotateResource($output, 0, $bgColor, IMG_FLIP_VERTICAL);
                     break;
                 case 5:
-                    $output = $this->_rotateResource($output, 90, $white, IMG_FLIP_HORIZONTAL);
+                    $output = $this->_rotateResource($output, 90, $bgColor, IMG_FLIP_HORIZONTAL);
                     break;
                 case 6:
-                    $output = $this->_rotateResource($output, -90, $white);
+                    $output = $this->_rotateResource($output, -90, $bgColor);
                     break;
                 case 7:
-                    $output = $this->_rotateResource($output, -90, $white, IMG_FLIP_HORIZONTAL);
+                    $output = $this->_rotateResource($output, -90, $bgColor, IMG_FLIP_HORIZONTAL);
                     break;
                 case 8:
-                    $output = $this->_rotateResource($output, 90, $white);
+                    $output = $this->_rotateResource($output, 90, $bgColor);
                     break;
             }
 
