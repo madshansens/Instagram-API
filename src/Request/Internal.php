@@ -916,6 +916,19 @@ class Internal extends RequestCollection
     }
 
     /**
+     * Get hidden entities for users, places and hastags via Facebook's algorithm.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FacebookHiddenEntitiesResponse
+     */
+    public function searchFacebookHiddenEntities()
+    {
+        return $this->ig->request('fbsearch/get_hidden_search_entities/')
+            ->getResponse(new Response\FacebookHiddenEntitiesResponse());
+    }
+
+    /**
      * Get Facebook OTA (Over-The-Air) update information.
      *
      * @throws \InstagramAPI\Exception\InstagramException
