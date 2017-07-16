@@ -138,25 +138,25 @@ class ImageAutoResizer
     /**
      * Constructor.
      *
-     * @param string      $inputFile      Path to an input file.
-     * @param int|null    $cropFocus      Crop focus position (-50 .. 50), uses
-     *                                    intelligent guess if not set.
-     * @param float|null  $minAspectRatio Minimum allowed aspect ratio, uses
-     *                                    self::MIN_RATIO if not set.
-     * @param float|null  $maxAspectRatio Maximum allowed aspect ratio, uses
-     *                                    self::MAX_RATIO if not set.
-     * @param string|null $tmpPath        Path to temp directory, uses system
-     *                                    temp location or class-default if not set.
+     * @param string $inputFile Path to an input file.
+     * @param array  $options   An associative array of optional parameters, including:
+     *                          "cropFocus" (int) - Crop focus position (-50 .. 50), uses intelligent guess if not set;
+     *                          "minAspectRatio" (float) - Minimum allowed aspect ratio, uses self::MIN_RATIO if not set;
+     *                          "maxAspectRatio" (float) - Maximum allowed aspect ratio, uses self::MAX_RATIO if not set;
+     *                          "tmpPath" (string) - Path to temp directory, uses system temp location or class-default if not set.
      *
      * @throws \InvalidArgumentException
      */
     public function __construct(
         $inputFile,
-        $cropFocus = null,
-        $minAspectRatio = null,
-        $maxAspectRatio = null,
-        $tmpPath = null)
+        array $options = [])
     {
+        // Assign variables for all options, to avoid bulky code repetition.
+        $cropFocus = isset($options['cropFocus']) ? $options['cropFocus'] : null;
+        $minAspectRatio = isset($options['minAspectRatio']) ? $options['minAspectRatio'] : null;
+        $maxAspectRatio = isset($options['maxAspectRatio']) ? $options['maxAspectRatio'] : null;
+        $tmpPath = isset($options['tmpPath']) ? $options['tmpPath'] : null;
+
         // Input file.
         if (!is_file($inputFile)) {
             throw new \InvalidArgumentException(sprintf('Input file "%s" doesn\'t exist.', $inputFile));
