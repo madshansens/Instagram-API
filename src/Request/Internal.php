@@ -916,13 +916,16 @@ class Internal extends RequestCollection
     }
 
     /**
-     * Get hidden entities for users, places and hastags via Facebook's algorithm.
+     * Get hidden entities for users, places and hashtags via Facebook's algorithm.
+     *
+     * TODO: We don't know what this function does. If we ever discover that it
+     * has a useful purpose, then we should move it somewhere else.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\FacebookHiddenEntitiesResponse
      */
-    public function searchFacebookHiddenEntities()
+    public function getFacebookHiddenSearchEntities()
     {
         return $this->ig->request('fbsearch/get_hidden_search_entities/')
             ->getResponse(new Response\FacebookHiddenEntitiesResponse());
