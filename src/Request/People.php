@@ -472,21 +472,6 @@ class People extends RequestCollection
     }
 
     /**
-     * Get suggested users via Facebook's algorithm.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\SuggestedUsersFacebookResponse
-     */
-    public function getSuggestedUsersFacebook()
-    {
-        return $this->ig->request('fbsearch/suggested_searches/')
-            ->addParam('type', 'blended')
-            ->addParam('rank_token', $this->ig->rank_token)
-            ->getResponse(new Response\SuggestedUsersFacebookResponse());
-    }
-
-    /**
      * Get suggested users via account badge.
      *
      * This is the endpoint for when you press the "user icon with the plus
@@ -504,6 +489,21 @@ class People extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('module', 'discover_people')
             ->getResponse(new Response\SuggestedUsersBadgeResponse());
+    }
+
+    /**
+     * Get suggested users via Facebook's algorithm.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\SuggestedUsersFacebookResponse
+     */
+    public function getSuggestedUsersFacebook()
+    {
+        return $this->ig->request('fbsearch/suggested_searches/')
+            ->addParam('type', 'blended')
+            ->addParam('rank_token', $this->ig->rank_token)
+            ->getResponse(new Response\SuggestedUsersFacebookResponse());
     }
 
     /**
