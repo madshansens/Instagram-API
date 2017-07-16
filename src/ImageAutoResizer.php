@@ -24,6 +24,12 @@ namespace InstagramAPI;
  */
 class ImageAutoResizer
 {
+    /** @var int Crop Operation. */
+    const CROP = 1;
+
+    /** @var int Expand Operation. */
+    const EXPAND = 2;
+
     /**
      * Lowest allowed aspect ratio (4:5, meaning portrait).
      *
@@ -108,6 +114,9 @@ class ImageAutoResizer
     /** @var array Background color [R, G, B] for the final image. */
     protected $_bgColor;
 
+    /** @var int Operation to perform on the image. */
+    protected $_operation;
+
     /** @var string Path to a tmp directory. */
     protected $_tmpPath;
 
@@ -143,10 +152,11 @@ class ImageAutoResizer
      *
      * @param string $inputFile Path to an input file.
      * @param array  $options   An associative array of optional parameters, including:
-     *                          "cropFocus" (int) - Crop focus position (-50 .. 50), uses intelligent guess if not set;
+     *                          "cropFocus" (int) - Crop focus position (-50 .. 50) when cropping, uses intelligent guess if not set;
      *                          "minAspectRatio" (float) - Minimum allowed aspect ratio, uses self::MIN_RATIO if not set;
      *                          "maxAspectRatio" (float) - Maximum allowed aspect ratio, uses self::MAX_RATIO if not set;
      *                          "bgColor" (array) - Array with 3 color components [R, G, B] (0-255/0x00-0xFF) for the background, uses white if not set;
+     *                          "operation" (int) - Operation to perform on the image (CROP or EXPAND), uses self::CROP if not set;
      *                          "tmpPath" (string) - Path to temp directory, uses system temp location or class-default if not set.
      *
      * @throws \InvalidArgumentException
@@ -160,6 +170,7 @@ class ImageAutoResizer
         $minAspectRatio = isset($options['minAspectRatio']) ? $options['minAspectRatio'] : null;
         $maxAspectRatio = isset($options['maxAspectRatio']) ? $options['maxAspectRatio'] : null;
         $bgColor = isset($options['bgColor']) ? $options['bgColor'] : null;
+        $operation = isset($options['operation']) ? $options['operation'] : null;
         $tmpPath = isset($options['tmpPath']) ? $options['tmpPath'] : null;
 
         // Input file.
@@ -200,6 +211,14 @@ class ImageAutoResizer
             $bgColor = [255, 255, 255]; // White.
         }
         $this->_bgColor = $bgColor;
+
+        // Image operation.
+        if ($operation !== null && $operation !== self::CROP && $operation !== self::EXPAND) {
+            throw new \InvalidArgumentException('The operation must be one of the class constants CROP or EXPAND.');
+        } elseif ($operation === null) {
+            $operation = self::CROP;
+        }
+        $this->_operation = $operation;
 
         // Temporary directory path.
         if ($tmpPath === null) {
@@ -412,7 +431,7 @@ class ImageAutoResizer
      * @throws \Exception
      * @throws \RuntimeException
      */
-    protected function _cropAndResize(
+    protected function _createNewImage(
         $source,
         $src_x,
         $src_y,
@@ -501,7 +520,7 @@ class ImageAutoResizer
         $x2 = $width = $this->_width;
         $y2 = $height = $this->_height;
 
-        // Check aspect ratio and crop if needed.
+        // Check aspect ratio and crop/expand to fit requirements if needed.
         if ($this->_minAspectRatio !== null && $this->_aspectRatio < $this->_minAspectRatio) {
             // We need to limit the height, so floor is used intentionally to
             // AVOID rounding height upwards to a still-illegal aspect ratio.
@@ -572,11 +591,11 @@ class ImageAutoResizer
             }
         }
 
-        // Do the crop & resize (coordinates are swapped for rotated images).
+        // Do the image operation (coordinates are swapped for rotated images).
         if (!$this->_isRotated) {
-            $this->_cropAndResize($resource, $x1, $y1, $x2 - $x1, $y2 - $y1, $width, $height);
+            $this->_createNewImage($resource, $x1, $y1, $x2 - $x1, $y2 - $y1, $width, $height);
         } else {
-            $this->_cropAndResize($resource, $y1, $x1, $y2 - $y1, $x2 - $x1, $height, $width);
+            $this->_createNewImage($resource, $y1, $x1, $y2 - $y1, $x2 - $x1, $height, $width);
         }
     }
 
