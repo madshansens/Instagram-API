@@ -12,6 +12,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method string getItemId()
  * @method mixed getItemType()
  * @method DirectLink getLink()
+ * @method Location getLocation()
  * @method DirectThreadItemMedia getMedia()
  * @method Item getMediaShare()
  * @method Placeholder getPlaceholder()
@@ -29,6 +30,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isItemId()
  * @method bool isItemType()
  * @method bool isLink()
+ * @method bool isLocation()
  * @method bool isMedia()
  * @method bool isMediaShare()
  * @method bool isPlaceholder()
@@ -46,6 +48,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setItemId(string $value)
  * @method setItemType(mixed $value)
  * @method setLink(DirectLink $value)
+ * @method setLocation(Location $value)
  * @method setMedia(DirectThreadItemMedia $value)
  * @method setMediaShare(Item $value)
  * @method setPlaceholder(Placeholder $value)
@@ -126,4 +129,8 @@ class DirectThreadItem extends AutoPropertyHandler
      * @var Placeholder
      */
     public $placeholder;
+    /**
+     * @var Location
+     */
+    public $location;
 }
