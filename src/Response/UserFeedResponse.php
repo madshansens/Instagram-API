@@ -38,4 +38,5 @@ class UserFeedResponse extends AutoPropertyHandler implements ResponseInterface
      * @var string
      */
     public $next_max_id;
+    public $max_id;
 }
