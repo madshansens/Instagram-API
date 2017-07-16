@@ -396,6 +396,11 @@ class People extends RequestCollection
     /**
      * Get recent searches via Facebook's algorithm.
      *
+     * NOTE: Despite its name, it doesn't simply return "recent searches".
+     * It seems to list profiles that you've found via the searching/discovery
+     * mechanisms AND then visited. In the app, they're listed as the "Recent"
+     * users in the user-search window.
+     *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\RecentFacebookSearchesResponse
@@ -506,6 +511,10 @@ class People extends RequestCollection
 
     /**
      * Get suggested users via Facebook's algorithm.
+     *
+     * NOTE: This seems to list profiles that you have manually searched for
+     * and frequently visited. In the app, they're listed as the "Suggested"
+     * top users in the user-search window.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
