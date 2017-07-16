@@ -5,8 +5,9 @@ namespace InstagramAPI;
 /**
  * Automatic image resizer.
  *
- * Resizes and crops an image to match Instagram's requirements, if necessary.
- * You can also use this to force your image into different aspects, ie square.
+ * Resizes and crops/expands an image to match Instagram's requirements, if
+ * necessary. You can also use this with your own parameters, to force your
+ * image into different aspects, ie square, or for adding borders to images.
  *
  * Usage:
  *
@@ -108,7 +109,7 @@ class ImageAutoResizer
     /** @var float|null Maximum allowed aspect ratio. */
     protected $_maxAspectRatio;
 
-    /** @var int Crop focus position (-50 .. 50). */
+    /** @var int Crop focus position (-50 .. 50) when cropping. */
     protected $_cropFocus;
 
     /** @var array Background color [R, G, B] for the final image. */
@@ -420,13 +421,17 @@ class ImageAutoResizer
     }
 
     /**
-     * @param resource $source
-     * @param int      $src_x
-     * @param int      $src_y
-     * @param int      $src_w
-     * @param int      $src_h
-     * @param int      $dst_w
-     * @param int      $dst_h
+     * @param resource $source The original image loaded as a resource.
+     * @param int      $src_x  X-coordinate of source point to copy from.
+     * @param int      $src_y  Y-coordinate of source point to copy from.
+     * @param int      $src_w  Source width (how many pixels to copy).
+     * @param int      $src_h  Source height (how many pixels to copy).
+     * @param int      $dst_x  X-coordinate of destination point to copy to.
+     * @param int      $dst_y  Y-coordinate of destination point to copy to.
+     * @param int      $dst_w  Destination width (how many pixels to scale to).
+     * @param int      $dst_h  Destination height (how many pixels to scale to).
+     * @param int      $cnv_w  Width of the new image canvas to create.
+     * @param int      $cnv_h  Height of the new image canvas to create.
      *
      * @throws \Exception
      * @throws \RuntimeException
@@ -437,28 +442,33 @@ class ImageAutoResizer
         $src_y,
         $src_w,
         $src_h,
+        $dst_x,
+        $dst_y,
         $dst_w,
-        $dst_h)
+        $dst_h,
+        $cnv_w,
+        $cnv_h)
     {
-        $output = imagecreatetruecolor($dst_w, $dst_h);
+        // Create an output canvas with our desired size.
+        $output = imagecreatetruecolor($cnv_w, $cnv_h);
         if ($output === false) {
             throw new \RuntimeException('Failed to create output image.');
         }
         try {
-            // Create an output canvas with our background color.
-            // NOTE: If cropping, this is just to have a nice background in the
-            // resulting JPG if a transparent image was used as input. If
-            // expanding, this will be the color of the border as well.
+            // Fill the output canvas with our background color.
+            // NOTE: If cropping, this is just to have a nice background in
+            // the resulting JPG if a transparent image was used as input.
+            // If expanding, this will be the color of the border as well.
             $bgColor = imagecolorallocate($output, $this->_bgColor[0], $this->_bgColor[1], $this->_bgColor[2]);
             if ($bgColor === false) {
                 throw new \RuntimeException('Failed to allocate background color.');
             }
-            if (imagefilledrectangle($output, 0, 0, $dst_w - 1, $dst_h - 1, $bgColor) === false) {
-                throw new \RuntimeException('Failed to fill image with default color.');
+            if (imagefilledrectangle($output, 0, 0, $cnv_w - 1, $cnv_h - 1, $bgColor) === false) {
+                throw new \RuntimeException('Failed to fill image with background color.');
             }
 
             // Copy the resized (and resampled) image onto the new canvas.
-            if (imagecopyresampled($output, $source, 0, 0, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h) === false) {
+            if (imagecopyresampled($output, $source, $dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h) === false) {
                 throw new \RuntimeException('Failed to resample image.');
             }
 
@@ -522,9 +532,20 @@ class ImageAutoResizer
 
         // Check aspect ratio and crop/expand to fit requirements if needed.
         if ($this->_minAspectRatio !== null && $this->_aspectRatio < $this->_minAspectRatio) {
-            // We need to limit the height, so floor is used intentionally to
-            // AVOID rounding height upwards to a still-illegal aspect ratio.
-            $height = floor($this->_width / $this->_minAspectRatio);
+            if ($this->_operation === self::CROP) {
+                // We need to limit the height, so floor is used intentionally to
+                // AVOID rounding height upwards to a still-illegal aspect ratio.
+                $height = floor($this->_width / $this->_minAspectRatio);
+            } elseif ($this->_operation === self::EXPAND) {
+                // We need to expand the width with left/right borders. We use
+                // ceil to guarantee that the final image is wide enough to be
+                // above the minimum allowed aspect ratio.
+                // NOTE: Beware that it may actually exceed maxAspectRatio if
+                // their values are very close to each other! For example with
+                // 450x600 input and min/max aspect of 1.2625, it'll create a
+                // 758x600 expanded image (ratio 1.2633). That's unavoidable.
+                $width = ceil($this->_height * $this->_minAspectRatio);
+            }
             $aspectRatio = $this->_minAspectRatio;
 
             // Crop vertical images from top by default, to keep faces, etc.
@@ -540,9 +561,20 @@ class ImageAutoResizer
             $y1 = round($diff * (50 + $cropFocus) / 100);
             $y2 = $y2 - ($diff - $y1);
         } elseif ($this->_maxAspectRatio !== null && $this->_aspectRatio > $this->_maxAspectRatio) {
-            // We need to limit the width. We use floor to guarantee cutting
-            // enough pixels, since our width exceeds the maximum allowed ratio.
-            $width = floor($this->_height * $this->_maxAspectRatio);
+            if ($this->_operation === self::CROP) {
+                // We need to limit the width. We use floor to guarantee cutting
+                // enough pixels, since our width exceeds the maximum allowed ratio.
+                $width = floor($this->_height * $this->_maxAspectRatio);
+            } elseif ($this->_operation === self::EXPAND) {
+                // We need to expand the height with top/bottom borders. We use
+                // ceil to guarantee that the final image is tall enough to be
+                // below the maximum allowed aspect ratio.
+                // NOTE: Beware that it may actually be below maxAspectRatio if
+                // their values are very close to each other! For example with
+                // 600x450 input and min/max aspect of 0.8625, it'll create a
+                // 600x696 expanded image (ratio 0.86206). That's unavoidable.
+                $height = ceil($this->_width / $this->_maxAspectRatio);
+            }
             $aspectRatio = $this->_maxAspectRatio;
 
             // Crop horizontal images from center by default.
@@ -591,11 +623,47 @@ class ImageAutoResizer
             }
         }
 
-        // Do the image operation (coordinates are swapped for rotated images).
-        if (!$this->_isRotated) {
-            $this->_createNewImage($resource, $x1, $y1, $x2 - $x1, $y2 - $y1, $width, $height);
-        } else {
-            $this->_createNewImage($resource, $y1, $x1, $y2 - $y1, $x2 - $x1, $height, $width);
+        // Determine the image operation's resampling parameters and perform it.
+        if ($this->_operation === self::CROP) {
+            // Cropping coordinates are swapped for rotated images.
+            if (!$this->_isRotated) {
+                $this->_createNewImage($resource, $x1, $y1, $x2 - $x1, $y2 - $y1, 0, 0, $width, $height, $width, $height);
+            } else {
+                $this->_createNewImage($resource, $y1, $x1, $y2 - $y1, $x2 - $x1, 0, 0, $height, $width, $height, $width);
+            }
+        } elseif ($this->_operation === self::EXPAND) {
+            // For expansion, we'll calculate all operation parameters now. We
+            // ignore all of the various x/y and crop-focus parameters used by
+            // the cropping code above. None of them are used for expansion!
+
+            // We'll create a new canvas with the desired dimensions.
+            $cnv_w = !$this->_isRotated ? $width : $height;
+            $cnv_h = !$this->_isRotated ? $height : $width;
+
+            // Always copy from the absolute top left of the original image.
+            $src_x = $src_y = 0;
+
+            // We'll copy the entire input image onto the new canvas.
+            $src_w = !$this->_isRotated ? $this->_width : $this->_height;
+            $src_h = !$this->_isRotated ? $this->_height : $this->_width;
+
+            // Determine the target dimensions to fit it on the new canvas,
+            // because the input image's dimensions may have been too large.
+            // This will not scale anything (uses scale=1) if the input fits.
+            // NOTE: We use ceil to guarantee that it'll never scale a side
+            // badly and leave a 1px gap between the image and canvas sides.
+            // Also note that ceil will never produce bad values, since PHP
+            // allows the dst_w/dst_h to exceed beyond canvas dimensions!
+            $scale = min($cnv_w / $src_w, $cnv_h / $src_h);
+            $dst_w = ceil($scale * $src_w);
+            $dst_h = ceil($scale * $src_h);
+
+            // Now calculate the centered destination offset on the canvas.
+            $dst_x = floor(($cnv_w - $dst_w) / 2);
+            $dst_y = floor(($cnv_h - $dst_h) / 2);
+
+            // Create the new, expanded image!
+            $this->_createNewImage($resource, $src_x, $src_y, $src_w, $src_h, $dst_x, $dst_y, $dst_w, $dst_h, $cnv_w, $cnv_h);
         }
     }
 
