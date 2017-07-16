@@ -394,6 +394,19 @@ class People extends RequestCollection
     }
 
     /**
+     * Get recent searches via Facebook's algorithm.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\RecentFacebookSearchesResponse
+     */
+    public function getRecentFacebookSearches()
+    {
+        return $this->ig->request('fbsearch/recent_searches/')
+            ->getResponse(new Response\RecentFacebookSearchesResponse());
+    }
+
+    /**
      * Search for users by linking your address book to Instagram.
      *
      * WARNING: You must unlink your current address book before you can link
