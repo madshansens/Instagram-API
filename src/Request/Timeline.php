@@ -310,7 +310,7 @@ class Timeline extends RequestCollection
      */
     public function getArchivedMediaFeed()
     {
-        return $this->ig->request("feed/only_me_feed/")
+        return $this->ig->request('feed/only_me_feed/')
             ->getResponse(new Response\UserFeedResponse());
     }
 
