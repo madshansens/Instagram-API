@@ -597,15 +597,16 @@ class ImageAutoResizer
         // Handle square target ratios or too-large target dimensions.
         if ($aspectRatio == 1) {
             // Ratio = 1: Square.
-            // NOTE: Our square will be the size of the shortest side, or the
-            // maximum allowed image width by Instagram, whichever is smallest.
-            $squareWidth = $width < $height ? $width : $height;
+            // NOTE: Our square will be the size of the shortest side when
+            // cropping or the longest side when expanding, but never more
+            // than the maximum allowed image width by Instagram.
+            $squareWidth = $this->_operation === self::CROP ? min($width, $height) : max($width, $height);
             if ($squareWidth > self::MAX_WIDTH) {
                 $squareWidth = self::MAX_WIDTH;
             }
             $width = $height = $squareWidth;
         } else {
-            // All other ratios: Ensure the target width fits Instagram's limit.
+            // All other ratios: Ensure the final width fits Instagram's limit.
             // If ratio > 1: Landscape (wider than tall). Limit by width.
             // If ratio < 1: Portrait (taller than wide). Limit by width.
             // NOTE: Maximum "allowed" height is 1350, which is EXACTLY what you
