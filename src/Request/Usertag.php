@@ -130,13 +130,13 @@ class Usertag extends RequestCollection
      * @return \InstagramAPI\Response\ReviewPreferenceResponse
      */
     public function setReviewPreference(
-     $enabled)
+        $enabled)
     {
-     return $this->ig->request('usertags/review_preference/')
-         ->addPost('_uuid', $this->ig->uuid)
-         ->addPost('_uid', $this->ig->account_id)
-         ->addPost('_csrftoken', $this->ig->client->getToken())
-         ->addPost('enabled', (int) $enabled)
-         ->getResponse(new Response\ReviewPreferenceResponse());
+        return $this->ig->request('usertags/review_preference/')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('enabled', (int) $enabled)
+            ->getResponse(new Response\ReviewPreferenceResponse());
     }
 }
