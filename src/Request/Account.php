@@ -52,6 +52,10 @@ class Account extends RequestCollection
         $email,
         $gender)
     {
+        // We must mark the profile for editing before doing the main request.
+        $this->ig->request('accounts/current_user/?edit=true')
+            ->getResponse(new Response\UserInfoResponse());
+
         return $this->ig->request('accounts/edit_profile/')
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
