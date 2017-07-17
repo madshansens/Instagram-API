@@ -354,7 +354,8 @@ class Timeline extends RequestCollection
             break;
         }
 
-        return $this->ig->request("media/{$mediaId}/{$endpoint}/?media_type={$mediaCode}")
+        return $this->ig->request("media/{$mediaId}/{$endpoint}/")
+            ->addParam('media_type', $mediaCode)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
