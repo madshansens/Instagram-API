@@ -205,6 +205,11 @@ class Request
         $key,
         $value)
     {
+        if ($value === true) {
+            $value = 'true';
+        } elseif ($value === false) {
+            $value = 'false';
+        }
         $this->_posts[$key] = $value;
 
         return $this;
