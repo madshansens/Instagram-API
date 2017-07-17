@@ -9,7 +9,7 @@ use InstagramAPI\ResponseTrait;
 /**
  * @method mixed getAutoLoadMoreEnabled()
  * @method Model\Item[] getItems()
- * @method mixed getMaxId()
+ * @method string getMaxId()
  * @method mixed getMoreAvailable()
  * @method string getNextMaxId()
  * @method mixed getNumResults()
@@ -21,7 +21,7 @@ use InstagramAPI\ResponseTrait;
  * @method bool isNumResults()
  * @method setAutoLoadMoreEnabled(mixed $value)
  * @method setItems(Model\Item[] $value)
- * @method setMaxId(mixed $value)
+ * @method setMaxId(string $value)
  * @method setMoreAvailable(mixed $value)
  * @method setNextMaxId(string $value)
  * @method setNumResults(mixed $value)

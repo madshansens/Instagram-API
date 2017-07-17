@@ -108,6 +108,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getViewerCount()
  * @method mixed getViewerCursor()
  * @method User[] getViewers()
+ * @method mixed getVisibility()
  * @method bool isAdAction()
  * @method bool isAdHeaderStyle()
  * @method bool isAdLinkType()
@@ -211,6 +212,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isViewerCount()
  * @method bool isViewerCursor()
  * @method bool isViewers()
+ * @method bool isVisibility()
  * @method setAdAction(mixed $value)
  * @method setAdHeaderStyle(mixed $value)
  * @method setAdLinkType(mixed $value)
@@ -313,6 +315,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setViewerCount(mixed $value)
  * @method setViewerCursor(mixed $value)
  * @method setViewers(User[] $value)
+ * @method setVisibility(mixed $value)
  */
 class Item extends AutoPropertyHandler
 {
@@ -320,7 +323,6 @@ class Item extends AutoPropertyHandler
     const VIDEO = 2;
     const ALBUM = 8;
 
-    public $taken_at;
     /**
      * @var string
      */
@@ -329,9 +331,11 @@ class Item extends AutoPropertyHandler
      * @var string
      */
     public $id;
-    public $device_timestamp;
     public $media_type;
     public $code;
+    public $visibility;
+    public $taken_at;
+    public $device_timestamp;
     public $client_cache_key;
     public $filter_type;
     /**
