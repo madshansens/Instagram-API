@@ -119,4 +119,24 @@ class Usertag extends RequestCollection
     {
         return $this->getUserFeed($this->ig->account_id);
     }
+
+    /**
+     * Choose how photos you are tagged in will be added to your profile.
+     *
+     * @param bool $enable TRUE to manually accept photos, or FALSE to accept automatically.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ReviewPreferenceResponse
+     */
+    public function setReviewPreference(
+     $enabled)
+    {
+     return $this->ig->request('usertags/review_preference/')
+         ->addPost('_uuid', $this->ig->uuid)
+         ->addPost('_uid', $this->ig->account_id)
+         ->addPost('_csrftoken', $this->ig->client->getToken())
+         ->addPost('enabled', (int) $enabled)
+         ->getResponse(new Response\ReviewPreferenceResponse());
+    }
 }
