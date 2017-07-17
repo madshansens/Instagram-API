@@ -302,7 +302,7 @@ class Timeline extends RequestCollection
     }
 
     /**
-     * Get archived media feed.
+     * Get your archived timeline media feed.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -320,10 +320,11 @@ class Timeline extends RequestCollection
      * Marking media as "archived" will hide it from everyone except yourself.
      * You can unmark the media again at any time, to make it public again.
      *
-     * @param string $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string $mediaType Media type ("photo", "album" or "video").
-     * @param bool   $onlyMe    If true, archives your media so that it's only visible to you.
-     *                          Otherwise, if false, makes the media public to everyone again.
+     * @param string     $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string|int $mediaType The type of the media item you are deleting. One of: "PHOTO", "VIDEO"
+     *                              "ALBUM", or the raw value of the Item's "getMediaType()" function.
+     * @param bool       $onlyMe    If true, archives your media so that it's only visible to you.
+     *                              Otherwise, if false, makes the media public to everyone again.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -332,23 +333,25 @@ class Timeline extends RequestCollection
      */
     public function archiveMedia(
         $mediaId,
-        $mediaType,
-        $onlyMe)
+        $mediaType = 'PHOTO',
+        $onlyMe = true)
     {
+        $mediaType = Utils::checkMediaType($mediaType);
+
         $endpoint = $onlyMe ? 'only_me' : 'undo_only_me';
         switch ($mediaType) {
-            case 'photo':
-                $mediaCode = 1;
-                break;
-            case 'video':
-                $mediaCode = 2;
-                break;
-            case 'album':
-                $mediaCode = 8;
-                break;
-            default:
-                throw new \InvalidArgumentException('You must provide a valid media type.');
-                break;
+        case 'PHOTO':
+            $mediaCode = 1;
+            break;
+        case 'VIDEO':
+            $mediaCode = 2;
+            break;
+        case 'ALBUM':
+            $mediaCode = 8;
+            break;
+        default:
+            throw new \InvalidArgumentException(sprintf('Unknown media type (%s).', $mediaType));
+            break;
         }
 
         return $this->ig->request("media/{$mediaId}/{$endpoint}/?media_type={$mediaCode}")
