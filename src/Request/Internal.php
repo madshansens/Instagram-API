@@ -494,7 +494,7 @@ class Internal extends RequestCollection
 
         // Available external metadata parameters:
         /** @var string|null Caption to use for the media. */
-        $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : null;
+        $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : '';
         /** @var string[]|null Array of numerical UserPK IDs of people tagged in
          * your video. ONLY USED IN STORY VIDEOS! TODO: Actually, it's not even
          * implemented for stories. */
@@ -514,14 +514,13 @@ class Internal extends RequestCollection
         // Build the request...
         $request = $this->ig->request($endpoint)
             ->addParam('video', 1)
-            ->addPost('video_result', 'deprecated')
+            ->addPost('video_result', '')
             ->addPost('upload_id', $uploadId)
             ->addPost('poster_frame_index', 0)
             ->addPost('length', round($videoDetails->getDuration(), 1))
             ->addPost('audio_muted', false)
             ->addPost('filter_type', 0)
             ->addPost('source_type', 4)
-            ->addPost('video_result', 'deprecated')
             ->addPost('device',
                 [
                     'manufacturer'      => $this->ig->device->getManufacturer(),
