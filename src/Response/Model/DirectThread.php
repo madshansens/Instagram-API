@@ -10,6 +10,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getHasNewer()
  * @method mixed getHasOlder()
  * @method \InstagramAPI\Response\Model\User getInviter()
+ * @method mixed getIsPin()
  * @method mixed getIsSpam()
  * @method \InstagramAPI\Response\Model\DirectThreadItem[] getItems()
  * @method mixed getLastActivityAt()
@@ -33,6 +34,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isHasNewer()
  * @method bool isHasOlder()
  * @method bool isInviter()
+ * @method bool isIsPin()
  * @method bool isIsSpam()
  * @method bool isItems()
  * @method bool isLastActivityAt()
@@ -56,6 +58,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setHasNewer(mixed $value)
  * @method setHasOlder(mixed $value)
  * @method setInviter(\InstagramAPI\Response\Model\User $value)
+ * @method setIsPin(mixed $value)
  * @method setIsSpam(mixed $value)
  * @method setItems(\InstagramAPI\Response\Model\DirectThreadItem[] $value)
  * @method setLastActivityAt(mixed $value)
@@ -131,4 +134,5 @@ class DirectThread extends AutoPropertyHandler
      * @var \InstagramAPI\Response\Model\PermanentItem
      */
     public $last_permanent_item;
+    public $is_pin;
 }
