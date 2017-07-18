@@ -532,10 +532,24 @@ class ImageAutoResizer
 
         // Check aspect ratio and crop/expand to fit requirements if needed.
         if ($this->_minAspectRatio !== null && $this->_aspectRatio < $this->_minAspectRatio) {
+            $aspectRatio = $this->_minAspectRatio;
             if ($this->_operation === self::CROP) {
                 // We need to limit the height, so floor is used intentionally to
                 // AVOID rounding height upwards to a still-illegal aspect ratio.
                 $height = floor($this->_width / $this->_minAspectRatio);
+
+                // Crop vertical images from top by default, to keep faces, etc.
+                $cropFocus = $this->_cropFocus !== null ? $this->_cropFocus : -50;
+
+                // Apply fix for flipped images.
+                if ($this->_isVerFlipped) {
+                    $cropFocus = -$cropFocus;
+                }
+
+                // Calculate difference and divide it by cropFocus.
+                $diff = $this->_height - $height;
+                $y1 = round($diff * (50 + $cropFocus) / 100);
+                $y2 = $y2 - ($diff - $y1);
             } elseif ($this->_operation === self::EXPAND) {
                 // We need to expand the width with left/right borders. We use
                 // ceil to guarantee that the final image is wide enough to be
@@ -546,25 +560,25 @@ class ImageAutoResizer
                 // 758x600 expanded image (ratio 1.2633). That's unavoidable.
                 $width = ceil($this->_height * $this->_minAspectRatio);
             }
-            $aspectRatio = $this->_minAspectRatio;
-
-            // Crop vertical images from top by default, to keep faces, etc.
-            $cropFocus = $this->_cropFocus !== null ? $this->_cropFocus : -50;
-
-            // Apply fix for flipped images.
-            if ($this->_isVerFlipped) {
-                $cropFocus = -$cropFocus;
-            }
-
-            // Calculate difference and divide it by cropFocus.
-            $diff = $this->_height - $height;
-            $y1 = round($diff * (50 + $cropFocus) / 100);
-            $y2 = $y2 - ($diff - $y1);
         } elseif ($this->_maxAspectRatio !== null && $this->_aspectRatio > $this->_maxAspectRatio) {
+            $aspectRatio = $this->_maxAspectRatio;
             if ($this->_operation === self::CROP) {
                 // We need to limit the width. We use floor to guarantee cutting
                 // enough pixels, since our width exceeds the maximum allowed ratio.
                 $width = floor($this->_height * $this->_maxAspectRatio);
+
+                // Crop horizontal images from center by default.
+                $cropFocus = $this->_cropFocus !== null ? $this->_cropFocus : 0;
+
+                // Apply fix for flipped images.
+                if ($this->_isHorFlipped) {
+                    $cropFocus = -$cropFocus;
+                }
+
+                // Calculate difference and divide it by cropFocus.
+                $diff = $this->_width - $width;
+                $x1 = round($diff * (50 + $cropFocus) / 100);
+                $x2 = $x2 - ($diff - $x1);
             } elseif ($this->_operation === self::EXPAND) {
                 // We need to expand the height with top/bottom borders. We use
                 // ceil to guarantee that the final image is tall enough to be
@@ -575,20 +589,6 @@ class ImageAutoResizer
                 // 600x696 expanded image (ratio 0.86206). That's unavoidable.
                 $height = ceil($this->_width / $this->_maxAspectRatio);
             }
-            $aspectRatio = $this->_maxAspectRatio;
-
-            // Crop horizontal images from center by default.
-            $cropFocus = $this->_cropFocus !== null ? $this->_cropFocus : 0;
-
-            // Apply fix for flipped images.
-            if ($this->_isHorFlipped) {
-                $cropFocus = -$cropFocus;
-            }
-
-            // Calculate difference and divide it by cropFocus.
-            $diff = $this->_width - $width;
-            $x1 = round($diff * (50 + $cropFocus) / 100);
-            $x2 = $x2 - ($diff - $x1);
         } else {
             // The image's aspect ratio is already within the legal range.
             $aspectRatio = $this->_aspectRatio;
