@@ -514,7 +514,7 @@ class Internal extends RequestCollection
         // Build the request...
         $request = $this->ig->request($endpoint)
             ->addParam('video', 1)
-            ->addPost('video_result', '')
+            ->addPost('video_result', $internalMetadata->getVideoUploadResponse() !== null ? (string) $internalMetadata->getVideoUploadResponse()->getResult() : '')
             ->addPost('upload_id', $uploadId)
             ->addPost('poster_frame_index', 0)
             ->addPost('length', round($videoDetails->getDuration(), 1))
