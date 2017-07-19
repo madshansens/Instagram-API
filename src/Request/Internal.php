@@ -172,8 +172,8 @@ class Internal extends RequestCollection
         }
 
         // Available external metadata parameters:
-        /** @var string|null Caption to use for the media. NOT USED FOR STORY MEDIA! */
-        $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : null;
+        /** @var string Caption to use for the media. NOT USED FOR STORY MEDIA! */
+        $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : '';
         /** @var Response\Model\Location|null A Location object describing where
          the media was taken. NOT USED FOR STORY MEDIA! */
         $location = (isset($externalMetadata['location']) && $targetFeed != 'story') ? $externalMetadata['location'] : null;
@@ -493,7 +493,7 @@ class Internal extends RequestCollection
         }
 
         // Available external metadata parameters:
-        /** @var string|null Caption to use for the media. */
+        /** @var string Caption to use for the media. */
         $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : '';
         /** @var string[]|null Array of numerical UserPK IDs of people tagged in
          * your video. ONLY USED IN STORY VIDEOS! TODO: Actually, it's not even
@@ -626,8 +626,8 @@ class Internal extends RequestCollection
         $albumUploadId = $internalMetadata->getUploadId();
 
         // Available external metadata parameters:
-        /** @var string|null Caption to use for the album. */
-        $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : null;
+        /** @var string Caption to use for the album. */
+        $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : '';
         /** @var Response\Model\Location|null A Location object describing where
          the album was taken. */
         $location = isset($externalMetadata['location']) ? $externalMetadata['location'] : null;
