@@ -50,6 +50,13 @@ class Request
     protected $_posts;
 
     /**
+     * An array of POST params keys to exclude from signed body.
+     *
+     * @var string[]
+     */
+    protected $_excludeSigned;
+
+    /**
      * Raw request body.
      *
      * @var StreamInterface
@@ -139,6 +146,7 @@ class Request
         $this->_guzzleOptions = [];
         $this->_needsAuth = true;
         $this->_signedPost = true;
+        $this->_excludeSigned = [];
         $this->_defaultHeaders = true;
     }
 
@@ -211,6 +219,27 @@ class Request
             $value = 'false';
         }
         $this->_posts[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Add unsigned POST param to request, overwriting any previous value.
+     *
+     * This adds a POST value and marks it as "never sign it", even if this
+     * is a signed request. Instagram sometimes needs a few unsigned values.
+     *
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return self
+     */
+    public function addUnsignedPost(
+        $key,
+        $value)
+    {
+        $this->addPost($key, $value);
+        $this->_excludeSigned[] = $key;
 
         return $this;
     }
@@ -524,7 +553,7 @@ class Request
         }
         // Sign POST data if needed.
         if ($this->_signedPost) {
-            $this->_posts = Signatures::signData($this->_posts);
+            $this->_posts = Signatures::signData($this->_posts, $this->_excludeSigned);
         }
         // Switch between multipart (at least one file) or urlencoded body.
         if (!count($this->_files)) {

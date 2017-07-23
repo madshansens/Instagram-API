@@ -33,13 +33,23 @@ class Signatures
     /**
      * Generate signed array.
      *
-     * @param array $data
+     * @param array    $data
+     * @param string[] $exclude
      *
      * @return array
      */
     public static function signData(
-        array $data)
+        array $data,
+        array $exclude = [])
     {
+        $result = [];
+        // Exclude some params from signed body.
+        foreach ($exclude as $key) {
+            if (isset($data[$key])) {
+                $result[$key] = $data[$key];
+                unset($data[$key]);
+            }
+        }
         // Typecast all scalar values to string.
         foreach ($data as &$value) {
             if (is_scalar($value)) {
@@ -49,11 +59,11 @@ class Signatures
         unset($value); // Clear reference.
         // Reorder and convert data to JSON string.
         $data = json_encode(Utils::reorderByHashCode($data));
+        // Sign data.
+        $result['ig_sig_key_version'] = Constants::SIG_KEY_VERSION;
+        $result['signed_body'] = self::generateSignature($data).'.'.$data;
         // Return value must be reordered.
-        return Utils::reorderByHashCode([
-            'ig_sig_key_version' => Constants::SIG_KEY_VERSION,
-            'signed_body'        => self::generateSignature($data).'.'.$data,
-        ]);
+        return Utils::reorderByHashCode($result);
     }
 
     public static function generateDeviceId()
