@@ -150,41 +150,69 @@ class Media extends RequestCollection
     /**
      * Like a media item.
      *
-     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string    $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string    $moduleName (optional) From which app module (page) you're performing this action.
+     * @param string[]  $extraData (optinal) Depending the module you have set, additional data is required.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\GenericResponse
      */
     public function like(
-        $mediaId)
+        $mediaId,
+        $module = 'feed_contextual_post',
+        array $extraData = [])
     {
-        return $this->ig->request("media/{$mediaId}/like/")
+        $request = $this->ig->request("media/{$mediaId}/like/")
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('media_id', $mediaId)
-            ->getResponse(new Response\GenericResponse());
+            ->addPost('radio_type', 'wifi-none')
+            ->addPost('module_name', $module);
+
+        if ($module == 'feed_contextual_post' && isset($extraData['exploreToken'])) {
+            $request->addPost('explore_source_token', $extraData['exploreToken']);
+        } elseif ($module == 'photo_view_profile' && isset($extraData['username']) && isset($extraData['userid'])) {
+            $request->addPost('username', $extraData['username'])
+                    ->addPost('user_id', $extraData['userid']);
+        }
+
+        return $request->getResponse(new Response\GenericResponse());
     }
 
     /**
      * Unlike a media item.
      *
-     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string    $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string    $moduleName (optional) From which app module (page) you're performing this action.
+     * @param string[]  $extraData (optinal) Depending the module you have set, additional data is required.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\GenericResponse
      */
     public function unlike(
-        $mediaId)
+        $mediaId,
+        $module = 'feed_contextual_post',
+        array $extraData = [])
     {
-        return $this->ig->request("media/{$mediaId}/unlike/")
+        $request = $this->ig->request("media/{$mediaId}/unlike/")
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('media_id', $mediaId)
-            ->getResponse(new Response\GenericResponse());
+            ->addPost('radio_type', 'wifi-none')
+            ->addPost('module_name', $module);
+
+        if ($module == 'feed_contextual_post' && isset($extraData['exploreToken'])) {
+            $request->addPost('explore_source_token', $extraData['exploreToken']);
+        } elseif ($module == 'photo_view_profile' && isset($extraData['username']) && isset($extraData['userid'])) {
+            $request->addPost('username', $extraData['username'])
+                    ->addPost('user_id', $extraData['userid']);
+        }
+
+        return $request->getResponse(new Response\GenericResponse());
     }
 
     /**
