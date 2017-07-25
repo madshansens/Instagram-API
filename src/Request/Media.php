@@ -150,9 +150,9 @@ class Media extends RequestCollection
     /**
      * Like a media item.
      *
-     * @param string   $mediaId    The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string   $moduleName (optional) From which app module (page) you're performing this action.
-     * @param string[] $extraData  (optinal) Depending the module you have set, additional data is required.
+     * @param string $mediaId    The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string $moduleName (optional) From which app module (page) you're performing this action.
+     * @param array  $extraData  (optional) Depending on the module name, additional data is required.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -184,9 +184,9 @@ class Media extends RequestCollection
     /**
      * Unlike a media item.
      *
-     * @param string   $mediaId    The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string   $moduleName (optional) From which app module (page) you're performing this action.
-     * @param string[] $extraData  (optinal) Depending the module you have set, additional data is required.
+     * @param string $mediaId    The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string $moduleName (optional) From which app module (page) you're performing this action.
+     * @param array  $extraData  (optional) Depending on the module name, additional data is required.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
