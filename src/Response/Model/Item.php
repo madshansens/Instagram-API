@@ -52,6 +52,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getImpressionToken()
  * @method Injected getInjected()
  * @method mixed getIsDashEligible()
+ * @method mixed getIsNewSuggestion()
  * @method mixed getIsReelMedia()
  * @method mixed getIsSidecarChild()
  * @method mixed getLargeUrls()
@@ -156,6 +157,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isImpressionToken()
  * @method bool isInjected()
  * @method bool isIsDashEligible()
+ * @method bool isIsNewSuggestion()
  * @method bool isIsReelMedia()
  * @method bool isIsSidecarChild()
  * @method bool isLargeUrls()
@@ -260,6 +262,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setImpressionToken(mixed $value)
  * @method setInjected(Injected $value)
  * @method setIsDashEligible(mixed $value)
+ * @method setIsNewSuggestion(mixed $value)
  * @method setIsReelMedia(mixed $value)
  * @method setIsSidecarChild(mixed $value)
  * @method setLargeUrls(mixed $value)
@@ -435,6 +438,7 @@ class Item extends AutoPropertyHandler
      * @var SuggestedUsers
      */
     public $suggested_users;
+    public $is_new_suggestion;
     public $comment_likes_enabled;
     public $can_viewer_save;
     public $has_viewer_saved;
