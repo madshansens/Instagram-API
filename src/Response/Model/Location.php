@@ -22,6 +22,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getProfilePicUsername()
  * @method mixed getShortName()
  * @method mixed getStartTime()
+ * @method mixed getTimeGranularity()
  * @method mixed getType()
  * @method bool isAddress()
  * @method bool isCity()
@@ -40,6 +41,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isProfilePicUsername()
  * @method bool isShortName()
  * @method bool isStartTime()
+ * @method bool isTimeGranularity()
  * @method bool isType()
  * @method setAddress(mixed $value)
  * @method setCity(mixed $value)
@@ -58,6 +60,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setProfilePicUsername(mixed $value)
  * @method setShortName(mixed $value)
  * @method setStartTime(mixed $value)
+ * @method setTimeGranularity(mixed $value)
  * @method setType(mixed $value)
  */
 class Location extends AutoPropertyHandler
@@ -104,4 +107,5 @@ class Location extends AutoPropertyHandler
     public $type;
     public $profile_pic_url;
     public $profile_pic_username;
+    public $time_granularity;
 }
