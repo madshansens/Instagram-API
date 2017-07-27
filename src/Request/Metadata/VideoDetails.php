@@ -23,6 +23,7 @@ class VideoDetails extends MediaDetails
      */
     public function getDurationInMsec()
     {
+        // NOTE: ceil() is to round up and get rid of any MS decimals.
         return (int) ceil($this->getDuration() * 1000);
     }
 

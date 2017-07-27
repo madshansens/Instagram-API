@@ -408,13 +408,6 @@ class Utils
                     $mediaFilename, $width
                 ));
             }
-
-            // TODO: Support for landscape/portrait photos and videos in
-            // Instagram Direct is coming soon to Android:
-            // http://blog.instagram.com/post/161060792262/
-            if ($targetFeed == 'direct_v2' && $width != $height) {
-                throw new \InvalidArgumentException('Instagram Direct only accepts square videos.');
-            }
         }
 
         // Check Aspect Ratio.

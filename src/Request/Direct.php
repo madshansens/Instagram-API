@@ -577,7 +577,7 @@ class Direct extends RequestCollection
      *                              To start a new thread, provide "users" as an array
      *                              of numerical UserPK IDs. To use an existing thread
      *                              instead, provide "thread" with the thread ID.
-     * @param string $videoFilename The video filename. Video MUST be square.
+     * @param string $videoFilename The video filename.
      * @param array  $options       An associative array of optional parameters, including:
      *                              "client_context" - predefined UUID used to prevent double-posting.
      *

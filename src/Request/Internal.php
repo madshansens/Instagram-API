@@ -307,35 +307,7 @@ class Internal extends RequestCollection
             $internalMetadata->setVideoDetails($targetFeed, $videoFilename);
         }
 
-        switch ($targetFeed) {
-            case 'album':
-                $useResumableUploader = false;
-                break;
-            case 'timeline':
-                $useResumableUploader = $this->ig->isExperimentEnabled(
-                    'ig_android_upload_reliability_universe',
-                    'is_enabled_fbupload_followers_share');
-                break;
-            case 'direct_v2':
-                $useResumableUploader = $this->ig->isExperimentEnabled(
-                    'ig_android_upload_reliability_universe',
-                    'is_enabled_fbupload_direct_share');
-                break;
-            case 'story':
-                $useResumableUploader = $this->ig->isExperimentEnabled(
-                    'ig_android_upload_reliability_universe',
-                    'is_enabled_fbupload_reel_share');
-                break;
-            case 'direct_story':
-                $useResumableUploader = $this->ig->isExperimentEnabled(
-                    'ig_android_upload_reliability_universe',
-                    'is_enabled_fbupload_story_share');
-                break;
-            default:
-                $useResumableUploader = false;
-        }
-
-        if ($useResumableUploader) {
+        if ($this->useResumableUploader($targetFeed, $internalMetadata)) {
             $this->_uploadResumableVideo($targetFeed, $internalMetadata);
         } else {
             // Request parameters for uploading a new video.
@@ -412,40 +384,11 @@ class Internal extends RequestCollection
     {
         $request = $this->ig->request('upload/video/')
             ->setSignedPost(false)
-            ->addPost('upload_id', $internalMetadata->getUploadId())
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('_uuid', $this->ig->uuid);
 
-        // Critically important internal library-generated metadata parameters:
-        if ($targetFeed == 'album') {
-            // NOTE: NO INTERNAL DATA IS NEEDED HERE YET.
-            $request->addPost('is_sidecar', 1);
-        } else {
-            // Get all of the INTERNAL metadata needed for non-album videos.
-            $videoDetails = $internalMetadata->getVideoDetails();
-            $request
-                ->addPost('media_type', '2')
-                // NOTE: ceil() is to round up and get rid of any MS decimals.
-                ->addPost('upload_media_duration_ms', $videoDetails->getDurationInMsec())
-                ->addPost('upload_media_width', $videoDetails->getWidth())
-                ->addPost('upload_media_height', $videoDetails->getHeight());
-
-            if ($targetFeed === 'direct_v2') {
-                $cropX = mt_rand(0, 128);
-                $cropY = mt_rand(0, 128);
-                $request
-                    ->addPost('upload_media_width', '0')
-                    ->addPost('upload_media_height', '0')
-                    ->addPost('direct_v2', '1')
-                    ->addPost('hflip', 'false')
-                    ->addPost('rotate', '0')
-                    ->addPost('crop_rect', json_encode([
-                        $cropX,
-                        $cropY,
-                        $cropX + $videoDetails->getWidth(),
-                        $cropY + $videoDetails->getHeight(),
-                    ]));
-            }
+        foreach ($this->getVideoUploadParams($targetFeed, $internalMetadata) as $key => $value) {
+            $request->addPost($key, $value);
         }
 
         // Perform the "pre-upload" API request.
@@ -1365,28 +1308,17 @@ class Internal extends RequestCollection
             $rurCookie->getValue()
         );
 
-        $videoDetails = $internalMetadata->getVideoDetails();
-        $uploadParams = [
-            'upload_media_height'      => (string) $videoDetails->getHeight(),
-            'upload_media_width'       => (string) $videoDetails->getWidth(),
-            'upload_media_duration_ms' => (string) $videoDetails->getDurationInMsec(),
-            'upload_id'                => (string) $internalMetadata->getUploadId(),
-            'media_type'               => (string) Response\Model\Item::VIDEO,
-        ];
-        if ($targetFeed === 'direct_v2') {
-            $uploadParams['direct_v2'] = '1';
-            $uploadParams['rotate'] = '0';
-            $uploadParams['hflip'] = 'false';
-        }
+        $uploadParams = $this->getVideoUploadParams($targetFeed, $internalMetadata);
         $uploadParams = Utils::reorderByHashCode($uploadParams);
 
         $offsetTemplate = new Request($this->ig, $endpoint);
         $offsetTemplate
             ->setAddDefaultHeaders(false)
-            // TODO Store waterfall ID in internalMetadata?
+            // TODO: Store waterfall ID in internalMetadata?
             ->addHeader('X_FB_VIDEO_WATERFALL_ID', Signatures::generateUUID(true))
             ->addHeader('X-Instagram-Rupload-Params', json_encode($uploadParams));
 
+        $videoDetails = $internalMetadata->getVideoDetails();
         $length = $videoDetails->getFilesize();
         $uploadTemplate = clone $offsetTemplate;
         $uploadTemplate
@@ -1454,5 +1386,95 @@ class Internal extends RequestCollection
             'Upload of \"%s\" failed.',
             $videoFilename
         ));
+    }
+
+    /**
+     * Determine whether to use resumable uploader based on target feed and internal metadata.
+     *
+     * @param string           $targetFeed       Target feed for this media ("timeline", "story", "direct_story", "album" or "direct_v2").
+     * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
+     *
+     * @return bool
+     */
+    public function useResumableUploader(
+        $targetFeed,
+        InternalMetadata $internalMetadata)
+    {
+        // TODO: use $internalMetadata object for additional checks.
+        switch ($targetFeed) {
+            case 'album':
+                $result = false;
+                break;
+            case 'timeline':
+                $result = $this->ig->isExperimentEnabled(
+                    'ig_android_upload_reliability_universe',
+                    'is_enabled_fbupload_followers_share');
+                break;
+            case 'direct_v2':
+                $result = $this->ig->isExperimentEnabled(
+                    'ig_android_upload_reliability_universe',
+                    'is_enabled_fbupload_direct_share');
+                break;
+            case 'story':
+                $result = $this->ig->isExperimentEnabled(
+                    'ig_android_upload_reliability_universe',
+                    'is_enabled_fbupload_reel_share');
+                break;
+            case 'direct_story':
+                $result = $this->ig->isExperimentEnabled(
+                    'ig_android_upload_reliability_universe',
+                    'is_enabled_fbupload_story_share');
+                break;
+            default:
+                $result = false;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get params for upload job.
+     *
+     * @param string           $targetFeed       Target feed for this media ("timeline", "story", "direct_story", "album" or "direct_v2").
+     * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
+     *
+     * @return array
+     */
+    public function getVideoUploadParams(
+        $targetFeed,
+        InternalMetadata $internalMetadata)
+    {
+        $videoDetails = $internalMetadata->getVideoDetails();
+        if ($videoDetails === null) {
+            throw new \InvalidArgumentException('Video details are missing from internal metadata.');
+        }
+        // Common params.
+        $result = [
+            'upload_id'                => (string) $internalMetadata->getUploadId(),
+            'upload_media_height'      => (string) $videoDetails->getHeight(),
+            'upload_media_width'       => (string) $videoDetails->getWidth(),
+            'upload_media_duration_ms' => (string) $videoDetails->getDurationInMsec(),
+            'media_type'               => (string) Response\Model\Item::VIDEO,
+        ];
+        // Target feed's specific params.
+        switch ($targetFeed) {
+            case 'album':
+                $result['is_sidecar'] = '1';
+                break;
+            case 'direct_v2':
+                $result['direct_v2'] = '1';
+                $result['rotate'] = '0';
+                $result['hflip'] = 'false';
+                break;
+            case 'story':
+                $result['for_album'] = '1';
+                break;
+            case 'direct_story':
+                $result['for_direct_story'] = '1';
+                break;
+            default:
+        }
+
+        return $result;
     }
 }
