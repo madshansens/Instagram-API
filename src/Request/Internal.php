@@ -307,7 +307,7 @@ class Internal extends RequestCollection
             $internalMetadata->setVideoDetails($targetFeed, $videoFilename);
         }
 
-        if ($this->useResumableUploader($targetFeed, $internalMetadata)) {
+        if ($this->_useResumableUploader($targetFeed, $internalMetadata)) {
             $this->_uploadResumableVideo($targetFeed, $internalMetadata);
         } else {
             // Request parameters for uploading a new video.
@@ -387,7 +387,7 @@ class Internal extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('_uuid', $this->ig->uuid);
 
-        foreach ($this->getVideoUploadParams($targetFeed, $internalMetadata) as $key => $value) {
+        foreach ($this->_getVideoUploadParams($targetFeed, $internalMetadata) as $key => $value) {
             $request->addPost($key, $value);
         }
 
@@ -1308,7 +1308,7 @@ class Internal extends RequestCollection
             $rurCookie->getValue()
         );
 
-        $uploadParams = $this->getVideoUploadParams($targetFeed, $internalMetadata);
+        $uploadParams = $this->_getVideoUploadParams($targetFeed, $internalMetadata);
         $uploadParams = Utils::reorderByHashCode($uploadParams);
 
         $offsetTemplate = new Request($this->ig, $endpoint);
@@ -1396,7 +1396,7 @@ class Internal extends RequestCollection
      *
      * @return bool
      */
-    public function useResumableUploader(
+    protected function _useResumableUploader(
         $targetFeed,
         InternalMetadata $internalMetadata)
     {
@@ -1440,7 +1440,7 @@ class Internal extends RequestCollection
      *
      * @return array
      */
-    public function getVideoUploadParams(
+    protected function _getVideoUploadParams(
         $targetFeed,
         InternalMetadata $internalMetadata)
     {
