@@ -199,7 +199,7 @@ final class Internal
     {
         if (isset($recipients['users'])) {
             $this->_directUsers = $recipients['users'];
-            $this->_directThreads = '["0"]';
+            $this->_directThreads = '[]';
         } elseif (isset($recipients['thread'])) {
             $this->_directUsers = '[]';
             $this->_directThreads = $recipients['thread'];
