@@ -1,6 +1,12 @@
 <?php
 
 return PhpCsFixer\Config::create()
+    ->setFinder(
+        PhpCsFixer\Finder::create()
+        ->in(__DIR__)
+    )
+    ->setIndent('    ')
+    ->setLineEnding("\n")
     ->setRules([
         '@Symfony'                            => true,
         // Override @Symfony rules
@@ -18,8 +24,4 @@ return PhpCsFixer\Config::create()
         'ordered_imports'                     => true,
         'phpdoc_order'                        => true,
         'array_syntax'                        => ['syntax' => 'short'],
-    ])
-    ->setFinder(
-        PhpCsFixer\Finder::create()
-            ->in(__DIR__)
-    );
+    ]);
