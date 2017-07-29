@@ -87,6 +87,7 @@ class styleChecker
     {
         $hasProblems = false;
         $hasVisibilityProblems = false;
+        $fileName = basename($filePath);
         $inputLines = @file($filePath);
         $outputLines = [];
 
@@ -119,6 +120,13 @@ class styleChecker
                 $visibility = &$matches[1]; // public, private, protected
                 $type = &$matches[2]; // $, function
                 $name = &$matches[3]; // Member name
+
+                // Ignore the intentionally "public $_messages;" property in our
+                // Response trait to skip the annoying warning. We can't rename
+                // that variable since it comes from Instagram's server.
+                if ($fileName == 'ResponseTrait.php' && $visibility == 'public' && $type == '$' && $name == '_messages') {
+                    continue;
+                }
 
                 if ($visibility == 'public') {
                     if ($name[0] == '_' && (
