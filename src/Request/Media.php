@@ -171,6 +171,12 @@ class Media extends RequestCollection
             ->addPost('radio_type', 'wifi-none')
             ->addPost('module_name', $module);
 
+        if (isset($extraData['doubleTap'])) {
+            $request->addUnsignedPost('d', 1);
+        } else {
+            $request->addUnsignedPost('d', 0);
+        }
+
         if ($module == 'feed_contextual_post' && isset($extraData['exploreToken'])) {
             $request->addPost('explore_source_token', $extraData['exploreToken']);
         } elseif ($module == 'photo_view_profile' && isset($extraData['username']) && isset($extraData['userid'])) {
@@ -203,7 +209,8 @@ class Media extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('media_id', $mediaId)
             ->addPost('radio_type', 'wifi-none')
-            ->addPost('module_name', $module);
+            ->addPost('module_name', $module)
+            ->addUnsignedPost('d', 0);
 
         if ($module == 'feed_contextual_post' && isset($extraData['exploreToken'])) {
             $request->addPost('explore_source_token', $extraData['exploreToken']);
