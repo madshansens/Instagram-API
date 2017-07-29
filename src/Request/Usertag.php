@@ -123,7 +123,7 @@ class Usertag extends RequestCollection
     /**
      * Choose how photos you are tagged in will be added to your profile.
      *
-     * @param bool $enable TRUE to manually accept photos, or FALSE to accept automatically.
+     * @param bool $enabled TRUE to manually accept photos, or FALSE to accept automatically.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *

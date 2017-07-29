@@ -53,6 +53,14 @@
         "ext-event": "Installing PHP's native Event extension enables faster Realtime class event handling."
     },
     "require-dev": {
-        "react/http": "^0.7.2"
+        "react/http": "^0.7.2",
+        "friendsofphp/php-cs-fixer": "^2.4"
+    },
+    "scripts": {
+        "codestyle": [
+            "php devtools/generateAutoPropertyHandlerDocs.php",
+            "php-cs-fixer fix --config=.php_cs",
+            "php devtools/checkStyle.php x"
+        ]
     }
 }

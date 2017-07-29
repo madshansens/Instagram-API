@@ -290,8 +290,8 @@ class Instagram
      *
      * @see http://php.net/curl_setopt CURLOPT_INTERFACE
      *
-     * @var string|null Interface name, IP address or hostname, or NULL to
-     *                  disable override and let Guzzle use any interface.
+     * @param string|null $value Interface name, IP address or hostname, or NULL to
+     *                           disable override and let Guzzle use any interface.
      */
     public function setOutputInterface(
         $value)
