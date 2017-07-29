@@ -400,7 +400,8 @@ class Request
      *
      * @return self
      */
-    public function setBody(StreamInterface $stream)
+    public function setBody(
+        StreamInterface $stream)
     {
         $this->_body = $stream;
 

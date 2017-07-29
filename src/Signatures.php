@@ -81,7 +81,8 @@ class Signatures
      *
      * @return bool
      */
-    public static function isValidUUID($uuid)
+    public static function isValidUUID(
+        $uuid)
     {
         if (!is_string($uuid)) {
             return false;
