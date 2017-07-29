@@ -153,8 +153,13 @@ foreach ($testDevices as $thisDevice) {
 
 /**
  * Changes the user-agent sent by the InstagramAPI library.
+ *
+ * @param \InstagramAPI\Instagram $ig
+ * @param Device|string           $value
  */
-function switchDevice($ig, $value)
+function switchDevice(
+    $ig,
+    $value)
 {
     // Create the new Device object, without automatic fallbacks.
     $device = ($value instanceof Device ? $value : new Device(Constants::IG_VERSION, Constants::USER_AGENT_LOCALE, $value, false));
@@ -187,8 +192,13 @@ function switchDevice($ig, $value)
  * they will RESIZE them to no more than 640 pixels WIDE. Perhaps they will
  * someday allow 1080-width playback, in which case we will have to test and
  * revise all device identifiers again to make sure they all see the best URLs.
+ *
+ * @param \InstagramAPI\Instagram $ig
+ * @param string                  $userPk
  */
-function buildVideoList($ig, $userPk)
+function buildVideoList(
+    $ig,
+    $userPk)
 {
     // We must use a good device to get answers when scanning for HD videos.
     switchDevice($ig, GoodDevices::getRandomGoodDevice());
