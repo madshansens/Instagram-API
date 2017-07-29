@@ -209,13 +209,8 @@ class Media extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('media_id', $mediaId)
             ->addPost('radio_type', 'wifi-none')
-            ->addPost('module_name', $module);
-
-        if (isset($extraData['doubleTap']) && $extraData['doubleTap']) {
-            $request->addUnsignedPost('d', 1);
-        } else {
-            $request->addUnsignedPost('d', 0);
-        }
+            ->addPost('module_name', $module)
+            ->addUnsignedPost('d', 0); // IG doesn't have "double-tap to unlike".
 
         if ($module == 'feed_contextual_post' && isset($extraData['exploreToken'])) {
             $request->addPost('explore_source_token', $extraData['exploreToken']);
