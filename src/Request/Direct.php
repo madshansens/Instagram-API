@@ -1165,7 +1165,7 @@ class Direct extends RequestCollection
             ->addPost('action', 'send_item')
             ->addPost('client_context', $options['client_context'])
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_uuid', $this->ig->uuid)
             ->getResponse(new Response\DirectSendItemResponse());
     }
 
