@@ -57,6 +57,8 @@ class MediaAutoResizer
     /**
      * Maximum allowed image width.
      *
+     * This value is the same for both stories and general media.
+     *
      * These are decided by Instagram. Not by us!
      *
      * @var int
@@ -68,12 +70,39 @@ class MediaAutoResizer
     /**
      * Maximum allowed image height.
      *
-     * This is derived from 1080 / 0.8 (tallest portrait aspect allowed).
-     * Instagram enforces the width & aspect. Height is auto-derived from that.
+     * This value is only for general media (not story media). It is derived
+     * from 1080 / 0.8 (tallest portrait aspect allowed). Instagram enforces the
+     * width & aspect. Height is auto-derived from that.
      *
      * @var int
      */
     const MAX_HEIGHT = 1350;
+
+    /**
+     * Lowest allowed story aspect ratio.
+     *
+     * This range was decided through community research, which revealed that
+     * all Instagram stories are in ~9:16 (0.5625, widescreen portrait) ratio,
+     * with a small range of similar portrait ratios also being used sometimes.
+     *
+     * We have selected a photo/video story aspect range which supports all
+     * story media aspects in common use by the official app: 0.56 - 0.67.
+     * (That's ~1080x1611 to ~1080x1928.)
+     *
+     * @var float
+     *
+     * @see https://github.com/mgp25/Instagram-API/issues/1420#issuecomment-318146010
+     */
+    const MIN_STORY_RATIO = 0.56;
+
+    /**
+     * Highest allowed story aspect ratio.
+     *
+     * This range was decided through community research.
+     *
+     * @var float
+     */
+    const MAX_STORY_RATIO = 0.67;
 
     /**
      * Output JPEG quality.
