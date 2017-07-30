@@ -38,7 +38,11 @@ $styleChecker = new styleChecker(
     ],
     $onlyShowInvalidFiles
 );
-$styleChecker->run();
+$badFiles = $styleChecker->run();
+if (count($badFiles) > 0) {
+    // Exit with non-zero code to signal that there are problems.
+    exit(1);
+}
 
 class styleChecker
 {
@@ -81,6 +85,8 @@ class styleChecker
      * Process single file.
      *
      * @param string $filePath
+     *
+     * @return bool TRUE if the file has codestyle problems, otherwise FALSE.
      */
     private function _processFile(
         $filePath)
@@ -162,21 +168,31 @@ class styleChecker
         } else {
             echo "- {$filePath}: Had member visibility problems.\n";
         }
+
+        return $hasProblems;
     }
 
     /**
      * Process all *.php files in given path.
+     *
+     * @return string[] An array with all files that have codestyle problems.
      */
     public function run()
     {
+        $filesWithProblems = [];
         foreach ($this->_inspectFolders as $inspectFolder) {
             $directoryIterator = new RecursiveDirectoryIterator($this->_baseDir.'/'.$inspectFolder);
             $recursiveIterator = new RecursiveIteratorIterator($directoryIterator);
             $phpIterator = new RegexIterator($recursiveIterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
 
             foreach ($phpIterator as $filePath => $dummy) {
-                $this->_processFile($filePath);
+                $hasProblems = $this->_processFile($filePath);
+                if ($hasProblems) {
+                    $filesWithProblems[] = $filePath;
+                }
             }
         }
+
+        return $filesWithProblems;
     }
 }
