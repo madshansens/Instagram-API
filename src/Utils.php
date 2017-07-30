@@ -861,6 +861,24 @@ class Utils
     }
 
     /**
+     * Checks if a URL has valid syntax.
+     *
+     * The URL must contain a protocol and a host. Note that a valid URL doesn't
+     * mean that the target is valid/reachable. For example, "foo://localhost"
+     * is a "valid" URL. This function simply performs a URL syntax validation!
+     *
+     * @param string $url
+     *
+     * @return bool TRUE if valid syntax, otherwise FALSE.
+     */
+    public static function hasValidURLSyntax(
+        $url)
+    {
+        return false !== filter_var($url, FILTER_VALIDATE_URL,
+                                    FILTER_FLAG_SCHEME_REQUIRED | FILTER_FLAG_HOST_REQUIRED);
+    }
+
+    /**
      * Extract all URLs from a text string.
      *
      * This function is Unicode-aware.

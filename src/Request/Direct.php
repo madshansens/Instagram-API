@@ -797,10 +797,7 @@ class Direct extends RequestCollection
         $link,
         array $options = [])
     {
-        $valid = filter_var($link, FILTER_VALIDATE_URL, [
-            'flags' => FILTER_FLAG_SCHEME_REQUIRED | FILTER_FLAG_HOST_REQUIRED,
-        ]);
-        if ($valid === false) {
+        if (!Utils::hasValidURLSyntax($link)) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a valid URL.', $link));
         }
 
