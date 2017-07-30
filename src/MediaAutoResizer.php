@@ -3,7 +3,7 @@
 namespace InstagramAPI;
 
 /**
- * Automatic image resizer.
+ * Automatic media resizer.
  *
  * Resizes and crops/expands an image to match Instagram's requirements, if
  * necessary. You can also use this with your own parameters, to force your
@@ -20,10 +20,13 @@ namespace InstagramAPI;
  *
  * Remember to thank Abyr Valg for the brilliant image processing algorithm!
  *
+ * TODO: Add support for video processing someday... It'll use the exact same
+ * algorithms to determine the final dimensions, so half the work is already done.
+ *
  * @author Abyr Valg <valga.github@abyrga.ru>
  * @author SteveJobzniak (https://github.com/SteveJobzniak)
  */
-class ImageAutoResizer
+class MediaAutoResizer
 {
     /** @var int Crop Operation. */
     const CROP = 1;
@@ -96,7 +99,7 @@ class ImageAutoResizer
      * TIP: If your default system temp folder isn't writable, it's NECESSARY
      * for you to set this value to another, writable path, like this:
      *
-     * \InstagramAPI\ImageAutoResizer::$defaultTmpPath = '/home/example/foo/';
+     * \InstagramAPI\MediaAutoResizer::$defaultTmpPath = '/home/example/foo/';
      */
     public static $defaultTmpPath = null;
 
@@ -283,7 +286,7 @@ class ImageAutoResizer
      *
      * @return string The path to the image file.
      *
-     * @see ImageAutoResizer::_shouldProcess() For the criteria that determines processing.
+     * @see MediaAutoResizer::_shouldProcess() For the criteria that determines processing.
      */
     public function getFile()
     {
