@@ -180,7 +180,8 @@ class Internal extends RequestCollection
         /** @var array|null Array of usertagging instructions, in the format
          [['position'=>[0.5,0.5], 'user_id'=>'123'], ...]. ONLY FOR TIMELINE PHOTOS! */
         $usertags = (isset($externalMetadata['usertags']) && $targetFeed == 'timeline') ? $externalMetadata['usertags'] : null;
-        /** @var string Link to use for the media. ONLY USED FOR STORY MEDIA AND BUSINESS ACCOUNTS! */
+        /** @var string|null Link to attach to the media. ONLY USED FOR STORY MEDIA,
+         * AND YOU MUST HAVE A BUSINESS INSTAGRAM ACCOUNT TO POST A STORY LINK! */
         $link = (isset($externalMetadata['link']) && $targetFeed == 'story') ? $externalMetadata['link'] : null;
         /** @var void Photo filter. THIS DOES NOTHING! All real filters are done in the mobile app. */
         // $filter = isset($externalMetadata['filter']) ? $externalMetadata['filter'] : null;
@@ -245,12 +246,9 @@ class Internal extends RequestCollection
                     ->addPost('client_timestamp', (string) (time() - mt_rand(3, 10)))
                     ->addPost('upload_id', $uploadId);
 
-                if (!is_null($link)) {
-                    $links = [];
-                    $webUri = [];
-                    $webUri[] = ['webUri' => $link];
-                    $links[] = ['links' => $webUri];
-                    $request->addPost('story_cta', json_encode($links));
+                if (is_string($link) && Utils::hasValidURLSyntax($link)) {
+                    $story_cta = '[{"links":[{"webUri":'.json_encode($link).'}]}]';
+                    $request->addPost('story_cta', $story_cta);
                 }
                 break;
             case 'direct_story':
@@ -455,7 +453,8 @@ class Internal extends RequestCollection
         /** @var Response\Model\Location|null A Location object describing where
          the media was taken. NOT USED FOR STORY MEDIA! */
         $location = (isset($externalMetadata['location']) && $targetFeed != 'story') ? $externalMetadata['location'] : null;
-        /** @var string Link to use for the media. ONLY USED FOR STORY MEDIA AND BUSINESS ACCOUNTS! */
+        /** @var string|null Link to attach to the media. ONLY USED FOR STORY MEDIA,
+         * AND YOU MUST HAVE A BUSINESS INSTAGRAM ACCOUNT TO POST A STORY LINK! */
         $link = (isset($externalMetadata['link']) && $targetFeed == 'story') ? $externalMetadata['link'] : null;
 
         // Fix very bad external user-metadata values.
@@ -500,12 +499,9 @@ class Internal extends RequestCollection
                     ->addPost('client_shared_at', time() - mt_rand(3, 10))
                     ->addPost('client_timestamp', time());
 
-                if (!is_null($link)) {
-                    $links = [];
-                    $webUri = [];
-                    $webUri[] = ['webUri' => $link];
-                    $links[] = ['links' => $webUri];
-                    $request->addPost('story_cta', json_encode($links));
+                if (is_string($link) && Utils::hasValidURLSyntax($link)) {
+                    $story_cta = '[{"links":[{"webUri":'.json_encode($link).'}]}]';
+                    $request->addPost('story_cta', $story_cta);
                 }
                 break;
             case 'direct_story':
