@@ -455,6 +455,8 @@ class Internal extends RequestCollection
         /** @var Response\Model\Location|null A Location object describing where
          the media was taken. NOT USED FOR STORY MEDIA! */
         $location = (isset($externalMetadata['location']) && $targetFeed != 'story') ? $externalMetadata['location'] : null;
+        /** @var string Link to use for the media. ONLY USED FOR STORY MEDIA AND BUSINESS ACCOUNTS! */
+        $link = (isset($externalMetadata['link']) && $targetFeed == 'story') ? $externalMetadata['link'] : null;
 
         // Fix very bad external user-metadata values.
         if (!is_string($captionText)) {
@@ -497,6 +499,14 @@ class Internal extends RequestCollection
                     ->addPost('story_media_creation_date', time() - mt_rand(10, 20))
                     ->addPost('client_shared_at', time() - mt_rand(3, 10))
                     ->addPost('client_timestamp', time());
+
+                if (!is_null($link)) {
+                    $links    = [];
+                    $webUri   = [];
+                    $webUri[] = ['webUri' => $link];
+                    $links[]  = ['links' => $webUri];
+                    $request->addPost('story_cta', json_encode($links));
+                }
                 break;
             case 'direct_story':
                 $request
