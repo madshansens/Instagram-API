@@ -180,6 +180,7 @@ class Internal extends RequestCollection
         /** @var array|null Array of usertagging instructions, in the format
          [['position'=>[0.5,0.5], 'user_id'=>'123'], ...]. ONLY FOR TIMELINE PHOTOS! */
         $usertags = (isset($externalMetadata['usertags']) && $targetFeed == 'timeline') ? $externalMetadata['usertags'] : null;
+        $link = (isset($externalMetadata['link']) && $targetFeed == 'story') ? $externalMetadata['link'] : null;
         /** @var void Photo filter. THIS DOES NOTHING! All real filters are done in the mobile app. */
         // $filter = isset($externalMetadata['filter']) ? $externalMetadata['filter'] : null;
         $filter = null; // COMMENTED OUT SO USERS UNDERSTAND THEY CAN'T USE THIS!
@@ -242,6 +243,14 @@ class Internal extends RequestCollection
                     ->addPost('configure_mode', '1')
                     ->addPost('client_timestamp', (string) (time() - mt_rand(3, 10)))
                     ->addPost('upload_id', $uploadId);
+
+                if (!is_null($link)) {
+                    $links    = [];
+                    $webUri   = [];
+                    $webUri[] = ['webUri' => $link];
+                    $links[]  = ['links' => $webUri];
+                    $request->addPost('story_cta', json_encode($links));
+                }
                 break;
             case 'direct_story':
                 $request
