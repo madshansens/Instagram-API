@@ -9,6 +9,12 @@ use InstagramAPI\Utils;
 
 /**
  * Instagram Direct messaging functions.
+ *
+ * Be aware that many of the functions can take either a list of users or a
+ * thread ID as their "recipient". If a thread already exists with those
+ * user(s), you MUST use the "thread" recipient method (otherwise Instagram
+ * rejects your bad API call). If no thread exists yet, you MUST use the
+ * "users" recipient method a SINGLE time to create the thread first!
  */
 class Direct extends RequestCollection
 {
