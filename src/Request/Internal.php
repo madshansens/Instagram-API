@@ -246,10 +246,10 @@ class Internal extends RequestCollection
                     ->addPost('upload_id', $uploadId);
 
                 if (!is_null($link)) {
-                    $links    = [];
-                    $webUri   = [];
+                    $links = [];
+                    $webUri = [];
                     $webUri[] = ['webUri' => $link];
-                    $links[]  = ['links' => $webUri];
+                    $links[] = ['links' => $webUri];
                     $request->addPost('story_cta', json_encode($links));
                 }
                 break;
@@ -501,10 +501,10 @@ class Internal extends RequestCollection
                     ->addPost('client_timestamp', time());
 
                 if (!is_null($link)) {
-                    $links    = [];
-                    $webUri   = [];
+                    $links = [];
+                    $webUri = [];
                     $webUri[] = ['webUri' => $link];
-                    $links[]  = ['links' => $webUri];
+                    $links[] = ['links' => $webUri];
                     $request->addPost('story_cta', json_encode($links));
                 }
                 break;
