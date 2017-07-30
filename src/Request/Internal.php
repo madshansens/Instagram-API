@@ -180,6 +180,7 @@ class Internal extends RequestCollection
         /** @var array|null Array of usertagging instructions, in the format
          [['position'=>[0.5,0.5], 'user_id'=>'123'], ...]. ONLY FOR TIMELINE PHOTOS! */
         $usertags = (isset($externalMetadata['usertags']) && $targetFeed == 'timeline') ? $externalMetadata['usertags'] : null;
+        /** @var string Link to use for the media. ONLY USED FOR STORY MEDIA AND BUSINESS ACCOUNTS! */
         $link = (isset($externalMetadata['link']) && $targetFeed == 'story') ? $externalMetadata['link'] : null;
         /** @var void Photo filter. THIS DOES NOTHING! All real filters are done in the mobile app. */
         // $filter = isset($externalMetadata['filter']) ? $externalMetadata['filter'] : null;
