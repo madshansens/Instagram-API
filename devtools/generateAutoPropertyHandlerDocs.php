@@ -193,7 +193,7 @@ class autodoc
         $classDoc = $reflection->getDocComment();
         $methods = $this->_documentMagicMethods($reflection);
         if ($classDoc === false && strlen($methods)) {
-            // We have no PHPDoc, let's create a new one.
+            // We have no PHPDoc, but we found methods, so add new docs.
             $input = file($filePath);
             $startLine = $reflection->getStartLine();
             $output = implode('', array_slice($input, 0, $startLine - 1))
@@ -214,10 +214,14 @@ class autodoc
             } else {
                 $output = '';
             }
-            $contents = file_get_contents($filePath);
-            // Replace only first occurence (we append \n to the search string to be able to remove empty PHPDoc).
-            $contents = preg_replace('#'.preg_quote($classDoc."\n", '#').'#', $output, $contents, 1);
-            file_put_contents($filePath, $contents);
+            // Only write the new contents to disk if the docs have changed.
+            if ($output !== $classDoc."\n") {
+                $contents = file_get_contents($filePath);
+                // Replace only first occurence (we append \n to the search
+                // string to be able to remove empty PHPDoc).
+                $contents = preg_replace('#'.preg_quote($classDoc."\n", '#').'#', $output, $contents, 1);
+                file_put_contents($filePath, $contents);
+            }
         }
     }
 
