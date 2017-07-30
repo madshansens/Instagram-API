@@ -370,15 +370,14 @@ class Utils
     /**
      * Verifies that a piece of media follows Instagram's size/aspect rules.
      *
-     * Currently all photos and videos everywhere have the exact same rules.
-     * We bring in the up-to-date rules from the ImageAutoResizer class.
+     * We bring in the up-to-date rules from the MediaAutoResizer class.
      *
      * @param string       $targetFeed   Target feed for this media ("timeline", "story", "direct_story", "album" or "direct_v2").
      * @param MediaDetails $mediaDetails Media details.
      *
      * @throws \InvalidArgumentException If Instagram won't allow this file.
      *
-     * @see ImageAutoResizer
+     * @see MediaAutoResizer
      */
     public static function throwIfIllegalMediaResolution(
         $targetFeed,
@@ -386,25 +385,33 @@ class Utils
     {
         $width = $mediaDetails->getWidth();
         $height = $mediaDetails->getHeight();
+
         // WARNING TO CONTRIBUTORS: $mediaFilename is for ERROR DISPLAY to
         // users. Do NOT use it to read from the hard disk!
         $mediaFilename = $mediaDetails->getFilename();
-        // Check Resolution.
+
+        // Check Media Width.
+        // NOTE: They have height-limits too, but we automatically enforce
+        // those when validating the aspect ratio range further down.
         if ($mediaDetails instanceof PhotoDetails) {
-            // Validate photo resolution.
-            if ($width > ImageAutoResizer::MAX_WIDTH || $height > ImageAutoResizer::MAX_HEIGHT) {
+            // Validate photo resolution. Instagram allows between 320px-1080px width.
+            if ($width < 320 || $width > MediaAutoResizer::MAX_WIDTH) {
                 throw new \InvalidArgumentException(sprintf(
-                    'Instagram only accepts photos with a maximum resolution up to %dx%d. Your file "%s" has a %dx%d resolution.',
-                    ImageAutoResizer::MAX_WIDTH, ImageAutoResizer::MAX_HEIGHT, $mediaFilename, $width, $height
+                    'Instagram only accepts photos that are between 320 and %d pixels wide. Your file "%s" is %d pixels wide.',
+                    MediaAutoResizer::MAX_WIDTH, $mediaFilename, $width
                 ));
             }
         } elseif ($mediaDetails instanceof VideoDetails) {
-            // Validate video resolution. Instagram allows between 320px-1080px width.
-            // NOTE: They have height-limits too, but we automatically enforce
-            // those when validating the aspect ratio further down.
-            if ($width < 320 || $width > 1080) {
+            // Validate video resolution. Instagram allows between 480px-720px width.
+            // NOTE: They'll resize 720px wide videos on the server, to 640px instead.
+            // NOTE: Their server CAN receive between 320px-1080px width without
+            // rejecting the file, but the official app would NEVER upload such
+            // resolutions. It's controlled by the "ig_android_universe_video_production"
+            // experiment variable, which currently enforces width of min:480, max:720.
+            // If users want to upload bigger videos, they MUST resize locally first!
+            if ($width < 480 || $width > 720) {
                 throw new \InvalidArgumentException(sprintf(
-                    'Instagram only accepts videos that are between 320 and 1080 pixels wide. Your file "%s" is %d pixels wide.',
+                    'Instagram only accepts videos that are between 480 and 720 pixels wide. Your file "%s" is %d pixels wide.',
                     $mediaFilename, $width
                 ));
             }
@@ -412,13 +419,25 @@ class Utils
 
         // Check Aspect Ratio.
         // NOTE: This Instagram rule is the same for both videos and photos.
-        // See ImageAutoResizer for the latest up-to-date allowed ratios.
+        // See MediaAutoResizer for the latest up-to-date allowed ratios.
         $aspectRatio = $width / $height;
-        if ($aspectRatio < ImageAutoResizer::MIN_RATIO || $aspectRatio > ImageAutoResizer::MAX_RATIO) {
-            throw new \InvalidArgumentException(sprintf(
-                'Instagram only accepts media with aspect ratios between %.2f and %.2f. Your file "%s" has a %.2f aspect ratio.',
-                ImageAutoResizer::MIN_RATIO, ImageAutoResizer::MAX_RATIO, $mediaFilename, $aspectRatio
-            ));
+        switch ($targetFeed) {
+        case 'story':
+        case 'direct_story':
+            if ($aspectRatio < MediaAutoResizer::MIN_STORY_RATIO || $aspectRatio > MediaAutoResizer::MAX_STORY_RATIO) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Instagram only accepts story media with aspect ratios between %.2f and %.2f. Your file "%s" has a %.2f aspect ratio.',
+                    MediaAutoResizer::MIN_STORY_RATIO, MediaAutoResizer::MAX_STORY_RATIO, $mediaFilename, $aspectRatio
+                ));
+            }
+            break;
+        default:
+            if ($aspectRatio < MediaAutoResizer::MIN_RATIO || $aspectRatio > MediaAutoResizer::MAX_RATIO) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Instagram only accepts media with aspect ratios between %.2f and %.2f. Your file "%s" has a %.2f aspect ratio.',
+                    MediaAutoResizer::MIN_RATIO, MediaAutoResizer::MAX_RATIO, $mediaFilename, $aspectRatio
+                ));
+            }
         }
     }
 
@@ -508,8 +527,8 @@ class Utils
      *
      * @throws \InvalidArgumentException If the video file is missing.
      * @throws \RuntimeException         If FFmpeg isn't working properly, or
-     *                                   thumbnail ImageAutoResizer failed.
-     * @throws \Exception                If ImageAutoResizer failed.
+     *                                   thumbnail MediaAutoResizer failed.
+     * @throws \Exception                If MediaAutoResizer failed.
      *
      * @return string The JPEG binary data for the generated thumbnail.
      */
@@ -547,7 +566,7 @@ class Utils
             }
 
             // Automatically crop&resize the thumbnail to Instagram's requirements.
-            $resizer = new ImageAutoResizer($tmpFilename);
+            $resizer = new MediaAutoResizer($tmpFilename);
             $jpegContents = file_get_contents($resizer->getFile()); // Process&get.
             $resizer->deleteFile();
 
