@@ -2,6 +2,7 @@
 
 namespace InstagramAPI\Request;
 
+use InstagramAPI\Constants;
 use InstagramAPI\Response;
 
 /**
@@ -29,7 +30,7 @@ class Story extends RequestCollection
         $photoFilename,
         array $externalMetadata = [])
     {
-        return $this->ig->internal->uploadSinglePhoto('story', $photoFilename, null, $externalMetadata);
+        return $this->ig->internal->uploadSinglePhoto(Constants::FEED_STORY, $photoFilename, null, $externalMetadata);
     }
 
     /**
@@ -51,7 +52,7 @@ class Story extends RequestCollection
         $videoFilename,
         array $externalMetadata = [])
     {
-        return $this->ig->internal->uploadSingleVideo('story', $videoFilename, null, $externalMetadata);
+        return $this->ig->internal->uploadSingleVideo(Constants::FEED_STORY, $videoFilename, null, $externalMetadata);
     }
 
     /**

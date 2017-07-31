@@ -33,7 +33,7 @@ class Timeline extends RequestCollection
         $photoFilename,
         array $externalMetadata = [])
     {
-        return $this->ig->internal->uploadSinglePhoto('timeline', $photoFilename, null, $externalMetadata);
+        return $this->ig->internal->uploadSinglePhoto(Constants::FEED_TIMELINE, $photoFilename, null, $externalMetadata);
     }
 
     /**
@@ -54,7 +54,7 @@ class Timeline extends RequestCollection
         $videoFilename,
         array $externalMetadata = [])
     {
-        return $this->ig->internal->uploadSingleVideo('timeline', $videoFilename, null, $externalMetadata);
+        return $this->ig->internal->uploadSingleVideo(Constants::FEED_TIMELINE, $videoFilename, null, $externalMetadata);
     }
 
     /**
@@ -117,11 +117,11 @@ class Timeline extends RequestCollection
             switch ($item['type']) {
             case 'photo':
                 // Determine the photo details.
-                $itemInternalMetadata->setPhotoDetails('album', $item['file']);
+                $itemInternalMetadata->setPhotoDetails(Constants::FEED_TIMELINE_ALBUM, $item['file']);
                 break;
             case 'video':
                 // Determine the video details.
-                $itemInternalMetadata->setVideoDetails('album', $item['file']);
+                $itemInternalMetadata->setVideoDetails(Constants::FEED_TIMELINE_ALBUM, $item['file']);
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('Unsupported album media type "%s".', $item['type']));
@@ -137,14 +137,14 @@ class Timeline extends RequestCollection
 
             switch ($item['type']) {
             case 'photo':
-                $itemInternalMetadata->setPhotoUploadResponse($this->ig->internal->uploadPhotoData('album', $itemInternalMetadata));
+                $itemInternalMetadata->setPhotoUploadResponse($this->ig->internal->uploadPhotoData(Constants::FEED_TIMELINE_ALBUM, $itemInternalMetadata));
                 break;
             case 'video':
                 // Attempt to upload the video data.
-                $itemInternalMetadata = $this->ig->internal->uploadVideo('album', $item['file'], $itemInternalMetadata);
+                $itemInternalMetadata = $this->ig->internal->uploadVideo(Constants::FEED_TIMELINE_ALBUM, $item['file'], $itemInternalMetadata);
 
                 // Attempt to upload the thumbnail, associated with our video's ID.
-                $itemInternalMetadata->setPhotoUploadResponse($this->ig->internal->uploadPhotoData('album', $itemInternalMetadata));
+                $itemInternalMetadata->setPhotoUploadResponse($this->ig->internal->uploadPhotoData(Constants::FEED_TIMELINE_ALBUM, $itemInternalMetadata));
             }
 
             $media[$key]['internalMetadata'] = $itemInternalMetadata;

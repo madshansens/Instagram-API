@@ -43,8 +43,9 @@ class Internal extends RequestCollection
     /**
      * UPLOADS A *SINGLE* PHOTO.
      *
-     * @param string                $targetFeed       Target feed for this media ("timeline", "story", "direct_story"
-     *                                                but NOT "album", they are handled elsewhere).
+     * This is NOT used for albums!
+     *
+     * @param int                   $targetFeed       One of the FEED_X constants.
      * @param string                $photoFilename    The photo filename.
      * @param InternalMetadata|null $internalMetadata (optional) Internal library-generated metadata object.
      * @param array                 $externalMetadata (optional) User-provided metadata key-value pairs.
@@ -63,7 +64,7 @@ class Internal extends RequestCollection
         array $externalMetadata = [])
     {
         // Make sure we only allow these particular feeds for this function.
-        if ($targetFeed != 'timeline' && $targetFeed != 'story' && $targetFeed != 'direct_story') {
+        if ($targetFeed != Constants::FEED_TIMELINE && $targetFeed != Constants::FEED_STORY && $targetFeed != Constants::FEED_DIRECT_STORY) {
             throw new \InvalidArgumentException(sprintf('Bad target feed "%s".', $targetFeed));
         }
 
@@ -86,7 +87,7 @@ class Internal extends RequestCollection
     /**
      * Upload the data for a photo to Instagram.
      *
-     * @param string           $targetFeed       Target feed for this media ("timeline", "story", "direct_story" or "album").
+     * @param int              $targetFeed       One of the FEED_X constants.
      * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
      *
      * @throws \InvalidArgumentException
@@ -98,6 +99,11 @@ class Internal extends RequestCollection
         $targetFeed,
         InternalMetadata $internalMetadata)
     {
+        // Make sure we disallow some feeds for this function.
+        if ($targetFeed == Constants::FEED_DIRECT) {
+            throw new \InvalidArgumentException(sprintf('Bad target feed "%s".', $targetFeed));
+        }
+
         $isVideoThumbnail = false;
         // Determine which file contents to upload.
         if ($internalMetadata->getPhotoDetails() !== null) {
@@ -124,7 +130,7 @@ class Internal extends RequestCollection
             ->addPost('image_compression', '{"lib_name":"jt","lib_version":"1.3.0","quality":"87"}')
             ->addFileData('photo', $photoData, 'pending_media_'.Utils::generateUploadId().'.jpg');
 
-        if ($targetFeed == 'album') {
+        if ($targetFeed == Constants::FEED_TIMELINE_ALBUM) {
             $request->addPost('is_sidecar', '1');
             if ($isVideoThumbnail) {
                 $request->addPost('media_type', '2');
@@ -143,8 +149,7 @@ class Internal extends RequestCollection
      * GIVE THEM THEIR OWN FUNCTION LIKE WE DID WITH "configureTimelineAlbum()",
      * TO AVOID ADDING BUGGY AND UNMAINTAINABLE SPIDERWEB CODE!
      *
-     * @param string           $targetFeed       Target feed for this media ("timeline", "story", "direct_story"
-     *                                           but NOT "album", they are handled elsewhere).
+     * @param int              $targetFeed       One of the FEED_X constants.
      * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
      * @param array            $externalMetadata (optional) User-provided metadata key-value pairs.
      *
@@ -160,11 +165,11 @@ class Internal extends RequestCollection
     {
         // Determine the target endpoint for the photo.
         switch ($targetFeed) {
-        case 'timeline':
+        case Constants::FEED_TIMELINE:
             $endpoint = 'media/configure/';
             break;
-        case 'direct_story':
-        case 'story':
+        case Constants::FEED_DIRECT_STORY:
+        case Constants::FEED_STORY:
             $endpoint = 'media/configure_to_story/';
             break;
         default:
@@ -176,13 +181,13 @@ class Internal extends RequestCollection
         $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : '';
         /** @var Response\Model\Location|null A Location object describing where
          the media was taken. NOT USED FOR STORY MEDIA! */
-        $location = (isset($externalMetadata['location']) && $targetFeed != 'story') ? $externalMetadata['location'] : null;
+        $location = (isset($externalMetadata['location']) && $targetFeed != Constants::FEED_STORY) ? $externalMetadata['location'] : null;
         /** @var array|null Array of usertagging instructions, in the format
          [['position'=>[0.5,0.5], 'user_id'=>'123'], ...]. ONLY FOR TIMELINE PHOTOS! */
-        $usertags = (isset($externalMetadata['usertags']) && $targetFeed == 'timeline') ? $externalMetadata['usertags'] : null;
+        $usertags = (isset($externalMetadata['usertags']) && $targetFeed == Constants::FEED_TIMELINE) ? $externalMetadata['usertags'] : null;
         /** @var string|null Link to attach to the media. ONLY USED FOR STORY MEDIA,
          * AND YOU MUST HAVE A BUSINESS INSTAGRAM ACCOUNT TO POST A STORY LINK! */
-        $link = (isset($externalMetadata['link']) && $targetFeed == 'story') ? $externalMetadata['link'] : null;
+        $link = (isset($externalMetadata['link']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['link'] : null;
         /** @var void Photo filter. THIS DOES NOTHING! All real filters are done in the mobile app. */
         // $filter = isset($externalMetadata['filter']) ? $externalMetadata['filter'] : null;
         $filter = null; // COMMENTED OUT SO USERS UNDERSTAND THEY CAN'T USE THIS!
@@ -225,7 +230,7 @@ class Internal extends RequestCollection
                 ]);
 
         switch ($targetFeed) {
-            case 'timeline':
+            case Constants::FEED_TIMELINE:
                 $request
                     ->addPost('caption', $captionText)
                     ->addPost('source_type', '4')
@@ -238,7 +243,7 @@ class Internal extends RequestCollection
                     $request->addPost('usertags', json_encode($usertags));
                 }
                 break;
-            case 'story':
+            case Constants::FEED_STORY:
                 $request
                     ->addPost('client_shared_at', (string) time())
                     ->addPost('source_type', '3')
@@ -251,7 +256,7 @@ class Internal extends RequestCollection
                     $request->addPost('story_cta', $story_cta);
                 }
                 break;
-            case 'direct_story':
+            case Constants::FEED_DIRECT_STORY:
                 $request
                     ->addPost('recipient_users', $internalMetadata->getDirectUsers())
                     ->addPost('thread_ids', $internalMetadata->getDirectThreads())
@@ -292,7 +297,7 @@ class Internal extends RequestCollection
     /**
      * Uploads a raw video file.
      *
-     * @param string                $targetFeed       Target feed for this media ("timeline", "story", "direct_story", "album" or "direct_v2").
+     * @param int                   $targetFeed       One of the FEED_X constants.
      * @param string                $videoFilename    The video filename.
      * @param InternalMetadata|null $internalMetadata (optional) Internal library-generated metadata object.
      *
@@ -331,8 +336,9 @@ class Internal extends RequestCollection
     /**
      * UPLOADS A *SINGLE* VIDEO.
      *
-     * @param string                $targetFeed       Target feed for this media ("timeline", "story", "direct_story",
-     *                                                but NOT "album", they are handled elsewhere).
+     * This is NOT used for albums!
+     *
+     * @param int                   $targetFeed       One of the FEED_X constants.
      * @param string                $videoFilename    The video filename.
      * @param InternalMetadata|null $internalMetadata (optional) Internal library-generated metadata object.
      * @param array                 $externalMetadata (optional) User-provided metadata key-value pairs.
@@ -353,7 +359,7 @@ class Internal extends RequestCollection
         array $externalMetadata = [])
     {
         // Make sure we only allow these particular feeds for this function.
-        if ($targetFeed != 'timeline' && $targetFeed != 'story' && $targetFeed != 'direct_story') {
+        if ($targetFeed != Constants::FEED_TIMELINE && $targetFeed != Constants::FEED_STORY && $targetFeed != Constants::FEED_DIRECT_STORY) {
             throw new \InvalidArgumentException(sprintf('Bad target feed "%s".', $targetFeed));
         }
 
@@ -379,7 +385,7 @@ class Internal extends RequestCollection
     /**
      * Asks Instagram for parameters for uploading a new video.
      *
-     * @param string           $targetFeed       Target feed for this media ("timeline", "story", "album" or "direct_v2").
+     * @param int              $targetFeed       One of the FEED_X constants.
      * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
      *
      * @throws \InstagramAPI\Exception\InstagramException If the request fails.
@@ -415,8 +421,7 @@ class Internal extends RequestCollection
      * GIVE THEM THEIR OWN FUNCTION LIKE WE DID WITH "configureTimelineAlbum()",
      * TO AVOID ADDING BUGGY AND UNMAINTAINABLE SPIDERWEB CODE!
      *
-     * @param string           $targetFeed       Target feed for this media ("timeline", "story", "direct_story"
-     *                                           but NOT "album", they are handled elsewhere).
+     * @param int              $targetFeed       One of the FEED_X constants.
      * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
      * @param array            $externalMetadata (optional) User-provided metadata key-value pairs.
      *
@@ -432,11 +437,11 @@ class Internal extends RequestCollection
     {
         // Determine the target endpoint for the video.
         switch ($targetFeed) {
-        case 'timeline':
+        case Constants::FEED_TIMELINE:
             $endpoint = 'media/configure/';
             break;
-        case 'direct_story':
-        case 'story':
+        case Constants::FEED_DIRECT_STORY:
+        case Constants::FEED_STORY:
             $endpoint = 'media/configure_to_story/';
             break;
         default:
@@ -449,13 +454,13 @@ class Internal extends RequestCollection
         /** @var string[]|null Array of numerical UserPK IDs of people tagged in
          * your video. ONLY USED IN STORY VIDEOS! TODO: Actually, it's not even
          * implemented for stories. */
-        $usertags = (isset($externalMetadata['usertags']) && $targetFeed == 'story') ? $externalMetadata['usertags'] : null;
+        $usertags = (isset($externalMetadata['usertags']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['usertags'] : null;
         /** @var Response\Model\Location|null A Location object describing where
          the media was taken. NOT USED FOR STORY MEDIA! */
-        $location = (isset($externalMetadata['location']) && $targetFeed != 'story') ? $externalMetadata['location'] : null;
+        $location = (isset($externalMetadata['location']) && $targetFeed != Constants::FEED_STORY) ? $externalMetadata['location'] : null;
         /** @var string|null Link to attach to the media. ONLY USED FOR STORY MEDIA,
          * AND YOU MUST HAVE A BUSINESS INSTAGRAM ACCOUNT TO POST A STORY LINK! */
-        $link = (isset($externalMetadata['link']) && $targetFeed == 'story') ? $externalMetadata['link'] : null;
+        $link = (isset($externalMetadata['link']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['link'] : null;
 
         // Fix very bad external user-metadata values.
         if (!is_string($captionText)) {
@@ -492,7 +497,7 @@ class Internal extends RequestCollection
             ->addPost('_uid', $this->ig->account_id);
 
         switch ($targetFeed) {
-            case 'story':
+            case Constants::FEED_STORY:
                 $request
                     ->addPost('configure_mode', 1) // 1 - REEL_SHARE
                     ->addPost('story_media_creation_date', time() - mt_rand(10, 20))
@@ -504,7 +509,7 @@ class Internal extends RequestCollection
                     $request->addPost('story_cta', $story_cta);
                 }
                 break;
-            case 'direct_story':
+            case Constants::FEED_DIRECT_STORY:
                 $request
                     ->addPost('configure_mode', 2) // 2 - DIRECT_STORY_SHARE
                     ->addPost('recipient_users', $internalMetadata->getDirectUsers())
@@ -517,7 +522,7 @@ class Internal extends RequestCollection
 
         $request->addPost('caption', $captionText);
 
-        if ($targetFeed == 'story') {
+        if ($targetFeed == Constants::FEED_STORY) {
             $request->addPost('story_media_creation_date', time());
             if (!is_null($usertags)) {
                 // Reel Mention example:
@@ -1103,7 +1108,7 @@ class Internal extends RequestCollection
      * the exact chunks that have been dropped from their server, and it won't
      * waste time with chunks that are already successfully uploaded.
      *
-     * @param string           $targetFeed       Target feed for this media ("timeline", "story", "album" or "direct_v2").
+     * @param int              $targetFeed       One of the FEED_X constants.
      * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
      *
      * @throws \InvalidArgumentException
@@ -1123,7 +1128,7 @@ class Internal extends RequestCollection
         // request, otherwise the server will reply with a "StagedUpload not
         // found" error when the final chunk has been uploaded.
         $sessionIDCookie = null;
-        if ($targetFeed == 'album') {
+        if ($targetFeed == Constants::FEED_TIMELINE_ALBUM) {
             $foundCookie = $this->ig->client->getCookie('sessionid', 'i.instagram.com');
             if ($foundCookie !== null) {
                 $sessionIDCookie = $foundCookie->getValue();
@@ -1196,7 +1201,7 @@ class Internal extends RequestCollection
 
                 // When uploading videos to albums, we must fake-inject the
                 // "sessionid" cookie (the official app fake-injects it too).
-                if ($targetFeed == 'album' && $sessionIDCookie !== null) {
+                if ($targetFeed == Constants::FEED_TIMELINE_ALBUM && $sessionIDCookie !== null) {
                     // We'll add it with the default options ("single use")
                     // so the fake cookie is only added to THIS request.
                     $this->ig->client->getMiddleware()->addFakeCookie('sessionid', $sessionIDCookie);
@@ -1294,8 +1299,7 @@ class Internal extends RequestCollection
     /**
      * Performs a resumable upload of a video file, with support for retries.
      *
-     * @param string           $targetFeed       Target feed for this media ("timeline", "story", "direct_story",
-     *                                           "direct_v2", but NOT "album", they are handled elsewhere).
+     * @param int              $targetFeed       One of the FEED_X constants.
      * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
      *
      * @throws \InvalidArgumentException
@@ -1407,7 +1411,7 @@ class Internal extends RequestCollection
     /**
      * Determine whether to use resumable uploader based on target feed and internal metadata.
      *
-     * @param string           $targetFeed       Target feed for this media ("timeline", "story", "direct_story", "album" or "direct_v2").
+     * @param int              $targetFeed       One of the FEED_X constants.
      * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
      *
      * @return bool
@@ -1418,25 +1422,25 @@ class Internal extends RequestCollection
     {
         // TODO: use $internalMetadata object for additional checks.
         switch ($targetFeed) {
-            case 'album':
+            case Constants::FEED_TIMELINE_ALBUM:
                 $result = false;
                 break;
-            case 'timeline':
+            case Constants::FEED_TIMELINE:
                 $result = $this->ig->isExperimentEnabled(
                     'ig_android_upload_reliability_universe',
                     'is_enabled_fbupload_followers_share');
                 break;
-            case 'direct_v2':
+            case Constants::FEED_DIRECT:
                 $result = $this->ig->isExperimentEnabled(
                     'ig_android_upload_reliability_universe',
                     'is_enabled_fbupload_direct_share');
                 break;
-            case 'story':
+            case Constants::FEED_STORY:
                 $result = $this->ig->isExperimentEnabled(
                     'ig_android_upload_reliability_universe',
                     'is_enabled_fbupload_reel_share');
                 break;
-            case 'direct_story':
+            case Constants::FEED_DIRECT_STORY:
                 $result = $this->ig->isExperimentEnabled(
                     'ig_android_upload_reliability_universe',
                     'is_enabled_fbupload_story_share');
@@ -1451,7 +1455,7 @@ class Internal extends RequestCollection
     /**
      * Get params for upload job.
      *
-     * @param string           $targetFeed       Target feed for this media ("timeline", "story", "direct_story", "album" or "direct_v2").
+     * @param int              $targetFeed       One of the FEED_X constants.
      * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
      *
      * @return array
@@ -1474,18 +1478,18 @@ class Internal extends RequestCollection
         ];
         // Target feed's specific params.
         switch ($targetFeed) {
-            case 'album':
+            case Constants::FEED_TIMELINE_ALBUM:
                 $result['is_sidecar'] = '1';
                 break;
-            case 'direct_v2':
+            case Constants::FEED_DIRECT:
                 $result['direct_v2'] = '1';
                 $result['rotate'] = '0';
                 $result['hflip'] = 'false';
                 break;
-            case 'story':
+            case Constants::FEED_STORY:
                 $result['for_album'] = '1';
                 break;
-            case 'direct_story':
+            case Constants::FEED_DIRECT_STORY:
                 $result['for_direct_story'] = '1';
                 break;
             default:

@@ -372,7 +372,7 @@ class Utils
      *
      * We bring in the up-to-date rules from the MediaAutoResizer class.
      *
-     * @param string       $targetFeed   Target feed for this media ("timeline", "story", "direct_story", "album" or "direct_v2").
+     * @param int          $targetFeed   One of the FEED_X constants.
      * @param MediaDetails $mediaDetails Media details.
      *
      * @throws \InvalidArgumentException If Instagram won't allow this file.
@@ -422,8 +422,8 @@ class Utils
         // See MediaAutoResizer for the latest up-to-date allowed ratios.
         $aspectRatio = $width / $height;
         switch ($targetFeed) {
-        case 'story':
-        case 'direct_story':
+        case Constants::FEED_STORY:
+        case Constants::FEED_DIRECT_STORY:
             if ($aspectRatio < MediaAutoResizer::MIN_STORY_RATIO || $aspectRatio > MediaAutoResizer::MAX_STORY_RATIO) {
                 throw new \InvalidArgumentException(sprintf(
                     'Instagram only accepts story media with aspect ratios between %.2f and %.2f. Your file "%s" has a %.2f aspect ratio.',
@@ -444,7 +444,7 @@ class Utils
     /**
      * Verifies that a video's details follow Instagram's requirements.
      *
-     * @param string       $targetFeed   Target feed for this media ("timeline", "story", "direct_story", "album" or "direct_v2").
+     * @param int          $targetFeed   One of the FEED_X constants.
      * @param VideoDetails $videoDetails Video details.
      *
      * @throws \InvalidArgumentException If Instagram won't allow this video.
@@ -459,7 +459,7 @@ class Utils
         // also ensures we can only upload small files exactly as intended.
         $duration = $videoDetails->getDuration();
         switch ($targetFeed) {
-        case 'story':
+        case Constants::FEED_STORY:
             // Instagram only allows 3-15 seconds for stories.
             if ($duration < 3 || $duration > 15) {
                 throw new \InvalidArgumentException(sprintf(
@@ -468,8 +468,8 @@ class Utils
                 ));
             }
             break;
-        case 'direct_v2':
-        case 'direct_story':
+        case Constants::FEED_DIRECT:
+        case Constants::FEED_DIRECT_STORY:
             // Instagram only allows 0.1-15 seconds for direct messages.
             if ($duration < 0.1 || $duration > 15) {
                 throw new \InvalidArgumentException(sprintf(
@@ -496,7 +496,7 @@ class Utils
     /**
      * Verifies that a photo's details follow Instagram's requirements.
      *
-     * @param string       $targetFeed   Target feed for this photo ("timeline", "story", "direct_story", "album" or "direct_v2").
+     * @param int          $targetFeed   One of the FEED_X constants.
      * @param PhotoDetails $photoDetails Photo details.
      *
      * @throws \InvalidArgumentException If Instagram won't allow this photo.

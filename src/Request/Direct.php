@@ -2,6 +2,7 @@
 
 namespace InstagramAPI\Request;
 
+use InstagramAPI\Constants;
 use InstagramAPI\Request\Metadata\Internal as InternalMetadata;
 use InstagramAPI\Response;
 use InstagramAPI\Signatures;
@@ -476,7 +477,7 @@ class Direct extends RequestCollection
         if (count($urls)) {
             /** @var Response\DirectSendItemResponse $result */
             $result = $this->_sendDirectItem('links', $recipients, array_merge($options, [
-                'link_urls' => json_encode(array_map(function ($url) {
+                'link_urls' => json_encode(array_map(function (array $url) {
                     return $url['fullUrl'];
                 }, $urls)),
                 'link_text' => $text,
@@ -587,7 +588,7 @@ class Direct extends RequestCollection
         $internalMetadata = new InternalMetadata();
         $internalMetadata->setDirectRecipients($this->_prepareRecipients($recipients, true));
 
-        return $this->ig->internal->uploadSinglePhoto('direct_story', $photoFilename, $internalMetadata, $externalMetadata);
+        return $this->ig->internal->uploadSinglePhoto(Constants::FEED_DIRECT_STORY, $photoFilename, $internalMetadata, $externalMetadata);
     }
 
     /**
@@ -616,7 +617,7 @@ class Direct extends RequestCollection
         // Direct videos use different upload IDs.
         $internalMetadata = new InternalMetadata(Utils::generateUploadId(true));
         // Attempt to upload the video data.
-        $internalMetadata = $this->ig->internal->uploadVideo('direct_v2', $videoFilename, $internalMetadata);
+        $internalMetadata = $this->ig->internal->uploadVideo(Constants::FEED_DIRECT, $videoFilename, $internalMetadata);
 
         // We must use the same client_context for all attempts to prevent double-posting.
         if (!isset($options['client_context'])) {
@@ -667,7 +668,7 @@ class Direct extends RequestCollection
         $internalMetadata = new InternalMetadata();
         $internalMetadata->setDirectRecipients($this->_prepareRecipients($recipients, true));
 
-        return $this->ig->internal->uploadSingleVideo('direct_story', $videoFilename, $internalMetadata, $externalMetadata);
+        return $this->ig->internal->uploadSingleVideo(Constants::FEED_DIRECT_STORY, $videoFilename, $internalMetadata, $externalMetadata);
     }
 
     /**

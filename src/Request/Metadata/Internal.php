@@ -68,7 +68,7 @@ final class Internal
     /**
      * Set video details from the given filename.
      *
-     * @param string $targetFeed
+     * @param int    $targetFeed    One of the FEED_X constants.
      * @param string $videoFilename
      *
      * @throws \InvalidArgumentException If the video file is missing or invalid, or Instagram won't allow this video.
@@ -94,7 +94,7 @@ final class Internal
     /**
      * Set photo details from the given filename.
      *
-     * @param string $targetFeed
+     * @param int    $targetFeed    One of the FEED_X constants.
      * @param string $photoFilename
      *
      * @throws \InvalidArgumentException If the photo file is missing or invalid, or Instagram won't allow this photo.

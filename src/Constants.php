@@ -43,6 +43,13 @@ class Constants
     const ANALYTICS_ACCESS_TOKEN = '567067343352427|f249176f09e26ce54212b472dbab8fa8';
     const SURFACE_PARAM = 4715;
 
+    // Internal Feedtype Constants. CRITICAL: EVERY value here MUST be unique!
+    const FEED_TIMELINE = 1;
+    const FEED_TIMELINE_ALBUM = 2;
+    const FEED_STORY = 3;
+    const FEED_DIRECT = 4;
+    const FEED_DIRECT_STORY = 5;
+
     // General Constants.
     const SRC_DIR = __DIR__; // Absolute path to the "src" folder.
 }
