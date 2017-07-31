@@ -137,6 +137,16 @@ class Instagram
     public $settings;
 
     /**
+     * The current application session ID.
+     *
+     * This is a temporary ID which changes in the official app every time the
+     * user closes and re-opens the Instagram application or switches account.
+     *
+     * @var string
+     */
+    public $session_id;
+
+    /**
      * A list of experiments enabled on per-account basis.
      *
      * @var array
@@ -362,6 +372,7 @@ class Instagram
 
             // Clear other params we also need to regenerate for the new device.
             $this->settings->set('advertising_id', '');
+            $this->settings->set('session_id', '');
             $this->settings->set('experiments', '');
 
             // Remove the previous hardware's login details to force a relogin.
@@ -382,6 +393,9 @@ class Instagram
         if (empty($this->settings->get('advertising_id'))) {
             $this->settings->set('advertising_id', Signatures::generateUUID(true));
         }
+        if (empty($this->settings->get('session_id'))) {
+            $this->settings->set('session_id', Signatures::generateUUID(true));
+        }
 
         // Store various important parameters for easy access.
         $this->username = $username;
@@ -389,6 +403,7 @@ class Instagram
         $this->uuid = $this->settings->get('uuid');
         $this->advertising_id = $this->settings->get('advertising_id');
         $this->device_id = $this->settings->get('device_id');
+        $this->session_id = $this->settings->get('session_id');
         $this->experiments = $this->settings->getExperiments();
 
         // Load the previous session details if we're possibly logged in.
@@ -629,6 +644,11 @@ class Instagram
             if (is_null($lastLoginTime) || (time() - $lastLoginTime) > $appRefreshInterval) {
                 $this->settings->set('last_login', time());
 
+                // Generate and save a new application session ID.
+                $this->session_id = Signatures::generateUUID(true);
+                $this->settings->set('session_id', $this->session_id);
+
+                // Do the rest of the "user is re-opening the app" API flow...
                 $this->people->getAutoCompleteUserList();
                 $this->story->getReelsTrayFeed();
                 $this->direct->getRankedRecipients('reshare', true);
