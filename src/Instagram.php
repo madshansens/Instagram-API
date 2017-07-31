@@ -444,11 +444,11 @@ class Instagram
 
         // Perform a full relogin if necessary.
         if (!$this->isLoggedIn || $forceLogin) {
+            // Calling this non-token API will put a csrftoken in our cookie
+            // jar. We must do this before any functions that require a token.
             $this->internal->syncDeviceFeatures(true);
 
             $this->internal->readMsisdnHeader();
-
-            // Call log attribution API so a csrftoken is put in our cookie jar.
             $this->internal->logAttribution();
 
             try {
