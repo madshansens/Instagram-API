@@ -426,7 +426,7 @@ class Utils
         case Constants::FEED_DIRECT_STORY:
             if ($aspectRatio < MediaAutoResizer::MIN_STORY_RATIO || $aspectRatio > MediaAutoResizer::MAX_STORY_RATIO) {
                 throw new \InvalidArgumentException(sprintf(
-                    'Instagram only accepts story media with aspect ratios between %.2f and %.2f. Your file "%s" has a %.2f aspect ratio.',
+                    'Instagram only accepts story media with aspect ratios between %.3f and %.3f. Your file "%s" has a %.4f aspect ratio.',
                     MediaAutoResizer::MIN_STORY_RATIO, MediaAutoResizer::MAX_STORY_RATIO, $mediaFilename, $aspectRatio
                 ));
             }
@@ -434,7 +434,7 @@ class Utils
         default:
             if ($aspectRatio < MediaAutoResizer::MIN_RATIO || $aspectRatio > MediaAutoResizer::MAX_RATIO) {
                 throw new \InvalidArgumentException(sprintf(
-                    'Instagram only accepts media with aspect ratios between %.2f and %.2f. Your file "%s" has a %.2f aspect ratio.',
+                    'Instagram only accepts media with aspect ratios between %.3f and %.3f. Your file "%s" has a %.4f aspect ratio.',
                     MediaAutoResizer::MIN_RATIO, MediaAutoResizer::MAX_RATIO, $mediaFilename, $aspectRatio
                 ));
             }
@@ -523,6 +523,7 @@ class Utils
      * Automatically guarantees that the generated image follows Instagram's
      * allowed image specifications, so that there won't be any upload issues.
      *
+     * @param int    $targetFeed    One of the FEED_X constants.
      * @param string $videoFilename Path to the video file.
      *
      * @throws \InvalidArgumentException If the video file is missing.
@@ -533,6 +534,7 @@ class Utils
      * @return string The JPEG binary data for the generated thumbnail.
      */
     public static function createVideoIcon(
+        $targetFeed,
         $videoFilename)
     {
         // The user must have FFmpeg.
@@ -566,7 +568,7 @@ class Utils
             }
 
             // Automatically crop&resize the thumbnail to Instagram's requirements.
-            $resizer = new MediaAutoResizer($tmpFilename);
+            $resizer = new MediaAutoResizer($tmpFilename, ['targetFeed' => $targetFeed]);
             $jpegContents = file_get_contents($resizer->getFile()); // Process&get.
             $resizer->deleteFile();
 
