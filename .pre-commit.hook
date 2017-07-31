@@ -33,7 +33,7 @@ fi
 
 # Look for specific problems with the style, related to our project.
 echo "> Verifying checkStyle..."
-php devtools/checkStyle.php x
+/usr/bin/env php devtools/checkStyle.php x
 if [ $? -ne 0 ]; then
     failed="yes"
 fi
