@@ -246,7 +246,7 @@ class Internal extends RequestCollection
                     ->addPost('client_timestamp', (string) (time() - mt_rand(3, 10)))
                     ->addPost('upload_id', $uploadId);
 
-                if (is_string($link) && Utils::hasValidURLSyntax($link)) {
+                if (is_string($link) && Utils::hasValidWebURLSyntax($link)) {
                     $story_cta = '[{"links":[{"webUri":'.json_encode($link).'}]}]';
                     $request->addPost('story_cta', $story_cta);
                 }
@@ -499,7 +499,7 @@ class Internal extends RequestCollection
                     ->addPost('client_shared_at', time() - mt_rand(3, 10))
                     ->addPost('client_timestamp', time());
 
-                if (is_string($link) && Utils::hasValidURLSyntax($link)) {
+                if (is_string($link) && Utils::hasValidWebURLSyntax($link)) {
                     $story_cta = '[{"links":[{"webUri":'.json_encode($link).'}]}]';
                     $request->addPost('story_cta', $story_cta);
                 }

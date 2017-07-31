@@ -861,21 +861,33 @@ class Utils
     }
 
     /**
-     * Checks if a URL has valid syntax.
+     * Checks if a URL has valid "web" syntax.
      *
-     * The URL must contain a protocol and a host. Note that a valid URL doesn't
-     * mean that the target is valid/reachable. For example, "foo://localhost"
-     * is a "valid" URL. This function simply performs a URL syntax validation!
+     * This function is Unicode-aware.
+     *
+     * Be aware that it only performs URL syntax validation! It doesn't check
+     * if the domain/URL is fully valid and actually reachable!
+     *
+     * It verifies that the URL begins with either the "http://" or "https://"
+     * protocol, and that it must contain a host with at least one period in it,
+     * and at least two characters after the period (in other words, a TLD). The
+     * rest of the string can be any sequence of non-whitespace characters.
+     *
+     * For example, "http://localhost" will not be seen as a valid web URL, and
+     * "http://www.google.com foobar" is not a valid web URL since there's a
+     * space in it. But "https://bing.com" and "https://a.com/foo" are valid.
+     * However, "http://a.abdabdbadbadbsa" is also seen as a valid URL, since
+     * the validation is pretty simple and doesn't verify the TLDs (there are
+     * too many now to catch them all and new ones appear constantly).
      *
      * @param string $url
      *
-     * @return bool TRUE if valid syntax, otherwise FALSE.
+     * @return bool TRUE if valid web syntax, otherwise FALSE.
      */
-    public static function hasValidURLSyntax(
+    public static function hasValidWebURLSyntax(
         $url)
     {
-        return false !== filter_var($url, FILTER_VALIDATE_URL,
-                                    FILTER_FLAG_SCHEME_REQUIRED | FILTER_FLAG_HOST_REQUIRED);
+        return (bool) preg_match('/^https?:\/\/[^\s.\/]+\.[^\s.\/]{2}\S*$/iu', $url);
     }
 
     /**

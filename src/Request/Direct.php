@@ -797,7 +797,7 @@ class Direct extends RequestCollection
         $link,
         array $options = [])
     {
-        if (!Utils::hasValidURLSyntax($link)) {
+        if (!Utils::hasValidWebURLSyntax($link)) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a valid URL.', $link));
         }
 
