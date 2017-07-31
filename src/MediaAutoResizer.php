@@ -35,31 +35,14 @@ class MediaAutoResizer
     const EXPAND = 2;
 
     /**
-     * Lowest allowed aspect ratio (4:5, meaning portrait).
-     *
-     * These are decided by Instagram. Not by us!
-     *
-     * @var float
-     *
-     * @see https://help.instagram.com/1469029763400082
-     */
-    const MIN_RATIO = 0.8;
-
-    /**
-     * Highest allowed aspect ratio (1.91:1, meaning landscape).
-     *
-     * These are decided by Instagram. Not by us!
-     *
-     * @var float
-     */
-    const MAX_RATIO = 1.91;
-
-    /**
      * Maximum allowed image width.
+     *
+     * These are decided by Instagram. Not by us!
      *
      * This value is the same for both stories and general media.
      *
-     * These are decided by Instagram. Not by us!
+     * Note that Instagram doesn't enforce any max-height. Instead, it checks
+     * the width and aspect ratio which ensures that the height is legal too.
      *
      * @var int
      *
@@ -68,15 +51,28 @@ class MediaAutoResizer
     const MAX_WIDTH = 1080;
 
     /**
-     * Maximum allowed image height.
+     * Lowest allowed general media aspect ratio (4:5, meaning portrait).
      *
-     * This value is only for general media (not story media). It is derived
-     * from 1080 / 0.8 (tallest portrait aspect allowed). Instagram enforces the
-     * width & aspect. Height is auto-derived from that.
+     * These are decided by Instagram. Not by us!
      *
-     * @var int
+     * A different value (MIN_STORY_RATIO) will be used for story media.
+     *
+     * @var float
+     *
+     * @see https://help.instagram.com/1469029763400082
      */
-    const MAX_HEIGHT = 1350;
+    const MIN_RATIO = 0.8;
+
+    /**
+     * Highest allowed general media aspect ratio (1.91:1, meaning landscape).
+     *
+     * These are decided by Instagram. Not by us!
+     *
+     * A different value (MAX_STORY_RATIO) will be used for story media.
+     *
+     * @var float
+     */
+    const MAX_RATIO = 1.91;
 
     /**
      * Lowest allowed story aspect ratio.
@@ -86,8 +82,12 @@ class MediaAutoResizer
      * with a small range of similar portrait ratios also being used sometimes.
      *
      * We have selected a photo/video story aspect range which supports all
-     * story media aspects in common use by the official app: 0.56 - 0.67.
+     * story media aspects that are commonly used by the app: 0.56 - 0.67.
      * (That's ~1080x1611 to ~1080x1928.)
+     *
+     * However, note that we'll target the "best story aspect ratio range"
+     * by default and that you must manually disable that constructor option
+     * to get this extended story aspect range, if you REALLY want it...
      *
      * @var float
      *
@@ -105,13 +105,55 @@ class MediaAutoResizer
     const MAX_STORY_RATIO = 0.67;
 
     /**
+     * The best story aspect ratio.
+     *
+     * This is exactly 9:16 ratio, meaning a standard widescreen phone viewed in
+     * portrait mode. It is the most common story ratio on Instagram, and it's
+     * the one that looks the best on most devices. All other ratios will look
+     * "cropped" when viewed on 16:9 widescreen devices, since the app "zooms"
+     * the story until it fills the screen without any black bars. So unless the
+     * story is exactly 16:9, it won't look great on 16:9 screens.
+     *
+     * Every manufacturer uses 16:9 screens. Even Apple since the iPhone 5.
+     *
+     * Therefore, this will be the final target aspect ratio used EVERY time
+     * that media destined for a story feed is outside of the allowed range!
+     * That's because it doesn't make sense to let people target non-9:16 final
+     * story aspect ratios, since only 9:16 looks good on most devices!
+     *
+     * @var float
+     */
+    const BEST_STORY_RATIO = 0.5625;
+
+    /**
+     * Lowest ratio allowed when enforcing the best story aspect ratio.
+     *
+     * These constants are used instead of MIN_STORY_RATIO and MAX_STORY_RATIO
+     * whenever the user tells us to "use the best ~9:16 story ratio" (which is
+     * enabled by default). We need to allow a bit above/below it to prevent
+     * pointless processing when the media is a few pixels off from the perfect
+     * ratio, since the perfect story ratio is often impossible to hit unless
+     * the input media is already exactly 720x1280 or 1080x1920.
+     *
+     * @var float
+     */
+    const BEST_MIN_STORY_RATIO = 0.56;
+
+    /**
+     * Highest ratio allowed when enforcing the best story aspect ratio.
+     *
+     * @var float
+     */
+    const BEST_MAX_STORY_RATIO = 0.565;
+
+    /**
      * Output JPEG quality.
      *
      * This value was chosen because 100 is very wasteful. And don't tweak this
      * number, because the JPEG quality number is actually totally meaningless
      * (it is non-standardized) and Instagram can't even read it from the file.
      * They have no idea what quality we've used, and it can be harmful to go
-     * lower since different JPEG compressors (like PHP's implementation) use
+     * lower since different JPEG compressors (such as PHP's implementation) use
      * different quality scales and are often awful at lower qualities! We know
      * that PHP's JPEG quality at 95 is great, so there's no reason to lower it.
      *
@@ -134,6 +176,9 @@ class MediaAutoResizer
 
     /** @var string Input file path. */
     protected $_inputFile;
+
+    /** @var string Target feed (either "story" or "general"). */
+    protected $_targetFeed;
 
     /** @var float|null Minimum allowed aspect ratio. */
     protected $_minAspectRatio;
@@ -185,9 +230,11 @@ class MediaAutoResizer
      *
      * @param string $inputFile Path to an input file.
      * @param array  $options   An associative array of optional parameters, including:
+     *                          "targetFeed" (int) - One of the FEED_X constants, MUST be used if you're targeting stories, defaults to FEED_TIMELINE;
      *                          "cropFocus" (int) - Crop focus position (-50 .. 50) when cropping, uses intelligent guess if not set;
-     *                          "minAspectRatio" (float) - Minimum allowed aspect ratio, uses self::MIN_RATIO if not set;
-     *                          "maxAspectRatio" (float) - Maximum allowed aspect ratio, uses self::MAX_RATIO if not set;
+     *                          "minAspectRatio" (float) - Minimum allowed aspect ratio, uses auto-selected class constants if not set;
+     *                          "maxAspectRatio" (float) - Maximum allowed aspect ratio, uses auto-selected class constants if not set;
+     *                          "useBestStoryRatio" (bool) - Enabled by default and affects which min/max aspect class constants are auto-selected for stories;
      *                          "bgColor" (array) - Array with 3 color components [R, G, B] (0-255/0x00-0xFF) for the background, uses white if not set;
      *                          "operation" (int) - Operation to perform on the image (CROP or EXPAND), uses self::CROP if not set;
      *                          "tmpPath" (string) - Path to temp directory, uses system temp location or class-default if not set.
@@ -199,9 +246,11 @@ class MediaAutoResizer
         array $options = [])
     {
         // Assign variables for all options, to avoid bulky code repetition.
+        $targetFeed = isset($options['targetFeed']) ? $options['targetFeed'] : Constants::FEED_TIMELINE;
         $cropFocus = isset($options['cropFocus']) ? $options['cropFocus'] : null;
         $minAspectRatio = isset($options['minAspectRatio']) ? $options['minAspectRatio'] : null;
         $maxAspectRatio = isset($options['maxAspectRatio']) ? $options['maxAspectRatio'] : null;
+        $useBestStoryRatio = isset($options['useBestStoryRatio']) ? (bool) $options['useBestStoryRatio'] : true;
         $bgColor = isset($options['bgColor']) ? $options['bgColor'] : null;
         $operation = isset($options['operation']) ? $options['operation'] : null;
         $tmpPath = isset($options['tmpPath']) ? $options['tmpPath'] : null;
@@ -218,18 +267,44 @@ class MediaAutoResizer
         }
         $this->_cropFocus = $cropFocus;
 
-        // Aspect ratios.
-        if ($minAspectRatio !== null && ($minAspectRatio < self::MIN_RATIO || $minAspectRatio > self::MAX_RATIO)) {
-            throw new \InvalidArgumentException(sprintf('Minimum aspect ratio must be between %.2f and %.2f.',
-                self::MIN_RATIO, self::MAX_RATIO));
-        } elseif ($minAspectRatio === null) {
-            $minAspectRatio = self::MIN_RATIO;
+        // Target feed. Turn it into a string for easier processing,
+        // since we only care about story ratios vs general ratios.
+        switch ($targetFeed) {
+        case Constants::FEED_STORY:
+        case Constants::FEED_DIRECT_STORY:
+            $targetFeed = 'story';
+            break;
+        default:
+            $targetFeed = 'general';
         }
-        if ($maxAspectRatio !== null && ($maxAspectRatio < self::MIN_RATIO || $maxAspectRatio > self::MAX_RATIO)) {
-            throw new \InvalidArgumentException(sprintf('Maximum aspect ratio must be between %.2f and %.2f.',
-                self::MIN_RATIO, self::MAX_RATIO));
+        $this->_targetFeed = $targetFeed;
+
+        // Determine the legal min/max aspect ratios for the target feed.
+        if ($targetFeed == 'story') {
+            if ($useBestStoryRatio) { // On by default.
+                $allowedMinRatio = self::BEST_MIN_STORY_RATIO;
+                $allowedMaxRatio = self::BEST_MAX_STORY_RATIO;
+            } else {
+                $allowedMinRatio = self::MIN_STORY_RATIO;
+                $allowedMaxRatio = self::MAX_STORY_RATIO;
+            }
+        } else {
+            $allowedMinRatio = self::MIN_RATIO;
+            $allowedMaxRatio = self::MAX_RATIO;
+        }
+
+        // Select allowed aspect ratio range based on defaults and user input.
+        if ($minAspectRatio !== null && ($minAspectRatio < $allowedMinRatio || $minAspectRatio > $allowedMaxRatio)) {
+            throw new \InvalidArgumentException(sprintf('Minimum aspect ratio must be between %.3f and %.3f.',
+                $allowedMinRatio, $allowedMaxRatio));
+        } elseif ($minAspectRatio === null) {
+            $minAspectRatio = $allowedMinRatio;
+        }
+        if ($maxAspectRatio !== null && ($maxAspectRatio < $allowedMinRatio || $maxAspectRatio > $allowedMaxRatio)) {
+            throw new \InvalidArgumentException(sprintf('Maximum aspect ratio must be between %.3f and %.3f.',
+                $allowedMinRatio, $allowedMaxRatio));
         } elseif ($maxAspectRatio === null) {
-            $maxAspectRatio = self::MAX_RATIO;
+            $maxAspectRatio = $allowedMaxRatio;
         }
         if ($minAspectRatio !== null && $maxAspectRatio !== null && $minAspectRatio > $maxAspectRatio) {
             throw new \InvalidArgumentException('Maximum aspect ratio must be greater or equal to minimum.');
@@ -381,8 +456,8 @@ class MediaAutoResizer
             return true;
         }
 
-        // Process if any side > maximum allowed.
-        if ($this->_width > self::MAX_WIDTH || $this->_height > self::MAX_HEIGHT) {
+        // Process if width > maximum allowed.
+        if ($this->_width > self::MAX_WIDTH) {
             return true;
         }
 
@@ -564,11 +639,12 @@ class MediaAutoResizer
 
         // Check aspect ratio and crop/expand to fit requirements if needed.
         if ($this->_minAspectRatio !== null && $this->_aspectRatio < $this->_minAspectRatio) {
-            $aspectRatio = $this->_minAspectRatio;
+            // Determine target ratio; in case of stories we always target 9:16.
+            $targetAspectRatio = $this->_targetFeed === 'story' ? self::BEST_STORY_RATIO : $this->_minAspectRatio;
             if ($this->_operation === self::CROP) {
                 // We need to limit the height, so floor is used intentionally to
                 // AVOID rounding height upwards to a still-illegal aspect ratio.
-                $height = floor($this->_width / $this->_minAspectRatio);
+                $height = floor($this->_width / $targetAspectRatio);
 
                 // Crop vertical images from top by default, to keep faces, etc.
                 $cropFocus = $this->_cropFocus !== null ? $this->_cropFocus : -50;
@@ -590,14 +666,15 @@ class MediaAutoResizer
                 // their values are very close to each other! For example with
                 // 450x600 input and min/max aspect of 1.2625, it'll create a
                 // 758x600 expanded image (ratio 1.2633). That's unavoidable.
-                $width = ceil($this->_height * $this->_minAspectRatio);
+                $width = ceil($this->_height * $targetAspectRatio);
             }
         } elseif ($this->_maxAspectRatio !== null && $this->_aspectRatio > $this->_maxAspectRatio) {
-            $aspectRatio = $this->_maxAspectRatio;
+            // Determine target ratio; in case of stories we always target 9:16.
+            $targetAspectRatio = $this->_targetFeed === 'story' ? self::BEST_STORY_RATIO : $this->_maxAspectRatio;
             if ($this->_operation === self::CROP) {
                 // We need to limit the width. We use floor to guarantee cutting
                 // enough pixels, since our width exceeds the maximum allowed ratio.
-                $width = floor($this->_height * $this->_maxAspectRatio);
+                $width = floor($this->_height * $targetAspectRatio);
 
                 // Crop horizontal images from center by default.
                 $cropFocus = $this->_cropFocus !== null ? $this->_cropFocus : 0;
@@ -619,15 +696,15 @@ class MediaAutoResizer
                 // their values are very close to each other! For example with
                 // 600x450 input and min/max aspect of 0.8625, it'll create a
                 // 600x696 expanded image (ratio 0.86206). That's unavoidable.
-                $height = ceil($this->_width / $this->_maxAspectRatio);
+                $height = ceil($this->_width / $targetAspectRatio);
             }
         } else {
             // The image's aspect ratio is already within the legal range.
-            $aspectRatio = $this->_aspectRatio;
+            $targetAspectRatio = $this->_aspectRatio;
         }
 
         // Handle square target ratios or too-large target dimensions.
-        if ($aspectRatio == 1) {
+        if ($targetAspectRatio == 1) {
             // Ratio = 1: Square.
             // NOTE: Our square will be the size of the shortest side when
             // cropping or the longest side when expanding, but never more
@@ -641,9 +718,8 @@ class MediaAutoResizer
             // All other ratios: Ensure the final width fits Instagram's limit.
             // If ratio > 1: Landscape (wider than tall). Limit by width.
             // If ratio < 1: Portrait (taller than wide). Limit by width.
-            // NOTE: Maximum "allowed" height is 1350, which is EXACTLY what you
-            // get with a maxwidth of 1080 / 0.8 (4:5 aspect ratio). Instagram
-            // enforces width & aspect ratio, which in turn auto-limits height.
+            // NOTE: Instagram enforces width & aspect ratio, which in turn
+            // auto-limits height.
             if ($width > self::MAX_WIDTH) {
                 // Target exceeds Instagram's pixel-limit. Set width to max.
                 $width = self::MAX_WIDTH;
@@ -652,7 +728,7 @@ class MediaAutoResizer
                 // otherwise result may not be tall enough to get a legal ratio!
                 // This is safe since the height will always be lower than its
                 // original even via ceil(), since we've reduced the width.
-                $height = $aspectRatio > 1 ? ceil($width / $aspectRatio) : floor($width / $aspectRatio);
+                $height = $targetAspectRatio > 1 ? ceil($width / $targetAspectRatio) : floor($width / $targetAspectRatio);
             }
         }
 
