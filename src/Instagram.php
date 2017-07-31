@@ -446,11 +446,10 @@ class Instagram
         if (!$this->isLoggedIn || $forceLogin) {
             $this->internal->syncDeviceFeatures(true);
 
+            $this->internal->readMsisdnHeader();
+
             // Call log attribution API so a csrftoken is put in our cookie jar.
             $this->internal->logAttribution();
-
-            // Not required, at least for now. Last check 10.30.0.
-            //$this->internal->readMsisdnHeader();
 
             try {
                 $response = $this->request('accounts/login/')
@@ -458,8 +457,8 @@ class Instagram
                     ->addPost('phone_id', $this->settings->get('phone_id'))
                     ->addPost('_csrftoken', $this->client->getToken())
                     ->addPost('username', $this->username)
-                    ->addPost('guid', $this->uuid)
                     ->addPost('adid', $this->advertising_id)
+                    ->addPost('guid', $this->uuid)
                     ->addPost('device_id', $this->device_id)
                     ->addPost('password', $this->password)
                     ->addPost('login_attempt_count', 0)
