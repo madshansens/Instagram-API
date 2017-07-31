@@ -2,13 +2,14 @@
 
 :+1::tada: First off, thanks for taking the time to contribute! :tada::+1:
 
-The following is a set of guidelines for contributing to Instagram API, which are hosted in [Instagram API repository](https://github.com/mgp25/Instagram-API) on GitHub.
+The following is a set of guidelines for contributing to the Instagram API, which is hosted in the [Instagram API repository](https://github.com/mgp25/Instagram-API) on GitHub.
 These are just guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
 
 - [What should I know before I get started?](#what-should-i-know-before-i-get-started)
   * [Code of Conduct](#code-of-conduct)
 
 - [Basic rules](#basic-rules)
+  * [Git Setup](#git-setup)
   * [Commits](#commits)
   * [Modifying anything in the existing code](#modifying-anything-in-the-existing-code)
 
@@ -34,6 +35,15 @@ Please report any unacceptable behavior.
 Important! Your contributions must follow all of these rules for a consistent and bug-free project.
 
 This is a document which, among other things, describes PSR-4 class autoloading, clean commits, how to handle/document exceptions, how to structure function arguments, naming clear variables, always adding/updating PHPdoc blocks in all affected functions, and how to verify that your changes don't _break everything_ when performing big changes to existing functions or adding brand new functions and classes.
+
+
+### Git Setup
+
+If you are using a Linux/Mac/Unix system, you **MUST** install our git-hook in your local repository. It will help prevent you from accidentally committing badly formatted code. Please run the following command in the project's root folder (the folder which has files like `README.md` etc), to install the hook in your repository:
+
+```
+ln -fs "../../.pre-commit.hook" .git/hooks/pre-commit
+```
 
 
 ### Commits
