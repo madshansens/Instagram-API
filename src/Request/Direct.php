@@ -472,9 +472,23 @@ class Direct extends RequestCollection
             throw new \InvalidArgumentException('Text can not be empty.');
         }
 
-        return $this->_sendDirectItem('message', $recipients, array_merge($options, [
-            'text' => $text,
-        ]));
+        $urls = Utils::extractURLs($text);
+        if (count($urls)) {
+            /** @var Response\DirectSendItemResponse $result */
+            $result = $this->_sendDirectItem('links', $recipients, array_merge($options, [
+                'link_urls' => json_encode(array_map(function ($url) {
+                    return $url['fullUrl'];
+                }, $urls)),
+                'link_text' => $text,
+            ]));
+        } else {
+            /** @var Response\DirectSendItemResponse $result */
+            $result = $this->_sendDirectItem('message', $recipients, array_merge($options, [
+                'text' => $text,
+            ]));
+        }
+
+        return $result;
     }
 
     /**
@@ -772,38 +786,6 @@ class Direct extends RequestCollection
 
         return $this->_sendDirectItem('profile', $recipients, array_merge($options, [
             'profile_user_id' => $userId,
-        ]));
-    }
-
-    /**
-     * Send a link to a user's inbox.
-     *
-     * @param array  $recipients An array with "users" or "thread" keys.
-     *                           To start a new thread, provide "users" as an array
-     *                           of numerical UserPK IDs. To use an existing thread
-     *                           instead, provide "thread" with the thread ID.
-     * @param string $link       The URL to send.
-     * @param array  $options    An associative array of optional parameters, including:
-     *                           "client_context" - predefined UUID used to prevent double-posting;
-     *                           "text" - text message.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\DirectSendItemResponse
-     */
-    public function sendLink(
-        $recipients,
-        $link,
-        array $options = [])
-    {
-        if (!Utils::hasValidWebURLSyntax($link)) {
-            throw new \InvalidArgumentException(sprintf('"%s" is not a valid URL.', $link));
-        }
-
-        return $this->_sendDirectItem('links', $recipients, array_merge($options, [
-            'link_urls' => json_encode([$link]),
-            'link_text' => isset($options['text']) ? $options['text'] : $link,
         ]));
     }
 
