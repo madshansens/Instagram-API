@@ -13,10 +13,26 @@ require __DIR__.'/../vendor/autoload.php';
  * derive from AutoPropertyHandler, and documents their getters, setters and
  * is-ers via adding "@method" declarations to the PHPdoc. That documentation is
  * necessary for things like code analysis tools and IDE autocomplete!
+ *
+ * Tip: Use the "--validate-only" param to check code without writing to disk.
+ * A non-zero exit code will indicate that some files need new class docs.
  */
 
-$autodoc = new autodoc(__DIR__.'/../src/');
-$autodoc->run();
+$opts = getopt('', ['validate-only']);
+$isValidateRun = isset($opts['validate-only']);
+
+$autodoc = new autodoc(__DIR__.'/../src/', !$isValidateRun);
+$badFiles = $autodoc->run();
+
+if ($isValidateRun && count($badFiles) > 0) {
+    printf("The following %d files need updated class method documentation:\n", count($badFiles));
+    foreach ($badFiles as $file) {
+        printf("- \"%s\"\n", $file);
+    }
+
+    // Exit with non-zero code to signal that there are problems.
+    exit(1);
+}
 
 class autodoc
 {
@@ -26,17 +42,25 @@ class autodoc
     private $_dir;
 
     /**
+     * @var bool
+     */
+    private $_writeFiles;
+
+    /**
      * Constructor.
      *
-     * @param string $dir
+     * @param string $dir        Directory to process.
+     * @param bool   $writeFiles If FALSE, only checks if existing docs are ok.
      */
     public function __construct(
-        $dir)
+        $dir,
+        $writeFiles = true)
     {
         $this->_dir = realpath($dir);
         if ($this->_dir === false) {
             throw new InvalidArgumentException(sprintf('"%s" is not a valid path.', $dir));
         }
+        $this->_writeFiles = $writeFiles;
     }
 
     /**
@@ -185,23 +209,29 @@ class autodoc
      *
      * @param string          $filePath
      * @param ReflectionClass $reflection
+     *
+     * @return bool TRUE if the file needed new docs, otherwise FALSE.
      */
     private function _processFile(
         $filePath,
         ReflectionClass $reflection)
     {
+        $needsNewDocs = false;
         $classDoc = $reflection->getDocComment();
         $methods = $this->_documentMagicMethods($reflection);
         if ($classDoc === false && strlen($methods)) {
             // We have no PHPDoc, but we found methods, so add new docs.
-            $input = file($filePath);
-            $startLine = $reflection->getStartLine();
-            $output = implode('', array_slice($input, 0, $startLine - 1))
-                ."/**\n"
-                .$methods
-                ."\n */\n"
-                .implode('', array_slice($input, $startLine - 1));
-            file_put_contents($filePath, $output);
+            $needsNewDocs = true;
+            if ($this->_writeFiles) {
+                $input = file($filePath);
+                $startLine = $reflection->getStartLine();
+                $output = implode('', array_slice($input, 0, $startLine - 1))
+                        ."/**\n"
+                        .$methods
+                        ."\n */\n"
+                        .implode('', array_slice($input, $startLine - 1));
+                file_put_contents($filePath, $output);
+            }
         } elseif ($classDoc !== false) {
             // We already have PHPDoc, so let's merge into it.
             $existing = $this->_cleanClassDoc($classDoc);
@@ -216,17 +246,24 @@ class autodoc
             }
             // Only write the new contents to disk if the docs have changed.
             if ($output !== $classDoc."\n") {
-                $contents = file_get_contents($filePath);
-                // Replace only first occurence (we append \n to the search
-                // string to be able to remove empty PHPDoc).
-                $contents = preg_replace('#'.preg_quote($classDoc."\n", '#').'#', $output, $contents, 1);
-                file_put_contents($filePath, $contents);
+                $needsNewDocs = true;
+                if ($this->_writeFiles) {
+                    $contents = file_get_contents($filePath);
+                    // Replace only first occurence (we append \n to the search
+                    // string to be able to remove empty PHPDoc).
+                    $contents = preg_replace('#'.preg_quote($classDoc."\n", '#').'#', $output, $contents, 1);
+                    file_put_contents($filePath, $contents);
+                }
             }
         }
+
+        return $needsNewDocs;
     }
 
     /**
      * Process all *.php files in given path.
+     *
+     * @return string[] An array with all files that needed new docs.
      */
     public function run()
     {
@@ -234,11 +271,17 @@ class autodoc
         $recursiveIterator = new RecursiveIteratorIterator($directoryIterator);
         $phpIterator = new RegexIterator($recursiveIterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
 
+        $filesWithProblems = [];
         foreach ($phpIterator as $filePath => $dummy) {
             $reflection = new ReflectionClass($this->_extractClassName($filePath));
             if ($reflection->isSubclassOf('\InstagramAPI\AutoPropertyHandler')) {
-                $this->_processFile($filePath, $reflection);
+                $hasProblems = $this->_processFile($filePath, $reflection);
+                if ($hasProblems) {
+                    $filesWithProblems[] = $filePath;
+                }
             }
         }
+
+        return $filesWithProblems;
     }
 }
