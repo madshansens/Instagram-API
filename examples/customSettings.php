@@ -61,7 +61,7 @@ $ig = new \InstagramAPI\Instagram($debug, $truncatedDebug, [
 // about hasUser(), moveUser() and deleteUser(). Three very, VERY DANGEROUS
 // commands which let you rename or delete account settings in your storage.
 // Carefully read through their descriptions and use them wisely. If you're sure
-// that you dare to use them, then you can access them via $ig->storage->...
+// that you dare to use them, then you can access them via $ig->settings->...
 
 // 6. Lastly... if you want to implement your own completely custom storage,
 // then you simply have to do one thing: Implement the StorageInterface class
