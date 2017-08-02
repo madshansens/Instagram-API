@@ -6,7 +6,7 @@ use InstagramAPI\AutoPropertyHandler;
 
 /**
  * @method mixed getBroadcasts()
- * @method Media getMedia()
+ * @method Item getMedia()
  * @method mixed getStickerVersion()
  * @method mixed getStoryRankingToken()
  * @method mixed getText()
@@ -20,7 +20,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isTray()
  * @method bool isType()
  * @method setBroadcasts(mixed $value)
- * @method setMedia(Media $value)
+ * @method setMedia(Item $value)
  * @method setStickerVersion(mixed $value)
  * @method setStoryRankingToken(mixed $value)
  * @method setText(mixed $value)
