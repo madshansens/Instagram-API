@@ -326,8 +326,11 @@ class Media extends RequestCollection
     /**
      * Post a comment on a media item.
      *
-     * @param string $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string $commentText Your comment text.
+     * @param string $mediaId        The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string $commentText    Your comment text.
+     * @param string $replyCommentId (optional) ID of the comment you want to reply (ie "17895795823020906").
+     *                               $commentText MUST contain a mention to the user.
+     * @param string $module         (optional) From which app module (page) you're performing this action.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -335,18 +338,25 @@ class Media extends RequestCollection
      */
     public function comment(
         $mediaId,
-        $commentText)
+        $commentText,
+        $replyCommentId = null,
+        $module = 'comments_feed_timeline')
     {
-        return $this->ig->request("media/{$mediaId}/comment/")
+        $request = $this->ig->request("media/{$mediaId}/comment/")
             ->addPost('user_breadcrumb', Utils::generateUserBreadcrumb(mb_strlen($commentText)))
             ->addPost('idempotence_token', Signatures::generateUUID(true))
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('comment_text', $commentText)
-            ->addPost('containermodule', 'comments_feed_timeline')
-            ->addPost('radio_type', 'wifi-none')
-            ->getResponse(new Response\CommentResponse());
+            ->addPost('containermodule', $module)
+            ->addPost('radio_type', 'wifi-none');
+
+        if (!is_null($replyCommentId)) {
+            $request->addPost('replied_to_comment_id', $replyCommentId);
+        }
+
+        return $request->getResponse(new Response\CommentResponse());
     }
 
     /**
