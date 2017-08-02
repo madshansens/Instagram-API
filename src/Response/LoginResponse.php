@@ -8,6 +8,7 @@ use InstagramAPI\ResponseTrait;
 
 /**
  * @method mixed getButtons()
+ * @method Model\Challenge getChallenge()
  * @method mixed getCheckpointUrl()
  * @method mixed getErrorTitle()
  * @method mixed getErrorType()
@@ -26,6 +27,7 @@ use InstagramAPI\ResponseTrait;
  * @method mixed getTwoFactorRequired()
  * @method mixed getUsername()
  * @method bool isButtons()
+ * @method bool isChallenge()
  * @method bool isCheckpointUrl()
  * @method bool isErrorTitle()
  * @method bool isErrorType()
@@ -44,6 +46,7 @@ use InstagramAPI\ResponseTrait;
  * @method bool isTwoFactorRequired()
  * @method bool isUsername()
  * @method setButtons(mixed $value)
+ * @method setChallenge(Model\Challenge $value)
  * @method setCheckpointUrl(mixed $value)
  * @method setErrorTitle(mixed $value)
  * @method setErrorType(mixed $value)
@@ -99,4 +102,8 @@ class LoginResponse extends AutoPropertyHandler implements ResponseInterface
     public $checkpoint_url;
     public $lock;
     public $help_url;
+    /**
+     * @var Model\Challenge
+     */
+    public $challenge;
 }
