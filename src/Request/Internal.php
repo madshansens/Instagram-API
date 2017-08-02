@@ -191,6 +191,8 @@ class Internal extends RequestCollection
         /** @var void Photo filter. THIS DOES NOTHING! All real filters are done in the mobile app. */
         // $filter = isset($externalMetadata['filter']) ? $externalMetadata['filter'] : null;
         $filter = null; // COMMENTED OUT SO USERS UNDERSTAND THEY CAN'T USE THIS!
+        /** @var array Hashtags to use for the media. ONLY STORY MEDIA! */
+        $hashtags = (isset($externalMetadata['hashtags']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['hashtags'] : null;
 
         // Fix very bad external user-metadata values.
         if (!is_string($captionText)) {
@@ -254,6 +256,13 @@ class Internal extends RequestCollection
                 if (is_string($link) && Utils::hasValidWebURLSyntax($link)) {
                     $story_cta = '[{"links":[{"webUri":'.json_encode($link).'}]}]';
                     $request->addPost('story_cta', $story_cta);
+                }
+                if (!is_null($hashtags) && $captionText != '') {
+                    Utils::throwIfInvalidHashtags($captionText, $hashtags);
+                    $request
+                        ->addPost('story_hashtags', json_encode($hashtags))
+                        ->addPost('caption', $captionText)
+                        ->addPost('mas_opt_in', 'NOT_PROMPTED');
                 }
                 break;
             case Constants::FEED_DIRECT_STORY:
@@ -461,6 +470,8 @@ class Internal extends RequestCollection
         /** @var string|null Link to attach to the media. ONLY USED FOR STORY MEDIA,
          * AND YOU MUST HAVE A BUSINESS INSTAGRAM ACCOUNT TO POST A STORY LINK! */
         $link = (isset($externalMetadata['link']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['link'] : null;
+        /** @var array Hashtags to use for the media. ONLY STORY MEDIA! */
+        $hashtags = (isset($externalMetadata['hashtags']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['hashtags'] : null;
 
         // Fix very bad external user-metadata values.
         if (!is_string($captionText)) {
@@ -507,6 +518,13 @@ class Internal extends RequestCollection
                 if (is_string($link) && Utils::hasValidWebURLSyntax($link)) {
                     $story_cta = '[{"links":[{"webUri":'.json_encode($link).'}]}]';
                     $request->addPost('story_cta', $story_cta);
+                }
+                if (!is_null($hashtags) && $captionText != '') {
+                    Utils::throwIfInvalidHashtags($captionText, $hashtags);
+                    $request
+                        ->addPost('story_hashtags', json_encode($hashtags))
+                        ->addPost('caption', $captionText)
+                        ->addPost('mas_opt_in', 'NOT_PROMPTED');
                 }
                 break;
             case Constants::FEED_DIRECT_STORY:
