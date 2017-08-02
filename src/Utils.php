@@ -643,6 +643,43 @@ class Utils
     }
 
     /**
+     * Verifies if a caption is valid for a hashtag and verifies an array of hashtags.
+     *
+     * @param string $captionText The caption for the story hashtag.
+     * @param array  $hashtags    The array of usertags.
+     *
+     * @throws \InvalidArgumentException If caption doesn't contains any hashtag.
+     *                                   or if any tags are invalid.
+     */
+    public static function throwIfInvalidStoryHashtags(
+         $captionText,
+         array $hashtags)
+    {
+        preg_match_all("/(#\w+)/u", $captionText, $matches);
+
+        if (!$matches[1]) {
+            throw new \InvalidArgumentException('Invalid caption for hashtag.');
+        }
+
+        foreach ($hashtags as $hashtag) {
+            if (!in_array($hashtag['tag_name'], $matches[1])) {
+                throw new \InvalidArgumentException(sprintf('Tag name "%s" does not exist in the caption text.', $hashtag['tag_name']));
+            }
+            foreach ($hashtag as $k => $v) {
+                if (!in_array($k, ['tag_name', 'x', 'y', 'width', 'height', 'rotation', 'is_sticker', 'use_custom_title'], true)) {
+                    throw new \InvalidArgumentException(sprintf('Invalid key "%s" for hashtag.', $k));
+                }
+                if (
+                     (($k !== 'is_sticker' && $k !== 'use_custom_title') && ($v < 0.0 || $v > 1.0))
+                     || (($k === 'is_sticker' || $k === 'use_custom_title') && !is_bool($v))
+                ) {
+                    throw new \InvalidArgumentException(sprintf('Invalid value "%s" for hashtag "%s".', $v, $k));
+                }
+            }
+        }
+    }
+
+    /**
      * Checks and validates a media item's type.
      *
      * @param string|int $mediaType The type of the media item. One of: "PHOTO", "VIDEO"
