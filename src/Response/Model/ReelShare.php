@@ -39,7 +39,7 @@ class ReelShare extends AutoPropertyHandler
     public $text;
     public $type;
     /**
-     * @var Media
+     * @var Item
      */
     public $media;
 }
