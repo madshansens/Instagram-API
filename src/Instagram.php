@@ -623,7 +623,7 @@ class Instagram
             $this->people->getRecentActivityInbox();
             $this->internal->getQPFetch();
             $this->media->getBlockedMedia();
-            $this->discover->getExploreFeed();
+            $this->discover->getExploreFeed(null, true);
             //$this->internal->getFacebookOTA();
         } else {
             // Act like a real logged in app client refreshing its news timeline.

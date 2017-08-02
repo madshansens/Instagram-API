@@ -12,18 +12,29 @@ class Discover extends RequestCollection
     /**
      * Get Explore tab feed.
      *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param null|string $maxId      Next "maximum ID", used for pagination.
+     * @param bool        $isPrefetch Flag for first fetch.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\ExploreResponse
      */
     public function getExploreFeed(
-        $maxId = null)
+        $maxId = null,
+        $isPrefetch = false)
     {
-        $request = $this->ig->request('discover/explore/');
-        if ($maxId) {
+        $request = $this->ig->request('discover/explore/')
+            ->addParam('is_prefetch', $isPrefetch)
+            ->addParam('is_from_promote', false)
+            ->addParam('timezone_offset', 0)
+            ->addParam('session_id', $this->ig->session_id);
+
+        if (!$isPrefetch) {
+            if (is_null($maxId)) {
+                $maxId = 0;
+            }
             $request->addParam('max_id', $maxId);
+            $request->addParam('module', 'explore_popular');
         }
 
         return $request->getResponse(new Response\ExploreResponse());
