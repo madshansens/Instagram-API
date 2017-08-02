@@ -11,7 +11,9 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getHideInThread()
  * @method string getItemId()
  * @method mixed getItemType()
+ * @method mixed getLike()
  * @method DirectLink getLink()
+ * @method mixed getLiveVideoShare()
  * @method Location getLocation()
  * @method DirectThreadItemMedia getMedia()
  * @method Item getMediaShare()
@@ -29,7 +31,9 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isHideInThread()
  * @method bool isItemId()
  * @method bool isItemType()
+ * @method bool isLike()
  * @method bool isLink()
+ * @method bool isLiveVideoShare()
  * @method bool isLocation()
  * @method bool isMedia()
  * @method bool isMediaShare()
@@ -47,7 +51,9 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setHideInThread(mixed $value)
  * @method setItemId(string $value)
  * @method setItemType(mixed $value)
+ * @method setLike(mixed $value)
  * @method setLink(DirectLink $value)
+ * @method setLiveVideoShare(mixed $value)
  * @method setLocation(Location $value)
  * @method setMedia(DirectThreadItemMedia $value)
  * @method setMediaShare(Item $value)
@@ -133,4 +139,6 @@ class DirectThreadItem extends AutoPropertyHandler
      * @var Location
      */
     public $location;
+    public $like;
+    public $live_video_share;
 }
