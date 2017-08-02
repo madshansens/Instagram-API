@@ -5,17 +5,17 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyHandler;
 
 /**
- * @method DirectLinkContext getLinkContext()
+ * @method LinkContext getLinkContext()
  * @method string getText()
  * @method bool isLinkContext()
  * @method bool isText()
- * @method setLinkContext(DirectLinkContext $value)
+ * @method setLinkContext(LinkContext $value)
  * @method setText(string $value)
  */
 class DirectLink extends AutoPropertyHandler
 {
     /** @var string */
     public $text;
-    /** @var DirectLinkContext */
+    /** @var LinkContext */
     public $link_context;
 }
