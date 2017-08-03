@@ -255,4 +255,25 @@ class Live extends RequestCollection
             ->addPost('internal_only', 0)
             ->getResponse(new Response\CreateLiveResponse());
     }
+
+    /**
+     * Start a live broadcast.
+     *
+     * @param string $broadcastId       The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param bool   $sendNotifications (optional).
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\StartLiveResponse
+     */
+    public function start(
+        $broadcastId,
+        $sendNotifications = true)
+    {
+        return $this->ig->request("live/{$broadcastId}/start/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('should_send_notifications', (int) $sendNotifications)
+            ->getResponse(new Response\StartLiveResponse());
+    }
 }
