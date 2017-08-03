@@ -206,4 +206,26 @@ class Live extends RequestCollection
             ->addParam('like_ts', $likeTs)
             ->getResponse(new Response\BroadcastLikeCountResponse());
     }
+
+    /**
+     * Get live likes after live broadcast is over.
+     *
+     * @param string $broadcastId    The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param int    $startingOffset (optional).
+     * @param string $encodingTag    (optional).
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BroadcastCommentsResponse
+     */
+    public function getPostLiveLikes(
+        $broadcastId,
+        $startingOffset = 0,
+        $encodingTag = 'instagram_dash_remuxed')
+    {
+        return $this->ig->request("live/{$broadcastId}/get_post_live_likes/")
+            ->addParam('starting_offset', $startingOffset)
+            ->addParam('encoding_tag', $encodingTag)
+            ->getResponse(new Response\PostLiveLikesResponse());
+    }
 }
