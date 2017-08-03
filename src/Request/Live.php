@@ -158,7 +158,7 @@ class Live extends RequestCollection
         return $this->ig->request("live/{$broadcastId}/get_post_live_comments/")
             ->addParam('starting_offset', $startingOffset)
             ->addParam('encoding_tag', $encodingTag)
-            ->getResponse(new Response\BroadcastCommentsResponse());
+            ->getResponse(new Response\PostLiveCommentsResponse());
     }
 
     /**
