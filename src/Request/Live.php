@@ -148,7 +148,7 @@ class Live extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\BroadcastCommentsResponse
+     * @return \InstagramAPI\Response\PostLiveCommentsResponse
      */
     public function getPostLiveComments(
         $broadcastId,
@@ -216,7 +216,7 @@ class Live extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\BroadcastCommentsResponse
+     * @return \InstagramAPI\Response\PostLiveLikesResponse
      */
     public function getPostLiveLikes(
         $broadcastId,
@@ -227,5 +227,32 @@ class Live extends RequestCollection
             ->addParam('starting_offset', $startingOffset)
             ->addParam('encoding_tag', $encodingTag)
             ->getResponse(new Response\PostLiveLikesResponse());
+    }
+
+    /**
+     * Create a live broadcast.
+     *
+     * @param int    $previewHeight    (optional).
+     * @param int    $previewWidth     (optional).
+     * @param string $broadcastMessage (optional).
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CreateLiveResponse
+     */
+    public function create(
+        $previewHeight = 1184,
+        $previewWidth = 720,
+        $broadcastMessage = '')
+    {
+        return $this->ig->request('live/create/')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('preview_height', $previewHeight)
+            ->addPost('preview_width', $previewWidth)
+            ->addPost('broadcast_message', $broadcastMessage)
+            ->addPost('broadcast_type', 'RTMP')
+            ->addPost('internal_only', 0)
+            ->getResponse(new Response\CreateLiveResponse());
     }
 }
