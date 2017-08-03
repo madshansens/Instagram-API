@@ -140,6 +140,28 @@ class Live extends RequestCollection
     }
 
     /**
+     * Get live comments after live broadcast is over.
+     *
+     * @param string $broadcastId    The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param int    $startingOffset (optional).
+     * @param string $encodingTag    (optional).
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BroadcastCommentsResponse
+     */
+    public function getPostLiveComments(
+        $broadcastId,
+        $startingOffset = 0,
+        $encodingTag = 'instagram_dash_remuxed')
+    {
+        return $this->ig->request("live/{$broadcastId}/get_post_live_comments/")
+            ->addParam('starting_offset', $startingOffset)
+            ->addParam('encoding_tag', $encodingTag)
+            ->getResponse(new Response\BroadcastCommentsResponse());
+    }
+
+    /**
      * Like a broadcast.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
