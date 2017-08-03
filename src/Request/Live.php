@@ -276,4 +276,23 @@ class Live extends RequestCollection
             ->addPost('should_send_notifications', (int) $sendNotifications)
             ->getResponse(new Response\StartLiveResponse());
     }
+
+    /**
+     * Add broadcast to your feed (replay).
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\AddToLiveResponse
+     */
+    public function addToPostLive(
+        $broadcastId)
+    {
+        return $this->ig->request("live/{$broadcastId}/add_to_post_live/")
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\AddToLiveResponse());
+    }
 }
