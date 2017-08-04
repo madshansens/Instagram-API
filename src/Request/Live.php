@@ -80,6 +80,38 @@ class Live extends RequestCollection
     }
 
     /**
+     * Get viewer list of a broadcast.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BroadcastInfoResponse
+     */
+    public function getViewerList(
+        $broadcastId)
+    {
+        return $this->ig->request("live/{$broadcastId}/get_viewer_list/")
+            ->getResponse(new Response\ViewerListResponse());
+    }
+
+    /**
+     * Get viewer list of a broadcast when it has ended.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BroadcastInfoResponse
+     */
+    public function getFinalViewerList(
+        $broadcastId)
+    {
+        return $this->ig->request("live/{$broadcastId}/get_final_viewer_list/")
+            ->getResponse(new Response\FinalViewerListResponse());
+    }
+
+    /**
      * Get a live broadcast's heartbeat and viewer count.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
