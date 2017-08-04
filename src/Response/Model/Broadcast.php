@@ -22,6 +22,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getRankedPosition()
  * @method mixed getRtmpPlaybackUrl()
  * @method mixed getSeenRankedPosition()
+ * @method mixed getTotalUniqueViewerCount()
  * @method mixed getViewerCount()
  * @method bool isBroadcastMessage()
  * @method bool isBroadcastOwner()
@@ -40,6 +41,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isRankedPosition()
  * @method bool isRtmpPlaybackUrl()
  * @method bool isSeenRankedPosition()
+ * @method bool isTotalUniqueViewerCount()
  * @method bool isViewerCount()
  * @method setBroadcastMessage(mixed $value)
  * @method setBroadcastOwner(BroadcastOwner $value)
@@ -58,6 +60,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setRankedPosition(mixed $value)
  * @method setRtmpPlaybackUrl(mixed $value)
  * @method setSeenRankedPosition(mixed $value)
+ * @method setTotalUniqueViewerCount(mixed $value)
  * @method setViewerCount(mixed $value)
  */
 class Broadcast extends AutoPropertyHandler
@@ -89,4 +92,5 @@ class Broadcast extends AutoPropertyHandler
     public $dash_manifest;
     public $expire_at;
     public $encoding_tag;
+    public $total_unique_viewer_count;
 }
