@@ -153,6 +153,46 @@ class Live extends RequestCollection
     }
 
     /**
+     * Pin a comment on live broadcast.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param string $commentId   Target comment ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\PinCommentBroadcastResponse
+     */
+    public function pinComment(
+        $broadcastId,
+        $commentId)
+    {
+        return $this->ig->request("live/{$broadcastId}/pin_comment/")
+            ->addPost('offset_to_video_start', 0)
+            ->addPost('comment_id', $commentId)
+            ->getResponse(new Response\PinCommentBroadcastResponse());
+    }
+
+    /**
+     * Unpin comment on live broadcast.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param string $commentId   Pinned comment ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\UnpinCommentBroadcastResponse
+     */
+    public function unpinComment(
+        $broadcastId,
+        $commentId)
+    {
+        return $this->ig->request("live/{$broadcastId}/unpin_comment/")
+            ->addPost('offset_to_video_start', 0)
+            ->addPost('comment_id', $commentId)
+            ->getResponse(new Response\UnpinCommentBroadcastResponse());
+    }
+
+    /**
      * Get broadcast comments.
      *
      * @param string $broadcastId   The broadcast ID in Instagram's internal format (ie "17854587811139572").
