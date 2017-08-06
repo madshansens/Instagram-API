@@ -156,7 +156,7 @@ class Live extends RequestCollection
      * Pin a comment on live broadcast.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param string $commentId Target comment ID.
+     * @param string $commentId   Target comment ID.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -176,7 +176,7 @@ class Live extends RequestCollection
      * Unpin comment on live broadcast.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param string $commentId Pinned comment ID.
+     * @param string $commentId   Pinned comment ID.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
