@@ -169,6 +169,9 @@ class Live extends RequestCollection
         return $this->ig->request("live/{$broadcastId}/pin_comment/")
             ->addPost('offset_to_video_start', 0)
             ->addPost('comment_id', $commentId)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\PinCommentBroadcastResponse());
     }
 
@@ -189,6 +192,9 @@ class Live extends RequestCollection
         return $this->ig->request("live/{$broadcastId}/unpin_comment/")
             ->addPost('offset_to_video_start', 0)
             ->addPost('comment_id', $commentId)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\UnpinCommentBroadcastResponse());
     }
 
