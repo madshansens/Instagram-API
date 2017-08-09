@@ -1305,7 +1305,9 @@ class Internal extends RequestCollection
             }
         } finally {
             // Guaranteed to release handle even if something bad happens above!
-            fclose($handle);
+            if (is_resource($handle)) {
+                fclose($handle);
+            }
         }
 
         throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
@@ -1417,7 +1419,9 @@ class Internal extends RequestCollection
             }
         } finally {
             // Guaranteed to release handle even if something bad happens above!
-            fclose($handle);
+            if (is_resource($handle)) {
+                fclose($handle);
+            }
         }
 
         throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
