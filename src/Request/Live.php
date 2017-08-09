@@ -86,7 +86,7 @@ class Live extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\BroadcastInfoResponse
+     * @return \InstagramAPI\Response\ViewerListResponse
      */
     public function getViewerList(
         $broadcastId)
@@ -102,13 +102,35 @@ class Live extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\BroadcastInfoResponse
+     * @return \InstagramAPI\Response\FinalViewerListResponse
      */
     public function getFinalViewerList(
         $broadcastId)
     {
         return $this->ig->request("live/{$broadcastId}/get_final_viewer_list/")
             ->getResponse(new Response\FinalViewerListResponse());
+    }
+
+    /**
+     * Get viewer list of a saved broadcast.
+     *
+     * @param string      $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param null|string $maxId       Next "maximum ID", used for pagination.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\PostLiveViewerListResponse
+     */
+    public function getPostLiveViewerList(
+        $broadcastId,
+        $maxId = null)
+    {
+        $request = $this->ig->request("live/{$broadcastId}/get_post_live_viewers_list/");
+        if (!is_null($maxId)) {
+            $request->addParam('max_id', $maxId);
+        }
+
+        return $request->getResponse(new Response\PostLiveViewerListResponse());
     }
 
     /**

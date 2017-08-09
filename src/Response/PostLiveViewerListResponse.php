@@ -7,14 +7,17 @@ use InstagramAPI\ResponseInterface;
 use InstagramAPI\ResponseTrait;
 
 /**
- * @method mixed getTotalUniqueViewerCount()
+ * @method mixed getNextMaxId()
+ * @method mixed getTotalViewerCount()
  * @method Model\User[] getUsers()
+ * @method bool isNextMaxId()
  * @method bool isTotalViewerCount()
  * @method bool isUsers()
- * @method setTotalUniqueViewerCount(mixed $value)
+ * @method setNextMaxId(mixed $value)
+ * @method setTotalViewerCount(mixed $value)
  * @method setUsers(Model\User[] $value)
  */
-class FinalViewerListResponse extends AutoPropertyHandler implements ResponseInterface
+class PostLiveViewerListResponse extends AutoPropertyHandler implements ResponseInterface
 {
     use ResponseTrait;
 
@@ -22,5 +25,6 @@ class FinalViewerListResponse extends AutoPropertyHandler implements ResponseInt
      * @var Model\User[]
      */
     public $users;
-    public $total_unique_viewer_count;
+    public $next_max_id;
+    public $total_viewer_count;
 }
