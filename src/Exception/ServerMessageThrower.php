@@ -38,6 +38,7 @@ class ServerMessageThrower
      */
     const EXCEPTION_MAP = [
         'LoginRequiredException'       => ['login_required'],
+        'ChallengeRequiredException'   => ['challenge_required'],
         'CheckpointRequiredException'  => [
             'checkpoint_required', // message
             'checkpoint_challenge_required', // error_type
