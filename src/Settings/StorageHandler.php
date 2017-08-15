@@ -494,6 +494,7 @@ class StorageHandler
                 if (!$e instanceof SettingsException) {
                     $e = new SettingsException($e->getMessage());
                 }
+
                 throw $e; // Re-throw;
             }
         }

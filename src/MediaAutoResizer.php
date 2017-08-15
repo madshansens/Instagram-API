@@ -561,6 +561,7 @@ class MediaAutoResizer
         if ($output === false) {
             throw new \RuntimeException('Failed to create output image.');
         }
+
         try {
             // Fill the output canvas with our background color.
             // NOTE: If cropping, this is just to have a nice background in
@@ -606,6 +607,7 @@ class MediaAutoResizer
 
             // Write the result to disk.
             $tempFile = null;
+
             try {
                 $tempFile = $this->_makeTempFile();
                 if (imagejpeg($output, $tempFile, self::JPEG_QUALITY) === false) {
@@ -617,6 +619,7 @@ class MediaAutoResizer
                 if ($tempFile !== null && is_file($tempFile)) {
                     @unlink($tempFile);
                 }
+
                 throw $e; // Re-throw.
             }
         } finally {

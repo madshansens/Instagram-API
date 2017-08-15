@@ -1023,6 +1023,7 @@ class Internal extends RequestCollection
             }
 
             $result = null;
+
             try {
                 /** @var ResponseInterface $result */
                 $result = call_user_func($configurator);
@@ -1181,6 +1182,7 @@ class Internal extends RequestCollection
                 $videoFilename
             ));
         }
+
         try {
             // Create a stream for the opened file handle.
             $stream = new Stream($handle);
@@ -1227,6 +1229,7 @@ class Internal extends RequestCollection
 
                 // Perform the upload of the current chunk.
                 $start = microtime(true);
+
                 try {
                     $httpResponse = $request->getHttpResponse();
                 } catch (NetworkException $e) {
@@ -1240,6 +1243,7 @@ class Internal extends RequestCollection
                 $newChunkSize = min(self::MAX_CHUNK_SIZE, max(self::MIN_CHUNK_SIZE, $newChunkSize));
 
                 $result = null;
+
                 try {
                     /** @var Response\UploadVideoResponse $result */
                     $result = $request->getResponse(new Response\UploadVideoResponse());
@@ -1376,6 +1380,7 @@ class Internal extends RequestCollection
                 $videoFilename
             ));
         }
+
         try {
             // Create a stream for the opened file handle.
             $stream = new Stream($handle);

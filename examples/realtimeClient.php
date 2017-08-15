@@ -13,6 +13,7 @@ $truncatedDebug = false;
 //////////////////////
 
 $ig = new \InstagramAPI\Instagram($debug, $truncatedDebug);
+
 try {
     $ig->setUser($username, $password);
     $ig->login();

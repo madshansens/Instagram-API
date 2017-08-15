@@ -494,6 +494,7 @@ abstract class Client
         if (!$this->isSendingAvailable()) {
             return false;
         }
+
         try {
             return $this->_sendCommand($command);
         } catch (\Exception $e) {

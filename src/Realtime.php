@@ -126,6 +126,7 @@ class Realtime implements EventEmitterInterface
     {
         if ($doLogin) {
             $this->debug('[rtc] Calling login()');
+
             try {
                 $this->_instagram->login();
             } catch (\Exception $e) {

@@ -628,6 +628,7 @@ class Request
             }
 
             $this->_resetHandles();
+
             try {
                 $this->_httpResponse = $this->_parent->client->api($this->_buildHttpRequest(), $this->_guzzleOptions);
             } finally {

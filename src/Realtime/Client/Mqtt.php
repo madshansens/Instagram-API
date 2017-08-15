@@ -355,6 +355,7 @@ class Mqtt extends Client
         if ($cookie !== null) {
             return sprintf('%s=%s', $cookie->getName(), $cookie->getValue());
         }
+
         throw new \RuntimeException('No session cookie was found.');
     }
 
@@ -436,6 +437,7 @@ class Mqtt extends Client
         $connector = new Connector($this->_rtc->getLoop(), $this->getConnector($host, false), $this->getConnector($host, true));
         /** @var ReactMqttClient $connection */
         $connection = $connector(true);
+
         try {
             $password = $this->_getMqttPassword();
         } catch (\Exception $e) {

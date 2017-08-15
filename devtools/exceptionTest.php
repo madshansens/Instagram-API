@@ -28,6 +28,7 @@ foreach ($exceptionsToTest as $exceptionClassName => $testResponse) {
     $testResponse = \InstagramAPI\Client::api_body_decode($testResponse);
     $response = $mapper->map($testResponse, new \InstagramAPI\Response\GenericResponse());
     $response->setFullResponse($testResponse);
+
     try {
         ServerMessageThrower::autoThrow(null, $response->getMessage(), $response);
     } catch (\InstagramAPI\Exception\InstagramException $e) {
