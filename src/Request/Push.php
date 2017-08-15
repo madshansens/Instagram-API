@@ -30,29 +30,15 @@ class Push extends RequestCollection
         }
 
         $request = $this->ig->request('push/register/')
+            ->setSignedPost(false)
+            ->addPost('device_type', $pushChannel === 'mqtt' ? 'android_mqtt' : 'android_gcm')
+            ->addPost('is_main_push_channel', $pushChannel === 'mqtt')
             ->addPost('phone_id', $this->ig->settings->get('phone_id'))
+            ->addPost('device_token', $token)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('guid', $this->ig->uuid)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('users', $this->ig->account_id);
-
-        if ($pushChannel == 'gcm') {
-            $request
-                ->addPost('is_main_push_channel', false)
-                ->addPost('device_type', 'android_gcm')
-                ->addPost('device_token', $token);
-        } elseif ($pushChannel == 'mqtt') {
-            $deviceToken = json_encode([
-                'k' => $token,
-                'v' => 0,
-                't' => 'fbns-b64',
-            ]);
-
-            $request
-                ->addPost('is_main_push_channel', true)
-                ->addPost('device_type', 'android_mqtt')
-                ->addPost('device_token', $deviceToken);
-        }
 
         return $request->getResponse(new Response\PushRegisterResponse());
     }

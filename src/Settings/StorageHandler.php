@@ -2,6 +2,8 @@
 
 namespace InstagramAPI\Settings;
 
+use Fbns\Client\Auth\DeviceAuth;
+use Fbns\Client\AuthInterface;
 use InstagramAPI\Exception\SettingsException;
 
 /**
@@ -33,6 +35,7 @@ class StorageHandler
         'experiments', // Interesting experiment variables for this account.
         'last_login', // Tracks time elapsed since our last login state refresh.
         'last_experiments', // Tracks time elapsed since our last experiments refresh.
+        'fbns_auth', // Serialized auth credentials for FBNS.
     ];
 
     /**
@@ -570,5 +573,29 @@ class StorageHandler
         }
 
         return $experiments;
+    }
+
+    /**
+     * @param AuthInterface $auth
+     */
+    public function setFbnsAuth(
+        AuthInterface $auth)
+    {
+        $this->set('fbns_auth', $auth);
+    }
+
+    /**
+     * @return AuthInterface
+     */
+    public function getFbnsAuth()
+    {
+        $result = new DeviceAuth();
+
+        try {
+            $result->read($this->get('fbns_auth'));
+        } catch (\Exception $e) {
+        }
+
+        return $result;
     }
 }

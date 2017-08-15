@@ -28,6 +28,13 @@ class Device
     protected $_appVersion;
 
     /**
+     * Which Instagram client app version code this "device" is running.
+     *
+     * @var string
+     */
+    protected $_versionCode;
+
+    /**
      * The device user's locale, such as "en_US".
      *
      * @var string
@@ -47,6 +54,13 @@ class Device
      * @var string
      */
     protected $_userAgent;
+
+    /**
+     * The FB user agent to use for this device. Built from properties.
+     *
+     * @var string
+     */
+    protected $_fbUserAgent;
 
     // Properties parsed from the device string...
 
@@ -81,6 +95,7 @@ class Device
      * Constructor.
      *
      * @param string      $appVersion   Instagram client app version.
+     * @param string      $versionCode  Instagram client app version code.
      * @param string      $userLocale   The user's locale, such as "en_US".
      * @param string|null $deviceString (optional) The device string to attempt
      *                                  to construct from. If NULL or not a good
@@ -91,11 +106,13 @@ class Device
      */
     public function __construct(
         $appVersion,
+        $versionCode,
         $userLocale,
         $deviceString = null,
         $autoFallback = true)
     {
         $this->_appVersion = $appVersion;
+        $this->_versionCode = $versionCode;
         $this->_userLocale = $userLocale;
 
         // Use the provided device if a valid good device. Otherwise use random.
@@ -160,6 +177,9 @@ class Device
 
         // Build our user agent.
         $this->_userAgent = UserAgent::buildUserAgent($this->_appVersion, $this->_userLocale, $this);
+
+        // Build user agent for FB.
+        $this->_fbUserAgent = UserAgent::buildFbUserAgent($this->_appVersion, $this->_versionCode, $this->_userLocale, $this);
     }
 
     // Getters for all properties...
@@ -172,6 +192,11 @@ class Device
     public function getUserAgent()
     {
         return $this->_userAgent;
+    }
+
+    public function getFbUserAgent()
+    {
+        return $this->_fbUserAgent;
     }
 
     public function getAndroidVersion()

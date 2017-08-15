@@ -23,7 +23,13 @@ try {
 }
 
 $loop = \React\EventLoop\Factory::create();
-$rtc = new \InstagramAPI\Realtime($ig, $loop);
+if ($debug) {
+    $logger = new \Monolog\Logger('rtc');
+    $logger->pushHandler(new \Monolog\Handler\StreamHandler('php://stdout', \Monolog\Logger::INFO));
+} else {
+    $logger = null;
+}
+$rtc = new \InstagramAPI\Realtime($ig, $loop, $logger);
 $rtc->init()->then(function (\InstagramAPI\Realtime $rtc) use ($loop) {
     $rtc->on('live-started', function (\InstagramAPI\Realtime\Event\Payload\Live $live) {
         printf('[RTC] Live broadcast %s has been started%s', $live->broadcast_id, PHP_EOL);

@@ -2,10 +2,16 @@
 
 namespace InstagramAPI;
 
+use Clue\React\HttpProxy\ProxyConnector as HttpConnectProxy;
+use Clue\React\Socks\Client as SocksProxy;
 use InstagramAPI\Request\Metadata\MediaDetails;
 use InstagramAPI\Request\Metadata\PhotoDetails;
 use InstagramAPI\Request\Metadata\VideoDetails;
 use InstagramAPI\Response\Model\Item;
+use React\EventLoop\LoopInterface;
+use React\Socket\Connector;
+use React\Socket\ConnectorInterface;
+use React\Socket\SecureConnector;
 
 class Utils
 {
@@ -962,5 +968,128 @@ class Utils
         }
 
         return $urls;
+    }
+
+    /**
+     * Returns a proxy (if any) for a given host based on a given config.
+     *
+     * @param string $host        Host.
+     * @param mixed  $proxyConfig Proxy config.
+     *
+     * @return string|null
+     *
+     * @see http://docs.guzzlephp.org/en/stable/request-options.html#proxy
+     */
+    public static function getProxyForHost(
+        $host,
+        $proxyConfig = null)
+    {
+        // Empty config => no proxy.
+        if (empty($proxyConfig)) {
+            return;
+        }
+
+        // Plain string => return it.
+        if (!is_array($proxyConfig)) {
+            return $proxyConfig;
+        }
+
+        // HTTP proxies do not have CONNECT method.
+        if (!isset($proxyConfig['https'])) {
+            throw new \InvalidArgumentException('No proxy with CONNECT method found');
+        }
+
+        // Check exceptions.
+        if (isset($proxyConfig['no']) && \GuzzleHttp\is_host_in_noproxy($host, $proxyConfig['no'])) {
+            return;
+        }
+
+        return $proxyConfig['https'];
+    }
+
+    /**
+     * Parse given SSL certificate verification and return a secure context.
+     *
+     * @param mixed $config
+     *
+     * @return array
+     *
+     * @see http://docs.guzzlephp.org/en/stable/request-options.html#verify
+     */
+    public static function getSecureContext(
+        $config)
+    {
+        $context = [];
+        if ($config === true) {
+            // PHP 5.6 or greater will find the system cert by default. When
+            // < 5.6, use the Guzzle bundled cacert.
+            if (PHP_VERSION_ID < 50600) {
+                $context['cafile'] = \GuzzleHttp\default_ca_bundle();
+            }
+        } elseif (is_string($config)) {
+            $context['cafile'] = $config;
+            if (!file_exists($config)) {
+                throw new \RuntimeException("SSL CA bundle not found: $config");
+            }
+        } elseif ($config === false) {
+            $context['verify_peer'] = false;
+            $context['verify_peer_name'] = false;
+
+            return $context;
+        } else {
+            throw new \InvalidArgumentException('Invalid verify request option');
+        }
+        $context['verify_peer'] = true;
+        $context['verify_peer_name'] = true;
+        $context['allow_self_signed'] = false;
+
+        return $context;
+    }
+
+    /**
+     * Returns a secure connector for given configuration.
+     *
+     * @param LoopInterface $loop
+     * @param array         $secureContext
+     * @param string|null   $proxyAddress
+     *
+     * @return ConnectorInterface
+     */
+    public static function getSecureConnector(
+        LoopInterface $loop,
+        array $secureContext = [],
+        $proxyAddress = null)
+    {
+        if ($proxyAddress === null) {
+            $connector = new Connector($loop);
+
+            return new SecureConnector($connector, $loop, $secureContext);
+        }
+
+        if (strpos($proxyAddress, '://') === false) {
+            $scheme = 'http';
+        } else {
+            $scheme = parse_url($proxyAddress, PHP_URL_SCHEME);
+        }
+
+        $connector = new Connector($loop);
+        switch ($scheme) {
+            case 'socks':
+            case 'socks4':
+            case 'socks4a':
+            case 'socks5':
+                $connector = new SocksProxy($proxyAddress, $connector);
+                break;
+            case 'http':
+                $connector = new HttpConnectProxy($proxyAddress, $connector);
+                break;
+            case 'https':
+                $connector = new HttpConnectProxy($proxyAddress, new SecureConnector($connector, $loop, $secureContext));
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf('Unsupported proxy scheme: %s', $scheme));
+        }
+
+        return new SecureConnector($connector, $loop, $secureContext);
     }
 }

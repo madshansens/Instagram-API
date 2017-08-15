@@ -141,6 +141,7 @@ class styleChecker
                         && $name != '__call'
                         && $name != '__get'
                         && $name != '__invoke'
+                        && $name != '__toString'
                     )) {
                         $hasProblems = true;
                         $hasVisibilityProblems = true;

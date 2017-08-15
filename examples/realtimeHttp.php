@@ -50,8 +50,14 @@ try {
 
 // Create main event loop.
 $loop = \React\EventLoop\Factory::create();
+if ($debug) {
+    $logger = new \Monolog\Logger('rtc');
+    $logger->pushHandler(new \Monolog\Handler\StreamHandler('php://stdout', \Monolog\Logger::INFO));
+} else {
+    $logger = null;
+}
 // Create HTTP server along with Realtime client.
-$httpServer = new RealtimeHttpServer($loop, $ig);
+$httpServer = new RealtimeHttpServer($loop, $ig, $logger);
 // Run main loop.
 $loop->run();
 
@@ -77,20 +83,29 @@ class RealtimeHttpServer
     /** @var \React\Http\Server */
     protected $_server;
 
+    /** @var \Psr\Log\LoggerInterface */
+    protected $_logger;
+
     /**
      * Constructor.
      *
      * @param \React\EventLoop\LoopInterface $loop
      * @param \InstagramAPI\Instagram        $instagram
+     * @param \Psr\Log\LoggerInterface|null  $logger
      */
     public function __construct(
         \React\EventLoop\LoopInterface $loop,
-        \InstagramAPI\Instagram $instagram)
+        \InstagramAPI\Instagram $instagram,
+        \Psr\Log\LoggerInterface $logger = null)
     {
         $this->_loop = $loop;
         $this->_instagram = $instagram;
+        if ($logger === null) {
+            $logger = new \Psr\Log\NullLogger();
+        }
+        $this->_logger = $logger;
         $this->_contexts = [];
-        $this->_rtc = new \InstagramAPI\Realtime($this->_instagram, $this->_loop);
+        $this->_rtc = new \InstagramAPI\Realtime($this->_instagram, $this->_loop, $this->_logger);
         $this->_rtc->init()->then([$this, 'onRealtimeReady'], [$this, 'onRealtimeFail']);
     }
 
@@ -116,7 +131,7 @@ class RealtimeHttpServer
     public function onRealtimeFail(
         \Exception $e)
     {
-        printf('[!!!] Got fatal error from Realtime: %s%s', $e->getMessage(), PHP_EOL);
+        $this->_logger->error((string) $e);
         $this->_stop();
     }
 
@@ -128,7 +143,7 @@ class RealtimeHttpServer
     public function onClientContextAck(
         \InstagramAPI\Realtime\Action\Ack $ack)
     {
-        printf('[RTC] Received ACK for %s with status %s%s', $ack->payload->client_context, $ack->status, PHP_EOL);
+        $this->_logger->info(sprintf('Received ACK for %s with status %s%s', $ack->payload->client_context, $ack->status));
         // Check if we have deferred object for this client_context.
         $context = $ack->payload->client_context;
         if (!isset($this->_contexts[$context])) {
@@ -197,10 +212,13 @@ class RealtimeHttpServer
     public function onHttpRequest(
         \Psr\Http\Message\ServerRequestInterface $request)
     {
+        // Treat request path as command.
+        $command = $request->getUri()->getPath();
         // Params validation is up to you.
         $params = $request->getQueryParams();
-        // Treat request path as command.
-        switch ($request->getUri()->getPath()) {
+        // Log command with its params.
+        $this->_logger->info(sprintf('Received command %s', $command), $params);
+        switch ($command) {
             case '/ping':
                 return new \React\Http\Response(200, [], 'pong');
             case '/stop':
@@ -222,6 +240,7 @@ class RealtimeHttpServer
             case '/unlikeItem':
                 return $this->_handleClientContext($this->_rtc->deleteReactionFromDirect($params['threadId'], $params['threadItemId'], 'like'));
             default:
+                $this->_logger->warning(sprintf('Unknown command %s', $command), $params);
                 // If command is unknown, reply with 404 Not Found.
                 return new \React\Http\Response(404);
         }
@@ -234,7 +253,7 @@ class RealtimeHttpServer
     {
         // Create server socket.
         $socket = new \React\Socket\Server(self::HOST.':'.self::PORT, $this->_loop);
-        printf('[RTC] Listening on http://%s%s', $socket->getAddress(), PHP_EOL);
+        $this->_logger->info(sprintf('Listening on http://%s%s', $socket->getAddress()));
         // Bind HTTP server on server socket.
         $this->_server = new \React\Http\Server([$this, 'onHttpRequest']);
         $this->_server->listen($socket);

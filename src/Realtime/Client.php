@@ -2,24 +2,15 @@
 
 namespace InstagramAPI\Realtime;
 
-use Clue\React\HttpProxy\ProxyConnector as HttpConnectProxy;
-use Clue\React\Socks\Client as SocksProxy;
 use InstagramAPI\Client as HttpClient;
 use InstagramAPI\Instagram;
 use InstagramAPI\Realtime;
-use React\Dns\Resolver\Factory as DnsFactory;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
-use React\Socket\ConnectorInterface;
-use React\Socket\DnsConnector;
-use React\Socket\SecureConnector;
-use React\Socket\TcpConnector;
-use React\Socket\TimeoutConnector;
 
 abstract class Client
 {
-    const DNS_SERVER = '8.8.8.8';
-
     const CONNECTION_TIMEOUT = 5;
 
     const KEEPALIVE_INTERVAL = 30;
@@ -37,6 +28,9 @@ abstract class Client
 
     /** @var Realtime */
     protected $_rtc;
+
+    /** @var LoopInterface */
+    protected $_loop;
 
     /** @var TimerInterface */
     protected $_keepaliveTimer;
@@ -56,8 +50,8 @@ abstract class Client
     /** @var bool */
     protected $_isConnected;
 
-    /** @var bool */
-    protected $_debug;
+    /** @var LoggerInterface */
+    protected $_logger;
 
     /** @var \JsonMapper */
     protected $_mapper;
@@ -75,28 +69,34 @@ abstract class Client
     /**
      * Constructor.
      *
-     * @param string    $id
-     * @param Realtime  $rtc
-     * @param Instagram $instagram
-     * @param array     $params
+     * @param string          $id
+     * @param Realtime        $rtc
+     * @param Instagram       $instagram
+     * @param LoopInterface   $loop
+     * @param LoggerInterface $logger
+     * @param array           $params
      */
     public function __construct(
         $id,
         Realtime $rtc,
         Instagram $instagram,
+        LoopInterface $loop,
+        LoggerInterface $logger,
         array $params = [])
     {
         $this->_id = $id;
         $this->_rtc = $rtc;
         $this->_instagram = $instagram;
-        $this->_shutdown = false;
-        $this->_isConnected = false;
-        $this->_debug = $rtc->debug;
+        $this->_loop = $loop;
+        $this->_logger = $logger;
         $this->_handleParams($params);
 
         // Create our JSON object mapper and set global default options.
         $this->_mapper = new \JsonMapper();
         $this->_mapper->bStrictNullTypes = false; // Allow NULL values.
+
+        $this->_shutdown = false;
+        $this->_isConnected = false;
     }
 
     /**
@@ -117,6 +117,16 @@ abstract class Client
     public function getRtc()
     {
         return $this->_rtc;
+    }
+
+    /**
+     * Return stored logger instance.
+     *
+     * @return LoggerInterface
+     */
+    public function getLogger()
+    {
+        return $this->_logger;
     }
 
     /**
@@ -151,32 +161,6 @@ abstract class Client
     }
 
     /**
-     * Print debug message.
-     *
-     * @param string $message
-     */
-    public function debug(
-        $message)
-    {
-        if (!$this->_debug) {
-            return;
-        }
-
-        $now = date('H:i:s');
-        if (func_num_args() > 1) {
-            $args = func_get_args();
-            $message = array_shift($args);
-            $message = '[%s] [%s] '.$message.PHP_EOL;
-            array_unshift($args, $this->_id);
-            array_unshift($args, $now);
-            array_unshift($args, $message);
-            call_user_func_array('printf', $args);
-        } else {
-            printf('[%s] [%s] %s%s', $now, $this->_id, $message, PHP_EOL);
-        }
-    }
-
-    /**
      * onKeepaliveTimer event.
      */
     public function onKeepaliveTimer()
@@ -190,7 +174,7 @@ abstract class Client
     public function emitKeepaliveTimer()
     {
         $this->_keepaliveTimer = null;
-        $this->debug('Keepalive timer is fired');
+        $this->_logger->warning('Keepalive timer is fired.');
         $this->onKeepaliveTimer();
     }
 
@@ -203,9 +187,11 @@ abstract class Client
             return;
         }
         // Cancel existing timer.
-        $this->_keepaliveTimer->cancel();
+        if ($this->_keepaliveTimer->isActive()) {
+            $this->_logger->info('Existing keepalive timer has been cancelled.');
+            $this->_keepaliveTimer->cancel();
+        }
         $this->_keepaliveTimer = null;
-        $this->debug('Existing keepalive timer has been cancelled');
     }
 
     /**
@@ -217,9 +203,11 @@ abstract class Client
             return;
         }
         // Cancel existing timer.
-        $this->_reconnectTimer->cancel();
+        if ($this->_reconnectTimer->isActive()) {
+            $this->_logger->info('Existing reconnect timer has been cancelled');
+            $this->_reconnectTimer->cancel();
+        }
         $this->_reconnectTimer = null;
-        $this->debug('Existing reconnect timer has been cancelled');
     }
 
     /**
@@ -245,8 +233,8 @@ abstract class Client
             $this->_keepaliveTimerInterval = max(0, $interval);
         }
         // Set up new timer.
-        $this->debug('Setting up keepalive timer to %.1f seconds', $this->_keepaliveTimerInterval);
-        $this->_keepaliveTimer = $this->_rtc->getLoop()->addTimer($this->_keepaliveTimerInterval, function () {
+        $this->_logger->info(sprintf('Setting up keepalive timer to %.1f seconds', $this->_keepaliveTimerInterval));
+        $this->_keepaliveTimer = $this->_loop->addTimer($this->_keepaliveTimerInterval, function () {
             $this->emitKeepaliveTimer();
         });
     }
@@ -273,9 +261,9 @@ abstract class Client
         }
         // We must keep interval sane.
         $this->_reconnectTimerInterval = max(0.1, min($interval, self::MAX_RECONNECT_INTERVAL));
-        $this->debug('Setting up connection timer to %.1f seconds', $this->_reconnectTimerInterval);
+        $this->_logger->info(sprintf('Setting up connection timer to %.1f seconds', $this->_reconnectTimerInterval));
         // Set up new timer.
-        $this->_reconnectTimer = $this->_rtc->getLoop()->addTimer($this->_reconnectTimerInterval, function () {
+        $this->_reconnectTimer = $this->_loop->addTimer($this->_reconnectTimerInterval, function () {
             $this->_keepaliveTimerInterval = self::KEEPALIVE_INTERVAL;
             $this->_connect();
         });
@@ -311,135 +299,9 @@ abstract class Client
         if (!$this->_isConnected) {
             return;
         }
-        $this->debug('Shutting down');
+        $this->_logger->info('Shutting down');
         $this->_shutdown = true;
         $this->_disconnect();
-    }
-
-    /**
-     * @param string $host
-     *
-     * @return null|string
-     */
-    protected function _getProxyAddress(
-        $host)
-    {
-        $proxy = $this->_instagram->getProxy();
-        if (!is_array($proxy)) {
-            return $proxy;
-        }
-
-        if (!isset($proxy['https'])) {
-            throw new \InvalidArgumentException('No proxy with CONNECT method found');
-        }
-
-        if (isset($proxy['no']) && \GuzzleHttp\is_host_in_noproxy($host, $proxy['no'])) {
-            return;
-        }
-
-        return $proxy['https'];
-    }
-
-    /**
-     * @param string             $proxyAddress
-     * @param ConnectorInterface $connector
-     * @param LoopInterface      $loop
-     *
-     * @return HttpConnectProxy|SocksProxy
-     */
-    protected function _getProxyConnector(
-        $proxyAddress,
-        ConnectorInterface $connector,
-        LoopInterface $loop)
-    {
-        if (strpos($proxyAddress, '://') === false) {
-            $scheme = 'http';
-        } else {
-            $scheme = parse_url($proxyAddress, PHP_URL_SCHEME);
-        }
-
-        switch ($scheme) {
-            case 'socks':
-            case 'socks4':
-            case 'socks4a':
-            case 'socks5':
-                return new SocksProxy($proxyAddress, $connector);
-            case 'http':
-                return new HttpConnectProxy($proxyAddress, $connector);
-            case 'https':
-                $ssl = new SecureConnector($connector, $loop, $this->_getSecureContext());
-
-                return new HttpConnectProxy($proxyAddress, $ssl);
-            default:
-                throw new \InvalidArgumentException(sprintf('Unsupported proxy scheme: %s', $scheme));
-        }
-    }
-
-    /**
-     * Fetch secure context from parent Instagram object.
-     *
-     * @return array
-     */
-    protected function _getSecureContext()
-    {
-        $context = [];
-        $value = $this->_instagram->getVerifySSL();
-        if ($value === true) {
-            // PHP 5.6 or greater will find the system cert by default. When
-            // < 5.6, use the Guzzle bundled cacert.
-            if (PHP_VERSION_ID < 50600) {
-                $context['cafile'] = \GuzzleHttp\default_ca_bundle();
-            }
-        } elseif (is_string($value)) {
-            $context['cafile'] = $value;
-            if (!file_exists($value)) {
-                throw new \RuntimeException("SSL CA bundle not found: $value");
-            }
-        } elseif ($value === false) {
-            $context['verify_peer'] = false;
-            $context['verify_peer_name'] = false;
-
-            return $context;
-        } else {
-            throw new \InvalidArgumentException('Invalid verify request option');
-        }
-        $context['verify_peer'] = true;
-        $context['verify_peer_name'] = true;
-        $context['allow_self_signed'] = false;
-
-        return $context;
-    }
-
-    /**
-     * @param string $url
-     * @param bool   $secure
-     *
-     * @return ConnectorInterface
-     */
-    public function getConnector(
-        $url,
-        $secure)
-    {
-        $host = parse_url($url, PHP_URL_HOST);
-        $loop = $this->_rtc->getLoop();
-        // Use Google resolver.
-        $dnsFactory = new DnsFactory();
-        $resolver = $dnsFactory->create(self::DNS_SERVER, $loop);
-        // Initial connection.
-        $tcp = new TcpConnector($loop);
-        // Lookup hostname / proxy.
-        $dns = new DnsConnector($tcp, $resolver);
-        // Proxy connection (optional).
-        $proxy = $this->_getProxyAddress($host);
-        if ($proxy !== null) {
-            $dns = $this->_getProxyConnector($proxy, $dns, $loop);
-        }
-        // Check for secure.
-        if ($secure) {
-            $dns = new SecureConnector($dns, $loop, $this->_getSecureContext());
-        }
-        // Set connection timeout.
-        return new TimeoutConnector($dns, self::CONNECTION_TIMEOUT, $loop);
     }
 
     /**
@@ -521,7 +383,7 @@ abstract class Client
     protected function _processAction(
         $message)
     {
-        $this->debug('Received action "%s"', $message->action);
+        $this->_logger->info(sprintf('Received action "%s"', $message->action));
         switch ($message->action) {
             case Action::ACK:
                 /** @var Action\Ack $action */
@@ -532,7 +394,7 @@ abstract class Client
                 $action = $this->mapToJson($message, new Action\Unseen());
                 break;
             default:
-                $this->debug('Action "%s" is ignored (unknown type)', $message->action);
+                $this->_logger->warning(sprintf('Action "%s" is ignored (unknown type)', $message->action));
 
                 return;
         }
@@ -558,14 +420,14 @@ abstract class Client
     protected function _processEvent(
         $message)
     {
-        $this->debug('Received event "%s"', $message->event);
+        $this->_logger->info(sprintf('Received event "%s"', $message->event));
         switch ($message->event) {
             case Event::PATCH:
                 /** @var Event\Patch $event */
                 $event = $this->mapToJson($message, new Event\Patch());
                 break;
             default:
-                $this->debug('Event "%s" is ignored (unknown type)', $message->event);
+                $this->_logger->warning(sprintf('Event "%s" is ignored (unknown type)', $message->event));
 
                 return;
         }
@@ -585,7 +447,7 @@ abstract class Client
         } elseif (isset($message->action)) {
             $this->_processAction($message);
         } else {
-            $this->debug('Invalid message (both event and action are missing)');
+            $this->_logger->warning('Invalid message (both event and action are missing)');
         }
     }
 
@@ -597,7 +459,7 @@ abstract class Client
     protected function _processMessage(
         $message)
     {
-        $this->debug('Received message %s', $message);
+        $this->_logger->info(sprintf('Received message %s', $message));
         $message = HttpClient::api_body_decode($message);
         if (!is_array($message)) {
             $this->_processSingleMessage($message);

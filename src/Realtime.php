@@ -5,6 +5,8 @@ namespace InstagramAPI;
 use Evenement\EventEmitterInterface;
 use Evenement\EventEmitterTrait;
 use InstagramAPI\Realtime\Client as RealtimeClient;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use React\Promise\FulfilledPromise;
@@ -50,29 +52,27 @@ class Realtime implements EventEmitterInterface
     /** @var TimerInterface */
     protected $_reloginTimer;
 
-    /** @var bool */
-    public $debug;
+    /** @var LoggerInterface */
+    protected $_logger;
 
     /**
      * Constructor.
      *
-     * @param Instagram     $instagram
-     * @param LoopInterface $loop
-     * @param null|bool     $debug
+     * @param Instagram            $instagram
+     * @param LoopInterface        $loop
+     * @param LoggerInterface|null $logger
      */
     public function __construct(
         Instagram $instagram,
         LoopInterface $loop,
-        $debug = null)
+        LoggerInterface $logger = null)
     {
         $this->_instagram = $instagram;
         $this->_loop = $loop;
-        // Inherit debug flag from Instagram if not supplied.
-        if ($debug === null) {
-            $this->debug = $instagram->debug;
-        } else {
-            $this->debug = $debug;
+        if ($logger === null) {
+            $logger = new NullLogger();
         }
+        $this->_logger = $logger;
     }
 
     /**
@@ -96,27 +96,6 @@ class Realtime implements EventEmitterInterface
     }
 
     /**
-     * Print debug message.
-     *
-     * @param string $message
-     */
-    public function debug(
-        $message)
-    {
-        if (!$this->debug) {
-            return;
-        }
-
-        echo date('[H:i:s] ');
-        if (func_num_args() > 1) {
-            call_user_func_array('printf', func_get_args());
-        } else {
-            echo $message;
-        }
-        echo PHP_EOL;
-    }
-
-    /**
      * Fires periodically to refresh session state.
      *
      * @param bool $doLogin
@@ -125,20 +104,20 @@ class Realtime implements EventEmitterInterface
         $doLogin = true)
     {
         if ($doLogin) {
-            $this->debug('[rtc] Calling login()');
+            $this->_logger->info('Calling login()...');
 
             try {
                 $this->_instagram->login();
             } catch (\Exception $e) {
+                $this->_logger->error((string) $e);
                 $this->emit('error', [$e]);
             }
         }
 
         $interval = mt_rand(self::LOGIN_INTERVAL_MIN, self::LOGIN_INTERVAL_MAX);
-        $this->debug('[rtc] Setting up timer for login() to %d seconds', $interval);
-        $rtc = $this;
-        $this->_reloginTimer = $this->_loop->addTimer($interval, function () use ($rtc) {
-            $rtc->onReloginTimer();
+        $this->_logger->info(sprintf('[rtc] Setting up timer for login() to %d seconds', $interval));
+        $this->_reloginTimer = $this->_loop->addTimer($interval, function () {
+            $this->onReloginTimer();
         });
     }
 
@@ -158,9 +137,12 @@ class Realtime implements EventEmitterInterface
      */
     public function stop()
     {
-        if ($this->_reloginTimer) {
-            $this->debug('[rtc] Login timer is cancelled');
-            $this->_reloginTimer->cancel();
+        if ($this->_reloginTimer !== null) {
+            if ($this->_reloginTimer->isActive()) {
+                $this->_logger->info('Login timer has been cancelled');
+                $this->_reloginTimer->cancel();
+            }
+            $this->_reloginTimer = null;
         }
         if ($this->_mqttClient !== null) {
             $this->_mqttClient->shutdown();
@@ -172,8 +154,8 @@ class Realtime implements EventEmitterInterface
      */
     protected function _init()
     {
-        // Refresh state.
-        $this->_instagram->login();
+        $this->_logger->info('Fetching sequence ID from direct inbox...');
+        $inbox = $this->_instagram->direct->getInbox();
         // Init MQTT client.
         $experiments = $this->_instagram->experiments;
         $mqttFeatures = isset($experiments['ig_android_mqtt_skywalker'])
@@ -182,14 +164,21 @@ class Realtime implements EventEmitterInterface
             ? $experiments['ig_android_skywalker_live_event_start_end'] : [];
         $graphqlFeatures = isset($experiments['ig_android_gqls_typing_indicator'])
             ? $experiments['ig_android_gqls_typing_indicator'] : [];
-        $this->debug('[rtc] starting mqtt client');
-        $this->_mqttClient = new RealtimeClient\Mqtt('mqtt', $this, $this->_instagram, [
-            'isMqttLiveEnabled' => RealtimeClient::isFeatureEnabled($mqttLiveFeatures, 'is_enabled'),
-            'isIrisEnabled'     => RealtimeClient::isFeatureEnabled($mqttFeatures, 'is_direct_over_iris_enabled'),
-            'msgTypeBlacklist'  => isset($mqttFeatures['pubsub_msg_type_blacklist']) ? $mqttFeatures['pubsub_msg_type_blacklist'] : null,
-            'isGraphQlEnabled'  => RealtimeClient::isFeatureEnabled($graphqlFeatures, 'is_enabled'),
-            'sequenceId'        => $this->_instagram->direct->getInbox()->getSeqId(),
-        ]);
+        $this->_logger->info('Starting MQTT client...');
+        $this->_mqttClient = new RealtimeClient\Mqtt(
+            'mqtt',
+            $this,
+            $this->_instagram,
+            $this->_loop,
+            $this->_logger,
+            [
+                'isMqttLiveEnabled' => RealtimeClient::isFeatureEnabled($mqttLiveFeatures, 'is_enabled'),
+                'isIrisEnabled'     => RealtimeClient::isFeatureEnabled($mqttFeatures, 'is_direct_over_iris_enabled'),
+                'msgTypeBlacklist'  => isset($mqttFeatures['pubsub_msg_type_blacklist']) ? $mqttFeatures['pubsub_msg_type_blacklist'] : null,
+                'isGraphQlEnabled'  => RealtimeClient::isFeatureEnabled($graphqlFeatures, 'is_enabled'),
+                'sequenceId'        => $inbox->getSeqId(),
+            ]
+        );
     }
 
     /**
@@ -202,6 +191,8 @@ class Realtime implements EventEmitterInterface
         try {
             $this->_init();
         } catch (\Exception $e) {
+            $this->_logger->error((string) $e);
+
             return new RejectedPromise($e);
         }
 
