@@ -180,10 +180,10 @@ class Internal extends RequestCollection
         /** @var string Caption to use for the media. NOT USED FOR STORY MEDIA! */
         $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : '';
         /** @var Response\Model\Location|null A Location object describing where
-         the media was taken. NOT USED FOR STORY MEDIA! */
+         * the media was taken. NOT USED FOR STORY MEDIA! */
         $location = (isset($externalMetadata['location']) && $targetFeed != Constants::FEED_STORY) ? $externalMetadata['location'] : null;
         /** @var array|null Array of usertagging instructions, in the format
-         [['position'=>[0.5,0.5], 'user_id'=>'123'], ...]. ONLY FOR TIMELINE PHOTOS! */
+         * [['position'=>[0.5,0.5], 'user_id'=>'123'], ...]. ONLY FOR TIMELINE PHOTOS! */
         $usertags = (isset($externalMetadata['usertags']) && $targetFeed == Constants::FEED_TIMELINE) ? $externalMetadata['usertags'] : null;
         /** @var string|null Link to attach to the media. ONLY USED FOR STORY MEDIA,
          * AND YOU MUST HAVE A BUSINESS INSTAGRAM ACCOUNT TO POST A STORY LINK! */
@@ -465,7 +465,7 @@ class Internal extends RequestCollection
          * implemented for stories. */
         $usertags = (isset($externalMetadata['usertags']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['usertags'] : null;
         /** @var Response\Model\Location|null A Location object describing where
-         the media was taken. NOT USED FOR STORY MEDIA! */
+         * the media was taken. NOT USED FOR STORY MEDIA! */
         $location = (isset($externalMetadata['location']) && $targetFeed != Constants::FEED_STORY) ? $externalMetadata['location'] : null;
         /** @var string|null Link to attach to the media. ONLY USED FOR STORY MEDIA,
          * AND YOU MUST HAVE A BUSINESS INSTAGRAM ACCOUNT TO POST A STORY LINK! */
@@ -611,7 +611,7 @@ class Internal extends RequestCollection
         /** @var string Caption to use for the album. */
         $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : '';
         /** @var Response\Model\Location|null A Location object describing where
-         the album was taken. */
+         * the album was taken. */
         $location = isset($externalMetadata['location']) ? $externalMetadata['location'] : null;
 
         // Fix very bad external user-metadata values.
