@@ -182,6 +182,10 @@ class Media extends RequestCollection
         } elseif ($module == 'photo_view_profile' && isset($extraData['username']) && isset($extraData['userid'])) {
             $request->addPost('username', $extraData['username'])
                     ->addPost('user_id', $extraData['userid']);
+        } elseif ($module == 'feed_contextual_hashtag' && isset($extraData['hashtag'])) {
+            $request->addPost('feed_contextual_hashtag', $extraData['hashtag']);
+        } else if ($module == 'feed_contextual_location' && isset($extraData['locationId'])) {
+            $request->addPost('feed_contextual_location', $extraData['locationId']);
         }
 
         return $request->getResponse(new Response\GenericResponse());
