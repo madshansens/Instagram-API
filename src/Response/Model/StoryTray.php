@@ -6,6 +6,7 @@ use InstagramAPI\AutoPropertyHandler;
 
 /**
  * @method mixed getCanReply()
+ * @method mixed getCanReshare()
  * @method DismissCard getDismissCard()
  * @method mixed getExpiringAt()
  * @method string getId()
@@ -24,6 +25,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getSourceToken()
  * @method User getUser()
  * @method bool isCanReply()
+ * @method bool isCanReshare()
  * @method bool isDismissCard()
  * @method bool isExpiringAt()
  * @method bool isId()
@@ -42,6 +44,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isSourceToken()
  * @method bool isUser()
  * @method setCanReply(mixed $value)
+ * @method setCanReshare(mixed $value)
  * @method setDismissCard(DismissCard $value)
  * @method setExpiringAt(mixed $value)
  * @method setId(string $value)
@@ -101,4 +104,5 @@ class StoryTray extends AutoPropertyHandler
      * @var DismissCard
      */
     public $dismiss_card;
+    public $can_reshare;
 }

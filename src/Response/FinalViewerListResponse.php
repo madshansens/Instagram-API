@@ -9,7 +9,7 @@ use InstagramAPI\ResponseTrait;
 /**
  * @method mixed getTotalUniqueViewerCount()
  * @method Model\User[] getUsers()
- * @method bool isTotalViewerCount()
+ * @method bool isTotalUniqueViewerCount()
  * @method bool isUsers()
  * @method setTotalUniqueViewerCount(mixed $value)
  * @method setUsers(Model\User[] $value)
