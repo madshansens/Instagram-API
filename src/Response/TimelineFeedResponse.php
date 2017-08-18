@@ -8,7 +8,7 @@ use InstagramAPI\ResponseTrait;
 
 /**
  * @method mixed getAutoLoadMoreEnabled()
- * @method Model\Item[] getFeedItems()
+ * @method Model\FeedItem[] getFeedItems()
  * @method mixed getIsDirectV2Enabled()
  * @method Model\FeedAysf getMegaphone()
  * @method mixed getMoreAvailable()
@@ -22,7 +22,7 @@ use InstagramAPI\ResponseTrait;
  * @method bool isNextMaxId()
  * @method bool isNumResults()
  * @method setAutoLoadMoreEnabled(mixed $value)
- * @method setFeedItems(Model\Item[] $value)
+ * @method setFeedItems(Model\FeedItem[] $value)
  * @method setIsDirectV2Enabled(mixed $value)
  * @method setMegaphone(Model\FeedAysf $value)
  * @method setMoreAvailable(mixed $value)
@@ -42,7 +42,7 @@ class TimelineFeedResponse extends AutoPropertyHandler implements ResponseInterf
      */
     public $next_max_id;
     /**
-     * @var Model\Item[]
+     * @var Model\FeedItem[]
      */
     public $feed_items;
     /**
