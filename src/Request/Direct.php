@@ -518,13 +518,13 @@ class Direct extends RequestCollection
         array $options = [])
     {
         if (!preg_match('#^\d+_\d+$#D', $mediaId)) {
-            throw new \InvalidArgumentException(sprintf('"%s" is not a valid media ID.'));
+            throw new \InvalidArgumentException(sprintf('"%s" is not a valid media ID.', $mediaId));
         }
         if (!isset($options['media_type'])) {
             throw new \InvalidArgumentException('Please provide media_type in options.');
         }
         if ($options['media_type'] !== 'photo' && $options['media_type'] !== 'video') {
-            throw new \InvalidArgumentException(sprintf('"%s" is not a valid media_type.'), $options['media_type']);
+            throw new \InvalidArgumentException(sprintf('"%s" is not a valid media_type.', $options['media_type']));
         }
 
         return $this->_sendDirectItem('media_share', $recipients, array_merge($options, [
@@ -554,7 +554,7 @@ class Direct extends RequestCollection
         array $options = [])
     {
         if (!is_file($photoFilename) || !is_readable($photoFilename)) {
-            throw new \InvalidArgumentException(sprintf('File "%s" is not available for reading.'));
+            throw new \InvalidArgumentException(sprintf('File "%s" is not available for reading.', $photoFilename));
         }
 
         return $this->_sendDirectItem('photo', $recipients, array_merge($options, [

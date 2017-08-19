@@ -184,7 +184,7 @@ class Media extends RequestCollection
                     ->addPost('user_id', $extraData['userid']);
         } elseif ($module == 'feed_contextual_hashtag' && isset($extraData['hashtag'])) {
             $request->addPost('feed_contextual_hashtag', $extraData['hashtag']);
-        } else if ($module == 'feed_contextual_location' && isset($extraData['locationId'])) {
+        } elseif ($module == 'feed_contextual_location' && isset($extraData['locationId'])) {
             $request->addPost('feed_contextual_location', $extraData['locationId']);
         }
 
