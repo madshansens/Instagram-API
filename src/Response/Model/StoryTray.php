@@ -9,6 +9,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getCanReshare()
  * @method DismissCard getDismissCard()
  * @method mixed getExpiringAt()
+ * @method mixed getHasBestiesMedia()
  * @method string getId()
  * @method mixed getIsNux()
  * @method Item[] getItems()
@@ -28,6 +29,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isCanReshare()
  * @method bool isDismissCard()
  * @method bool isExpiringAt()
+ * @method bool isHasBestiesMedia()
  * @method bool isId()
  * @method bool isIsNux()
  * @method bool isItems()
@@ -47,6 +49,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setCanReshare(mixed $value)
  * @method setDismissCard(DismissCard $value)
  * @method setExpiringAt(mixed $value)
+ * @method setHasBestiesMedia(mixed $value)
  * @method setId(string $value)
  * @method setIsNux(mixed $value)
  * @method setItems(Item[] $value)
@@ -105,4 +108,5 @@ class StoryTray extends AutoPropertyHandler
      */
     public $dismiss_card;
     public $can_reshare;
+    public $has_besties_media;
 }

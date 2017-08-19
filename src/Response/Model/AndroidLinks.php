@@ -10,18 +10,21 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getDeeplinkUri()
  * @method mixed getLinkType()
  * @method mixed getPackage()
+ * @method mixed getRedirectUri()
  * @method mixed getWebUri()
  * @method bool isAndroidClass()
  * @method bool isCallToActionTitle()
  * @method bool isDeeplinkUri()
  * @method bool isLinkType()
  * @method bool isPackage()
+ * @method bool isRedirectUri()
  * @method bool isWebUri()
  * @method setAndroidClass(mixed $value)
  * @method setCallToActionTitle(mixed $value)
  * @method setDeeplinkUri(mixed $value)
  * @method setLinkType(mixed $value)
  * @method setPackage(mixed $value)
+ * @method setRedirectUri(mixed $value)
  * @method setWebUri(mixed $value)
  */
 class AndroidLinks extends AutoPropertyHandler
@@ -32,4 +35,5 @@ class AndroidLinks extends AutoPropertyHandler
     public $package;
     public $deeplinkUri;
     public $callToActionTitle;
+    public $redirectUri;
 }

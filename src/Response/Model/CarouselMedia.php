@@ -7,6 +7,7 @@ use InstagramAPI\AutoPropertyHandler;
 /**
  * @method string getCarouselParentId()
  * @method mixed getHasAudio()
+ * @method Headline getHeadline()
  * @method string getId()
  * @method Image_Versions2 getImageVersions2()
  * @method mixed getMediaType()
@@ -19,6 +20,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method VideoVersions[] getVideoVersions()
  * @method bool isCarouselParentId()
  * @method bool isHasAudio()
+ * @method bool isHeadline()
  * @method bool isId()
  * @method bool isImageVersions2()
  * @method bool isMediaType()
@@ -31,6 +33,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isVideoVersions()
  * @method setCarouselParentId(string $value)
  * @method setHasAudio(mixed $value)
+ * @method setHeadline(Headline $value)
  * @method setId(string $value)
  * @method setImageVersions2(Image_Versions2 $value)
  * @method setMediaType(mixed $value)
@@ -77,4 +80,8 @@ class CarouselMedia extends AutoPropertyHandler
      */
     public $usertags;
     public $preview;
+    /**
+     * @var Headline
+     */
+    public $headline;
 }

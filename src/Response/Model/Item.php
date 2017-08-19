@@ -72,6 +72,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getMediaType()
  * @method mixed getMultiAuthorReelNames()
  * @method string getNextMaxId()
+ * @method string getOrganicPostId()
  * @method mixed getOrganicTrackingToken()
  * @method mixed getOriginalHeight()
  * @method mixed getOriginalWidth()
@@ -177,6 +178,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isMediaType()
  * @method bool isMultiAuthorReelNames()
  * @method bool isNextMaxId()
+ * @method bool isOrganicPostId()
  * @method bool isOrganicTrackingToken()
  * @method bool isOriginalHeight()
  * @method bool isOriginalWidth()
@@ -281,6 +283,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setMediaType(mixed $value)
  * @method setMultiAuthorReelNames(mixed $value)
  * @method setNextMaxId(string $value)
+ * @method setOrganicPostId(string $value)
  * @method setOrganicTrackingToken(mixed $value)
  * @method setOriginalHeight(mixed $value)
  * @method setOriginalWidth(mixed $value)
@@ -541,6 +544,10 @@ class Item extends AutoPropertyHandler
      */
     public $reel_share;
     public $story_polls;
+    /**
+     * @var string
+     */
+    public $organic_post_id;
 
     public function setMediaOrAd(
         $params)
