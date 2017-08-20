@@ -47,7 +47,7 @@ class Hashtag extends RequestCollection
             ->addParam('rank_token', $this->ig->rank_token);
 
         if (!empty($excludeList)) {
-            $request->addParam('exclude_list', json_encode(array_map('intval', $excludeList)));
+            $request->addParam('exclude_list', json_encode(array_unique(array_map('intval', $excludeList))));
         }
 
         return $request->getResponse(new Response\SearchTagResponse());
