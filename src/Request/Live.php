@@ -384,7 +384,7 @@ class Live extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\AddToLiveResponse
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function addToPostLive(
         $broadcastId)
@@ -393,6 +393,25 @@ class Live extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->getResponse(new Response\AddToLiveResponse());
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
+     * Delete a post live broadcast.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function deletePostLive(
+        $broadcastId)
+    {
+        return $this->ig->request("live/{$broadcastId}/delete_post_live/")
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\GenericResponse());
     }
 }

@@ -19,6 +19,7 @@ vendor/
 .\#*
 *.sublime-project
 *.sublime-workspace
+.idea
 
 # operating system cache files
 .DS_Store
