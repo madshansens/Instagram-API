@@ -29,20 +29,28 @@ class Hashtag extends RequestCollection
     /**
      * Search for hashtags.
      *
-     * @param string $query Finds hashtags containing this string.
+     * @param string       $query       Finds hashtags containing this string.
+     * @param string array $excludeList Exclude tags from the response list.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\SearchTagResponse
      */
     public function search(
-        $query)
+        $query,
+        array $excludeList = [])
     {
-        return $this->ig->request('tags/search/')
-            ->addParam('is_typeahead', true)
+        $request = $this->ig->request('tags/search/')
             ->addParam('q', $query)
-            ->addParam('rank_token', $this->ig->rank_token)
-            ->getResponse(new Response\SearchTagResponse());
+            ->addParam('timezone_offset', 0)
+            ->addParam('count', 30)
+            ->addParam('rank_token', $this->ig->rank_token);
+
+        if (!empty($excludeList)) {
+            $request->addParam('exclude_list', json_encode(array_map('intval', $excludeList)));
+        }
+
+        return $request->getResponse(new Response\SearchTagResponse());
     }
 
     /**
