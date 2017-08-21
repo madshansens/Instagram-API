@@ -42,12 +42,12 @@ class Hashtag extends RequestCollection
     {
         $request = $this->ig->request('tags/search/')
             ->addParam('q', $query)
-            ->addParam('timezone_offset', 0)
+            ->addParam('timezone_offset', date('Z'))
             ->addParam('count', 30)
             ->addParam('rank_token', $this->ig->rank_token);
 
         if (!empty($excludeList)) {
-            $request->addParam('exclude_list', json_encode(array_unique(array_map('intval', $excludeList))));
+            $request->addParam('exclude_list', '['.implode(', ', $excludeList).']');
         }
 
         return $request->getResponse(new Response\SearchTagResponse());
