@@ -590,4 +590,19 @@ class Media extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\BlockedMediaResponse());
     }
+
+    /**
+     * Get list of users who liked a comment.
+     *
+     * @param string $commentId The comment's ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CommentLikersResponse
+     */
+    public function getCommentLikers(
+        $commentId)
+    {
+        return $this->ig->request("media/{$commentId}/comment_likers")->getResponse(new Response\CommentLikersResponse());
+    }
 }
