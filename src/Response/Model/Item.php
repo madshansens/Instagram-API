@@ -68,10 +68,10 @@ use InstagramAPI\AutoPropertyHandler;
  * @method Media getMedia()
  * @method string[] getMediaIds()
  * @method mixed getMediaInfos()
- * @method mixed getMediaOrAd()
  * @method mixed getMediaType()
  * @method mixed getMultiAuthorReelNames()
  * @method string getNextMaxId()
+ * @method mixed getNumberOfQualities()
  * @method string getOrganicPostId()
  * @method mixed getOrganicTrackingToken()
  * @method mixed getOriginalHeight()
@@ -174,10 +174,10 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isMedia()
  * @method bool isMediaIds()
  * @method bool isMediaInfos()
- * @method bool isMediaOrAd()
  * @method bool isMediaType()
  * @method bool isMultiAuthorReelNames()
  * @method bool isNextMaxId()
+ * @method bool isNumberOfQualities()
  * @method bool isOrganicPostId()
  * @method bool isOrganicTrackingToken()
  * @method bool isOriginalHeight()
@@ -283,6 +283,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setMediaType(mixed $value)
  * @method setMultiAuthorReelNames(mixed $value)
  * @method setNextMaxId(string $value)
+ * @method setNumberOfQualities(mixed $value)
  * @method setOrganicPostId(string $value)
  * @method setOrganicTrackingToken(mixed $value)
  * @method setOriginalHeight(mixed $value)
@@ -427,7 +428,6 @@ class Item extends AutoPropertyHandler
      * @var Usertag
      */
     public $usertags;
-    public $media_or_ad;
     /**
      * @var Media
      */
@@ -475,6 +475,7 @@ class Item extends AutoPropertyHandler
     public $link_text;
     public $is_dash_eligible;
     public $video_dash_manifest;
+    public $number_of_qualities;
     /**
      * @var Injected
      */
@@ -549,16 +550,23 @@ class Item extends AutoPropertyHandler
      */
     public $organic_post_id;
 
-    public function setMediaOrAd(
-        $params)
-    {
-        foreach ($params as $k => $v) {
-            $this->$k = $v;
-        }
-    }
-
+    /**
+     * Get the web URL for this media item.
+     *
+     * @return string
+     */
     public function getItemUrl()
     {
-        return 'https://www.instagram.com/p/'.$this->getCode().'/';
+        return 'https://www.instagram.com/p/'.$this->code.'/';
+    }
+
+    /**
+     * Checks whether this media item is an advertisement.
+     *
+     * @return bool
+     */
+    public function isAd()
+    {
+        return $this->dr_ad_type !== null;
     }
 }
