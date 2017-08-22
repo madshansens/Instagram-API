@@ -512,9 +512,7 @@ class Request
         }
 
         foreach ($this->_handles as $handle) {
-            if (is_resource($handle)) {
-                fclose($handle);
-            }
+            Utils::safe_fclose($handle);
         }
         $this->_resetHandles();
     }

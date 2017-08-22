@@ -198,7 +198,7 @@ class Live extends RequestCollection
     }
 
     /**
-     * Unpin comment on live broadcast.
+     * Unpin a comment on live broadcast.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
      * @param string $commentId   Pinned comment ID.

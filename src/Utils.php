@@ -921,6 +921,29 @@ class Utils
     }
 
     /**
+     * Closes a file pointer if it's open.
+     *
+     * Always use this function instead of fclose()!
+     *
+     * Unlike the normal fclose(), this function is safe to call multiple times
+     * since it only attempts to close the pointer if it's actually still open.
+     * The normal fclose() would give an annoying warning in that scenario.
+     *
+     * @param resource $handle A file pointer opened by fopen() or fsockopen().
+     *
+     * @return bool TRUE on success or FALSE on failure.
+     */
+    public static function safe_fclose(
+        $handle)
+    {
+        if (is_resource($handle)) {
+            return fclose($handle);
+        }
+
+        return true;
+    }
+
+    /**
      * Checks if a URL has valid "web" syntax.
      *
      * This function is Unicode-aware.
