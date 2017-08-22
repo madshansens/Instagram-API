@@ -508,6 +508,9 @@ class Internal extends RequestCollection
             ->addPost('_uid', $this->ig->account_id);
 
         switch ($targetFeed) {
+            case Constants::FEED_TIMELINE:
+                $request->addPost('caption', $captionText);
+                break;
             case Constants::FEED_STORY:
                 $request
                     ->addPost('configure_mode', 1) // 1 - REEL_SHARE
@@ -537,8 +540,6 @@ class Internal extends RequestCollection
                     ->addPost('client_timestamp', time());
                 break;
         }
-
-        $request->addPost('caption', $captionText);
 
         if ($targetFeed == Constants::FEED_STORY) {
             $request->addPost('story_media_creation_date', time());
