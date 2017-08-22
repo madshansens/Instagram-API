@@ -112,7 +112,7 @@ class Live extends RequestCollection
     }
 
     /**
-     * Get viewer list of a saved broadcast.
+     * Get viewer list of a post-live (saved replay) broadcast.
      *
      * @param string      $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
      * @param null|string $maxId       Next "maximum ID", used for pagination.
@@ -240,11 +240,11 @@ class Live extends RequestCollection
     }
 
     /**
-     * Get live comments after live broadcast is over.
+     * Get post-live (saved replay) broadcast comments.
      *
      * @param string $broadcastId    The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param int    $startingOffset (optional).
-     * @param string $encodingTag    (optional).
+     * @param int    $startingOffset (optional) The time-offset to start at when retrieving the comments.
+     * @param string $encodingTag    (optional) TODO: ?.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -308,11 +308,11 @@ class Live extends RequestCollection
     }
 
     /**
-     * Get live likes after live broadcast is over.
+     * Get post-live (saved replay) broadcast likes.
      *
      * @param string $broadcastId    The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param int    $startingOffset (optional).
-     * @param string $encodingTag    (optional).
+     * @param int    $startingOffset (optional) The time-offset to start at when retrieving the likes.
+     * @param string $encodingTag    (optional) TODO: ?.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -378,7 +378,7 @@ class Live extends RequestCollection
     }
 
     /**
-     * Add broadcast to your feed (replay).
+     * Add a finished broadcast to your post-live feed (saved replay).
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
      *
@@ -397,7 +397,7 @@ class Live extends RequestCollection
     }
 
     /**
-     * Delete a post live broadcast.
+     * Delete a saved post-live broadcast.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
      *
