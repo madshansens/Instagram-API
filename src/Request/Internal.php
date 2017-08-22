@@ -258,7 +258,7 @@ class Internal extends RequestCollection
                     $request->addPost('story_cta', $story_cta);
                 }
                 if (!is_null($hashtags) && $captionText != '') {
-                    Utils::throwIfInvalidHashtags($captionText, $hashtags);
+                    Utils::throwIfInvalidStoryHashtags($captionText, $hashtags);
                     $request
                         ->addPost('story_hashtags', json_encode($hashtags))
                         ->addPost('caption', $captionText)
@@ -520,7 +520,7 @@ class Internal extends RequestCollection
                     $request->addPost('story_cta', $story_cta);
                 }
                 if (!is_null($hashtags) && $captionText != '') {
-                    Utils::throwIfInvalidHashtags($captionText, $hashtags);
+                    Utils::throwIfInvalidStoryHashtags($captionText, $hashtags);
                     $request
                         ->addPost('story_hashtags', json_encode($hashtags))
                         ->addPost('caption', $captionText)
