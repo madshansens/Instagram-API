@@ -26,26 +26,27 @@ try {
     exit(0);
 }
 
-// NOTE: This code will make the hashtag 'clickable', but you need to draw the hashtag,
-//       or put an image overlay of the hashtag on top of your image.
+// NOTE: This code will make the hashtag area 'clickable', but YOU need to
+// manually draw the hashtag or a sticker-image on top of your image yourself
+// before uploading, if you want the tag to actually be visible on-screen!
 
-$metadata =
-    ['hashtags' => [
-            // You can add more than one hashtag in the array.
-            // All float values can be from 0.0 to 1.0.
-            [
-                'tag_name'         => '#test', // NOTE: This hashtag MUST appear in the caption.
-                'x'                => 0.5, // x = 0.5 and y = 0.5 is center of screen.
-                'y'                => 0.5,
-                'width'            => 0.24305555,
-                'height'           => 0.07347973,
-                'rotation'         => 0.0,
-                'is_sticker'       => false, // Don't change this value.
-                'use_custom_title' => false, // Don't change this value.
-            ],
-            // ...
+$metadata = [
+    'hashtags' => [
+        // Note that you can add more than one hashtag in this array.
+        [
+            'tag_name'         => '#test', // NOTE: This hashtag MUST appear in the caption.
+            'x'                => 0.5, // Range: 0.0 - 1.0
+            'y'                => 0.5, // Note that x = 0.5 and y = 0.5 is center of screen.
+            'width'            => 0.24305555, // Percentage: 0.0 - 1.0
+            'height'           => 0.07347973, // Percentage: 0.0 - 1.0
+            'rotation'         => 0.0,
+            'is_sticker'       => false, // Don't change this value.
+            'use_custom_title' => false, // Don't change this value.
         ],
-    'caption' => '#test this is a cool API', ];
+        // ...
+    ],
+    'caption' => '#test This is a great API!',
+];
 
 try {
     $ig->story->uploadPhoto($photoFilename, $metadata);
