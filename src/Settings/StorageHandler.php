@@ -33,9 +33,9 @@ class StorageHandler
         'advertising_id', // Google Play advertising ID.
         'session_id', // The user's current application session ID.
         'experiments', // Interesting experiment variables for this account.
+        'fbns_auth', // Serialized auth credentials for FBNS.
         'last_login', // Tracks time elapsed since our last login state refresh.
         'last_experiments', // Tracks time elapsed since our last experiments refresh.
-        'fbns_auth', // Serialized auth credentials for FBNS.
     ];
 
     /**
@@ -576,6 +576,8 @@ class StorageHandler
     }
 
     /**
+     * Save FBNS authorization.
+     *
      * @param AuthInterface $auth
      */
     public function setFbnsAuth(
@@ -585,6 +587,11 @@ class StorageHandler
     }
 
     /**
+     * Get FBNS authorization.
+     *
+     * Will restore previously saved auth details if they exist. Otherwise it
+     * creates random new authorization details.
+     *
      * @return AuthInterface
      */
     public function getFbnsAuth()

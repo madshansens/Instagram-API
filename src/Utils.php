@@ -1034,7 +1034,7 @@ class Utils
 
         // HTTP proxies do not have CONNECT method.
         if (!isset($proxyConfig['https'])) {
-            throw new \InvalidArgumentException('No proxy with CONNECT method found');
+            throw new \InvalidArgumentException('No proxy with CONNECT method found.');
         }
 
         // Check exceptions.
@@ -1067,7 +1067,7 @@ class Utils
         } elseif (is_string($config)) {
             $context['cafile'] = $config;
             if (!file_exists($config)) {
-                throw new \RuntimeException("SSL CA bundle not found: $config");
+                throw new \RuntimeException(sprintf('SSL CA bundle not found: "%s".', $config));
             }
         } elseif ($config === false) {
             $context['verify_peer'] = false;
@@ -1075,7 +1075,7 @@ class Utils
 
             return $context;
         } else {
-            throw new \InvalidArgumentException('Invalid verify request option');
+            throw new \InvalidArgumentException('Invalid verify request option.');
         }
         $context['verify_peer'] = true;
         $context['verify_peer_name'] = true;
@@ -1125,7 +1125,7 @@ class Utils
                 $connector = new HttpConnectProxy($proxyAddress, new SecureConnector($connector, $loop, $secureContext));
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('Unsupported proxy scheme: %s', $scheme));
+                throw new \InvalidArgumentException(sprintf('Unsupported proxy scheme: %s.', $scheme));
         }
 
         return new SecureConnector($connector, $loop, $secureContext);

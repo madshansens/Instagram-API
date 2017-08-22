@@ -20,7 +20,7 @@ use React\Socket\ConnectorInterface;
  * The following events are emitted:
  *  - incoming - New PUSH notification has been received.
  *  - like - Someone has liked your media.
- *  - comment - Someone has commented your media.
+ *  - comment - Someone has commented on your media.
  *  - direct_v2_message - Someone has messaged you.
  *  - ...
  *  - error - An event of severity "error" occurred.

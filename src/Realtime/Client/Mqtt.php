@@ -190,7 +190,7 @@ class Mqtt extends Client
     }
 
     /**
-     * Returns a device associated with Instagram account.
+     * Returns the device associated with the Instagram account.
      *
      * @return \InstagramAPI\Devices\Device
      */
