@@ -690,7 +690,8 @@ class Utils
                     throw new \InvalidArgumentException(sprintf('Invalid key "%s" for hashtag.', $k));
                 }
                 if (
-                    (($k === 'x' || $k === 'y') && (!is_float($v) || $v < 0.0 || $v > 1.0))
+                    // NOTE: Yes, the width/height are relative (0.0-1.0) floats exactly like x/y!
+                    (($k === 'x' || $k === 'y' || $k === 'width' || $k === 'height') && (!is_float($v) || $v < 0.0 || $v > 1.0))
                     || (($k === 'is_sticker' || $k === 'use_custom_title') && !is_bool($v))
                 ) {
                     throw new \InvalidArgumentException(sprintf('Invalid value "%s" for hashtag array-key "%s".', $v, $k));
