@@ -10,7 +10,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method string getCreatedAt()
  * @method string getCreatedAtUtc()
  * @method string getMediaId()
- * @method mixed getPk()
+ * @method string getPk()
  * @method mixed getStatus()
  * @method mixed getText()
  * @method mixed getType()
@@ -32,7 +32,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setCreatedAt(string $value)
  * @method setCreatedAtUtc(string $value)
  * @method setMediaId(string $value)
- * @method setPk(mixed $value)
+ * @method setPk(string $value)
  * @method setStatus(mixed $value)
  * @method setText(mixed $value)
  * @method setType(mixed $value)
@@ -50,6 +50,9 @@ class Headline extends AutoPropertyHandler
      * @var string
      */
     public $user_id;
+    /**
+     * @var string
+     */
     public $pk;
     public $text;
     public $type;
