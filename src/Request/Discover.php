@@ -13,7 +13,7 @@ class Discover extends RequestCollection
      * Get Explore tab feed.
      *
      * @param null|string $maxId      Next "maximum ID", used for pagination.
-     * @param bool        $isPrefetch Flag for first fetch.
+     * @param bool        $isPrefetch Whether this is the first fetch; we'll ignore maxId if TRUE.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -26,7 +26,7 @@ class Discover extends RequestCollection
         $request = $this->ig->request('discover/explore/')
             ->addParam('is_prefetch', $isPrefetch)
             ->addParam('is_from_promote', false)
-            ->addParam('timezone_offset', 0)
+            ->addParam('timezone_offset', date('Z'))
             ->addParam('session_id', $this->ig->session_id);
 
         if (!$isPrefetch) {
