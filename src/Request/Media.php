@@ -332,10 +332,11 @@ class Media extends RequestCollection
      *
      * @param string $mediaId        The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param string $commentText    Your comment text.
-     * @param string $replyCommentId (optional) ID of the comment you want to reply (ie "17895795823020906").
-     *                               $commentText MUST contain a mention to the user.
+     * @param string $replyCommentId (optional) The comment ID you are replying to, if this is a reply (ie "17895795823020906");
+     *                               when replying, your $commentText MUST contain an @-mention at the start (ie "@theirusername Hello!").
      * @param string $module         (optional) From which app module (page) you're performing this action.
      *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\CommentResponse
@@ -357,6 +358,9 @@ class Media extends RequestCollection
             ->addPost('radio_type', 'wifi-none');
 
         if (!is_null($replyCommentId)) {
+            if ($commentText[0] !== '@') {
+                throw new \InvalidArgumentException('When replying to a comment, your text must begin with an @-mention to their username.');
+            }
             $request->addPost('replied_to_comment_id', $replyCommentId);
         }
 
