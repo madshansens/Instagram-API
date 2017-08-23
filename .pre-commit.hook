@@ -7,6 +7,9 @@
 # all files but haven't added the codestyle fixes to their commit, they'll still
 # pass this check. But it's still a great protection against most mistakes.
 #
+# To install this hook, just run the following in the project's root folder:
+#   ln -fs "../../.pre-commit.hook" .git/hooks/pre-commit
+#
 
 # Redirect output to stderr.
 exec 1>&2
