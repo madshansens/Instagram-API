@@ -19,6 +19,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getCaptionIsEdited()
  * @method mixed getCaptionPosition()
  * @method CarouselMedia[] getCarouselMedia()
+ * @method mixed getCarouselMediaType()
  * @method Channel getChannel()
  * @method mixed getClientCacheKey()
  * @method mixed getCode()
@@ -125,6 +126,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isCaptionIsEdited()
  * @method bool isCaptionPosition()
  * @method bool isCarouselMedia()
+ * @method bool isCarouselMediaType()
  * @method bool isChannel()
  * @method bool isClientCacheKey()
  * @method bool isCode()
@@ -231,6 +233,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setCaptionIsEdited(mixed $value)
  * @method setCaptionPosition(mixed $value)
  * @method setCarouselMedia(CarouselMedia[] $value)
+ * @method setCarouselMediaType(mixed $value)
  * @method setChannel(Channel $value)
  * @method setClientCacheKey(mixed $value)
  * @method setCode(mixed $value)
@@ -394,6 +397,7 @@ class Item extends AutoPropertyHandler
      * @var CarouselMedia[]
      */
     public $carousel_media;
+    public $carousel_media_type;
     /**
      * @var Caption
      */
@@ -472,7 +476,6 @@ class Item extends AutoPropertyHandler
     public $gating;
     public $story_hashtags;
     public $ad_action;
-    public $link_text;
     public $is_dash_eligible;
     public $video_dash_manifest;
     public $number_of_qualities;
@@ -500,6 +503,7 @@ class Item extends AutoPropertyHandler
      */
     public $ad_metadata;
     public $link;
+    public $link_text;
     public $link_hint_text;
     public $iTunesItem;
     public $ad_link_type;
