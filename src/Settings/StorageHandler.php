@@ -39,6 +39,21 @@ class StorageHandler
     ];
 
     /**
+     * List of important settings to keep when erasing device-specific settings.
+     *
+     * Whenever we are told to erase all device-specific settings, we will clear
+     * the values of all settings EXCEPT the keys listed here. It is therefore
+     * VERY important to list ALL important NON-DEVICE specific settings here!
+     *
+     * @var array
+     *
+     * @see StorageHandler::eraseDeviceSettings()
+     */
+    const KEEP_KEYS_WHEN_ERASING_DEVICE = [
+        'account_id', // We don't really need to keep this, but it's a good example.
+    ];
+
+    /**
      * Whitelist for experiments.
      *
      * We will save ONLY the experiments mentioned in this list.
@@ -268,6 +283,27 @@ class StorageHandler
 
         return $this->_storage->hasUserCookies()
                 && !empty($this->get('account_id'));
+    }
+
+    /**
+     * Erase all device-specific settings.
+     *
+     * This is useful when assigning a new Android device to the account, upon
+     * which it's very important that we erase all previous, device-specific
+     * settings so that our account still looks natural to Instagram.
+     *
+     * Note that cookies will NOT be erased, since that action isn't supported
+     * by all storage backends. Ignoring old cookies is the job of the caller!
+     *
+     * @throws \InstagramAPI\Exception\SettingsException
+     */
+    public function eraseDeviceSettings()
+    {
+        foreach (self::PERSISTENT_KEYS as $key) {
+            if (!in_array($key, self::KEEP_KEYS_WHEN_ERASING_DEVICE)) {
+                $this->set($key, '');
+            }
+        }
     }
 
     /**
