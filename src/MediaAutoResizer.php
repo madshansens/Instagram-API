@@ -35,6 +35,19 @@ class MediaAutoResizer
     const EXPAND = 2;
 
     /**
+     * Minimum allowed image width.
+     *
+     * These are decided by Instagram. Not by us!
+     *
+     * This value is the same for both stories and general media.
+     *
+     * @var int
+     *
+     * @see https://help.instagram.com/1631821640426723
+     */
+    const MIN_WIDTH = 320;
+
+    /**
      * Maximum allowed image width.
      *
      * These are decided by Instagram. Not by us!
@@ -45,8 +58,6 @@ class MediaAutoResizer
      * the width and aspect ratio which ensures that the height is legal too.
      *
      * @var int
-     *
-     * @see https://help.instagram.com/1631821640426723
      */
     const MAX_WIDTH = 1080;
 

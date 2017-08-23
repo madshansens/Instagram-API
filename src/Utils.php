@@ -401,17 +401,17 @@ class Utils
         // those when validating the aspect ratio range further down.
         if ($mediaDetails instanceof PhotoDetails) {
             // Validate photo resolution. Instagram allows between 320px-1080px width.
-            if ($width < 320 || $width > MediaAutoResizer::MAX_WIDTH) {
+            if ($width < MediaAutoResizer::MIN_WIDTH || $width > MediaAutoResizer::MAX_WIDTH) {
                 throw new \InvalidArgumentException(sprintf(
-                    'Instagram only accepts photos that are between 320 and %d pixels wide. Your file "%s" is %d pixels wide.',
-                    MediaAutoResizer::MAX_WIDTH, $mediaFilename, $width
+                    'Instagram only accepts photos that are between %d and %d pixels wide. Your file "%s" is %d pixels wide.',
+                    MediaAutoResizer::MIN_WIDTH, MediaAutoResizer::MAX_WIDTH, $mediaFilename, $width
                 ));
             }
         } elseif ($mediaDetails instanceof VideoDetails) {
             // Validate video resolution. Instagram allows between 480px-720px width.
             // NOTE: They'll resize 720px wide videos on the server, to 640px instead.
             // NOTE: Their server CAN receive between 320px-1080px width without
-            // rejecting the file, but the official app would NEVER upload such
+            // rejecting the video, but the official app would NEVER upload such
             // resolutions. It's controlled by the "ig_android_universe_video_production"
             // experiment variable, which currently enforces width of min:480, max:720.
             // If users want to upload bigger videos, they MUST resize locally first!
