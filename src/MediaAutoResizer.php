@@ -467,6 +467,11 @@ class MediaAutoResizer
             return true;
         }
 
+        // Process if width < minimum allowed.
+        if ($this->_width < self::MIN_WIDTH) {
+            return true;
+        }
+
         // Process if width > maximum allowed.
         if ($this->_width > self::MAX_WIDTH) {
             return true;
@@ -647,18 +652,30 @@ class MediaAutoResizer
     protected function _processResource(
         $resource)
     {
-        $x1 = $y1 = 0;
-        $x2 = $width = $this->_width;
-        $y2 = $height = $this->_height;
+        // Initialize target canvas to original input dimensions & aspect ratio.
+        $targetWidth = $this->_width;
+        $targetHeight = $this->_height;
+        $targetAspectRatio = $this->_aspectRatio;
 
-        // Check aspect ratio and crop/expand to fit requirements if needed.
-        if ($this->_minAspectRatio !== null && $this->_aspectRatio < $this->_minAspectRatio) {
+        // Initialize the crop-shifting variables. These control what range of
+        // X/Y coordinates we'll copy from the ORIGINAL input to final canvas.
+        $x1 = $y1 = 0;
+        $x2 = $this->_width;
+        $y2 = $this->_height;
+
+        // Check aspect ratio and crop/expand final canvas to fit aspect if needed.
+        $useFloorHeightRecalc = true; // Height-behavior in any later re-calculations.
+        if ($this->_minAspectRatio !== null && $targetAspectRatio < $this->_minAspectRatio) {
+            $useFloorHeightRecalc = true; // Use floor() so height is above minAspectRatio.
             // Determine target ratio; in case of stories we always target 9:16.
             $targetAspectRatio = $this->_targetFeed === 'story' ? self::BEST_STORY_RATIO : $this->_minAspectRatio;
             if ($this->_operation === self::CROP) {
                 // We need to limit the height, so floor is used intentionally to
                 // AVOID rounding height upwards to a still-illegal aspect ratio.
-                $height = floor($this->_width / $targetAspectRatio);
+                $targetHeight = floor($targetWidth / $targetAspectRatio);
+
+                // We must also calculate cropped input height, for focus-shift math.
+                $inputCroppedHeight = floor($this->_width / $targetAspectRatio);
 
                 // Crop vertical images from top by default, to keep faces, etc.
                 $cropFocus = $this->_cropFocus !== null ? $this->_cropFocus : -50;
@@ -668,8 +685,8 @@ class MediaAutoResizer
                     $cropFocus = -$cropFocus;
                 }
 
-                // Calculate difference and divide it by cropFocus.
-                $diff = $this->_height - $height;
+                // Calculate difference and divide it by cropFocus to get shift.
+                $diff = $this->_height - $inputCroppedHeight;
                 $y1 = round($diff * (50 + $cropFocus) / 100);
                 $y2 = $y2 - ($diff - $y1);
             } elseif ($this->_operation === self::EXPAND) {
@@ -680,15 +697,19 @@ class MediaAutoResizer
                 // their values are very close to each other! For example with
                 // 450x600 input and min/max aspect of 1.2625, it'll create a
                 // 758x600 expanded image (ratio 1.2633). That's unavoidable.
-                $width = ceil($this->_height * $targetAspectRatio);
+                $targetWidth = ceil($targetHeight * $targetAspectRatio);
             }
-        } elseif ($this->_maxAspectRatio !== null && $this->_aspectRatio > $this->_maxAspectRatio) {
+        } elseif ($this->_maxAspectRatio !== null && $targetAspectRatio > $this->_maxAspectRatio) {
+            $useFloorHeightRecalc = false; // Use ceil() so height is below maxAspectRatio.
             // Determine target ratio; in case of stories we always target 9:16.
             $targetAspectRatio = $this->_targetFeed === 'story' ? self::BEST_STORY_RATIO : $this->_maxAspectRatio;
             if ($this->_operation === self::CROP) {
                 // We need to limit the width. We use floor to guarantee cutting
                 // enough pixels, since our width exceeds the maximum allowed ratio.
-                $width = floor($this->_height * $targetAspectRatio);
+                $targetWidth = floor($targetHeight * $targetAspectRatio);
+
+                // We must also calculate cropped input width, for focus-shift math.
+                $inputCroppedWidth = floor($this->_height * $targetAspectRatio);
 
                 // Crop horizontal images from center by default.
                 $cropFocus = $this->_cropFocus !== null ? $this->_cropFocus : 0;
@@ -698,8 +719,8 @@ class MediaAutoResizer
                     $cropFocus = -$cropFocus;
                 }
 
-                // Calculate difference and divide it by cropFocus.
-                $diff = $this->_width - $width;
+                // Calculate difference and divide it by cropFocus to get shift.
+                $diff = $this->_width - $inputCroppedWidth;
                 $x1 = round($diff * (50 + $cropFocus) / 100);
                 $x2 = $x2 - ($diff - $x1);
             } elseif ($this->_operation === self::EXPAND) {
@@ -710,49 +731,56 @@ class MediaAutoResizer
                 // their values are very close to each other! For example with
                 // 600x450 input and min/max aspect of 0.8625, it'll create a
                 // 600x696 expanded image (ratio 0.86206). That's unavoidable.
-                $height = ceil($this->_width / $targetAspectRatio);
+                $targetHeight = ceil($targetWidth / $targetAspectRatio);
             }
         } else {
-            // The image's aspect ratio is already within the legal range.
-            $targetAspectRatio = $this->_aspectRatio;
+            // The image's aspect ratio is already within the legal range, but
+            // we'll still need to set up a proper height re-calc variable if
+            // our input needs to be re-scaled based on width limits further
+            // below. So determine whether the input is closest to min or max.
+            $minAspectDistance = abs(($this->_minAspectRatio !== null ? $this->_minAspectRatio : 0) - $targetAspectRatio);
+            $maxAspectDistance = abs(($this->_maxAspectRatio !== null ? $this->_maxAspectRatio : 0) - $targetAspectRatio);
+            // If it's closest to minimum allowed ratio, we'll use floor() to
+            // ensure the result is above the minimum ratio. Otherwise we'll use
+            // ceil() to ensure that the result is below the maximum ratio.
+            $useFloorHeightRecalc = ($minAspectDistance < $maxAspectDistance);
         }
 
-        // Handle square target ratios or too-large target dimensions.
-        if ($targetAspectRatio == 1) {
-            // Ratio = 1: Square.
+        // Handle square target ratios by making the final canvas into a square.
+        if ($targetAspectRatio == 1) { // Ratio 1 = Square.
             // NOTE: Our square will be the size of the shortest side when
-            // cropping or the longest side when expanding, but never more
-            // than the maximum allowed image width by Instagram.
-            $squareWidth = $this->_operation === self::CROP ? min($width, $height) : max($width, $height);
-            if ($squareWidth > self::MAX_WIDTH) {
-                $squareWidth = self::MAX_WIDTH;
-            }
-            $width = $height = $squareWidth;
-        } else {
-            // All other ratios: Ensure the final width fits Instagram's limit.
-            // If ratio > 1: Landscape (wider than tall). Limit by width.
-            // If ratio < 1: Portrait (taller than wide). Limit by width.
-            // NOTE: Instagram enforces width & aspect ratio, which in turn
-            // auto-limits height.
-            if ($width > self::MAX_WIDTH) {
-                // Target exceeds Instagram's pixel-limit. Set width to max.
-                $width = self::MAX_WIDTH;
-                // Re-calculate the target height via our chosen aspect ratio.
-                // NOTE: Must use ceil() if aspect ratio is above 1 (landscape),
-                // otherwise result may not be tall enough to get a legal ratio!
-                // This is safe since the height will always be lower than its
-                // original even via ceil(), since we've reduced the width.
-                $height = $targetAspectRatio > 1 ? ceil($width / $targetAspectRatio) : floor($width / $targetAspectRatio);
-            }
+            // cropping or the longest side when expanding.
+            $targetWidth = $targetHeight = $this->_operation === self::CROP
+                         ? min($targetWidth, $targetHeight)
+                         : max($targetWidth, $targetHeight);
+        }
+
+        // Lastly, enforce minimum and maximum width limits on our final canvas.
+        // NOTE: Instagram only enforces width & aspect ratio, which in turn
+        // auto-limits height (since we can only use legal height ratios).
+        $mustRecalcHeight = false;
+        if ($targetWidth > self::MAX_WIDTH) {
+            $targetWidth = self::MAX_WIDTH;
+            $mustRecalcHeight = true;
+        } elseif ($targetWidth < self::MIN_WIDTH) {
+            $targetWidth = self::MIN_WIDTH;
+            $mustRecalcHeight = true;
+        }
+        if ($mustRecalcHeight) {
+            // Use floor() or ceil() depending on whether we need the resulting
+            // aspect ratio to be either >= or <= the target aspect ratio.
+            $targetHeight = $useFloorHeightRecalc
+                          ? floor($targetWidth / $targetAspectRatio) // >=
+                          : ceil($targetWidth / $targetAspectRatio); // <=
         }
 
         // Determine the image operation's resampling parameters and perform it.
         if ($this->_operation === self::CROP) {
             // Cropping coordinates are swapped for rotated images.
             if (!$this->_isRotated) {
-                $this->_createNewImage($resource, $x1, $y1, $x2 - $x1, $y2 - $y1, 0, 0, $width, $height, $width, $height);
+                $this->_createNewImage($resource, $x1, $y1, $x2 - $x1, $y2 - $y1, 0, 0, $targetWidth, $targetHeight, $targetWidth, $targetHeight);
             } else {
-                $this->_createNewImage($resource, $y1, $x1, $y2 - $y1, $x2 - $x1, 0, 0, $height, $width, $height, $width);
+                $this->_createNewImage($resource, $y1, $x1, $y2 - $y1, $x2 - $x1, 0, 0, $targetHeight, $targetWidth, $targetHeight, $targetWidth);
             }
         } elseif ($this->_operation === self::EXPAND) {
             // For expansion, we'll calculate all operation parameters now. We
@@ -760,13 +788,13 @@ class MediaAutoResizer
             // the cropping code above. None of them are used for expansion!
 
             // We'll create a new canvas with the desired dimensions.
-            $cnv_w = !$this->_isRotated ? $width : $height;
-            $cnv_h = !$this->_isRotated ? $height : $width;
+            $cnv_w = !$this->_isRotated ? $targetWidth : $targetHeight;
+            $cnv_h = !$this->_isRotated ? $targetHeight : $targetWidth;
 
             // Always copy from the absolute top left of the original image.
             $src_x = $src_y = 0;
 
-            // We'll copy the entire input image onto the new canvas.
+            // We'll copy the entire original input image onto the new canvas.
             $src_w = !$this->_isRotated ? $this->_width : $this->_height;
             $src_h = !$this->_isRotated ? $this->_height : $this->_width;
 
