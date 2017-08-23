@@ -201,6 +201,15 @@ class Instagram
         $truncatedDebug = false,
         $storageConfig = [])
     {
+        // Prevent people from running this library on ancient PHP versions.
+        if (!defined('PHP_VERSION_ID')) { // Emulate version value if missing.
+            $version = explode('.', PHP_VERSION);
+            define('PHP_VERSION_ID', ($version[0] * 10000 + $version[1] * 100 + $version[2]));
+        }
+        if (PHP_VERSION_ID < 50600) {
+            throw new \InstagramAPI\Exception\InternalException('You must have PHP 5.6 or higher to use the Instagram API library.');
+        }
+
         // Debugging options.
         $this->debug = $debug;
         $this->truncatedDebug = $truncatedDebug;
