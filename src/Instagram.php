@@ -102,6 +102,13 @@ class Instagram
     public $device_id;
 
     /**
+     * Phone ID.
+     *
+     * @var string
+     */
+    public $phone_id;
+
+    /**
      * Numerical UserPK ID of the active user account.
      *
      * @var string
@@ -412,6 +419,7 @@ class Instagram
         $this->uuid = $this->settings->get('uuid');
         $this->advertising_id = $this->settings->get('advertising_id');
         $this->device_id = $this->settings->get('device_id');
+        $this->phone_id = $this->settings->get('phone_id');
         $this->session_id = $this->settings->get('session_id');
         $this->experiments = $this->settings->getExperiments();
 
@@ -478,7 +486,7 @@ class Instagram
             try {
                 $response = $this->request('accounts/login/')
                     ->setNeedsAuth(false)
-                    ->addPost('phone_id', $this->settings->get('phone_id'))
+                    ->addPost('phone_id', $this->phone_id)
                     ->addPost('_csrftoken', $this->client->getToken())
                     ->addPost('username', $this->username)
                     ->addPost('adid', $this->advertising_id)
@@ -705,7 +713,7 @@ class Instagram
     public function logout()
     {
         $response = $this->request('accounts/logout/')
-            ->addPost('phone_id', $this->settings->get('phone_id'))
+            ->addPost('phone_id', $this->phone_id)
             ->addPost('_csrftoken', $this->client->getToken())
             ->addPost('guid', $this->uuid)
             ->addPost('device_id', $this->device_id)

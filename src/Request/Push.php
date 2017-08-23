@@ -33,7 +33,7 @@ class Push extends RequestCollection
             ->setSignedPost(false)
             ->addPost('device_type', $pushChannel === 'mqtt' ? 'android_mqtt' : 'android_gcm')
             ->addPost('is_main_push_channel', $pushChannel === 'mqtt')
-            ->addPost('phone_id', $this->ig->settings->get('phone_id'))
+            ->addPost('phone_id', $this->ig->phone_id)
             ->addPost('device_token', $token)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('guid', $this->ig->uuid)

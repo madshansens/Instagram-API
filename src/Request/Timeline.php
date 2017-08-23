@@ -195,7 +195,7 @@ class Timeline extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('is_prefetch', '0')
-            ->addPost('phone_id', $this->ig->settings->get('phone_id'))
+            ->addPost('phone_id', $this->ig->phone_id)
             ->addPost('battery_level', '100')
             ->addPost('is_charging', '1')
             ->addPost('timezone_offset', date('Z'));
