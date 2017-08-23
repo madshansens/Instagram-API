@@ -390,6 +390,8 @@ class Instagram
             $this->settings->set('advertising_id', '');
             $this->settings->set('session_id', '');
             $this->settings->set('experiments', '');
+            $this->settings->set('last_experiments', '0');
+            $this->settings->set('fbns_auth', '');
 
             // Remove the previous hardware's login details to force a relogin.
             $this->settings->set('account_id', '');
