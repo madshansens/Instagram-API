@@ -705,6 +705,11 @@ class Instagram
     public function logout()
     {
         $response = $this->request('accounts/logout/')
+            ->addPost('phone_id', $this->settings->get('phone_id'))
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('guid', $this->uuid)
+            ->addPost('device_id', $this->device_id)
+            ->addPost('_uuid', $this->uuid)
             ->getResponse(new Response\LogoutResponse());
 
         // We've now logged out. Forcibly write our cookies to the storage, to
