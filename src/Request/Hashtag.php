@@ -64,7 +64,7 @@ class Hashtag extends RequestCollection
             // Safely restrict the amount of excludes we allow. Their server
             // hates high numbers, and around 150 they will literally disconnect
             // you from the API server without even answering the endpoint call.
-            if (count($excludeList) > 65) { // Arbitrary safe number: 2*31 (two pages) of results plus a bit extra.
+            if (count($excludeList) > 65) { // Arbitrary safe number: 2*30 (two pages) of results plus a bit extra.
                 throw new \InvalidArgumentException('You are not allowed to provide more than 65 hashtags to exclude from the search.');
             }
             $request->addParam('exclude_list', '['.implode(', ', $excludeList).']');

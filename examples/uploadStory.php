@@ -50,6 +50,9 @@ $metadata = [
 
 try {
     $ig->story->uploadPhoto($photoFilename, $metadata);
+    // NOTE: Providing metadata for story uploads is OPTIONAL. If you just want
+    // to upload the story without hashtags, just do the following instead:
+    // $ig->story->uploadPhoto($photoFilename);
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";
 }
