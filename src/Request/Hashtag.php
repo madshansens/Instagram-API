@@ -29,9 +29,23 @@ class Hashtag extends RequestCollection
     /**
      * Search for hashtags.
      *
-     * @param string       $query       Finds hashtags containing this string.
-     * @param string array $excludeList Exclude tags from the response list.
+     * Gives you search results ordered by best matches first.
      *
+     * Note that you can get more than one "page" of hashtag search results by
+     * excluding the numerical IDs of all tags from a previous search query.
+     *
+     * Also note that the excludes must be done via Instagram's internal,
+     * numerical IDs for the tags, which you can get from this search-response.
+     *
+     * Lastly, be aware that they will never exclude any tag that perfectly
+     * matches your search query, even if you provide its exact ID too.
+     *
+     * @param string         $query       Finds hashtags containing this string.
+     * @param string[]|int[] $excludeList Array of numerical hashtag IDs (ie "17841562498105353")
+     *                                    to exclude from the response, allowing you to skip tags
+     *                                    from a previous call to get more results.
+     *
+     * @throws \InvalidArgumentException                  If trying to exclude too many tags.
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\SearchTagResponse
@@ -47,6 +61,12 @@ class Hashtag extends RequestCollection
             ->addParam('rank_token', $this->ig->rank_token);
 
         if (!empty($excludeList)) {
+            // Safely restrict the amount of excludes we allow. Their server
+            // hates high numbers, and around 150 they will literally disconnect
+            // you from the API server without even answering the endpoint call.
+            if (count($excludeList) > 65) { // Arbitrary safe number: 2*31 (two pages) of results plus a bit extra.
+                throw new \InvalidArgumentException('You are not allowed to provide more than 65 hashtags to exclude from the search.');
+            }
             $request->addParam('exclude_list', '['.implode(', ', $excludeList).']');
         }
 
