@@ -27,6 +27,13 @@ class Instagram
     const EXPERIMENTS_REFRESH = 7200;
 
     /**
+     * Ficticious username used for non authenticate requests.
+     *
+     * @var string
+     */
+    const ANONYMOUS_USER = 'Instanonymous';
+
+    /**
      * Currently active Instagram username.
      *
      * @var string
@@ -186,6 +193,8 @@ class Instagram
     public $people;
     /** @var Request\Push Collection of Push related functions. */
     public $push;
+    /** @var Request\Registration Collection of Registration related functions. */
+    public $registration;
     /** @var Request\Story Collection of Story related functions. */
     public $story;
     /** @var Request\Timeline Collection of Timeline related functions. */
@@ -235,6 +244,7 @@ class Instagram
         $this->media = new Request\Media($this);
         $this->people = new Request\People($this);
         $this->push = new Request\Push($this);
+        $this->registration = new Request\Registration($this);
         $this->story = new Request\Story($this);
         $this->timeline = new Request\Timeline($this);
         $this->usertag = new Request\Usertag($this);
@@ -438,6 +448,25 @@ class Instagram
     }
 
     /**
+     * Set the active ficticious account for non authenticate requests.
+     *
+     * @param bool $clearData Clears data from the fictious username.
+     */
+    public function setAnonymousUser(
+        $clearData = false)
+    {
+        if ($clearData) {
+            $this->settings->deleteUser(self::ANONYMOUS_USER);
+        }
+
+        $this->setUser(self::ANONYMOUS_USER, '-');
+
+        if ($clearData) {
+            $this->_sendPreLoginFlow();
+        }
+    }
+
+    /**
      * Login to Instagram or automatically resume and refresh previous session.
      *
      * WARNING: You MUST run this function EVERY time your script runs! It handles automatic session
@@ -472,12 +501,7 @@ class Instagram
 
         // Perform a full relogin if necessary.
         if (!$this->isLoggedIn || $forceLogin) {
-            // Calling this non-token API will put a csrftoken in our cookie
-            // jar. We must do this before any functions that require a token.
-            $this->internal->syncDeviceFeatures(true);
-
-            $this->internal->readMsisdnHeader();
-            $this->internal->logAttribution();
+            $this->_sendPreLoginFlow();
 
             try {
                 $response = $this->request('accounts/login/')
@@ -689,6 +713,20 @@ class Instagram
         // cookies to the storage, to ensure that the storage doesn't miss them
         // in case something bad happens to PHP after this moment.
         $this->client->saveCookieJar();
+    }
+
+    /**
+     * Sends pre login flow. This is required to emulate real device behavior.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     */
+    protected function _sendPreLoginFlow()
+    {
+        // Calling this non-token API will put a csrftoken in our cookie
+        // jar. We must do this before any functions that require a token.
+        $this->internal->syncDeviceFeatures(true);
+        $this->internal->readMsisdnHeader();
+        $this->internal->logAttribution();
     }
 
     /**
