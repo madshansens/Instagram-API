@@ -606,7 +606,7 @@ class Request
     {
         // Check the cached login state. May not reflect what will happen on the
         // server. But it's the best we can check without trying the actual request!
-        if (!$this->_parent->isLoggedIn) {
+        if (!$this->_parent->isLoggedIn && $this->_parent->username !== Instagram::ANONYMOUS_USER) {
             throw new \InstagramAPI\Exception\LoginRequiredException('User not logged in. Please call login() and then try again.');
         }
     }
