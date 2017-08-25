@@ -22,12 +22,19 @@ class Registration extends RequestCollection
     public function checkUsername(
         $username)
     {
-        return $this->ig->request('users/check_username/')
-        ->setSignedPost(true)
-        ->addPost('_uuid', $this->ig->uuid)
-        ->addPost('username', $username)
-        ->addPost('_csrftoken', $this->ig->client->getToken())
-        ->getResponse(new Response\CheckUsernameResponse());
+        $request = $this->ig->request('users/check_username/')
+            ->setSignedPost(true)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('username', $username)
+            ->addPost('_csrftoken', $this->ig->client->getToken());
+
+        if ($this->ig->username === \InstagramAPI\Instagram::ANONYMOUS_USER) {
+            $request->setNeedsAuth(false);
+        } else {
+            $request->addPost('_uid', $this->ig->account_id);
+        }
+
+        $request->getResponse(new Response\CheckUsernameResponse());
     }
 
     /**
@@ -42,12 +49,20 @@ class Registration extends RequestCollection
     public function checkEmail(
         $email)
     {
-        return $this->ig->request('users/check_email/')
-        ->setSignedPost(true)
-        ->addPost('qe_id', Signatures::generateUUID(true))
-        ->addPost('waterfall_id', Signatures::generateUUID(true))
-        ->addPost('email', $email)
-        ->addPost('_csrftoken', $this->ig->client->getToken())
-        ->getResponse(new Response\CheckEmailResponse());
+        $request = $this->ig->request('users/check_email/')
+            ->setNeedsAuth(false)
+            ->setSignedPost(true)
+            ->addPost('qe_id', Signatures::generateUUID(true))
+            ->addPost('waterfall_id', Signatures::generateUUID(true))
+            ->addPost('email', $email)
+            ->addPost('_csrftoken', $this->ig->client->getToken());
+
+        if ($this->ig->username === \InstagramAPI\Instagram::ANONYMOUS_USER) {
+            $request->setNeedsAuth(false);
+        } else {
+            $request->addPost('_uid', $this->ig->account_id);
+        }
+
+        $request->getResponse(new Response\CheckEmailResponse());
     }
 }
