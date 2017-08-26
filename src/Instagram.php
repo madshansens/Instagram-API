@@ -497,6 +497,10 @@ class Instagram
             throw new \InstagramAPI\Exception\LoginRequiredException(
                 'You must provide a username and password to setUser() before attempting to login.'
             );
+        } elseif ($this->username === self::ANONYMOUS_USER) {
+            throw new \InstagramAPI\Exception\InstagramException(
+                'You can\'t login while using the anonymous username.'
+            );
         }
 
         // Perform a full relogin if necessary.
