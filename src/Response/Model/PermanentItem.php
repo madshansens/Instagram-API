@@ -11,6 +11,8 @@ use InstagramAPI\AutoPropertyHandler;
  * @method Link getLink()
  * @method Location getLocation()
  * @method MediaData getMedia()
+ * @method Item getMediaShare()
+ * @method ReelShare getReelShare()
  * @method mixed getText()
  * @method mixed getTimestamp()
  * @method string getUserId()
@@ -20,6 +22,8 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isLink()
  * @method bool isLocation()
  * @method bool isMedia()
+ * @method bool isMediaShare()
+ * @method bool isReelShare()
  * @method bool isText()
  * @method bool isTimestamp()
  * @method bool isUserId()
@@ -29,6 +33,8 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setLink(Link $value)
  * @method setLocation(Location $value)
  * @method setMedia(MediaData $value)
+ * @method setMediaShare(Item $value)
+ * @method setReelShare(ReelShare $value)
  * @method setText(mixed $value)
  * @method setTimestamp(mixed $value)
  * @method setUserId(string $value)
@@ -59,4 +65,12 @@ class PermanentItem extends AutoPropertyHandler
      * @var Link
      */
     public $link;
+    /**
+     * @var Item
+     */
+    public $media_share;
+    /**
+     * @var ReelShare
+     */
+    public $reel_share;
 }

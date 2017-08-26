@@ -18,6 +18,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getIsDemo()
  * @method mixed getIsHoldout()
  * @method mixed getLabel()
+ * @method string getLeadGenFormId()
  * @method mixed getShowAdChoices()
  * @method mixed getShowIcon()
  * @method mixed getTrackingToken()
@@ -35,6 +36,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isIsDemo()
  * @method bool isIsHoldout()
  * @method bool isLabel()
+ * @method bool isLeadGenFormId()
  * @method bool isShowAdChoices()
  * @method bool isShowIcon()
  * @method bool isTrackingToken()
@@ -52,6 +54,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setIsDemo(mixed $value)
  * @method setIsHoldout(mixed $value)
  * @method setLabel(mixed $value)
+ * @method setLeadGenFormId(string $value)
  * @method setShowAdChoices(mixed $value)
  * @method setShowIcon(mixed $value)
  * @method setTrackingToken(mixed $value)
@@ -79,4 +82,8 @@ class Injected extends AutoPropertyHandler
     public $hide_reasons_v2;
     public $hide_flow_type;
     public $cookies;
+    /**
+     * @var string
+     */
+    public $lead_gen_form_id;
 }

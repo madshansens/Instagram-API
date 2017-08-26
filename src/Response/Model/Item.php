@@ -67,6 +67,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method Location getLocation()
  * @method mixed getMaxNumVisiblePreviewComments()
  * @method Media getMedia()
+ * @method mixed getMediaId()
  * @method string[] getMediaIds()
  * @method mixed getMediaInfos()
  * @method mixed getMediaType()
@@ -174,6 +175,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isLocation()
  * @method bool isMaxNumVisiblePreviewComments()
  * @method bool isMedia()
+ * @method bool isMediaId()
  * @method bool isMediaIds()
  * @method bool isMediaInfos()
  * @method bool isMediaType()
@@ -281,6 +283,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setLocation(Location $value)
  * @method setMaxNumVisiblePreviewComments(mixed $value)
  * @method setMedia(Media $value)
+ * @method setMediaId(mixed $value)
  * @method setMediaIds(string[] $value)
  * @method setMediaInfos(mixed $value)
  * @method setMediaType(mixed $value)
@@ -493,6 +496,7 @@ class Item extends AutoPropertyHandler
      * @var string[]
      */
     public $media_ids;
+    public $media_id;
     public $thumbnail_urls;
     public $large_urls;
     public $media_infos;
