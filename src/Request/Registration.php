@@ -23,7 +23,6 @@ class Registration extends RequestCollection
         $username)
     {
         $request = $this->ig->request('users/check_username/')
-            ->setSignedPost(true)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('username', $username)
             ->addPost('_csrftoken', $this->ig->client->getToken());
@@ -50,8 +49,6 @@ class Registration extends RequestCollection
         $email)
     {
         $request = $this->ig->request('users/check_email/')
-            ->setNeedsAuth(false)
-            ->setSignedPost(true)
             ->addPost('qe_id', Signatures::generateUUID(true))
             ->addPost('waterfall_id', Signatures::generateUUID(true))
             ->addPost('email', $email)
