@@ -9,6 +9,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method string getId()
  * @method mixed getLandingSiteTitle()
  * @method mixed getLandingSiteType()
+ * @method mixed getNetegoType()
  * @method mixed getSuggestions()
  * @method mixed getTitle()
  * @method mixed getTrackingToken()
@@ -19,6 +20,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isId()
  * @method bool isLandingSiteTitle()
  * @method bool isLandingSiteType()
+ * @method bool isNetegoType()
  * @method bool isSuggestions()
  * @method bool isTitle()
  * @method bool isTrackingToken()
@@ -29,6 +31,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setId(string $value)
  * @method setLandingSiteTitle(mixed $value)
  * @method setLandingSiteType(mixed $value)
+ * @method setNetegoType(mixed $value)
  * @method setSuggestions(mixed $value)
  * @method setTitle(mixed $value)
  * @method setTrackingToken(mixed $value)
@@ -54,4 +57,5 @@ class SuggestedUsers extends AutoPropertyHandler
      * @var Suggestion[]
      */
     public $suggestions;
+    public $netego_type;
 }

@@ -8,14 +8,17 @@ use InstagramAPI\ResponseTrait;
 
 /**
  * @method Model\DirectInbox getInbox()
+ * @method Model\Megaphone getMegaphone()
  * @method mixed getPendingRequestsTotal()
  * @method Model\User[] getPendingRequestsUsers()
  * @method string getSeqId()
  * @method bool isInbox()
+ * @method bool isMegaphone()
  * @method bool isPendingRequestsTotal()
  * @method bool isPendingRequestsUsers()
  * @method bool isSeqId()
  * @method setInbox(Model\DirectInbox $value)
+ * @method setMegaphone(Model\Megaphone $value)
  * @method setPendingRequestsTotal(mixed $value)
  * @method setPendingRequestsUsers(Model\User[] $value)
  * @method setSeqId(string $value)
@@ -37,4 +40,8 @@ class DirectInboxResponse extends AutoPropertyHandler implements ResponseInterfa
      * @var Model\DirectInbox
      */
     public $inbox;
+    /**
+     * @var Model\Megaphone
+     */
+    public $megaphone;
 }

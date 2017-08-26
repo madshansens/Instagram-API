@@ -15,8 +15,10 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getEncodingTag()
  * @method mixed getExpireAt()
  * @method string getId()
+ * @method mixed getInternalOnly()
  * @method string getMediaId()
  * @method mixed getMuted()
+ * @method mixed getNumberOfQualities()
  * @method mixed getOrganicTrackingToken()
  * @method mixed getPublishedTime()
  * @method mixed getRankedPosition()
@@ -34,8 +36,10 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isEncodingTag()
  * @method bool isExpireAt()
  * @method bool isId()
+ * @method bool isInternalOnly()
  * @method bool isMediaId()
  * @method bool isMuted()
+ * @method bool isNumberOfQualities()
  * @method bool isOrganicTrackingToken()
  * @method bool isPublishedTime()
  * @method bool isRankedPosition()
@@ -53,8 +57,10 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setEncodingTag(mixed $value)
  * @method setExpireAt(mixed $value)
  * @method setId(string $value)
+ * @method setInternalOnly(mixed $value)
  * @method setMediaId(string $value)
  * @method setMuted(mixed $value)
+ * @method setNumberOfQualities(mixed $value)
  * @method setOrganicTrackingToken(mixed $value)
  * @method setPublishedTime(mixed $value)
  * @method setRankedPosition(mixed $value)
@@ -93,4 +99,6 @@ class Broadcast extends AutoPropertyHandler
     public $expire_at;
     public $encoding_tag;
     public $total_unique_viewer_count;
+    public $internal_only;
+    public $number_of_qualities;
 }

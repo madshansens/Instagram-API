@@ -7,6 +7,7 @@ use InstagramAPI\AutoPropertyHandler;
 /**
  * @method Broadcast[] getBroadcasts()
  * @method mixed getCanReply()
+ * @method mixed getCanReshare()
  * @method mixed getLastSeenBroadcastTs()
  * @method mixed getMuted()
  * @method string getPk()
@@ -15,6 +16,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method User getUser()
  * @method bool isBroadcasts()
  * @method bool isCanReply()
+ * @method bool isCanReshare()
  * @method bool isLastSeenBroadcastTs()
  * @method bool isMuted()
  * @method bool isPk()
@@ -23,6 +25,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isUser()
  * @method setBroadcasts(Broadcast[] $value)
  * @method setCanReply(mixed $value)
+ * @method setCanReshare(mixed $value)
  * @method setLastSeenBroadcastTs(mixed $value)
  * @method setMuted(mixed $value)
  * @method setPk(string $value)
@@ -49,4 +52,5 @@ class PostLiveItem extends AutoPropertyHandler
     public $ranked_position;
     public $seen_ranked_position;
     public $muted;
+    public $can_reshare;
 }
