@@ -499,7 +499,7 @@ class Instagram
             );
         } elseif ($this->username === self::ANONYMOUS_USER) {
             throw new \InstagramAPI\Exception\InstagramException(
-                'You can\'t login while using the anonymous username.'
+                'You can\'t login while using the anonymous user.'
             );
         }
 
