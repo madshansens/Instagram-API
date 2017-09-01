@@ -10,14 +10,17 @@ use InstagramAPI\ResponseTrait;
  * @method mixed getHasMore()
  * @method string getNextMaxId()
  * @method mixed getNumResults()
+ * @method mixed getRankToken()
  * @method Model\User[] getUsers()
  * @method bool isHasMore()
  * @method bool isNextMaxId()
  * @method bool isNumResults()
+ * @method bool isRankToken()
  * @method bool isUsers()
  * @method setHasMore(mixed $value)
  * @method setNextMaxId(string $value)
  * @method setNumResults(mixed $value)
+ * @method setRankToken(mixed $value)
  * @method setUsers(Model\User[] $value)
  */
 class SearchUserResponse extends AutoPropertyHandler implements ResponseInterface
@@ -34,4 +37,5 @@ class SearchUserResponse extends AutoPropertyHandler implements ResponseInterfac
      * @var Model\User[]
      */
     public $users;
+    public $rank_token;
 }

@@ -91,6 +91,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method ReelShare getReelShare()
  * @method string[] getSavedCollectionIds()
  * @method mixed getSocialContext()
+ * @method User[] getSponsorTags()
  * @method Stories getStories()
  * @method mixed getStoryCta()
  * @method mixed getStoryHashtags()
@@ -199,6 +200,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isReelShare()
  * @method bool isSavedCollectionIds()
  * @method bool isSocialContext()
+ * @method bool isSponsorTags()
  * @method bool isStories()
  * @method bool isStoryCta()
  * @method bool isStoryHashtags()
@@ -307,6 +309,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setReelShare(ReelShare $value)
  * @method setSavedCollectionIds(string[] $value)
  * @method setSocialContext(mixed $value)
+ * @method setSponsorTags(User[] $value)
  * @method setStories(Stories $value)
  * @method setStoryCta(mixed $value)
  * @method setStoryHashtags(mixed $value)
@@ -557,6 +560,10 @@ class Item extends AutoPropertyHandler
      * @var string
      */
     public $organic_post_id;
+    /**
+     * @var User[]
+     */
+    public $sponsor_tags;
 
     /**
      * Get the web URL for this media item.
