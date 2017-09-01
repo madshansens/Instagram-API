@@ -34,7 +34,7 @@ $metadata = [
     'hashtags' => [
         // Note that you can add more than one hashtag in this array.
         [
-            'tag_name'         => '#test', // NOTE: This hashtag MUST appear in the caption.
+            'tag_name'         => 'test', // NOTE: This hashtag MUST appear in the caption (it does NOT include the '#' here).
             'x'                => 0.5, // Range: 0.0 - 1.0
             'y'                => 0.5, // Note that x = 0.5 and y = 0.5 is center of screen.
             'width'            => 0.24305555, // Percentage: 0.0 - 1.0

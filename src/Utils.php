@@ -680,7 +680,7 @@ class Utils
             }
 
             // Verify that this tag exists somewhere in the caption to check.
-            if (!in_array($hashtag['tag_name'], $matches[1])) {
+            if (!in_array('#'.$hashtag['tag_name'], $matches[1])) {
                 throw new \InvalidArgumentException(sprintf('Tag name "%s" does not exist in the caption text.', $hashtag['tag_name']));
             }
 

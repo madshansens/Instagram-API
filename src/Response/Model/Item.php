@@ -96,6 +96,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getStoryCta()
  * @method mixed getStoryHashtags()
  * @method StoryLocation[] getStoryLocations()
+ * @method mixed getStoryPollVoterInfos()
  * @method mixed getStoryPolls()
  * @method SuggestedUsers getSuggestedUsers()
  * @method mixed getTakenAt()
@@ -205,6 +206,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isStoryCta()
  * @method bool isStoryHashtags()
  * @method bool isStoryLocations()
+ * @method bool isStoryPollVoterInfos()
  * @method bool isStoryPolls()
  * @method bool isSuggestedUsers()
  * @method bool isTakenAt()
@@ -314,6 +316,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setStoryCta(mixed $value)
  * @method setStoryHashtags(mixed $value)
  * @method setStoryLocations(StoryLocation[] $value)
+ * @method setStoryPollVoterInfos(mixed $value)
  * @method setStoryPolls(mixed $value)
  * @method setSuggestedUsers(SuggestedUsers $value)
  * @method setTakenAt(mixed $value)
@@ -564,6 +567,7 @@ class Item extends AutoPropertyHandler
      * @var User[]
      */
     public $sponsor_tags;
+    public $story_poll_voter_infos;
 
     /**
      * Get the web URL for this media item.
