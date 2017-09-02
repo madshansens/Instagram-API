@@ -3,6 +3,7 @@
 namespace InstagramAPI\Request;
 
 use InstagramAPI\Response;
+use InstagramAPI\Signatures;
 
 /**
  * Account-related functions, such as profile editing and security.
@@ -161,6 +162,47 @@ class Account extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\UserInfoResponse());
+    }
+
+    /**
+     * Check if Instagram username is available.
+     *
+     * @param string $username Instagram username.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CheckUsernameResponse
+     */
+    public function checkUsername(
+        $username)
+    {
+        return $this->ig->request('users/check_username/')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('username', $username)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uid', $this->ig->account_id)
+            ->getResponse(new Response\CheckUsernameResponse());
+    }
+
+    /**
+     * Check if email is available.
+     *
+     * @param string $email Email account.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CheckEmailResponse
+     */
+    public function checkEmail(
+        $email)
+    {
+        return $this->ig->request('users/check_email/')
+            ->addPost('qe_id', Signatures::generateUUID(true))
+            ->addPost('waterfall_id', Signatures::generateUUID(true))
+            ->addPost('email', $email)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uid', $this->ig->account_id)
+            ->getResponse(new Response\CheckEmailResponse());
     }
 
     /**
