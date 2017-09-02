@@ -27,13 +27,6 @@ class Instagram
     const EXPERIMENTS_REFRESH = 7200;
 
     /**
-     * Ficticious username used for non authenticate requests.
-     *
-     * @var string
-     */
-    const ANONYMOUS_USER = 'Instanonymous';
-
-    /**
      * Currently active Instagram username.
      *
      * @var string
@@ -193,8 +186,6 @@ class Instagram
     public $people;
     /** @var Request\Push Collection of Push related functions. */
     public $push;
-    /** @var Request\Registration Collection of Registration related functions. */
-    public $registration;
     /** @var Request\Story Collection of Story related functions. */
     public $story;
     /** @var Request\Timeline Collection of Timeline related functions. */
@@ -244,7 +235,6 @@ class Instagram
         $this->media = new Request\Media($this);
         $this->people = new Request\People($this);
         $this->push = new Request\Push($this);
-        $this->registration = new Request\Registration($this);
         $this->story = new Request\Story($this);
         $this->timeline = new Request\Timeline($this);
         $this->usertag = new Request\Usertag($this);
@@ -448,25 +438,6 @@ class Instagram
     }
 
     /**
-     * Set the active ficticious account for non authenticate requests.
-     *
-     * @param bool $clearData Clears data from the fictious username.
-     */
-    public function setAnonymousUser(
-        $clearData = false)
-    {
-        if ($clearData) {
-            $this->settings->deleteUser(self::ANONYMOUS_USER);
-        }
-
-        $this->setUser(self::ANONYMOUS_USER, '-');
-
-        if ($clearData) {
-            $this->_sendPreLoginFlow();
-        }
-    }
-
-    /**
      * Login to Instagram or automatically resume and refresh previous session.
      *
      * WARNING: You MUST run this function EVERY time your script runs! It handles automatic session
@@ -496,10 +467,6 @@ class Instagram
         if (empty($this->username)) {
             throw new \InstagramAPI\Exception\LoginRequiredException(
                 'You must provide a username and password to setUser() before attempting to login.'
-            );
-        } elseif ($this->username === self::ANONYMOUS_USER) {
-            throw new \InstagramAPI\Exception\InstagramException(
-                'You can\'t login while using the anonymous user.'
             );
         }
 
