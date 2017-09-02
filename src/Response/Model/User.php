@@ -40,6 +40,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getHasAnonymousProfilePicture()
  * @method mixed getHasBiographyTranslation()
  * @method mixed getHasChaining()
+ * @method mixed getHasUnseenBestiesMedia()
  * @method ImageCandidate getHdProfilePicUrlInfo()
  * @method ImageCandidate[] getHdProfilePicVersions()
  * @method string getId()
@@ -119,6 +120,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isHasAnonymousProfilePicture()
  * @method bool isHasBiographyTranslation()
  * @method bool isHasChaining()
+ * @method bool isHasUnseenBestiesMedia()
  * @method bool isHdProfilePicUrlInfo()
  * @method bool isHdProfilePicVersions()
  * @method bool isId()
@@ -198,6 +200,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setHasAnonymousProfilePicture(mixed $value)
  * @method setHasBiographyTranslation(mixed $value)
  * @method setHasChaining(mixed $value)
+ * @method setHasUnseenBestiesMedia(mixed $value)
  * @method setHdProfilePicUrlInfo(ImageCandidate $value)
  * @method setHdProfilePicVersions(ImageCandidate[] $value)
  * @method setId(string $value)
@@ -369,4 +372,5 @@ class User extends AutoPropertyHandler
      * @var string
      */
     public $latest_reel_media;
+    public $has_unseen_besties_media;
 }
