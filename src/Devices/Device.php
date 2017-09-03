@@ -56,11 +56,11 @@ class Device
     protected $_userAgent;
 
     /**
-     * The FB user agent to use for this device. Built from properties.
+     * The FB user agents to use for this device. Built from properties.
      *
-     * @var string
+     * @var array
      */
-    protected $_fbUserAgent;
+    protected $_fbUserAgents;
 
     // Properties parsed from the device string...
 
@@ -178,8 +178,7 @@ class Device
         // Build our user agent.
         $this->_userAgent = UserAgent::buildUserAgent($this->_appVersion, $this->_userLocale, $this);
 
-        // Build user agent for FB.
-        $this->_fbUserAgent = UserAgent::buildFbUserAgent($this->_appVersion, $this->_versionCode, $this->_userLocale, $this);
+        $this->_fbUserAgents = [];
     }
 
     // Getters for all properties...
@@ -194,9 +193,25 @@ class Device
         return $this->_userAgent;
     }
 
-    public function getFbUserAgent()
+    /**
+     * @param string $appName Application name.
+     *
+     * @return string
+     */
+    public function getFbUserAgent(
+        $appName)
     {
-        return $this->_fbUserAgent;
+        if (!isset($this->_fbUserAgents[$appName])) {
+            $this->_fbUserAgents[$appName] = UserAgent::buildFbUserAgent(
+                $appName,
+                $this->_appVersion,
+                $this->_versionCode,
+                $this->_userLocale,
+                $this
+            );
+        }
+
+        return $this->_fbUserAgents[$appName];
     }
 
     public function getAndroidVersion()

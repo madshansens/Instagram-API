@@ -89,6 +89,7 @@ class UserAgent
     /**
      * Generates a FB User Agent string from a Device.
      *
+     * @param string $appName     Application name.
      * @param string $appVersion  Instagram client app version.
      * @param string $versionCode Instagram client app version code.
      * @param string $userLocale  The user's locale, such as "en_US".
@@ -99,6 +100,7 @@ class UserAgent
      * @return string
      */
     public static function buildFbUserAgent(
+        $appName,
         $appVersion,
         $versionCode,
         $userLocale,
@@ -107,7 +109,7 @@ class UserAgent
         list($width, $height) = explode('x', $device->getResolution());
         $density = round(str_replace('dpi', '', $device->getDPI()) / 160, 1);
         $result = [
-            'FBAN' => Constants::APPLICATION_NAME,
+            'FBAN' => $appName,
             'FBAV' => $appVersion,
             'FBBV' => $versionCode,
             'FBDM' => sprintf('{density=%.1f,width=%d,height=%d}', $density, $width, $height),

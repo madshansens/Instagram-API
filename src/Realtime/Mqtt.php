@@ -1,20 +1,32 @@
 <?php
 
-namespace InstagramAPI\Realtime\Client;
+namespace InstagramAPI\Realtime;
 
 use BinSoul\Net\Mqtt\Client\React\ReactMqttClient;
-use BinSoul\Net\Mqtt\Connection;
 use BinSoul\Net\Mqtt\DefaultConnection;
 use BinSoul\Net\Mqtt\DefaultMessage;
 use BinSoul\Net\Mqtt\Message;
+use Evenement\EventEmitterInterface;
+use Fbns\Client\AuthInterface;
 use InstagramAPI\Client as HttpClient;
 use InstagramAPI\Constants;
+use InstagramAPI\Devices\Device;
+use InstagramAPI\React\PersistentInterface;
+use InstagramAPI\React\PersistentTrait;
 use InstagramAPI\Realtime;
-use InstagramAPI\Realtime\Client;
-use InstagramAPI\Utils;
+use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
+use React\EventLoop\Timer\TimerInterface;
+use React\Socket\ConnectorInterface;
 
-class Mqtt extends Client
+class Mqtt implements PersistentInterface
 {
+    use PersistentTrait;
+
+    const CONNECTION_TIMEOUT = 5;
+
+    const REALTIME_CLIENT_TYPE = 'mqtt';
+
     /* PubSub topics */
     const DIRECT_TOPIC_TEMPLATE = 'ig/u/v1/%s';
     const LIVE_TOPIC_TEMPLATE = 'ig/live_notification_subscribe/%s';
@@ -80,6 +92,33 @@ class Mqtt extends Client
 
     const INVALID_SEQUENCE_ID = -1;
 
+    /** @var EventEmitterInterface */
+    protected $_target;
+
+    /** @var ConnectorInterface */
+    protected $_connector;
+
+    /** @var AuthInterface */
+    protected $_auth;
+
+    /** @var Device */
+    protected $_device;
+
+    /** @var LoopInterface */
+    protected $_loop;
+
+    /** @var TimerInterface */
+    protected $_keepaliveTimer;
+
+    /** @var bool */
+    protected $_shutdown;
+
+    /** @var LoggerInterface */
+    protected $_logger;
+
+    /** @var \JsonMapper */
+    protected $_mapper;
+
     /** @var int */
     protected $_capabilities;
 
@@ -89,7 +128,7 @@ class Mqtt extends Client
     protected $_graphqlTopics;
 
     /** @var ReactMqttClient */
-    protected $_connection;
+    protected $_client;
 
     /** @var bool */
     protected $_mqttLiveEnabled;
@@ -102,55 +141,318 @@ class Mqtt extends Client
     /** @var int */
     protected $_sequenceId;
 
-    /** {@inheritdoc} */
-    protected function _handleParams(
-        array $params)
+    /**
+     * Constructor.
+     *
+     * @param EventEmitterInterface $target
+     * @param ConnectorInterface    $connector
+     * @param AuthInterface         $auth
+     * @param Device                $device
+     * @param array                 $experiments
+     * @param LoopInterface         $loop
+     * @param LoggerInterface       $logger
+     */
+    public function __construct(
+        EventEmitterInterface $target,
+        ConnectorInterface $connector,
+        AuthInterface $auth,
+        Device $device,
+        array $experiments,
+        LoopInterface $loop,
+        LoggerInterface $logger)
     {
-        // MQTT params.
-        if (isset($params['isMqttLiveEnabled'])) {
-            $this->_mqttLiveEnabled = (bool) $params['isMqttLiveEnabled'];
-        } else {
-            $this->_mqttLiveEnabled = false;
-        }
-        if (isset($params['isIrisEnabled'])) {
-            $this->_irisEnabled = (bool) $params['isIrisEnabled'];
-        } else {
-            $this->_irisEnabled = false;
-        }
-        if (isset($params['msgTypeBlacklist'])) {
-            $this->_msgTypeBlacklist = $params['msgTypeBlacklist'];
-        }
-        if (isset($params['isGraphQlEnabled'])) {
-            $this->_graphQlEnabled = (bool) $params['isGraphQlEnabled'];
-        } else {
-            $this->_graphQlEnabled = false;
-        }
-        if (isset($params['sequenceId'])) {
-            $this->_sequenceId = (int) $params['sequenceId'];
-        } else {
-            $this->_sequenceId = self::INVALID_SEQUENCE_ID;
-        }
-        // Set up PubSub topics.
-        $this->_pubsubTopics = [];
-        if ($this->_mqttLiveEnabled) {
-            $this->_pubsubTopics[] = sprintf(self::LIVE_TOPIC_TEMPLATE, $this->_getMqttUserId());
-        }
-        $this->_pubsubTopics[] = sprintf(self::DIRECT_TOPIC_TEMPLATE, $this->_getMqttUserId());
-        // Set up GraphQL topics.
-        $this->_graphqlTopics = [];
-        if ($this->_graphQlEnabled) {
-            $this->_graphqlTopics[] = sprintf(self::TYPING_TOPIC_TEMPLATE, $this->_getMqttUserId());
-        }
+        $this->_target = $target;
+        $this->_connector = $connector;
+        $this->_auth = $auth;
+        $this->_device = $device;
+        $this->_loop = $loop;
+        $this->_logger = $logger;
+
+        // Create our JSON object mapper and set global default options.
+        $this->_mapper = new \JsonMapper();
+        $this->_mapper->bStrictNullTypes = false; // Allow NULL values.
+
+        $this->_loadExperiments($experiments);
+
+        $this->_shutdown = false;
+        $this->_client = $this->_getClient();
     }
 
     /** {@inheritdoc} */
+    public function getLoop()
+    {
+        return $this->_loop;
+    }
+
+    /** {@inheritdoc} */
+    public function isActive()
+    {
+        return !$this->_shutdown;
+    }
+
+    /**
+     * Cancel a keepalive timer (if any).
+     */
+    protected function _cancelKeepaliveTimer()
+    {
+        if ($this->_keepaliveTimer !== null) {
+            if ($this->_keepaliveTimer->isActive()) {
+                $this->_logger->info('Existing keepalive timer has been canceled.');
+                $this->_keepaliveTimer->cancel();
+            }
+            $this->_keepaliveTimer = null;
+        }
+    }
+
+    /**
+     * Set up a new keepalive timer.
+     */
+    protected function _setKeepaliveTimer()
+    {
+        $this->_cancelKeepaliveTimer();
+        $keepaliveInterval = self::MQTT_KEEPALIVE;
+        $this->_logger->info(sprintf('Setting up keepalive timer to %d seconds', $keepaliveInterval));
+        $this->_keepaliveTimer = $this->_loop->addTimer($keepaliveInterval, function () {
+            $this->_logger->info('Keepalive timer has been fired.');
+            $this->_disconnect();
+        });
+    }
+
+    /**
+     * Try to establish a connection.
+     */
+    protected function _connect()
+    {
+        $this->_setReconnectTimer(function () {
+            $this->_logger->info(sprintf('Connecting to %s:%d...', self::DEFAULT_HOST, self::DEFAULT_PORT));
+
+            $connection = new DefaultConnection(
+                $this->_getMqttUsername(),
+                $this->_auth->getPassword(),
+                null,
+                $this->_auth->getClientId(),
+                self::MQTT_KEEPALIVE,
+                self::MQTT_VERSION,
+                true
+            );
+
+            return $this->_client->connect(self::DEFAULT_HOST, self::DEFAULT_PORT, $connection, self::CONNECTION_TIMEOUT);
+        });
+    }
+
+    /**
+     * Perform first connection in a row.
+     */
+    public function start()
+    {
+        $this->_shutdown = false;
+        $this->_connect();
+    }
+
+    /**
+     * Whether connection is established.
+     *
+     * @return bool
+     */
+    protected function _isConnected()
+    {
+        return $this->_client->isConnected();
+    }
+
+    /**
+     * Disconnect from server.
+     */
     protected function _disconnect()
     {
-        if ($this->_connection === null) {
-            return;
+        $this->_cancelKeepaliveTimer();
+        $this->_client->disconnect();
+    }
+
+    /**
+     * Proxy for _disconnect().
+     */
+    public function stop()
+    {
+        $this->_logger->info('Shutting down...');
+        $this->_shutdown = true;
+        $this->_disconnect();
+    }
+
+    /**
+     * Check if feature is enabled.
+     *
+     * @param array  $params
+     * @param string $feature
+     *
+     * @return bool
+     */
+    protected function _isFeatureEnabled(
+        array $params,
+        $feature)
+    {
+        if (!isset($params[$feature])) {
+            return false;
         }
-        $this->_unsubscribe();
-        $this->_connection->disconnect();
+
+        return in_array($params[$feature], ['enabled', 'true', '1']);
+    }
+
+    /**
+     * Send command.
+     *
+     * @param string $command
+     *
+     * @return bool
+     */
+    protected function _sendCommand(
+        $command)
+    {
+        $this->_publish(self::SEND_MESSAGE_TOPIC, $command, self::FIRE_AND_FORGET);
+
+        return true;
+    }
+
+    /**
+     * Proxy for _sendCommand().
+     *
+     * @param string $command
+     *
+     * @return bool
+     */
+    public function sendCommand(
+        $command)
+    {
+        if (!$this->_isConnected()) {
+            return false;
+        }
+
+        try {
+            return $this->_sendCommand($command);
+        } catch (\Exception $e) {
+            $this->_logger->error($e->getMessage());
+
+            return false;
+        }
+    }
+
+    /**
+     * Process incoming action.
+     *
+     * @param object $message
+     */
+    protected function _processAction(
+        $message)
+    {
+        $this->_logger->info(sprintf('Received action "%s"', $message->action));
+        switch ($message->action) {
+            case Action::ACK:
+                /** @var Action\Ack $action */
+                $action = $this->_mapper->map($message, new Action\Ack());
+                break;
+            default:
+                $this->_logger->warning(sprintf('Action "%s" is ignored (unknown type)', $message->action));
+
+                return;
+        }
+        $action->handle($this->_target);
+    }
+
+    /**
+     * Process incoming event.
+     *
+     * @param object $message
+     */
+    protected function _processEvent(
+        $message)
+    {
+        $this->_logger->info(sprintf('Received event "%s"', $message->event));
+        switch ($message->event) {
+            case Event::PATCH:
+                /** @var Event\Patch $event */
+                $event = $this->_mapper->map($message, new Event\Patch($this->_mapper, $this->_logger));
+                break;
+            default:
+                $this->_logger->warning(sprintf('Event "%s" is ignored (unknown type)', $message->event));
+
+                return;
+        }
+        $event->handle($this->_target);
+    }
+
+    /**
+     * Process single incoming message.
+     *
+     * @param mixed $message
+     */
+    protected function _processSingleMessage(
+        $message)
+    {
+        if (isset($message->event)) {
+            $this->_processEvent($message);
+        } elseif (isset($message->action)) {
+            $this->_processAction($message);
+        } else {
+            $this->_logger->warning('Invalid message (both event and action are missing)');
+        }
+    }
+
+    /**
+     * Process incoming message.
+     *
+     * @param string $message
+     */
+    protected function _processMessage(
+        $message)
+    {
+        $this->_logger->info(sprintf('Received message %s', $message));
+        $message = HttpClient::api_body_decode($message);
+        if (!is_array($message)) {
+            $this->_processSingleMessage($message);
+        } else {
+            foreach ($message as $singleMessage) {
+                $this->_processSingleMessage($singleMessage);
+            }
+        }
+    }
+
+    /**
+     * Load experiments.
+     *
+     * @param array $experiments
+     */
+    protected function _loadExperiments(
+        array $experiments)
+    {
+        // Direct features.
+        $directFeatures = isset($experiments['ig_android_realtime_iris'])
+            ? $experiments['ig_android_realtime_iris'] : [];
+        $this->_irisEnabled = $this->_isFeatureEnabled($directFeatures, 'is_direct_over_iris_enabled');
+        if (isset($directFeatures['pubsub_msg_type_blacklist'])) {
+            $this->_msgTypeBlacklist = $directFeatures['msgTypeBlacklist'];
+        }
+
+        // Live features.
+        $liveFeatures = isset($experiments['ig_android_skywalker_live_event_start_end'])
+            ? $experiments['ig_android_skywalker_live_event_start_end'] : [];
+        $this->_mqttLiveEnabled = $this->_isFeatureEnabled($liveFeatures, 'is_enabled');
+
+        // GraphQL features.
+        $graphqlFeatures = isset($experiments['ig_android_gqls_typing_indicator'])
+            ? $experiments['ig_android_gqls_typing_indicator'] : [];
+        $this->_graphQlEnabled = $this->_isFeatureEnabled($graphqlFeatures, 'is_enabled');
+
+        // Set up PubSub topics.
+        $this->_pubsubTopics = [];
+        if ($this->_mqttLiveEnabled) {
+            $this->_pubsubTopics[] = sprintf(self::LIVE_TOPIC_TEMPLATE, $this->_auth->getUserId());
+        }
+        $this->_pubsubTopics[] = sprintf(self::DIRECT_TOPIC_TEMPLATE, $this->_auth->getUserId());
+
+        // Set up GraphQL topics.
+        $this->_graphqlTopics = [];
+        if ($this->_graphQlEnabled) {
+            $this->_graphqlTopics[] = sprintf(self::TYPING_TOPIC_TEMPLATE, $this->_auth->getUserId());
+        }
     }
 
     /**
@@ -180,26 +482,6 @@ class Mqtt extends Client
     }
 
     /**
-     * Return a user ID for MQTT client.
-     *
-     * @return string
-     */
-    protected function _getMqttUserId()
-    {
-        return $this->_instagram->account_id;
-    }
-
-    /**
-     * Returns the device associated with the Instagram account.
-     *
-     * @return \InstagramAPI\Devices\Device
-     */
-    protected function _getDevice()
-    {
-        return $this->_instagram->device;
-    }
-
-    /**
      * Returns application specific info.
      *
      * @return array
@@ -210,7 +492,7 @@ class Mqtt extends Client
             'platform'      => Constants::PLATFORM,
             'app_version'   => Constants::IG_VERSION,
             'capabilities'  => Constants::X_IG_Capabilities,
-            'User-Agent'    => $this->_getDevice()->getUserAgent(),
+            'User-Agent'    => $this->_device->getUserAgent(),
             'ig_mqtt_route' => 'django',
         ];
         // PubSub message type blacklist.
@@ -260,7 +542,7 @@ class Mqtt extends Client
             // USER_ID
             'u'                 => '%ACCOUNT_ID_'.$randNum.'%',
             // AGENT
-            'a'                 => $this->_getDevice()->getFbUserAgent(),
+            'a'                 => $this->_device->getFbUserAgent(Constants::INSTAGRAM_APPLICATION_NAME),
             // CAPABILITIES
             'cp'                => $this->_getCapabilities(),
             // CLIENT_MQTT_SESSION_ID
@@ -274,9 +556,9 @@ class Mqtt extends Client
             // NO_AUTOMATIC_FOREGROUND
             'no_auto_fg'        => true,
             // DEVICE_ID
-            'd'                 => $this->_getMqttDeviceId(),
+            'd'                 => $this->_auth->getDeviceId(),
             // DEVICE_SECRET
-            'ds'                => '',
+            'ds'                => $this->_auth->getDeviceSecret(),
             // INITIAL_FOREGROUND_STATE
             'fg'                => false,
             // ENDPOINT_CAPABILITIES
@@ -295,7 +577,7 @@ class Mqtt extends Client
             'app_specific_info' => $this->_getAppSpecificInfo(),
         ]);
         $result = strtr($result, [
-            json_encode('%ACCOUNT_ID_'.$randNum.'%') => $this->_getMqttUserId(),
+            json_encode('%ACCOUNT_ID_'.$randNum.'%') => $this->_auth->getUserId(),
             json_encode('%SESSION_ID_'.$randNum.'%') => round($sessionId),
         ]);
 
@@ -303,172 +585,49 @@ class Mqtt extends Client
     }
 
     /**
-     * Returns password for MQTT connection.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
-     *
-     * @return string
-     */
-    protected function _getMqttPassword()
-    {
-        $cookie = $this->_instagram->client->getCookie('sessionid', 'i.instagram.com');
-        if ($cookie !== null) {
-            return sprintf('%s=%s', $cookie->getName(), $cookie->getValue());
-        }
-
-        throw new \RuntimeException('No session cookie was found.');
-    }
-
-    /**
-     * Returns device's identifier for MQTT connection.
-     *
-     * @return string
-     */
-    protected function _getMqttDeviceId()
-    {
-        return strtolower($this->_instagram->uuid);
-    }
-
-    /**
-     * Returns client's identifier for MQTT connection.
-     *
-     * @return string
-     */
-    protected function _getMqttClientId()
-    {
-        return substr($this->_getMqttDeviceId(), 0, 20);
-    }
-
-    /**
-     * @param ReactMqttClient $connection
-     */
-    protected function _beforeConnect(
-        ReactMqttClient $connection)
-    {
-        $connection->on('error', function (\Exception $e) {
-            $this->_logger->error($e->getMessage());
-        });
-        $connection->on('warning', function (\Exception $e) {
-            $this->_logger->warning($e->getMessage());
-        });
-        $connection->on('open', function () {
-            $this->_logger->info('Connection has been established');
-        });
-        $connection->on('close', function () {
-            $this->_logger->info('Connection has been closed');
-            $this->_connection = null;
-            $this->_isConnected = false;
-            $this->connect();
-        });
-        $connection->on('connect', function () {
-            $this->_logger->info('Connected to a broker');
-        });
-    }
-
-    /**
-     * @param ReactMqttClient $connection
-     */
-    protected function _afterConnect(
-        ReactMqttClient $connection)
-    {
-        $connection->on('ping', function () {
-            $this->_logger->info('Ping flow completed');
-            $this->setKeepaliveTimer(self::MQTT_KEEPALIVE);
-        });
-        $connection->on('pong', function () {
-            $this->_logger->info('PINGRESP sent');
-            $this->setKeepaliveTimer(self::MQTT_KEEPALIVE);
-        });
-        $connection->on('publish', function () {
-            $this->_logger->info('Publish flow completed');
-            $this->setKeepaliveTimer(self::MQTT_KEEPALIVE);
-        });
-        $connection->on('subscribe', function () {
-            $this->_logger->info('Subscribe flow completed');
-            $this->setKeepaliveTimer(self::MQTT_KEEPALIVE);
-        });
-        $connection->on('unsubscribe', function () {
-            $this->_logger->info('Unsubscribe flow completed');
-            $this->setKeepaliveTimer(self::MQTT_KEEPALIVE);
-        });
-        $connection->on('message', function (Message $message) {
-            $this->setKeepaliveTimer(self::MQTT_KEEPALIVE);
-            $this->_onReceive($message);
-        });
-        $connection->on('disconnect', function () {
-            $this->_logger->info('Disconnected from broker');
-        });
-        $this->setKeepaliveTimer(self::MQTT_KEEPALIVE);
-        $this->_connection = $connection;
-        $this->_isConnected = true;
-        $this->_subscribe();
-    }
-
-    /**
-     * @param string $host
+     * Create a new MQTT client.
      *
      * @return ReactMqttClient
      */
-    protected function _createMqttClient(
-        $host)
+    protected function _getClient()
     {
-        return new ReactMqttClient(
-            Utils::getSecureConnector(
-                $this->_loop,
-                Utils::getSecureContext($this->_instagram->getVerifySSL()),
-                Utils::getProxyForHost($host, $this->_instagram->getProxy())
-            ),
-            $this->_loop,
-            null,
-            new Client\Mqtt\StreamParser()
-        );
-    }
+        $client = new ReactMqttClient($this->_connector, $this->_loop, null, new Mqtt\StreamParser());
 
-    /**
-     * @return Connection
-     */
-    protected function _getConnectionParams()
-    {
-        return new DefaultConnection(
-            $this->_getMqttUsername(),
-            $this->_getMqttPassword(),
-            null,
-            $this->_getMqttClientId(),
-            self::MQTT_KEEPALIVE,
-            self::MQTT_VERSION,
-            true
-        );
-    }
+        $client->on('error', function (\Exception $e) {
+            $this->_logger->error($e->getMessage());
+        });
+        $client->on('warning', function (\Exception $e) {
+            $this->_logger->warning($e->getMessage());
+        });
+        $client->on('open', function () {
+            $this->_logger->info('Connection has been established');
+        });
+        $client->on('close', function () {
+            $this->_logger->info('Connection has been closed');
+            $this->_connect();
+        });
+        $client->on('connect', function () {
+            $this->_logger->info('Connected to a broker');
+            $this->_setKeepaliveTimer();
+            $this->_subscribe();
+        });
+        $client->on('ping', function () {
+            $this->_logger->info('Ping flow completed');
+            $this->_setKeepaliveTimer();
+        });
+        $client->on('publish', function () {
+            $this->_logger->info('Publish flow completed');
+            $this->_setKeepaliveTimer();
+        });
+        $client->on('message', function (Message $message) {
+            $this->_setKeepaliveTimer();
+            $this->_onReceive($message);
+        });
+        $client->on('disconnect', function () {
+            $this->_logger->info('Disconnected from broker');
+        });
 
-    /** {@inheritdoc} */
-    protected function _connect()
-    {
-        $host = self::DEFAULT_HOST;
-        $port = self::DEFAULT_PORT;
-        $this->_logger->info(sprintf('Connecting to "%s:%d"', $host, $port));
-
-        try {
-            // It can fail with invalid proxy set up.
-            $client = $this->_createMqttClient($host);
-            // It can fail when no session cookie is available.
-            $params = $this->_getConnectionParams();
-        } catch (\Exception $e) {
-            $this->_rtc->emit('error', $e);
-
-            return;
-        }
-
-        $this->_beforeConnect($client);
-        $client->connect($host, $port, $params, self::CONNECTION_TIMEOUT)->then(
-            function () use ($client) {
-                $this->_afterConnect($client);
-            },
-            function (\Exception $e) {
-                $this->_logger->info('Retrying connection attempt because of the error');
-                $this->reconnect();
-            }
-        );
+        return $client;
     }
 
     /**
@@ -499,7 +658,7 @@ class Mqtt extends Client
         }
         $this->_sequenceId = $sequenceId;
         $this->_logger->info(sprintf('Sequence updated to %d', $this->_sequenceId));
-        if ($this->_isConnected) {
+        if ($this->_isConnected()) {
             $this->_subscribeToIris();
         }
     }
@@ -591,14 +750,11 @@ class Mqtt extends Client
         $payload,
         $qosLevel)
     {
-        if ($this->_connection === null) {
-            return;
-        }
         $this->_logger->info(sprintf('Sending message %s to topic %s', $payload, $topic));
         $payload = zlib_encode($payload, ZLIB_ENCODING_DEFLATE, 9);
         // We need to map human readable topic name to its ID because of bandwidth saving.
         $topic = $this->_mapTopic($topic);
-        $this->_connection->publish(new DefaultMessage($topic, $payload, $qosLevel));
+        $this->_client->publish(new DefaultMessage($topic, $payload, $qosLevel));
     }
 
     /**
@@ -619,8 +775,8 @@ class Mqtt extends Client
         switch ($topic) {
             case self::PUBSUB_TOPIC:
             case self::PUBSUB_TOPIC_ID:
-                $skywalker = new Client\Mqtt\Skywalker($payload);
-                if (!in_array($skywalker->getType(), [Client\Mqtt\Skywalker::TYPE_DIRECT, Client\Mqtt\Skywalker::TYPE_LIVE])) {
+                $skywalker = new Mqtt\Skywalker($payload);
+                if (!in_array($skywalker->getType(), [Mqtt\Skywalker::TYPE_DIRECT, Mqtt\Skywalker::TYPE_LIVE])) {
                     $this->_logger->warning(sprintf('Received Skywalker message with unsupported type %d', $skywalker->getType()));
 
                     return;
@@ -631,8 +787,8 @@ class Mqtt extends Client
             case self::GRAPHQL_TOPIC_ID:
             case self::REALTIME_SUB_TOPIC:
             case self::REALTIME_SUB_TOPIC_ID:
-                $graphQl = new Client\Mqtt\GraphQl($payload);
-                if (!in_array($graphQl->getTopic(), [Client\Mqtt\GraphQl::TOPIC_DIRECT])) {
+                $graphQl = new Mqtt\GraphQl($payload);
+                if (!in_array($graphQl->getTopic(), [Mqtt\GraphQl::TOPIC_DIRECT])) {
                     $this->_logger->warning(sprintf('Received GraphQL message with unsupported topic %s', $graphQl->getTopic()));
 
                     return;
@@ -647,8 +803,8 @@ class Mqtt extends Client
 
                     return;
                 }
-                /** @var Client\Mqtt\Iris $iris */
-                $iris = $this->mapToJson($json, new Client\Mqtt\Iris());
+                /** @var Mqtt\Iris $iris */
+                $iris = $this->_mapper->map($json, new Mqtt\Iris());
                 if (!$iris->isSucceeded()) {
                     $this->_logger->warning(sprintf('Failed to subscribe to Iris (%d): %s', $iris->getErrorType(), $iris->getErrorMessage()));
                 }
@@ -668,11 +824,8 @@ class Mqtt extends Client
     }
 
     /** {@inheritdoc} */
-    protected function _sendCommand(
-        $command)
+    public function getLogger()
     {
-        $this->_publish(self::SEND_MESSAGE_TOPIC, $command, self::FIRE_AND_FORGET);
-
-        return true;
+        return $this->_logger;
     }
 }

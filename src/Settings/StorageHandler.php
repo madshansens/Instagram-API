@@ -62,7 +62,7 @@ class StorageHandler
      */
     const EXPERIMENT_KEYS = [
         'ig_android_2fac',
-        'ig_android_mqtt_skywalker',
+        'ig_android_realtime_iris',
         'ig_android_skywalker_live_event_start_end',
         'ig_android_gqls_typing_indicator',
         'ig_android_upload_reliability_universe',

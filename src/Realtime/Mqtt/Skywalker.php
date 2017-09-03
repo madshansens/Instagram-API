@@ -1,16 +1,18 @@
 <?php
 
-namespace InstagramAPI\Realtime\Client\Mqtt;
+namespace InstagramAPI\Realtime\Mqtt;
 
-class GraphQl extends Thrift
+class Skywalker extends Thrift
 {
-    const TOPIC_DIRECT = 'direct';
+    const TYPE_DIRECT = 1;
+    const TYPE_LIVE = 2;
+    const TYPE_LIVEWITH = 3;
 
-    const FIELD_TOPIC = 1;
+    const FIELD_TYPE = 1;
     const FIELD_PAYLOAD = 2;
 
-    /** @var string */
-    protected $_topic;
+    /** @var int */
+    protected $_type;
     /** @var string */
     protected $_payload;
 
@@ -22,8 +24,8 @@ class GraphQl extends Thrift
         $value)
     {
         switch ($field) {
-            case self::FIELD_TOPIC:
-                $this->_topic = (string) $value;
+            case self::FIELD_TYPE:
+                $this->_type = (int) $value;
                 break;
             case self::FIELD_PAYLOAD:
                 $this->_payload = (string) $value;
@@ -32,11 +34,11 @@ class GraphQl extends Thrift
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getTopic()
+    public function getType()
     {
-        return $this->_topic;
+        return $this->_type;
     }
 
     /**

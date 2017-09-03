@@ -106,7 +106,10 @@ class RealtimeHttpServer
         $this->_logger = $logger;
         $this->_contexts = [];
         $this->_rtc = new \InstagramAPI\Realtime($this->_instagram, $this->_loop, $this->_logger);
-        $this->_rtc->init()->then([$this, 'onRealtimeReady'], [$this, 'onRealtimeFail']);
+        $this->_rtc->on('client-context-ack', [$this, 'onClientContextAck']);
+        $this->_rtc->on('error', [$this, 'onRealtimeFail']);
+        $this->_rtc->start();
+        $this->_startHttpServer();
     }
 
     /**
@@ -154,18 +157,6 @@ class RealtimeHttpServer
         $deferred->resolve($ack);
         // Clean up.
         unset($this->_contexts[$context]);
-    }
-
-    /**
-     * Called when Realtime is ready to run.
-     */
-    public function onRealtimeReady()
-    {
-        // Bind event listener for acknowledgements.
-        $this->_rtc->on('client-context-ack', [$this, 'onClientContextAck']);
-        $this->_rtc->on('error', [$this, 'onRealtimeFail']);
-        $this->_rtc->start();
-        $this->_startHttpServer();
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace InstagramAPI\Push;
 
 use Fbns\Client\Json;
+use InstagramAPI\Push\Payload\BadgeCount;
 
 class Notification
 {

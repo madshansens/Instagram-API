@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Realtime\Event;
 
-use InstagramAPI\Realtime\Client;
+use Evenement\EventEmitterInterface;
 
 /**
  * @method \InstagramAPI\Realtime\Event\Patch\Op[] getData()
@@ -36,10 +36,10 @@ class Patch extends \InstagramAPI\Realtime\Event
 
     /** {@inheritdoc} */
     public function handle(
-        Client $client)
+        EventEmitterInterface $target)
     {
         foreach ($this->data as $op) {
-            $op->handle($client);
+            $op->handle($target, $this->_jsonMapper, $this->_logger);
         }
     }
 }

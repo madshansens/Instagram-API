@@ -2,6 +2,7 @@
 
 namespace InstagramAPI\Realtime;
 
+use Evenement\EventEmitterInterface;
 use InstagramAPI\AutoPropertyHandler;
 
 /**
@@ -15,7 +16,6 @@ use InstagramAPI\AutoPropertyHandler;
 abstract class Action extends AutoPropertyHandler
 {
     const ACK = 'item_ack';
-    const UNSEEN_COUNT = 'inbox_unseen_count';
     const UNKNOWN = 'unknown';
 
     public $status;
@@ -24,8 +24,8 @@ abstract class Action extends AutoPropertyHandler
     /**
      * Action handler.
      *
-     * @param Client $client
+     * @param EventEmitterInterface $target
      */
     abstract public function handle(
-        Client $client);
+        EventEmitterInterface $target);
 }

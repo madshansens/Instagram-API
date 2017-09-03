@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Realtime\Action;
 
-use InstagramAPI\Realtime\Client;
+use Evenement\EventEmitterInterface;
 
 /**
  * @method \InstagramAPI\Response\Model\DirectSendItemPayload getPayload()
@@ -22,8 +22,8 @@ class Ack extends \InstagramAPI\Realtime\Action
 
     /** {@inheritdoc} */
     public function handle(
-        Client $client)
+        EventEmitterInterface $target)
     {
-        $client->getRtc()->emit('client-context-ack', [$this]);
+        $target->emit('client-context-ack', [$this]);
     }
 }

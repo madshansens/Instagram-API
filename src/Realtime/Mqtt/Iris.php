@@ -1,6 +1,6 @@
 <?php
 
-namespace InstagramAPI\Realtime\Client\Mqtt;
+namespace InstagramAPI\Realtime\Mqtt;
 
 use InstagramAPI\AutoPropertyHandler;
 

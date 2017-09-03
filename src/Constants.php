@@ -36,7 +36,8 @@ class Constants
 
     // MQTT Constants.
     const PLATFORM = 'android';
-    const APPLICATION_NAME = 'InstagramForAndroid';
+    const FBNS_APPLICATION_NAME = 'MQTT';
+    const INSTAGRAM_APPLICATION_NAME = 'InstagramForAndroid';
     const PACKAGE_NAME = 'com.instagram.android';
 
     // Instagram Analytics.
