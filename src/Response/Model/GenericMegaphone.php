@@ -18,7 +18,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getTitle()
  * @method mixed getTitleColor()
  * @method mixed getType()
- * @method mixed getUuid()
+ * @method string getUuid()
  * @method bool isActionInfo()
  * @method bool isBackgroundColor()
  * @method bool isButtonLayout()
@@ -46,7 +46,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setTitle(mixed $value)
  * @method setTitleColor(mixed $value)
  * @method setType(mixed $value)
- * @method setUuid(mixed $value)
+ * @method setUuid(string $value)
  */
 class GenericMegaphone extends AutoPropertyHandler
 {
@@ -66,5 +66,8 @@ class GenericMegaphone extends AutoPropertyHandler
     public $background_color;
     public $title_color;
     public $message_color;
+    /**
+     * @var string
+     */
     public $uuid;
 }
