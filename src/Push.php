@@ -17,13 +17,13 @@ use React\EventLoop\LoopInterface;
  *  - like - Someone has liked your media.
  *  - comment - Someone has commented on your media.
  *  - direct_v2_message - Someone has messaged you.
- *  - usertag - You have been tagged on some photo.
+ *  - usertag - You have been tagged in some photo.
  *  - mentioned_comment - You have been mentioned in some comment.
- *  - new_follower - Someone as started following you.
+ *  - new_follower - Someone has started following you.
  *  - live_broadcast - Someone you know has started live broadcast.
  *  - live_broadcast_revoke - Someone you know has stopped live broadcast.
  *  - follow_request_approved - Your follow request has been approved.
- *  - comment_like - Your commend has been liked by someone.
+ *  - comment_like - Your comment has been liked by someone.
  *  - private_user_follow_request - Someone wants to follow you.
  *  - post - Someone you know has posted something.
  *  - comment_on_tag - Someone has commented on photo you are tagged in.
