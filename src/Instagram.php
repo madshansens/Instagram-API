@@ -575,6 +575,20 @@ class Instagram
     }
 
     /**
+     * Sends pre-login flow. This is required to emulate real device behavior.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     */
+    protected function _sendPreLoginFlow()
+    {
+        // Calling this non-token API will put a csrftoken in our cookie
+        // jar. We must do this before any functions that require a token.
+        $this->internal->syncDeviceFeatures(true);
+        $this->internal->readMsisdnHeader();
+        $this->internal->logAttribution();
+    }
+
+    /**
      * Sends login flow. This is required to emulate real device behavior.
      *
      * @param bool $justLoggedIn
@@ -684,20 +698,6 @@ class Instagram
         // cookies to the storage, to ensure that the storage doesn't miss them
         // in case something bad happens to PHP after this moment.
         $this->client->saveCookieJar();
-    }
-
-    /**
-     * Sends pre login flow. This is required to emulate real device behavior.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     */
-    protected function _sendPreLoginFlow()
-    {
-        // Calling this non-token API will put a csrftoken in our cookie
-        // jar. We must do this before any functions that require a token.
-        $this->internal->syncDeviceFeatures(true);
-        $this->internal->readMsisdnHeader();
-        $this->internal->logAttribution();
     }
 
     /**
