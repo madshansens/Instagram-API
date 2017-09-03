@@ -165,9 +165,14 @@ class Account extends RequestCollection
     }
 
     /**
-     * Check if Instagram username is available.
+     * Check if an Instagram username is available (not already registered).
      *
-     * @param string $username Instagram username.
+     * Use this before trying to rename your Instagram account,
+     * to be sure that the new username is available.
+     *
+     * TODO: Account renaming endpoint is not implemented.
+     *
+     * @param string $username Instagram username to check.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -185,9 +190,12 @@ class Account extends RequestCollection
     }
 
     /**
-     * Check if email is available.
+     * Check if an email address is available (not already registered).
      *
-     * @param string $email Email account.
+     * Use this before trying to change your account's email address,
+     * to be sure that the new email address isn't used by another account.
+     *
+     * @param string $email Email address to check.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -239,19 +247,6 @@ class Account extends RequestCollection
     }
 
     /**
-     * Get account spam filter keywords.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\CommentFilterKeywordsResponse
-     */
-    public function getCommentFilterKeywords()
-    {
-        return $this->ig->request('accounts/get_comment_filter_keywords/')
-            ->getResponse(new Response\CommentFilterKeywordsResponse());
-    }
-
-    /**
      * Get whether the comment category filter is disabled.
      *
      * @throws \InstagramAPI\Exception\InstagramException
@@ -262,6 +257,19 @@ class Account extends RequestCollection
     {
         return $this->ig->request('accounts/get_comment_category_filter_disabled/')
             ->getResponse(new Response\CommentCategoryFilterResponse());
+    }
+
+    /**
+     * Get account spam filter keywords.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CommentFilterKeywordsResponse
+     */
+    public function getCommentFilterKeywords()
+    {
+        return $this->ig->request('accounts/get_comment_filter_keywords/')
+            ->getResponse(new Response\CommentFilterKeywordsResponse());
     }
 
     /**
