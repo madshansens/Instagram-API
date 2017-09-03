@@ -661,7 +661,7 @@ class Utils
          $captionText,
          array $hashtags)
     {
-        if (!preg_match_all("/(#\w+)/u", $captionText, $matches)) {
+        if (!preg_match_all('/#(\w+)/u', $captionText, $matches)) {
             throw new \InvalidArgumentException('Invalid caption for hashtag.');
         }
 
@@ -679,8 +679,13 @@ class Utils
                 throw new \InvalidArgumentException(sprintf('Missing keys "%s" for hashtag array.', implode(', ', $missingKeys)));
             }
 
+            // Ensure that the tag_name property does NOT have a leading '#'.
+            if ($hashtag['tag_name'][0] === '#') {
+                throw new \InvalidArgumentException(sprintf('Tag name "%s" is not allowed to start with the "#" symbol.', $hashtag['tag_name']));
+            }
+
             // Verify that this tag exists somewhere in the caption to check.
-            if (!in_array('#'.$hashtag['tag_name'], $matches[1])) {
+            if (!in_array($hashtag['tag_name'], $matches[1])) {
                 throw new \InvalidArgumentException(sprintf('Tag name "%s" does not exist in the caption text.', $hashtag['tag_name']));
             }
 
