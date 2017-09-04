@@ -33,16 +33,25 @@ class Account extends RequestCollection
     /**
      * Edit your profile.
      *
-     * @param string $url       Website URL. Use "" for nothing.
-     * @param string $phone     Phone number. Use "" for nothing.
-     * @param string $name      Name. Use "" for nothing.
-     * @param string $biography Biography text. Use "" for nothing.
-     * @param string $email     Email. Required.
-     * @param int    $gender    Gender. Male = 1, Female = 2, Unknown = 3.
+     * Warning: You must provide ALL parameters to this function. The values
+     * which you provide will overwrite all current values on your profile.
+     * You can use getCurrentUser() to see your current values first.
+     *
+     * @param string      $url         Website URL. Use "" for nothing.
+     * @param string      $phone       Phone number. Use "" for nothing.
+     * @param string      $name        Full name. Use "" for nothing.
+     * @param string      $biography   Biography text. Use "" for nothing.
+     * @param string      $email       Email. Required!
+     * @param int         $gender      Gender (1 = male, 2 = female, 3 = unknown). Required!
+     * @param null|string $newUsername (optional) Rename your account to a new username,
+     *                                 which you've already verified with checkUsername().
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\UserInfoResponse
+     *
+     * @see Account::getCurrentUser() to get your current account details.
+     * @see Account::checkUsername() to verify your new username first.
      */
     public function editProfile(
         $url,
@@ -50,12 +59,18 @@ class Account extends RequestCollection
         $name,
         $biography,
         $email,
-        $gender)
+        $gender,
+        $newUsername = null)
     {
         // We must mark the profile for editing before doing the main request.
         $this->ig->request('accounts/current_user/')
             ->addParam('edit', true)
             ->getResponse(new Response\UserInfoResponse());
+
+        // Determine the desired username value.
+        $username = is_string($newUsername) && strlen($newUsername) > 0
+                  ? $newUsername
+                  : $this->ig->username;
 
         return $this->ig->request('accounts/edit_profile/')
             ->addPost('_uuid', $this->ig->uuid)
@@ -63,7 +78,7 @@ class Account extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('external_url', $url)
             ->addPost('phone_number', $phone)
-            ->addPost('username', $this->ig->username)
+            ->addPost('username', $username)
             ->addPost('first_name', $name)
             ->addPost('biography', $biography)
             ->addPost('email', $email)
@@ -169,13 +184,13 @@ class Account extends RequestCollection
      * Use this before trying to rename your Instagram account,
      * to be sure that the new username is available.
      *
-     * TODO: Account renaming endpoint is not implemented.
-     *
      * @param string $username Instagram username to check.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\CheckUsernameResponse
+     *
+     * @see Account::editProfile() to rename your account.
      */
     public function checkUsername(
         $username)
