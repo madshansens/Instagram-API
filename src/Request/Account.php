@@ -189,30 +189,6 @@ class Account extends RequestCollection
     }
 
     /**
-     * Check if an email address is available (not already registered).
-     *
-     * Use this before trying to change your account's email address,
-     * to be sure that the new email address isn't used by another account.
-     *
-     * @param string $email Email address to check.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\CheckEmailResponse
-     */
-    public function checkEmail(
-        $email)
-    {
-        return $this->ig->request('users/check_email/')
-            ->addPost('email', $email)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('send_source', 'edit_profile')
-            ->getResponse(new Response\CheckEmailResponse());
-    }
-
-    /**
      * Get account spam filter status.
      *
      * @throws \InstagramAPI\Exception\InstagramException
@@ -430,7 +406,7 @@ class Account extends RequestCollection
         return $this->ig->request('accounts/send_confirm_email/')
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
-            ->addPost('send_source', 'profile_megaphone')
+            ->addPost('send_source', 'edit_profile')
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\SendConfirmEmailResponse());
     }
