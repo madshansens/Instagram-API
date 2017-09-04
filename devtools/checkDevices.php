@@ -33,8 +33,7 @@ $ig = new \InstagramAPI\Instagram(
     false // Use non-truncated API debugging.
 );
 
-$ig->setUser($username, $password);
-$ig->login();
+$ig->login($username, $password);
 
 // Code for building video lists (uncomment both lines).
 // $userPk = $ig->people->getInfoByName('selenagomez')->getUser()->getPk();

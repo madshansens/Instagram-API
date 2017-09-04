@@ -48,8 +48,7 @@ $captionText = ''; // Caption to use for the album.
 $ig = new \InstagramAPI\Instagram($debug, $truncatedDebug);
 
 try {
-    $ig->setUser($username, $password);
-    $ig->login();
+    $ig->login($username, $password);
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";
     exit(0);

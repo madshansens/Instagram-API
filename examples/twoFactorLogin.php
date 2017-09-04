@@ -15,17 +15,16 @@ $truncatedDebug = false;
 $ig = new \InstagramAPI\Instagram($debug, $truncatedDebug);
 
 try {
-    $ig->setUser($username, $password);
-    $loginResponse = $ig->login();
+    $loginResponse = $ig->login($username, $password);
 
-    if (!is_null($loginResponse) && $loginResponse->getTwoFactorRequired()) {
+    if (!is_null($loginResponse) && $loginResponse->isTwoFactorRequired()) {
         $twoFactorIdentifier = $loginResponse->getTwoFactorInfo()->getTwoFactorIdentifier();
 
         // The "STDIN" lets you paste the code via terminal for testing.
         // You should replace this line with the logic you want.
         // The verification code will be sent by Instagram via SMS.
         $verificationCode = trim(fgets(STDIN));
-        $ig->twoFactorLogin($verificationCode, $twoFactorIdentifier);
+        $ig->finishTwoFactorLogin($verificationCode, $twoFactorIdentifier);
     }
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";

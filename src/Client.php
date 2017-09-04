@@ -174,7 +174,7 @@ class Client
     /**
      * Resets certain Client settings via the current Settings storage.
      *
-     * Used whenever the user switches setUser(), to configure our internal state.
+     * Used whenever we switch active user, to configure our internal state.
      *
      * @param bool $resetCookieJar (optional) Whether to clear current cookies.
      *
