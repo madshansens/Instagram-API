@@ -3,7 +3,6 @@
 namespace InstagramAPI\Request;
 
 use InstagramAPI\Response;
-use InstagramAPI\Signatures;
 
 /**
  * Account-related functions, such as profile editing and security.
@@ -205,11 +204,11 @@ class Account extends RequestCollection
         $email)
     {
         return $this->ig->request('users/check_email/')
-            ->addPost('qe_id', Signatures::generateUUID(true))
-            ->addPost('waterfall_id', Signatures::generateUUID(true))
             ->addPost('email', $email)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('send_source', 'edit_profile')
             ->getResponse(new Response\CheckEmailResponse());
     }
 
