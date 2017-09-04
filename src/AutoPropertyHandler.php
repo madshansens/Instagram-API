@@ -30,6 +30,26 @@ namespace InstagramAPI;
 class AutoPropertyHandler
 {
     /**
+     * Whether we should cache all magic method translations.
+     *
+     * This costs a bit of RAM, but greatly speeds up magic function calls so
+     * that they only take about 16% as long as they would without the cache.
+     *
+     * Tip: If you have limited memory, you can easily disable this cache:
+     * \InstagramAPI\AutoPropertyHandler::$useCache = false;
+     *
+     * @var bool
+     */
+    public static $useCache = true;
+
+    /**
+     * Magic method lookup cache.
+     *
+     * @var array
+     */
+    public static $lookupCache = [];
+
+    /**
      * __CALL is invoked when attempting to access missing functions.
      *
      * This handler auto-maps setters and getters for object properties.
@@ -52,30 +72,42 @@ class AutoPropertyHandler
         $functionName,
         $arguments)
     {
-        // Extract the components of the function they tried to call.
-        $chunks = self::explodeCamelCase($functionName);
-        if ($chunks === false || count($chunks) < 2) {
-            throw new \Exception("Unknown function {$functionName}.");
+        if (self::$useCache && isset(self::$lookupCache[$functionName])) {
+            // Read the processed result from the lookup cache.
+            list($functionType, $propertyName, $camelPropertyName) = self::$lookupCache[$functionName];
+        } else {
+            // Extract the components of the function they tried to call.
+            $chunks = self::explodeCamelCase($functionName);
+            if ($chunks === false || count($chunks) < 2) {
+                throw new \Exception("Unknown function {$functionName}.");
+            }
+
+            // Determine the type (such as "get") and the property (ie "is_valid").
+            $functionType = array_shift($chunks);
+            $propertyName = implode('_', $chunks); // "is_valid"
+
+            // Some objects have rare camelcase properties, so instead of naming it
+            // "i_tunes_item" they have "iTunesItem" as the property.
+            $camelPropertyName = null;
+            if (($len = count($chunks)) >= 2) {
+                // Make word 2 and higher start with uppercase ("i,Tunes,Item").
+                // NOTE: Instagram's rule so far is that the first word is always
+                // lowercase when they use camelcase.
+                for ($i = 1; $i < $len; ++$i) {
+                    $chunks[$i] = ucfirst($chunks[$i]);
+                }
+                $camelPropertyName = implode('', $chunks); // "iTunesItem"
+            }
+
+            // Store the processed result in the lookup cache, if enabled.
+            if (self::$useCache && !isset(self::$lookupCache[$functionName])) {
+                self::$lookupCache[$functionName] = [$functionType, $propertyName, $camelPropertyName];
+            }
         }
 
-        // Determine the type (such as "get") and the property (ie "is_valid").
-        $functionType = array_shift($chunks);
-        $propertyName = implode('_', $chunks); // "is_valid"
-
-        // Some objects have rare camelcase properties, so instead of naming it
-        // "i_tunes_item" they have "iTunesItem" as the property. We'll have to
-        // check for the existence of a camelcase property and use it if found.
-        if (($len = count($chunks)) >= 2) {
-            // Make word 2 and higher start with uppercase ("i,Tunes,Item").
-            // NOTE: Instagram's rule so far is that the first word is always
-            // lowercase when they use camelcase.
-            for ($i = 1; $i < $len; ++$i) {
-                $chunks[$i] = ucfirst($chunks[$i]);
-            }
-            $camelPropertyName = implode('', $chunks); // "iTunesItem"
-            if (property_exists($this, $camelPropertyName)) {
-                $propertyName = $camelPropertyName; // Use this name instead.
-            }
+        // Check for the existence of a camelcase property and use it if found.
+        if ($camelPropertyName !== null && property_exists($this, $camelPropertyName)) {
+            $propertyName = $camelPropertyName; // Use this name instead.
         }
 
         // Make sure the requested function has a corresponding object property.
