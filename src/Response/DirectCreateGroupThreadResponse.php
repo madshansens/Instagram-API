@@ -11,6 +11,7 @@ use InstagramAPI\ResponseTrait;
  * @method mixed getHasNewer()
  * @method mixed getHasOlder()
  * @method \InstagramAPI\Response\Model\User getInviter()
+ * @method mixed getIsPin()
  * @method \InstagramAPI\Response\Model\DirectThreadItem[] getItems()
  * @method mixed getLastActivityAt()
  * @method mixed getLastSeenAt()
@@ -27,6 +28,7 @@ use InstagramAPI\ResponseTrait;
  * @method bool isHasNewer()
  * @method bool isHasOlder()
  * @method bool isInviter()
+ * @method bool isIsPin()
  * @method bool isItems()
  * @method bool isLastActivityAt()
  * @method bool isLastSeenAt()
@@ -43,6 +45,7 @@ use InstagramAPI\ResponseTrait;
  * @method setHasNewer(mixed $value)
  * @method setHasOlder(mixed $value)
  * @method setInviter(\InstagramAPI\Response\Model\User $value)
+ * @method setIsPin(mixed $value)
  * @method setItems(\InstagramAPI\Response\Model\DirectThreadItem[] $value)
  * @method setLastActivityAt(mixed $value)
  * @method setLastSeenAt(mixed $value)
@@ -94,4 +97,5 @@ class DirectCreateGroupThreadResponse extends AutoPropertyHandler implements Res
     public $has_older;
     public $has_newer;
     public $last_seen_at;
+    public $is_pin;
 }
