@@ -112,7 +112,9 @@ class Fbns implements PersistentInterface, EventEmitterInterface
             })
             ->on('disconnect', function () {
                 // Try to reconnect.
-                $this->_connect();
+                if (!$this->_reconnectInterval) {
+                    $this->_connect();
+                }
             })
             ->on('register', function (Register $message) {
                 if (!empty($message->getError())) {
@@ -171,6 +173,7 @@ class Fbns implements PersistentInterface, EventEmitterInterface
     {
         $this->_logger->info('Stopping FBNS client...');
         $this->_isActive = false;
+        $this->_cancelReconnectTimer();
         $this->_client->disconnect();
     }
 

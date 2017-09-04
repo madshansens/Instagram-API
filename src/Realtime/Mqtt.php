@@ -246,6 +246,7 @@ class Mqtt implements PersistentInterface
     public function start()
     {
         $this->_shutdown = false;
+        $this->_reconnectInterval = 0;
         $this->_connect();
     }
 
@@ -275,6 +276,7 @@ class Mqtt implements PersistentInterface
     {
         $this->_logger->info('Shutting down...');
         $this->_shutdown = true;
+        $this->_cancelReconnectTimer();
         $this->_disconnect();
     }
 
@@ -604,7 +606,10 @@ class Mqtt implements PersistentInterface
         });
         $client->on('close', function () {
             $this->_logger->info('Connection has been closed');
-            $this->_connect();
+            $this->_cancelKeepaliveTimer();
+            if (!$this->_reconnectInterval) {
+                $this->_connect();
+            }
         });
         $client->on('connect', function () {
             $this->_logger->info('Connected to a broker');
