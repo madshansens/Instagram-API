@@ -34,10 +34,10 @@ $metadata = [
         // Note that you can add more than one hashtag in this array.
         [
             'tag_name'         => 'test', // Hashtag WITHOUT the '#'! NOTE: This hashtag MUST appear in the caption.
-            'x'                => 0.5, // Range: 0.0 - 1.0
-            'y'                => 0.5, // Note that x = 0.5 and y = 0.5 is center of screen.
-            'width'            => 0.24305555, // Percentage: 0.0 - 1.0
-            'height'           => 0.07347973, // Percentage: 0.0 - 1.0
+            'x'                => 0.5, // Range: 0.0 - 1.0. Note that x = 0.5 and y = 0.5 is center of screen.
+            'y'                => 0.5, // Also note that X/Y is setting the position of the CENTER of the clickable area.
+            'width'            => 0.24305555, // Clickable area size, as percentage of image size: 0.0 - 1.0
+            'height'           => 0.07347973, // ...
             'rotation'         => 0.0,
             'is_sticker'       => false, // Don't change this value.
             'use_custom_title' => false, // Don't change this value.
