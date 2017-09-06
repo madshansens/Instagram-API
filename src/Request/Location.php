@@ -12,6 +12,9 @@ class Location extends RequestCollection
     /**
      * Search for nearby Instagram locations by geographical coordinates.
      *
+     * NOTE: The locations found by this endpoint can be used for attaching
+     * locations to media uploads. This is the endpoint used by the real app!
+     *
      * @param string      $latitude
      * @param string      $longitude
      * @param null|string $query     (optional) If provided, Instagram does a
@@ -44,6 +47,9 @@ class Location extends RequestCollection
     /**
      * Search for Facebook locations by name.
      *
+     * WARNING: The locations found by this function DO NOT work for attaching
+     * locations to media uploads. Use Location::search() instead!
+     *
      * @param string $query
      * @param int    $count (optional) Facebook will return up to this many results.
      *
@@ -68,6 +74,9 @@ class Location extends RequestCollection
 
     /**
      * Search for Facebook locations by geographical location.
+     *
+     * WARNING: The locations found by this function DO NOT work for attaching
+     * locations to media uploads. Use Location::search() instead!
      *
      * @param string $lat   Latitude.
      * @param string $lng   Longitude.

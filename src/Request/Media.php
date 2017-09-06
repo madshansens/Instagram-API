@@ -111,21 +111,8 @@ class Media extends RequestCollection
                     throw new \InvalidArgumentException('The "location" metadata value must be an instance of \InstagramAPI\Response\Model\Location.');
                 }
 
-                // TODO: THIS WORKS. BUT WE SHOULD VERIFY ALL OF THE PARAMETERS
-                // BELOW TO BE SURE THEY ARE REALLY THE CORRECT WAY TO EDIT
-                // LOCATION WHEN EDITING MEDIA!
-
-                $loc = [
-                    $metadata['location']->getExternalIdSource().'_id' => $metadata['location']->getExternalId(),
-                    'name'                                             => $metadata['location']->getName(),
-                    'lat'                                              => $metadata['location']->getLat(),
-                    'lng'                                              => $metadata['location']->getLng(),
-                    'address'                                          => $metadata['location']->getAddress(),
-                    'external_source'                                  => $metadata['location']->getExternalIdSource(),
-                ];
-
                 $request
-                    ->addPost('location', json_encode($loc))
+                    ->addPost('location', Utils::buildMediaLocationJSON($metadata['location']))
                     ->addPost('geotag_enabled', '1')
                     ->addPost('posting_latitude', $metadata['location']->getLat())
                     ->addPost('posting_longitude', $metadata['location']->getLng())

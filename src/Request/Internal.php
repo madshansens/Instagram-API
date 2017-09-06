@@ -278,17 +278,8 @@ class Internal extends RequestCollection
         }
 
         if ($location instanceof Response\Model\Location) {
-            $loc = [
-                $location->getExternalIdSource().'_id'   => $location->getExternalId(),
-                'name'                                   => $location->getName(),
-                'lat'                                    => $location->getLat(),
-                'lng'                                    => $location->getLng(),
-                'address'                                => $location->getAddress(),
-                'external_source'                        => $location->getExternalIdSource(),
-            ];
-
             $request
-                ->addPost('location', json_encode($loc))
+                ->addPost('location', Utils::buildMediaLocationJSON($location))
                 ->addPost('geotag_enabled', '1')
                 ->addPost('posting_latitude', $location->getLat())
                 ->addPost('posting_longitude', $location->getLng())
@@ -555,17 +546,8 @@ class Internal extends RequestCollection
         }
 
         if ($location instanceof Response\Model\Location) {
-            $loc = [
-                $location->getExternalIdSource().'_id'   => $location->getExternalId(),
-                'name'                                   => $location->getName(),
-                'lat'                                    => $location->getLat(),
-                'lng'                                    => $location->getLng(),
-                'address'                                => $location->getAddress(),
-                'external_source'                        => $location->getExternalIdSource(),
-            ];
-
             $request
-                ->addPost('location', json_encode($loc))
+                ->addPost('location', Utils::buildMediaLocationJSON($location))
                 ->addPost('geotag_enabled', '1')
                 ->addPost('posting_latitude', $location->getLat())
                 ->addPost('posting_longitude', $location->getLng())
@@ -697,17 +679,8 @@ class Internal extends RequestCollection
             ->addPost('children_metadata', $childrenMetadata);
 
         if ($location instanceof Response\Model\Location) {
-            $loc = [
-                $location->getExternalIdSource().'_id'   => $location->getExternalId(),
-                'name'                                   => $location->getName(),
-                'lat'                                    => $location->getLat(),
-                'lng'                                    => $location->getLng(),
-                'address'                                => $location->getAddress(),
-                'external_source'                        => $location->getExternalIdSource(),
-            ];
-
             $request
-                ->addPost('location', json_encode($loc))
+                ->addPost('location', Utils::buildMediaLocationJSON($location))
                 ->addPost('geotag_enabled', '1')
                 ->addPost('posting_latitude', $location->getLat())
                 ->addPost('posting_longitude', $location->getLng())

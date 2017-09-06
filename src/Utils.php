@@ -8,6 +8,7 @@ use InstagramAPI\Request\Metadata\MediaDetails;
 use InstagramAPI\Request\Metadata\PhotoDetails;
 use InstagramAPI\Request\Metadata\VideoDetails;
 use InstagramAPI\Response\Model\Item;
+use InstagramAPI\Response\Model\Location;
 use React\EventLoop\LoopInterface;
 use React\Socket\Connector;
 use React\Socket\ConnectorInterface;
@@ -197,6 +198,54 @@ class Utils
         $data = $size.' '.$term.' '.$text_change_event_count.' '.$date;
 
         return base64_encode(hash_hmac('sha256', $data, $key, true))."\n".base64_encode($data)."\n";
+    }
+
+    /**
+     * Builds an Instagram media location JSON object in the correct format.
+     *
+     * This function is used whenever we need to send a location to Instagram's
+     * API. All endpoints (so far) expect location data in this exact format.
+     *
+     * @param Location $location A model object representing the location.
+     *
+     * @throws \InvalidArgumentException If the location is invalid.
+     *
+     * @return string The final JSON string ready to submit as an API parameter.
+     */
+    public static function buildMediaLocationJSON(
+        $location)
+    {
+        if (!$location instanceof Location) {
+            throw new \InvalidArgumentException('The location must be an instance of \InstagramAPI\Response\Model\Location.');
+        }
+
+        // Forbid locations that came from Location::searchFacebook() and
+        // Location::searchFacebookByPoint()! They have slightly different
+        // properties, and they don't always contain all data we need. The
+        // real application NEVER uses the "Facebook" endpoints for attaching
+        // locations to media, and NEITHER SHOULD WE.
+        if ($location->getFacebookPlacesId() !== null) {
+            throw new \InvalidArgumentException('You are not allowed to use Location model objects from the Facebook-based location search functions. They are not valid media locations!');
+        }
+
+        // Core location keys that always exist.
+        $obj = [
+            'name'            => $location->getName(),
+            'lat'             => $location->getLat(),
+            'lng'             => $location->getLng(),
+            'address'         => $location->getAddress(),
+            'external_source' => $location->getExternalIdSource(),
+        ];
+
+        // Attach the location ID via a dynamically generated key.
+        // NOTE: This automatically generates a key such as "facebook_places_id".
+        $key = $location->getExternalIdSource().'_id';
+        $obj[$key] = $location->getExternalId();
+
+        // Ensure that all keys are listed in the correct hash order.
+        $obj = self::reorderByHashCode($obj);
+
+        return json_encode($obj);
     }
 
     /**
