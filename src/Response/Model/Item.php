@@ -5,8 +5,10 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyHandler;
 
 /**
+ * @method mixed getActorFbid()
  * @method mixed getAdAction()
  * @method mixed getAdHeaderStyle()
+ * @method string getAdId()
  * @method mixed getAdLinkType()
  * @method AdMetadata[] getAdMetadata()
  * @method mixed getAlgorithm()
@@ -50,6 +52,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getIcon()
  * @method string getId()
  * @method Image_Versions2 getImageVersions2()
+ * @method mixed getImportedTakenAt()
  * @method mixed getImpressionToken()
  * @method Injected getInjected()
  * @method mixed getIsDashEligible()
@@ -58,6 +61,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getIsSidecarChild()
  * @method mixed getLargeUrls()
  * @method float getLat()
+ * @method string getLeadGenFormId()
  * @method mixed getLikeCount()
  * @method User[] getLikers()
  * @method mixed getLink()
@@ -115,8 +119,10 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getViewerCursor()
  * @method User[] getViewers()
  * @method mixed getVisibility()
+ * @method bool isActorFbid()
  * @method bool isAdAction()
  * @method bool isAdHeaderStyle()
+ * @method bool isAdId()
  * @method bool isAdLinkType()
  * @method bool isAdMetadata()
  * @method bool isAlgorithm()
@@ -160,6 +166,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isIcon()
  * @method bool isId()
  * @method bool isImageVersions2()
+ * @method bool isImportedTakenAt()
  * @method bool isImpressionToken()
  * @method bool isInjected()
  * @method bool isIsDashEligible()
@@ -168,6 +175,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isIsSidecarChild()
  * @method bool isLargeUrls()
  * @method bool isLat()
+ * @method bool isLeadGenFormId()
  * @method bool isLikeCount()
  * @method bool isLikers()
  * @method bool isLink()
@@ -225,8 +233,10 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isViewerCursor()
  * @method bool isViewers()
  * @method bool isVisibility()
+ * @method setActorFbid(mixed $value)
  * @method setAdAction(mixed $value)
  * @method setAdHeaderStyle(mixed $value)
+ * @method setAdId(string $value)
  * @method setAdLinkType(mixed $value)
  * @method setAdMetadata(AdMetadata[] $value)
  * @method setAlgorithm(mixed $value)
@@ -270,6 +280,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setIcon(mixed $value)
  * @method setId(string $value)
  * @method setImageVersions2(Image_Versions2 $value)
+ * @method setImportedTakenAt(mixed $value)
  * @method setImpressionToken(mixed $value)
  * @method setInjected(Injected $value)
  * @method setIsDashEligible(mixed $value)
@@ -278,6 +289,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setIsSidecarChild(mixed $value)
  * @method setLargeUrls(mixed $value)
  * @method setLat(float $value)
+ * @method setLeadGenFormId(string $value)
  * @method setLikeCount(mixed $value)
  * @method setLikers(User[] $value)
  * @method setLink(mixed $value)
@@ -571,6 +583,16 @@ class Item extends AutoPropertyHandler
      */
     public $sponsor_tags;
     public $story_poll_voter_infos;
+    public $imported_taken_at;
+    /**
+     * @var string
+     */
+    public $lead_gen_form_id;
+    /**
+     * @var string
+     */
+    public $ad_id;
+    public $actor_fbid;
 
     /**
      * Get the web URL for this media item.

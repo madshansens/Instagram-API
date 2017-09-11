@@ -8,6 +8,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getAddressStreet()
  * @method mixed getAggregatePromoteEngagement()
  * @method mixed getAllowContactsSync()
+ * @method mixed getAllowedCommenterType()
  * @method mixed getAutoExpandChaining()
  * @method mixed getBiography()
  * @method mixed getBirthday()
@@ -88,6 +89,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isAddressStreet()
  * @method bool isAggregatePromoteEngagement()
  * @method bool isAllowContactsSync()
+ * @method bool isAllowedCommenterType()
  * @method bool isAutoExpandChaining()
  * @method bool isBiography()
  * @method bool isBirthday()
@@ -168,6 +170,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setAddressStreet(mixed $value)
  * @method setAggregatePromoteEngagement(mixed $value)
  * @method setAllowContactsSync(mixed $value)
+ * @method setAllowedCommenterType(mixed $value)
  * @method setAutoExpandChaining(mixed $value)
  * @method setBiography(mixed $value)
  * @method setBirthday(mixed $value)
@@ -373,4 +376,5 @@ class User extends AutoPropertyHandler
      */
     public $latest_reel_media;
     public $has_unseen_besties_media;
+    public $allowed_commenter_type;
 }
