@@ -103,6 +103,15 @@ class Request
     protected $_signedPost;
 
     /**
+     * Whether this API call has multiple responses.
+     *
+     * Off by default.
+     *
+     * @var bool
+     */
+    protected $_isMultiResponse;
+
+    /**
      * Opened file handles.
      *
      * @var resource[]
@@ -439,6 +448,21 @@ class Request
     }
 
     /**
+     * Set multiple response flag.
+     *
+     * @param bool $flag
+     *
+     * @return self
+     */
+    public function setIsMultiResponse(
+        $flag = false)
+    {
+        $this->_isMultiResponse = $flag;
+
+        return $this;
+    }
+
+    /**
      * Get a Stream for the given file.
      *
      * @param array $file
@@ -648,8 +672,14 @@ class Request
         $assoc = false)
     {
         $httpResponse = $this->getHttpResponse();
+        $body = $httpResponse->getBody();
+
+        if ($this->_isMultiResponse) {
+            $body = str_replace("}\r\n{", ',', $body);
+        }
+
         // Important: Special JSON decoder.
-        return Client::api_body_decode((string) $httpResponse->getBody(), $assoc);
+        return Client::api_body_decode((string) $body, $assoc);
     }
 
     /**
