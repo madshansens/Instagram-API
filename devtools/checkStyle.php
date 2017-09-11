@@ -134,6 +134,13 @@ class styleChecker
                     continue;
                 }
 
+                // Ignore the visibility warnings for public GraphQL properties.
+                if ($visibility == 'public' && $type == '$'
+                    && in_array($fileName, ['BusinessFeed.php', 'BusinessManager.php', 'BusinessNode.php', 'PromotionsUnit.php']
+                )) {
+                    continue;
+                }
+
                 if ($visibility == 'public') {
                     if ($name[0] == '_' && (
                         $name != '__construct'
