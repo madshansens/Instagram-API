@@ -39,7 +39,7 @@ class GraphqlBatchResponse extends AutoPropertyHandler implements ResponseInterf
         } else {
             // Set a nice message for exceptions.
             if ($this->getMessage() === null) {
-                $this->setMessage('There is an error fetching account statistics. Try again later.');
+                $this->setMessage('There was an error while fetching account statistics. Try again later.');
             }
 
             return false;

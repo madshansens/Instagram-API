@@ -5,7 +5,7 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyHandler;
 
 /**
- * @method mixed getActorFbid()
+ * @method string getActorFbid()
  * @method mixed getAdAction()
  * @method mixed getAdHeaderStyle()
  * @method string getAdId()
@@ -233,7 +233,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isViewerCursor()
  * @method bool isViewers()
  * @method bool isVisibility()
- * @method setActorFbid(mixed $value)
+ * @method setActorFbid(string $value)
  * @method setAdAction(mixed $value)
  * @method setAdHeaderStyle(mixed $value)
  * @method setAdId(string $value)
@@ -592,6 +592,9 @@ class Item extends AutoPropertyHandler
      * @var string
      */
     public $ad_id;
+    /**
+     * @var string
+     */
     public $actor_fbid;
 
     /**
