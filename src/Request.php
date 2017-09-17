@@ -103,7 +103,7 @@ class Request
     protected $_signedPost;
 
     /**
-     * Whether this API call has multiple responses.
+     * Whether this API endpoint responds with multiple JSON objects.
      *
      * Off by default.
      *
@@ -155,6 +155,7 @@ class Request
         $this->_guzzleOptions = [];
         $this->_needsAuth = true;
         $this->_signedPost = true;
+        $this->_isMultiResponse = false;
         $this->_excludeSigned = [];
         $this->_defaultHeaders = true;
     }
@@ -448,7 +449,7 @@ class Request
     }
 
     /**
-     * Set multiple response flag.
+     * Set the "this API endpoint responds with multiple JSON objects" flag.
      *
      * @param bool $flag
      *
@@ -674,6 +675,12 @@ class Request
         $httpResponse = $this->getHttpResponse();
         $body = $httpResponse->getBody();
 
+        // Handle API endpoints that respond with multiple JSON objects.
+        // NOTE: We simply merge all JSON objects into a single object. This
+        // text replacement of "}\r\n{" is safe, because the actual JSON data
+        // objects never contain literal newline characters (http://json.org).
+        // And if we get any duplicate properties, then PHP will simply select
+        // the latest value for that property (ex: a:1,a:2 is treated as a:2).
         if ($this->_isMultiResponse) {
             $body = str_replace("}\r\n{", ',', $body);
         }
