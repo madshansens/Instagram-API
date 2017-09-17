@@ -52,12 +52,18 @@ class Realtime implements EventEmitterInterface
      * @param Instagram            $instagram
      * @param LoopInterface        $loop
      * @param LoggerInterface|null $logger
+     *
+     * @throws \RuntimeException
      */
     public function __construct(
         Instagram $instagram,
         LoopInterface $loop,
         LoggerInterface $logger = null)
     {
+        if (PHP_SAPI !== 'cli') {
+            throw new \RuntimeException('You must run Realtime client only from command line.');
+        }
+
         $this->_instagram = $instagram;
         $this->_loop = $loop;
         $this->_logger = $logger;
