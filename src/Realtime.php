@@ -61,7 +61,7 @@ class Realtime implements EventEmitterInterface
         LoggerInterface $logger = null)
     {
         if (PHP_SAPI !== 'cli') {
-            throw new \RuntimeException('You must run Realtime client only from command line.');
+            throw new \RuntimeException('The Realtime client can only run from the command line.');
         }
 
         $this->_instagram = $instagram;
