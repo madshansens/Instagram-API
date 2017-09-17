@@ -430,7 +430,7 @@ class Mqtt implements PersistentInterface
             ? $experiments['ig_android_realtime_iris'] : [];
         $this->_irisEnabled = $this->_isFeatureEnabled($directFeatures, 'is_direct_over_iris_enabled');
         if (isset($directFeatures['pubsub_msg_type_blacklist'])) {
-            $this->_msgTypeBlacklist = $directFeatures['msgTypeBlacklist'];
+            $this->_msgTypeBlacklist = $directFeatures['pubsub_msg_type_blacklist'];
         }
 
         // Live features.
