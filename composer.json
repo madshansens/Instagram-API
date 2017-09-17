@@ -56,13 +56,13 @@
     },
     "require-dev": {
         "react/http": "^0.7.2",
-        "friendsofphp/php-cs-fixer": "^2.4",
+        "friendsofphp/php-cs-fixer": "^2.6",
         "monolog/monolog": "^1.23"
     },
     "scripts": {
         "codestyle": [
             "php devtools/generateAutoPropertyHandlerDocs.php",
-            "php-cs-fixer fix --config=.php_cs.dist",
+            "php-cs-fixer fix --config=.php_cs.dist --allow-risky yes",
             "php devtools/checkStyle.php x"
         ]
     }
