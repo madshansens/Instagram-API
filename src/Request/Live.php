@@ -126,7 +126,7 @@ class Live extends RequestCollection
         $maxId = null)
     {
         $request = $this->ig->request("live/{$broadcastId}/get_post_live_viewers_list/");
-        if (!is_null($maxId)) {
+        if ($maxId !== null) {
             $request->addParam('max_id', $maxId);
         }
 

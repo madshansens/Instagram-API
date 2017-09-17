@@ -103,8 +103,8 @@ class Usertag extends RequestCollection
         return $this->ig->request("usertags/{$userId}/feed/")
             ->addParam('rank_token', $this->ig->rank_token)
             ->addParam('ranked_content', 'true')
-            ->addParam('max_id', (!is_null($maxId) ? $maxId : ''))
-            ->addParam('min_timestamp', (!is_null($minTimestamp) ? $minTimestamp : ''))
+            ->addParam('max_id', ($maxId !== null ? $maxId : ''))
+            ->addParam('min_timestamp', ($minTimestamp !== null ? $minTimestamp : ''))
             ->getResponse(new Response\UsertagsResponse());
     }
 

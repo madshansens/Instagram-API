@@ -89,7 +89,7 @@ class Hashtag extends RequestCollection
     {
         $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
         $hashtagFeed = $this->ig->request("feed/tag/{$urlHashtag}/");
-        if (!is_null($maxId)) {
+        if ($maxId !== null) {
             $hashtagFeed->addParam('max_id', $maxId);
         }
 

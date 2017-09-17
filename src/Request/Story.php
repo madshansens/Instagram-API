@@ -166,7 +166,7 @@ class Story extends RequestCollection
         $maxId = null)
     {
         $request = $this->ig->request("media/{$storyPk}/list_reel_media_viewer/");
-        if (!is_null($maxId)) {
+        if ($maxId !== null) {
             $request->addParam('max_id', $maxId);
         }
 

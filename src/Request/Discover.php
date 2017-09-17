@@ -30,7 +30,7 @@ class Discover extends RequestCollection
             ->addParam('session_id', $this->ig->session_id);
 
         if (!$isPrefetch) {
-            if (is_null($maxId)) {
+            if ($maxId === null) {
                 $maxId = 0;
             }
             $request->addParam('max_id', $maxId);

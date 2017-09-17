@@ -35,7 +35,7 @@ class Location extends RequestCollection
             ->addParam('latitude', $latitude)
             ->addParam('longitude', $longitude);
 
-        if (is_null($query)) {
+        if ($query === null) {
             $locations->addParam('timestamp', time());
         } else {
             $locations->addParam('search_query', $query);
@@ -65,7 +65,7 @@ class Location extends RequestCollection
             ->addParam('rank_token', $this->ig->rank_token)
             ->addParam('query', $query);
 
-        if (!is_null($count)) {
+        if ($count !== null) {
             $location->addParam('count', $count);
         }
 
@@ -96,7 +96,7 @@ class Location extends RequestCollection
             ->addParam('lat', $lat)
             ->addParam('lng', $lng);
 
-        if (!is_null($count)) {
+        if ($count !== null) {
             $location->addParam('count', $count);
         }
 
@@ -146,7 +146,7 @@ class Location extends RequestCollection
         $maxId = null)
     {
         $locationFeed = $this->ig->request("feed/location/{$locationId}/");
-        if (!is_null($maxId)) {
+        if ($maxId !== null) {
             $locationFeed->addParam('max_id', $maxId);
         }
 

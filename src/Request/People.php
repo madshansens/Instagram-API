@@ -113,7 +113,7 @@ class People extends RequestCollection
         $maxId = null)
     {
         $activity = $this->ig->request('news/');
-        if (!is_null($maxId)) {
+        if ($maxId !== null) {
             $activity->addParam('max_id', $maxId);
         }
 
@@ -280,10 +280,10 @@ class People extends RequestCollection
     {
         $request = $this->ig->request("friendships/{$userId}/following/")
             ->addParam('rank_token', $this->ig->rank_token);
-        if (!is_null($searchQuery)) {
+        if ($searchQuery !== null) {
             $request->addParam('query', $searchQuery);
         }
-        if (!is_null($maxId)) {
+        if ($maxId !== null) {
             $request->addParam('max_id', $maxId);
         }
 
@@ -308,10 +308,10 @@ class People extends RequestCollection
     {
         $request = $this->ig->request("friendships/{$userId}/followers/")
             ->addParam('rank_token', $this->ig->rank_token);
-        if (!is_null($searchQuery)) {
+        if ($searchQuery !== null) {
             $request->addParam('query', $searchQuery);
         }
-        if (!is_null($maxId)) {
+        if ($maxId !== null) {
             $request->addParam('max_id', $maxId);
         }
 

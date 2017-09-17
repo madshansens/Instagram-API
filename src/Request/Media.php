@@ -226,7 +226,7 @@ class Media extends RequestCollection
         $maxId = null)
     {
         $request = $this->ig->request('feed/liked/');
-        if (!is_null($maxId)) {
+        if ($maxId !== null) {
             $request->addParam('max_id', $maxId);
         }
 
@@ -344,7 +344,7 @@ class Media extends RequestCollection
             ->addPost('containermodule', $module)
             ->addPost('radio_type', 'wifi-none');
 
-        if (!is_null($replyCommentId)) {
+        if ($replyCommentId !== null) {
             if ($commentText[0] !== '@') {
                 throw new \InvalidArgumentException('When replying to a comment, your text must begin with an @-mention to their username.');
             }
@@ -574,7 +574,7 @@ class Media extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken());
 
-        if (!is_null($maxId)) {
+        if ($maxId !== null) {
             $request->addParam('max_id', $maxId);
         }
 

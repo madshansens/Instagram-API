@@ -31,7 +31,7 @@ class Creative extends RequestCollection
         if ($stickerType != 'static_stickers') {
             throw new \InvalidArgumentException('You must provide a valid sticker type.');
         }
-        if (!is_null($location) && (!isset($location['lat'])
+        if ($location !== null && (!isset($location['lat'])
                                     || !isset($location['lng'])
                                     || !isset($location['horizontalAccuracy']))) {
             throw new \InvalidArgumentException('Your location array must contain keys for "lat", "lng" and "horizontalAccuracy".');
@@ -40,7 +40,7 @@ class Creative extends RequestCollection
         $request = $this->ig->request('creatives/assets/')
             ->addPost('type', $stickerType);
 
-        if (!is_null($location)) {
+        if ($location !== null) {
             $request
                 ->addPost('lat', $location['lat'])
                 ->addPost('lng', $location['lat'])

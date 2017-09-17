@@ -17,7 +17,7 @@ $ig = new \InstagramAPI\Instagram($debug, $truncatedDebug);
 try {
     $loginResponse = $ig->login($username, $password);
 
-    if (!is_null($loginResponse) && $loginResponse->isTwoFactorRequired()) {
+    if ($loginResponse !== null && $loginResponse->isTwoFactorRequired()) {
         $twoFactorIdentifier = $loginResponse->getTwoFactorInfo()->getTwoFactorIdentifier();
 
         // The "STDIN" lets you paste the code via terminal for testing.

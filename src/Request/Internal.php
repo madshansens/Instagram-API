@@ -257,7 +257,7 @@ class Internal extends RequestCollection
                     $story_cta = '[{"links":[{"webUri":'.json_encode($link).'}]}]';
                     $request->addPost('story_cta', $story_cta);
                 }
-                if (!is_null($hashtags) && $captionText != '') {
+                if ($hashtags !== null && $captionText != '') {
                     Utils::throwIfInvalidStoryHashtags($captionText, $hashtags);
                     $request
                         ->addPost('story_hashtags', json_encode($hashtags))
@@ -513,7 +513,7 @@ class Internal extends RequestCollection
                     $story_cta = '[{"links":[{"webUri":'.json_encode($link).'}]}]';
                     $request->addPost('story_cta', $story_cta);
                 }
-                if (!is_null($hashtags) && $captionText != '') {
+                if ($hashtags !== null && $captionText != '') {
                     Utils::throwIfInvalidStoryHashtags($captionText, $hashtags);
                     $request
                         ->addPost('story_hashtags', json_encode($hashtags))
@@ -534,7 +534,7 @@ class Internal extends RequestCollection
 
         if ($targetFeed == Constants::FEED_STORY) {
             $request->addPost('story_media_creation_date', time());
-            if (!is_null($usertags)) {
+            if ($usertags !== null) {
                 // Reel Mention example:
                 // [{\"y\":0.3407772676161919,\"rotation\":0,\"user_id\":\"USER_ID\",\"x\":0.39892578125,\"width\":0.5619921875,\"height\":0.06011525487256372}]
                 // NOTE: The backslashes are just double JSON encoding, ignore

@@ -490,7 +490,7 @@ class Client
 
         // Display the number of bytes uploaded in the data body, if provided for debugging.
         // NOTE: Only provide this from functions that actually upload files!
-        if (!is_null($uploadedBytes)) {
+        if ($uploadedBytes !== null) {
             Debug::printUpload(Utils::formatBytes($uploadedBytes));
         }
 
@@ -591,7 +591,7 @@ class Client
         $criticalOptions = [
             'cookies' => ($this->_cookieJar instanceof CookieJar ? $this->_cookieJar : false),
             'verify'  => $this->_verifySSL,
-            'proxy'   => (!is_null($this->_proxy) ? $this->_proxy : null),
+            'proxy'   => ($this->_proxy !== null ? $this->_proxy : null),
         ];
 
         // Critical options always overwrite identical keys in regular opts.

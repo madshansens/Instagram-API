@@ -682,7 +682,7 @@ class Instagram
             // Perform the "user has returned to their already-logged in app,
             // so refresh all feeds to check for news" API flow.
             $lastLoginTime = $this->settings->get('last_login');
-            if (is_null($lastLoginTime) || (time() - $lastLoginTime) > $appRefreshInterval) {
+            if ($lastLoginTime === null || (time() - $lastLoginTime) > $appRefreshInterval) {
                 $this->settings->set('last_login', time());
 
                 // Generate and save a new application session ID.
@@ -707,7 +707,7 @@ class Instagram
             // Users normally resume their sessions, meaning that their
             // experiments never get synced and updated. So sync periodically.
             $lastExperimentsTime = $this->settings->get('last_experiments');
-            if (is_null($lastExperimentsTime) || (time() - $lastExperimentsTime) > self::EXPERIMENTS_REFRESH) {
+            if ($lastExperimentsTime === null || (time() - $lastExperimentsTime) > self::EXPERIMENTS_REFRESH) {
                 $this->internal->syncUserFeatures();
                 $this->internal->syncDeviceFeatures();
             }

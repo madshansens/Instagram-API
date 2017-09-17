@@ -95,7 +95,7 @@ trait ResponseTrait
         // $obj = json_decode($json, false, 512, JSON_BIGINT_AS_STRING);
         // $this->message = $obj->message;
 
-        if (is_null($this->message) || is_string($this->message)) {
+        if ($this->message === null || is_string($this->message)) {
             // Single error string or nothing at all.
             return $this->message;
         } elseif (is_object($this->message)) {
