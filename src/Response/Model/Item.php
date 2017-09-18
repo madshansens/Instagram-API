@@ -55,6 +55,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getImportedTakenAt()
  * @method mixed getImpressionToken()
  * @method Injected getInjected()
+ * @method mixed getIsAd4ad()
  * @method mixed getIsDashEligible()
  * @method mixed getIsNewSuggestion()
  * @method mixed getIsReelMedia()
@@ -169,6 +170,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isImportedTakenAt()
  * @method bool isImpressionToken()
  * @method bool isInjected()
+ * @method bool isIsAd4ad()
  * @method bool isIsDashEligible()
  * @method bool isIsNewSuggestion()
  * @method bool isIsReelMedia()
@@ -283,6 +285,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setImportedTakenAt(mixed $value)
  * @method setImpressionToken(mixed $value)
  * @method setInjected(Injected $value)
+ * @method setIsAd4ad(mixed $value)
  * @method setIsDashEligible(mixed $value)
  * @method setIsNewSuggestion(mixed $value)
  * @method setIsReelMedia(mixed $value)
@@ -596,6 +599,7 @@ class Item extends AutoPropertyHandler
      * @var string
      */
     public $actor_fbid;
+    public $is_ad4ad;
 
     /**
      * Get the web URL for this media item.
