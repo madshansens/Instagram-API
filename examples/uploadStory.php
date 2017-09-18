@@ -48,10 +48,18 @@ $metadata = [
 ];
 
 try {
-    $ig->story->uploadPhoto($photoFilename, $metadata);
+    // This example will upload the image via our automatic media resizer class.
+    // It will ensure that the story file matches the ~9:16 (portrait) aspect
+    // ratio needed by Instagram stories. You have nothing to worry about, since
+    // the class uses temporary files if the input needs processing, and it
+    // never overwrites your original file. There are many other options for
+    // the MediaAutoResizer class, so you should read its class documentation!
+    $resizer = new \InstagramAPI\MediaAutoResizer($photoFilename, ['targetFeed' => \InstagramAPI\Constants::FEED_STORY]);
+    $ig->story->uploadPhoto($resizer->getFile(), $metadata);
+
     // NOTE: Providing metadata for story uploads is OPTIONAL. If you just want
-    // to upload the story without hashtags, just do the following instead:
-    // $ig->story->uploadPhoto($photoFilename);
+    // to upload it without any hashtags, simply do the following instead:
+    // $ig->story->uploadPhoto($resizer->getFile());
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";
 }
