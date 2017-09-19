@@ -41,7 +41,7 @@ try {
     $debug = true;
     $ig = new \InstagramAPI\Instagram($debug);
     $ig->login('yourusername', 'yourpassword');
-    $result = $ig->comment('14123451234567890_1234567890', "Hello World");
+    $result = $ig->media->comment('14123451234567890_1234567890', 'Hello World');
     var_dump($result);
 } catch (\Exception $e) {
     echo $e->getMessage()."\n";
