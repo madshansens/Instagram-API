@@ -10,6 +10,7 @@ These are just guidelines, not rules. Use your best judgment, and feel free to p
 
 - [Basic rules](#basic-rules)
   * [Git Setup](#git-setup)
+  * [Available Tasks](#available-tasks)
   * [Commits](#commits)
   * [Modifying anything in the existing code](#modifying-anything-in-the-existing-code)
 
@@ -44,6 +45,11 @@ If you are using a Linux/Mac/Unix system, you **MUST** install our git-hook in y
 ```
 ln -fs "../../.pre-commit.hook" .git/hooks/pre-commit
 ```
+
+
+### Available Tasks
+
+Please visit our [Project Task Tracker](https://github.com/mgp25/Instagram-API/projects), where contributors can look at the list of available work. High-quality code contributions are greatly appreciated.
 
 
 ### Commits
