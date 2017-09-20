@@ -2,8 +2,6 @@
 
 namespace InstagramAPI\Media;
 
-use InstagramAPI\Request\Metadata\MediaDetails;
-
 interface ResizerInterface
 {
     /**

@@ -2,7 +2,6 @@
 
 namespace InstagramAPI\Media;
 
-use InstagramAPI\Request\Metadata\PhotoDetails;
 use InstagramAPI\Utils;
 
 class ImageResizer implements ResizerInterface

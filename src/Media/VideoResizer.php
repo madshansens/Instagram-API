@@ -2,7 +2,6 @@
 
 namespace InstagramAPI\Media;
 
-use InstagramAPI\Request\Metadata\VideoDetails;
 use InstagramAPI\Utils;
 
 class VideoResizer implements ResizerInterface

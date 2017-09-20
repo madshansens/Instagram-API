@@ -1,6 +1,6 @@
 <?php
 
-namespace InstagramAPI\Request\Metadata;
+namespace InstagramAPI\Media;
 
 abstract class MediaDetails
 {
