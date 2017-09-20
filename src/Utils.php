@@ -4,6 +4,8 @@ namespace InstagramAPI;
 
 use Clue\React\HttpProxy\ProxyConnector as HttpConnectProxy;
 use Clue\React\Socks\Client as SocksProxy;
+use InstagramAPI\Media\ImageResizer;
+use InstagramAPI\Media\VideoResizer;
 use InstagramAPI\Request\Metadata\MediaDetails;
 use InstagramAPI\Request\Metadata\PhotoDetails;
 use InstagramAPI\Request\Metadata\VideoDetails;
@@ -402,21 +404,33 @@ class Utils
         // We ignore all audio and subtitle streams.
         $videoDetails = [];
         foreach ($probeResult['streams'] as $streamIdx => $streamInfo) {
-            if ($streamInfo['codec_type'] == 'video') {
+            if ($streamInfo['codec_type'] === 'video') {
                 $videoDetails['filesize'] = $filesize;
                 $videoDetails['codec'] = $streamInfo['codec_name']; // string
-                $videoDetails['width'] = intval($streamInfo['width'], 10);
-                $videoDetails['height'] = intval($streamInfo['height'], 10);
-                // NOTE: Duration is a float such as "230.138000".
-                $videoDetails['duration'] = floatval($streamInfo['duration']);
+                $videoDetails['width'] = (int) $streamInfo['width'];
+                $videoDetails['height'] = (int) $streamInfo['height'];
+                if (isset($videoDetails['duration'])) {
+                    // NOTE: Duration is a float such as "230.138000".
+                    $videoDetails['duration'] = (float) $streamInfo['duration'];
+                }
 
                 break; // Stop checking streams.
             }
         }
 
-        // Make sure we have found format details.
+        // Make sure we have found at least one video stream.
         if (count($videoDetails) === 0) {
             throw new \RuntimeException(sprintf('FFprobe failed to detect any video format details. Is "%s" a valid video file?', $videoFilename));
+        }
+
+        // Sometimes there is no duration in stream info, so we should check the format.
+        if (!isset($videoDetails['duration']) && isset($probeResult['format']['duration'])) {
+            $videoDetails['duration'] = (float) $probeResult['format']['duration'];
+        }
+
+        // Make sure we have detected the video duration.
+        if (!isset($videoDetails['duration'])) {
+            throw new \RuntimeException(sprintf('FFprobe failed to detect video duration. Is "%s" a valid video file?', $videoFilename));
         }
 
         return $videoDetails;
@@ -450,10 +464,10 @@ class Utils
         // those when validating the aspect ratio range further down.
         if ($mediaDetails instanceof PhotoDetails) {
             // Validate photo resolution. Instagram allows between 320px-1080px width.
-            if ($width < MediaAutoResizer::MIN_WIDTH || $width > MediaAutoResizer::MAX_WIDTH) {
+            if ($width < ImageResizer::MIN_WIDTH || $width > ImageResizer::MAX_WIDTH) {
                 throw new \InvalidArgumentException(sprintf(
                     'Instagram only accepts photos that are between %d and %d pixels wide. Your file "%s" is %d pixels wide.',
-                    MediaAutoResizer::MIN_WIDTH, MediaAutoResizer::MAX_WIDTH, $mediaFilename, $width
+                    ImageResizer::MIN_WIDTH, ImageResizer::MAX_WIDTH, $mediaFilename, $width
                 ));
             }
         } elseif ($mediaDetails instanceof VideoDetails) {
@@ -464,10 +478,10 @@ class Utils
             // resolutions. It's controlled by the "ig_android_universe_video_production"
             // experiment variable, which currently enforces width of min:480, max:720.
             // If users want to upload bigger videos, they MUST resize locally first!
-            if ($width < 480 || $width > 720) {
+            if ($width < VideoResizer::MIN_WIDTH || $width > VideoResizer::MAX_WIDTH) {
                 throw new \InvalidArgumentException(sprintf(
-                    'Instagram only accepts videos that are between 480 and 720 pixels wide. Your file "%s" is %d pixels wide.',
-                    $mediaFilename, $width
+                    'Instagram only accepts videos that are between %d and %d pixels wide. Your file "%s" is %d pixels wide.',
+                    VideoResizer::MIN_WIDTH, VideoResizer::MAX_WIDTH, $mediaFilename, $width
                 ));
             }
         }
