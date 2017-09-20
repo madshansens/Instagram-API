@@ -41,11 +41,11 @@ class Dimensions
     }
 
     /**
-     * Swaps the axes.
+     * Create a new object with swapped axes.
      *
      * @return self
      */
-    public function swapAxes()
+    public function createSwappedAxes()
     {
         return new self($this->_height, $this->_width);
     }

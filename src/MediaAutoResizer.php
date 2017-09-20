@@ -11,15 +11,15 @@ use InstagramAPI\Media\VideoResizer;
 /**
  * Automatic media resizer.
  *
- * Resizes and crops/expands a media to match Instagram's requirements, if
- * necessary. You can also use this with your own parameters, to force your
+ * Resizes and crops/expands a media file to match Instagram's requirements,
+ * if necessary. You can also use this with your own parameters, to force your
  * media into different aspects, ie square, or for adding borders to media.
  *
  * Usage:
  *
  * - Create an instance of the class with your media file and requirements.
- * - Call getFile() to get the path to a media matching the requirements. This
- *   will be the same as the input file if no processing was required.
+ * - Call getFile() to get the path to a media file matching the requirements.
+ *   This will be the same as the input file if no processing was required.
  * - Optionally, call deleteFile() if you want to delete the temporary file
  *   ahead of time instead of automatically when PHP does its object garbage
  *   collection. This function is safe and won't delete the original input file.
@@ -106,7 +106,7 @@ class MediaAutoResizer
      * Therefore, this will be the final target aspect ratio used EVERY time
      * that media destined for a story feed is outside of the allowed range!
      * That's because it doesn't make sense to let people target non-9:16 final
-     * story aspect ratios, since only 9:16 looks good on most devices!
+     * story aspect ratios, since only 9:16 stories look good on most devices!
      *
      * @var float
      */
@@ -173,7 +173,7 @@ class MediaAutoResizer
     /** @var string Output file path. */
     protected $_outputFile;
 
-    /** @var ResizerInterface */
+    /** @var ResizerInterface The media resizer for our input file. */
     protected $_resizer;
 
     /**
@@ -259,13 +259,13 @@ class MediaAutoResizer
             $maxAspectRatio = $allowedMaxRatio;
         }
         if ($minAspectRatio !== null && $maxAspectRatio !== null && $minAspectRatio > $maxAspectRatio) {
-            throw new \InvalidArgumentException('Maximum aspect ratio must be greater or equal to minimum.');
+            throw new \InvalidArgumentException('Maximum aspect ratio must be greater than or equal to minimum.');
         }
         $this->_minAspectRatio = $minAspectRatio;
         $this->_maxAspectRatio = $maxAspectRatio;
 
         // Background color.
-        if ($bgColor !== null && (!is_array($bgColor) || count($bgColor) != 3 || !isset($bgColor[0]) || !isset($bgColor[1]) || !isset($bgColor[2]))) {
+        if ($bgColor !== null && (!is_array($bgColor) || count($bgColor) !== 3 || !isset($bgColor[0]) || !isset($bgColor[1]) || !isset($bgColor[2]))) {
             throw new \InvalidArgumentException('The background color must be a 3-element array [R, G, B].');
         } elseif ($bgColor === null) {
             $bgColor = [255, 255, 255]; // White.
@@ -291,55 +291,54 @@ class MediaAutoResizer
         }
         $this->_tmpPath = realpath($tmpPath);
 
-        // Init a resizer and load media details from it.
-        $this->_resizer = $this->_buildResizer($this->_inputFile);
+        // Create an appropriate media resizer based on the input media type.
+        $fileType = $this->_determineFileType($this->_inputFile);
+        if ($fileType === 'image') {
+            $this->_resizer = new ImageResizer($this->_inputFile, $this->_tmpPath, $this->_bgColor);
+        } elseif ($fileType === 'video') {
+            $this->_resizer = new VideoResizer($this->_inputFile, $this->_tmpPath, $this->_bgColor);
+        } else {
+            throw new \InvalidArgumentException('Unsupported input media type.');
+        }
     }
 
     /**
-     * Build a resizer from input media.
+     * Determines the media type of a file.
      *
-     * @param string $inputFile
+     * @param string $filePath The file to evaluate.
      *
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
-     *
-     * @return ResizerInterface
+     * @return string|null Either "image", "video" or NULL (if another type).
      */
-    protected function _buildResizer(
-        $inputFile)
+    protected function _determineFileType(
+        $filePath)
     {
-        $isImage = false;
-        $isVideo = false;
+        $fileType = null;
 
+        // Use PHP's binary MIME-type heuristic if available. It ignores file
+        // extension and is therefore more accurate at finding the real type.
         $mimeType = false;
         if (function_exists('mime_content_type')) {
-            $mimeType = @mime_content_type($inputFile);
+            $mimeType = @mime_content_type($filePath);
         }
 
+        // Now determine whether the file is an image or a video.
         if ($mimeType !== false) {
             if (strncmp($mimeType, 'image/', 6) === 0) {
-                $isImage = true;
+                $fileType = 'image';
             } elseif (strncmp($mimeType, 'video/', 6) === 0) {
-                $isVideo = true;
+                $fileType = 'video';
             }
         } else {
-            $extension = pathinfo($inputFile, PATHINFO_EXTENSION);
+            // Fallback to guessing based on file-extension if MIME unavailable.
+            $extension = pathinfo($filePath, PATHINFO_EXTENSION);
             if (preg_match('#^(jpe?g|png|gif|bmp)$#iD', $extension)) {
-                $isImage = true;
+                $fileType = 'image';
             } elseif (preg_match('#^(3g2|3gp|asf|asx|avi|dvb|f4v|fli|flv|fvt|h261|h263|h264|jpgm|jpgv|jpm|m1v|m2v|m4u|m4v|mj2|mjp2|mk3d|mks|mkv|mng|mov|movie|mp4|mp4v|mpe|mpeg|mpg|mpg4|mxu|ogv|pyv|qt|smv|uvh|uvm|uvp|uvs|uvu|uvv|uvvh|uvvm|uvvp|uvvs|uvvu|uvvv|viv|vob|webm|wm|wmv|wmx|wvx)$#iD', $extension)) {
-                $isVideo = true;
+                $fileType = 'video';
             }
         }
 
-        if ($isImage) {
-            $result = new ImageResizer($inputFile, $this->_tmpPath, $this->_bgColor);
-        } elseif ($isVideo) {
-            $result = new VideoResizer($inputFile, $this->_tmpPath, $this->_bgColor);
-        } else {
-            throw new \InvalidArgumentException('Unsupported media.');
-        }
-
-        return $result;
+        return $fileType;
     }
 
     /**
@@ -366,7 +365,7 @@ class MediaAutoResizer
     public function deleteFile()
     {
         // Only delete if outputfile exists and isn't the same as input file.
-        if ($this->_outputFile !== null && $this->_outputFile != $this->_inputFile && is_file($this->_outputFile)) {
+        if ($this->_outputFile !== null && $this->_outputFile !== $this->_inputFile && is_file($this->_outputFile)) {
             $result = @unlink($this->_outputFile);
             $this->_outputFile = null; // Reset so getFile() will work again.
             return $result;
@@ -436,7 +435,8 @@ class MediaAutoResizer
             return true;
         }
 
-        // Process if resizer requires additional processing (such as rotating or transcoding).
+        // Process if the media resizer sees any other problems with the input
+        // file (such as needing rotation or media format transcoding).
         if ($this->_resizer->isProcessingRequired()) {
             return true;
         }
@@ -446,14 +446,15 @@ class MediaAutoResizer
     }
 
     /**
-     * Resize the input file and return an output one.
+     * Process the input file and create the new file.
      *
      * @throws \RuntimeException
      *
-     * @return string
+     * @return string The path to the new file.
      */
     protected function _process()
     {
+        // Get the dimensions of the original input file.
         $inputDimensions = $this->_resizer->getInputDimensions();
         $inputWidth = $inputDimensions->getWidth();
         $inputHeight = $inputDimensions->getHeight();
@@ -486,7 +487,7 @@ class MediaAutoResizer
                 // Crop vertical media from top by default, to keep faces, etc.
                 $cropFocus = $this->_cropFocus !== null ? $this->_cropFocus : -50;
 
-                // Apply fix for flipped media.
+                // Invert the cropFocus if this is vertically flipped media.
                 if ($this->_resizer->isVerFlipped()) {
                     $cropFocus = -$cropFocus;
                 }
@@ -520,7 +521,7 @@ class MediaAutoResizer
                 // Crop horizontal media from center by default.
                 $cropFocus = $this->_cropFocus !== null ? $this->_cropFocus : 0;
 
-                // Apply fix for flipped media.
+                // Invert the cropFocus if this is horizontally flipped media.
                 if ($this->_resizer->isHorFlipped()) {
                     $cropFocus = -$cropFocus;
                 }
@@ -582,8 +583,8 @@ class MediaAutoResizer
 
         // Determine the media operation's resampling parameters and perform it.
         if ($this->_operation === self::CROP) {
-            $srcRect = new Rectangle($x1, $y1, $x2 - $x1, $y2 - $y1);
             $canvas = new Dimensions($targetWidth, $targetHeight);
+            $srcRect = new Rectangle($x1, $y1, $x2 - $x1, $y2 - $y1);
             $dstRect = new Rectangle(0, 0, $targetWidth, $targetHeight);
         } elseif ($this->_operation === self::EXPAND) {
             // For expansion, we'll calculate all operation parameters now. We
@@ -612,10 +613,10 @@ class MediaAutoResizer
             $dst_x = floor(($canvas->getWidth() - $dst_w) / 2);
             $dst_y = floor(($canvas->getHeight() - $dst_h) / 2);
 
-            // Create the new, expanded media!
+            // Build the final destination rectangle for the expanded canvas!
             $dstRect = new Rectangle($dst_x, $dst_y, $dst_w, $dst_h);
         } else {
-            throw new \RuntimeException(sprintf('Unsupported operation: %d.', $this->_operation));
+            throw new \RuntimeException(sprintf('Unsupported operation: %s.', $this->_operation));
         }
 
         return $this->_resizer->resize($srcRect, $dstRect, $canvas);

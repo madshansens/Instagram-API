@@ -29,16 +29,16 @@ class VideoResizer implements ResizerInterface
      */
     const MAX_WIDTH = 720;
 
-    /** @var string */
+    /** @var string Input file path. */
     protected $_inputFile;
 
-    /** @var VideoDetails */
+    /** @var VideoDetails Media details for the input file. */
     protected $_details;
 
     /** @var string Output directory. */
     protected $_outputDir;
 
-    /** @var array Background color [R, G, B] for the final image. */
+    /** @var array Background color [R, G, B] for the final video. */
     protected $_bgColor;
 
     /**
@@ -77,13 +77,17 @@ class VideoResizer implements ResizerInterface
     }
 
     /**
-     * Returns true, if the video is rotated.
+     * Check if the input video's pixel data is rotated.
      *
      * @return bool
      */
     protected function _isRotated()
     {
         // TODO: Research and implement how to handle rotated videos.
+        // Videos can have metadata with a rotation flag:
+        // https://addpipe.com/blog/mp4-rotation-metadata-in-mobile-video-files/
+        // But ffmpeg has some autorotation-code enabled by default, so we
+        // should check how it works: https://trac.ffmpeg.org/ticket/515
         return false;
     }
 
@@ -97,30 +101,6 @@ class VideoResizer implements ResizerInterface
     public function isVerFlipped()
     {
         return false;
-    }
-
-    /** {@inheritdoc} */
-    public function resize(
-        Rectangle $srcRect,
-        Rectangle $dstRect,
-        Dimensions $canvas)
-    {
-        $result = null;
-
-        try {
-            // Prepare output file.
-            $result = $this->_makeTempFile();
-            // Attempt to process the input file.
-            $this->_processVideo($srcRect, $dstRect, $canvas, $result);
-        } catch (\Exception $e) {
-            if ($result !== null && is_file($result)) {
-                @unlink($result);
-            }
-
-            throw $e; // Re-throw.
-        }
-
-        return $result;
     }
 
     /** {@inheritdoc} */
@@ -140,12 +120,36 @@ class VideoResizer implements ResizerInterface
     {
         $result = new Dimensions($this->_details->getWidth(), $this->_details->getHeight());
 
-        // Swap coordinates for the rotated video.
+        // Swap to correct dimensions if the video pixels are stored rotated.
         if ($this->_isRotated()) {
-            $result = $result->swapAxes();
+            $result = $result->createSwappedAxes();
         }
 
         return $result;
+    }
+
+    /** {@inheritdoc} */
+    public function resize(
+        Rectangle $srcRect,
+        Rectangle $dstRect,
+        Dimensions $canvas)
+    {
+        $outputFile = null;
+
+        try {
+            // Prepare output file.
+            $outputFile = $this->_makeTempFile();
+            // Attempt to process the input file.
+            $this->_processVideo($srcRect, $dstRect, $canvas, $outputFile);
+        } catch (\Exception $e) {
+            if ($outputFile !== null && is_file($outputFile)) {
+                @unlink($outputFile);
+            }
+
+            throw $e; // Re-throw.
+        }
+
+        return $outputFile;
     }
 
     /**
@@ -155,16 +159,6 @@ class VideoResizer implements ResizerInterface
     protected function _loadVideoDetails()
     {
         $this->_details = new VideoDetails($this->_inputFile, Utils::getVideoFileDetails($this->_inputFile));
-    }
-
-    /**
-     * Creates an empty temp file with a unique filename.
-     *
-     * @return string
-     */
-    protected function _makeTempFile()
-    {
-        return tempnam($this->_outputDir, 'VID');
     }
 
     /**
@@ -208,5 +202,15 @@ class VideoResizer implements ResizerInterface
         if ($returnCode) {
             throw new \RuntimeException($output, $returnCode);
         }
+    }
+
+    /**
+     * Creates an empty temp file with a unique filename.
+     *
+     * @return string
+     */
+    protected function _makeTempFile()
+    {
+        return tempnam($this->_outputDir, 'VID');
     }
 }

@@ -7,28 +7,31 @@ use InstagramAPI\Request\Metadata\MediaDetails;
 interface ResizerInterface
 {
     /**
-     * Returns media details.
+     * Get the media details.
      *
      * @return MediaDetails
      */
     public function getMediaDetails();
 
     /**
-     * Returns true, if media requires processing.
+     * Check if media requires processing.
+     *
+     * This must return TRUE if the media resizer sees any other problems with
+     * the input file (such as needing rotation or media format transcoding).
      *
      * @return bool
      */
     public function isProcessingRequired();
 
     /**
-     * Returns true, if media is horizontally flipped (used for cropFocus auto-detection).
+     * Check if media is horizontally flipped (used for cropFocus auto-detection).
      *
      * @return bool
      */
     public function isHorFlipped();
 
     /**
-     * Returns true, if media is vertically flipped (used for cropFocus auto-detection).
+     * Check if media is vertically flipped (used for cropFocus auto-detection).
      *
      * @return bool
      */
@@ -41,7 +44,7 @@ interface ResizerInterface
      * @param Rectangle  $dstRect
      * @param Dimensions $canvas
      *
-     * @return string
+     * @return string The path to the output file.
      */
     public function resize(
         Rectangle $srcRect,
@@ -49,21 +52,21 @@ interface ResizerInterface
         Dimensions $canvas);
 
     /**
-     * Returns minimum allowed media width.
+     * Get the minimum allowed media width for this media type.
      *
      * @return int
      */
     public function getMinWidth();
 
     /**
-     * Returns maximum allowed media width.
+     * Get the maximum allowed media width for this media type.
      *
      * @return int
      */
     public function getMaxWidth();
 
     /**
-     * Returns dimensions object for input media.
+     * Get the original dimensions for the input media.
      *
      * @return Dimensions
      */

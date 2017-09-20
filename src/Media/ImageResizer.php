@@ -49,10 +49,10 @@ class ImageResizer implements ResizerInterface
      */
     const JPEG_QUALITY = 95;
 
-    /** @var string */
+    /** @var string Input file path. */
     protected $_inputFile;
 
-    /** @var PhotoDetails */
+    /** @var PhotoDetails Media details for the input file. */
     protected $_details;
 
     /** @var int|null Orientation of the original image. */
@@ -108,7 +108,7 @@ class ImageResizer implements ResizerInterface
     }
 
     /**
-     * Returns true, if the image is rotated.
+     * Check if the input image's pixel data is rotated.
      *
      * @return bool
      */
@@ -146,9 +146,9 @@ class ImageResizer implements ResizerInterface
     {
         $result = new Dimensions($this->_details->getWidth(), $this->_details->getHeight());
 
-        // Swap coordinates for the rotated image.
+        // Swap to correct dimensions if the image pixels are stored rotated.
         if ($this->_isRotated()) {
-            $result = $result->swapAxes();
+            $result = $result->createSwappedAxes();
         }
 
         return $result;
@@ -160,7 +160,7 @@ class ImageResizer implements ResizerInterface
         Rectangle $dstRect,
         Dimensions $canvas)
     {
-        $result = null;
+        $outputFile = null;
 
         try {
             // Attempt to process the input file.
@@ -171,25 +171,26 @@ class ImageResizer implements ResizerInterface
             } finally {
                 @imagedestroy($resource);
             }
+
             // Write the result to disk.
-            $result = $this->_makeTempFile();
+            $outputFile = $this->_makeTempFile();
 
             try {
-                if (imagejpeg($output, $result, self::JPEG_QUALITY) === false) {
+                if (!imagejpeg($output, $outputFile, self::JPEG_QUALITY)) {
                     throw new \RuntimeException('Failed to create JPEG image file.');
                 }
             } finally {
                 @imagedestroy($output);
             }
         } catch (\Exception $e) {
-            if ($result !== null && is_file($result)) {
-                @unlink($result);
+            if ($outputFile !== null && is_file($outputFile)) {
+                @unlink($outputFile);
             }
 
             throw $e; // Re-throw.
         }
 
-        return $result;
+        return $outputFile;
     }
 
     /**
@@ -199,7 +200,7 @@ class ImageResizer implements ResizerInterface
     {
         $this->_details = new PhotoDetails($this->_inputFile, Utils::getPhotoFileDetails($this->_inputFile));
 
-        // Detect image orientation.
+        // Detect JPEG EXIF orientation if it exists.
         if ($this->_isJpeg() && ($exif = @exif_read_data($this->_inputFile)) !== false) {
             $this->_imageOrientation = isset($exif['Orientation']) ? $exif['Orientation'] : null;
         }
@@ -245,9 +246,9 @@ class ImageResizer implements ResizerInterface
 
     /**
      * @param resource   $source  The original image loaded as a resource.
-     * @param Rectangle  $srcRect
-     * @param Rectangle  $dstRect
-     * @param Dimensions $canvas
+     * @param Rectangle  $srcRect Rectangle to copy from the input image.
+     * @param Rectangle  $dstRect Destination place and scale of copied pixels.
+     * @param Dimensions $canvas  The size of the destination canvas.
      *
      * @throws \Exception
      * @throws \RuntimeException
@@ -260,11 +261,11 @@ class ImageResizer implements ResizerInterface
         Rectangle $dstRect,
         Dimensions $canvas
     ) {
-        // Swap coordinates back for the rotated image.
+        // If our input image pixels are stored rotated, swap all coordinates.
         if ($this->_isRotated()) {
-            $srcRect = $srcRect->swapAxes();
-            $dstRect = $dstRect->swapAxes();
-            $canvas = $canvas->swapAxes();
+            $srcRect = $srcRect->createSwappedAxes();
+            $dstRect = $dstRect->createSwappedAxes();
+            $canvas = $canvas->createSwappedAxes();
         }
 
         // Create an output canvas with our desired size.
@@ -325,7 +326,7 @@ class ImageResizer implements ResizerInterface
     }
 
     /**
-     * Wrapper for imagerotate function.
+     * Wrapper for PHP's imagerotate function.
      *
      * @param resource $original
      * @param int      $angle

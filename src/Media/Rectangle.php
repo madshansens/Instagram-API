@@ -69,11 +69,11 @@ class Rectangle
     }
 
     /**
-     * Swaps the axes.
+     * Create a new object with swapped axes.
      *
      * @return self
      */
-    public function swapAxes()
+    public function createSwappedAxes()
     {
         return new self($this->_y, $this->_x, $this->_height, $this->_width);
     }
