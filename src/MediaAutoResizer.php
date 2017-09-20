@@ -3,7 +3,7 @@
 namespace InstagramAPI;
 
 use InstagramAPI\Media\Dimensions;
-use InstagramAPI\Media\ImageResizer;
+use InstagramAPI\Media\PhotoResizer;
 use InstagramAPI\Media\Rectangle;
 use InstagramAPI\Media\ResizerInterface;
 use InstagramAPI\Media\VideoResizer;
@@ -294,7 +294,7 @@ class MediaAutoResizer
         // Create an appropriate media resizer based on the input media type.
         $fileType = $this->_determineFileType($this->_inputFile);
         if ($fileType === 'image') {
-            $this->_resizer = new ImageResizer($this->_inputFile, $this->_tmpPath, $this->_bgColor);
+            $this->_resizer = new PhotoResizer($this->_inputFile, $this->_tmpPath, $this->_bgColor);
         } elseif ($fileType === 'video') {
             $this->_resizer = new VideoResizer($this->_inputFile, $this->_tmpPath, $this->_bgColor);
         } else {

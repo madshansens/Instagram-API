@@ -4,9 +4,9 @@ namespace InstagramAPI;
 
 use Clue\React\HttpProxy\ProxyConnector as HttpConnectProxy;
 use Clue\React\Socks\Client as SocksProxy;
-use InstagramAPI\Media\ImageResizer;
 use InstagramAPI\Media\MediaDetails;
 use InstagramAPI\Media\PhotoDetails;
+use InstagramAPI\Media\PhotoResizer;
 use InstagramAPI\Media\VideoDetails;
 use InstagramAPI\Media\VideoResizer;
 use InstagramAPI\Response\Model\Item;
@@ -464,10 +464,10 @@ class Utils
         // those when validating the aspect ratio range further down.
         if ($mediaDetails instanceof PhotoDetails) {
             // Validate photo resolution. Instagram allows between 320px-1080px width.
-            if ($width < ImageResizer::MIN_WIDTH || $width > ImageResizer::MAX_WIDTH) {
+            if ($width < PhotoResizer::MIN_WIDTH || $width > PhotoResizer::MAX_WIDTH) {
                 throw new \InvalidArgumentException(sprintf(
                     'Instagram only accepts photos that are between %d and %d pixels wide. Your file "%s" is %d pixels wide.',
-                    ImageResizer::MIN_WIDTH, ImageResizer::MAX_WIDTH, $mediaFilename, $width
+                    PhotoResizer::MIN_WIDTH, PhotoResizer::MAX_WIDTH, $mediaFilename, $width
                 ));
             }
         } elseif ($mediaDetails instanceof VideoDetails) {

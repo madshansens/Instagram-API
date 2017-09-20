@@ -4,7 +4,7 @@ namespace InstagramAPI\Media;
 
 use InstagramAPI\Utils;
 
-class ImageResizer implements ResizerInterface
+class PhotoResizer implements ResizerInterface
 {
     /**
      * Minimum allowed image width.
