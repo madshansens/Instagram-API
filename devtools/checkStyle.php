@@ -147,6 +147,9 @@ class styleChecker
                         && $name != '__destruct'
                         && $name != '__call'
                         && $name != '__get'
+                        && $name != '__set'
+                        && $name != '__isset'
+                        && $name != '__unset'
                         && $name != '__invoke'
                         && $name != '__toString'
                     )) {
