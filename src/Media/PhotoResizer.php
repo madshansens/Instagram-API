@@ -245,7 +245,7 @@ class PhotoResizer implements ResizerInterface
 
     /**
      * @param resource   $source  The original image loaded as a resource.
-     * @param Rectangle  $srcRect Rectangle to copy from the input image.
+     * @param Rectangle  $srcRect Rectangle to copy from the input.
      * @param Rectangle  $dstRect Destination place and scale of copied pixels.
      * @param Dimensions $canvas  The size of the destination canvas.
      *
