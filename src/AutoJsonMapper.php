@@ -41,7 +41,7 @@ namespace InstagramAPI;
  * memory usage, and all object/variable conversions are done lazily on a
  * property-basis when that property is accessed, instead of wasting time
  * converting the whole object recursively (like the normal JsonMapper). And
- * unlike the norma JsonMapper, there's no need for any runtime reflection,
+ * unlike the normal JsonMapper, there's no need for any runtime reflection,
  * reflection caches, duplicated value-caches, etc.
  *
  * This class is intended to handle Instagram's server responses, so all of your
