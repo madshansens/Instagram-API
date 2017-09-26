@@ -427,7 +427,7 @@ class People extends RequestCollection
      * @see People::unlinkAddressBook()
      */
     public function linkAddressBook(
-        $contacts)
+        array $contacts)
     {
         return $this->ig->request('address_book/link/?include=extra_display_name,thumbnails')
             ->setSignedPost(false)

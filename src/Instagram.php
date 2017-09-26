@@ -206,7 +206,7 @@ class Instagram
     public function __construct(
         $debug = false,
         $truncatedDebug = false,
-        $storageConfig = [])
+        array $storageConfig = [])
     {
         // Prevent people from running this library on ancient PHP versions.
         if (!defined('PHP_VERSION_ID')) { // Emulate version value if missing.

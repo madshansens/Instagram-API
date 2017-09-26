@@ -270,7 +270,7 @@ class Request
         $key,
         $filepath,
         $filename = null,
-        $headers = [])
+        array $headers = [])
     {
         // Validate
         if (!is_file($filepath)) {
@@ -314,7 +314,7 @@ class Request
         $key,
         $data,
         $filename,
-        $headers = [])
+        array $headers = [])
     {
         $filename = basename($filename);
         // Default headers.

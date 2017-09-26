@@ -465,7 +465,7 @@ class Direct extends RequestCollection
      * @return \InstagramAPI\Response\DirectSendItemResponse
      */
     public function sendText(
-        $recipients,
+        array $recipients,
         $text,
         array $options = [])
     {
@@ -513,7 +513,7 @@ class Direct extends RequestCollection
      * @see https://help.instagram.com/1209246439090858 For more information.
      */
     public function sendPost(
-        $recipients,
+        array $recipients,
         $mediaId,
         array $options = [])
     {
@@ -549,7 +549,7 @@ class Direct extends RequestCollection
      * @return \InstagramAPI\Response\DirectSendItemResponse
      */
     public function sendPhoto(
-        $recipients,
+        array $recipients,
         $photoFilename,
         array $options = [])
     {
@@ -581,7 +581,7 @@ class Direct extends RequestCollection
      * @see Internal::configureSinglePhoto() for available metadata fields.
      */
     public function sendDisappearingPhoto(
-        $recipients,
+        array $recipients,
         $photoFilename,
         array $externalMetadata = [])
     {
@@ -610,7 +610,7 @@ class Direct extends RequestCollection
      * @return \InstagramAPI\Response\DirectSendItemResponse
      */
     public function sendVideo(
-        $recipients,
+        array $recipients,
         $videoFilename,
         array $options = [])
     {
@@ -661,7 +661,7 @@ class Direct extends RequestCollection
      * @see Internal::configureSingleVideo() for available metadata fields.
      */
     public function sendDisappearingVideo(
-        $recipients,
+        array $recipients,
         $videoFilename,
         array $externalMetadata = [])
     {
@@ -686,7 +686,7 @@ class Direct extends RequestCollection
      * @return \InstagramAPI\Response\DirectSendItemResponse
      */
     public function sendLike(
-        $recipients,
+        array $recipients,
         array $options = [])
     {
         return $this->_sendDirectItem('like', $recipients, $options);
@@ -710,7 +710,7 @@ class Direct extends RequestCollection
      * @return \InstagramAPI\Response\DirectSendItemResponse
      */
     public function sendHashtag(
-        $recipients,
+        array $recipients,
         $hashtag,
         array $options = [])
     {
@@ -746,7 +746,7 @@ class Direct extends RequestCollection
      * @see Location::search()
      */
     public function sendLocation(
-        $recipients,
+        array $recipients,
         $locationId,
         array $options = [])
     {
@@ -777,7 +777,7 @@ class Direct extends RequestCollection
      * @return \InstagramAPI\Response\DirectSendItemResponse
      */
     public function sendProfile(
-        $recipients,
+        array $recipients,
         $userId,
         array $options = [])
     {
@@ -999,7 +999,7 @@ class Direct extends RequestCollection
      */
     protected function _sendDirectItem(
         $type,
-        $recipients,
+        array $recipients,
         array $options = [])
     {
         switch ($type) {

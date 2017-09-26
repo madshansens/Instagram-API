@@ -70,7 +70,7 @@ class AutoPropertyHandler
      */
     public function __call(
         $functionName,
-        $arguments)
+        array $arguments)
     {
         if (self::$useCache && isset(self::$lookupCache[$functionName])) {
             // Read the processed result from the lookup cache.
