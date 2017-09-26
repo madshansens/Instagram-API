@@ -22,6 +22,7 @@ require __DIR__.'/../vendor/autoload.php';
 
 use InstagramAPI\Constants;
 use InstagramAPI\Devices\Device;
+use InstagramAPI\Devices\DeviceInterface;
 use InstagramAPI\Devices\GoodDevices;
 
 $debug = false;
@@ -154,14 +155,14 @@ foreach ($testDevices as $thisDevice) {
  * Changes the user-agent sent by the InstagramAPI library.
  *
  * @param \InstagramAPI\Instagram $ig
- * @param Device|string           $value
+ * @param DeviceInterface|string  $value
  */
 function switchDevice(
     $ig,
     $value)
 {
     // Create the new Device object, without automatic fallbacks.
-    $device = ($value instanceof Device ? $value : new Device(Constants::IG_VERSION, Constants::VERSION_CODE, Constants::USER_AGENT_LOCALE, $value, false));
+    $device = ($value instanceof DeviceInterface ? $value : new Device(Constants::IG_VERSION, Constants::VERSION_CODE, Constants::USER_AGENT_LOCALE, $value, false));
 
     // Update the Instagram Client's User-Agent to the new Device.
     $ig->device = $device;

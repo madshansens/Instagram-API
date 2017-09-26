@@ -19,25 +19,19 @@ class UserAgent
     const USER_AGENT_FORMAT = 'Instagram %s Android (%s/%s; %s; %s; %s; %s; %s; %s; %s)';
 
     /**
-     * Generates a User Agent string from a Device.
+     * Generates a User Agent string from a DeviceInterface.
      *
-     * @param string $appVersion Instagram client app version.
-     * @param string $userLocale The user's locale, such as "en_US".
-     * @param Device $device
-     *
-     * @throws \InvalidArgumentException If the device parameter is invalid.
+     * @param string          $appVersion Instagram client app version.
+     * @param string          $userLocale The user's locale, such as "en_US".
+     * @param DeviceInterface $device
      *
      * @return string
      */
     public static function buildUserAgent(
         $appVersion,
         $userLocale,
-        Device $device)
+        DeviceInterface $device)
     {
-        if (!$device instanceof Device) {
-            throw new \InvalidArgumentException('The device parameter must be a Device class instance.');
-        }
-
         // Build the appropriate "Manufacturer" or "Manufacturer/Brand" string.
         $manufacturerWithBrand = $device->getManufacturer();
         if ($device->getBrand() !== null) {
@@ -87,13 +81,13 @@ class UserAgent
     }
 
     /**
-     * Generates a FB User Agent string from a Device.
+     * Generates a FB User Agent string from a DeviceInterface.
      *
-     * @param string $appName     Application name.
-     * @param string $appVersion  Instagram client app version.
-     * @param string $versionCode Instagram client app version code.
-     * @param string $userLocale  The user's locale, such as "en_US".
-     * @param Device $device
+     * @param string          $appName     Application name.
+     * @param string          $appVersion  Instagram client app version.
+     * @param string          $versionCode Instagram client app version code.
+     * @param string          $userLocale  The user's locale, such as "en_US".
+     * @param DeviceInterface $device
      *
      * @throws \InvalidArgumentException If the device parameter is invalid.
      *
@@ -104,7 +98,7 @@ class UserAgent
         $appVersion,
         $versionCode,
         $userLocale,
-        Device $device)
+        DeviceInterface $device)
     {
         list($width, $height) = explode('x', $device->getResolution());
         $density = round(str_replace('dpi', '', $device->getDPI()) / 160, 1);

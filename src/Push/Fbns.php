@@ -9,7 +9,7 @@ use Fbns\Client\Lite;
 use Fbns\Client\Message\Push as PushMessage;
 use Fbns\Client\Message\Register;
 use InstagramAPI\Constants;
-use InstagramAPI\Devices\Device;
+use InstagramAPI\Devices\DeviceInterface;
 use InstagramAPI\Push\Fbns\Auth;
 use InstagramAPI\React\PersistentInterface;
 use InstagramAPI\React\PersistentTrait;
@@ -40,7 +40,7 @@ class Fbns implements PersistentInterface, EventEmitterInterface
     /** @var Auth */
     protected $_auth;
 
-    /** @var Device */
+    /** @var DeviceInterface */
     protected $_device;
 
     /** @var LoopInterface */
@@ -61,7 +61,7 @@ class Fbns implements PersistentInterface, EventEmitterInterface
      * @param EventEmitterInterface $target
      * @param ConnectorInterface    $connector
      * @param Auth                  $auth
-     * @param Device                $device
+     * @param DeviceInterface       $device
      * @param LoopInterface         $loop
      * @param LoggerInterface       $logger
      */
@@ -69,7 +69,7 @@ class Fbns implements PersistentInterface, EventEmitterInterface
         EventEmitterInterface $target,
         ConnectorInterface $connector,
         Auth $auth,
-        Device $device,
+        DeviceInterface $device,
         LoopInterface $loop,
         LoggerInterface $logger)
     {

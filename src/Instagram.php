@@ -41,9 +41,9 @@ class Instagram
     public $password;
 
     /**
-     * The Android Device for the currently active user.
+     * The Android device for the currently active user.
      *
-     * @var \InstagramAPI\Devices\Device
+     * @var \InstagramAPI\Devices\DeviceInterface
      */
     public $device;
 
@@ -488,7 +488,7 @@ class Instagram
         // Load all settings from the storage and mark as current user.
         $this->settings->setActiveUser($username);
 
-        // Generate the user's Device instance, which will be created from the
+        // Generate the user's device instance, which will be created from the
         // user's last-used device IF they've got a valid, good one stored.
         // But if they've got a BAD/none, this will create a brand-new device.
         $savedDeviceString = $this->settings->get('devicestring');
@@ -497,7 +497,7 @@ class Instagram
         // Get active device string so that we can compare it to any saved one.
         $deviceString = $this->device->getDeviceString();
 
-        // Generate a brand-new device fingerprint if the Device wasn't reused
+        // Generate a brand-new device fingerprint if the device wasn't reused
         // from settings, OR if any of the stored fingerprints are missing.
         // NOTE: The regeneration when our device model changes is to avoid
         // dangerously reusing the "previous phone's" unique hardware IDs.

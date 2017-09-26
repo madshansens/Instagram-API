@@ -10,7 +10,7 @@ use Evenement\EventEmitterInterface;
 use Fbns\Client\AuthInterface;
 use InstagramAPI\Client as HttpClient;
 use InstagramAPI\Constants;
-use InstagramAPI\Devices\Device;
+use InstagramAPI\Devices\DeviceInterface;
 use InstagramAPI\React\PersistentInterface;
 use InstagramAPI\React\PersistentTrait;
 use InstagramAPI\Realtime;
@@ -101,7 +101,7 @@ class Mqtt implements PersistentInterface
     /** @var AuthInterface */
     protected $_auth;
 
-    /** @var Device */
+    /** @var DeviceInterface */
     protected $_device;
 
     /** @var LoopInterface */
@@ -147,7 +147,7 @@ class Mqtt implements PersistentInterface
      * @param EventEmitterInterface $target
      * @param ConnectorInterface    $connector
      * @param AuthInterface         $auth
-     * @param Device                $device
+     * @param DeviceInterface       $device
      * @param array                 $experiments
      * @param LoopInterface         $loop
      * @param LoggerInterface       $logger
@@ -156,7 +156,7 @@ class Mqtt implements PersistentInterface
         EventEmitterInterface $target,
         ConnectorInterface $connector,
         AuthInterface $auth,
-        Device $device,
+        DeviceInterface $device,
         array $experiments,
         LoopInterface $loop,
         LoggerInterface $logger)
