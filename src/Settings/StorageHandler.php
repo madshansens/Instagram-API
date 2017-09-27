@@ -34,6 +34,8 @@ class StorageHandler
         'session_id', // The user's current application session ID.
         'experiments', // Interesting experiment variables for this account.
         'fbns_auth', // Serialized auth credentials for FBNS.
+        'fbns_token', // Serialized FBNS token.
+        'last_fbns_token', // Tracks time elapsed since our last FBNS token refresh.
         'last_login', // Tracks time elapsed since our last login state refresh.
         'last_experiments', // Tracks time elapsed since our last experiments refresh.
     ];

@@ -608,6 +608,52 @@ class Instagram
     }
 
     /**
+     * Registers available Push channels during the login flow.
+     */
+    protected function _registerPushChannels()
+    {
+        // Forcibly remove the stored token value if >24 hours old.
+        // This prevents us from constantly re-registering the user's
+        // "useless" token if they have stopped using the Push features.
+        try {
+            $lastFbnsToken = (int) $this->settings->get('last_fbns_token');
+        } catch (\Exception $e) {
+            $lastFbnsToken = null;
+        }
+        if (!$lastFbnsToken || $lastFbnsToken < strtotime('-24 hours')) {
+            try {
+                $this->settings->set('fbns_token', '');
+            } catch (\Exception $e) {
+                // Ignore storage errors.
+            }
+
+            return;
+        }
+
+        // Read our token from the storage.
+        try {
+            $fbnsToken = $this->settings->get('fbns_token');
+        } catch (\Exception $e) {
+            $fbnsToken = null;
+        }
+        if ($fbnsToken === null) {
+            return;
+        }
+
+        // Register our last token since we had a fresh (age <24 hours) one,
+        // or clear our stored token if we fail to register it again.
+        try {
+            $this->push->register('mqtt', $fbnsToken);
+        } catch (\Exception $e) {
+            try {
+                $this->settings->set('fbns_token', '');
+            } catch (\Exception $e) {
+                // Ignore storage errors.
+            }
+        }
+    }
+
+    /**
      * Sends login flow. This is required to emulate real device behavior.
      *
      * @param bool $justLoggedIn
@@ -653,7 +699,7 @@ class Instagram
             $this->timeline->getTimelineFeed();
             $this->direct->getRecentRecipients();
             $this->internal->syncUserFeatures();
-            //$this->push->register();
+            $this->_registerPushChannels();
             $this->direct->getRankedRecipients('reshare', true);
             $this->direct->getRankedRecipients('raven', true);
             $this->direct->getInbox();
@@ -694,9 +740,8 @@ class Instagram
                 $this->story->getReelsTrayFeed();
                 $this->direct->getRankedRecipients('reshare', true);
                 $this->direct->getRankedRecipients('raven', true);
-                //push register
+                $this->_registerPushChannels();
                 $this->direct->getRecentRecipients();
-                //push register
                 //$this->internal->getMegaphoneLog();
                 $this->direct->getInbox();
                 $this->people->getRecentActivityInbox();

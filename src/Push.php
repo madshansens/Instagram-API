@@ -46,6 +46,9 @@ class Push implements EventEmitterInterface
     /** @var Fbns */
     protected $_fbns;
 
+    /** @var Fbns\Auth */
+    protected $_fbnsAuth;
+
     /**
      * Push constructor.
      *
@@ -71,6 +74,7 @@ class Push implements EventEmitterInterface
             $this->_logger = new NullLogger();
         }
 
+        $this->_fbnsAuth = new Fbns\Auth($this->_instagram);
         $this->_fbns = $this->_getFbns();
     }
 
@@ -100,17 +104,53 @@ class Push implements EventEmitterInterface
         $fbns = new Fbns(
             $this,
             new Connector($this->_instagram, $this->_loop),
-            new Fbns\Auth($this->_instagram),
+            $this->_fbnsAuth,
             $this->_instagram->device,
             $this->_loop,
             $this->_logger
         );
-        $fbns->on('token', function ($token) {
-            // Register the received token.
+        $fbns->on('fbns_auth', function ($authJson) {
+            try {
+                $this->_fbnsAuth->update($authJson);
+            } catch (\Exception $e) {
+                $this->_logger->error(sprintf('Failed to update FBNS auth: %s', $e->getMessage()), [$authJson]);
+            }
+        });
+        $fbns->on('fbns_token', function ($token) {
+            // Refresh the "last token activity" timestamp.
+            // The age of this timestamp helps us detect when the user
+            // has stopped using the Push features due to inactivity.
+            try {
+                $this->_instagram->settings->set('last_fbns_token', time());
+            } catch (\Exception $e) {
+                $this->_logger->error(sprintf('Failed to write FBNS token timestamp: %s', $e->getMessage()));
+            }
+            // Read our old token. If an identical value exists, then we know
+            // that we've already registered that token during this session.
+            try {
+                $oldToken = $this->_instagram->settings->get('fbns_token');
+                // Do nothing when the new token is equal to the old one.
+                if ($token === $oldToken) {
+                    return;
+                }
+            } catch (\Exception $e) {
+                $this->_logger->error(sprintf('Failed to read FBNS token: %s', $e->getMessage()));
+            }
+            // Register the new token.
             try {
                 $this->_instagram->push->register('mqtt', $token);
             } catch (\Exception $e) {
                 $this->emit('error', $e);
+            }
+            // Save the newly received token to the storage.
+            // NOTE: We save it even if the registration failed, since we now
+            // got it from the server and assume they've given us a good one.
+            // However, it'll always be re-validated during the general login()
+            // flow, and will be cleared there if it fails to register there.
+            try {
+                $this->_instagram->settings->set('fbns_token', $token);
+            } catch (\Exception $e) {
+                $this->_logger->error(sprintf('Failed to update FBNS token: %s', $e->getMessage()), [$token]);
             }
         });
         $fbns->on('push', function (Notification $notification) {

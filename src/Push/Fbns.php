@@ -4,13 +4,13 @@ namespace InstagramAPI\Push;
 
 use Evenement\EventEmitterInterface;
 use Evenement\EventEmitterTrait;
+use Fbns\Client\AuthInterface;
 use Fbns\Client\Connection;
 use Fbns\Client\Lite;
 use Fbns\Client\Message\Push as PushMessage;
 use Fbns\Client\Message\Register;
 use InstagramAPI\Constants;
 use InstagramAPI\Devices\DeviceInterface;
-use InstagramAPI\Push\Fbns\Auth;
 use InstagramAPI\React\PersistentInterface;
 use InstagramAPI\React\PersistentTrait;
 use Psr\Log\LoggerInterface;
@@ -37,7 +37,7 @@ class Fbns implements PersistentInterface, EventEmitterInterface
     /** @var ConnectorInterface */
     protected $_connector;
 
-    /** @var Auth */
+    /** @var AuthInterface */
     protected $_auth;
 
     /** @var DeviceInterface */
@@ -60,7 +60,7 @@ class Fbns implements PersistentInterface, EventEmitterInterface
      *
      * @param EventEmitterInterface $target
      * @param ConnectorInterface    $connector
-     * @param Auth                  $auth
+     * @param AuthInterface         $auth
      * @param DeviceInterface       $device
      * @param LoopInterface         $loop
      * @param LoggerInterface       $logger
@@ -68,7 +68,7 @@ class Fbns implements PersistentInterface, EventEmitterInterface
     public function __construct(
         EventEmitterInterface $target,
         ConnectorInterface $connector,
-        Auth $auth,
+        AuthInterface $auth,
         DeviceInterface $device,
         LoopInterface $loop,
         LoggerInterface $logger)
@@ -99,12 +99,7 @@ class Fbns implements PersistentInterface, EventEmitterInterface
                 $authJson = $responsePacket->getAuth();
                 if (strlen($authJson)) {
                     $this->_logger->info('Received a non-empty auth.', [$authJson]);
-
-                    try {
-                        $this->_auth->update($authJson);
-                    } catch (\Exception $e) {
-                        $this->_logger->error(sprintf('Failed to update FBNS auth: %s', $e->getMessage()), [$authJson]);
-                    }
+                    $this->emit('fbns_auth', [$authJson]);
                 }
 
                 // Register an application.
@@ -122,7 +117,8 @@ class Fbns implements PersistentInterface, EventEmitterInterface
 
                     return;
                 }
-                $this->emit('token', [$message->getToken()]);
+                $this->_logger->info('Received a non-empty token.', [$message->getToken()]);
+                $this->emit('fbns_token', [$message->getToken()]);
             })
             ->on('push', function (PushMessage $message) {
                 $payload = $message->getPayload();
