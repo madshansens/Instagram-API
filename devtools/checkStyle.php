@@ -106,7 +106,7 @@ class styleChecker
 
         foreach ($inputLines as $line) {
             // Function arguments on separate lines.
-            if (preg_match('/^(.*(?:public|private|protected)(?:\s+static)?\s+function\s+.+?)\((.+)\)(.*)$/', $line, $matches)) {
+            if (preg_match('/^(.*?(?:(?:final|static)\s+)*(?:public|private|protected)(?:\s+(?:final|static))*\s+function\s+.+?)\((.+)\)(.*)$/', $line, $matches)) {
                 $hasProblems = true;
 
                 $funcstart = $matches[1];
@@ -129,7 +129,7 @@ class styleChecker
             }
 
             // Appropriate public, private and protected member prefixes.
-            if (preg_match('/^\s+(public|private|protected)(?:\s+static)?\s+(function|\$)\s*([^;\(\s]+)/', $line, $matches)) {
+            if (preg_match('/^\s*(?:(?:final|static)\s+)*(public|private|protected)(?:\s+(?:final|static))*\s+(function|\$)\s*&?([^;\(\s]+)/', $line, $matches)) {
                 $visibility = &$matches[1]; // public, private, protected
                 $type = &$matches[2]; // $, function
                 $name = &$matches[3]; // Member name
