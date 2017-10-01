@@ -714,21 +714,21 @@ class Utils
     /**
      * Verifies if a story location is valid.
      *
-     * @param array[] $storyLocation Array with story location key-values.
+     * @param array[] $locationSticker Array with location sticker key-value.
      *
      * @throws \InvalidArgumentException If a value hasn't the right formar or if a key is missing.
      */
     public static function throwIfInvalidStoryLocation(
-        array $storyLocation)
+        array $locationSticker)
     {
         $requiredKeys = ['location_id'];
-        $missingKeys = array_keys(array_diff_key(['location_id' => 1], $storyLocation));
+        $missingKeys = array_keys(array_diff_key(['location_id' => 1], $locationSticker));
 
         if (count($missingKeys)) {
             throw new \InvalidArgumentException(sprintf('Missing keys "%s" for location array.', implode(', ', $missingKeys)));
         }
 
-        foreach ($storyLocation as $k => $v) {
+        foreach ($locationSticker as $k => $v) {
             switch ($k) {
                 case 'location_id':
                     if (!is_string($v) && !is_numeric($v)) {
@@ -736,7 +736,7 @@ class Utils
                     }
                     break;
             }
-            self::_throwIfInvalidStorySticker(array_diff_key($storyLocation, array_flip($requiredKeys)), 'location');
+            self::_throwIfInvalidStorySticker(array_diff_key($locationSticker, array_flip($requiredKeys)), 'location');
         }
     }
 
