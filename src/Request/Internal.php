@@ -180,8 +180,10 @@ class Internal extends RequestCollection
         /** @var string Caption to use for the media. NOT USED FOR STORY MEDIA! */
         $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : '';
         /** @var Response\Model\Location|null A Location object describing where
-         * the media was taken. NOT USED FOR STORY MEDIA! */
-        $location = (isset($externalMetadata['location']) && $targetFeed != Constants::FEED_STORY) ? $externalMetadata['location'] : null;
+         * the media was taken. */
+        $location = (isset($externalMetadata['location'])) ? $externalMetadata['location'] : null;
+        /** @var array|null Array of location sticker instructions, ONLY FOR STORY PHOTOS! */
+        $locationSticker = (isset($externalMetadata['location_sticker']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['location_sticker'] : null;
         /** @var array|null Array of usertagging instructions, in the format
          * [['position'=>[0.5,0.5], 'user_id'=>'123'], ...]. ONLY FOR TIMELINE PHOTOS! */
         $usertags = (isset($externalMetadata['usertags']) && $targetFeed == Constants::FEED_TIMELINE) ? $externalMetadata['usertags'] : null;
@@ -264,6 +266,12 @@ class Internal extends RequestCollection
                         ->addPost('caption', $captionText)
                         ->addPost('mas_opt_in', 'NOT_PROMPTED');
                 }
+                if ($locationSticker !== null && $location !== null) {
+                    Utils::throwIfInvalidStoryLocation($locationSticker);
+                    $request
+                        ->addPost('story_locations', json_encode([$locationSticker]))
+                        ->addPost('mas_opt_in', 'NOT_PROMPTED');
+                }
                 break;
             case Constants::FEED_DIRECT_STORY:
                 $request
@@ -278,15 +286,15 @@ class Internal extends RequestCollection
         }
 
         if ($location instanceof Response\Model\Location) {
+            if ($targetFeed === Constants::FEED_TIMELINE) {
+                $request->addPost('location', Utils::buildMediaLocationJSON($location));
+            }
             $request
-                ->addPost('location', Utils::buildMediaLocationJSON($location))
                 ->addPost('geotag_enabled', '1')
                 ->addPost('posting_latitude', $location->getLat())
                 ->addPost('posting_longitude', $location->getLng())
                 ->addPost('media_latitude', $location->getLat())
-                ->addPost('media_longitude', $location->getLng())
-                ->addPost('av_latitude', 0.0)
-                ->addPost('av_longitude', 0.0);
+                ->addPost('media_longitude', $location->getLng());
         }
 
         $configure = $request->getResponse(new Response\ConfigureResponse());
@@ -458,6 +466,8 @@ class Internal extends RequestCollection
         /** @var Response\Model\Location|null A Location object describing where
          * the media was taken. NOT USED FOR STORY MEDIA! */
         $location = (isset($externalMetadata['location']) && $targetFeed != Constants::FEED_STORY) ? $externalMetadata['location'] : null;
+        /** @var array|null Array of location sticker instructions, ONLY FOR STORY PHOTOS! */
+        $locationSticker = (isset($externalMetadata['location_sticker']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['location_sticker'] : null;
         /** @var string|null Link to attach to the media. ONLY USED FOR STORY MEDIA,
          * AND YOU MUST HAVE A BUSINESS INSTAGRAM ACCOUNT TO POST A STORY LINK! */
         $link = (isset($externalMetadata['link']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['link'] : null;
@@ -518,6 +528,12 @@ class Internal extends RequestCollection
                     $request
                         ->addPost('story_hashtags', json_encode($hashtags))
                         ->addPost('caption', $captionText)
+                        ->addPost('mas_opt_in', 'NOT_PROMPTED');
+                }
+                if ($locationSticker !== null && $location !== null) {
+                    Utils::throwIfInvalidStoryLocation($locationSticker);
+                    $request
+                        ->addPost('story_locations', json_encode([$locationSticker]))
                         ->addPost('mas_opt_in', 'NOT_PROMPTED');
                 }
                 break;
