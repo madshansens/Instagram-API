@@ -25,9 +25,18 @@ try {
     exit(0);
 }
 
+try {
+    $location = $ig->location->search('40.7439862', '-73.998511')->getVenues()[0];
+} catch (\Exception $e) {
+    echo 'Something went wrong: '.$e->getMessage()."\n";
+}
+
 // NOTE: This code will make the hashtag area 'clickable', but YOU need to
 // manually draw the hashtag or a sticker-image on top of your image yourself
 // before uploading, if you want the tag to actually be visible on-screen!
+
+// NOTE: The same thing happens when a location sticker is added.
+// Location sticker WILL ONLY work if you also add the location as shown below.
 
 $metadata = [
     'hashtags' => [
@@ -44,7 +53,17 @@ $metadata = [
         ],
         // ...
     ],
-    'caption' => '#test This is a great API!',
+    'location_sticker' => [
+        'width'         => 0.89333333333333331,
+        'height'        => 0.071281859070464776,
+        'x'             => 0.5,
+        'y'             => 0.2,
+        'rotation'      => 0.0,
+        'is_sticker'    => true,
+        'location_id'   => $location->getExternalId(),
+    ],
+    'location' => $location,
+    'caption'  => '#test This is a great API!',
 ];
 
 try {
