@@ -712,6 +712,35 @@ class Utils
     }
 
     /**
+     * Verifies if a story location is valid.
+     *
+     * @param array[] $storyLocation Array with story location key-values.
+     *
+     * @throws \InvalidArgumentException If a value hasn't the right formar or if a key is missing.
+     */
+    public static function throwIfInvalidStoryLocation(
+        array $storyLocation)
+    {
+        $requiredKeys = ['location_id'];
+        $missingKeys = array_keys(array_diff_key(['location_id' => 1], $storyLocation));
+
+        if (count($missingKeys)) {
+            throw new \InvalidArgumentException(sprintf('Missing keys "%s" for location array.', implode(', ', $missingKeys)));
+        }
+
+        foreach ($storyLocation as $k => $v) {
+            switch ($k) {
+                case 'location_id':
+                    if (!is_string($v) && !is_numeric($v)) {
+                        throw new \InvalidArgumentException(sprintf('Invalid value "%s" for location array-key "%s".', $v, $k));
+                    }
+                    break;
+            }
+            self::_throwIfInvalidStorySticker(array_diff_key($storyLocation, array_flip($requiredKeys)), 'location');
+        }
+    }
+
+    /**
      * Verifies if a caption is valid for a hashtag and verifies an array of hashtags.
      *
      * @param string  $captionText The caption for the story hashtag to verify.
@@ -724,46 +753,74 @@ class Utils
          $captionText,
          array $hashtags)
     {
+        $requiredKeys = ['tag_name', 'use_custom_title'];
+
         if (!preg_match_all('/#(\w+)/u', $captionText, $matches)) {
             throw new \InvalidArgumentException('Invalid caption for hashtag.');
         }
 
-        $requiredKeys = ['tag_name', 'x', 'y', 'width', 'height', 'rotation', 'is_sticker', 'use_custom_title'];
-
         foreach ($hashtags as $hashtag) {
-            // Ensure that all required hashtag array keys exist.
-            $missingKeys = [];
-            foreach ($requiredKeys as $k) {
-                if (!isset($hashtag[$k])) {
-                    $missingKeys[] = $k;
-                }
-            }
+            // Ensure that all keys exist.
+            $missingKeys = array_keys(array_diff_key(['tag_name' => 1, 'use_custom_title' => 1], $hashtag));
             if (count($missingKeys)) {
                 throw new \InvalidArgumentException(sprintf('Missing keys "%s" for hashtag array.', implode(', ', $missingKeys)));
             }
 
-            // Ensure that the tag_name property does NOT have a leading '#'.
-            if ($hashtag['tag_name'][0] === '#') {
-                throw new \InvalidArgumentException(sprintf('Tag name "%s" is not allowed to start with the "#" symbol.', $hashtag['tag_name']));
-            }
-
-            // Verify that this tag exists somewhere in the caption to check.
-            if (!in_array($hashtag['tag_name'], $matches[1])) {
-                throw new \InvalidArgumentException(sprintf('Tag name "%s" does not exist in the caption text.', $hashtag['tag_name']));
-            }
-
-            // Check the individual array values.
             foreach ($hashtag as $k => $v) {
-                if (!in_array($k, $requiredKeys, true)) {
-                    throw new \InvalidArgumentException(sprintf('Invalid key "%s" for hashtag.', $k));
+                switch ($k) {
+                    case 'tag_name':
+                        // Ensure that the tag_name property does NOT have a leading '#'.
+                        if ($v[0] === '#') {
+                            throw new \InvalidArgumentException(sprintf('Tag name "%s" is not allowed to start with the "#" symbol.', $v));
+                        }
+                        // Verify that this tag exists somewhere in the caption to check.
+                        if (!in_array($v, $matches[1])) {
+                            throw new \InvalidArgumentException(sprintf('Tag name "%s" does not exist in the caption text.', $v));
+                        }
+                        break;
+                    case 'use_custom_title':
+                        if (!is_bool($v)) {
+                            throw new \InvalidArgumentException(sprintf('Invalid value "%s" for hashtag array-key "%s".', $v, $k));
+                        }
+                        break;
                 }
-                if (
-                    // NOTE: Yes, the width/height are relative (0.0-1.0) floats exactly like x/y!
-                    (($k === 'x' || $k === 'y' || $k === 'width' || $k === 'height') && (!is_float($v) || $v < 0.0 || $v > 1.0))
-                    || (($k === 'is_sticker' || $k === 'use_custom_title') && !is_bool($v))
-                ) {
-                    throw new \InvalidArgumentException(sprintf('Invalid value "%s" for hashtag array-key "%s".', $v, $k));
-                }
+                self::_throwIfInvalidStorySticker(array_diff_key($hashtag, array_flip($requiredKeys)), 'hashtag');
+            }
+        }
+    }
+
+    protected static function _throwIfInvalidStorySticker(
+        array $storySticker,
+        $type)
+    {
+        $requiredKeys = ['x', 'y', 'width', 'height', 'rotation', 'is_sticker'];
+
+        // Ensure that all required hashtag array keys exist.
+        $missingKeys = array_keys(array_diff_key(['x' => 1, 'y' => 1, 'width' => 1, 'height' => 1, 'rotation' => 0, 'is_sticker' => 1], $storySticker));
+        if (count($missingKeys)) {
+            throw new \InvalidArgumentException(sprintf('Missing keys "%s" for "%s".', implode(', ', $missingKeys), $type));
+        }
+
+        // Check the individual array values.
+        foreach ($storySticker as $k => $v) {
+            if (!in_array($k, $requiredKeys, true)) {
+                throw new \InvalidArgumentException(sprintf('Invalid key "%s" for "%s".', $k, $type));
+            }
+            switch ($k) {
+                case 'x':
+                case 'y':
+                case 'width':
+                case 'height':
+                case 'rotation':
+                    if (!is_float($v) || $v < 0.0 || $v > 1.0) {
+                        throw new \InvalidArgumentException(sprintf('Invalid value "%s" for "%s" key "%s".', $v, $type, $k));
+                    }
+                    break;
+                case 'is_sticker':
+                    if (!is_bool($v)) {
+                        throw new \InvalidArgumentException(sprintf('Invalid value "%s" for hashtag array-key "%s".', $v, $k));
+                    }
+                    break;
             }
         }
     }
