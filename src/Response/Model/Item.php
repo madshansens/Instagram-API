@@ -31,6 +31,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getCommentCount()
  * @method mixed getCommentLikesEnabled()
  * @method mixed getCommentThreadingEnabled()
+ * @method mixed getCommentingDisabledForViewer()
  * @method Comment[] getComments()
  * @method mixed getCommentsDisabled()
  * @method CoverMedia getCoverMedia()
@@ -146,6 +147,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isCommentCount()
  * @method bool isCommentLikesEnabled()
  * @method bool isCommentThreadingEnabled()
+ * @method bool isCommentingDisabledForViewer()
  * @method bool isComments()
  * @method bool isCommentsDisabled()
  * @method bool isCoverMedia()
@@ -261,6 +263,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method setCommentCount(mixed $value)
  * @method setCommentLikesEnabled(mixed $value)
  * @method setCommentThreadingEnabled(mixed $value)
+ * @method setCommentingDisabledForViewer(mixed $value)
  * @method setComments(Comment[] $value)
  * @method setCommentsDisabled(mixed $value)
  * @method setCoverMedia(CoverMedia $value)
@@ -600,6 +603,7 @@ class Item extends AutoPropertyHandler
      */
     public $actor_fbid;
     public $is_ad4ad;
+    public $commenting_disabled_for_viewer;
 
     /**
      * Get the web URL for this media item.
