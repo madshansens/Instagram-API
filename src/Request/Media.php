@@ -141,13 +141,14 @@ class Media extends RequestCollection
      * @param string $module    (optional) From which app module (page) you're performing this action.
      * @param array  $extraData (optional) Depending on the module name, additional data is required.
      *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\GenericResponse
      */
     public function like(
         $mediaId,
-        $module = 'feed_contextual_post',
+        $module = 'feed_timeline',
         array $extraData = [])
     {
         $request = $this->ig->request("media/{$mediaId}/like/")
@@ -158,21 +159,51 @@ class Media extends RequestCollection
             ->addPost('radio_type', 'wifi-none')
             ->addPost('module_name', $module);
 
-        if (isset($extraData['doubleTap']) && $extraData['doubleTap']) {
+        if (isset($extraData['double_tap']) && $extraData['double_tap']) {
             $request->addUnsignedPost('d', 1);
         } else {
             $request->addUnsignedPost('d', 0);
         }
 
-        if ($module == 'feed_contextual_post' && isset($extraData['exploreToken'])) {
-            $request->addPost('explore_source_token', $extraData['exploreToken']);
-        } elseif ($module == 'photo_view_profile' && isset($extraData['username']) && isset($extraData['userid'])) {
-            $request->addPost('username', $extraData['username'])
-                    ->addPost('user_id', $extraData['userid']);
-        } elseif ($module == 'feed_contextual_hashtag' && isset($extraData['hashtag'])) {
-            $request->addPost('feed_contextual_hashtag', $extraData['hashtag']);
-        } elseif ($module == 'feed_contextual_location' && isset($extraData['locationId'])) {
-            $request->addPost('feed_contextual_location', $extraData['locationId']);
+        switch ($module) {
+            case 'feed_contextual_post':
+                if (isset($extraData['explore_source_token'])) {
+                    $request->addPost('explore_source_token', $extraData['explore_source_token']);
+                } else {
+                    throw new \InvalidArgumentException(sprintf('Missing value for %s module.', $module));
+                }
+                break;
+            case 'profile':
+            case 'media_view_profile':
+            case 'video_view_profile':
+            case 'photo_view_profile':
+                if (isset($extraData['username']) && isset($extraData['user_id'])) {
+                    $request->addPost('username', $extraData['username'])
+                            ->addPost('user_id', $extraData['user_id']);
+                } else {
+                    throw new \InvalidArgumentException(sprintf('Missing value for %s module.', $module));
+                }
+                break;
+            case 'feed_contextual_hashtag':
+                if (isset($extraData['hashtag'])) {
+                    $request->addPost('feed_contextual_hashtag', str_replace('#', '', $extraData['hashtag']));
+                } else {
+                    throw new \InvalidArgumentException(sprintf('Missing value for %s module.', $module));
+                }
+                break;
+            case 'feed_contextual_location':
+                 if (isset($extraData['location_id'])) {
+                     $request->addPost('feed_contextual_location', $extraData['location_id']);
+                 } else {
+                     throw new \InvalidArgumentException(sprintf('Missing value for %s module.', $module));
+                 }
+                 break;
+            case 'feed_timeline':
+            case 'newsfeed':
+            case 'feed_contextual_newsfeed_multi_media_liked':
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf('Invalid module name. %s does not corresponds to any of the valid module names.', $module));
         }
 
         return $request->getResponse(new Response\GenericResponse());
