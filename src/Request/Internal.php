@@ -177,7 +177,7 @@ class Internal extends RequestCollection
         }
 
         // Available external metadata parameters:
-        /** @var string Caption to use for the media. NOT USED FOR STORY MEDIA! */
+        /** @var string Caption to use for the media. */
         $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : '';
         /** @var Response\Model\Location|null A Location object describing where
          * the media was taken. */
@@ -195,6 +195,8 @@ class Internal extends RequestCollection
         $filter = null; // COMMENTED OUT SO USERS UNDERSTAND THEY CAN'T USE THIS!
         /** @var array Hashtags to use for the media. ONLY STORY MEDIA! */
         $hashtags = (isset($externalMetadata['hashtags']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['hashtags'] : null;
+        /** @var array Mentions to use for the media. ONLY STORY MEDIA! */
+        $storyMentions = (isset($externalMetadata['story_mentions']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_mentions'] : null;
 
         // Fix very bad external user-metadata values.
         if (!is_string($captionText)) {
@@ -270,6 +272,13 @@ class Internal extends RequestCollection
                     Utils::throwIfInvalidStoryLocation($locationSticker);
                     $request
                         ->addPost('story_locations', json_encode([$locationSticker]))
+                        ->addPost('mas_opt_in', 'NOT_PROMPTED');
+                }
+                if ($storyMentions !== null && $captionText != '') {
+                    Utils::throwIfInvalidStoryMentions($storyMentions);
+                    $request
+                        ->addPost('reel_mentions', json_encode($storyMentions))
+                        ->addPost('caption', str_replace(' ', '+', $captionText).'+')
                         ->addPost('mas_opt_in', 'NOT_PROMPTED');
                 }
                 break;
@@ -473,6 +482,8 @@ class Internal extends RequestCollection
         $link = (isset($externalMetadata['link']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['link'] : null;
         /** @var array Hashtags to use for the media. ONLY STORY MEDIA! */
         $hashtags = (isset($externalMetadata['hashtags']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['hashtags'] : null;
+        /** @var array Mentions to use for the media. ONLY STORY MEDIA! */
+        $storyMentions = (isset($externalMetadata['story_mentions']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_mentions'] : null;
 
         // Fix very bad external user-metadata values.
         if (!is_string($captionText)) {
@@ -534,6 +545,14 @@ class Internal extends RequestCollection
                     Utils::throwIfInvalidStoryLocation($locationSticker);
                     $request
                         ->addPost('story_locations', json_encode([$locationSticker]))
+                        ->addPost('mas_opt_in', 'NOT_PROMPTED');
+                }
+                break;
+                if ($storyMentions !== null && $captionText != '') {
+                    Utils::throwIfInvalidStoryMentions($storyMentions);
+                    $request
+                        ->addPost('reel_mentions', json_encode($storyMentions))
+                        ->addPost('caption', str_replace(' ', '+', $captionText).'+')
                         ->addPost('mas_opt_in', 'NOT_PROMPTED');
                 }
                 break;
