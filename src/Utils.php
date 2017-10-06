@@ -734,7 +734,7 @@ class Utils
             foreach ($mention as $k => $v) {
                 switch ($k) {
                     case 'user_id':
-                        if (!is_string($v) && !is_numeric($v)) {
+                        if (!ctype_digit($v) && (!is_int($v) || $v < 0)) {
                             throw new \InvalidArgumentException(sprintf('Invalid value "%s" for story mention array-key "%s".', $v, $k));
                         }
                         break;

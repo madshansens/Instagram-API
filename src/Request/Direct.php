@@ -814,6 +814,37 @@ class Direct extends RequestCollection
     }
 
     /**
+     * Send a story to a user's inbox.
+     *
+     * @param array  $recipients An array with "users" or "thread" keys.
+     *                           To start a new thread, provide "users" as an array
+     *                           of numerical UserPK IDs. To use an existing thread
+     *                           instead, provide "thread" with the thread ID.
+     * @param string $storyId    Numerical story ID.
+     * @param array  $options    An associative array of optional parameters, including:
+     *                           "client_context" - predefined UUID used to prevent double-posting;
+     *                           "text" - text message.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\DirectSendItemResponse
+     */
+    public function sendStory(
+        array $recipients,
+        $storyId,
+        array $options = [])
+    {
+        if (!ctype_digit($storyId) && (!is_int($storyId) || $storyId < 0)) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not a valid numerical story ID.', $storyId));
+        }
+
+        return $this->_sendDirectItem('story', $recipients, array_merge($options, [
+            'story_media_id' => $storyId,
+        ]));
+    }
+
+    /**
      * Delete a reaction to an existing thread item.
      *
      * @param string $threadId     Thread identifier.
@@ -991,6 +1022,7 @@ class Direct extends RequestCollection
      *                           "photo" uses "client_context" and "filepath";
      *                           "video" uses "client_context", "upload_id" and "video_result";
      *                           "links" uses "client_context", "link_text" and "link_urls".
+     *                           "story" uses "client_context" and "text".
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -1123,6 +1155,18 @@ class Direct extends RequestCollection
                     throw new \InvalidArgumentException('No node_type provided.');
                 }
                 $request->addPost('node_type', $options['node_type']);
+                break;
+            case 'story':
+                $request = $this->ig->request('direct_v2/threads/broadcast/story_share/');
+                // Check and set story_media_id.
+                if (!isset($options['story_media_id'])) {
+                    throw new \InvalidArgumentException('No story_media_id provided.');
+                }
+                $request->addPost('story_media_id', $options['story_media_id']);
+                // Set text if provided.
+                if (isset($options['text']) && strlen($options['text'])) {
+                    $request->addPost('text', $options['text']);
+                }
                 break;
             default:
                 throw new \InvalidArgumentException('Unsupported _sendDirectItem() type.');
