@@ -7,6 +7,7 @@ use InstagramAPI\AutoPropertyHandler;
 /**
  * @method mixed getBroadcasts()
  * @method Item getMedia()
+ * @method mixed getMentionedUserId()
  * @method mixed getStickerVersion()
  * @method mixed getStoryRankingToken()
  * @method mixed getText()
@@ -14,6 +15,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method mixed getType()
  * @method bool isBroadcasts()
  * @method bool isMedia()
+ * @method bool isMentionedUserId()
  * @method bool isStickerVersion()
  * @method bool isStoryRankingToken()
  * @method bool isText()
@@ -21,6 +23,7 @@ use InstagramAPI\AutoPropertyHandler;
  * @method bool isType()
  * @method setBroadcasts(mixed $value)
  * @method setMedia(Item $value)
+ * @method setMentionedUserId(mixed $value)
  * @method setStickerVersion(mixed $value)
  * @method setStoryRankingToken(mixed $value)
  * @method setText(mixed $value)
@@ -42,4 +45,5 @@ class ReelShare extends AutoPropertyHandler
      * @var Item
      */
     public $media;
+    public $mentioned_user_id;
 }
