@@ -262,7 +262,7 @@ class Internal extends RequestCollection
                     $story_cta = '[{"links":[{"webUri":'.json_encode($link).'}]}]';
                     $request->addPost('story_cta', $story_cta);
                 }
-                if ($hashtags !== null && $captionText != '') {
+                if ($hashtags !== null && $captionText !== '') {
                     Utils::throwIfInvalidStoryHashtags($captionText, $hashtags);
                     $request
                         ->addPost('story_hashtags', json_encode($hashtags))
@@ -275,7 +275,7 @@ class Internal extends RequestCollection
                         ->addPost('story_locations', json_encode([$locationSticker]))
                         ->addPost('mas_opt_in', 'NOT_PROMPTED');
                 }
-                if ($storyMentions !== null && $captionText != '') {
+                if ($storyMentions !== null && $captionText !== '') {
                     Utils::throwIfInvalidStoryMentions($storyMentions);
                     $request
                         ->addPost('reel_mentions', json_encode($storyMentions))
@@ -539,7 +539,7 @@ class Internal extends RequestCollection
                     $story_cta = '[{"links":[{"webUri":'.json_encode($link).'}]}]';
                     $request->addPost('story_cta', $story_cta);
                 }
-                if ($hashtags !== null && $captionText != '') {
+                if ($hashtags !== null && $captionText !== '') {
                     Utils::throwIfInvalidStoryHashtags($captionText, $hashtags);
                     $request
                         ->addPost('story_hashtags', json_encode($hashtags))
@@ -553,7 +553,7 @@ class Internal extends RequestCollection
                         ->addPost('mas_opt_in', 'NOT_PROMPTED');
                 }
                 break;
-                if ($storyMentions !== null && $captionText != '') {
+                if ($storyMentions !== null && $captionText !== '') {
                     Utils::throwIfInvalidStoryMentions($storyMentions);
                     $request
                         ->addPost('reel_mentions', json_encode($storyMentions))
