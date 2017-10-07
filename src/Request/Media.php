@@ -203,7 +203,7 @@ class Media extends RequestCollection
             case 'feed_contextual_newsfeed_multi_media_liked':
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('Invalid module name. %s does not corresponds to any of the valid module names.', $module));
+                throw new \InvalidArgumentException(sprintf('Invalid module name. %s does not correspond to any of the valid module names.', $module));
         }
 
         return $request->getResponse(new Response\GenericResponse());
