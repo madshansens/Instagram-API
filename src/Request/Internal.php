@@ -299,6 +299,9 @@ class Internal extends RequestCollection
             if ($targetFeed === Constants::FEED_TIMELINE) {
                 $request->addPost('location', Utils::buildMediaLocationJSON($location));
             }
+            if ($targetFeed === Constants::FEED_STORY && $locationSticker === null) {
+                throw new \InvalidArgumentException('You must provide a location_sticker together with your story location.');
+            }
             $request
                 ->addPost('geotag_enabled', '1')
                 ->addPost('posting_latitude', $location->getLat())
