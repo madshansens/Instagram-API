@@ -716,8 +716,7 @@ class Utils
      *
      * @param array[] $storyMentions The array of all story mentions.
      *
-     * @throws \InvalidArgumentException If caption doesn't contain any hashtag,
-     *                                   or if any tags are invalid.
+     * @throws \InvalidArgumentException If it's missing keys or has invalid values.
      */
     public static function throwIfInvalidStoryMentions(
         array $storyMentions)
@@ -739,19 +738,19 @@ class Utils
                         }
                         break;
                 }
-                self::_throwIfInvalidStorySticker(array_diff_key($mention, array_flip($requiredKeys)), 'story mentions');
+                self::_throwIfInvalidStoryStickerPlacement(array_diff_key($mention, array_flip($requiredKeys)), 'story mentions');
             }
         }
     }
 
     /**
-     * Verifies if a story location is valid.
+     * Verifies if a story location sticker is valid.
      *
-     * @param array[] $locationSticker Array with location sticker key-value.
+     * @param array[] $locationSticker Array with location sticker key-value pairs.
      *
-     * @throws \InvalidArgumentException If a value hasn't the right formar or if a key is missing.
+     * @throws \InvalidArgumentException If it's missing keys or has invalid values.
      */
-    public static function throwIfInvalidStoryLocation(
+    public static function throwIfInvalidStoryLocationSticker(
         array $locationSticker)
     {
         $requiredKeys = ['location_id', 'is_sticker'];
@@ -774,7 +773,7 @@ class Utils
                     }
                     break;
             }
-            self::_throwIfInvalidStorySticker(array_diff_key($locationSticker, array_flip($requiredKeys)), 'location');
+            self::_throwIfInvalidStoryStickerPlacement(array_diff_key($locationSticker, array_flip($requiredKeys)), 'location');
         }
     }
 
@@ -827,12 +826,26 @@ class Utils
                         }
                         break;
                 }
-                self::_throwIfInvalidStorySticker(array_diff_key($hashtag, array_flip($requiredKeys)), 'hashtag');
+                self::_throwIfInvalidStoryStickerPlacement(array_diff_key($hashtag, array_flip($requiredKeys)), 'hashtag');
             }
         }
     }
 
-    protected static function _throwIfInvalidStorySticker(
+    /**
+     * Verifies a story sticker's placement parameters.
+     *
+     * There are many kinds of story stickers, such as hashtags, locations,
+     * mentions, etc. To place them on the media, the user must provide certain
+     * parameters for things like position and size. This function verifies all
+     * of those parameters and ensures that the sticker placement is valid.
+     *
+     * @param array  $storySticker The array describing the story sticker placement.
+     * @param string $type         What type of sticker this is.
+     *
+     * @throws \InvalidArgumentException If caption doesn't contain any hashtag,
+     *                                   or if any tags are invalid.
+     */
+    protected static function _throwIfInvalidStoryStickerPlacement(
         array $storySticker,
         $type)
     {

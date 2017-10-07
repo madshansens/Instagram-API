@@ -270,7 +270,7 @@ class Internal extends RequestCollection
                         ->addPost('mas_opt_in', 'NOT_PROMPTED');
                 }
                 if ($locationSticker !== null && $location !== null) {
-                    Utils::throwIfInvalidStoryLocation($locationSticker);
+                    Utils::throwIfInvalidStoryLocationSticker($locationSticker);
                     $request
                         ->addPost('story_locations', json_encode([$locationSticker]))
                         ->addPost('mas_opt_in', 'NOT_PROMPTED');
@@ -547,7 +547,7 @@ class Internal extends RequestCollection
                         ->addPost('mas_opt_in', 'NOT_PROMPTED');
                 }
                 if ($locationSticker !== null && $location !== null) {
-                    Utils::throwIfInvalidStoryLocation($locationSticker);
+                    Utils::throwIfInvalidStoryLocationSticker($locationSticker);
                     $request
                         ->addPost('story_locations', json_encode([$locationSticker]))
                         ->addPost('mas_opt_in', 'NOT_PROMPTED');
