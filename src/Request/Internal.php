@@ -182,7 +182,8 @@ class Internal extends RequestCollection
         /** @var Response\Model\Location|null A Location object describing where
          * the media was taken. */
         $location = (isset($externalMetadata['location'])) ? $externalMetadata['location'] : null;
-        /** @var array|null Array of location sticker instructions, ONLY FOR STORY PHOTOS! */
+        /** @var array|null Array of story location sticker instructions. ONLY
+         * USED FOR STORY MEDIA! */
         $locationSticker = (isset($externalMetadata['location_sticker']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['location_sticker'] : null;
         /** @var array|null Array of usertagging instructions, in the format
          * [['position'=>[0.5,0.5], 'user_id'=>'123'], ...]. ONLY FOR TIMELINE PHOTOS! */
@@ -475,7 +476,8 @@ class Internal extends RequestCollection
         /** @var Response\Model\Location|null A Location object describing where
          * the media was taken. NOT USED FOR STORY MEDIA! */
         $location = (isset($externalMetadata['location']) && $targetFeed != Constants::FEED_STORY) ? $externalMetadata['location'] : null;
-        /** @var array|null Array of location sticker instructions, ONLY FOR STORY PHOTOS! */
+        /** @var array|null Array of story location sticker instructions. ONLY
+         * USED FOR STORY MEDIA! */
         $locationSticker = (isset($externalMetadata['location_sticker']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['location_sticker'] : null;
         /** @var string|null Link to attach to the media. ONLY USED FOR STORY MEDIA,
          * AND YOU MUST HAVE A BUSINESS INSTAGRAM ACCOUNT TO POST A STORY LINK! */
