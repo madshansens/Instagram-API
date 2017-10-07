@@ -56,7 +56,7 @@
     },
     "require-dev": {
         "react/http": "^0.7.2",
-        "friendsofphp/php-cs-fixer": "^2.6",
+        "friendsofphp/php-cs-fixer": "^2.7.1",
         "monolog/monolog": "^1.23"
     },
     "scripts": {
