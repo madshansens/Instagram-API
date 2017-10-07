@@ -25,20 +25,30 @@ try {
     exit(0);
 }
 
+// You don't have to provide hashtags or locations for your story. It is
+// optional! But we will show you how to do both...
+
+// NOTE: This code will make the hashtag area 'clickable', but YOU need to
+// manually draw the hashtag or a sticker-image on top of your image yourself
+// before uploading, if you want the tag to actually be visible on-screen!
+
+// NOTE: The same thing happens when a location sticker is added. And the
+// "location_sticker" WILL ONLY work if you also add the "location" as shown
+// below.
+
+// If we want to attach a location, we must find a valid Location object first:
 try {
     $location = $ig->location->search('40.7439862', '-73.998511')->getVenues()[0];
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";
 }
 
-// NOTE: This code will make the hashtag area 'clickable', but YOU need to
-// manually draw the hashtag or a sticker-image on top of your image yourself
-// before uploading, if you want the tag to actually be visible on-screen!
-
-// NOTE: The same thing happens when a location sticker is added.
-// Location sticker WILL ONLY work if you also add the location as shown below.
-
+// Now create the metadata array:
 $metadata = [
+    // (optional) Captions can always be used, like this:
+    'caption'  => '#test This is a great API!',
+
+    // (optional) To add a hashtag, do this:
     'hashtags' => [
         // Note that you can add more than one hashtag in this array.
         [
@@ -53,6 +63,8 @@ $metadata = [
         ],
         // ...
     ],
+
+    // (optional) To add a location, do BOTH of these:
     'location_sticker' => [
         'width'         => 0.89333333333333331,
         'height'        => 0.071281859070464776,
@@ -63,7 +75,6 @@ $metadata = [
         'location_id'   => $location->getExternalId(),
     ],
     'location' => $location,
-    'caption'  => '#test This is a great API!',
 ];
 
 try {
@@ -77,7 +88,7 @@ try {
     $ig->story->uploadPhoto($resizer->getFile(), $metadata);
 
     // NOTE: Providing metadata for story uploads is OPTIONAL. If you just want
-    // to upload it without any hashtags, simply do the following instead:
+    // to upload it without any tags/location, simply do the following instead:
     // $ig->story->uploadPhoto($resizer->getFile());
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";
