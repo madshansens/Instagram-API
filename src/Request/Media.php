@@ -186,14 +186,14 @@ class Media extends RequestCollection
                 break;
             case 'feed_contextual_hashtag':
                 if (isset($extraData['hashtag'])) {
-                    $request->addPost('feed_contextual_hashtag', str_replace('#', '', $extraData['hashtag']));
+                    $request->addPost('hashtag', str_replace('#', '', $extraData['hashtag']));
                 } else {
                     throw new \InvalidArgumentException(sprintf('Missing value for %s module.', $module));
                 }
                 break;
             case 'feed_contextual_location':
                  if (isset($extraData['location_id'])) {
-                     $request->addPost('feed_contextual_location', $extraData['location_id']);
+                     $request->addPost('location_id', $extraData['location_id']);
                  } else {
                      throw new \InvalidArgumentException(sprintf('Missing value for %s module.', $module));
                  }
