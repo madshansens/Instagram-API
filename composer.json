@@ -34,8 +34,8 @@
         }
     },
     "require": {
-        "netresearch/jsonmapper": "^1.0",
         "php": ">=5.6",
+        "lazyjsonmapper/lazyjsonmapper": "^1.2.1",
         "guzzlehttp/guzzle": "^6.2",
         "ext-curl": "*",
         "ext-mbstring": "*",
