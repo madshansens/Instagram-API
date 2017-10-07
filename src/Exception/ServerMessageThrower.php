@@ -91,10 +91,11 @@ class ServerMessageThrower
     {
         $messages = [$serverMessage];
         if ($serverResponse instanceof ResponseInterface) {
-            $fullResponse = $serverResponse->getFullResponse();
-            if (isset($fullResponse->error_type)
-                && is_string($fullResponse->error_type)) {
-                $messages[] = $fullResponse->error_type;
+            // We are reading a property that isn't defined in the class
+            // property map, so we must use "has" first, to ensure it exists.
+            if ($serverResponse->hasErrorType()
+                && is_string($serverResponse->getErrorType())) {
+                $messages[] = $serverResponse->getErrorType();
             }
         }
 

@@ -23,12 +23,10 @@ $exceptionsToTest = [
     'InstagramAPI\\Exception\\InvalidSmsCodeException'     => '{"message":"Please check the security code we sent you and try again.","status":"fail","error_type":"sms_code_validation_code_invalid"}',
 ];
 
-$mapper = new \JsonMapper();
-$mapper->bStrictNullTypes = false;
 foreach ($exceptionsToTest as $exceptionClassName => $testResponse) {
-    $testResponse = \InstagramAPI\Client::api_body_decode($testResponse);
-    $response = $mapper->map($testResponse, new \InstagramAPI\Response\GenericResponse());
-    $response->setFullResponse($testResponse);
+    $response = new \InstagramAPI\Response\GenericResponse(
+        \InstagramAPI\Client::api_body_decode($testResponse)
+    );
 
     try {
         ServerMessageThrower::autoThrow(null, $response->getMessage(), $response);
@@ -36,6 +34,7 @@ foreach ($exceptionsToTest as $exceptionClassName => $testResponse) {
         $thisClassName = get_class($e);
         if ($exceptionClassName == $thisClassName) {
             echo "{$exceptionClassName}: OK!\n";
+            // $e->getResponse()->printJson(); // Uncomment to look at the data.
         } else {
             echo "{$exceptionClassName}: Got {$thisClassName} instead!\n";
         }

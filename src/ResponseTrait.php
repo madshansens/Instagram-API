@@ -19,8 +19,6 @@ trait ResponseTrait
     public $message;
     /** @var \InstagramAPI\Response\Model\_Message[] */
     public $_messages; // NOTE: Full classpath is needed above for JSONMapper!
-    /** @var mixed */
-    public $fullResponse;
     /** @var HttpResponseInterface */
     public $httpResponse;
 
@@ -158,37 +156,6 @@ trait ResponseTrait
     public function is_Messages()
     {
         return $this->_messages !== null;
-    }
-
-    /**
-     * Sets the full response.
-     *
-     * @param mixed $response
-     */
-    public function setFullResponse(
-        $response)
-    {
-        $this->fullResponse = $response;
-    }
-
-    /**
-     * Gets the full response.
-     *
-     * @return mixed
-     */
-    public function getFullResponse()
-    {
-        return $this->fullResponse;
-    }
-
-    /**
-     * Checks if a full response value exists.
-     *
-     * @return bool
-     */
-    public function isFullResponse()
-    {
-        return $this->fullResponse !== null;
     }
 
     /**

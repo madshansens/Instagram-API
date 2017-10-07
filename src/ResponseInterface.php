@@ -93,28 +93,6 @@ interface ResponseInterface
     public function is_Messages();
 
     /**
-     * Sets the full response.
-     *
-     * @param mixed $response
-     */
-    public function setFullResponse(
-        $response);
-
-    /**
-     * Gets the full response.
-     *
-     * @return mixed
-     */
-    public function getFullResponse();
-
-    /**
-     * Checks if a full response value exists.
-     *
-     * @return bool
-     */
-    public function isFullResponse();
-
-    /**
      * Sets the HTTP response.
      *
      * @param HttpResponseInterface $response

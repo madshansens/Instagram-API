@@ -1067,7 +1067,6 @@ class Internal extends RequestCollection
             }
 
             $httpResponse = $result->getHttpResponse();
-            $fullResponse = $result->getFullResponse();
             $delay = 1;
             switch ($httpResponse->getStatusCode()) {
                 case 200:
@@ -1077,7 +1076,11 @@ class Internal extends RequestCollection
                         throw new \InstagramAPI\Exception\UploadFailedException(sprintf(
                             'Configuration of "%s" failed. You need to reupload the media (%s).',
                             $entity,
-                            (isset($fullResponse->error_title) ? $fullResponse->error_title : 'unknown error')
+                            // We are reading a property that isn't defined in the class
+                            // property map, so we must use "has" first, to ensure it exists.
+                            ($result->hasErrorTitle() && is_string($result->getErrorTitle())
+                             ? $result->getErrorTitle()
+                             : 'unknown error')
                         ));
                     } elseif ($result->isOk()) {
                         return $result;
@@ -1085,8 +1088,10 @@ class Internal extends RequestCollection
                     // Continue to the next attempt.
                     break;
                 case 202:
-                    if (isset($fullResponse->cooldown_time_in_seconds)) {
-                        $delay = max((int) $fullResponse->cooldown_time_in_seconds, 1);
+                    // We are reading a property that isn't defined in the class
+                    // property map, so we must use "has" first, to ensure it exists.
+                    if ($result->hasCooldownTimeInSeconds() && $result->getCooldownTimeInSeconds() !== null) {
+                        $delay = max((int) $result->getCooldownTimeInSeconds(), 1);
                     }
                     break;
                 default:

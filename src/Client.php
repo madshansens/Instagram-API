@@ -547,9 +547,6 @@ class Client
         /** @var ResponseInterface $responseObject */
         $responseObject = $this->_mapper->map($serverResponse, $baseClass);
 
-        // Save the raw response object as the "getFullResponse()" value.
-        $responseObject->setFullResponse($serverResponse);
-
         // Save the HTTP response object as the "getHttpResponse()" value.
         $responseObject->setHttpResponse($httpResponse);
 
