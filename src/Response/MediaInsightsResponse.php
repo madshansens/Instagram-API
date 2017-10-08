@@ -2,21 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method Model\MediaInsights[] getMediaOrganicInsights()
- * @method bool isMediaOrganicInsights()
- * @method setMediaOrganicInsights(Model\MediaInsights[] $value)
- */
-class MediaInsightsResponse extends AutoPropertyHandler implements ResponseInterface
+class MediaInsightsResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\MediaInsights[]
-     */
-    public $media_organic_insights;
+    const JSON_PROPERTY_MAP = [
+        'media_organic_insights' => 'Model\MediaInsights[]',
+    ];
 }

@@ -2,18 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getBackupCodes()
- * @method bool isBackupCodes()
- * @method setBackupCodes(mixed $value)
- */
-class EnableTwoFactorResponse extends AutoPropertyHandler implements ResponseInterface
+class EnableTwoFactorResponse extends Response
 {
-    use ResponseTrait;
-
-    public $backup_codes;
+    const JSON_PROPERTY_MAP = [
+        'backup_codes' => '',
+    ];
 }

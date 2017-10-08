@@ -2,21 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method Model\FriendshipStatus getFriendshipStatus()
- * @method bool isFriendshipStatus()
- * @method setFriendshipStatus(Model\FriendshipStatus $value)
- */
-class FriendshipResponse extends AutoPropertyHandler implements ResponseInterface
+class FriendshipResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\FriendshipStatus
-     */
-    public $friendship_status;
+    const JSON_PROPERTY_MAP = [
+        'friendship_status' => 'Model\FriendshipStatus',
+    ];
 }

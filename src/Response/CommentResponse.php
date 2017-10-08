@@ -2,18 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getComment()
- * @method bool isComment()
- * @method setComment(mixed $value)
- */
-class CommentResponse extends AutoPropertyHandler implements ResponseInterface
+class CommentResponse extends Response
 {
-    use ResponseTrait;
-
-    public $comment;
+    const JSON_PROPERTY_MAP = [
+        'comment' => '',
+    ];
 }

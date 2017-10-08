@@ -2,11 +2,8 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-class CommentFilterSetResponse extends AutoPropertyHandler implements ResponseInterface
+class CommentFilterSetResponse extends Response
 {
-    use ResponseTrait;
 }

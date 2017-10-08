@@ -2,25 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method string getCollectionId()
- * @method mixed getCollectionName()
- * @method bool isCollectionId()
- * @method bool isCollectionName()
- * @method setCollectionId(string $value)
- * @method setCollectionName(mixed $value)
- */
-class EditCollectionResponse extends AutoPropertyHandler implements ResponseInterface
+class EditCollectionResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var string
-     */
-    public $collection_id;
-    public $collection_name;
+    const JSON_PROPERTY_MAP = [
+        'collection_id'   => 'string',
+        'collection_name' => '',
+    ];
 }

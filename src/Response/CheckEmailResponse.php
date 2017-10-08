@@ -2,37 +2,15 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getAvailable()
- * @method mixed getConfirmed()
- * @method mixed getErrorType()
- * @method string[] getUsernameSuggestions()
- * @method mixed getValid()
- * @method bool isAvailable()
- * @method bool isConfirmed()
- * @method bool isErrorType()
- * @method bool isUsernameSuggestions()
- * @method bool isValid()
- * @method setAvailable(mixed $value)
- * @method setConfirmed(mixed $value)
- * @method setErrorType(mixed $value)
- * @method setUsernameSuggestions(string[] $value)
- * @method setValid(mixed $value)
- */
-class CheckEmailResponse extends AutoPropertyHandler implements ResponseInterface
+class CheckEmailResponse extends Response
 {
-    use ResponseTrait;
-
-    public $valid;
-    public $available;
-    public $confirmed;
-    /**
-     * @var string[]
-     */
-    public $username_suggestions;
-    public $error_type;
+    const JSON_PROPERTY_MAP = [
+        'valid'                => '',
+        'available'            => '',
+        'confirmed'            => '',
+        'username_suggestions' => 'string[]',
+        'error_type'           => '',
+    ];
 }

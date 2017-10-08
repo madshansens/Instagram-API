@@ -2,21 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method Model\Insights[] getInstagramUser()
- * @method bool isInstagramUser()
- * @method setInstagramUser(Model\Insights[] $value)
- */
-class InsightsResponse extends AutoPropertyHandler implements ResponseInterface
+class InsightsResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\Insights[]
-     */
-    public $instagram_user;
+    const JSON_PROPERTY_MAP = [
+        'instagram_user' => 'Model\Insights[]',
+    ];
 }

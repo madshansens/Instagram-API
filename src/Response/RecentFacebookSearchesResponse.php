@@ -2,21 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method Model\Suggested[] getRecent()
- * @method bool isRecent()
- * @method setRecent(Model\Suggested[] $value)
- */
-class RecentFacebookSearchesResponse extends AutoPropertyHandler implements ResponseInterface
+class RecentFacebookSearchesResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\Suggested[]
-     */
-    public $recent;
+    const JSON_PROPERTY_MAP = [
+        'recent' => 'Model\Suggested[]',
+    ];
 }

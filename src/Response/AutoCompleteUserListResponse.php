@@ -2,25 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getExpires()
- * @method Model\User[] getUsers()
- * @method bool isExpires()
- * @method bool isUsers()
- * @method setExpires(mixed $value)
- * @method setUsers(Model\User[] $value)
- */
-class AutoCompleteUserListResponse extends AutoPropertyHandler implements ResponseInterface
+class AutoCompleteUserListResponse extends Response
 {
-    use ResponseTrait;
-
-    public $expires;
-    /**
-     * @var Model\User[]
-     */
-    public $users;
+    const JSON_PROPERTY_MAP = [
+        'expires' => '',
+        'users'   => 'Model\User[]',
+    ];
 }

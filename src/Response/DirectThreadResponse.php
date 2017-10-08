@@ -2,21 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method Model\DirectThread getThread()
- * @method bool isThread()
- * @method setThread(Model\DirectThread $value)
- */
-class DirectThreadResponse extends AutoPropertyHandler implements ResponseInterface
+class DirectThreadResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\DirectThread
-     */
-    public $thread;
+    const JSON_PROPERTY_MAP = [
+        'thread' => 'Model\DirectThread',
+    ];
 }

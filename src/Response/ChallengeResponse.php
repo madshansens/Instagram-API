@@ -2,11 +2,8 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-class ChallengeResponse extends AutoPropertyHandler implements ResponseInterface
+class ChallengeResponse extends Response
 {
-    use ResponseTrait;
 }

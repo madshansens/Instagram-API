@@ -9,4 +9,6 @@ use InstagramAPI\Response;
  */
 class GenericResponse extends Response
 {
+    const JSON_PROPERTY_MAP = [
+    ];
 }

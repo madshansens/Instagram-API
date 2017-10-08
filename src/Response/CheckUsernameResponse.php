@@ -2,30 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getAvailable()
- * @method mixed getError()
- * @method mixed getErrorType()
- * @method mixed getUsername()
- * @method bool isAvailable()
- * @method bool isError()
- * @method bool isErrorType()
- * @method bool isUsername()
- * @method setAvailable(mixed $value)
- * @method setError(mixed $value)
- * @method setErrorType(mixed $value)
- * @method setUsername(mixed $value)
- */
-class CheckUsernameResponse extends AutoPropertyHandler implements ResponseInterface
+class CheckUsernameResponse extends Response
 {
-    use ResponseTrait;
-
-    public $username;
-    public $available;
-    public $error;
-    public $error_type;
+    const JSON_PROPERTY_MAP = [
+        'username'   => '',
+        'available'  => '',
+        'error'      => '',
+        'error_type' => '',
+    ];
 }

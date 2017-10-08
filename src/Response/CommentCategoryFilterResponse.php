@@ -2,18 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getDisabled()
- * @method bool isDisabled()
- * @method setDisabled(mixed $value)
- */
-class CommentCategoryFilterResponse extends AutoPropertyHandler implements ResponseInterface
+class CommentCategoryFilterResponse extends Response
 {
-    use ResponseTrait;
-
-    public $disabled;
+    const JSON_PROPERTY_MAP = [
+        'disabled' => '',
+    ];
 }

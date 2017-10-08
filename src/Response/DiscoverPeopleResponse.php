@@ -2,32 +2,13 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method Model\Groups[] getGroups()
- * @method string getMaxId()
- * @method mixed getMoreAvailable()
- * @method bool isGroups()
- * @method bool isMaxId()
- * @method bool isMoreAvailable()
- * @method setGroups(Model\Groups[] $value)
- * @method setMaxId(string $value)
- * @method setMoreAvailable(mixed $value)
- */
-class DiscoverPeopleResponse extends AutoPropertyHandler implements ResponseInterface
+class DiscoverPeopleResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\Groups[]
-     */
-    public $groups;
-    public $more_available;
-    /**
-     * @var string
-     */
-    public $max_id;
+    const JSON_PROPERTY_MAP = [
+        'groups'         => 'Model\Groups[]',
+        'more_available' => '',
+        'max_id'         => 'string',
+    ];
 }

@@ -2,21 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method Model\FaceModels getFaceModels()
- * @method bool isFaceModels()
- * @method setFaceModels(Model\FaceModels $value)
- */
-class FaceModelsResponse extends AutoPropertyHandler implements ResponseInterface
+class FaceModelsResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\FaceModels
-     */
-    public $face_models;
+    const JSON_PROPERTY_MAP = [
+        'face_models' => 'Model\FaceModels',
+    ];
 }

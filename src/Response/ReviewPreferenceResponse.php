@@ -2,21 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method Model\User getUser()
- * @method bool isUser()
- * @method setUser(Model\User $value)
- */
-class ReviewPreferenceResponse extends AutoPropertyHandler implements ResponseInterface
+class ReviewPreferenceResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\User
-     */
-    public $user;
+    const JSON_PROPERTY_MAP = [
+        'user' => 'Model\User',
+    ];
 }

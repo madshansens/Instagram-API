@@ -2,13 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-class DirectVisualThreadResponse extends Model\DirectThread implements ResponseInterface
+class DirectVisualThreadResponse extends Response
 {
-    use ResponseTrait;
-
-    // NOTE: This is a special response object which extends
-    // Model\DirectThread to inherit all of its properties!
+    const JSON_PROPERTY_MAP = [
+        Model\DirectThread::class, // Import property map.
+    ];
 }

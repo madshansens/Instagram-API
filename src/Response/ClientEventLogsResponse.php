@@ -2,30 +2,14 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getAppData()
- * @method mixed getChecksum()
- * @method mixed getConfig()
- * @method mixed getError()
- * @method bool isAppData()
- * @method bool isChecksum()
- * @method bool isConfig()
- * @method bool isError()
- * @method setAppData(mixed $value)
- * @method setChecksum(mixed $value)
- * @method setConfig(mixed $value)
- * @method setError(mixed $value)
- */
-class ClientEventLogsResponse extends AutoPropertyHandler implements ResponseInterface
+class ClientEventLogsResponse extends Response
 {
-    use ResponseTrait;
-
-    public $checksum;
-    public $config;
-    public $app_data;
-    public $error;
+    const JSON_PROPERTY_MAP = [
+        'checksum' => '',
+        'config'   => '',
+        'app_data' => '',
+        'error'    => '',
+    ];
 }

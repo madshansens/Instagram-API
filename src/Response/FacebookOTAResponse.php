@@ -2,25 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getBundles()
- * @method string getRequestId()
- * @method bool isBundles()
- * @method bool isRequestId()
- * @method setBundles(mixed $value)
- * @method setRequestId(string $value)
- */
-class FacebookOTAResponse extends AutoPropertyHandler implements ResponseInterface
+class FacebookOTAResponse extends Response
 {
-    use ResponseTrait;
-
-    public $bundles;
-    /**
-     * @var string
-     */
-    public $request_id;
+    const JSON_PROPERTY_MAP = [
+        'bundles'    => '',
+        'request_id' => 'string',
+    ];
 }

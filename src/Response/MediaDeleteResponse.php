@@ -2,18 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getDidDelete()
- * @method bool isDidDelete()
- * @method setDidDelete(mixed $value)
- */
-class MediaDeleteResponse extends AutoPropertyHandler implements ResponseInterface
+class MediaDeleteResponse extends Response
 {
-    use ResponseTrait;
-
-    public $did_delete;
+    const JSON_PROPERTY_MAP = [
+        'did_delete' => '',
+    ];
 }

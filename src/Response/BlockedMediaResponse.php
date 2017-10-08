@@ -2,18 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getMediaIds()
- * @method bool isMediaIds()
- * @method setMediaIds(mixed $value)
- */
-class BlockedMediaResponse extends AutoPropertyHandler implements ResponseInterface
+class BlockedMediaResponse extends Response
 {
-    use ResponseTrait;
-
-    public $media_ids;
+    const JSON_PROPERTY_MAP = [
+        'media_ids' => '',
+    ];
 }

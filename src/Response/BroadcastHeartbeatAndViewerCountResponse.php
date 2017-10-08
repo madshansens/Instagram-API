@@ -2,22 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getBroadcastStatus()
- * @method mixed getViewerCount()
- * @method bool isBroadcastStatus()
- * @method bool isViewerCount()
- * @method setBroadcastStatus(mixed $value)
- * @method setViewerCount(mixed $value)
- */
-class BroadcastHeartbeatAndViewerCountResponse extends AutoPropertyHandler implements ResponseInterface
+class BroadcastHeartbeatAndViewerCountResponse extends Response
 {
-    use ResponseTrait;
-
-    public $broadcast_status;
-    public $viewer_count;
+    const JSON_PROPERTY_MAP = [
+        'broadcast_status' => '',
+        'viewer_count'     => '',
+    ];
 }

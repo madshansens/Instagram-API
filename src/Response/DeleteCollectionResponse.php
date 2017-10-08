@@ -2,11 +2,8 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-class DeleteCollectionResponse extends AutoPropertyHandler implements ResponseInterface
+class DeleteCollectionResponse extends Response
 {
-    use ResponseTrait;
 }

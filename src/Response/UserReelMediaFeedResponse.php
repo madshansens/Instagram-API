@@ -2,13 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-class UserReelMediaFeedResponse extends Model\Reel implements ResponseInterface
+class UserReelMediaFeedResponse extends Response
 {
-    use ResponseTrait;
-
-    // NOTE: This is a special response object which extends
-    // Model\Reel to inherit all of its properties!
+    const JSON_PROPERTY_MAP = [
+        Model\Reel::class, // Import property map.
+    ];
 }

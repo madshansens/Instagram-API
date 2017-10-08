@@ -2,25 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getRankToken()
- * @method Model\Suggested[] getSuggested()
- * @method bool isRankToken()
- * @method bool isSuggested()
- * @method setRankToken(mixed $value)
- * @method setSuggested(Model\Suggested[] $value)
- */
-class SuggestedUsersFacebookResponse extends AutoPropertyHandler implements ResponseInterface
+class SuggestedUsersFacebookResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\Suggested[]
-     */
-    public $suggested;
-    public $rank_token;
+    const JSON_PROPERTY_MAP = [
+        'suggested'  => 'Model\Suggested[]',
+        'rank_token' => '',
+    ];
 }

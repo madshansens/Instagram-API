@@ -2,18 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getKeywords()
- * @method bool isKeywords()
- * @method setKeywords(mixed $value)
- */
-class CommentFilterKeywordsResponse extends AutoPropertyHandler implements ResponseInterface
+class CommentFilterKeywordsResponse extends Response
 {
-    use ResponseTrait;
-
-    public $keywords;
+    const JSON_PROPERTY_MAP = [
+        'keywords' => '',
+    ];
 }

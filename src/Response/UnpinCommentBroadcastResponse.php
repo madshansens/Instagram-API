@@ -2,21 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method string getCommentId()
- * @method bool isCommentId()
- * @method setCommentId(string $value)
- */
-class UnpinCommentBroadcastResponse extends AutoPropertyHandler implements ResponseInterface
+class UnpinCommentBroadcastResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var string
-     */
-    public $comment_id;
+    const JSON_PROPERTY_MAP = [
+        'comment_id' => 'string',
+    ];
 }

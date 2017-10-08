@@ -2,21 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method Model\Broadcast[] getBroadcasts()
- * @method bool isBroadcasts()
- * @method setBroadcasts(Model\Broadcast[] $value)
- */
-class SuggestedBroadcastsResponse extends AutoPropertyHandler implements ResponseInterface
+class SuggestedBroadcastsResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\Broadcast[]
-     */
-    public $broadcasts;
+    const JSON_PROPERTY_MAP = [
+        'broadcasts' => 'Model\Broadcast[]',
+    ];
 }

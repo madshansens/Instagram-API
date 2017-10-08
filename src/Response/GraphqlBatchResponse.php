@@ -2,39 +2,25 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getIsError()
- * @method mixed getIsSkipped()
- * @method mixed getIsSuccessful()
- * @method Model\GraphQuery getQ0()
- * @method bool isIsError()
- * @method bool isIsSkipped()
- * @method bool isIsSuccessful()
- * @method bool isQ0()
- * @method setIsError(mixed $value)
- * @method setIsSkipped(mixed $value)
- * @method setIsSuccessful(mixed $value)
- * @method setQ0(Model\GraphQuery $value)
- */
-class GraphqlBatchResponse extends AutoPropertyHandler implements ResponseInterface
+class GraphqlBatchResponse extends Response
 {
-    use ResponseTrait;
+    const JSON_PROPERTY_MAP = [
+        'q0'            => 'Model\GraphQuery',
+        'is_successful' => '',
+        'is_error'      => '',
+        'is_skipped'    => '',
+    ];
 
     /**
-     * @var Model\GraphQuery
+     * Checks if the response was successful.
+     *
+     * @return bool
      */
-    public $q0;
-    public $is_successful;
-    public $is_error;
-    public $is_skipped;
-
     public function isOk()
     {
-        if ($this->getQ0() !== null && $this->getIsSuccessful() === 1) {
+        if ($this->_getProperty('q0') !== null && $this->_getProperty('is_successful') == 1) {
             return true;
         } else {
             // Set a nice message for exceptions.

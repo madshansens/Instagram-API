@@ -2,26 +2,13 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getBody()
- * @method mixed getIsEmailLegit()
- * @method mixed getTitle()
- * @method bool isBody()
- * @method bool isIsEmailLegit()
- * @method bool isTitle()
- * @method setBody(mixed $value)
- * @method setIsEmailLegit(mixed $value)
- * @method setTitle(mixed $value)
- */
-class SendConfirmEmailResponse extends AutoPropertyHandler implements ResponseInterface
+class SendConfirmEmailResponse extends Response
 {
-    use ResponseTrait;
-
-    public $title;
-    public $is_email_legit;
-    public $body;
+    const JSON_PROPERTY_MAP = [
+        'title'          => '',
+        'is_email_legit' => '',
+        'body'           => '',
+    ];
 }

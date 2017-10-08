@@ -2,21 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method string getMediaId()
- * @method bool isMediaId()
- * @method setMediaId(string $value)
- */
-class StartLiveResponse extends AutoPropertyHandler implements ResponseInterface
+class StartLiveResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var string
-     */
-    public $media_id;
+    const JSON_PROPERTY_MAP = [
+        'media_id' => 'string',
+    ];
 }

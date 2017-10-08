@@ -2,11 +2,8 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-class SaveAndUnsaveMedia extends AutoPropertyHandler implements ResponseInterface
+class SaveAndUnsaveMedia extends Response
 {
-    use ResponseTrait;
 }

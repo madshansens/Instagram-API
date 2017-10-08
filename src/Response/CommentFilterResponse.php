@@ -2,18 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getConfigValue()
- * @method bool isConfigValue()
- * @method setConfigValue(mixed $value)
- */
-class CommentFilterResponse extends AutoPropertyHandler implements ResponseInterface
+class CommentFilterResponse extends Response
 {
-    use ResponseTrait;
-
-    public $config_value;
+    const JSON_PROPERTY_MAP = [
+        'config_value' => '',
+    ];
 }

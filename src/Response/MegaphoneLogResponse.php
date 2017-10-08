@@ -2,18 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getSuccess()
- * @method bool isSuccess()
- * @method setSuccess(mixed $value)
- */
-class MegaphoneLogResponse extends AutoPropertyHandler implements ResponseInterface
+class MegaphoneLogResponse extends Response
 {
-    use ResponseTrait;
-
-    public $success;
+    const JSON_PROPERTY_MAP = [
+        'success' => '',
+    ];
 }

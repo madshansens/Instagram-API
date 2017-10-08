@@ -2,21 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method Model\Suggestion[] getItems()
- * @method bool isItems()
- * @method setItems(Model\Suggestion[] $value)
- */
-class LinkAddressBookResponse extends AutoPropertyHandler implements ResponseInterface
+class LinkAddressBookResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\Suggestion[]
-     */
-    public $items;
+    const JSON_PROPERTY_MAP = [
+        'items' => 'Model\Suggestion[]',
+    ];
 }

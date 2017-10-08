@@ -2,34 +2,15 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getHasMore()
- * @method mixed getHashtags()
- * @method mixed getPlaces()
- * @method mixed getRankToken()
- * @method mixed getUsers()
- * @method bool isHasMore()
- * @method bool isHashtags()
- * @method bool isPlaces()
- * @method bool isRankToken()
- * @method bool isUsers()
- * @method setHasMore(mixed $value)
- * @method setHashtags(mixed $value)
- * @method setPlaces(mixed $value)
- * @method setRankToken(mixed $value)
- * @method setUsers(mixed $value)
- */
-class FBSearchResponse extends AutoPropertyHandler implements ResponseInterface
+class FBSearchResponse extends Response
 {
-    use ResponseTrait;
-
-    public $has_more;
-    public $hashtags;
-    public $users;
-    public $places;
-    public $rank_token;
+    const JSON_PROPERTY_MAP = [
+        'has_more'   => '',
+        'hashtags'   => '',
+        'users'      => '',
+        'places'     => '',
+        'rank_token' => '',
+    ];
 }

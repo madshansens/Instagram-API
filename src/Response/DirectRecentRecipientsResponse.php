@@ -2,22 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getExpirationInterval()
- * @method mixed getRecentRecipients()
- * @method bool isExpirationInterval()
- * @method bool isRecentRecipients()
- * @method setExpirationInterval(mixed $value)
- * @method setRecentRecipients(mixed $value)
- */
-class DirectRecentRecipientsResponse extends AutoPropertyHandler implements ResponseInterface
+class DirectRecentRecipientsResponse extends Response
 {
-    use ResponseTrait;
-
-    public $expiration_interval;
-    public $recent_recipients;
+    const JSON_PROPERTY_MAP = [
+        'expiration_interval' => '',
+        'recent_recipients'   => '',
+    ];
 }

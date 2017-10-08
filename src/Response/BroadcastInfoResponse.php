@@ -2,51 +2,17 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getBroadcastMessage()
- * @method Model\User getBroadcastOwner()
- * @method mixed getBroadcastStatus()
- * @method string getId()
- * @method string getMediaId()
- * @method mixed getOrganicTrackingToken()
- * @method mixed getPublishedTime()
- * @method bool isBroadcastMessage()
- * @method bool isBroadcastOwner()
- * @method bool isBroadcastStatus()
- * @method bool isId()
- * @method bool isMediaId()
- * @method bool isOrganicTrackingToken()
- * @method bool isPublishedTime()
- * @method setBroadcastMessage(mixed $value)
- * @method setBroadcastOwner(Model\User $value)
- * @method setBroadcastStatus(mixed $value)
- * @method setId(string $value)
- * @method setMediaId(string $value)
- * @method setOrganicTrackingToken(mixed $value)
- * @method setPublishedTime(mixed $value)
- */
-class BroadcastInfoResponse extends AutoPropertyHandler implements ResponseInterface
+class BroadcastInfoResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var string
-     */
-    public $id;
-    public $broadcast_message;
-    public $organic_tracking_token;
-    public $published_time;
-    public $broadcast_status;
-    /**
-     * @var string
-     */
-    public $media_id;
-    /**
-     * @var Model\User
-     */
-    public $broadcast_owner;
+    const JSON_PROPERTY_MAP = [
+        'id'                     => 'string',
+        'broadcast_message'      => '',
+        'organic_tracking_token' => '',
+        'published_time'         => '',
+        'broadcast_status'       => '',
+        'media_id'               => 'string',
+        'broadcast_owner'        => 'Model\User',
+    ];
 }

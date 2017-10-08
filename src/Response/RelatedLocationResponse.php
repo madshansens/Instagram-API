@@ -2,21 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method Model\Location[] getRelated()
- * @method bool isRelated()
- * @method setRelated(Model\Location[] $value)
- */
-class RelatedLocationResponse extends AutoPropertyHandler implements ResponseInterface
+class RelatedLocationResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\Location[]
-     */
-    public $related;
+    const JSON_PROPERTY_MAP = [
+        'related' => 'Model\Location[]',
+    ];
 }

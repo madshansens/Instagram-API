@@ -2,18 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getBadgePayload()
- * @method bool isBadgePayload()
- * @method setBadgePayload(mixed $value)
- */
-class BadgeNotificationsResponse extends AutoPropertyHandler implements ResponseInterface
+class BadgeNotificationsResponse extends Response
 {
-    use ResponseTrait;
-
-    public $badge_payload; // Only exists if you have notifications, contains data keyed by userId.
+    const JSON_PROPERTY_MAP = [
+        // Only exists if you have notifications, contains data keyed by userId:
+        'badge_payload' => '',
+    ];
 }

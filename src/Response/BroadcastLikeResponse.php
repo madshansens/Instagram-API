@@ -2,18 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getLikes()
- * @method bool isLikes()
- * @method setLikes(mixed $value)
- */
-class BroadcastLikeResponse extends AutoPropertyHandler implements ResponseInterface
+class BroadcastLikeResponse extends Response
 {
-    use ResponseTrait;
-
-    public $likes;
+    const JSON_PROPERTY_MAP = [
+        'likes' => '',
+    ];
 }

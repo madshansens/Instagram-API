@@ -2,25 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getAccountCreated()
- * @method Model\User getCreatedUser()
- * @method bool isAccountCreated()
- * @method bool isCreatedUser()
- * @method setAccountCreated(mixed $value)
- * @method setCreatedUser(Model\User $value)
- */
-class AccountCreateResponse extends AutoPropertyHandler implements ResponseInterface
+class AccountCreateResponse extends Response
 {
-    use ResponseTrait;
-
-    public $account_created;
-    /**
-     * @var Model\User
-     */
-    public $created_user;
+    const JSON_PROPERTY_MAP = [
+        'account_created' => '',
+        'created_user'    => 'Model\User',
+    ];
 }

@@ -2,25 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method string[] getNewSuggestionIds()
- * @method mixed getShouldBadge()
- * @method bool isNewSuggestionIds()
- * @method bool isShouldBadge()
- * @method setNewSuggestionIds(string[] $value)
- * @method setShouldBadge(mixed $value)
- */
-class SuggestedUsersBadgeResponse extends AutoPropertyHandler implements ResponseInterface
+class SuggestedUsersBadgeResponse extends Response
 {
-    use ResponseTrait;
-
-    public $should_badge;
-    /**
-     * @var string[]
-     */
-    public $new_suggestion_ids;
+    const JSON_PROPERTY_MAP = [
+        'should_badge'       => '',
+        'new_suggestion_ids' => 'string[]',
+    ];
 }

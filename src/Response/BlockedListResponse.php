@@ -2,25 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method Model\User[] getBlockedList()
- * @method mixed getPageSize()
- * @method bool isBlockedList()
- * @method bool isPageSize()
- * @method setBlockedList(Model\User[] $value)
- * @method setPageSize(mixed $value)
- */
-class BlockedListResponse extends AutoPropertyHandler implements ResponseInterface
+class BlockedListResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\User[]
-     */
-    public $blocked_list;
-    public $page_size;
+    const JSON_PROPERTY_MAP = [
+        'blocked_list' => 'Model\User[]',
+        'page_size'    => '',
+    ];
 }

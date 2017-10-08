@@ -2,21 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method Model\Item getMedia()
- * @method bool isMedia()
- * @method setMedia(Model\Item $value)
- */
-class EditMediaResponse extends AutoPropertyHandler implements ResponseInterface
+class EditMediaResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\Item
-     */
-    public $media;
+    const JSON_PROPERTY_MAP = [
+        'media' => 'Model\Item',
+    ];
 }

@@ -2,25 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getUserCount()
- * @method Model\User[] getUsers()
- * @method bool isUserCount()
- * @method bool isUsers()
- * @method setUserCount(mixed $value)
- * @method setUsers(Model\User[] $value)
- */
-class MediaLikersResponse extends AutoPropertyHandler implements ResponseInterface
+class MediaLikersResponse extends Response
 {
-    use ResponseTrait;
-
-    public $user_count;
-    /**
-     * @var Model\User[]
-     */
-    public $users;
+    const JSON_PROPERTY_MAP = [
+        'user_count' => '',
+        'users'      => 'Model\User[]',
+    ];
 }

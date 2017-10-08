@@ -2,22 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getMediaCount()
- * @method mixed getProfile()
- * @method bool isMediaCount()
- * @method bool isProfile()
- * @method setMediaCount(mixed $value)
- * @method setProfile(mixed $value)
- */
-class TagInfoResponse extends AutoPropertyHandler implements ResponseInterface
+class TagInfoResponse extends Response
 {
-    use ResponseTrait;
-
-    public $profile;
-    public $media_count;
+    const JSON_PROPERTY_MAP = [
+        'profile'     => '',
+        'media_count' => '',
+    ];
 }

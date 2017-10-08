@@ -2,25 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getObfuscatedPhoneNumber()
- * @method Model\PhoneVerificationSettings getPhoneVerificationSettings()
- * @method bool isObfuscatedPhoneNumber()
- * @method bool isPhoneVerificationSettings()
- * @method setObfuscatedPhoneNumber(mixed $value)
- * @method setPhoneVerificationSettings(Model\PhoneVerificationSettings $value)
- */
-class RequestTwoFactorResponse extends AutoPropertyHandler implements ResponseInterface
+class RequestTwoFactorResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\PhoneVerificationSettings
-     */
-    public $phone_verification_settings;
-    public $obfuscated_phone_number;
+    const JSON_PROPERTY_MAP = [
+        'phone_verification_settings' => 'Model\PhoneVerificationSettings',
+        'obfuscated_phone_number'     => '',
+    ];
 }

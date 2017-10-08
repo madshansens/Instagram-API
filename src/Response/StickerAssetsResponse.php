@@ -2,25 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method Model\StaticStickers[] getStaticStickers()
- * @method mixed getVersion()
- * @method bool isStaticStickers()
- * @method bool isVersion()
- * @method setStaticStickers(Model\StaticStickers[] $value)
- * @method setVersion(mixed $value)
- */
-class StickerAssetsResponse extends AutoPropertyHandler implements ResponseInterface
+class StickerAssetsResponse extends Response
 {
-    use ResponseTrait;
-
-    public $version;
-    /**
-     * @var Model\StaticStickers[]
-     */
-    public $static_stickers;
+    const JSON_PROPERTY_MAP = [
+        'version'         => '',
+        'static_stickers' => 'Model\StaticStickers[]',
+    ];
 }

@@ -2,23 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method string getNextMaxId()
- * @method bool isNextMaxId()
- * @method setNextMaxId(string $value)
- */
-class BlockedReelsResponse extends Model\BlockedReels implements ResponseInterface
+class BlockedReelsResponse extends Response
 {
-    use ResponseTrait;
-
-    // NOTE: This is a special response object which extends
-    // Model\BlockedReels to inherit all of its properties!
-
-    /**
-     * @var string
-     */
-    public $next_max_id;
+    const JSON_PROPERTY_MAP = [
+        Model\BlockedReels::class, // Import property map.
+        'next_max_id' => 'string',
+    ];
 }

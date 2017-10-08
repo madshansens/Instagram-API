@@ -2,40 +2,15 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getHasMore()
- * @method string getNextMaxId()
- * @method mixed getNumResults()
- * @method mixed getRankToken()
- * @method Model\User[] getUsers()
- * @method bool isHasMore()
- * @method bool isNextMaxId()
- * @method bool isNumResults()
- * @method bool isRankToken()
- * @method bool isUsers()
- * @method setHasMore(mixed $value)
- * @method setNextMaxId(string $value)
- * @method setNumResults(mixed $value)
- * @method setRankToken(mixed $value)
- * @method setUsers(Model\User[] $value)
- */
-class SearchUserResponse extends AutoPropertyHandler implements ResponseInterface
+class SearchUserResponse extends Response
 {
-    use ResponseTrait;
-
-    public $has_more;
-    public $num_results;
-    /**
-     * @var string
-     */
-    public $next_max_id;
-    /**
-     * @var Model\User[]
-     */
-    public $users;
-    public $rank_token;
+    const JSON_PROPERTY_MAP = [
+        'has_more'    => '',
+        'num_results' => '',
+        'next_max_id' => 'string',
+        'users'       => 'Model\User[]',
+        'rank_token'  => '',
+    ];
 }

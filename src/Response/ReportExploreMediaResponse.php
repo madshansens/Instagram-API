@@ -2,18 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getExploreReportStatus()
- * @method bool isExploreReportStatus()
- * @method setExploreReportStatus(mixed $value)
- */
-class ReportExploreMediaResponse extends AutoPropertyHandler implements ResponseInterface
+class ReportExploreMediaResponse extends Response
 {
-    use ResponseTrait;
-
-    public $explore_report_status;
+    const JSON_PROPERTY_MAP = [
+        'explore_report_status' => '',
+    ];
 }

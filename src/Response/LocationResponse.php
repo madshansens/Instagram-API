@@ -2,28 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method string getRequestId()
- * @method Model\Location[] getVenues()
- * @method bool isRequestId()
- * @method bool isVenues()
- * @method setRequestId(string $value)
- * @method setVenues(Model\Location[] $value)
- */
-class LocationResponse extends AutoPropertyHandler implements ResponseInterface
+class LocationResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\Location[]
-     */
-    public $venues;
-    /**
-     * @var string
-     */
-    public $request_id;
+    const JSON_PROPERTY_MAP = [
+        'venues'     => 'Model\Location[]',
+        'request_id' => 'string',
+    ];
 }

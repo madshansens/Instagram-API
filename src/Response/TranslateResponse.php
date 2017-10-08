@@ -2,21 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method Model\CommentTranslations[] getCommentTranslations()
- * @method bool isCommentTranslations()
- * @method setCommentTranslations(Model\CommentTranslations[] $value)
- */
-class TranslateResponse extends AutoPropertyHandler implements ResponseInterface
+class TranslateResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\CommentTranslations[]
-     */
-    public $comment_translations;
+    const JSON_PROPERTY_MAP = [
+        'comment_translations' => 'Model\CommentTranslations[]',
+    ];
 }

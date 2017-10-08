@@ -2,13 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-class FriendshipsShowResponse extends Model\FriendshipStatus implements ResponseInterface
+class FriendshipsShowResponse extends Response
 {
-    use ResponseTrait;
-
-    // NOTE: This is a special response object which extends
-    // Model\FriendshipStatus to inherit all of its properties!
+    const JSON_PROPERTY_MAP = [
+        Model\FriendshipStatus::class, // Import property map.
+    ];
 }

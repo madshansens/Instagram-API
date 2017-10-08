@@ -2,11 +2,8 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-class MediaSeenResponse extends AutoPropertyHandler implements ResponseInterface
+class MediaSeenResponse extends Response
 {
-    use ResponseTrait;
 }

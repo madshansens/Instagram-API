@@ -2,25 +2,12 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method mixed getIsBackup()
- * @method Model\User[] getUsers()
- * @method bool isIsBackup()
- * @method bool isUsers()
- * @method setIsBackup(mixed $value)
- * @method setUsers(Model\User[] $value)
- */
-class SuggestedUsersResponse extends AutoPropertyHandler implements ResponseInterface
+class SuggestedUsersResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\User[]
-     */
-    public $users;
-    public $is_backup;
+    const JSON_PROPERTY_MAP = [
+        'users'     => 'Model\User[]',
+        'is_backup' => '',
+    ];
 }

@@ -2,21 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-/**
- * @method Model\Experiment[] getExperiments()
- * @method bool isExperiments()
- * @method setExperiments(Model\Experiment[] $value)
- */
-class SyncResponse extends AutoPropertyHandler implements ResponseInterface
+class SyncResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\Experiment[]
-     */
-    public $experiments;
+    const JSON_PROPERTY_MAP = [
+        'experiments' => 'Model\Experiment[]',
+    ];
 }
