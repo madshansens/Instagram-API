@@ -35,7 +35,7 @@ $styleChecker = new styleChecker(
     $onlyShowInvalidFiles
 );
 $badFiles = $styleChecker->run();
-if (count($badFiles) > 0) {
+if (!empty($badFiles)) {
     // Exit with non-zero code to signal that there are problems.
     exit(1);
 }
@@ -133,20 +133,6 @@ class styleChecker
                 $visibility = &$matches[1]; // public, private, protected
                 $type = &$matches[2]; // $, function
                 $name = &$matches[3]; // Member name
-
-                // Ignore the intentionally "public $_messages;" property in our
-                // Response trait to skip the annoying warning. We can't rename
-                // that variable since it comes from Instagram's server.
-                if ($fileName == 'ResponseTrait.php' && $visibility == 'public' && $type == '$' && $name == '_messages') {
-                    continue;
-                }
-
-                // Ignore the visibility warnings for public GraphQL properties.
-                if ($visibility == 'public' && $type == '$'
-                    && in_array($fileName, ['BusinessFeed.php', 'BusinessManager.php', 'BusinessNode.php', 'PromotionsUnit.php']
-                    )) {
-                    continue;
-                }
 
                 if ($visibility == 'public') {
                     if ($name[0] == '_' && (
