@@ -243,7 +243,7 @@ class RealtimeHttpServer
     {
         // Create server socket.
         $socket = new \React\Socket\Server(self::HOST.':'.self::PORT, $this->_loop);
-        $this->_logger->info(sprintf('Listening on http://%s%s', $socket->getAddress()));
+        $this->_logger->info(sprintf('Listening on http://%s', $socket->getAddress()));
         // Bind HTTP server on server socket.
         $this->_server = new \React\Http\Server([$this, 'onHttpRequest']);
         $this->_server->listen($socket);
