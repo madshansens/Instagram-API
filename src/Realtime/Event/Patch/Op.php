@@ -103,7 +103,7 @@ class Op extends AutoPropertyMapper
         }
         list($path, $threadId, $threadItemId) = $matches;
         $json = HttpClient::api_body_decode($this->value);
-        if (!is_object($json)) {
+        if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode thread item JSON: %s', json_last_error_msg()));
 
             return;
@@ -143,7 +143,7 @@ class Op extends AutoPropertyMapper
         }
         list($path, $threadId) = $matches;
         $json = HttpClient::api_body_decode($this->value);
-        if (!is_object($json)) {
+        if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode thread JSON: %s', json_last_error_msg()));
 
             return;
@@ -177,7 +177,7 @@ class Op extends AutoPropertyMapper
         }
 
         $json = HttpClient::api_body_decode($this->value);
-        if (!is_object($json)) {
+        if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode live broadcast JSON: %s', json_last_error_msg()));
 
             return;
@@ -206,7 +206,7 @@ class Op extends AutoPropertyMapper
         }
         list($path, $threadId, $indicatorId) = $matches;
         $json = HttpClient::api_body_decode($this->value);
-        if (!is_object($json)) {
+        if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode thread activity JSON: %s', json_last_error_msg()));
 
             return;
@@ -232,7 +232,7 @@ class Op extends AutoPropertyMapper
         }
         list($path, $threadId, $threadItemId) = $matches;
         $json = HttpClient::api_body_decode($this->value);
-        if (!is_object($json)) {
+        if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode thread item JSON: %s', json_last_error_msg()));
 
             return;
@@ -303,7 +303,7 @@ class Op extends AutoPropertyMapper
         }
         list($path, $threadId, $userId) = $matches;
         $json = HttpClient::api_body_decode($this->value);
-        if (!is_object($json)) {
+        if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode thread seen JSON: %s', json_last_error_msg()));
 
             return;
@@ -329,7 +329,7 @@ class Op extends AutoPropertyMapper
         }
         list($path, $threadId) = $matches;
         $json = HttpClient::api_body_decode($this->value);
-        if (!is_object($json)) {
+        if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode thread JSON: %s', json_last_error_msg()));
 
             return;
@@ -354,7 +354,7 @@ class Op extends AutoPropertyMapper
             return;
         }
         $json = HttpClient::api_body_decode($this->value);
-        if (!is_object($json)) {
+        if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode inbox JSON: %s', json_last_error_msg()));
 
             return;
@@ -385,7 +385,7 @@ class Op extends AutoPropertyMapper
         }
         list($path, $threadId) = $matches;
         $json = HttpClient::api_body_decode($this->value);
-        if (!is_object($json)) {
+        if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode story action JSON: %s', json_last_error_msg()));
 
             return;
@@ -488,7 +488,7 @@ class Op extends AutoPropertyMapper
         }
         list($path, $threadId, $threadItemId) = $matches;
         $json = HttpClient::api_body_decode($this->value);
-        if (!is_object($json)) {
+        if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode thread item notify JSON: %s', json_last_error_msg()));
 
             return;

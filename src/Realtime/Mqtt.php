@@ -798,7 +798,7 @@ class Mqtt implements PersistentInterface
             case self::IRIS_SUB_RESPONSE_TOPIC:
             case self::IRIS_SUB_RESPONSE_TOPIC_ID:
                 $json = HttpClient::api_body_decode($payload);
-                if (!is_object($json)) {
+                if (!is_array($json)) {
                     $this->_logger->warning(sprintf('Failed to decode Iris JSON: %s', json_last_error_msg()));
 
                     return;
