@@ -293,9 +293,10 @@ class Op extends AutoPropertyMapper
             return;
         }
 
-        $payload = new DirectSeenItemPayload();
-        $payload->count = (int) $this->_getProperty('value');
-        $payload->timestamp = $this->_getProperty('ts');
+        $payload = new DirectSeenItemPayload([
+            'count'     => (int) $this->_getProperty('value'),
+            'timestamp' => $this->_getProperty('ts'),
+        ]);
         $this->_target->emit('unseen-count-update', [$payload]);
     }
 
@@ -376,11 +377,12 @@ class Op extends AutoPropertyMapper
         }
         /** @var DirectInbox $inbox */
         $inbox = new DirectInbox($json);
-        if (!isset($inbox->threads) || !count($inbox->threads)) {
+        $allThreads = $inbox->getThreads();
+        if (!isset($allThreads) || !count($allThreads)) {
             return;
         }
         /** @var DirectThread $thread */
-        $thread = reset($inbox->threads);
+        $thread = reset($allThreads); // Get first thread.
         $this->_target->emit('direct-story-created', [$thread]);
     }
 
