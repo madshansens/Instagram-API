@@ -748,26 +748,25 @@ class Internal extends RequestCollection
         Response\SyncResponse $syncResponse)
     {
         $experiments = [];
-        foreach ($syncResponse->experiments as $experiment) {
-            if (!isset($experiment->name)) {
+        foreach ($syncResponse->getExperiments() as $experiment) {
+            $group = $experiment->getName();
+            $params = $experiment->getParams();
+
+            if ($group === null || $params === null) {
                 continue;
             }
 
-            $group = $experiment->name;
             if (!isset($experiments[$group])) {
                 $experiments[$group] = [];
             }
 
-            if (!isset($experiment->params)) {
-                continue;
-            }
-
-            foreach ($experiment->params as $param) {
-                if (!isset($param->name)) {
+            foreach ($params as $param) {
+                $paramName = $param->getName();
+                if ($paramName === null) {
                     continue;
                 }
 
-                $experiments[$group][$param->name] = $param->value;
+                $experiments[$group][$paramName] = $param->getValue();
             }
         }
 
