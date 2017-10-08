@@ -109,7 +109,7 @@ class Op extends AutoPropertyMapper
             return;
         }
         /** @var DirectThreadItem $threadItem */
-        $threadItem = $this->_jsonMapper->map($json, new DirectThreadItem());
+        $threadItem = new DirectThreadItem($json);
         $this->_target->emit(
             $this->op === self::ADD ? 'thread-item-created' : 'thread-item-updated',
             [$threadId, $threadItemId, $threadItem]
@@ -149,7 +149,7 @@ class Op extends AutoPropertyMapper
             return;
         }
         /** @var DirectThread $thread */
-        $thread = $this->_jsonMapper->map($json, new DirectThread());
+        $thread = new DirectThread($json);
         $this->_target->emit(
             $this->op === self::ADD ? 'thread-created' : 'thread-updated',
             [$threadId, $thread]
@@ -183,7 +183,7 @@ class Op extends AutoPropertyMapper
             return;
         }
         /** @var EventPayload\Live $livePayload */
-        $livePayload = $this->_jsonMapper->map($json, new EventPayload\Live());
+        $livePayload = new EventPayload\Live($json);
         $this->_target->emit(
             $this->op === self::ADD ? 'live-started' : 'live-stopped',
             [$livePayload]
@@ -212,7 +212,7 @@ class Op extends AutoPropertyMapper
             return;
         }
         /** @var EventPayload\Activity $activity */
-        $activity = $this->_jsonMapper->map($json, new EventPayload\Activity());
+        $activity = new EventPayload\Activity($json);
         $this->_target->emit('thread-activity', [$threadId, $activity]);
     }
 
@@ -238,7 +238,7 @@ class Op extends AutoPropertyMapper
             return;
         }
         /** @var DirectThreadItem $threadItem */
-        $threadItem = $this->_jsonMapper->map($json, new DirectThreadItem());
+        $threadItem = new DirectThreadItem($json);
         $this->_target->emit('direct-story-updated', [$threadId, $threadItemId, $threadItem]);
     }
 
@@ -309,7 +309,7 @@ class Op extends AutoPropertyMapper
             return;
         }
         /** @var DirectThreadLastSeenAt $lastSeenAt */
-        $lastSeenAt = $this->_jsonMapper->map($json, new DirectThreadLastSeenAt());
+        $lastSeenAt = new DirectThreadLastSeenAt($json);
         $this->_target->emit('thread-seen', [$threadId, $userId, $lastSeenAt]);
     }
 
@@ -335,7 +335,7 @@ class Op extends AutoPropertyMapper
             return;
         }
         /** @var EventPayload\Screenshot $screenshot */
-        $screenshot = $this->_jsonMapper->map($json, new EventPayload\Screenshot());
+        $screenshot = new EventPayload\Screenshot($json);
         $this->_target->emit('direct-story-screenshot', [$threadId, $screenshot]);
     }
 
@@ -360,7 +360,7 @@ class Op extends AutoPropertyMapper
             return;
         }
         /** @var DirectInbox $inbox */
-        $inbox = $this->_jsonMapper->map($json, new DirectInbox());
+        $inbox = new DirectInbox($json);
         if (!isset($inbox->threads) || !count($inbox->threads)) {
             return;
         }
@@ -391,7 +391,7 @@ class Op extends AutoPropertyMapper
             return;
         }
         /** @var ActionBadge $storyAction */
-        $storyAction = $this->_jsonMapper->map($json, new ActionBadge());
+        $storyAction = new ActionBadge($json);
         $this->_target->emit('direct-story-action', [$threadId, $storyAction]);
     }
 
@@ -494,7 +494,7 @@ class Op extends AutoPropertyMapper
             return;
         }
         /** @var EventPayload\Notify $notifyPayload */
-        $notifyPayload = $this->_jsonMapper->map($json, new EventPayload\Notify());
+        $notifyPayload = new EventPayload\Notify($json);
         $this->_target->emit('thread-notify', [$threadId, $threadItemId, $notifyPayload]);
     }
 

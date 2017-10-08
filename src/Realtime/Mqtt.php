@@ -344,7 +344,7 @@ class Mqtt implements PersistentInterface
         switch ($message['action']) {
             case Action::ACK:
                 /** @var Action\Ack $action */
-                $action = $this->_mapper->map($message, new Action\Ack());
+                $action = new Action\Ack($message);
                 break;
             default:
                 $this->_logger->warning(sprintf('Action "%s" is ignored (unknown type)', $message['action']));
@@ -366,7 +366,7 @@ class Mqtt implements PersistentInterface
         switch ($message['event']) {
             case Event::PATCH:
                 /** @var Event\Patch $event */
-                $event = $this->_mapper->map($message, new Event\Patch());
+                $event = new Event\Patch($message);
                 break;
             default:
                 $this->_logger->warning(sprintf('Event "%s" is ignored (unknown type)', $message['event']));
@@ -807,7 +807,7 @@ class Mqtt implements PersistentInterface
                     return;
                 }
                 /** @var Mqtt\Iris $iris */
-                $iris = $this->_mapper->map($json, new Mqtt\Iris());
+                $iris = new Mqtt\Iris($json);
                 if (!$iris->isSucceeded()) {
                     $this->_logger->warning(sprintf('Failed to subscribe to Iris (%d): %s', $iris->getErrorType(), $iris->getErrorMessage()));
                 }
