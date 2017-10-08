@@ -335,19 +335,19 @@ class Mqtt implements PersistentInterface
     /**
      * Process incoming action.
      *
-     * @param object $message
+     * @param array $message
      */
     protected function _processAction(
-        $message)
+        array $message)
     {
-        $this->_logger->info(sprintf('Received action "%s"', $message->action));
-        switch ($message->action) {
+        $this->_logger->info(sprintf('Received action "%s"', $message['action']));
+        switch ($message['action']) {
             case Action::ACK:
                 /** @var Action\Ack $action */
                 $action = $this->_mapper->map($message, new Action\Ack());
                 break;
             default:
-                $this->_logger->warning(sprintf('Action "%s" is ignored (unknown type)', $message->action));
+                $this->_logger->warning(sprintf('Action "%s" is ignored (unknown type)', $message['action']));
 
                 return;
         }
@@ -357,19 +357,19 @@ class Mqtt implements PersistentInterface
     /**
      * Process incoming event.
      *
-     * @param object $message
+     * @param array $message
      */
     protected function _processEvent(
-        $message)
+        array $message)
     {
-        $this->_logger->info(sprintf('Received event "%s"', $message->event));
-        switch ($message->event) {
+        $this->_logger->info(sprintf('Received event "%s"', $message['event']));
+        switch ($message['event']) {
             case Event::PATCH:
                 /** @var Event\Patch $event */
                 $event = $this->_mapper->map($message, new Event\Patch($this->_logger));
                 break;
             default:
-                $this->_logger->warning(sprintf('Event "%s" is ignored (unknown type)', $message->event));
+                $this->_logger->warning(sprintf('Event "%s" is ignored (unknown type)', $message['event']));
 
                 return;
         }
@@ -379,14 +379,14 @@ class Mqtt implements PersistentInterface
     /**
      * Process single incoming message.
      *
-     * @param mixed $message
+     * @param array $message
      */
     protected function _processSingleMessage(
-        $message)
+        array $message)
     {
-        if (isset($message->event)) {
+        if (isset($message['event'])) {
             $this->_processEvent($message);
-        } elseif (isset($message->action)) {
+        } elseif (isset($message['action'])) {
             $this->_processAction($message);
         } else {
             $this->_logger->warning('Invalid message (both event and action are missing)');
@@ -402,8 +402,11 @@ class Mqtt implements PersistentInterface
         $message)
     {
         $this->_logger->info(sprintf('Received message %s', $message));
+        // TODO: Rewrite this in a nicer way? Such as checking for keys on the
+        // decoded array to determine if key [0] exists (hence a multi-message)?
+        $isMultiMessages = is_string($message) && $message !== '' && $message[0] === '[';
         $message = HttpClient::api_body_decode($message);
-        if (!is_array($message)) {
+        if (!$isMultiMessages) {
             $this->_processSingleMessage($message);
         } else {
             foreach ($message as $singleMessage) {
