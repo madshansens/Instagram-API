@@ -38,28 +38,31 @@ class Op extends AutoPropertyMapper
     /**
      * Checks if $path starts with specified substring.
      *
+     * @param string $path
      * @param string $string
      *
      * @return bool
      */
     protected function _isPathStartsWith(
+        $path,
         $string)
     {
-        return strncmp($this->_getProperty('path'), $string, strlen($string)) === 0;
+        return strncmp($path, $string, strlen($string)) === 0;
     }
 
     /**
      * Checks if $path ends with specified substring.
      *
+     * @param string $path
      * @param string $string
      *
      * @return bool
      */
     protected function _isPathEndsWith(
+        $path,
         $string)
     {
         $length = strlen($string);
-        $path = $this->_getProperty('path');
 
         return substr_compare($path, $string, strlen($path) - $length, $length) === 0;
     }
@@ -104,7 +107,7 @@ class Op extends AutoPropertyMapper
 
             return;
         }
-        list($path, $threadId, $threadItemId) = $matches;
+        list($path, $threadId, $threadItemId) = $matches; // NOTE: Changes $path.
         $json = HttpClient::api_body_decode($this->_getProperty('value'));
         if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode thread item JSON: %s', json_last_error_msg()));
@@ -146,7 +149,7 @@ class Op extends AutoPropertyMapper
 
             return;
         }
-        list($path, $threadId) = $matches;
+        list($path, $threadId) = $matches; // NOTE: Changes $path.
         $json = HttpClient::api_body_decode($this->_getProperty('value'));
         if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode thread JSON: %s', json_last_error_msg()));
@@ -211,7 +214,7 @@ class Op extends AutoPropertyMapper
 
             return;
         }
-        list($path, $threadId, $indicatorId) = $matches;
+        list($path, $threadId, $indicatorId) = $matches; // NOTE: Changes $path.
         $json = HttpClient::api_body_decode($this->_getProperty('value'));
         if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode thread activity JSON: %s', json_last_error_msg()));
@@ -238,7 +241,7 @@ class Op extends AutoPropertyMapper
 
             return;
         }
-        list($path, $threadId, $threadItemId) = $matches;
+        list($path, $threadId, $threadItemId) = $matches; // NOTE: Changes $path.
         $json = HttpClient::api_body_decode($this->_getProperty('value'));
         if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode thread item JSON: %s', json_last_error_msg()));
@@ -257,7 +260,7 @@ class Op extends AutoPropertyMapper
     {
         $handled = false;
         $path = $this->_getProperty('path');
-        if ($this->_isPathStartsWith('/direct_v2/threads')) {
+        if ($this->_isPathStartsWith($path, '/direct_v2/threads')) {
             if (strpos($path, 'activity_indicator_id') === false) {
                 $this->_upsertThreadItem();
                 $handled = true;
@@ -265,13 +268,13 @@ class Op extends AutoPropertyMapper
                 $this->_upsertThreadActivity();
                 $handled = true;
             }
-        } elseif ($this->_isPathStartsWith('/direct_v2/inbox/threads')) {
+        } elseif ($this->_isPathStartsWith($path, '/direct_v2/inbox/threads')) {
             $this->_upsertThread();
             $handled = true;
-        } elseif ($this->_isPathStartsWith('/broadcast')) {
+        } elseif ($this->_isPathStartsWith($path, '/broadcast')) {
             $this->_handleLiveBroadcast();
             $handled = true;
-        } elseif ($this->_isPathStartsWith('/direct_v2/visual_threads')) {
+        } elseif ($this->_isPathStartsWith($path, '/direct_v2/visual_threads')) {
             $this->_updateDirectStory();
             $handled = true;
         }
@@ -311,7 +314,7 @@ class Op extends AutoPropertyMapper
 
             return;
         }
-        list($path, $threadId, $userId) = $matches;
+        list($path, $threadId, $userId) = $matches; // NOTE: Changes $path.
         $json = HttpClient::api_body_decode($this->_getProperty('value'));
         if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode thread seen JSON: %s', json_last_error_msg()));
@@ -338,7 +341,7 @@ class Op extends AutoPropertyMapper
 
             return;
         }
-        list($path, $threadId) = $matches;
+        list($path, $threadId) = $matches; // NOTE: Changes $path.
         $json = HttpClient::api_body_decode($this->_getProperty('value'));
         if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode thread JSON: %s', json_last_error_msg()));
@@ -396,7 +399,7 @@ class Op extends AutoPropertyMapper
 
             return;
         }
-        list($path, $threadId) = $matches;
+        list($path, $threadId) = $matches; // NOTE: Changes $path.
         $json = HttpClient::api_body_decode($this->_getProperty('value'));
         if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode story action JSON: %s', json_last_error_msg()));
@@ -414,37 +417,38 @@ class Op extends AutoPropertyMapper
     protected function _handleReplace()
     {
         $handled = false;
-        if ($this->_isPathStartsWith('/direct_v2/threads')) {
-            if ($this->_isPathEndsWith('has_seen')) {
+        $path = $this->_getProperty('path');
+        if ($this->_isPathStartsWith($path, '/direct_v2/threads')) {
+            if ($this->_isPathEndsWith($path, 'has_seen')) {
                 $this->_updateSeen();
                 $handled = true;
             } else {
                 $this->_upsertThreadItem();
                 $handled = true;
             }
-        } elseif ($this->_isPathStartsWith('/direct_v2/inbox/threads')) {
+        } elseif ($this->_isPathStartsWith($path, '/direct_v2/inbox/threads')) {
             $this->_upsertThread();
             $handled = true;
-        } elseif ($this->_isPathStartsWith('/direct_v2/inbox') || $this->_isPathStartsWith('/direct_v2/visual_inbox')) {
-            if ($this->_isPathEndsWith('unseen_count')) {
+        } elseif ($this->_isPathStartsWith($path, '/direct_v2/inbox') || $this->_isPathStartsWith($path, '/direct_v2/visual_inbox')) {
+            if ($this->_isPathEndsWith($path, 'unseen_count')) {
                 $this->_updateUnseenCount();
                 $handled = true;
             }
-        } elseif ($this->_isPathStartsWith('/direct_v2/visual_action_badge')) {
+        } elseif ($this->_isPathStartsWith($path, '/direct_v2/visual_action_badge')) {
             $this->_directStoryAction();
             $handled = true;
-        } elseif ($this->_isPathStartsWith('/direct_v2/visual_thread')) {
-            if ($this->_isPathEndsWith('screenshot')) {
+        } elseif ($this->_isPathStartsWith($path, '/direct_v2/visual_thread')) {
+            if ($this->_isPathEndsWith($path, 'screenshot')) {
                 $this->_notifyDirectStoryScreenshot();
                 $handled = true;
-            } elseif ($this->_isPathEndsWith('create')) {
+            } elseif ($this->_isPathEndsWith($path, 'create')) {
                 $this->_createDirectStory();
                 $handled = true;
             }
         }
 
         if (!$handled) {
-            $this->_logger->warning(sprintf('Unsupported REPLACE path "%s"', $this->_getProperty('path')));
+            $this->_logger->warning(sprintf('Unsupported REPLACE path "%s"', $path));
         }
     }
 
@@ -463,7 +467,7 @@ class Op extends AutoPropertyMapper
 
             return;
         }
-        list($path, $threadId, $threadItemId) = $matches;
+        list($path, $threadId, $threadItemId) = $matches; // NOTE: Changes $path.
         $this->_target->emit('thread-item-removed', [$threadId, $threadItemId]);
     }
 
@@ -473,16 +477,17 @@ class Op extends AutoPropertyMapper
     protected function _handleRemove()
     {
         $handled = false;
-        if ($this->_isPathStartsWith('/direct_v2')) {
+        $path = $this->_getProperty('path');
+        if ($this->_isPathStartsWith($path, '/direct_v2')) {
             $this->_removeThreadItem();
             $handled = true;
-        } elseif ($this->_isPathStartsWith('/broadcast')) {
+        } elseif ($this->_isPathStartsWith($path, '/broadcast')) {
             $this->_handleLiveBroadcast();
             $handled = true;
         }
 
         if (!$handled) {
-            $this->_logger->warning(sprintf('Unsupported REMOVE path "%s"', $this->_getProperty('path')));
+            $this->_logger->warning(sprintf('Unsupported REMOVE path "%s"', $path));
         }
     }
 
@@ -501,7 +506,7 @@ class Op extends AutoPropertyMapper
 
             return;
         }
-        list($path, $threadId, $threadItemId) = $matches;
+        list($path, $threadId, $threadItemId) = $matches; // NOTE: Changes $path.
         $json = HttpClient::api_body_decode($this->_getProperty('value'));
         if (!is_array($json)) {
             $this->_logger->warning(sprintf('Failed to decode thread item notify JSON: %s', json_last_error_msg()));
@@ -519,13 +524,14 @@ class Op extends AutoPropertyMapper
     protected function _handleNotify()
     {
         $handled = false;
-        if ($this->_isPathStartsWith('/direct_v2/threads')) {
+        $path = $this->_getProperty('path');
+        if ($this->_isPathStartsWith($path, '/direct_v2/threads')) {
             $this->_notifyThread();
             $handled = true;
         }
 
         if (!$handled) {
-            $this->_logger->warning(sprintf('Unsupported NOTIFY path "%s"', $this->_getProperty('path')));
+            $this->_logger->warning(sprintf('Unsupported NOTIFY path "%s"', $path));
         }
     }
 
