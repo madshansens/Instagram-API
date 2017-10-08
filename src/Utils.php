@@ -842,8 +842,7 @@ class Utils
      * @param array  $storySticker The array describing the story sticker placement.
      * @param string $type         What type of sticker this is.
      *
-     * @throws \InvalidArgumentException If caption doesn't contain any hashtag,
-     *                                   or if any tags are invalid.
+     * @throws \InvalidArgumentException If storySticker is missing keys or has invalid values.
      */
     protected static function _throwIfInvalidStoryStickerPlacement(
         array $storySticker,
