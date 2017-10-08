@@ -20,9 +20,9 @@ exec 1>&2
 failed="no"
 echo "[pre-commit] Checking work-tree codestyle..."
 
-# Check if we need new AutoPropertyHandler documentation.
-echo "> Verifying generateAutoPropertyHandlerDocs..."
-/usr/bin/env php devtools/generateAutoPropertyHandlerDocs.php --validate-only
+# Check if we need new AutoPropertyMapper documentation.
+echo "> Verifying generateAutoPropertyMapperDocs..."
+/usr/bin/env php devtools/generateAutoPropertyMapperDocs.php --validate-only
 if [ $? -ne 0 ]; then
     failed="yes"
 fi
