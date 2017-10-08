@@ -477,8 +477,8 @@ class Internal extends RequestCollection
          * implemented for stories. */
         $usertags = (isset($externalMetadata['usertags']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['usertags'] : null;
         /** @var Response\Model\Location|null A Location object describing where
-         * the media was taken. NOT USED FOR STORY MEDIA! */
-        $location = (isset($externalMetadata['location']) && $targetFeed != Constants::FEED_STORY) ? $externalMetadata['location'] : null;
+         * the media was taken. */
+        $location = (isset($externalMetadata['location'])) ? $externalMetadata['location'] : null;
         /** @var array|null Array of story location sticker instructions. ONLY
          * USED FOR STORY MEDIA! */
         $locationSticker = (isset($externalMetadata['location_sticker']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['location_sticker'] : null;
@@ -586,15 +586,18 @@ class Internal extends RequestCollection
         }
 
         if ($location instanceof Response\Model\Location) {
+            if ($targetFeed === Constants::FEED_TIMELINE) {
+                $request->addPost('location', Utils::buildMediaLocationJSON($location));
+            }
+            if ($targetFeed === Constants::FEED_STORY && $locationSticker === null) {
+                throw new \InvalidArgumentException('You must provide a location_sticker together with your story location.');
+            }
             $request
-                ->addPost('location', Utils::buildMediaLocationJSON($location))
                 ->addPost('geotag_enabled', '1')
                 ->addPost('posting_latitude', $location->getLat())
                 ->addPost('posting_longitude', $location->getLng())
                 ->addPost('media_latitude', $location->getLat())
-                ->addPost('media_longitude', $location->getLng())
-                ->addPost('av_latitude', 0.0)
-                ->addPost('av_longitude', 0.0);
+                ->addPost('media_longitude', $location->getLng());
         }
 
         $configure = $request->getResponse(new Response\ConfigureResponse());
