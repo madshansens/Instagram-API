@@ -145,10 +145,9 @@ class RealtimeHttpServer
     public function onClientContextAck(
         \InstagramAPI\Realtime\Action\Ack $ack)
     {
-        $payload = $ack->getPayload();
-        $this->_logger->info(sprintf('Received ACK for %s with status %s%s', $payload->client_context, $ack->getStatus()));
+        $context = $ack->getPayload()->getClientContext();
+        $this->_logger->info(sprintf('Received ACK for %s with status %s%s', $context, $ack->getStatus()));
         // Check if we have deferred object for this client_context.
-        $context = $payload->client_context;
         if (!isset($this->_contexts[$context])) {
             return;
         }
