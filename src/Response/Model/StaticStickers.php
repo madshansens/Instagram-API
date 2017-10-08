@@ -2,28 +2,13 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method string getId()
- * @method mixed getIncludeInRecent()
- * @method Stickers[] getStickers()
- * @method bool isId()
- * @method bool isIncludeInRecent()
- * @method bool isStickers()
- * @method setId(string $value)
- * @method setIncludeInRecent(mixed $value)
- * @method setStickers(Stickers[] $value)
- */
-class StaticStickers extends AutoPropertyHandler
+class StaticStickers extends AutoPropertyMapper
 {
-    public $include_in_recent;
-    /**
-     * @var string
-     */
-    public $id;
-    /**
-     * @var Stickers[]
-     */
-    public $stickers;
+    const JSON_PROPERTY_MAP = [
+        'include_in_recent' => '',
+        'id'                => 'string',
+        'stickers'          => 'Stickers[]',
+    ];
 }

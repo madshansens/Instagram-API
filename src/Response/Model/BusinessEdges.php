@@ -2,21 +2,12 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method mixed getCursor()
- * @method BusinessNode getNode()
- * @method bool isCursor()
- * @method bool isNode()
- * @method setCursor(mixed $value)
- * @method setNode(BusinessNode $value)
- */
-class BusinessEdges extends AutoPropertyHandler
+class BusinessEdges extends AutoPropertyMapper
 {
-    /**
-     * @var BusinessNode
-     */
-    public $node;
-    public $cursor;
+    const JSON_PROPERTY_MAP = [
+        'node'   => 'BusinessNode',
+        'cursor' => '',
+    ];
 }

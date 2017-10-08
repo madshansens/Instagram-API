@@ -2,25 +2,13 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method string getId()
- * @method mixed getMediaCount()
- * @method mixed getName()
- * @method bool isId()
- * @method bool isMediaCount()
- * @method bool isName()
- * @method setId(string $value)
- * @method setMediaCount(mixed $value)
- * @method setName(mixed $value)
- */
-class Tag extends AutoPropertyHandler
+class Tag extends AutoPropertyMapper
 {
-    public $media_count;
-    public $name;
-    /**
-     * @var string
-     */
-    public $id;
+    const JSON_PROPERTY_MAP = [
+        'media_count' => '',
+        'name'        => '',
+        'id'          => 'string',
+    ];
 }

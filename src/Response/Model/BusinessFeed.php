@@ -2,17 +2,11 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method SummaryPromotions get_UnitsgGaCa()
- * @method bool is_UnitsgGaCa()
- * @method set_UnitsgGaCa(SummaryPromotions $value)
- */
-class BusinessFeed extends AutoPropertyHandler
+class BusinessFeed extends AutoPropertyMapper
 {
-    /**
-     * @var SummaryPromotions
-     */
-    public $_unitsgGaCa;
+    const JSON_PROPERTY_MAP = [
+        '_unitsgGaCa' => 'SummaryPromotions',
+    ];
 }

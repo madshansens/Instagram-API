@@ -2,17 +2,11 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method GenericMegaphone getGenericMegaphone()
- * @method bool isGenericMegaphone()
- * @method setGenericMegaphone(GenericMegaphone $value)
- */
-class Megaphone extends AutoPropertyHandler
+class Megaphone extends AutoPropertyMapper
 {
-    /**
-     * @var GenericMegaphone
-     */
-    public $generic_megaphone;
+    const JSON_PROPERTY_MAP = [
+        'generic_megaphone' => 'GenericMegaphone',
+    ];
 }

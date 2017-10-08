@@ -2,38 +2,17 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method mixed getAndroidClass()
- * @method mixed getCallToActionTitle()
- * @method mixed getDeeplinkUri()
- * @method mixed getLinkType()
- * @method mixed getPackage()
- * @method mixed getRedirectUri()
- * @method mixed getWebUri()
- * @method bool isAndroidClass()
- * @method bool isCallToActionTitle()
- * @method bool isDeeplinkUri()
- * @method bool isLinkType()
- * @method bool isPackage()
- * @method bool isRedirectUri()
- * @method bool isWebUri()
- * @method setAndroidClass(mixed $value)
- * @method setCallToActionTitle(mixed $value)
- * @method setDeeplinkUri(mixed $value)
- * @method setLinkType(mixed $value)
- * @method setPackage(mixed $value)
- * @method setRedirectUri(mixed $value)
- * @method setWebUri(mixed $value)
- */
-class AndroidLinks extends AutoPropertyHandler
+class AndroidLinks extends AutoPropertyMapper
 {
-    public $linkType;
-    public $webUri;
-    public $androidClass;
-    public $package;
-    public $deeplinkUri;
-    public $callToActionTitle;
-    public $redirectUri;
+    const JSON_PROPERTY_MAP = [
+        'linkType'          => '',
+        'webUri'            => '',
+        'androidClass'      => '',
+        'package'           => '',
+        'deeplinkUri'       => '',
+        'callToActionTitle' => '',
+        'redirectUri'       => '',
+    ];
 }

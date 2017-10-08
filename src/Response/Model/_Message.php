@@ -2,18 +2,12 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method mixed getKey()
- * @method mixed getTime()
- * @method bool isKey()
- * @method bool isTime()
- * @method setKey(mixed $value)
- * @method setTime(mixed $value)
- */
-class _Message extends AutoPropertyHandler
+class _Message extends AutoPropertyMapper
 {
-    public $key;
-    public $time;
+    const JSON_PROPERTY_MAP = [
+        'key'  => '',
+        'time' => '',
+    ];
 }

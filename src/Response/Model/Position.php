@@ -2,18 +2,12 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method mixed getPos1()
- * @method mixed getPos2()
- * @method bool isPos1()
- * @method bool isPos2()
- * @method setPos1(mixed $value)
- * @method setPos2(mixed $value)
- */
-class Position extends AutoPropertyHandler
+class Position extends AutoPropertyMapper
 {
-    public $pos1;
-    public $pos2;
+    const JSON_PROPERTY_MAP = [
+        'pos1' => '',
+        'pos2' => '',
+    ];
 }

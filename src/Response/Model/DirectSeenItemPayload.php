@@ -2,19 +2,12 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method mixed getCount()
- * @method string getTimestamp()
- * @method bool isCount()
- * @method bool isTimestamp()
- * @method setCount(mixed $value)
- * @method setTimestamp(string $value)
- */
-class DirectSeenItemPayload extends AutoPropertyHandler
+class DirectSeenItemPayload extends AutoPropertyMapper
 {
-    public $count;
-    /** @var string */
-    public $timestamp;
+    const JSON_PROPERTY_MAP = [
+        'count'     => '',
+        'timestamp' => 'string',
+    ];
 }

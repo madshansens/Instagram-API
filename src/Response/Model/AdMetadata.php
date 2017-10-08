@@ -2,18 +2,12 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method mixed getType()
- * @method mixed getValue()
- * @method bool isType()
- * @method bool isValue()
- * @method setType(mixed $value)
- * @method setValue(mixed $value)
- */
-class AdMetadata extends AutoPropertyHandler
+class AdMetadata extends AutoPropertyMapper
 {
-    public $value;
-    public $type;
+    const JSON_PROPERTY_MAP = [
+        'value' => '',
+        'type'  => '',
+    ];
 }

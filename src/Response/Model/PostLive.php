@@ -2,17 +2,11 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method PostLiveItem[] getPostLiveItems()
- * @method bool isPostLiveItems()
- * @method setPostLiveItems(PostLiveItem[] $value)
- */
-class PostLive extends AutoPropertyHandler
+class PostLive extends AutoPropertyMapper
 {
-    /**
-     * @var PostLiveItem[]
-     */
-    public $post_live_items;
+    const JSON_PROPERTY_MAP = [
+        'post_live_items' => 'PostLiveItem[]',
+    ];
 }

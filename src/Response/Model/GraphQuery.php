@@ -2,21 +2,12 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method mixed getError()
- * @method QueryResponse getResponse()
- * @method bool isError()
- * @method bool isResponse()
- * @method setError(mixed $value)
- * @method setResponse(QueryResponse $value)
- */
-class GraphQuery extends AutoPropertyHandler
+class GraphQuery extends AutoPropertyMapper
 {
-    /**
-     * @var QueryResponse
-     */
-    public $response;
-    public $error;
+    const JSON_PROPERTY_MAP = [
+        'response' => 'QueryResponse',
+        'error'    => '',
+    ];
 }

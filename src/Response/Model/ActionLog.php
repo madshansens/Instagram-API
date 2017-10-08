@@ -2,21 +2,12 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method Bold[] getBold()
- * @method mixed getDescription()
- * @method bool isBold()
- * @method bool isDescription()
- * @method setBold(Bold[] $value)
- * @method setDescription(mixed $value)
- */
-class ActionLog extends AutoPropertyHandler
+class ActionLog extends AutoPropertyMapper
 {
-    /**
-     * @var Bold[]
-     */
-    public $bold;
-    public $description;
+    const JSON_PROPERTY_MAP = [
+        'bold'        => 'Bold[]',
+        'description' => '',
+    ];
 }

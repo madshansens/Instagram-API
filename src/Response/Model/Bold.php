@@ -2,18 +2,12 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method mixed getEnd()
- * @method mixed getStart()
- * @method bool isEnd()
- * @method bool isStart()
- * @method setEnd(mixed $value)
- * @method setStart(mixed $value)
- */
-class Bold extends AutoPropertyHandler
+class Bold extends AutoPropertyMapper
 {
-    public $start;
-    public $end;
+    const JSON_PROPERTY_MAP = [
+        'start' => '',
+        'end'   => '',
+    ];
 }

@@ -2,35 +2,14 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method string getId()
- * @method mixed getIsPortrait()
- * @method TopLive getTopLive()
- * @method StoryTray[] getTray()
- * @method bool isId()
- * @method bool isIsPortrait()
- * @method bool isTopLive()
- * @method bool isTray()
- * @method setId(string $value)
- * @method setIsPortrait(mixed $value)
- * @method setTopLive(TopLive $value)
- * @method setTray(StoryTray[] $value)
- */
-class Stories extends AutoPropertyHandler
+class Stories extends AutoPropertyMapper
 {
-    public $is_portrait;
-    /**
-     * @var StoryTray[]
-     */
-    public $tray;
-    /**
-     * @var string
-     */
-    public $id;
-    /**
-     * @var TopLive
-     */
-    public $top_live;
+    const JSON_PROPERTY_MAP = [
+        'is_portrait' => '',
+        'tray'        => 'StoryTray[]',
+        'id'          => 'string',
+        'top_live'    => 'TopLive',
+    ];
 }

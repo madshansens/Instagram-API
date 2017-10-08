@@ -2,33 +2,15 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method mixed getHeight()
- * @method string getId()
- * @method mixed getType()
- * @method mixed getUrl()
- * @method mixed getWidth()
- * @method bool isHeight()
- * @method bool isId()
- * @method bool isType()
- * @method bool isUrl()
- * @method bool isWidth()
- * @method setHeight(mixed $value)
- * @method setId(string $value)
- * @method setType(mixed $value)
- * @method setUrl(mixed $value)
- * @method setWidth(mixed $value)
- */
-class VideoVersions extends AutoPropertyHandler
+class VideoVersions extends AutoPropertyMapper
 {
-    public $url;
-    public $type;
-    public $width;
-    public $height;
-    /**
-     * @var string
-     */
-    public $id;
+    const JSON_PROPERTY_MAP = [
+        'url'    => '',
+        'type'   => '',
+        'width'  => '',
+        'height' => '',
+        'id'     => 'string',
+    ];
 }

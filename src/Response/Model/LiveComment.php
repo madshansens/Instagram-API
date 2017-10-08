@@ -2,25 +2,13 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method Comment getComment()
- * @method mixed getEvent()
- * @method mixed getOffset()
- * @method bool isComment()
- * @method bool isEvent()
- * @method bool isOffset()
- * @method setComment(Comment $value)
- * @method setEvent(mixed $value)
- * @method setOffset(mixed $value)
- */
-class LiveComment extends AutoPropertyHandler
+class LiveComment extends AutoPropertyMapper
 {
-    /**
-     * @var Comment
-     */
-    public $comment;
-    public $offset;
-    public $event;
+    const JSON_PROPERTY_MAP = [
+        'comment' => 'Comment',
+        'offset'  => '',
+        'event'   => '',
+    ];
 }

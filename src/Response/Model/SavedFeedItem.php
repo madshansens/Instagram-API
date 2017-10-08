@@ -2,17 +2,11 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method Item getMedia()
- * @method bool isMedia()
- * @method setMedia(Item $value)
- */
-class SavedFeedItem extends AutoPropertyHandler
+class SavedFeedItem extends AutoPropertyMapper
 {
-    /**
-     * @var Item
-     */
-    public $media;
+    const JSON_PROPERTY_MAP = [
+        'media' => 'Item',
+    ];
 }

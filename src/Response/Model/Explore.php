@@ -2,25 +2,13 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method string getActorId()
- * @method mixed getExplanation()
- * @method mixed getSourceToken()
- * @method bool isActorId()
- * @method bool isExplanation()
- * @method bool isSourceToken()
- * @method setActorId(string $value)
- * @method setExplanation(mixed $value)
- * @method setSourceToken(mixed $value)
- */
-class Explore extends AutoPropertyHandler
+class Explore extends AutoPropertyMapper
 {
-    public $explanation;
-    /**
-     * @var string
-     */
-    public $actor_id;
-    public $source_token;
+    const JSON_PROPERTY_MAP = [
+        'explanation'  => '',
+        'actor_id'     => 'string',
+        'source_token' => '',
+    ];
 }

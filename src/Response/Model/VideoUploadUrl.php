@@ -2,25 +2,13 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method float getExpires()
- * @method string getJob()
- * @method string getUrl()
- * @method bool isExpires()
- * @method bool isJob()
- * @method bool isUrl()
- * @method setExpires(float $value)
- * @method setJob(string $value)
- * @method setUrl(string $value)
- */
-class VideoUploadUrl extends AutoPropertyHandler
+class VideoUploadUrl extends AutoPropertyMapper
 {
-    /** @var string */
-    public $url;
-    /** @var string */
-    public $job;
-    /** @var float */
-    public $expires;
+    const JSON_PROPERTY_MAP = [
+        'url'     => 'string',
+        'job'     => 'string',
+        'expires' => 'float',
+    ];
 }

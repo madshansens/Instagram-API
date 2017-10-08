@@ -2,21 +2,12 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method BroadcastOwner[] getBroadcastOwners()
- * @method mixed getRankedPosition()
- * @method bool isBroadcastOwners()
- * @method bool isRankedPosition()
- * @method setBroadcastOwners(BroadcastOwner[] $value)
- * @method setRankedPosition(mixed $value)
- */
-class TopLive extends AutoPropertyHandler
+class TopLive extends AutoPropertyMapper
 {
-    /**
-     * @var BroadcastOwner[]
-     */
-    public $broadcast_owners;
-    public $ranked_position;
+    const JSON_PROPERTY_MAP = [
+        'broadcast_owners' => 'BroadcastOwner[]',
+        'ranked_position'  => '',
+    ];
 }
