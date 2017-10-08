@@ -639,7 +639,7 @@ class Request
     /**
      * Perform the request and get its raw HTTP response.
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return HttpResponseInterface
      */
     public function getHttpResponse()
     {
@@ -692,14 +692,14 @@ class Request
     /**
      * Perform the request and map its response data to provided object.
      *
-     * @param ResponseInterface $baseClass An instance of a class object whose properties to fill with the response.
+     * @param Response $baseClass An instance of a class object whose properties to fill with the response.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return ResponseInterface An instance of baseClass.
+     * @return Response An instance of baseClass.
      */
     public function getResponse(
-        ResponseInterface $baseClass)
+        Response $baseClass)
     {
         // Check for API response success and attempt to decode it to the desired class.
         $result = $this->_parent->client->getMappedResponseObject($baseClass, $this->getRawResponse(), $this->getHttpResponse());

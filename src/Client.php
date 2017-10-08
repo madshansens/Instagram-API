@@ -509,7 +509,7 @@ class Client
     /**
      * Converts a server response to a specific kind of result object.
      *
-     * @param ResponseInterface     $baseClass      An instance of a class object whose
+     * @param Response              $baseClass      An instance of a class object whose
      *                                              properties to fill with the response.
      * @param mixed                 $serverResponse A decoded JSON response from
      *                                              Instagram's server.
@@ -518,10 +518,10 @@ class Client
      * @throws \InstagramAPI\Exception\InstagramException In case of invalid or
      *                                                    failed API response.
      *
-     * @return ResponseInterface
+     * @return Response
      */
     public function getMappedResponseObject(
-        ResponseInterface $baseClass,
+        Response $baseClass,
         $serverResponse,
         HttpResponseInterface $httpResponse)
     {
@@ -544,7 +544,7 @@ class Client
         $this->_mapper->bExceptionOnUndefinedProperty = $this->_parent->apiDeveloperDebug;
 
         // Perform mapping of all response properties.
-        /** @var ResponseInterface $responseObject */
+        /** @var Response $responseObject */
         $responseObject = $this->_mapper->map($serverResponse, $baseClass);
 
         // Save the HTTP response object as the "getHttpResponse()" value.
@@ -632,7 +632,7 @@ class Client
      * @throws \InstagramAPI\Exception\NetworkException   For any network/socket related errors.
      * @throws \InstagramAPI\Exception\ThrottledException When we're throttled by server.
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return HttpResponseInterface
      */
     protected function _guzzleRequest(
         HttpRequestInterface $request,

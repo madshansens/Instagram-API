@@ -14,7 +14,6 @@ use InstagramAPI\Exception\ThrottledException;
 use InstagramAPI\Request;
 use InstagramAPI\Request\Metadata\Internal as InternalMetadata;
 use InstagramAPI\Response;
-use InstagramAPI\ResponseInterface;
 use InstagramAPI\Signatures;
 use InstagramAPI\Utils;
 
@@ -1023,7 +1022,7 @@ class Internal extends RequestCollection
      * @throws \InstagramAPI\Exception\UploadFailedException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return ResponseInterface
+     * @return Response
      */
     public function configureWithRetries(
         $entity,
@@ -1042,7 +1041,7 @@ class Internal extends RequestCollection
             $result = null;
 
             try {
-                /** @var ResponseInterface $result */
+                /** @var Response $result */
                 $result = call_user_func($configurator);
             } catch (ThrottledException $e) {
                 throw $e;

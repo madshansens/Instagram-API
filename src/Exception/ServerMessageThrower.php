@@ -2,7 +2,7 @@
 
 namespace InstagramAPI\Exception;
 
-use InstagramAPI\ResponseInterface;
+use InstagramAPI\Response;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
 
 /**
@@ -77,7 +77,7 @@ class ServerMessageThrower
      *                                                   helpful such as the name of the class or
      *                                                   function which threw. Can be NULL.
      * @param string                     $serverMessage  The failure string from Instagram's API.
-     * @param ResponseInterface|null     $serverResponse The complete server response object,
+     * @param Response|null              $serverResponse The complete server response object,
      *                                                   if one is available (optional).
      * @param HttpResponseInterface|null $httpResponse   The HTTP response object (if available).
      *
@@ -86,11 +86,11 @@ class ServerMessageThrower
     public static function autoThrow(
         $prefixString,
         $serverMessage,
-        ResponseInterface $serverResponse = null,
+        Response $serverResponse = null,
         HttpResponseInterface $httpResponse = null)
     {
         $messages = [$serverMessage];
-        if ($serverResponse instanceof ResponseInterface) {
+        if ($serverResponse instanceof Response) {
             // We are reading a property that isn't defined in the class
             // property map, so we must use "has" first, to ensure it exists.
             if ($serverResponse->hasErrorType()
@@ -157,7 +157,7 @@ class ServerMessageThrower
 
         // Attach the server response to the exception, IF a response exists.
         // NOTE: Only possible on exceptions derived from InstagramException.
-        if ($serverResponse instanceof ResponseInterface
+        if ($serverResponse instanceof Response
             && $e instanceof \InstagramAPI\Exception\InstagramException) {
             $e->setResponse($serverResponse);
         }
