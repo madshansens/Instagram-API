@@ -2,11 +2,11 @@
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-class GenericResponse extends AutoPropertyHandler implements ResponseInterface
+/**
+ * Used for generic API responses that don't contain any extra data.
+ */
+class GenericResponse extends Response
 {
-    use ResponseTrait;
 }
