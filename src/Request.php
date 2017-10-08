@@ -690,20 +690,24 @@ class Request
     }
 
     /**
-     * Perform the request and map its response data to provided object.
+     * Perform the request and map its response data to the provided object.
      *
-     * @param Response $baseClass An instance of a class object whose properties to fill with the response.
+     * @param Response $responseObject An instance of a class object whose properties to fill with the response.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return Response An instance of baseClass.
+     * @return Response The provided responseObject with all JSON properties filled.
      */
     public function getResponse(
-        Response $baseClass)
+        Response $responseObject)
     {
-        // Check for API response success and attempt to decode it to the desired class.
-        $result = $this->_parent->client->getMappedResponseObject($baseClass, $this->getRawResponse(), $this->getHttpResponse());
+        // Check for API response success and put its response in the object.
+        $this->_parent->client->mapServerResponse(
+            $responseObject,
+            $this->getRawResponse(),
+            $this->getHttpResponse()
+        );
 
-        return $result;
+        return $responseObject;
     }
 }

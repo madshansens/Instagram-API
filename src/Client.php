@@ -5,8 +5,10 @@ namespace InstagramAPI;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\HandlerStack;
+use InstagramAPI\Exception\InstagramException;
 use InstagramAPI\Exception\ServerMessageThrower;
 use InstagramAPI\Exception\SettingsException;
+use LazyJsonMapper\Exception\LazyJsonMapperException;
 use Psr\Http\Message\RequestInterface as HttpRequestInterface;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
 use function GuzzleHttp\Psr7\modify_request;
@@ -118,17 +120,6 @@ class Client
     private $_settingsCookieLastSaved;
 
     /**
-     * Our JSON object mapper instance.
-     *
-     * This object must be globally preserved and always re-used, so that its
-     * runtime class analysis cache stays in memory, otherwise it wastes time
-     * analyzing our class source code every time it has to map a class again.
-     *
-     * @var \JsonMapper
-     */
-    private $_mapper;
-
-    /**
      * Constructor.
      *
      * @param \InstagramAPI\Instagram $parent
@@ -165,10 +156,6 @@ class Client
             // We'll instead MANUALLY be throwing on certain other HTTP codes.
             'http_errors'     => false,
         ]);
-
-        // Create our JSON object mapper and set global default options.
-        $this->_mapper = new \JsonMapper();
-        $this->_mapper->bStrictNullTypes = false; // Allow NULL values.
     }
 
     /**
@@ -507,28 +494,27 @@ class Client
     }
 
     /**
-     * Converts a server response to a specific kind of result object.
+     * Maps a server response onto a specific kind of result object.
      *
-     * @param Response              $baseClass      An instance of a class object whose
+     * The result is placed directly inside `$responseObject`.
+     *
+     * @param Response              $responseObject An instance of a class object whose
      *                                              properties to fill with the response.
      * @param mixed                 $serverResponse A decoded JSON response from
      *                                              Instagram's server.
      * @param HttpResponseInterface $httpResponse   HTTP response object.
      *
-     * @throws \InstagramAPI\Exception\InstagramException In case of invalid or
-     *                                                    failed API response.
-     *
-     * @return Response
+     * @throws InstagramException In case of invalid or failed API response.
      */
-    public function getMappedResponseObject(
-        Response $baseClass,
+    public function mapServerResponse(
+        Response $responseObject,
         $serverResponse,
         HttpResponseInterface $httpResponse)
     {
-        // If the server response is not an object, it means that JSON decoding
+        // If the server response is not an array, it means that JSON decoding
         // failed or some other bad thing happened. So analyze the HTTP status
         // code (if available) to see what really happened.
-        if (!is_object($serverResponse)) {
+        if (!is_array($serverResponse)) {
             $httpStatusCode = $httpResponse !== null ? $httpResponse->getStatusCode() : null;
             switch ($httpStatusCode) {
                 case 400:
@@ -540,12 +526,21 @@ class Client
             }
         }
 
-        // Use API developer debugging? Throws if class lacks properties.
-        $this->_mapper->bExceptionOnUndefinedProperty = $this->_parent->apiDeveloperDebug;
-
         // Perform mapping of all response properties.
-        /** @var Response $responseObject */
-        $responseObject = $this->_mapper->map($serverResponse, $baseClass);
+        try {
+            $responseObject->assignObjectData(
+                $serverResponse,
+                // Use API developer debugging? Throws if class lacks properties, or
+                // if they can't be mapped as defined in the class property map.
+                $this->_parent->apiDeveloperDebug
+            );
+        } catch (LazyJsonMapperException $e) {
+            // Exceptions will only be thrown if API developer debugging is
+            // enabled and finds a problem. Either way, we should re-wrap the
+            // exception to our native type instead. The message gives enough
+            // details and we don't need to know the exact Lazy sub-exception.
+            throw new InstagramException($e->getMessage());
+        }
 
         // Save the HTTP response object as the "getHttpResponse()" value.
         $responseObject->setHttpResponse($httpResponse);
@@ -561,14 +556,12 @@ class Client
                 $message = $responseObject->getMessage();
             }
             ServerMessageThrower::autoThrow(
-                get_class($baseClass),
+                get_class($responseObject),
                 $message,
                 $responseObject,
                 $httpResponse
             );
         }
-
-        return $responseObject;
     }
 
     /**
@@ -656,7 +649,7 @@ class Client
             throw new \InstagramAPI\Exception\ThrottledException('Throttled by Instagram because of too many API requests.');
             break;
         // WARNING: Do NOT detect 404 and other higher-level HTTP errors here,
-        // since we catch those later during steps like getMappedResponseObject
+        // since we catch those later during steps like mapServerResponse()
         // and autoThrow. This is a warning to future contributors!
         }
 
@@ -746,7 +739,7 @@ class Client
      * @param HttpRequestInterface $request       HTTP request to send.
      * @param array                $guzzleOptions Extra Guzzle options for this request.
      *
-     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws InstagramException
      *
      * @return HttpResponseInterface
      */
