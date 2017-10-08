@@ -515,6 +515,8 @@ class Op extends AutoPropertyMapper
     }
 
     /**
+     * Event handler.
+     *
      * @param EventEmitterInterface $target
      * @param LoggerInterface       $logger
      */

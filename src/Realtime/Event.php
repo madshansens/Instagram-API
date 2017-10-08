@@ -19,25 +19,13 @@ abstract class Event extends AutoPropertyMapper
         'event' => '',
     ];
 
-    /** @var LoggerInterface */
-    protected $_logger;
-
-    /**
-     * Constructor.
-     *
-     * @param LoggerInterface $logger
-     */
-    public function __construct(
-        LoggerInterface $logger)
-    {
-        $this->_logger = $logger;
-    }
-
     /**
      * Event handler.
      *
      * @param EventEmitterInterface $target
+     * @param LoggerInterface       $logger
      */
     abstract public function handle(
-        EventEmitterInterface $target);
+        EventEmitterInterface $target,
+        LoggerInterface $logger);
 }

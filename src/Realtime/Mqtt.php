@@ -351,7 +351,7 @@ class Mqtt implements PersistentInterface
 
                 return;
         }
-        $action->handle($this->_target);
+        $action->handle($this->_target, $this->_logger);
     }
 
     /**
@@ -366,14 +366,14 @@ class Mqtt implements PersistentInterface
         switch ($message['event']) {
             case Event::PATCH:
                 /** @var Event\Patch $event */
-                $event = $this->_mapper->map($message, new Event\Patch($this->_logger));
+                $event = $this->_mapper->map($message, new Event\Patch());
                 break;
             default:
                 $this->_logger->warning(sprintf('Event "%s" is ignored (unknown type)', $message['event']));
 
                 return;
         }
-        $event->handle($this->_target);
+        $event->handle($this->_target, $this->_logger);
     }
 
     /**

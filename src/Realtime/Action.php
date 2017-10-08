@@ -4,6 +4,7 @@ namespace InstagramAPI\Realtime;
 
 use Evenement\EventEmitterInterface;
 use InstagramAPI\AutoPropertyMapper;
+use Psr\Log\LoggerInterface;
 
 abstract class Action extends AutoPropertyMapper
 {
@@ -19,7 +20,9 @@ abstract class Action extends AutoPropertyMapper
      * Action handler.
      *
      * @param EventEmitterInterface $target
+     * @param LoggerInterface       $logger
      */
     abstract public function handle(
-        EventEmitterInterface $target);
+        EventEmitterInterface $target,
+        LoggerInterface $logger);
 }

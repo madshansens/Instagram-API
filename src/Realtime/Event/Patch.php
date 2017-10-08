@@ -4,6 +4,7 @@ namespace InstagramAPI\Realtime\Event;
 
 use Evenement\EventEmitterInterface;
 use InstagramAPI\Realtime\Event as RealtimeEvent;
+use Psr\Log\LoggerInterface;
 
 class Patch extends RealtimeEvent
 {
@@ -17,10 +18,11 @@ class Patch extends RealtimeEvent
 
     /** {@inheritdoc} */
     public function handle(
-        EventEmitterInterface $target)
+        EventEmitterInterface $target,
+        LoggerInterface $logger)
     {
-        foreach ($this->data as $op) {
-            $op->handle($target, $this->_logger);
+        foreach ($this->getData() as $op) {
+            $op->handle($target, $logger);
         }
     }
 }

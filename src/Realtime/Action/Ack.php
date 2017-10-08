@@ -4,6 +4,7 @@ namespace InstagramAPI\Realtime\Action;
 
 use Evenement\EventEmitterInterface;
 use InstagramAPI\Realtime\Action as RealtimeAction;
+use Psr\Log\LoggerInterface;
 
 class Ack extends RealtimeAction
 {
@@ -14,7 +15,8 @@ class Ack extends RealtimeAction
 
     /** {@inheritdoc} */
     public function handle(
-        EventEmitterInterface $target)
+        EventEmitterInterface $target,
+        LoggerInterface $logger)
     {
         $target->emit('client-context-ack', [$this]);
     }
