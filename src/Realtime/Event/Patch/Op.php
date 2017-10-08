@@ -12,7 +12,6 @@ use InstagramAPI\Response\Model\DirectSeenItemPayload;
 use InstagramAPI\Response\Model\DirectThread;
 use InstagramAPI\Response\Model\DirectThreadItem;
 use InstagramAPI\Response\Model\DirectThreadLastSeenAt;
-use JsonMapper;
 use Psr\Log\LoggerInterface;
 
 class Op extends AutoPropertyMapper
@@ -32,9 +31,6 @@ class Op extends AutoPropertyMapper
 
     /** @var EventEmitterInterface */
     protected $_target;
-
-    /** @var JsonMapper */
-    protected $_jsonMapper;
 
     /** @var LoggerInterface */
     protected $_logger;
@@ -520,16 +516,13 @@ class Op extends AutoPropertyMapper
 
     /**
      * @param EventEmitterInterface $target
-     * @param JsonMapper            $jsonMapper
      * @param LoggerInterface       $logger
      */
     public function handle(
         EventEmitterInterface $target,
-        JsonMapper $jsonMapper,
         LoggerInterface $logger)
     {
         $this->_target = $target;
-        $this->_jsonMapper = $jsonMapper;
         $this->_logger = $logger;
         switch ($this->op) {
             case self::ADD:

@@ -116,9 +116,6 @@ class Mqtt implements PersistentInterface
     /** @var LoggerInterface */
     protected $_logger;
 
-    /** @var \JsonMapper */
-    protected $_mapper;
-
     /** @var int */
     protected $_capabilities;
 
@@ -167,10 +164,6 @@ class Mqtt implements PersistentInterface
         $this->_device = $device;
         $this->_loop = $loop;
         $this->_logger = $logger;
-
-        // Create our JSON object mapper and set global default options.
-        $this->_mapper = new \JsonMapper();
-        $this->_mapper->bStrictNullTypes = false; // Allow NULL values.
 
         $this->_loadExperiments($experiments);
 
@@ -373,7 +366,7 @@ class Mqtt implements PersistentInterface
         switch ($message->event) {
             case Event::PATCH:
                 /** @var Event\Patch $event */
-                $event = $this->_mapper->map($message, new Event\Patch($this->_mapper, $this->_logger));
+                $event = $this->_mapper->map($message, new Event\Patch($this->_logger));
                 break;
             default:
                 $this->_logger->warning(sprintf('Event "%s" is ignored (unknown type)', $message->event));

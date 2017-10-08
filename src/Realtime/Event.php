@@ -4,7 +4,6 @@ namespace InstagramAPI\Realtime;
 
 use Evenement\EventEmitterInterface;
 use InstagramAPI\AutoPropertyMapper;
-use JsonMapper;
 use Psr\Log\LoggerInterface;
 
 abstract class Event extends AutoPropertyMapper
@@ -20,23 +19,17 @@ abstract class Event extends AutoPropertyMapper
         'event' => '',
     ];
 
-    /** @var JsonMapper */
-    protected $_jsonMapper;
-
     /** @var LoggerInterface */
     protected $_logger;
 
     /**
      * Constructor.
      *
-     * @param JsonMapper      $jsonMapper
      * @param LoggerInterface $logger
      */
     public function __construct(
-        JsonMapper $jsonMapper,
         LoggerInterface $logger)
     {
-        $this->_jsonMapper = $jsonMapper;
         $this->_logger = $logger;
     }
 

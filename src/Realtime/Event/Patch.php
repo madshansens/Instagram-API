@@ -20,7 +20,7 @@ class Patch extends RealtimeEvent
         EventEmitterInterface $target)
     {
         foreach ($this->data as $op) {
-            $op->handle($target, $this->_jsonMapper, $this->_logger);
+            $op->handle($target, $this->_logger);
         }
     }
 }
