@@ -2,30 +2,14 @@
 
 namespace InstagramAPI\Realtime\Mqtt;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method string getErrorMessage()
- * @method int getErrorType()
- * @method int getSeqId()
- * @method bool getSucceeded()
- * @method bool isErrorMessage()
- * @method bool isErrorType()
- * @method bool isSeqId()
- * @method bool isSucceeded()
- * @method setErrorMessage(string $value)
- * @method setErrorType(int $value)
- * @method setSeqId(int $value)
- * @method setSucceeded(bool $value)
- */
-class Iris extends AutoPropertyHandler
+class Iris extends AutoPropertyMapper
 {
-    /** @var int */
-    public $seq_id;
-    /** @var bool */
-    public $succeeded;
-    /** @var int */
-    public $error_type;
-    /** @var string */
-    public $error_message;
+    const JSON_PROPERTY_MAP = [
+        'seq_id'        => 'int',
+        'succeeded'     => 'bool',
+        'error_type'    => 'int',
+        'error_message' => 'string',
+    ];
 }

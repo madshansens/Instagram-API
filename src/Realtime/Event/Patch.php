@@ -3,36 +3,17 @@
 namespace InstagramAPI\Realtime\Event;
 
 use Evenement\EventEmitterInterface;
+use InstagramAPI\Realtime\Event as RealtimeEvent;
 
-/**
- * @method \InstagramAPI\Realtime\Event\Patch\Op[] getData()
- * @method bool getLazy()
- * @method int getMessageType()
- * @method int getNumEndpoints()
- * @method int getSeqId()
- * @method bool isData()
- * @method bool isLazy()
- * @method bool isMessageType()
- * @method bool isNumEndpoints()
- * @method bool isSeqId()
- * @method setData(\InstagramAPI\Realtime\Event\Patch\Op[] $value)
- * @method setLazy(bool $value)
- * @method setMessageType(int $value)
- * @method setNumEndpoints(int $value)
- * @method setSeqId(int $value)
- */
-class Patch extends \InstagramAPI\Realtime\Event
+class Patch extends RealtimeEvent
 {
-    /** @var \InstagramAPI\Realtime\Event\Patch\Op[] */
-    public $data;
-    /** @var int */
-    public $message_type;
-    /** @var int */
-    public $seq_id;
-    /** @var bool */
-    public $lazy;
-    /** @var int */
-    public $num_endpoints;
+    const JSON_PROPERTY_MAP = [
+        'data'          => '\InstagramAPI\Realtime\Event\Patch\Op[]',
+        'message_type'  => 'int',
+        'seq_id'        => 'int',
+        'lazy'          => 'bool',
+        'num_endpoints' => 'int',
+    ];
 
     /** {@inheritdoc} */
     public function handle(

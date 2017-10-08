@@ -3,23 +3,17 @@
 namespace InstagramAPI\Realtime;
 
 use Evenement\EventEmitterInterface;
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method mixed getAction()
- * @method mixed getStatus()
- * @method bool isAction()
- * @method bool isStatus()
- * @method setAction(mixed $value)
- * @method setStatus(mixed $value)
- */
-abstract class Action extends AutoPropertyHandler
+abstract class Action extends AutoPropertyMapper
 {
     const ACK = 'item_ack';
     const UNKNOWN = 'unknown';
 
-    public $status;
-    public $action;
+    const JSON_PROPERTY_MAP = [
+        'status' => '',
+        'action' => '',
+    ];
 
     /**
      * Action handler.

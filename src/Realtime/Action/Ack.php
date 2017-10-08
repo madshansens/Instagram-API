@@ -3,22 +3,14 @@
 namespace InstagramAPI\Realtime\Action;
 
 use Evenement\EventEmitterInterface;
+use InstagramAPI\Realtime\Action as RealtimeAction;
 
-/**
- * @method \InstagramAPI\Response\Model\DirectSendItemPayload getPayload()
- * @method mixed getStatusCode()
- * @method bool isPayload()
- * @method bool isStatusCode()
- * @method setPayload(\InstagramAPI\Response\Model\DirectSendItemPayload $value)
- * @method setStatusCode(mixed $value)
- */
-class Ack extends \InstagramAPI\Realtime\Action
+class Ack extends RealtimeAction
 {
-    public $status_code;
-    /**
-     * @var \InstagramAPI\Response\Model\DirectSendItemPayload
-     */
-    public $payload;
+    const JSON_PROPERTY_MAP = [
+        'status_code' => '',
+        'payload'     => '\InstagramAPI\Response\Model\DirectSendItemPayload',
+    ];
 
     /** {@inheritdoc} */
     public function handle(

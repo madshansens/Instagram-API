@@ -2,19 +2,12 @@
 
 namespace InstagramAPI\Realtime\Event\Payload;
 
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 
-/**
- * @method \InstagramAPI\Response\Model\User getActionUserDict()
- * @method mixed getMediaType()
- * @method bool isActionUserDict()
- * @method bool isMediaType()
- * @method setActionUserDict(\InstagramAPI\Response\Model\User $value)
- * @method setMediaType(mixed $value)
- */
-class Screenshot extends AutoPropertyHandler
+class Screenshot extends AutoPropertyMapper
 {
-    /** @var \InstagramAPI\Response\Model\User */
-    public $action_user_dict;
-    public $media_type;
+    const JSON_PROPERTY_MAP = [
+        'action_user_dict' => '\InstagramAPI\Response\Model\User',
+        'media_type'       => '',
+    ];
 }

@@ -3,7 +3,7 @@
 namespace InstagramAPI\Realtime\Event\Patch;
 
 use Evenement\EventEmitterInterface;
-use InstagramAPI\AutoPropertyHandler;
+use InstagramAPI\AutoPropertyMapper;
 use InstagramAPI\Client as HttpClient;
 use InstagramAPI\Realtime\Event\Payload as EventPayload;
 use InstagramAPI\Response\Model\ActionBadge;
@@ -15,35 +15,20 @@ use InstagramAPI\Response\Model\DirectThreadLastSeenAt;
 use JsonMapper;
 use Psr\Log\LoggerInterface;
 
-/**
- * @method mixed getDoublePublish()
- * @method mixed getOp()
- * @method mixed getPath()
- * @method mixed getTs()
- * @method mixed getValue()
- * @method bool isDoublePublish()
- * @method bool isOp()
- * @method bool isPath()
- * @method bool isTs()
- * @method bool isValue()
- * @method setDoublePublish(mixed $value)
- * @method setOp(mixed $value)
- * @method setPath(mixed $value)
- * @method setTs(mixed $value)
- * @method setValue(mixed $value)
- */
-class Op extends AutoPropertyHandler
+class Op extends AutoPropertyMapper
 {
     const ADD = 'add';
     const REMOVE = 'remove';
     const REPLACE = 'replace';
     const NOTIFY = 'notify';
 
-    public $op;
-    public $path;
-    public $value;
-    public $ts;
-    public $doublePublish;
+    const JSON_PROPERTY_MAP = [
+        'op'            => '',
+        'path'          => '',
+        'value'         => '',
+        'ts'            => '',
+        'doublePublish' => '',
+    ];
 
     /** @var EventEmitterInterface */
     protected $_target;
