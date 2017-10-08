@@ -72,7 +72,7 @@ $rtc->on('thread-item-removed', function ($threadId, $threadItemId) {
     printf('[RTC] Item %s has been removed from thread %s%s', $threadItemId, $threadId, PHP_EOL);
 });
 $rtc->on('client-context-ack', function (\InstagramAPI\Realtime\Action\Ack $ack) {
-    printf('[RTC] Received ACK for %s with status %s%s', $ack->payload->client_context, $ack->status, PHP_EOL);
+    printf('[RTC] Received ACK for %s with status %s%s', $ack->getPayload()->client_context, $ack->getStatus(), PHP_EOL);
 });
 $rtc->on('unseen-count-update', function (\InstagramAPI\Response\Model\DirectSeenItemPayload $payload) {
     printf('[RTC] Updating unseen count to %d%s', $payload->count, PHP_EOL);

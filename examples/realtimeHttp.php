@@ -145,9 +145,10 @@ class RealtimeHttpServer
     public function onClientContextAck(
         \InstagramAPI\Realtime\Action\Ack $ack)
     {
-        $this->_logger->info(sprintf('Received ACK for %s with status %s%s', $ack->payload->client_context, $ack->status));
+        $payload = $ack->getPayload();
+        $this->_logger->info(sprintf('Received ACK for %s with status %s%s', $payload->client_context, $ack->getStatus()));
         // Check if we have deferred object for this client_context.
-        $context = $ack->payload->client_context;
+        $context = $payload->client_context;
         if (!isset($this->_contexts[$context])) {
             return;
         }
@@ -184,7 +185,7 @@ class RealtimeHttpServer
                 // Cancel reject timer.
                 $timeout->cancel();
                 // Reply with info from $ack.
-                return new \React\Http\Response($ack->status_code, ['Content-Type' => 'text/json'], json_encode($ack->payload));
+                return new \React\Http\Response($ack->getStatusCode(), ['Content-Type' => 'text/json'], $ack->getPayload()->asJson());
             })
             ->otherwise(function () {
                 // Called by reject timer. Reply with 504 Gateway Time-out.
