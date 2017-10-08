@@ -9,7 +9,7 @@ use Psr\Log\LoggerInterface;
 class Patch extends RealtimeEvent
 {
     const JSON_PROPERTY_MAP = [
-        'data'          => '\InstagramAPI\Realtime\Event\Patch\Op[]',
+        'data'          => 'Patch\Op[]',
         'message_type'  => 'int',
         'seq_id'        => 'int',
         'lazy'          => 'bool',
@@ -21,7 +21,7 @@ class Patch extends RealtimeEvent
         EventEmitterInterface $target,
         LoggerInterface $logger)
     {
-        foreach ($this->getData() as $op) {
+        foreach ($this->_getProperty('data') as $op) {
             $op->handle($target, $logger);
         }
     }
