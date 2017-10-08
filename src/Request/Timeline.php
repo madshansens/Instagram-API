@@ -405,7 +405,7 @@ class Timeline extends RequestCollection
             $mediaFiles = []; // Reset queue.
             foreach ($myTimeline->getItems() as $item) {
                 $itemDate = date('Y-m-d \a\t H.i.s O', $item->getTakenAt());
-                if ($item->media_type == Response\Model\Item::ALBUM) {
+                if ($item->getMediaType() == Response\Model\Item::ALBUM) {
                     // Albums contain multiple items which must all be queued.
                     // NOTE: We won't name them by their subitem's getIds, since
                     // those Ids have no meaning outside of the album and they
@@ -416,8 +416,8 @@ class Timeline extends RequestCollection
                     $subPosition = 0;
                     foreach ($item->getCarouselMedia() as $subItem) {
                         ++$subPosition;
-                        if ($subItem->media_type == Response\Model\CarouselMedia::PHOTO) {
-                            $mediaUrl = $subItem->getImageVersions2()->candidates[0]->getUrl();
+                        if ($subItem->getMediaType() == Response\Model\CarouselMedia::PHOTO) {
+                            $mediaUrl = $subItem->getImageVersions2()->getCandidates()[0]->getUrl();
                         } else {
                             $mediaUrl = $subItem->getVideoVersions()[0]->getUrl();
                         }
@@ -428,8 +428,8 @@ class Timeline extends RequestCollection
                         ];
                     }
                 } else {
-                    if ($item->media_type == Response\Model\Item::PHOTO) {
-                        $mediaUrl = $item->getImageVersions2()->candidates[0]->getUrl();
+                    if ($item->getMediaType() == Response\Model\Item::PHOTO) {
+                        $mediaUrl = $item->getImageVersions2()->getCandidates()[0]->getUrl();
                     } else {
                         $mediaUrl = $item->getVideoVersions()[0]->getUrl();
                     }
@@ -458,6 +458,9 @@ class Timeline extends RequestCollection
                     touch($filePath, $mediaInfo['taken_at']);
                 }
             }
-        } while (($nextMaxId = $myTimeline->getNextMaxId()) !== null);
+
+            // Update the page ID to point to the next page (if more available).
+            $nextMaxId = $myTimeline->getNextMaxId();
+        } while ($nextMaxId !== null);
     }
 }
