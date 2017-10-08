@@ -789,14 +789,14 @@ class Client
      * OF BIG NUMBERS! OTHERWISE YOU'LL TRUNCATE VARIOUS INSTAGRAM API FIELDS!
      *
      * @param string $json  The body (JSON string) of the API response.
-     * @param bool   $assoc When TRUE, decode to associative array instead of object.
+     * @param bool   $assoc When FALSE, decode to object instead of associative array.
      *
      * @return object|array|null Object if assoc false, Array if assoc true,
      *                           or NULL if unable to decode JSON.
      */
     public static function api_body_decode(
         $json,
-        $assoc = false)
+        $assoc = true)
     {
         return json_decode($json, $assoc, 512, JSON_BIGINT_AS_STRING);
     }

@@ -665,12 +665,12 @@ class Request
     /**
      * Return JSON-decoded HTTP response.
      *
-     * @param bool $assoc When TRUE, decode to associative array instead of object.
+     * @param bool $assoc When FALSE, decode to object instead of associative array.
      *
      * @return mixed
      */
     public function getRawResponse(
-        $assoc = false)
+        $assoc = true)
     {
         $httpResponse = $this->getHttpResponse();
         $body = $httpResponse->getBody();
