@@ -4,6 +4,28 @@ namespace InstagramAPI\Response\Model;
 
 use InstagramAPI\AutoPropertyMapper;
 
+/**
+ * @method mixed getDurationInVideoInSec()
+ * @method float[] getPosition()
+ * @method mixed getStartTimeInVideoInSec()
+ * @method mixed getTimeInVideo()
+ * @method User getUser()
+ * @method bool isDurationInVideoInSec()
+ * @method bool isPosition()
+ * @method bool isStartTimeInVideoInSec()
+ * @method bool isTimeInVideo()
+ * @method bool isUser()
+ * @method $this setDurationInVideoInSec(mixed $value)
+ * @method $this setPosition(float[] $value)
+ * @method $this setStartTimeInVideoInSec(mixed $value)
+ * @method $this setTimeInVideo(mixed $value)
+ * @method $this setUser(User $value)
+ * @method $this unsetDurationInVideoInSec()
+ * @method $this unsetPosition()
+ * @method $this unsetStartTimeInVideoInSec()
+ * @method $this unsetTimeInVideo()
+ * @method $this unsetUser()
+ */
 class In extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [

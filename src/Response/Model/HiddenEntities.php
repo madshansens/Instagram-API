@@ -4,6 +4,20 @@ namespace InstagramAPI\Response\Model;
 
 use InstagramAPI\AutoPropertyMapper;
 
+/**
+ * @method mixed getHashtag()
+ * @method mixed getPlace()
+ * @method mixed getUser()
+ * @method bool isHashtag()
+ * @method bool isPlace()
+ * @method bool isUser()
+ * @method $this setHashtag(mixed $value)
+ * @method $this setPlace(mixed $value)
+ * @method $this setUser(mixed $value)
+ * @method $this unsetHashtag()
+ * @method $this unsetPlace()
+ * @method $this unsetUser()
+ */
 class HiddenEntities extends AutoPropertyMapper
 {
     // TODO: The server returns each of these fields as [] arrays, but we don't

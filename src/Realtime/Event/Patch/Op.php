@@ -14,6 +14,28 @@ use InstagramAPI\Response\Model\DirectThreadItem;
 use InstagramAPI\Response\Model\DirectThreadLastSeenAt;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @method mixed getDoublePublish()
+ * @method mixed getOp()
+ * @method mixed getPath()
+ * @method mixed getTs()
+ * @method mixed getValue()
+ * @method bool isDoublePublish()
+ * @method bool isOp()
+ * @method bool isPath()
+ * @method bool isTs()
+ * @method bool isValue()
+ * @method $this setDoublePublish(mixed $value)
+ * @method $this setOp(mixed $value)
+ * @method $this setPath(mixed $value)
+ * @method $this setTs(mixed $value)
+ * @method $this setValue(mixed $value)
+ * @method $this unsetDoublePublish()
+ * @method $this unsetOp()
+ * @method $this unsetPath()
+ * @method $this unsetTs()
+ * @method $this unsetValue()
+ */
 class Op extends AutoPropertyMapper
 {
     const ADD = 'add';

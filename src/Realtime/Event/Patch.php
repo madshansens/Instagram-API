@@ -6,6 +6,32 @@ use Evenement\EventEmitterInterface;
 use InstagramAPI\Realtime\Event as RealtimeEvent;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @method Patch\Op[] getData()
+ * @method mixed getEvent()
+ * @method bool getLazy()
+ * @method int getMessageType()
+ * @method int getNumEndpoints()
+ * @method int getSeqId()
+ * @method bool isData()
+ * @method bool isEvent()
+ * @method bool isLazy()
+ * @method bool isMessageType()
+ * @method bool isNumEndpoints()
+ * @method bool isSeqId()
+ * @method $this setData(Patch\Op[] $value)
+ * @method $this setEvent(mixed $value)
+ * @method $this setLazy(bool $value)
+ * @method $this setMessageType(int $value)
+ * @method $this setNumEndpoints(int $value)
+ * @method $this setSeqId(int $value)
+ * @method $this unsetData()
+ * @method $this unsetEvent()
+ * @method $this unsetLazy()
+ * @method $this unsetMessageType()
+ * @method $this unsetNumEndpoints()
+ * @method $this unsetSeqId()
+ */
 class Patch extends RealtimeEvent
 {
     const JSON_PROPERTY_MAP = [

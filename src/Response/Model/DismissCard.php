@@ -4,6 +4,32 @@ namespace InstagramAPI\Response\Model;
 
 use InstagramAPI\AutoPropertyMapper;
 
+/**
+ * @method mixed getButtonText()
+ * @method mixed getCameraTarget()
+ * @method mixed getCardId()
+ * @method mixed getImageUrl()
+ * @method mixed getMessage()
+ * @method mixed getTitle()
+ * @method bool isButtonText()
+ * @method bool isCameraTarget()
+ * @method bool isCardId()
+ * @method bool isImageUrl()
+ * @method bool isMessage()
+ * @method bool isTitle()
+ * @method $this setButtonText(mixed $value)
+ * @method $this setCameraTarget(mixed $value)
+ * @method $this setCardId(mixed $value)
+ * @method $this setImageUrl(mixed $value)
+ * @method $this setMessage(mixed $value)
+ * @method $this setTitle(mixed $value)
+ * @method $this unsetButtonText()
+ * @method $this unsetCameraTarget()
+ * @method $this unsetCardId()
+ * @method $this unsetImageUrl()
+ * @method $this unsetMessage()
+ * @method $this unsetTitle()
+ */
 class DismissCard extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [

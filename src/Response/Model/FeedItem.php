@@ -4,6 +4,24 @@ namespace InstagramAPI\Response\Model;
 
 use InstagramAPI\AutoPropertyMapper;
 
+/**
+ * @method Ad4ad getAd4ad()
+ * @method mixed getAdLinkType()
+ * @method Item getMediaOrAd()
+ * @method SuggestedUsers getSuggestedUsers()
+ * @method bool isAd4ad()
+ * @method bool isAdLinkType()
+ * @method bool isMediaOrAd()
+ * @method bool isSuggestedUsers()
+ * @method $this setAd4ad(Ad4ad $value)
+ * @method $this setAdLinkType(mixed $value)
+ * @method $this setMediaOrAd(Item $value)
+ * @method $this setSuggestedUsers(SuggestedUsers $value)
+ * @method $this unsetAd4ad()
+ * @method $this unsetAdLinkType()
+ * @method $this unsetMediaOrAd()
+ * @method $this unsetSuggestedUsers()
+ */
 class FeedItem extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
