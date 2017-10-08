@@ -7,7 +7,7 @@ use InstagramAPI\AutoPropertyMapper;
 class In extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'position'                   => 'Position',
+        'position'                   => 'float[]',
         'user'                       => 'User',
         'time_in_video'              => '',
         'start_time_in_video_in_sec' => '',
