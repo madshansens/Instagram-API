@@ -3,6 +3,7 @@
 :+1::tada: First off, thanks for taking the time to contribute! :tada::+1:
 
 The following is a set of guidelines for contributing to the Instagram API, which is hosted in the [Instagram API repository](https://github.com/mgp25/Instagram-API) on GitHub.
+
 These are just guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
 
 - [What should I know before I get started?](#what-should-i-know-before-i-get-started)
@@ -175,7 +176,7 @@ public function doSomething(
 }
 ```
 
-- All properties and functions MUST be named using `camelCase`, NOT `snake_case`. (The _only_ exception to this rule is  Instagram's server response property objects, meaning everything in the `src/Response/` folder, since _their_ server replies use underscores.)
+- All properties and functions MUST be named using `camelCase`, NOT `snake_case`. (The _only_ exception to this rule is Instagram's server response property objects, meaning everything in the `src/Response/` folder, since _their_ server replies can use underscores.)
 - Private and protected properties/functions MUST be _prefixed_ with an underscore, to clearly show that they are internal inside the class and _cannot_ be used from the outside. But the PUBLIC properties/functions MUST _NEVER_ be prefixed with an underscore (_except_ the _obvious_, specially named, built-in PHP double-underscore ones such as `public function __construct()`). And also note that function _arguments_ (such as in setters) MUST NEVER be prefixed by underscores.
 
 Example of a class with proper function and property underscore prefixes for private/protected members, and with the proper function argument style:
@@ -286,15 +287,13 @@ function uploadVideo($videoFilename, $filter, $url, $caption, $usertags, $hashta
 
 Make such multi-argument functions take future-extensible option-arrays instead, especially if you expect that more properties may be added in the future.
 
-Furthermore, its `uploadVideo` name is too generic. What if we _later_ need to be able to upload Story videos, when Instagram added its Story feature? And Album videos? Suddenly, the existing `uploadVideo` function name would be a huge problem for us.
-
 So the above would instead be PROPERLY designed as follows:
 
 ```php
-function uploadTimelineVideo($videoFilename, array $metadata);
+function uploadVideo($videoFilename, array $metadata);
 ```
 
-Now users can just say `uploadTimelineVideo($videoFilename, ['hashtags'=>$hashtags]);`, and we can easily add more metadata fields in the future without ever breaking backwards-compatibility with projects that are using our function! And since the function name is good and _specific_, it also means that we can easily add _other_ kinds of "video" upload functions for any _future features_ Instagram introduces, simply by creating new functions such as `uploadStoryVideo`, which gives us total freedom to implement Instagram's new features without breaking backwards-compatibility with anyone using the _other_ functions.
+Now users can just say `uploadVideo($videoFilename, ['hashtags'=>$hashtags]);`, and we can easily add more metadata fields in the future without ever breaking backwards-compatibility with projects that are using our function!
 
 ### Function Documentation
 
@@ -342,18 +341,20 @@ Example of a properly documented function:
 
 In order to add endpoints to the API you will need to capture the requests first. For that, you can use any HTTPS proxy you want. You can find a lot of information about this on the internet. Remember that you need to install a root CA (Certificate Authority) in your device so that the proxy can decrypt the requests and show them to you.
 
+Also be aware that you cannot capture Instagram for iPhone's requests. The iPhone API parameters are totally different and they are NOT compatible with this Android API library! You MUST use a real Android APK when capturing requests!
 
 Once you have the endpoint and necessary parameters, how do you add them to this library? Easy, you can follow this example:
 
 ```php
-    public function getAwesome()
+    public function getAwesome(
+        array $userList)
     {
-        return $this->request('awesome/endpoint/')
-        ->setSignedPost(false)
-        ->addPost('_uuid', $this->uuid)
-        ->addPost('user_ids', implode(',', $userList))
-        ->addPost('_csrftoken', $this->client->getToken())
-        ->getResponse(new Response\AwesomeResponse());
+        return $this->ig->request('awesome/endpoint/')
+            ->setSignedPost(false)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('user_ids', implode(',', $userList))
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\AwesomeResponse());
     }
 ```
 
@@ -367,13 +368,13 @@ Which is basically:
 
 Where key is the name of the POST param, and value is whatever value the server requires for that parameter.
 
-Some of the requests are signed. This means there is a hash concatenated to the JSON. In order to make a signed request, we can enable or disable signing with the following line:
+Some of the requests are signed. This means there is a hash concatenated with the JSON. In order to make a signed request, we can enable or disable signing with the following line:
 
 ```php
 ->setSignedPost($isSigned)
 ```
 
-`$isSigned` is boolean, if you want a signed request, you simply set it to `true`.
+`$isSigned` is boolean, so if you want a signed request, you simply set it to `true`.
 
 If the request is a GET request, you can add the GET query parameters like this (instead of using `addPost`):
 
@@ -387,7 +388,7 @@ And finally, we always end with the `getResponse` function call, which will read
 ->getResponse(new Response\AwesomeResponse());
 ```
 
-Now you might be wondering how to create that response class? But there is nothing to worry about, it's very simple.
+Now you might be wondering how to create that response class? But there is nothing to worry about... it's very simple!
 
 Imagine that you have the following response:
 
@@ -399,90 +400,77 @@ You can use [http://jsoneditoronline.org](http://jsoneditoronline.org/) for a be
 
 <img src="https://s29.postimg.org/3xyopcbg7/insta_help.jpg" width="300">
 
-So your new `src/Response/AwesomeResponse.php` class should contain one public var named `items`. Our magical JSONMapper object mapping system also needs a PHPdoc comment to tell us if the property is another class, an array, a string, a string array, etc. By default, if you don't specify any comment, it will read the JSON value as whatever type PHP detected it as internally (such as a string, int, float, bool, etc).
+(Alternatively, if you're an advanced user, you can create an empty response-class (with no defined properties yet), and then use its `->printJson()` function to look at its contents in a beautifully readable way.)
 
-In this scenario:
+So your new `src/Response/AwesomeResponse.php` class should contain one `JSON_PROPERTY_MAP` property named `items`. Our magical [LazyJsonMapper](https://github.com/SteveJobzniak/LazyJsonMapper) object mapping system needs a PHPdoc-style type-definition to tell us if the property is another class, a float, an int, a string, a string array, etc. By default, if you don't specify any type (if you set its value to `''`), it will treat the JSON value as whatever type PHP detected it as internally during JSON decoding (such as a string, int, float, bool, etc).
 
-```php
-    /**
-     * @var Model\Suggestion[]
-     */
-    public $items;
- ```
-
-The `$items` property will contain an array of Suggestion model objects. And `src/Response/Model/Suggestion.php` will look like this:
-
-```php
-<?php
-
-namespace InstagramAPI\Response\Model;
-
-use InstagramAPI\AutoPropertyHandler;
-
-class Suggestion extends AutoPropertyHandler
-{
-    public $media_infos;
-    public $social_context;
-    public $algorithm;
-    /**
-     * @var string[]
-     */
-    public $thumbnail_urls;
-    public $value;
-    public $caption;
-    /**
-     * @var User
-     */
-    public $user;
-    /**
-     * @var string[]
-     */
-    public $large_urls;
-    public $media_ids;
-    public $icon;
-}
-```
-
-Here in this `Suggestion` class you can see many variables that didn't appear in our example endpoint's response, but that's because many other requests _re-use_ the same object, and depending the request, the response variables may differ. Also note that unlike the AwesomeResponse class, the actual Model objects (the files in in `src/Response/Model/`) _don't_ have to use the "Model\" prefix when referring to other model objects, since they are in the same namespace already.
-
-Note that any Model objects relating to Media IDs, PKs, User PKs, etc, _must_ be declared as a `/** @var string */`, otherwise they may be handled as a float/int which won't fit on 32-bit CPUs and will truncate the number, leading to the wrong data. Just look at all other Model objects that are already in this project, and be sure that any ID/PK fields in your new Model object are properly tagged as `string` type!
-
-Lastly, our `src/Response/AwesomeResponse.php` should look as follows:
+In this scenario, your `src/Response/AwesomeResponse.php` file and its property definitions should look as follows, since we want to map `items` to an array of `Suggestion` objects:
 
 ```php
 <?php
 
 namespace InstagramAPI\Response;
 
-use InstagramAPI\AutoPropertyHandler;
-use InstagramAPI\ResponseInterface;
-use InstagramAPI\ResponseTrait;
+use InstagramAPI\Response;
 
-class AwesomeResponse extends AutoPropertyHandler implements ResponseInterface
+class AwesomeResponse extends Response
 {
-    use ResponseTrait;
-
-    /**
-     * @var Model\Suggestion[]
-     */
-    public $items;
+    const JSON_PROPERTY_MAP = [
+        'items' => 'Model\Suggestion[]',
+    ];
 }
 ```
 
-Now you can test your new endpoint, in order to see the response object:
-
-```
-$a = $i->getAwesome();
-var_dump($a); // this will print the response object
-```
-
-And finally, how do you access the object's data? Via the magical `AutoPropertyHandler` which you inherited. It automatically creates getters and setters for all properties.
+The `items` property will now expect an array of Suggestion model objects. And `src/Response/Model/Suggestion.php` should look like this:
 
 ```php
-$items = $a->getItems();
-$user = $items[0]->getUser();
+<?php
+
+namespace InstagramAPI\Response\Model;
+
+use InstagramAPI\AutoPropertyMapper;
+
+class Suggestion extends AutoPropertyMapper
+{
+    const JSON_PROPERTY_MAP = [
+        'media_infos'    => '',
+        'social_context' => '',
+        'algorithm'      => '',
+        'thumbnail_urls' => 'string[]',
+        'value'          => '',
+        'caption'        => '',
+        'user'           => 'User',
+        'large_urls'     => 'string[]',
+        'media_ids'      => '',
+        'icon'           => '',
+    ];
+}
 ```
 
-Lastly, you may sometimes be implementing an endpoint which uses a nearly empty response with just the standard "status" and/or "message" fields, and no other fields. In that case, there's already a pre-made response which you should use: "GenericResponse". Search the source code for that word and you'll find many endpoints where we use that basic response. Use it to easily add new endpoint implementations whenever there's no extra data to extract!
+Here in this `Suggestion` class you can see many variables that didn't appear in our example endpoint's response, but that's because many other requests _re-use_ the same object, and depending the request, their response contents may differ a bit. Also note that unlike the AwesomeResponse class, the actual Model objects (the files in in `src/Response/Model/`) _don't_ use the "Model\" prefix when referring to other model objects, since they are in the same namespace already.
 
-Hope you find this useful. :smile:
+Also note that many of the properties above are defined as `''` (no type), which means "mixed/untyped". It simply means that the value is not forcibly converted to anything. That's how you should define most properties unless you have a specific reason to force anything to a specific type.
+
+It is also _extremely important_ that any properties relating to Media IDs, PKs, User PKs, etc, _must_ be declared as a `string`, otherwise they may be handled as a float/int which won't fit on 32-bit CPUs and will truncate the number, leading to the wrong data. Just look at all other Model objects that are already in this project, and be sure that any ID/PK fields in your own new Model object are properly tagged as `string` type too!
+
+Now you can test your new endpoint, in order to look at its response object:
+
+```
+$awesome = $i->getAwesome(['123']);
+$awesome->printJson(); // Look at the object data.
+$awesome->printPropertyDescriptions(); // Look at all defined properties.
+```
+
+And finally, how do you access the object's data? Via the magical [LazyJsonMapper](https://github.com/SteveJobzniak/LazyJsonMapper), which your Response and Model objects inherit from! It automatically creates getters and setters for all properties, and has a million other features!
+
+```php
+$items = $awesome->getItems();
+$user = $items[0]->getUser();
+
+// LazyJsonMapper even lets you look at the JSON of specific sub-objects:
+$user->printJson();
+```
+
+Lastly, you may sometimes be implementing an endpoint which uses a nearly empty response with just the standard `status` and/or `message` (and `_messages`) fields, and no other fields. In that case, there's already a pre-made response which you should use: `GenericResponse`. Search the source code for that word and you'll find many endpoints where we use that basic response. Use it to easily add new endpoint implementations whenever there's no extra data to extract!
+
+We hope that you found this tutorial useful! :smile:
