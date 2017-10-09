@@ -528,12 +528,33 @@ class Client
 
         // Perform mapping of all response properties.
         try {
-            $responseObject->assignObjectData(
-                $serverResponse,
-                // Use API developer debugging? Throws if class lacks properties, or
-                // if they can't be mapped as defined in the class property map.
-                $this->_parent->apiDeveloperDebug
-            );
+            // Assign the new object data. Only throws if custom _init() fails.
+            // NOTE: False = assign data without automatic analysis.
+            $responseObject->assignObjectData($serverResponse, false); // Throws.
+
+            // Use API developer debugging? We'll throw if class lacks property
+            // definitions, or if they can't be mapped as defined in the class
+            // property map. But we'll ignore missing properties in our custom
+            // UnpredictableKeys containers, since those ALWAYS lack keys. ;-)
+            if ($this->_parent->apiDeveloperDebug) {
+                // Perform manual analysis (so that we can intercept its analysis result).
+                $analysis = $responseObject->exportClassAnalysis(); // Never throws.
+
+                // Remove all "missing_definitions" errors for UnpredictableKeys containers.
+                // NOTE: We will keep any "bad_definitions" errors for them.
+                foreach ($analysis->missing_definitions as $className => $x) {
+                    if (strpos($className, '\\Response\\Model\\UnpredictableKeys\\') !== false) {
+                        unset($analysis->missing_definitions[$className]);
+                    }
+                }
+
+                // If any problems remain after that, throw with all combined summaries.
+                if ($analysis->hasProblems()) {
+                    throw new LazyJsonMapperException(
+                        $analysis->generateNiceSummariesAsString()
+                    );
+                }
+            }
         } catch (LazyJsonMapperException $e) {
             // Exceptions will only be thrown if API developer debugging is
             // enabled and finds a problem. Either way, we should re-wrap the
