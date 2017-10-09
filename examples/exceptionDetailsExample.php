@@ -41,7 +41,7 @@ try {
 
     if ($e->hasResponse()) { // <-- VERY IMPORTANT TO CHECK FIRST!
         echo "The current exception contains a full server response:\n";
-        var_dump($e->getResponse());
+        $e->getResponse()->printJson();
         echo "Showing the 'did_delete' and 'message' values of the response:\n";
         var_dump($e->getResponse()->getDidDelete());
         var_dump($e->getResponse()->getMessage());
@@ -58,7 +58,7 @@ try {
 
     if ($e->hasResponse()) { // <-- VERY IMPORTANT TO CHECK FIRST!
         echo "The current exception contains a full server response:\n";
-        var_dump($e->getResponse());
+        $e->getResponse()->printJson();
         echo "Showing the 'did_delete' and 'message' values of the response:\n";
         var_dump($e->getResponse()->getDidDelete());
         var_dump($e->getResponse()->getMessage());
