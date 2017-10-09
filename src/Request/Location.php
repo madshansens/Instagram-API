@@ -15,8 +15,8 @@ class Location extends RequestCollection
      * NOTE: The locations found by this endpoint can be used for attaching
      * locations to media uploads. This is the endpoint used by the real app!
      *
-     * @param string      $latitude
-     * @param string      $longitude
+     * @param string      $latitude  Latitude.
+     * @param string      $longitude Longitude.
      * @param null|string $query     (optional) If provided, Instagram does a
      *                               worldwide location text search, but lists
      *                               locations closest to your lat/lng first.
@@ -78,23 +78,23 @@ class Location extends RequestCollection
      * WARNING: The locations found by this function DO NOT work for attaching
      * locations to media uploads. Use Location::search() instead!
      *
-     * @param string $lat   Latitude.
-     * @param string $lng   Longitude.
-     * @param int    $count (optional) Facebook will return up to this many results.
+     * @param string $latitude  Latitude.
+     * @param string $longitude Longitude.
+     * @param int    $count     (optional) Facebook will return up to this many results.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\FBLocationResponse
      */
     public function searchFacebookByPoint(
-        $lat,
-        $lng,
+        $latitude,
+        $longitude,
         $count = null)
     {
         $location = $this->ig->request('fbsearch/places/')
             ->addParam('rank_token', $this->ig->rank_token)
-            ->addParam('lat', $lat)
-            ->addParam('lng', $lng);
+            ->addParam('lat', $latitude)
+            ->addParam('lng', $longitude);
 
         if ($count !== null) {
             $location->addParam('count', $count);

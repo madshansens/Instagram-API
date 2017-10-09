@@ -378,8 +378,8 @@ class People extends RequestCollection
      * This performs a combined search for "top results" in all 3 areas at once.
      *
      * @param string $query     The username/full name, hashtag or location to search for.
-     * @param string $latitude
-     * @param string $longitude
+     * @param string $latitude  (optional) Latitude.
+     * @param string $longitude (optional) Longitude.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
