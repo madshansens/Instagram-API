@@ -8,6 +8,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getAlgorithm()
  * @method mixed getCaption()
  * @method mixed getIcon()
+ * @method mixed getIsNewSuggestion()
  * @method string[] getLargeUrls()
  * @method mixed getMediaIds()
  * @method mixed getMediaInfos()
@@ -18,6 +19,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isAlgorithm()
  * @method bool isCaption()
  * @method bool isIcon()
+ * @method bool isIsNewSuggestion()
  * @method bool isLargeUrls()
  * @method bool isMediaIds()
  * @method bool isMediaInfos()
@@ -28,6 +30,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setAlgorithm(mixed $value)
  * @method $this setCaption(mixed $value)
  * @method $this setIcon(mixed $value)
+ * @method $this setIsNewSuggestion(mixed $value)
  * @method $this setLargeUrls(string[] $value)
  * @method $this setMediaIds(mixed $value)
  * @method $this setMediaInfos(mixed $value)
@@ -38,6 +41,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetAlgorithm()
  * @method $this unsetCaption()
  * @method $this unsetIcon()
+ * @method $this unsetIsNewSuggestion()
  * @method $this unsetLargeUrls()
  * @method $this unsetMediaIds()
  * @method $this unsetMediaInfos()
@@ -49,15 +53,16 @@ use InstagramAPI\AutoPropertyMapper;
 class Suggestion extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'media_infos'    => '',
-        'social_context' => '',
-        'algorithm'      => '',
-        'thumbnail_urls' => 'string[]',
-        'value'          => '',
-        'caption'        => '',
-        'user'           => 'User',
-        'large_urls'     => 'string[]',
-        'media_ids'      => '',
-        'icon'           => '',
+        'media_infos'       => '',
+        'social_context'    => '',
+        'algorithm'         => '',
+        'thumbnail_urls'    => 'string[]',
+        'value'             => '',
+        'caption'           => '',
+        'user'              => 'User',
+        'large_urls'        => 'string[]',
+        'media_ids'         => '',
+        'icon'              => '',
+        'is_new_suggestion' => '',
     ];
 }
