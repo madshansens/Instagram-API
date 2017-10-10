@@ -16,7 +16,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getLastActivityAt()
  * @method mixed getLastActivityAtSecs()
  * @method PermanentItem getLastPermanentItem()
- * @method DirectThreadLastSeenAt[] getLastSeenAt()
+ * @method UnpredictableKeys\DirectThreadLastSeenAtUnpredictableContainer getLastSeenAt()
  * @method User[] getLeftUsers()
  * @method mixed getMuted()
  * @method mixed getNamed()
@@ -64,7 +64,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setLastActivityAt(mixed $value)
  * @method $this setLastActivityAtSecs(mixed $value)
  * @method $this setLastPermanentItem(PermanentItem $value)
- * @method $this setLastSeenAt(DirectThreadLastSeenAt[] $value)
+ * @method $this setLastSeenAt(UnpredictableKeys\DirectThreadLastSeenAtUnpredictableContainer $value)
  * @method $this setLeftUsers(User[] $value)
  * @method $this setMuted(mixed $value)
  * @method $this setNamed(mixed $value)
@@ -123,7 +123,7 @@ class DirectThread extends AutoPropertyMapper
         'canonical'             => '',
         'inviter'               => 'User',
         'pending'               => '',
-        'last_seen_at'          => 'DirectThreadLastSeenAt[]',
+        'last_seen_at'          => 'UnpredictableKeys\DirectThreadLastSeenAtUnpredictableContainer',
         'unseen_count'          => '',
         'action_badge'          => 'ActionBadge',
         'last_activity_at_secs' => '',
