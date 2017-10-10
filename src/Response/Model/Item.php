@@ -17,7 +17,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getBoostUnavailableReason()
  * @method mixed getBoostedStatus()
  * @method mixed getCanViewerSave()
- * @method Caption getCaption()
+ * @method mixed getCaption()
  * @method mixed getCaptionIsEdited()
  * @method mixed getCaptionPosition()
  * @method CarouselMedia[] getCarouselMedia()
@@ -100,6 +100,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method User[] getSponsorTags()
  * @method Stories getStories()
  * @method mixed getStoryCta()
+ * @method mixed getStoryEvents()
+ * @method mixed getStoryFeedMedia()
  * @method mixed getStoryHashtags()
  * @method StoryLocation[] getStoryLocations()
  * @method mixed getStoryPollVoterInfos()
@@ -216,6 +218,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isSponsorTags()
  * @method bool isStories()
  * @method bool isStoryCta()
+ * @method bool isStoryEvents()
+ * @method bool isStoryFeedMedia()
  * @method bool isStoryHashtags()
  * @method bool isStoryLocations()
  * @method bool isStoryPollVoterInfos()
@@ -249,7 +253,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setBoostUnavailableReason(mixed $value)
  * @method $this setBoostedStatus(mixed $value)
  * @method $this setCanViewerSave(mixed $value)
- * @method $this setCaption(Caption $value)
+ * @method $this setCaption(mixed $value)
  * @method $this setCaptionIsEdited(mixed $value)
  * @method $this setCaptionPosition(mixed $value)
  * @method $this setCarouselMedia(CarouselMedia[] $value)
@@ -332,6 +336,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setSponsorTags(User[] $value)
  * @method $this setStories(Stories $value)
  * @method $this setStoryCta(mixed $value)
+ * @method $this setStoryEvents(mixed $value)
+ * @method $this setStoryFeedMedia(mixed $value)
  * @method $this setStoryHashtags(mixed $value)
  * @method $this setStoryLocations(StoryLocation[] $value)
  * @method $this setStoryPollVoterInfos(mixed $value)
@@ -448,6 +454,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetSponsorTags()
  * @method $this unsetStories()
  * @method $this unsetStoryCta()
+ * @method $this unsetStoryEvents()
+ * @method $this unsetStoryFeedMedia()
  * @method $this unsetStoryHashtags()
  * @method $this unsetStoryLocations()
  * @method $this unsetStoryPollVoterInfos()
@@ -521,7 +529,7 @@ class Item extends AutoPropertyMapper
         'next_max_id'                      => 'string',
         'carousel_media'                   => 'CarouselMedia[]',
         'carousel_media_type'              => '',
-        'caption'                          => 'Caption',
+        'caption'                          => '',
         'caption_is_edited'                => '',
         'photo_of_you'                     => '',
         'video_versions'                   => 'VideoVersions[]',
@@ -607,6 +615,8 @@ class Item extends AutoPropertyMapper
         'actor_fbid'                       => 'string',
         'is_ad4ad'                         => '',
         'commenting_disabled_for_viewer'   => '',
+        'story_events'                     => '',
+        'story_feed_media'                 => '',
     ];
 
     /**
