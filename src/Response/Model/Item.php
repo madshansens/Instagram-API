@@ -16,8 +16,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method Attribution getAttribution()
  * @method mixed getBoostUnavailableReason()
  * @method mixed getBoostedStatus()
+ * @method mixed getCanReshare()
  * @method mixed getCanViewerSave()
- * @method mixed getCaption()
  * @method mixed getCaptionIsEdited()
  * @method mixed getCaptionPosition()
  * @method CarouselMedia[] getCarouselMedia()
@@ -134,6 +134,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isAttribution()
  * @method bool isBoostUnavailableReason()
  * @method bool isBoostedStatus()
+ * @method bool isCanReshare()
  * @method bool isCanViewerSave()
  * @method bool isCaption()
  * @method bool isCaptionIsEdited()
@@ -252,6 +253,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setAttribution(Attribution $value)
  * @method $this setBoostUnavailableReason(mixed $value)
  * @method $this setBoostedStatus(mixed $value)
+ * @method $this setCanReshare(mixed $value)
  * @method $this setCanViewerSave(mixed $value)
  * @method $this setCaption(mixed $value)
  * @method $this setCaptionIsEdited(mixed $value)
@@ -370,6 +372,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetAttribution()
  * @method $this unsetBoostUnavailableReason()
  * @method $this unsetBoostedStatus()
+ * @method $this unsetCanReshare()
  * @method $this unsetCanViewerSave()
  * @method $this unsetCaption()
  * @method $this unsetCaptionIsEdited()
@@ -617,6 +620,7 @@ class Item extends AutoPropertyMapper
         'commenting_disabled_for_viewer'   => '',
         'story_events'                     => '',
         'story_feed_media'                 => '',
+        'can_reshare'                      => '',
     ];
 
     /**
@@ -637,5 +641,20 @@ class Item extends AutoPropertyMapper
     public function isAd()
     {
         return $this->_getProperty('dr_ad_type') !== null;
+    }
+
+    /**
+     * Get the caption from this media item.
+     *
+     * @return Caption|string
+     */
+    public function getCaption()
+    {
+        $value = $this->_getProperty('caption');
+        if (is_array($value)) {
+            return new Caption($value);
+        } else {
+            return $value;
+        }
     }
 }

@@ -5,7 +5,6 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
- * @method mixed getAttribution()
  * @method float getHeight()
  * @method mixed getIsPinned()
  * @method Location getLocation()
@@ -50,4 +49,19 @@ class StoryLocation extends AutoPropertyMapper
         'attribution' => '',
         'is_pinned'   => '',
     ];
+
+    /**
+     * Get attribution.
+     *
+     * @return Attribution|string
+     */
+    public function getAttribution()
+    {
+        $value = $this->_getProperty('attribution');
+        if (is_array($value)) {
+            return new Attribution($value);
+        } else {
+            return $value;
+        }
+    }
 }
