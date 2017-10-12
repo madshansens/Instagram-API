@@ -8,6 +8,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getAndroidClass()
  * @method mixed getCallToActionTitle()
  * @method mixed getDeeplinkUri()
+ * @method mixed getIgUserId()
+ * @method mixed getLeadGenFormId()
  * @method mixed getLinkType()
  * @method mixed getPackage()
  * @method mixed getRedirectUri()
@@ -15,6 +17,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isAndroidClass()
  * @method bool isCallToActionTitle()
  * @method bool isDeeplinkUri()
+ * @method bool isIgUserId()
+ * @method bool isLeadGenFormId()
  * @method bool isLinkType()
  * @method bool isPackage()
  * @method bool isRedirectUri()
@@ -22,6 +26,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setAndroidClass(mixed $value)
  * @method $this setCallToActionTitle(mixed $value)
  * @method $this setDeeplinkUri(mixed $value)
+ * @method $this setIgUserId(mixed $value)
+ * @method $this setLeadGenFormId(mixed $value)
  * @method $this setLinkType(mixed $value)
  * @method $this setPackage(mixed $value)
  * @method $this setRedirectUri(mixed $value)
@@ -29,6 +35,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetAndroidClass()
  * @method $this unsetCallToActionTitle()
  * @method $this unsetDeeplinkUri()
+ * @method $this unsetIgUserId()
+ * @method $this unsetLeadGenFormId()
  * @method $this unsetLinkType()
  * @method $this unsetPackage()
  * @method $this unsetRedirectUri()
@@ -44,5 +52,7 @@ class AndroidLinks extends AutoPropertyMapper
         'deeplinkUri'       => '',
         'callToActionTitle' => '',
         'redirectUri'       => '',
+        'igUserId'          => '',
+        'leadGenFormId'     => '',
     ];
 }
