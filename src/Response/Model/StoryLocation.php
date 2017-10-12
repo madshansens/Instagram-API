@@ -5,7 +5,7 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
- * @method Attribution getAttribution()
+ * @method string getAttribution()
  * @method float getHeight()
  * @method mixed getIsPinned()
  * @method Location getLocation()
@@ -21,7 +21,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isWidth()
  * @method bool isX()
  * @method bool isY()
- * @method $this setAttribution(Attribution $value)
+ * @method $this setAttribution(string $value)
  * @method $this setHeight(float $value)
  * @method $this setIsPinned(mixed $value)
  * @method $this setLocation(Location $value)
@@ -47,7 +47,7 @@ class StoryLocation extends AutoPropertyMapper
         'height'      => 'float',
         'width'       => 'float',
         'location'    => 'Location',
-        'attribution' => 'Attribution',
+        'attribution' => 'string',
         'is_pinned'   => '',
     ];
 }
