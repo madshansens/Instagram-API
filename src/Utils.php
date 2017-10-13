@@ -712,6 +712,103 @@ class Utils
     }
 
     /**
+     * Verifies an array of story pollif a story poll is valid.
+     *
+     * @param array[] $storyPoll Array with story poll key-value pairs.
+     *
+     * @throws \InvalidArgumentException If it's missing keys or has invalid values.
+     */
+    public static function throwIfInvalidStoryPoll(
+        array $storyPoll)
+    {
+        $requiredKeys = ['question', 'viewer_vote', 'viewer_can_vote', 'tallies', 'is_sticker'];
+
+        if (count($storyPoll) !== 1) {
+            throw new \InvalidArgumentException(sprintf('Only one story poll is permitted. You added %d story polls.', count($storyPoll)));
+        }
+
+        // Ensure that all keys exist.
+        $missingKeys = array_keys(array_diff_key(['question' => 1, 'viewer_vote' => 1, 'viewer_can_vote' => 1, 'tallies' => 1, 'is_sticker' => 1], $storyPoll[0]));
+        if (count($missingKeys)) {
+            throw new \InvalidArgumentException(sprintf('Missing keys "%s" for story poll array.', implode(', ', $missingKeys)));
+        }
+
+        foreach ($storyPoll[0] as $k => $v) {
+            switch ($k) {
+                case 'question':
+                    if (!is_string($v)) {
+                        throw new \InvalidArgumentException(sprintf('Invalid value "%s" for story poll array-key "%s".', $v, $k));
+                    }
+                    break;
+                case 'viewer_vote':
+                    if ($v !== 0) {
+                        throw new \InvalidArgumentException(sprintf('Invalid value "%s" for story poll array-key "%s".', $v, $k));
+                    }
+                    break;
+                case 'viewer_can_vote':
+                case 'is_sticker':
+                    if (!is_bool($v) && $v !== true) {
+                        throw new \InvalidArgumentException(sprintf('Invalid value "%s" for story poll array-key "%s".', $v, $k));
+                    }
+                    break;
+                case 'tallies':
+                    if (!is_array($v)) {
+                        throw new \InvalidArgumentException(sprintf('Invalid value "%s" for story poll array-key "%s".', $v, $k));
+                    }
+                    self::_throwIfInvalidStoryPollTallies($v);
+                    break;
+            }
+            self::_throwIfInvalidStoryStickerPlacement(array_diff_key($storyPoll[0], array_flip($requiredKeys)), 'polls');
+        }
+    }
+
+    /**
+     * Verifies tallies are valid.
+     *
+     * @param array[] $tallies Array with story poll key-value pairs.
+     *
+     * @throws \InvalidArgumentException If it's missing keys or has invalid values.
+     */
+    protected static function _throwIfInvalidStoryPollTallies(
+        array $tallies)
+    {
+        $requiredKeys = ['text', 'count', 'font_size'];
+        if (count($tallies) !== 2) {
+            throw new \InvalidArgumentException(sprintf('Missing data for tallies.'));
+        }
+
+        foreach ($tallies as $tallie) {
+            $missingKeys = array_keys(array_diff_key(['text' => 1, 'count' => 1, 'font_size' => 1], $tallie));
+
+            if (count($missingKeys)) {
+                throw new \InvalidArgumentException(sprintf('Missing keys "%s" for location array.', implode(', ', $missingKeys)));
+            }
+            foreach ($tallie as $k => $v) {
+                if (!in_array($k, $requiredKeys, true)) {
+                    throw new \InvalidArgumentException(sprintf('Invalid key "%s" for story poll tallies.', $k));
+                }
+                switch ($k) {
+                    case 'text':
+                        if (!is_string($v)) {
+                            throw new \InvalidArgumentException(sprintf('Invalid value "%s" for tallies array-key "%s".', $v, $k));
+                        }
+                        break;
+                    case 'count':
+                        if ($v !== 0) {
+                            throw new \InvalidArgumentException(sprintf('Invalid value "%s" for tallies array-key "%s".', $v, $k));
+                        }
+                        break;
+                    case 'font_size':
+                        if (!is_float($v) || $v !== 35.0) {
+                            throw new \InvalidArgumentException(sprintf('Invalid value "%s" for tallies array-key "%s".', $v, $k));
+                        }
+                        break;
+                }
+            }
+        }
+    }
+
+    /**
      * Verifies an array of story mentions.
      *
      * @param array[] $storyMentions The array of all story mentions.
