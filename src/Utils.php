@@ -712,7 +712,7 @@ class Utils
     }
 
     /**
-     * Verifies an array of story pollif a story poll is valid.
+     * Verifies an array of story poll.
      *
      * @param array[] $storyPoll Array with story poll key-value pairs.
      *
@@ -758,12 +758,12 @@ class Utils
                     self::_throwIfInvalidStoryPollTallies($v);
                     break;
             }
-            self::_throwIfInvalidStoryStickerPlacement(array_diff_key($storyPoll[0], array_flip($requiredKeys)), 'polls');
         }
+        self::_throwIfInvalidStoryStickerPlacement(array_diff_key($storyPoll[0], array_flip($requiredKeys)), 'polls');
     }
 
     /**
-     * Verifies tallies are valid.
+     * Verifies if tallies are valid.
      *
      * @param array[] $tallies Array with story poll key-value pairs.
      *
@@ -835,8 +835,8 @@ class Utils
                         }
                         break;
                 }
-                self::_throwIfInvalidStoryStickerPlacement(array_diff_key($mention, array_flip($requiredKeys)), 'story mentions');
             }
+            self::_throwIfInvalidStoryStickerPlacement(array_diff_key($mention, array_flip($requiredKeys)), 'story mentions');
         }
     }
 
@@ -870,8 +870,8 @@ class Utils
                     }
                     break;
             }
-            self::_throwIfInvalidStoryStickerPlacement(array_diff_key($locationSticker, array_flip($requiredKeys)), 'location');
         }
+        self::_throwIfInvalidStoryStickerPlacement(array_diff_key($locationSticker, array_flip($requiredKeys)), 'location');
     }
 
     /**
@@ -923,8 +923,8 @@ class Utils
                         }
                         break;
                 }
-                self::_throwIfInvalidStoryStickerPlacement(array_diff_key($hashtag, array_flip($requiredKeys)), 'hashtag');
             }
+            self::_throwIfInvalidStoryStickerPlacement(array_diff_key($hashtag, array_flip($requiredKeys)), 'hashtag');
         }
     }
 
