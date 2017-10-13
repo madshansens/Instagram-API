@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * DirectReaction.
+ *
  * @method string getClientContext()
  * @method string getItemId()
  * @method string getNodeType()

@@ -5,7 +5,9 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * @method string getMessage()
+ * DirectThreadResponse.
+ *
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method Model\DirectThread getThread()
  * @method Model\_Message[] get_Messages()

@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * FriendshipStatus.
+ *
  * @method mixed getBlocking()
  * @method mixed getFollowedBy()
  * @method mixed getFollowing()

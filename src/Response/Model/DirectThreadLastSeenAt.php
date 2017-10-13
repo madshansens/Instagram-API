@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * DirectThreadLastSeenAt.
+ *
  * @method string getItemId()
  * @method mixed getTimestamp()
  * @method bool isItemId()

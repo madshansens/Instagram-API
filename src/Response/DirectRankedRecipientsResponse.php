@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * DirectRankedRecipientsResponse.
+ *
  * @method mixed getExpires()
  * @method mixed getFiltered()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getRankToken()
  * @method Model\DirectRankedRecipient[] getRankedRecipients()
  * @method string getRequestId()

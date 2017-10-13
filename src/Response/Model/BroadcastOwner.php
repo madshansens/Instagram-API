@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * BroadcastOwner.
+ *
  * @method FriendshipStatus getFriendshipStatus()
  * @method mixed getFullName()
  * @method mixed getIsPrivate()

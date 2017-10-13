@@ -5,10 +5,12 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * BroadcastLikeCountResponse.
+ *
  * @method mixed getLikeTs()
  * @method Model\User[] getLikers()
  * @method mixed getLikes()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
  * @method bool isLikeTs()

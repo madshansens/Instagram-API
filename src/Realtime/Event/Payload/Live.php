@@ -5,6 +5,8 @@ namespace InstagramAPI\Realtime\Event\Payload;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Live.
+ *
  * @method string getBroadcastId()
  * @method mixed getBroadcastMessage()
  * @method mixed getDisplayNotification()

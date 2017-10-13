@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * SearchUserResponse.
+ *
  * @method mixed getHasMore()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getNextMaxId()
  * @method mixed getNumResults()
  * @method mixed getRankToken()

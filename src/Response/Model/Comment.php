@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Comment.
+ *
  * @method mixed getBitFlags()
  * @method mixed getCommentLikeCount()
  * @method mixed getContentType()

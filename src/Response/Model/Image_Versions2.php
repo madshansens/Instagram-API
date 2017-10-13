@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Image_Versions2.
+ *
  * @method ImageCandidate[] getCandidates()
  * @method mixed getTraceToken()
  * @method bool isCandidates()

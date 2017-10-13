@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * VideoUploadUrl.
+ *
  * @method float getExpires()
  * @method string getJob()
  * @method string getUrl()

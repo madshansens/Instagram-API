@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Insights.
+ *
  * @method mixed getInstagramInsights()
  * @method bool isInstagramInsights()
  * @method $this setInstagramInsights(mixed $value)

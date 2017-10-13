@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * DirectReactions.
+ *
  * @method DirectReaction[] getLikes()
  * @method int getLikesCount()
  * @method bool isLikes()

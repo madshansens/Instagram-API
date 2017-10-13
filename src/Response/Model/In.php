@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * In.
+ *
  * @method mixed getDurationInVideoInSec()
  * @method float[] getPosition()
  * @method mixed getStartTimeInVideoInSec()

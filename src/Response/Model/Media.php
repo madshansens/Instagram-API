@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Media.
+ *
  * @method mixed getExpiringAt()
  * @method string getId()
  * @method mixed getImage()

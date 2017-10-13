@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * SuggestedUsersResponse.
+ *
  * @method mixed getIsBackup()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method Model\User[] getUsers()
  * @method Model\_Message[] get_Messages()

@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Button.
+ *
  * @method mixed getAction()
  * @method mixed getActionInfo()
  * @method mixed getBackgroundColor()

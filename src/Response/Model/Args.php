@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Args.
+ *
  * @method mixed getActionUrl()
  * @method mixed getClicked()
  * @method string getCommentId()

@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * FaceModels.
+ *
  * @method mixed getFaceAlignModel()
  * @method mixed getFaceDetectModel()
  * @method mixed getPdmMultires()

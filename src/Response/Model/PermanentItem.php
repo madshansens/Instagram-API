@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * PermanentItem.
+ *
  * @method string getItemId()
  * @method mixed getItemType()
  * @method mixed getLike()

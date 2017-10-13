@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * FBLocationResponse.
+ *
  * @method mixed getHasMore()
  * @method Model\LocationItem[] getItems()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getRankToken()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()

@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * DirectShareInboxResponse.
+ *
  * @method mixed getLastCountedAt()
  * @method string getMaxId()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getNewShares()
  * @method mixed getNewSharesInfo()
  * @method mixed getPatches()

@@ -5,11 +5,13 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * TimelineFeedResponse.
+ *
  * @method mixed getAutoLoadMoreEnabled()
  * @method Model\FeedItem[] getFeedItems()
  * @method mixed getIsDirectV2Enabled()
  * @method Model\FeedAysf getMegaphone()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getMoreAvailable()
  * @method string getNextMaxId()
  * @method mixed getNumResults()

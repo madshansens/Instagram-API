@@ -5,10 +5,12 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * GraphqlBatchResponse.
+ *
  * @method mixed getIsError()
  * @method mixed getIsSkipped()
  * @method mixed getIsSuccessful()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method Model\GraphQuery getQ0()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()

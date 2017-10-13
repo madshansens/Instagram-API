@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * TopLive.
+ *
  * @method BroadcastOwner[] getBroadcastOwners()
  * @method mixed getRankedPosition()
  * @method bool isBroadcastOwners()

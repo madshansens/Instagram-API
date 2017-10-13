@@ -5,6 +5,8 @@ namespace InstagramAPI\Realtime\Event\Payload;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Notify.
+ *
  * @method \InstagramAPI\Response\Model\ActionLog getActionLog()
  * @method string getUserId()
  * @method bool isActionLog()

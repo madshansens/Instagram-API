@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * BusinessManager.
+ *
  * @method BusinessNode getAccountInsightsUnit()
  * @method PromotionsUnit getPromotionsUnit()
  * @method BusinessFeed get_Feed2py0Z1()

@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * UserStoryFeedResponse.
+ *
  * @method Model\Broadcast getBroadcast()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method Model\PostLiveItem getPostLiveItem()
  * @method Model\Reel getReel()
  * @method string getStatus()

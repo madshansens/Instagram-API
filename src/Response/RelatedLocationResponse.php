@@ -5,7 +5,9 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * @method string getMessage()
+ * RelatedLocationResponse.
+ *
+ * @method mixed getMessage()
  * @method Model\Location[] getRelated()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()

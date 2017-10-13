@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * QueryResponse.
+ *
  * @method ShadowInstagramUser getShadowInstagramUser()
  * @method bool isShadowInstagramUser()
  * @method $this setShadowInstagramUser(ShadowInstagramUser $value)

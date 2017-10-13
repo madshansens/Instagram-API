@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Subscription.
+ *
  * @method mixed getAuth()
  * @method mixed getSequence()
  * @method mixed getTopic()

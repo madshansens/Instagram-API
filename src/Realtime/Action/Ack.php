@@ -7,6 +7,8 @@ use InstagramAPI\Realtime\Action as RealtimeAction;
 use Psr\Log\LoggerInterface;
 
 /**
+ * Ack.
+ *
  * @method mixed getAction()
  * @method \InstagramAPI\Response\Model\DirectSendItemPayload getPayload()
  * @method mixed getStatus()

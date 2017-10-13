@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * GenericMegaphone.
+ *
  * @method mixed getActionInfo()
  * @method mixed getBackgroundColor()
  * @method mixed getButtonLayout()

@@ -5,7 +5,9 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * @method string getMessage()
+ * SuggestedUsersBadgeResponse.
+ *
+ * @method mixed getMessage()
  * @method string[] getNewSuggestionIds()
  * @method mixed getShouldBadge()
  * @method string getStatus()

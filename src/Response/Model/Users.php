@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Users.
+ *
  * @method mixed getPosition()
  * @method User getUser()
  * @method bool isPosition()

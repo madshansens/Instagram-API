@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Injected.
+ *
  * @method mixed getAboutAdParams()
  * @method string getAdId()
  * @method mixed getAdTitle()

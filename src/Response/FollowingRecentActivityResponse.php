@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * FollowingRecentActivityResponse.
+ *
  * @method mixed getAutoLoadMoreEnabled()
  * @method mixed getMegaphone()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getNextMaxId()
  * @method string getStatus()
  * @method Model\Story[] getStories()

@@ -6,6 +6,14 @@ use Evenement\EventEmitterInterface;
 use InstagramAPI\AutoPropertyMapper;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Event.
+ *
+ * @method mixed getEvent()
+ * @method bool isEvent()
+ * @method $this setEvent(mixed $value)
+ * @method $this unsetEvent()
+ */
 abstract class Event extends AutoPropertyMapper
 {
     const SUBSCRIBED = 'subscribed';

@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * EditCollectionResponse.
+ *
  * @method string getCollectionId()
  * @method mixed getCollectionName()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
  * @method bool isCollectionId()

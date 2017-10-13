@@ -5,6 +5,8 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * FriendshipsShowResponse.
+ *
  * @method mixed getBlocking()
  * @method mixed getFollowedBy()
  * @method mixed getFollowing()
@@ -13,7 +15,7 @@ use InstagramAPI\Response;
  * @method mixed getIsBlockingReel()
  * @method mixed getIsMutingReel()
  * @method mixed getIsPrivate()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getOutgoingRequest()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()

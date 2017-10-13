@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Location.
+ *
  * @method mixed getAddress()
  * @method mixed getCity()
  * @method mixed getEndTime()

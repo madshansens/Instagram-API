@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Param.
+ *
  * @method mixed getName()
  * @method mixed getValue()
  * @method bool isName()

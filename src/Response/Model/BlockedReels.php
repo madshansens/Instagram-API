@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * BlockedReels.
+ *
  * @method mixed getBigList()
  * @method mixed getPageSize()
  * @method User[] getUsers()

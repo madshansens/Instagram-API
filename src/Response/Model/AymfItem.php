@@ -3,6 +3,8 @@
 namespace InstagramAPI\Response\Model;
 
 /**
+ * AymfItem.
+ *
  * @method string getActorFbid()
  * @method mixed getAdAction()
  * @method mixed getAdHeaderStyle()

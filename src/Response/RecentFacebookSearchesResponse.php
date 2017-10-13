@@ -5,7 +5,9 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * @method string getMessage()
+ * RecentFacebookSearchesResponse.
+ *
+ * @method mixed getMessage()
  * @method Model\Suggested[] getRecent()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()

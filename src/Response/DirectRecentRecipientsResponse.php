@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * DirectRecentRecipientsResponse.
+ *
  * @method mixed getExpirationInterval()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getRecentRecipients()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()

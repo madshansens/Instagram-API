@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Aymf.
+ *
  * @method AymfItem[] getItems()
  * @method mixed getMoreAvailable()
  * @method bool isItems()

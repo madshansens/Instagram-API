@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Related.
+ *
  * @method string getId()
  * @method mixed getName()
  * @method mixed getType()

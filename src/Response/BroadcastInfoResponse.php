@@ -5,12 +5,14 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * BroadcastInfoResponse.
+ *
  * @method mixed getBroadcastMessage()
  * @method Model\User getBroadcastOwner()
  * @method mixed getBroadcastStatus()
  * @method string getId()
  * @method string getMediaId()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getOrganicTrackingToken()
  * @method mixed getPublishedTime()
  * @method string getStatus()

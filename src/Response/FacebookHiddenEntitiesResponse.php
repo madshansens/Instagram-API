@@ -5,7 +5,9 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * @method string getMessage()
+ * FacebookHiddenEntitiesResponse.
+ *
+ * @method mixed getMessage()
  * @method Model\HiddenEntities getRecent()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()

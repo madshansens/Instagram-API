@@ -8,7 +8,7 @@ use RuntimeException;
 /**
  * Core class for Instagram API responses.
  *
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method Response\Model\_Message[] get_Messages()
  * @method bool isMessage()

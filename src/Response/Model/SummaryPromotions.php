@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * SummaryPromotions.
+ *
  * @method BusinessEdges[] getEdges()
  * @method BusinessPageInfo getPageInfo()
  * @method bool isEdges()

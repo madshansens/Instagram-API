@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Bold.
+ *
  * @method mixed getEnd()
  * @method mixed getStart()
  * @method bool isEnd()

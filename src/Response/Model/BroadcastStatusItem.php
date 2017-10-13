@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * BroadcastStatusItem.
+ *
  * @method mixed getBroadcastStatus()
  * @method mixed getCoverFrameUrl()
  * @method mixed getHasReducedVisibility()

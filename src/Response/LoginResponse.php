@@ -5,6 +5,8 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * LoginResponse.
+ *
  * @method mixed getButtons()
  * @method Model\Challenge getChallenge()
  * @method mixed getCheckpointUrl()
@@ -17,7 +19,7 @@ use InstagramAPI\Response;
  * @method mixed getIsPrivate()
  * @method mixed getLock()
  * @method Model\User getLoggedInUser()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method Model\PhoneVerificationSettings getPhoneVerificationSettings()
  * @method string getPk()
  * @method string getProfilePicId()

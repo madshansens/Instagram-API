@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * BusinessNode.
+ *
  * @method mixed getAllFollowersAgeGraph()
  * @method mixed getAverageEngagementCount()
  * @method mixed getFollowersCount()

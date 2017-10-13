@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * DirectPendingInboxResponse.
+ *
  * @method Model\DirectInbox getInbox()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getPendingRequestsTotal()
  * @method string getSeqId()
  * @method string getStatus()

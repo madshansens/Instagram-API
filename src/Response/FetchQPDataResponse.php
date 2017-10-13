@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * FetchQPDataResponse.
+ *
  * @method mixed getErrorMsg()
  * @method mixed getExtraInfo()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getQpData()
  * @method mixed getRequestStatus()
  * @method string getStatus()

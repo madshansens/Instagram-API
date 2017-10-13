@@ -5,6 +5,8 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * MediaCommentsResponse.
+ *
  * @method Model\Caption getCaption()
  * @method mixed getCaptionIsEdited()
  * @method mixed getCommentCount()
@@ -12,7 +14,7 @@ use InstagramAPI\Response;
  * @method Model\Comment[] getComments()
  * @method mixed getHasMoreComments()
  * @method mixed getHasMoreHeadloadComments()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getNextMaxId()
  * @method mixed getPreviewComments()
  * @method string getStatus()

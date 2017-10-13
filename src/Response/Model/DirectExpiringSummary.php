@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * DirectExpiringSummary.
+ *
  * @method int getCount()
  * @method string getTimestamp()
  * @method string getType()

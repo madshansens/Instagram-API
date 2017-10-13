@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Megaphone.
+ *
  * @method GenericMegaphone getGenericMegaphone()
  * @method bool isGenericMegaphone()
  * @method $this setGenericMegaphone(GenericMegaphone $value)

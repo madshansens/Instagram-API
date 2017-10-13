@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * PostLiveLikesResponse.
+ *
  * @method mixed getEndingOffset()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getNextFetchOffset()
  * @method mixed getStartingOffset()
  * @method string getStatus()

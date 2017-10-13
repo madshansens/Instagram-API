@@ -5,11 +5,13 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * ClientEventLogsResponse.
+ *
  * @method mixed getAppData()
  * @method mixed getChecksum()
  * @method mixed getConfig()
  * @method mixed getError()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
  * @method bool isAppData()

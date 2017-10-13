@@ -5,7 +5,9 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * @method string getMessage()
+ * MediaLikersResponse.
+ *
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method mixed getUserCount()
  * @method Model\User[] getUsers()

@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * DirectVisualInboxResponse.
+ *
  * @method mixed getHasMoreRead()
  * @method mixed getHasMoreUnread()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getReadCursor()
  * @method string getStatus()
  * @method Model\DirectThread[] getThreads()

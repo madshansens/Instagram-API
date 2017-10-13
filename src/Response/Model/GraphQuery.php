@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * GraphQuery.
+ *
  * @method mixed getError()
  * @method QueryResponse getResponse()
  * @method bool isError()

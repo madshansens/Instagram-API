@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * FacebookOTAResponse.
+ *
  * @method mixed getBundles()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getRequestId()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()

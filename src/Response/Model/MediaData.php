@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * MediaData.
+ *
  * @method Image_Versions2 getImageVersions2()
  * @method mixed getMediaType()
  * @method mixed getOriginalHeight()

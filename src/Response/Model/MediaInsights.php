@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * MediaInsights.
+ *
  * @method mixed getEngagementCount()
  * @method mixed getImpressionCount()
  * @method string[] getReachCount()

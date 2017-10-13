@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * ReelSettingsResponse.
+ *
  * @method Model\BlockedReels getBlockedReels()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getMessagePrefs()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()

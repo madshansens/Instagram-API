@@ -5,6 +5,8 @@ namespace InstagramAPI\Realtime\Mqtt;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Iris.
+ *
  * @method string getErrorMessage()
  * @method int getErrorType()
  * @method int getSeqId()

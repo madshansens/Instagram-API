@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Item.
+ *
  * @method string getActorFbid()
  * @method mixed getAdAction()
  * @method mixed getAdHeaderStyle()

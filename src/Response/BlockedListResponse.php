@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * BlockedListResponse.
+ *
  * @method Model\User[] getBlockedList()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getPageSize()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()

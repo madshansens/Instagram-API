@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Owner.
+ *
  * @method float getLat()
  * @method float getLng()
  * @method Location getLocationDict()

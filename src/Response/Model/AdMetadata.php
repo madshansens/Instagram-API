@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * AdMetadata.
+ *
  * @method mixed getType()
  * @method mixed getValue()
  * @method bool isType()

@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Suggested.
+ *
  * @method mixed getClientTime()
  * @method mixed getPosition()
  * @method User getUser()

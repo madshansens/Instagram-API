@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Link.
+ *
  * @method mixed getEnd()
  * @method string getId()
  * @method LinkContext getLinkContext()

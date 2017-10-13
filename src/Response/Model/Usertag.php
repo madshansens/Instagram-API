@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Usertag.
+ *
  * @method In[] getIn()
  * @method mixed getPhotoOfYou()
  * @method bool isIn()

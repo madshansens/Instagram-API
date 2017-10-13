@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * InlineFollow.
+ *
  * @method mixed getFollowing()
  * @method mixed getOutgoingRequest()
  * @method User getUserInfo()

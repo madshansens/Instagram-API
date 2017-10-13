@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Explore.
+ *
  * @method string getActorId()
  * @method mixed getExplanation()
  * @method mixed getSourceToken()

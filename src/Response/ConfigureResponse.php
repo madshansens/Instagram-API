@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * ConfigureResponse.
+ *
  * @method string getClientSidecarId()
  * @method Model\Item getMedia()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method Model\DirectMessageMetadata[] getMessageMetadata()
  * @method string getStatus()
  * @method string getUploadId()

@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * FriendshipsShowManyResponse.
+ *
  * @method Model\FriendshipStatus[] getFriendshipStatuses()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
  * @method bool isFriendshipStatuses()

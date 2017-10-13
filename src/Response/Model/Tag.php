@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Tag.
+ *
  * @method string getId()
  * @method mixed getMediaCount()
  * @method mixed getName()

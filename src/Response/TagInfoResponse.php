@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * TagInfoResponse.
+ *
  * @method mixed getMediaCount()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getProfile()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()

@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * BroadcastHeartbeatAndViewerCountResponse.
+ *
  * @method mixed getBroadcastStatus()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method mixed getViewerCount()
  * @method Model\_Message[] get_Messages()

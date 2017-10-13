@@ -7,7 +7,7 @@ use InstagramAPI\Response;
 /**
  * Used for generic API responses that don't contain any extra data.
  *
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
  * @method bool isMessage()

@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * TwoFactorInfo.
+ *
  * @method mixed getObfuscatedPhoneNumber()
  * @method PhoneVerificationSettings getPhoneVerificationSettings()
  * @method mixed getTwoFactorIdentifier()

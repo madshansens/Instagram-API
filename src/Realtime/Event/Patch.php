@@ -7,6 +7,8 @@ use InstagramAPI\Realtime\Event as RealtimeEvent;
 use Psr\Log\LoggerInterface;
 
 /**
+ * Patch.
+ *
  * @method Patch\Op[] getData()
  * @method mixed getEvent()
  * @method bool getLazy()

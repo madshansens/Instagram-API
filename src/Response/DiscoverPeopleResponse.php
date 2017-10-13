@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * DiscoverPeopleResponse.
+ *
  * @method Model\Groups[] getGroups()
  * @method string getMaxId()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getMoreAvailable()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()

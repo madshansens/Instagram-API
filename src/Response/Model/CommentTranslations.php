@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * CommentTranslations.
+ *
  * @method string getId()
  * @method mixed getTranslation()
  * @method bool isId()

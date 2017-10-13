@@ -15,6 +15,8 @@ use InstagramAPI\Response\Model\DirectThreadLastSeenAt;
 use Psr\Log\LoggerInterface;
 
 /**
+ * Op.
+ *
  * @method mixed getDoublePublish()
  * @method mixed getOp()
  * @method mixed getPath()

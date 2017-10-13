@@ -5,6 +5,8 @@ namespace InstagramAPI\Realtime\Event\Payload;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Activity.
+ *
  * @method mixed getActivityStatus()
  * @method string getSenderId()
  * @method mixed getTimestamp()

@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * SavedFeedItem.
+ *
  * @method Item getMedia()
  * @method bool isMedia()
  * @method $this setMedia(Item $value)

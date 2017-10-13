@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Groups.
+ *
  * @method Item[] getItems()
  * @method mixed getType()
  * @method bool isItems()

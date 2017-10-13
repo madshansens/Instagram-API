@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * DirectSeenItemPayload.
+ *
  * @method mixed getCount()
  * @method string getTimestamp()
  * @method bool isCount()

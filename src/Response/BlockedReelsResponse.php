@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * BlockedReelsResponse.
+ *
  * @method mixed getBigList()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getNextMaxId()
  * @method mixed getPageSize()
  * @method string getStatus()

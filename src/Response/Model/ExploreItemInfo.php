@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * ExploreItemInfo.
+ *
  * @method mixed getAspectRatio()
  * @method mixed getAutoplay()
  * @method mixed getNumColumns()

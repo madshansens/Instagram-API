@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * MediaInsightsResponse.
+ *
  * @method Model\MediaInsights[] getMediaOrganicInsights()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
  * @method bool isMediaOrganicInsights()

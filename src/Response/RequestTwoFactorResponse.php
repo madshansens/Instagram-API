@@ -5,7 +5,9 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * @method string getMessage()
+ * RequestTwoFactorResponse.
+ *
+ * @method mixed getMessage()
  * @method mixed getObfuscatedPhoneNumber()
  * @method Model\PhoneVerificationSettings getPhoneVerificationSettings()
  * @method string getStatus()

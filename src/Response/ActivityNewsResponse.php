@@ -5,13 +5,15 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * ActivityNewsResponse.
+ *
  * @method mixed getAdsManager()
  * @method Model\Aymf getAymf()
  * @method mixed getContinuation()
  * @method mixed getContinuationToken()
  * @method Model\Counts getCounts()
  * @method Model\Story[] getFriendRequestStories()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method Model\Story[] getNewStories()
  * @method Model\Story[] getOldStories()
  * @method string getStatus()

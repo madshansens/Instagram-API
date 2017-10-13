@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * ImageCandidate.
+ *
  * @method mixed getHeight()
  * @method mixed getUrl()
  * @method mixed getWidth()

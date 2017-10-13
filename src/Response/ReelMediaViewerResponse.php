@@ -5,7 +5,9 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * @method string getMessage()
+ * ReelMediaViewerResponse.
+ *
+ * @method mixed getMessage()
  * @method string getNextMaxId()
  * @method string getStatus()
  * @method mixed getTotalViewerCount()

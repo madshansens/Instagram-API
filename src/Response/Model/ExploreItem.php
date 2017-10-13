@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * ExploreItem.
+ *
  * @method Channel getChannel()
  * @method ExploreItemInfo getExploreItemInfo()
  * @method Item getMedia()

@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * HiddenEntities.
+ *
  * @method mixed getHashtag()
  * @method mixed getPlace()
  * @method mixed getUser()

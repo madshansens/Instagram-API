@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Caption.
+ *
  * @method mixed getBitFlags()
  * @method mixed getContentType()
  * @method mixed getCreatedAt()

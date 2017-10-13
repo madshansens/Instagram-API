@@ -5,6 +5,8 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * DirectVisualThreadResponse.
+ *
  * @method Model\ActionBadge getActionBadge()
  * @method mixed getCanonical()
  * @method mixed getHasNewer()
@@ -18,7 +20,7 @@ use InstagramAPI\Response;
  * @method Model\PermanentItem getLastPermanentItem()
  * @method Model\UnpredictableKeys\DirectThreadLastSeenAtUnpredictableContainer getLastSeenAt()
  * @method Model\User[] getLeftUsers()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getMuted()
  * @method mixed getNamed()
  * @method mixed getNewestCursor()

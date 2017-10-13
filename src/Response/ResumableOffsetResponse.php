@@ -5,7 +5,9 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * @method string getMessage()
+ * ResumableOffsetResponse.
+ *
+ * @method mixed getMessage()
  * @method int getOffset()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()

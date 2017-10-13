@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * DirectMessageMetadata.
+ *
  * @method string getItemId()
  * @method string[] getParticipantIds()
  * @method string getThreadId()

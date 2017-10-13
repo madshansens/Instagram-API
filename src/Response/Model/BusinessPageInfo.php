@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * BusinessPageInfo.
+ *
  * @method mixed getHasNextPage()
  * @method mixed getHasPreviousPage()
  * @method bool isHasNextPage()

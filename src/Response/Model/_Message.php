@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * _Message.
+ *
  * @method mixed getKey()
  * @method mixed getTime()
  * @method bool isKey()

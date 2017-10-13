@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * MediaInfoResponse.
+ *
  * @method mixed getAutoLoadMoreEnabled()
  * @method Model\Item[] getItems()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getMoreAvailable()
  * @method mixed getNumResults()
  * @method string getStatus()

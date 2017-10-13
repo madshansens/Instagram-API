@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Suggestion.
+ *
  * @method mixed getAlgorithm()
  * @method mixed getCaption()
  * @method mixed getIcon()

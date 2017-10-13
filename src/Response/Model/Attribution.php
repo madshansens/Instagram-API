@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Attribution.
+ *
  * @method mixed getName()
  * @method bool isName()
  * @method $this setName(mixed $value)

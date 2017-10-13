@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * ActionLog.
+ *
  * @method Bold[] getBold()
  * @method mixed getDescription()
  * @method bool isBold()

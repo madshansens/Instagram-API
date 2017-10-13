@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * DirectSendItemPayload.
+ *
  * @method string getClientContext()
  * @method string getClientRequestId()
  * @method string getItemId()

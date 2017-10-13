@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * FeedAysf.
+ *
  * @method mixed getActivator()
  * @method mixed getDisplayNewUnit()
  * @method mixed getFeedPosition()

@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * SuggestedUsers.
+ *
  * @method mixed getAutoDvance()
  * @method string getId()
  * @method mixed getLandingSiteTitle()

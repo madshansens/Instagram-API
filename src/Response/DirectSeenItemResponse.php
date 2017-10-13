@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * DirectSeenItemResponse.
+ *
  * @method mixed getAction()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method Model\DirectSeenItemPayload getPayload()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()

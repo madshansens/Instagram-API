@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * StoryTray.
+ *
  * @method mixed getCanReply()
  * @method mixed getCanReshare()
  * @method DismissCard getDismissCard()

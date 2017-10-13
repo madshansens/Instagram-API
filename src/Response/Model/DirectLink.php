@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * DirectLink.
+ *
  * @method LinkContext getLinkContext()
  * @method string getText()
  * @method bool isLinkContext()

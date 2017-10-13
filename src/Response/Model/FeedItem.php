@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * FeedItem.
+ *
  * @method Ad4ad getAd4ad()
  * @method mixed getAdLinkType()
  * @method Item getMediaOrAd()

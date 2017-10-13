@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Placeholder.
+ *
  * @method mixed getIsLinked()
  * @method mixed getMessage()
  * @method mixed getTitle()

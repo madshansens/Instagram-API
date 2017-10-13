@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Reel.
+ *
  * @method Broadcast getBroadcast()
  * @method mixed getCanReply()
  * @method mixed getExpiringAt()

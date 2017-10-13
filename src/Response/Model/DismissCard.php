@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * DismissCard.
+ *
  * @method mixed getButtonText()
  * @method mixed getCameraTarget()
  * @method mixed getCardId()

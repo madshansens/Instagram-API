@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * PostLiveCommentsResponse.
+ *
  * @method Model\LiveComment[] getComments()
  * @method mixed getEndingOffset()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getNextFetchOffset()
  * @method Model\LiveComment[] getPinnedComments()
  * @method mixed getStartingOffset()

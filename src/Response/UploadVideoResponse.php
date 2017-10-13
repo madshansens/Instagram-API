@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * UploadVideoResponse.
+ *
  * @method float getConfigureDelayMs()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getResult()
  * @method string getStatus()
  * @method string getUploadId()

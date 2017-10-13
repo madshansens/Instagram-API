@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * ReelShare.
+ *
  * @method mixed getBroadcasts()
  * @method Item getMedia()
  * @method string getMentionedUserId()

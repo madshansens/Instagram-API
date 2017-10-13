@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * LiveComment.
+ *
  * @method Comment getComment()
  * @method mixed getEvent()
  * @method mixed getOffset()

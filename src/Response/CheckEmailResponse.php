@@ -5,10 +5,12 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * CheckEmailResponse.
+ *
  * @method mixed getAvailable()
  * @method mixed getConfirmed()
  * @method mixed getErrorType()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method string[] getUsernameSuggestions()
  * @method mixed getValid()

@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Stickers.
+ *
  * @method string getId()
  * @method mixed getImageHeight()
  * @method mixed getImageUrl()

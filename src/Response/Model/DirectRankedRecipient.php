@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * DirectRankedRecipient.
+ *
  * @method DirectThread getThread()
  * @method User getUser()
  * @method bool isThread()

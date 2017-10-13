@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * FaceEffectsResponse.
+ *
  * @method Model\Effect[] getEffects()
  * @method Model\Effect getLoadingEffect()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getSdkVersion()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()

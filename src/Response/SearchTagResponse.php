@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * SearchTagResponse.
+ *
  * @method mixed getHasMore()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getRankToken()
  * @method Model\Tag[] getResults()
  * @method string getStatus()

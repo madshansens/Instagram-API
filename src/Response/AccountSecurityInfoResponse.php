@@ -5,11 +5,13 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * AccountSecurityInfoResponse.
+ *
  * @method mixed getBackupCodes()
  * @method mixed getCountryCode()
  * @method mixed getIsPhoneConfirmed()
  * @method mixed getIsTwoFactorEnabled()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getNationalNumber()
  * @method mixed getPhoneNumber()
  * @method string getStatus()

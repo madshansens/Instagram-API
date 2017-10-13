@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Stories.
+ *
  * @method string getId()
  * @method mixed getIsPortrait()
  * @method TopLive getTopLive()

@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * PhoneVerificationSettings.
+ *
  * @method mixed getMaxSmsCount()
  * @method mixed getResendSmsDelaySec()
  * @method mixed getRobocallAfterMaxSms()

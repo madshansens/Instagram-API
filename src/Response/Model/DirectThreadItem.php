@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * DirectThreadItem.
+ *
  * @method ActionLog getActionLog()
  * @method mixed getClientContext()
  * @method DirectExpiringSummary getExpiringMediaActionSummary()

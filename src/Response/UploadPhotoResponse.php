@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * UploadPhotoResponse.
+ *
  * @method string getMediaId()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method string getUploadId()
  * @method Model\_Message[] get_Messages()

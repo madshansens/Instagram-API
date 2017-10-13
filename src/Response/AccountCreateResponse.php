@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * AccountCreateResponse.
+ *
  * @method mixed getAccountCreated()
  * @method Model\User getCreatedUser()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
  * @method bool isAccountCreated()

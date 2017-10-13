@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Gating.
+ *
  * @method mixed getButtons()
  * @method mixed getDescription()
  * @method mixed getGatingType()

@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * BusinessFeed.
+ *
  * @method SummaryPromotions get_UnitsgGaCa()
  * @method bool is_UnitsgGaCa()
  * @method $this set_UnitsgGaCa(SummaryPromotions $value)

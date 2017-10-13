@@ -5,6 +5,8 @@ namespace InstagramAPI\Realtime\Event\Payload;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Screenshot.
+ *
  * @method \InstagramAPI\Response\Model\User getActionUserDict()
  * @method mixed getMediaType()
  * @method bool isActionUserDict()

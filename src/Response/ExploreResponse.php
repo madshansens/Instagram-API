@@ -5,10 +5,12 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * ExploreResponse.
+ *
  * @method mixed getAutoLoadMoreEnabled()
  * @method Model\ExploreItem[] getItems()
  * @method string getMaxId()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getMoreAvailable()
  * @method string getNextMaxId()
  * @method mixed getNumResults()

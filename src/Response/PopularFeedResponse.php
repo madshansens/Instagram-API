@@ -5,10 +5,12 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * PopularFeedResponse.
+ *
  * @method mixed getAutoLoadMoreEnabled()
  * @method Model\Item[] getItems()
  * @method string getMaxId()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getMoreAvailable()
  * @method string getNextMaxId()
  * @method mixed getNumResults()

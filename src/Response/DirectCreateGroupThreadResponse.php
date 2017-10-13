@@ -5,6 +5,8 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * DirectCreateGroupThreadResponse.
+ *
  * @method mixed getCanonical()
  * @method mixed getHasNewer()
  * @method mixed getHasOlder()
@@ -14,7 +16,7 @@ use InstagramAPI\Response;
  * @method mixed getLastActivityAt()
  * @method mixed getLastSeenAt()
  * @method Model\User[] getLeftUsers()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getMuted()
  * @method mixed getNamed()
  * @method mixed getPending()

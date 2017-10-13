@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * BusinessEdges.
+ *
  * @method mixed getCursor()
  * @method BusinessNode getNode()
  * @method bool isCursor()

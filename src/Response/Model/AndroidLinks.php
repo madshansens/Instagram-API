@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * AndroidLinks.
+ *
  * @method mixed getAndroidClass()
  * @method mixed getCallToActionTitle()
  * @method mixed getDeeplinkUri()

@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * PostLiveItem.
+ *
  * @method Broadcast[] getBroadcasts()
  * @method mixed getCanReply()
  * @method mixed getCanReshare()

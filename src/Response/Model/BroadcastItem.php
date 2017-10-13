@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * BroadcastItem.
+ *
  * @method mixed getBroadcastMessage()
  * @method User getBroadcastOwner()
  * @method mixed getBroadcastStatus()

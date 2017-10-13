@@ -5,7 +5,9 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * @method string getMessage()
+ * MegaphoneLogResponse.
+ *
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method mixed getSuccess()
  * @method Model\_Message[] get_Messages()

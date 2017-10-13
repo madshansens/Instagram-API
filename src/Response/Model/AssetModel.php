@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * AssetModel.
+ *
  * @method mixed getAssetUrl()
  * @method string getId()
  * @method bool isAssetUrl()

@@ -5,7 +5,9 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * @method string getMessage()
+ * ReelsMediaResponse.
+ *
+ * @method mixed getMessage()
  * @method Model\Reel[] getReels()
  * @method Model\Reel[] getReelsMedia()
  * @method string getStatus()

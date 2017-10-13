@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * SendConfirmEmailResponse.
+ *
  * @method mixed getBody()
  * @method mixed getIsEmailLegit()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method mixed getTitle()
  * @method Model\_Message[] get_Messages()

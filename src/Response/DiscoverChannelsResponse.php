@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * DiscoverChannelsResponse.
+ *
  * @method mixed getAutoLoadMoreEnabled()
  * @method Model\Item[] getItems()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getMoreAvailable()
  * @method string getNextMaxId()
  * @method string getStatus()

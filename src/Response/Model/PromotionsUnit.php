@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * PromotionsUnit.
+ *
  * @method SummaryPromotions get_SummaryPromotions2ubm1F()
  * @method bool is_SummaryPromotions2ubm1F()
  * @method $this set_SummaryPromotions2ubm1F(SummaryPromotions $value)

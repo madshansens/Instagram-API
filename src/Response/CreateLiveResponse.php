@@ -5,6 +5,8 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * CreateLiveResponse.
+ *
  * @method mixed getAllowResolutionChange()
  * @method mixed getAvcRtmpPayload()
  * @method string getBroadcastId()
@@ -13,7 +15,7 @@ use InstagramAPI\Response;
  * @method mixed getDisableSpeedTest()
  * @method mixed getHeartbeatInterval()
  * @method mixed getMaxTimeInSeconds()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getSpeedTestMinimumBandwidthThreshold()
  * @method mixed getSpeedTestRetryMaxCount()
  * @method mixed getSpeedTestRetryTimeDelay()

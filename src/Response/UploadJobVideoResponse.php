@@ -5,7 +5,9 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * @method string getMessage()
+ * UploadJobVideoResponse.
+ *
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method string getUploadId()
  * @method Model\VideoUploadUrl[] getVideoUploadUrls()

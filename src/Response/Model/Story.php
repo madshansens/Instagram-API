@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Story.
+ *
  * @method Args getArgs()
  * @method Counts getCounts()
  * @method string getPk()

@@ -5,8 +5,10 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * BadgeNotificationsResponse.
+ *
  * @method Model\UnpredictableKeys\CoreUnpredictableContainer getBadgePayload()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
  * @method bool isBadgePayload()

@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Ad4ad.
+ *
  * @method mixed getFooter()
  * @method string getId()
  * @method Item getMedia()

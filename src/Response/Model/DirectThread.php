@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * DirectThread.
+ *
  * @method ActionBadge getActionBadge()
  * @method mixed getCanonical()
  * @method mixed getHasNewer()

@@ -5,6 +5,8 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * UserReelMediaFeedResponse.
+ *
  * @method Model\Broadcast getBroadcast()
  * @method mixed getCanReply()
  * @method mixed getExpiringAt()
@@ -12,7 +14,7 @@ use InstagramAPI\Response;
  * @method Model\Item[] getItems()
  * @method mixed getLatestReelMedia()
  * @method Model\Location getLocation()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getPrefetchCount()
  * @method mixed getSeen()
  * @method string getStatus()

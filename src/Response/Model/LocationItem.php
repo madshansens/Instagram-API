@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * LocationItem.
+ *
  * @method Location getLocation()
  * @method mixed getMediaBundles()
  * @method mixed getSubtitle()

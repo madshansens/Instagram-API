@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * ShadowInstagramUser.
+ *
  * @method BusinessManager getBusinessManager()
  * @method mixed getError()
  * @method string getId()

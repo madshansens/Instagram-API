@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * DirectInbox.
+ *
  * @method mixed getHasOlder()
  * @method mixed getOldestCursor()
  * @method DirectThread[] getThreads()

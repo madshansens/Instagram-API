@@ -5,7 +5,9 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * @method string getMessage()
+ * StickerAssetsResponse.
+ *
+ * @method mixed getMessage()
  * @method Model\StaticStickers[] getStaticStickers()
  * @method string getStatus()
  * @method mixed getVersion()

@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * StoryLocation.
+ *
  * @method string getAttribution()
  * @method float getHeight()
  * @method mixed getIsPinned()

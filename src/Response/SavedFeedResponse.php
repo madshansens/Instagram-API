@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * SavedFeedResponse.
+ *
  * @method mixed getAutoLoadMoreEnabled()
  * @method Model\SavedFeedItem[] getItems()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getMoreAvailable()
  * @method string getNextMaxId()
  * @method mixed getNumResults()

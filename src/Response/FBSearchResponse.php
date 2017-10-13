@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * FBSearchResponse.
+ *
  * @method mixed getHasMore()
  * @method mixed getHashtags()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getPlaces()
  * @method mixed getRankToken()
  * @method string getStatus()

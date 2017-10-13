@@ -5,7 +5,9 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * @method string getMessage()
+ * MsisdnHeaderResponse.
+ *
+ * @method mixed getMessage()
  * @method string getPhoneNumber()
  * @method string getStatus()
  * @method string getUrl()

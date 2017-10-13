@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * StaticStickers.
+ *
  * @method string getId()
  * @method mixed getIncludeInRecent()
  * @method Stickers[] getStickers()

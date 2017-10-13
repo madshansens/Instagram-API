@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Effect.
+ *
  * @method mixed getAssetUrl()
  * @method string getEffectFileId()
  * @method string getEffectId()

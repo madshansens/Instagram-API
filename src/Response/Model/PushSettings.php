@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * PushSettings.
+ *
  * @method mixed getChecked()
  * @method mixed getEligible()
  * @method mixed getExample()

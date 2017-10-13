@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * ProfilePicture.
+ *
  * @method mixed getUri()
  * @method bool isUri()
  * @method $this setUri(mixed $value)

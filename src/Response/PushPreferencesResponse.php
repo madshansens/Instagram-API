@@ -5,6 +5,8 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * PushPreferencesResponse.
+ *
  * @method mixed getAds()
  * @method mixed getAnnouncements()
  * @method mixed getCommentLikes()
@@ -16,7 +18,7 @@ use InstagramAPI\Response;
  * @method mixed getLikeAndCommentOnPhotoUserTagged()
  * @method mixed getLikes()
  * @method mixed getLiveBroadcast()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getNewFollower()
  * @method mixed getNotificationReminders()
  * @method mixed getPendingDirectShare()

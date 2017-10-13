@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * CarouselMedia.
+ *
  * @method mixed getAdAction()
  * @method mixed getAdLinkType()
  * @method AdMetadata[] getAdMetadata()

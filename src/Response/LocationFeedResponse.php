@@ -5,11 +5,13 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * LocationFeedResponse.
+ *
  * @method mixed getAutoLoadMoreEnabled()
  * @method Model\Item[] getItems()
  * @method Model\Location getLocation()
  * @method mixed getMediaCount()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method mixed getMoreAvailable()
  * @method string getNextMaxId()
  * @method mixed getNumResults()

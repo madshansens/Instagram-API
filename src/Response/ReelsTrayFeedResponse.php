@@ -5,9 +5,11 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
+ * ReelsTrayFeedResponse.
+ *
  * @method Model\Broadcast[] getBroadcasts()
  * @method mixed getFaceFilterNuxVersion()
- * @method string getMessage()
+ * @method mixed getMessage()
  * @method Model\PostLive getPostLive()
  * @method string getStatus()
  * @method mixed getStickerVersion()

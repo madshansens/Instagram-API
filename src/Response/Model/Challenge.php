@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * Challenge.
+ *
  * @method mixed getApiPath()
  * @method mixed getHideWebviewHeader()
  * @method mixed getLock()

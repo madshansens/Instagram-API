@@ -5,6 +5,8 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
+ * PostLive.
+ *
  * @method PostLiveItem[] getPostLiveItems()
  * @method bool isPostLiveItems()
  * @method $this setPostLiveItems(PostLiveItem[] $value)
