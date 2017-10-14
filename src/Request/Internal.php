@@ -1028,6 +1028,80 @@ class Internal extends RequestCollection
     }
 
     /**
+     * Internal helper for marking story media items as seen.
+     *
+     * This is used by story-related functions in other request-collections!
+     *
+     * @param Response\Model\Item[] $items    Array of one or more story media Items.
+     * @param string|null           $sourceId Where the story was seen from,
+     *                                        such as a location story-tray ID.
+     *                                        If NULL, we automatically use the
+     *                                        user's profile ID from each Item
+     *                                        object as the source ID.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\MediaSeenResponse
+     *
+     * @see Story::markMediaSeen()
+     */
+    public function markStoryMediaSeen(
+        array $items,
+        $sourceId = null)
+    {
+        // Build the list of seen media, with human randomization of seen-time.
+        $reels = [];
+        $maxSeenAt = time(); // Get current global UTC timestamp.
+        $seenAt = $maxSeenAt - (3 * count($items)); // Start seenAt in the past.
+        foreach ($items as $item) {
+            if (!$item instanceof Response\Model\Item) {
+                throw new \InvalidArgumentException(
+                    'All story items must be instances of \InstagramAPI\Response\Model\Item.'
+                );
+            }
+
+            // Raise "seenAt" if it's somehow older than the item's "takenAt".
+            // NOTE: Can only happen if you see a story instantly when posted.
+            $itemTakenAt = $item->getTakenAt();
+            if ($seenAt < $itemTakenAt) {
+                $seenAt = $itemTakenAt + 2;
+            }
+
+            // Do not let "seenAt" exceed the current global UTC time.
+            if ($seenAt > $maxSeenAt) {
+                $seenAt = $maxSeenAt;
+            }
+
+            // Determine the source ID for this item. This is where the item was
+            // seen from, such as a UserID or a Location-StoryTray ID.
+            $itemSourceId = ($sourceId === null ? $item->getUser()->getPk() : $sourceId);
+
+            // Key Format: "mediaPk_userPk_sourceId".
+            // NOTE: In case of seeing stories on a user's profile, their
+            // userPk is used as the sourceId, as "mediaPk_userPk_userPk".
+            $reelId = $item->getId().'_'.$itemSourceId;
+
+            // Value Format: ["mediaTakenAt_seenAt"] (array with single string).
+            $reels[$reelId] = [$itemTakenAt.'_'.$seenAt];
+
+            // Randomly add 1-3 seconds to next seenAt timestamp, to act human.
+            $seenAt += rand(1, 3);
+        }
+
+        return $this->ig->request('media/seen/')
+            ->setVersion(2)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('reels', $reels)
+            ->addPost('live_vods', [])
+            ->addParam('reel', 1)
+            ->addParam('live_vod', 0)
+            ->getResponse(new Response\MediaSeenResponse());
+    }
+
+    /**
      * Configure media entity (album, video, ...) with retries.
      *
      * @param string   $entity       Entity to display in error messages.
