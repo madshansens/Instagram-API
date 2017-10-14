@@ -1045,6 +1045,7 @@ class Internal extends RequestCollection
      * @return \InstagramAPI\Response\MediaSeenResponse
      *
      * @see Story::markMediaSeen()
+     * @see Location::markStoryMediaSeen()
      */
     public function markStoryMediaSeen(
         array $items,
