@@ -3,6 +3,7 @@
 namespace InstagramAPI\Request;
 
 use InstagramAPI\Response;
+use InstagramAPI\Utils;
 
 /**
  * Functions related to finding and exploring hashtags.
@@ -14,6 +15,7 @@ class Hashtag extends RequestCollection
      *
      * @param string $hashtag The hashtag, not including the "#".
      *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\TagInfoResponse
@@ -21,6 +23,7 @@ class Hashtag extends RequestCollection
     public function getInfo(
         $hashtag)
     {
+        Utils::throwIfInvalidHashtag($hashtag);
         $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
         return $this->ig->request("tags/{$urlHashtag}/info/")
             ->getResponse(new Response\TagInfoResponse());
@@ -45,7 +48,9 @@ class Hashtag extends RequestCollection
      *                                    to exclude from the response, allowing you to skip tags
      *                                    from a previous call to get more results.
      *
-     * @throws \InvalidArgumentException                  If trying to exclude too many tags.
+     * @throws \InvalidArgumentException                  If invalid query or
+     *                                                    trying to exclude too
+     *                                                    many hashtags.
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\SearchTagResponse
@@ -54,6 +59,11 @@ class Hashtag extends RequestCollection
         $query,
         array $excludeList = [])
     {
+        // Do basic query validation. Do NOT use throwIfInvalidHashtag here.
+        if (!is_string($query) || !strlen($query)) {
+            throw new \InvalidArgumentException('Query must be a non-empty string.');
+        }
+
         $request = $this->ig->request('tags/search/')
             ->addParam('q', $query)
             ->addParam('timezone_offset', date('Z'))
@@ -62,8 +72,8 @@ class Hashtag extends RequestCollection
 
         if (!empty($excludeList)) {
             // Safely restrict the amount of excludes we allow. Their server
-            // hates high numbers, and around 150 they will literally disconnect
-            // you from the API server without even answering the endpoint call.
+            // HATES high numbers; at around 150 they will literally DISCONNECT
+            // you from the API server without even answering the endpoint call!
             if (count($excludeList) > 65) { // Arbitrary safe number: 2*30 (two pages) of results plus a bit extra.
                 throw new \InvalidArgumentException('You are not allowed to provide more than 65 hashtags to exclude from the search.');
             }
@@ -78,6 +88,7 @@ class Hashtag extends RequestCollection
      *
      * @param string $hashtag The hashtag, not including the "#".
      *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\TagRelatedResponse
@@ -85,6 +96,7 @@ class Hashtag extends RequestCollection
     public function getRelated(
         $hashtag)
     {
+        Utils::throwIfInvalidHashtag($hashtag);
         $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
         return $this->ig->request("tags/{$urlHashtag}/related/")
             ->addParam('visited', '[{"id":"'.$hashtag.'","type":"hashtag"}]')
@@ -98,6 +110,7 @@ class Hashtag extends RequestCollection
      * @param string      $hashtag The hashtag, not including the "#".
      * @param null|string $maxId   Next "maximum ID", used for pagination.
      *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\TagFeedResponse
@@ -106,6 +119,7 @@ class Hashtag extends RequestCollection
         $hashtag,
         $maxId = null)
     {
+        Utils::throwIfInvalidHashtag($hashtag);
         $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
         $hashtagFeed = $this->ig->request("feed/tag/{$urlHashtag}/");
         if ($maxId !== null) {

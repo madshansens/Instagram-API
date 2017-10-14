@@ -637,12 +637,7 @@ class Media extends RequestCollection
         case 'feed_contextual_hashtag': // "Hashtag" search result.
             if (isset($extraData['hashtag'])) {
                 // The hashtag where the app found this media.
-                // NOTE: Perform an UTF-8 aware search for the illegal "#"
-                // symbol. We must use mb_strpos to support international tags.
-                if (mb_strpos($extraData['hashtag'], '#') !== false) {
-                    throw new \InvalidArgumentException('Hashtag is not allowed to contain the "#" character.');
-                }
-
+                Utils::throwIfInvalidHashtag($extraData['hashtag']);
                 $request->addPost('hashtag', $extraData['hashtag']);
             } else {
                 throw new \InvalidArgumentException(sprintf('Missing extra data for module "%s".', $module));

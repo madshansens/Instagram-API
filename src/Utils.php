@@ -712,6 +712,33 @@ class Utils
     }
 
     /**
+     * Verifies that a single hashtag is valid.
+     *
+     * This function enforces the following requirements: It must be a string,
+     * at least 1 character long, and cannot contain the "#" character itself.
+     *
+     * @param mixed $hashtag The hashtag to check (should be string but we
+     *                       accept anything for checking purposes).
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function throwIfInvalidHashtag(
+        $hashtag)
+    {
+        if (!is_string($hashtag) || !strlen($hashtag)) {
+            throw new \InvalidArgumentException('Hashtag must be a non-empty string.');
+        }
+        // Perform an UTF-8 aware search for the illegal "#" symbol (anywhere).
+        // NOTE: We must use mb_strpos() to support international tags.
+        if (mb_strpos($hashtag, '#') !== false) {
+            throw new \InvalidArgumentException(sprintf(
+                'Hashtag "%s" is not allowed to contain the "#" character.',
+                $hashtag
+            ));
+        }
+    }
+
+    /**
      * Verifies an array of story poll.
      *
      * @param array[] $storyPoll Array with story poll key-value pairs.
@@ -889,12 +916,13 @@ class Utils
     {
         $requiredKeys = ['tag_name', 'use_custom_title', 'is_sticker'];
 
-        if (!preg_match_all('/#(\w+)/u', $captionText, $matches)) {
+        // Extract all hashtags from the caption using a UTF-8 aware regex.
+        if (!preg_match_all('/#(\w+)/u', $captionText, $tagsInCaption)) {
             throw new \InvalidArgumentException('Invalid caption for hashtag.');
         }
 
+        // Verify all provided hashtags.
         foreach ($hashtags as $hashtag) {
-            // Ensure that all keys exist.
             $missingKeys = array_keys(array_diff_key(['tag_name' => 1, 'use_custom_title' => 1, 'is_sticker' => 1], $hashtag));
             if (count($missingKeys)) {
                 throw new \InvalidArgumentException(sprintf('Missing keys "%s" for hashtag array.', implode(', ', $missingKeys)));
@@ -903,12 +931,10 @@ class Utils
             foreach ($hashtag as $k => $v) {
                 switch ($k) {
                     case 'tag_name':
-                        // Ensure that the tag_name property does NOT have a leading '#'.
-                        if ($v[0] === '#') {
-                            throw new \InvalidArgumentException(sprintf('Tag name "%s" is not allowed to start with the "#" symbol.', $v));
-                        }
+                        // Ensure that the hashtag format is valid.
+                        self::throwIfInvalidHashtag($v);
                         // Verify that this tag exists somewhere in the caption to check.
-                        if (!in_array($v, $matches[1])) {
+                        if (!in_array($v, $tagsInCaption[1])) { // NOTE: UTF-8 aware.
                             throw new \InvalidArgumentException(sprintf('Tag name "%s" does not exist in the caption text.', $v));
                         }
                         break;
