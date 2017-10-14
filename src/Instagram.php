@@ -116,11 +116,24 @@ class Instagram
     public $account_id;
 
     /**
-     * Session status.
+     * Our current guess about the session status.
+     *
+     * This contains our current GUESS about whether the current user is still
+     * logged in. There is NO GUARANTEE that we're still logged in. For example,
+     * the server may have invalidated our current session due to the account
+     * password being changed AFTER our last login happened (which kills all
+     * existing sessions for that account), or the session may have expired
+     * naturally due to not being used for a long time, and so on...
+     *
+     * NOTE TO USERS: The only way to know for sure if you're logged in is to
+     * try a request. If it throws a `LoginRequiredException`, then you're not
+     * logged in anymore. The `login()` function will always ensure that your
+     * current session is valid. But AFTER that, anything can happen... It's up
+     * to Instagram, and we have NO control over what they do with your session!
      *
      * @var bool
      */
-    public $isLoggedIn = false;
+    public $isMaybeLoggedIn = false;
 
     /**
      * Rank token.
@@ -382,7 +395,7 @@ class Instagram
         }
 
         // Perform a full relogin if necessary.
-        if (!$this->isLoggedIn || $forceLogin) {
+        if (!$this->isMaybeLoggedIn || $forceLogin) {
             $this->_sendPreLoginFlow();
 
             try {
@@ -552,18 +565,18 @@ class Instagram
 
         // Load the previous session details if we're possibly logged in.
         if (!$resetCookieJar && $this->settings->isMaybeLoggedIn()) {
-            $this->isLoggedIn = true;
+            $this->isMaybeLoggedIn = true;
             $this->account_id = $this->settings->get('account_id');
             $this->rank_token = $this->account_id.'_'.$this->uuid;
         } else {
-            $this->isLoggedIn = false;
+            $this->isMaybeLoggedIn = false;
             $this->account_id = null;
             $this->rank_token = null;
         }
 
-        // Configures Client for current user AND updates isLoggedIn state
+        // Configures Client for current user AND updates isMaybeLoggedIn state
         // if it fails to load the expected cookies from the user's jar.
-        // Must be done last here, so that isLoggedIn is properly updated!
+        // Must be done last here, so that isMaybeLoggedIn is properly updated!
         // NOTE: If we generated a new device we start a new cookie jar.
         $this->client->updateFromCurrentSettings($resetCookieJar);
     }
@@ -586,7 +599,7 @@ class Instagram
             throw new \InvalidArgumentException('Invalid login response provided to _updateLoginState().');
         }
 
-        $this->isLoggedIn = true;
+        $this->isMaybeLoggedIn = true;
         $this->account_id = $response->getLoggedInUser()->getPk();
         $this->settings->set('account_id', $this->account_id);
         $this->rank_token = $this->account_id.'_'.$this->uuid;

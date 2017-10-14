@@ -180,7 +180,7 @@ class Client
         // these checks succeed, the cookie may still not be valid. It's just a
         // preliminary check to detect definitely-invalid session cookies!
         if ($this->getToken() === null) {
-            $this->_parent->isLoggedIn = false;
+            $this->_parent->isMaybeLoggedIn = false;
         }
     }
 
