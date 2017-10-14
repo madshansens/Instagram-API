@@ -3,6 +3,7 @@
 namespace InstagramAPI\Response\Model\UnpredictableKeys;
 
 use InstagramAPI\AutoPropertyMapper;
+use LazyJsonMapper\Exception\LazyJsonMapperException;
 
 /**
  * This class defines a core "untyped" container of unpredictable data-keys.

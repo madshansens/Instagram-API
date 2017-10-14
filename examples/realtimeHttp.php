@@ -128,7 +128,7 @@ class RealtimeHttpServer
     /**
      * Called when fatal error has been received from Realtime.
      *
-     * @param Exception $e
+     * @param \Exception $e
      */
     public function onRealtimeFail(
         \Exception $e)
