@@ -3,6 +3,7 @@
 namespace InstagramAPI\Request;
 
 use InstagramAPI\Constants;
+use InstagramAPI\Request;
 use InstagramAPI\Response;
 use InstagramAPI\Signatures;
 use InstagramAPI\Utils;
@@ -145,6 +146,8 @@ class Media extends RequestCollection
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\GenericResponse
+     *
+     * @see Media::_parseLikeParameters() For all supported modules and required parameters.
      */
     public function like(
         $mediaId,
@@ -159,52 +162,7 @@ class Media extends RequestCollection
             ->addPost('radio_type', 'wifi-none')
             ->addPost('module_name', $module);
 
-        if (isset($extraData['double_tap']) && $extraData['double_tap']) {
-            $request->addUnsignedPost('d', 1);
-        } else {
-            $request->addUnsignedPost('d', 0);
-        }
-
-        switch ($module) {
-            case 'feed_contextual_post':
-                if (isset($extraData['explore_source_token'])) {
-                    $request->addPost('explore_source_token', $extraData['explore_source_token']);
-                } else {
-                    throw new \InvalidArgumentException(sprintf('Missing value for %s module.', $module));
-                }
-                break;
-            case 'profile':
-            case 'media_view_profile':
-            case 'video_view_profile':
-            case 'photo_view_profile':
-                if (isset($extraData['username']) && isset($extraData['user_id'])) {
-                    $request->addPost('username', $extraData['username'])
-                            ->addPost('user_id', $extraData['user_id']);
-                } else {
-                    throw new \InvalidArgumentException(sprintf('Missing value for %s module.', $module));
-                }
-                break;
-            case 'feed_contextual_hashtag':
-                if (isset($extraData['hashtag'])) {
-                    $request->addPost('hashtag', str_replace('#', '', $extraData['hashtag']));
-                } else {
-                    throw new \InvalidArgumentException(sprintf('Missing value for %s module.', $module));
-                }
-                break;
-            case 'feed_contextual_location':
-                 if (isset($extraData['location_id'])) {
-                     $request->addPost('location_id', $extraData['location_id']);
-                 } else {
-                     throw new \InvalidArgumentException(sprintf('Missing value for %s module.', $module));
-                 }
-                 break;
-            case 'feed_timeline':
-            case 'newsfeed':
-            case 'feed_contextual_newsfeed_multi_media_liked':
-                break;
-            default:
-                throw new \InvalidArgumentException(sprintf('Invalid module name. %s does not correspond to any of the valid module names.', $module));
-        }
+        $this->_parseLikeParameters('like', $request, $module, $extraData);
 
         return $request->getResponse(new Response\GenericResponse());
     }
@@ -216,13 +174,16 @@ class Media extends RequestCollection
      * @param string $module    (optional) From which app module (page) you're performing this action.
      * @param array  $extraData (optional) Depending on the module name, additional data is required.
      *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\GenericResponse
+     *
+     * @see Media::_parseLikeParameters() For all supported modules and required parameters.
      */
     public function unlike(
         $mediaId,
-        $module = 'feed_contextual_post',
+        $module = 'feed_timeline',
         array $extraData = [])
     {
         $request = $this->ig->request("media/{$mediaId}/unlike/")
@@ -231,15 +192,9 @@ class Media extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('media_id', $mediaId)
             ->addPost('radio_type', 'wifi-none')
-            ->addPost('module_name', $module)
-            ->addUnsignedPost('d', 0); // IG doesn't have "double-tap to unlike".
+            ->addPost('module_name', $module);
 
-        if ($module == 'feed_contextual_post' && isset($extraData['exploreToken'])) {
-            $request->addPost('explore_source_token', $extraData['exploreToken']);
-        } elseif ($module == 'photo_view_profile' && isset($extraData['username']) && isset($extraData['userid'])) {
-            $request->addPost('username', $extraData['username'])
-                    ->addPost('user_id', $extraData['userid']);
-        }
+        $this->_parseLikeParameters('unlike', $request, $module, $extraData);
 
         return $request->getResponse(new Response\GenericResponse());
     }
@@ -626,5 +581,98 @@ class Media extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\BlockedMediaResponse());
+    }
+
+    /**
+     * Validate and update the parameters for a like or unlike request.
+     *
+     * @param string  $type      What type of request this is (can be "like" or "unlike").
+     * @param Request $request   The request to fill with the parsed data.
+     * @param string  $module    From which app module (page) you're performing this action.
+     * @param array   $extraData Depending on the module name, additional data is required.
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function _parseLikeParameters(
+        $type,
+        Request $request,
+        $module,
+        array $extraData)
+    {
+        // Is this a "double-tap to like"? Note that Instagram doesn't have
+        // "double-tap to unlike". So this can only be "1" if it's a "like".
+        if ($type === 'like' && isset($extraData['double_tap']) && $extraData['double_tap']) {
+            $request->addUnsignedPost('d', 1);
+        } else {
+            $request->addUnsignedPost('d', 0); // Must always be 0 for "unlike".
+        }
+
+        // Now parse the necessary parameters for the selected module.
+        switch ($module) {
+        case 'feed_contextual_post': // "Explore" tab.
+            if (isset($extraData['explore_source_token'])) {
+                // The explore media `Item::getExploreSourceToken()` value.
+                $request->addPost('explore_source_token', $extraData['explore_source_token']);
+            } else {
+                throw new \InvalidArgumentException(sprintf('Missing extra data for module "%s".', $module));
+            }
+            break;
+        case 'profile': // LIST VIEW (when posts are shown vertically by the app
+                        // one at a time (as in the Timeline tab)): Any media on
+                        // a user profile (their timeline) in list view mode.
+        case 'media_view_profile': // GRID VIEW (standard 3x3): Album (carousel)
+                                   // on a user profile (their timeline).
+        case 'video_view_profile': // GRID VIEW (standard 3x3): Video on a user
+                                   // profile (their timeline).
+        case 'photo_view_profile': // GRID VIEW (standard 3x3): Photo on a user
+                                   // profile (their timeline).
+            if (isset($extraData['username']) && isset($extraData['user_id'])) {
+                // Username and id of the media's owner (the profile owner).
+                $request->addPost('username', $extraData['username'])
+                    ->addPost('user_id', $extraData['user_id']);
+            } else {
+                throw new \InvalidArgumentException(sprintf('Missing extra data for module "%s".', $module));
+            }
+            break;
+        case 'feed_contextual_hashtag': // "Hashtag" search result.
+            if (isset($extraData['hashtag'])) {
+                // The hashtag where the app found this media.
+                // NOTE: Perform an UTF-8 aware search for the illegal "#"
+                // symbol. We must use mb_strpos to support international tags.
+                if (mb_strpos($extraData['hashtag'], '#') !== false) {
+                    throw new \InvalidArgumentException('Hashtag is not allowed to contain the "#" character.');
+                }
+
+                $request->addPost('hashtag', $extraData['hashtag']);
+            } else {
+                throw new \InvalidArgumentException(sprintf('Missing extra data for module "%s".', $module));
+            }
+            break;
+        case 'feed_contextual_location': // "Location" search result.
+            if (isset($extraData['location_id'])) {
+                // The location ID of this media.
+                $request->addPost('location_id', $extraData['location_id']);
+            } else {
+                throw new \InvalidArgumentException(sprintf('Missing extra data for module "%s".', $module));
+            }
+            break;
+        case 'feed_timeline': // "Timeline" tab (the global Home-feed with all
+                              // kinds of mixed news).
+        case 'newsfeed': // "Followings Activity" feed tab. Used when
+                         // liking/unliking a post that we clicked on from a
+                         // single-activity "xyz liked abc's post" entry.
+        case 'feed_contextual_newsfeed_multi_media_liked':  // "Followings
+                                                            // Activity" feed
+                                                            // tab. Used when
+                                                            // liking/unliking a
+                                                            // post that we
+                                                            // clicked on from a
+                                                            // multi-activity
+                                                            // "xyz liked 5
+                                                            // posts" entry.
+            break;
+        default:
+            throw new \InvalidArgumentException(sprintf('Invalid module name. %s does not correspond to any of the valid module names.', $module));
+        }
     }
 }
