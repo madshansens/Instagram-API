@@ -1046,6 +1046,7 @@ class Internal extends RequestCollection
      *
      * @see Story::markMediaSeen()
      * @see Location::markStoryMediaSeen()
+     * @see Hashtag::markStoryMediaSeen()
      */
     public function markStoryMediaSeen(
         array $items,

@@ -74,6 +74,25 @@ class Hashtag extends RequestCollection
     }
 
     /**
+     * Get related hashtags.
+     *
+     * @param string $hashtag The hashtag, not including the "#".
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\TagRelatedResponse
+     */
+    public function getRelated(
+        $hashtag)
+    {
+        $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
+        return $this->ig->request("tags/{$urlHashtag}/related/")
+            ->addParam('visited', '[{"id":"'.$hashtag.'","type":"hashtag"}]')
+            ->addParam('related_types', '["hashtag"]')
+            ->getResponse(new Response\TagRelatedResponse());
+    }
+
+    /**
      * Get the feed for a hashtag.
      *
      * @param string      $hashtag The hashtag, not including the "#".
@@ -97,21 +116,70 @@ class Hashtag extends RequestCollection
     }
 
     /**
-     * Get related hashtags.
+     * Mark TagFeedResponse story media items as seen.
      *
-     * @param string $hashtag The hashtag, not including the "#".
+     * The "story" property of a `TagFeedResponse` only gives you a list of
+     * story media. It doesn't actually mark any stories as "seen", so the
+     * user doesn't know that you've seen their story. Actually marking the
+     * story as "seen" is done via this endpoint instead. The official app
+     * calls this endpoint periodically (with 1 or more items at a time)
+     * while watching a story.
      *
+     * This tells the user that you've seen their story, and also helps
+     * Instagram know that it shouldn't give you those seen stories again
+     * if you request the same hashtag feed multiple times.
+     *
+     * Tip: You can pass in the whole "getItems()" array from the hashtag's
+     * "story" property, to easily mark all of the TagFeedResponse's story
+     * media items as seen.
+     *
+     * @param Response\TagFeedResponse $hashtagFeed The hashtag feed response
+     *                                              object which the story media
+     *                                              items came from. The story
+     *                                              items MUST belong to it.
+     * @param Response\Model\Item[]    $items       Array of one or more story
+     *                                              media Items.
+     *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\TagRelatedResponse
+     * @return \InstagramAPI\Response\MediaSeenResponse
+     *
+     * @see Story::markMediaSeen()
+     * @see Location::markStoryMediaSeen()
      */
-    public function getRelated(
-        $hashtag)
+    public function markStoryMediaSeen(
+        Response\TagFeedResponse $hashtagFeed,
+        array $items)
     {
-        $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
-        return $this->ig->request("tags/{$urlHashtag}/related/")
-            ->addParam('visited', '[{"id":"'.$hashtag.'","type":"hashtag"}]')
-            ->addParam('related_types', '["hashtag"]')
-            ->getResponse(new Response\TagRelatedResponse());
+        // Extract the Hashtag Story-Tray ID from the user's hashtag response.
+        // NOTE: This can NEVER fail if the user has properly given us the exact
+        // same hashtag response that they got the story items from!
+        $sourceId = '';
+        if ($hashtagFeed->getStory() instanceof Response\Model\StoryTray) {
+            $sourceId = $hashtagFeed->getStory()->getId();
+        }
+        if (!strlen($sourceId)) {
+            throw new \InvalidArgumentException('Your provided TagFeedResponse is invalid and does not contain any Hashtag Story-Tray ID.');
+        }
+
+        // Ensure they only gave us valid items for this hashtag response.
+        // NOTE: We validate since people cannot be trusted to use their brain.
+        $validIds = [];
+        foreach ($hashtagFeed->getStory()->getItems() as $item) {
+            $validIds[$item->getId()] = true;
+        }
+        foreach ($items as $item) {
+            // NOTE: We only check Items here. Other data is rejected by Internal.
+            if ($item instanceof Response\Model\Item && !isset($validIds[$item->getId()])) {
+                throw new \InvalidArgumentException(sprintf(
+                    'The item with ID "%s" does not belong to this TagFeedResponse.',
+                    $item->getId()
+                ));
+            }
+        }
+
+        // Mark the story items as seen, with the hashtag as source ID.
+        return $this->ig->internal->markStoryMediaSeen($items, $sourceId);
     }
 }
