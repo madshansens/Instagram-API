@@ -33,7 +33,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getCollectionName()
  * @method mixed getCommentCount()
  * @method mixed getCommentLikesEnabled()
- * @method mixed getCommentThreadingEnabled()
+ * @method bool getCommentThreadingEnabled()
  * @method mixed getCommentingDisabledForViewer()
  * @method Comment[] getComments()
  * @method mixed getCommentsDisabled()
@@ -111,7 +111,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getStoryPolls()
  * @method SuggestedUsers getSuggestedUsers()
  * @method bool getSupportsReelReactions()
- * @method mixed getTakenAt()
+ * @method string getTakenAt()
  * @method mixed getThumbnailUrls()
  * @method mixed getTopLikers()
  * @method mixed getTotalViewerCount()
@@ -273,7 +273,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setCollectionName(mixed $value)
  * @method $this setCommentCount(mixed $value)
  * @method $this setCommentLikesEnabled(mixed $value)
- * @method $this setCommentThreadingEnabled(mixed $value)
+ * @method $this setCommentThreadingEnabled(bool $value)
  * @method $this setCommentingDisabledForViewer(mixed $value)
  * @method $this setComments(Comment[] $value)
  * @method $this setCommentsDisabled(mixed $value)
@@ -351,7 +351,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setStoryPolls(mixed $value)
  * @method $this setSuggestedUsers(SuggestedUsers $value)
  * @method $this setSupportsReelReactions(bool $value)
- * @method $this setTakenAt(mixed $value)
+ * @method $this setTakenAt(string $value)
  * @method $this setThumbnailUrls(mixed $value)
  * @method $this setTopLikers(mixed $value)
  * @method $this setTotalViewerCount(mixed $value)
@@ -500,7 +500,11 @@ class Item extends AutoPropertyMapper
         'media_type'                       => '',
         'code'                             => '',
         'visibility'                       => '',
-        'taken_at'                         => '',
+        /*
+         * The Unix timestamp (UTC) of when the media was UPLOADED by the user.
+         * It is NOT when the media was "taken". It's the upload time.
+         */
+        'taken_at'                         => 'string',
         'device_timestamp'                 => '',
         'client_cache_key'                 => '',
         'filter_type'                      => '',
@@ -603,7 +607,7 @@ class Item extends AutoPropertyMapper
         'playback_duration_secs'           => '',
         'url_expire_at_secs'               => '',
         'is_sidecar_child'                 => '',
-        'comment_threading_enabled'        => '',
+        'comment_threading_enabled'        => 'bool',
         'collection_id'                    => 'string',
         'collection_name'                  => '',
         'cover_media'                      => 'CoverMedia',

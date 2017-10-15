@@ -413,6 +413,9 @@ class User extends AutoPropertyMapper
         'aggregate_promote_engagement'        => '',
         'fbuid'                               => '',
         'page_id'                             => 'string',
+        /*
+         * Unix "taken_at" timestamp of the newest item in their story reel.
+         */
         'latest_reel_media'                   => 'string',
         'has_unseen_besties_media'            => '',
         'allowed_commenter_type'              => '',

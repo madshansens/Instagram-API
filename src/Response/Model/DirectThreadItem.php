@@ -20,6 +20,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method DirectThreadItemMedia getMedia()
  * @method Item getMediaShare()
  * @method Placeholder getPlaceholder()
+ * @method Item[] getPreviewMedias()
  * @method Item getRavenMedia()
  * @method DirectReactions getReactions()
  * @method ReelShare getReelShare()
@@ -40,6 +41,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isMedia()
  * @method bool isMediaShare()
  * @method bool isPlaceholder()
+ * @method bool isPreviewMedias()
  * @method bool isRavenMedia()
  * @method bool isReactions()
  * @method bool isReelShare()
@@ -60,6 +62,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setMedia(DirectThreadItemMedia $value)
  * @method $this setMediaShare(Item $value)
  * @method $this setPlaceholder(Placeholder $value)
+ * @method $this setPreviewMedias(Item[] $value)
  * @method $this setRavenMedia(Item $value)
  * @method $this setReactions(DirectReactions $value)
  * @method $this setReelShare(ReelShare $value)
@@ -80,6 +83,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetMedia()
  * @method $this unsetMediaShare()
  * @method $this unsetPlaceholder()
+ * @method $this unsetPreviewMedias()
  * @method $this unsetRavenMedia()
  * @method $this unsetReactions()
  * @method $this unsetReelShare()
@@ -109,6 +113,7 @@ class DirectThreadItem extends AutoPropertyMapper
         'item_type'                     => '',
         'text'                          => '',
         'media_share'                   => 'Item',
+        'preview_medias'                => 'Item[]',
         'media'                         => 'DirectThreadItemMedia',
         'user_id'                       => 'string',
         'timestamp'                     => '',

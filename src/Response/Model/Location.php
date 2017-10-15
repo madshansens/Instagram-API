@@ -9,7 +9,10 @@ use InstagramAPI\AutoPropertyMapper;
  *
  * @method mixed getAddress()
  * @method mixed getCity()
+ * @method int getCountry()
+ * @method string getCreatedAt()
  * @method mixed getEndTime()
+ * @method int getEventCategory()
  * @method string getExternalId()
  * @method string getExternalIdSource()
  * @method mixed getExternalSource()
@@ -20,6 +23,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method Location getLocationDict()
  * @method mixed getName()
  * @method string getPk()
+ * @method string getPlaceFbid()
+ * @method string getPlaceName()
  * @method mixed getProfilePicUrl()
  * @method mixed getProfilePicUsername()
  * @method mixed getShortName()
@@ -29,7 +34,10 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getType()
  * @method bool isAddress()
  * @method bool isCity()
+ * @method bool isCountry()
+ * @method bool isCreatedAt()
  * @method bool isEndTime()
+ * @method bool isEventCategory()
  * @method bool isExternalId()
  * @method bool isExternalIdSource()
  * @method bool isExternalSource()
@@ -40,6 +48,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isLocationDict()
  * @method bool isName()
  * @method bool isPk()
+ * @method bool isPlaceFbid()
+ * @method bool isPlaceName()
  * @method bool isProfilePicUrl()
  * @method bool isProfilePicUsername()
  * @method bool isShortName()
@@ -49,7 +59,10 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isType()
  * @method $this setAddress(mixed $value)
  * @method $this setCity(mixed $value)
+ * @method $this setCountry(int $value)
+ * @method $this setCreatedAt(string $value)
  * @method $this setEndTime(mixed $value)
+ * @method $this setEventCategory(int $value)
  * @method $this setExternalId(string $value)
  * @method $this setExternalIdSource(string $value)
  * @method $this setExternalSource(mixed $value)
@@ -60,6 +73,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setLocationDict(Location $value)
  * @method $this setName(mixed $value)
  * @method $this setPk(string $value)
+ * @method $this setPlaceFbid(string $value)
+ * @method $this setPlaceName(string $value)
  * @method $this setProfilePicUrl(mixed $value)
  * @method $this setProfilePicUsername(mixed $value)
  * @method $this setShortName(mixed $value)
@@ -69,7 +84,10 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setType(mixed $value)
  * @method $this unsetAddress()
  * @method $this unsetCity()
+ * @method $this unsetCountry()
+ * @method $this unsetCreatedAt()
  * @method $this unsetEndTime()
+ * @method $this unsetEventCategory()
  * @method $this unsetExternalId()
  * @method $this unsetExternalIdSource()
  * @method $this unsetExternalSource()
@@ -80,6 +98,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetLocationDict()
  * @method $this unsetName()
  * @method $this unsetPk()
+ * @method $this unsetPlaceFbid()
+ * @method $this unsetPlaceName()
  * @method $this unsetProfilePicUrl()
  * @method $this unsetProfilePicUsername()
  * @method $this unsetShortName()
@@ -111,5 +131,27 @@ class Location extends AutoPropertyMapper
         'profile_pic_username' => '',
         'time_granularity'     => '',
         'timezone'             => '',
+        /*
+         * Country number such as int(398), but it has no relation to actual
+         * country codes, so the number is useless...
+         */
+        'country'              => 'int',
+        /*
+         * Regular unix timestamp of when the location was created.
+         */
+        'created_at'           => 'string',
+        /*
+         * Some kind of internal number to signify what type of event a special
+         * location (such as a festival) is. We've only seen this with int(0).
+         */
+        'event_category'       => 'int',
+        /*
+         * 64-bit integer with the facebook places ID for the location.
+         */
+        'place_fbid'           => 'string',
+        /*
+         * Human-readable name of the facebook place for the location.
+         */
+        'place_name'           => 'string',
     ];
 }

@@ -11,8 +11,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method int getChildCommentCount()
  * @method mixed getCommentLikeCount()
  * @method mixed getContentType()
- * @method mixed getCreatedAt()
- * @method mixed getCreatedAtUtc()
+ * @method string getCreatedAt()
+ * @method string getCreatedAtUtc()
  * @method mixed getDidReportAsSpam()
  * @method mixed getHasLikedComment()
  * @method bool getHasMoreHeadChildComments()
@@ -53,8 +53,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setChildCommentCount(int $value)
  * @method $this setCommentLikeCount(mixed $value)
  * @method $this setContentType(mixed $value)
- * @method $this setCreatedAt(mixed $value)
- * @method $this setCreatedAtUtc(mixed $value)
+ * @method $this setCreatedAt(string $value)
+ * @method $this setCreatedAtUtc(string $value)
  * @method $this setDidReportAsSpam(mixed $value)
  * @method $this setHasLikedComment(mixed $value)
  * @method $this setHasMoreHeadChildComments(bool $value)
@@ -97,8 +97,11 @@ class Comment extends AutoPropertyMapper
     const JSON_PROPERTY_MAP = [
         'status'                       => '',
         'user_id'                      => 'string',
-        'created_at_utc'               => '',
-        'created_at'                   => '',
+        /*
+         * Unix timestamp (UTC) of when the comment was posted.
+         */
+        'created_at_utc'               => 'string',
+        'created_at'                   => 'string',
         'bit_flags'                    => '',
         'user'                         => 'User',
         'pk'                           => 'string',

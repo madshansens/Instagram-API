@@ -9,8 +9,8 @@ use InstagramAPI\AutoPropertyMapper;
  *
  * @method mixed getBitFlags()
  * @method mixed getContentType()
- * @method mixed getCreatedAt()
- * @method mixed getCreatedAtUtc()
+ * @method string getCreatedAt()
+ * @method string getCreatedAtUtc()
  * @method mixed getDidReportAsSpam()
  * @method mixed getHasTranslation()
  * @method string getMediaId()
@@ -35,8 +35,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isUserId()
  * @method $this setBitFlags(mixed $value)
  * @method $this setContentType(mixed $value)
- * @method $this setCreatedAt(mixed $value)
- * @method $this setCreatedAtUtc(mixed $value)
+ * @method $this setCreatedAt(string $value)
+ * @method $this setCreatedAtUtc(string $value)
  * @method $this setDidReportAsSpam(mixed $value)
  * @method $this setHasTranslation(mixed $value)
  * @method $this setMediaId(string $value)
@@ -65,8 +65,8 @@ class Caption extends AutoPropertyMapper
     const JSON_PROPERTY_MAP = [
         'status'             => '',
         'user_id'            => 'string',
-        'created_at_utc'     => '',
-        'created_at'         => '',
+        'created_at_utc'     => 'string',
+        'created_at'         => 'string',
         'bit_flags'          => '',
         'user'               => 'User',
         'content_type'       => '',

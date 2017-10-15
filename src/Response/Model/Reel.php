@@ -8,18 +8,22 @@ use InstagramAPI\AutoPropertyMapper;
  * Reel.
  *
  * @method Broadcast getBroadcast()
- * @method mixed getCanReply()
+ * @method bool getCanReply()
+ * @method bool getCanReshare()
  * @method mixed getExpiringAt()
+ * @method bool getHasBestiesMedia()
  * @method string getId()
  * @method Item[] getItems()
- * @method mixed getLatestReelMedia()
+ * @method string getLatestReelMedia()
  * @method Location getLocation()
  * @method mixed getPrefetchCount()
- * @method mixed getSeen()
+ * @method string getSeen()
  * @method User getUser()
  * @method bool isBroadcast()
  * @method bool isCanReply()
+ * @method bool isCanReshare()
  * @method bool isExpiringAt()
+ * @method bool isHasBestiesMedia()
  * @method bool isId()
  * @method bool isItems()
  * @method bool isLatestReelMedia()
@@ -28,18 +32,22 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isSeen()
  * @method bool isUser()
  * @method $this setBroadcast(Broadcast $value)
- * @method $this setCanReply(mixed $value)
+ * @method $this setCanReply(bool $value)
+ * @method $this setCanReshare(bool $value)
  * @method $this setExpiringAt(mixed $value)
+ * @method $this setHasBestiesMedia(bool $value)
  * @method $this setId(string $value)
  * @method $this setItems(Item[] $value)
- * @method $this setLatestReelMedia(mixed $value)
+ * @method $this setLatestReelMedia(string $value)
  * @method $this setLocation(Location $value)
  * @method $this setPrefetchCount(mixed $value)
- * @method $this setSeen(mixed $value)
+ * @method $this setSeen(string $value)
  * @method $this setUser(User $value)
  * @method $this unsetBroadcast()
  * @method $this unsetCanReply()
+ * @method $this unsetCanReshare()
  * @method $this unsetExpiringAt()
+ * @method $this unsetHasBestiesMedia()
  * @method $this unsetId()
  * @method $this unsetItems()
  * @method $this unsetLatestReelMedia()
@@ -55,10 +63,19 @@ class Reel extends AutoPropertyMapper
         'items'             => 'Item[]',
         'user'              => 'User',
         'expiring_at'       => '',
-        'seen'              => '',
-        'can_reply'         => '',
+        /*
+         * The "taken_at" timestamp of the last story media you have seen for
+         * that user (the current reel's user). Defaults to `0` (not seen).
+         */
+        'seen'              => 'string',
+        'can_reply'         => 'bool',
+        'can_reshare'       => 'bool',
+        'has_besties_media' => 'bool', // Uses int(0) for false and 1 for true.
         'location'          => 'Location',
-        'latest_reel_media' => '',
+        /*
+         * Unix "taken_at" timestamp of the newest item in their story reel.
+         */
+        'latest_reel_media' => 'string',
         'prefetch_count'    => '',
         'broadcast'         => 'Broadcast',
     ];
