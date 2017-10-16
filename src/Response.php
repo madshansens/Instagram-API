@@ -23,8 +23,25 @@ use RuntimeException;
  */
 class Response extends AutoPropertyMapper
 {
+    /** @var string */
+    const STATUS_OK = 'ok';
+    /** @var string */
+    const STATUS_FAIL = 'fail';
+
     const JSON_PROPERTY_MAP = [
+        /*
+         * Whether the API request succeeded or not.
+         *
+         * Can be: "ok", "fail".
+         */
         'status'  => 'string',
+        /*
+         * Instagram's API failure error message(s).
+         *
+         * NOTE: This MUST be marked as 'mixed' since the server can give us
+         * either a single string OR a data structure with multiple messages.
+         * Our custom `getMessage()` will take care of parsing their value.
+         */
         'message' => 'mixed',
         /*
          * This can exist in any Instagram API response, and carries special
@@ -46,7 +63,7 @@ class Response extends AutoPropertyMapper
      */
     public function isOk()
     {
-        return $this->_getProperty('status') === 'ok'; // Can be: 'ok', 'fail'
+        return $this->_getProperty('status') === self::STATUS_OK;
     }
 
     /**
