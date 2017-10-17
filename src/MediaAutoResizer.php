@@ -437,6 +437,9 @@ class MediaAutoResizer
 
         // Process if the media resizer sees any other problems with the input
         // file (such as needing rotation or media format transcoding).
+        // NOTE: Nobody is allowed to call `isMod2CanvasRequired()` here. That
+        // isn't its purpose. Whether a final Mod2 canvas is required for actual
+        // resizing has NOTHING to do with whether the input file is ok.
         if ($this->_resizer->isProcessingRequired()) {
             return true;
         }

@@ -78,6 +78,12 @@ class VideoResizer implements ResizerInterface
         return false;
     }
 
+    /** {@inheritdoc} */
+    public function isMod2CanvasRequired()
+    {
+        return true;
+    }
+
     /**
      * Check if the input video's pixel data is rotated.
      *

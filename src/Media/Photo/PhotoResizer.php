@@ -109,6 +109,12 @@ class PhotoResizer implements ResizerInterface
         return false;
     }
 
+    /** {@inheritdoc} */
+    public function isMod2CanvasRequired()
+    {
+        return false;
+    }
+
     /**
      * Check if the input image's pixel data is rotated.
      *
