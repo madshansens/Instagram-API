@@ -146,6 +146,9 @@ class MediaAutoResizer
      */
     public static $defaultTmpPath = null;
 
+    /** @var bool Whether to output debugging info during calculation steps. */
+    protected $_debug;
+
     /** @var string Input file path. */
     protected $_inputFile;
 
@@ -188,7 +191,8 @@ class MediaAutoResizer
      *                          "useBestStoryRatio" (bool) - Enabled by default and affects which min/max aspect class constants are auto-selected for stories;
      *                          "bgColor" (array) - Array with 3 color components [R, G, B] (0-255/0x00-0xFF) for the background, uses white if not set;
      *                          "operation" (int) - Operation to perform on the media (CROP or EXPAND), uses self::CROP if not set;
-     *                          "tmpPath" (string) - Path to temp directory, uses system temp location or class-default if not set.
+     *                          "tmpPath" (string) - Path to temp directory, uses system temp location or class-default if not set;
+     *                          "debug" (bool) - Whether to output debugging info during calculation steps.
      *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
@@ -206,6 +210,10 @@ class MediaAutoResizer
         $bgColor = isset($options['bgColor']) ? $options['bgColor'] : null;
         $operation = isset($options['operation']) ? $options['operation'] : null;
         $tmpPath = isset($options['tmpPath']) ? $options['tmpPath'] : null;
+        $debug = isset($options['debug']) ? $options['debug'] : null;
+
+        // Debugging.
+        $this->_debug = $debug === true;
 
         // Input file.
         if (!is_file($inputFile)) {
