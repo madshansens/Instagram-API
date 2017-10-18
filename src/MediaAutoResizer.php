@@ -632,4 +632,52 @@ class MediaAutoResizer
 
         return $this->_resizer->resize($srcRect, $dstRect, $canvas);
     }
+
+    /**
+     * Output debug text.
+     *
+     * @param string $stepDescription
+     * @param string $formatMessage
+     * @param mixed  $args,...
+     */
+    protected function _debugText(
+        $stepDescription,
+        $formatMessage,
+        ...$args)
+    {
+        if (!$this->_debug) {
+            return;
+        }
+
+        printf(
+            "[\033[1;33m%s\033[0m] {$formatMessage}\n",
+            $stepDescription,
+            ...$args
+        );
+    }
+
+    /**
+     * Debug current calculation dimensions and their ratio.
+     *
+     * @param int|float   $width
+     * @param int|float   $height
+     * @param string|null $stepDescription
+     */
+    protected function _debugDimensions(
+        $width,
+        $height,
+        $stepDescription = null)
+    {
+        if (!$this->_debug) {
+            return;
+        }
+
+        printf(
+            // NOTE: This uses 8 decimals for proper debugging, since small
+            // rounding errors can make rejected ratios look valid.
+            "[\033[1;33m%s\033[0m] w=%s h=%s (aspect %.8f)\n",
+            $stepDescription !== null ? $stepDescription : 'DEBUG',
+            $width, $height, $width / $height
+        );
+    }
 }
