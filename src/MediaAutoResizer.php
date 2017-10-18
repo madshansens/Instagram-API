@@ -467,8 +467,8 @@ class MediaAutoResizer
     {
         // Get the dimensions of the original input file.
         $inputDimensions = $this->_resizer->getInputDimensions();
-        $inputWidth = $inputDimensions->getWidth();
-        $inputHeight = $inputDimensions->getHeight();
+        $inputWidth = (int) $inputDimensions->getWidth();
+        $inputHeight = (int) $inputDimensions->getHeight();
 
         // Initialize target canvas to original input dimensions & aspect ratio.
         $targetWidth = $inputWidth;
@@ -490,10 +490,10 @@ class MediaAutoResizer
             if ($this->_operation === self::CROP) {
                 // We need to limit the height, so floor is used intentionally to
                 // AVOID rounding height upwards to a still-illegal aspect ratio.
-                $targetHeight = floor($targetWidth / $targetAspectRatio);
+                $targetHeight = (int) floor($targetWidth / $targetAspectRatio);
 
                 // We must also calculate cropped input height, for focus-shift math.
-                $inputCroppedHeight = floor($inputWidth / $targetAspectRatio);
+                $inputCroppedHeight = (int) floor($inputWidth / $targetAspectRatio);
 
                 // Crop vertical media from top by default, to keep faces, etc.
                 $cropFocus = $this->_cropFocus !== null ? $this->_cropFocus : -50;
@@ -505,7 +505,7 @@ class MediaAutoResizer
 
                 // Calculate difference and divide it by cropFocus to get shift.
                 $diff = $inputHeight - $inputCroppedHeight;
-                $y1 = round($diff * (50 + $cropFocus) / 100);
+                $y1 = (int) round($diff * (50 + $cropFocus) / 100);
                 $y2 = $y2 - ($diff - $y1);
             } elseif ($this->_operation === self::EXPAND) {
                 // We need to expand the width with left/right borders. We use
@@ -515,7 +515,7 @@ class MediaAutoResizer
                 // their values are very close to each other! For example with
                 // 450x600 input and min/max aspect of 1.2625, it'll create a
                 // 758x600 expanded media (ratio 1.2633). That's unavoidable.
-                $targetWidth = ceil($targetHeight * $targetAspectRatio);
+                $targetWidth = (int) ceil($targetHeight * $targetAspectRatio);
             }
         } elseif ($this->_maxAspectRatio !== null && $targetAspectRatio > $this->_maxAspectRatio) {
             $useFloorHeightRecalc = false; // Use ceil() so height is below maxAspectRatio.
@@ -524,10 +524,10 @@ class MediaAutoResizer
             if ($this->_operation === self::CROP) {
                 // We need to limit the width. We use floor to guarantee cutting
                 // enough pixels, since our width exceeds the maximum allowed ratio.
-                $targetWidth = floor($targetHeight * $targetAspectRatio);
+                $targetWidth = (int) floor($targetHeight * $targetAspectRatio);
 
                 // We must also calculate cropped input width, for focus-shift math.
-                $inputCroppedWidth = floor($inputHeight * $targetAspectRatio);
+                $inputCroppedWidth = (int) floor($inputHeight * $targetAspectRatio);
 
                 // Crop horizontal media from center by default.
                 $cropFocus = $this->_cropFocus !== null ? $this->_cropFocus : 0;
@@ -539,7 +539,7 @@ class MediaAutoResizer
 
                 // Calculate difference and divide it by cropFocus to get shift.
                 $diff = $inputWidth - $inputCroppedWidth;
-                $x1 = round($diff * (50 + $cropFocus) / 100);
+                $x1 = (int) round($diff * (50 + $cropFocus) / 100);
                 $x2 = $x2 - ($diff - $x1);
             } elseif ($this->_operation === self::EXPAND) {
                 // We need to expand the height with top/bottom borders. We use
@@ -549,7 +549,7 @@ class MediaAutoResizer
                 // their values are very close to each other! For example with
                 // 600x450 input and min/max aspect of 0.8625, it'll create a
                 // 600x696 expanded media (ratio 0.86206). That's unavoidable.
-                $targetHeight = ceil($targetWidth / $targetAspectRatio);
+                $targetHeight = (int) ceil($targetWidth / $targetAspectRatio);
             }
         } else {
             // The media's aspect ratio is already within the legal range, but
@@ -588,8 +588,8 @@ class MediaAutoResizer
             // Use floor() or ceil() depending on whether we need the resulting
             // aspect ratio to be either >= or <= the target aspect ratio.
             $targetHeight = $useFloorHeightRecalc
-                          ? floor($targetWidth / $targetAspectRatio) // >=
-                          : ceil($targetWidth / $targetAspectRatio); // <=
+                          ? (int) floor($targetWidth / $targetAspectRatio) // >=
+                          : (int) ceil($targetWidth / $targetAspectRatio); // <=
         }
 
         // Determine the media operation's resampling parameters and perform it.
@@ -617,12 +617,12 @@ class MediaAutoResizer
             // Also note that ceil will never produce bad values, since PHP
             // allows the dst_w/dst_h to exceed beyond canvas dimensions!
             $scale = min($canvas->getWidth() / $srcRect->getWidth(), $canvas->getHeight() / $srcRect->getHeight());
-            $dst_w = ceil($scale * $srcRect->getWidth());
-            $dst_h = ceil($scale * $srcRect->getHeight());
+            $dst_w = (int) ceil($scale * $srcRect->getWidth());
+            $dst_h = (int) ceil($scale * $srcRect->getHeight());
 
             // Now calculate the centered destination offset on the canvas.
-            $dst_x = floor(($canvas->getWidth() - $dst_w) / 2);
-            $dst_y = floor(($canvas->getHeight() - $dst_h) / 2);
+            $dst_x = (int) floor(($canvas->getWidth() - $dst_w) / 2);
+            $dst_y = (int) floor(($canvas->getHeight() - $dst_h) / 2);
 
             // Build the final destination rectangle for the expanded canvas!
             $dstRect = new Rectangle($dst_x, $dst_y, $dst_w, $dst_h);
