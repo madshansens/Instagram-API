@@ -199,7 +199,16 @@ class VideoResizer implements ResizerInterface
 
         exec($command, $output, $returnCode);
         if ($returnCode) {
-            throw new \RuntimeException($output, $returnCode);
+            // Extract important error messages and build a summary of them.
+            $errorLines = [];
+            foreach ($output as $line) {
+                if (preg_match('/^(?:\[.+?\]\s+)?(?:fail|error|warn|critical)/i', $line)) {
+                    $errorLines[] = $line;
+                }
+            }
+            $errorMsg = sprintf('FFmpeg Errors: ["%s"], Command: "%s".', implode('"], ["', $errorLines), $command);
+
+            throw new \RuntimeException($errorMsg, $returnCode);
         }
     }
 
