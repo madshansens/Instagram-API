@@ -161,6 +161,10 @@ class MediaAutoResizer
     /** @var float|null Maximum allowed aspect ratio. */
     protected $_maxAspectRatio;
 
+    /** @var float Whether to allow the new aspect ratio (during processing) to
+     * deviate slightly from the min/max targets. See constructor for info. */
+    protected $_allowNewAspectDeviation;
+
     /** @var int Crop focus position (-50 .. 50) when cropping. */
     protected $_cropFocus;
 
@@ -182,17 +186,55 @@ class MediaAutoResizer
     /**
      * Constructor.
      *
+     * Available `$options` parameters:
+     *
+     * - "targetFeed" (int): One of the FEED_X constants. MUST be used if you're
+     *   targeting stories. Defaults to `Constants::FEED_TIMELINE`.
+     *
+     * - "cropFocus" (int): Crop focus position (-50 .. 50) when cropping. Uses
+     *   intelligent guess if not set.
+     *
+     * - "minAspectRatio" (float): Minimum allowed aspect ratio. Uses
+     *   auto-selected class constants if not set.
+     *
+     * - "maxAspectRatio" (float): Maximum allowed aspect ratio. Uses
+     *   auto-selected class constants if not set.
+     *
+     * - "useBestStoryRatio" (bool): Enabled by default and affects which
+     *   min/max aspect class constants are auto-selected for stories.
+     *
+     * - "allowNewAspectDeviation" (bool): Whether to allow the new aspect ratio
+     *   (during processing) to deviate slightly from the min/max targets.
+     *   Normally, we will ENSURE that the resulting canvas PERFECTLY fits
+     *   within the provided minimum and maximum aspect ratio ranges. However,
+     *   if you want to resize your media to an "exact" static ratio such as
+     *   "minAspectRatio:1.25, maxAspectRatio:1.25" (or perhaps to a min/max
+     *   ratio from another piece of media, if you want all media to be changed
+     *   to the same size), then your result would almost always violate that
+     *   request since it would be IMPOSSIBLE to achieve such perfect and
+     *   specific final ratios in MOST cases (due to the original dimensions of
+     *   your input media). The ONLY ratio that is 100% sure to ALWAYS be
+     *   perfectly reachable is 1:1 (square). Other ratios may not be perfectly
+     *   possible. But by setting this option to `FALSE`, you will tell our
+     *   processing to allow such "slight missteps" and permit the final
+     *   "closest-possible canvas" we've calculated anyway. We will still get as
+     *   close as absolutely possible. For example, we may instead reach
+     *   "1.25385" in the "1.25" example.
+     *
+     * - "bgColor" (array) - Array with 3 color components `[R, G, B]`
+     *   (0-255/0x00-0xFF) for the background. Uses white if not set.
+     *
+     * - "operation" (int) - Operation to perform on the media (CROP or EXPAND).
+     *   Uses `self::CROP` if not set.
+     *
+     * - "tmpPath" (string) - Path to temp directory. Uses system temp location
+     *   or the class-default (`self::$defaultTmpPath`) if not set.
+     *
+     * - "debug" (bool) - Whether to output debugging info during calculation
+     *   steps.
+     *
      * @param string $inputFile Path to an input file.
-     * @param array  $options   An associative array of optional parameters, including:
-     *                          "targetFeed" (int) - One of the FEED_X constants, MUST be used if you're targeting stories, defaults to FEED_TIMELINE;
-     *                          "cropFocus" (int) - Crop focus position (-50 .. 50) when cropping, uses intelligent guess if not set;
-     *                          "minAspectRatio" (float) - Minimum allowed aspect ratio, uses auto-selected class constants if not set;
-     *                          "maxAspectRatio" (float) - Maximum allowed aspect ratio, uses auto-selected class constants if not set;
-     *                          "useBestStoryRatio" (bool) - Enabled by default and affects which min/max aspect class constants are auto-selected for stories;
-     *                          "bgColor" (array) - Array with 3 color components [R, G, B] (0-255/0x00-0xFF) for the background, uses white if not set;
-     *                          "operation" (int) - Operation to perform on the media (CROP or EXPAND), uses self::CROP if not set;
-     *                          "tmpPath" (string) - Path to temp directory, uses system temp location or class-default if not set;
-     *                          "debug" (bool) - Whether to output debugging info during calculation steps.
+     * @param array  $options   An associative array of optional parameters. See constructor description.
      *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
@@ -207,6 +249,7 @@ class MediaAutoResizer
         $minAspectRatio = isset($options['minAspectRatio']) ? $options['minAspectRatio'] : null;
         $maxAspectRatio = isset($options['maxAspectRatio']) ? $options['maxAspectRatio'] : null;
         $useBestStoryRatio = isset($options['useBestStoryRatio']) ? (bool) $options['useBestStoryRatio'] : true;
+        $allowNewAspectDeviation = isset($options['allowNewAspectDeviation']) ? (bool) $options['allowNewAspectDeviation'] : false;
         $bgColor = isset($options['bgColor']) ? $options['bgColor'] : null;
         $operation = isset($options['operation']) ? $options['operation'] : null;
         $tmpPath = isset($options['tmpPath']) ? $options['tmpPath'] : null;
@@ -271,6 +314,9 @@ class MediaAutoResizer
         }
         $this->_minAspectRatio = $minAspectRatio;
         $this->_maxAspectRatio = $maxAspectRatio;
+
+        // Allow the aspect ratio of the final, new canvas to deviate slightly?
+        $this->_allowNewAspectDeviation = (bool) $allowNewAspectDeviation;
 
         // Background color.
         if ($bgColor !== null && (!is_array($bgColor) || count($bgColor) !== 3 || !isset($bgColor[0]) || !isset($bgColor[1]) || !isset($bgColor[2]))) {
@@ -470,99 +516,30 @@ class MediaAutoResizer
         $inputWidth = (int) $inputDimensions->getWidth();
         $inputHeight = (int) $inputDimensions->getHeight();
 
-        // Initialize target canvas to original input dimensions & aspect ratio.
-        $targetWidth = $inputWidth;
-        $targetHeight = $inputHeight;
-        $targetAspectRatio = $inputWidth / $inputHeight;
-
-        // Check aspect ratio and crop/expand final canvas to fit aspect if needed.
-        $useFloorHeightRecalc = true; // Height-behavior in any later re-calculations.
-        if ($this->_minAspectRatio !== null && $targetAspectRatio < $this->_minAspectRatio) {
-            $useFloorHeightRecalc = true; // Use floor() so height is above minAspectRatio.
-            // Determine target ratio; in case of stories we always target 9:16.
-            $targetAspectRatio = $this->_targetFeed === 'story'
-                               ? self::BEST_STORY_RATIO : $this->_minAspectRatio;
-            if ($this->_operation === self::CROP) {
-                // We need to limit the height, so floor is used intentionally to
-                // AVOID rounding height upwards to a still-illegal aspect ratio.
-                $targetHeight = (int) floor($targetWidth / $targetAspectRatio);
-            } elseif ($this->_operation === self::EXPAND) {
-                // We need to expand the width with left/right borders. We use
-                // ceil to guarantee that the final media is wide enough to be
-                // above the minimum allowed aspect ratio.
-                $targetWidth = (int) ceil($targetHeight * $targetAspectRatio);
-            }
-        } elseif ($this->_maxAspectRatio !== null && $targetAspectRatio > $this->_maxAspectRatio) {
-            $useFloorHeightRecalc = false; // Use ceil() so height is below maxAspectRatio.
-            // Determine target ratio; in case of stories we always target 9:16.
-            $targetAspectRatio = $this->_targetFeed === 'story'
-                               ? self::BEST_STORY_RATIO : $this->_maxAspectRatio;
-            if ($this->_operation === self::CROP) {
-                // We need to limit the width. We use floor to guarantee cutting
-                // enough pixels, since our width exceeds the maximum allowed ratio.
-                $targetWidth = (int) floor($targetHeight * $targetAspectRatio);
-            } elseif ($this->_operation === self::EXPAND) {
-                // We need to expand the height with top/bottom borders. We use
-                // ceil to guarantee that the final media is tall enough to be
-                // below the maximum allowed aspect ratio.
-                $targetHeight = (int) ceil($targetWidth / $targetAspectRatio);
-            }
-        } else {
-            // The media's aspect ratio is already within the legal range, but
-            // we'll still need to set up a proper height re-calc variable if
-            // our input needs to be re-scaled based on width limits further
-            // below. So determine whether the input is closest to min or max.
-            $minAspectDistance = abs(($this->_minAspectRatio !== null
-                ? $this->_minAspectRatio : 0) - $targetAspectRatio);
-            $maxAspectDistance = abs(($this->_maxAspectRatio !== null
-                ? $this->_maxAspectRatio : 0) - $targetAspectRatio);
-
-            // If it's closest to minimum allowed ratio, we'll use floor() to
-            // ensure the result is above the minimum ratio. Otherwise we'll use
-            // ceil() to ensure that the result is below the maximum ratio.
-            $useFloorHeightRecalc = ($minAspectDistance < $maxAspectDistance);
-        }
-
-        // Handle square target ratios by making the final canvas into a square.
-        if ($targetAspectRatio == 1) { // Ratio 1 = Square.
-            // NOTE: Our square will be the size of the shortest side when
-            // cropping or the longest side when expanding.
-            $targetWidth = $targetHeight = $this->_operation === self::CROP
-                         ? min($targetWidth, $targetHeight)
-                         : max($targetWidth, $targetHeight);
-        }
-
-        // Lastly, enforce minimum and maximum width limits on our final canvas.
-        // NOTE: Instagram only enforces width & aspect ratio, which in turn
-        // auto-limits height (since we can only use legal height ratios).
-        $mustRecalcHeight = false;
-        if ($targetWidth > $this->_resizer->getMaxWidth()) {
-            $targetWidth = $this->_resizer->getMaxWidth();
-            $mustRecalcHeight = true;
-        } elseif ($targetWidth < $this->_resizer->getMinWidth()) {
-            $targetWidth = $this->_resizer->getMinWidth();
-            $mustRecalcHeight = true;
-        }
-        if ($mustRecalcHeight) {
-            // Use floor() or ceil() depending on whether we need the resulting
-            // aspect ratio to be either >= or <= the target aspect ratio.
-            $targetHeight = $useFloorHeightRecalc
-                          ? (int) floor($targetWidth / $targetAspectRatio) // >=
-                          : (int) ceil($targetWidth / $targetAspectRatio); // <=
-        }
+        // Create a new canvas with the desired dimensions.
+        // WARNING: This creates a LEGAL canvas which MUST be followed EXACTLY.
+        $canvas = $this->_calculateNewCanvas( // Throws.
+            $this->_targetFeed,
+            $this->_operation,
+            $inputWidth,
+            $inputHeight,
+            $this->_resizer->isMod2CanvasRequired(),
+            $this->_resizer->getMinWidth(),
+            $this->_resizer->getMaxWidth(),
+            $this->_minAspectRatio,
+            $this->_maxAspectRatio,
+            $this->_allowNewAspectDeviation
+        );
 
         // Determine the media operation's resampling parameters and perform it.
         if ($this->_operation === self::CROP) {
-            $canvas = new Dimensions($targetWidth, $targetHeight);
+            // TODO: REWRITE THIS ALGORITHM.
             $srcRect = new Rectangle($x1, $y1, $x2 - $x1, $y2 - $y1);
-            $dstRect = new Rectangle(0, 0, $targetWidth, $targetHeight);
+            $dstRect = new Rectangle(0, 0, $canvas->getWidth(), $canvas->getHeight());
         } elseif ($this->_operation === self::EXPAND) {
             // For expansion, we'll calculate all operation parameters now. We
             // ignore all of the various x/y and crop-focus parameters used by
             // the cropping code above. None of them are used for expansion!
-
-            // We'll create a new canvas with the desired dimensions.
-            $canvas = new Dimensions($targetWidth, $targetHeight);
 
             // We'll copy the entire original input media onto the new canvas.
             // Always copy from the absolute top left of the original media.
@@ -590,6 +567,520 @@ class MediaAutoResizer
         }
 
         return $this->_resizer->resize($srcRect, $dstRect, $canvas);
+    }
+
+    /**
+     * Calculate a new canvas based on input size and requested modifications.
+     *
+     * The final canvas will be the same size as the input if everything was
+     * already okay and within the limits. Otherwise it will be a new canvas
+     * representing the _exact_, best-possible size to convert input media to.
+     *
+     * It is up to the caller to perfectly follow these orders, since deviating
+     * by even a SINGLE PIXEL can create illegal media aspect ratios.
+     *
+     * Also note that the resulting canvas can be LARGER than the input in
+     * several cases, such as in EXPAND-mode (obviously), or when the input
+     * isn't wide enough to be legal (and must be scaled up), and whenever Mod2
+     * is requested. In the latter case, the algorithm may have to add a few
+     * pixels to the height to make it valid in a few rare cases. The caller
+     * must be aware of such "enlarged" canvases and should handle them by
+     * stretching the input if necessary.
+     *
+     * @param string     $targetFeed
+     * @param int        $operation
+     * @param int        $inputWidth
+     * @param int        $inputHeight
+     * @param bool       $isMod2CanvasRequired
+     * @param int        $minWidth
+     * @param int        $maxWidth
+     * @param float|null $minAspectRatio
+     * @param float|null $maxAspectRatio
+     * @param bool       $allowNewAspectDeviation See constructor arg docs.
+     *
+     * @throws \RuntimeException If requested canvas couldn't be achieved, most
+     *                           commonly if you have chosen way too narrow
+     *                           aspect ratio ranges that cannot be perfectly
+     *                           reached by your input media, and you AREN'T
+     *                           running with `$allowNewAspectDeviation`.
+     *
+     * @return array An array with `canvas` (`Dimensions`), `mod2WidthDiff` and
+     *               `mod2HeightDiff`. The latter are integers representing how
+     *               many pixels were cropped (-) or added (+) by the Mod2 step
+     *               compared to the ideal canvas.
+     */
+    protected function _calculateNewCanvas(
+        $targetFeed,
+        $operation,
+        $inputWidth,
+        $inputHeight,
+        $isMod2CanvasRequired,
+        $minWidth = 1,
+        $maxWidth = 99999,
+        $minAspectRatio = null,
+        $maxAspectRatio = null,
+        $allowNewAspectDeviation = false)
+    {
+        /*
+         * WARNING TO POTENTIAL CONTRIBUTORS:
+         *
+         * THIS right here is the MOST COMPLEX algorithm in the whole project.
+         * Everything is finely tuned to create 100% accurate, pixel-perfect
+         * resizes. A SINGLE PIXEL ERROR in your calculations WILL lead to it
+         * sometimes outputting illegally formatted files that will be rejected
+         * by Instagram. We know this, because we have SEEN IT HAPPEN while we
+         * tweaked and tweaked and tweaked to balance everything perfectly!
+         *
+         * Unfortunately, this file also seems to attract a lot of beginners.
+         * Maybe because a "media resizer" seems "fun and easy". But that would
+         * be an incorrect guess. It's the most serious algorithm in the whole
+         * project. If you break it, *YOU* break people's uploads.
+         *
+         * We have had many random, new contributors just jumping in and adding
+         * zero-effort code everywhere in here, and breaking the whole balance,
+         * and then opening pull requests. We have rejected EVERY single one of
+         * those pull requests because they were totally unusable and unsafe.
+         *
+         * We will not accept such pull requests. Ever.
+         *
+         * This warning is here to save your time, and ours.
+         *
+         * If you are interested in helping out with the MediaAutoResizer, then
+         * that's GREAT! But in that case we require that you fully read through
+         * the algorithm below and all of its comments about 50 times over a 3-4
+         * day period - until you understand every single step perfectly. The
+         * comments will help make it clearer the more you read...
+         *
+         *                                               ...and make an effort.
+         *
+         * Then you are ready... and welcome to the team. :-)
+         *
+         * Thank you.
+         */
+
+        // Initialize target canvas to original input dimensions & aspect ratio.
+        $targetWidth = (int) $inputWidth;
+        $targetHeight = (int) $inputHeight;
+        $targetAspectRatio = $inputWidth / $inputHeight;
+        $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS: Input Canvas Size');
+
+        // Check aspect ratio and crop/expand the canvas to fit aspect if needed.
+        $useFloorHeightRecalc = true; // Height-behavior in any later re-calculations.
+        if ($minAspectRatio !== null && $targetAspectRatio < $minAspectRatio) {
+            // Use floor() so that height will always be above minAspectRatio.
+            $useFloorHeightRecalc = true;
+            // Determine target ratio; in case of stories we always target 9:16.
+            $targetAspectRatio = $targetFeed === 'story'
+                               ? self::BEST_STORY_RATIO : $minAspectRatio;
+
+            if ($operation === self::CROP) {
+                // We need to limit the height, so floor is used intentionally to
+                // AVOID rounding height upwards to a still-illegal aspect ratio.
+                $targetHeight = (int) floor($targetWidth / $targetAspectRatio);
+                $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_CROPPED: Aspect Was < MIN');
+            } elseif ($operation === self::EXPAND) {
+                // We need to expand the width with left/right borders. We use
+                // ceil to guarantee that the final media is wide enough to be
+                // above the minimum allowed aspect ratio.
+                $targetWidth = (int) ceil($targetHeight * $targetAspectRatio);
+                $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_EXPANDED: Aspect Was < MIN');
+            }
+        } elseif ($maxAspectRatio !== null && $targetAspectRatio > $maxAspectRatio) {
+            // Use ceil() so that height will always be below maxAspectRatio.
+            $useFloorHeightRecalc = false;
+            // Determine target ratio; in case of stories we always target 9:16.
+            $targetAspectRatio = $targetFeed === 'story'
+                               ? self::BEST_STORY_RATIO : $maxAspectRatio;
+
+            if ($operation === self::CROP) {
+                // We need to limit the width. We use floor to guarantee cutting
+                // enough pixels, since our width exceeds the maximum allowed ratio.
+                $targetWidth = (int) floor($targetHeight * $targetAspectRatio);
+                $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_CROPPED: Aspect Was > MAX');
+            } elseif ($operation === self::EXPAND) {
+                // We need to expand the height with top/bottom borders. We use
+                // ceil to guarantee that the final media is tall enough to be
+                // below the maximum allowed aspect ratio.
+                $targetHeight = (int) ceil($targetWidth / $targetAspectRatio);
+                $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_EXPANDED: Aspect Was > MAX');
+            }
+        } else {
+            $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS: Aspect Ratio Already Legal');
+
+            // The media's aspect ratio is already within the legal range, but
+            // we'll still need to set up a proper height re-calc variable if
+            // our input needs to be re-scaled based on width limits further
+            // below. So determine whether the input is closest to min or max.
+            $minAspectDistance = abs(($minAspectRatio !== null
+                ? $minAspectRatio : 0) - $targetAspectRatio);
+            $maxAspectDistance = abs(($maxAspectRatio !== null
+                ? $maxAspectRatio : 0) - $targetAspectRatio);
+
+            // If it's closest to minimum allowed ratio, we'll use floor() to
+            // ensure the result is above the minimum ratio. Otherwise we'll use
+            // ceil() to ensure that the result is below the maximum ratio.
+            $useFloorHeightRecalc = ($minAspectDistance < $maxAspectDistance);
+        }
+
+        // Verify square target ratios by ensuring canvas is now a square.
+        // NOTE: This is just a sanity check against wrong code above. It will
+        // never execute, since all code above took care of making both
+        // dimensions identical already (if they differed in any way, they had a
+        // non-1 ratio and invoked the aspect ratio cropping/expansion code). It
+        // then made identical thanks to the fact that X / 1 = X, and X * 1 = X.
+        // NOTE: It's worth noting that our squares are always the size of the
+        // shortest side when cropping or the longest side when expanding.
+        if ($targetAspectRatio === 1 && $targetWidth !== $targetHeight) { // Ratio 1 = Square.
+            $targetWidth = $targetHeight = $operation === self::CROP
+                         ? min($targetWidth, $targetHeight)
+                         : max($targetWidth, $targetHeight);
+            $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_SQUARIFY: Fixed Badly Generated Square');
+        }
+
+        // Lastly, enforce minimum and maximum width limits on our final canvas.
+        // NOTE: Instagram only enforces width & aspect ratio, which in turn
+        // auto-limits height (since we can only use legal height ratios).
+        // NOTE: Yet again, if the target ratio is 1 (square), we'll get
+        // identical width & height, so NO NEED to MANUALLY "fix square" here.
+        if ($targetWidth > $maxWidth) {
+            $targetWidth = $maxWidth;
+            $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_WIDTH: Width Was > MAX');
+            $targetHeight = $this->_accurateHeightRecalc($useFloorHeightRecalc, $targetAspectRatio, $targetWidth);
+            $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_WIDTH: Height Recalc From Width & Aspect');
+        } elseif ($targetWidth < $minWidth) {
+            $targetWidth = $minWidth;
+            $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_WIDTH: Width Was < MIN');
+            $targetHeight = $this->_accurateHeightRecalc($useFloorHeightRecalc, $targetAspectRatio, $targetWidth);
+            $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_WIDTH: Height Recalc From Width & Aspect');
+        }
+
+        // All of the main canvas algorithms are now finished, and we are now
+        // able to check Mod2 compatibility and accurately readjust if needed.
+        $mod2WidthDiff = $mod2HeightDiff = 0;
+        if ($isMod2CanvasRequired
+            && (!$this->_isNumberMod2($targetWidth) || !$this->_isNumberMod2($targetHeight))
+        ) {
+            // Calculate the Mod2-adjusted final canvas size.
+            $mod2Canvas = $this->_calculateAdjustedMod2Canvas(
+                $inputWidth,
+                $inputHeight,
+                $useFloorHeightRecalc,
+                $targetWidth,
+                $targetHeight,
+                $targetAspectRatio,
+                $minWidth,
+                $maxWidth,
+                $minAspectRatio,
+                $maxAspectRatio,
+                $allowNewAspectDeviation
+            );
+
+            // Determine the pixel difference before and after processing.
+            $mod2WidthDiff = $mod2Canvas->getWidth() - $targetWidth;
+            $mod2HeightDiff = $mod2Canvas->getHeight() - $targetHeight;
+            $this->_debugText('CANVAS: Mod2 Difference Stats', 'width=%s, height=%s', $mod2WidthDiff, $mod2HeightDiff);
+
+            // Update the final canvas to the Mod2-adjusted canvas size.
+            // NOTE: If code above failed, the new values are invalid. But so
+            // could our original values have been. We check that further down.
+            $targetWidth = $mod2Canvas->getWidth();
+            $targetHeight = $mod2Canvas->getHeight();
+            $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS: Updated From Mod2 Result');
+        }
+
+        // Create the new canvas Dimensions object.
+        $canvas = new Dimensions($targetWidth, $targetHeight);
+        $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_FINAL: Final Result');
+
+        // We must now validate the canvas before returning it.
+        // NOTE: Most of these are just strict sanity-checks to protect against
+        // bad code contributions in the future. The canvas won't be able to
+        // pass all of these checks unless the algorithm above remains perfect.
+        $isIllegalRatio = (($minAspectRatio !== null && $canvas->getAspectRatio() < $minAspectRatio)
+                           || ($maxAspectRatio !== null && $canvas->getAspectRatio() > $maxAspectRatio));
+        if ($canvas->getWidth() < 1 || $canvas->getHeight() < 1) {
+            throw new \RuntimeException(sprintf(
+                'Canvas calculation failed. Target width (%s) or height (%s) less than one pixel.',
+                $canvas->getWidth(), $canvas->getHeight()
+            ));
+        } elseif ($canvas->getWidth() < $minWidth) {
+            throw new \RuntimeException(sprintf(
+                'Canvas calculation failed. Target width (%s) less than minimum allowed (%s).',
+                $canvas->getWidth(), $minWidth()
+            ));
+        } elseif ($canvas->getWidth() > $maxWidth) {
+            throw new \RuntimeException(sprintf(
+                'Canvas calculation failed. Target width (%s) greater than maximum allowed (%s).',
+                $canvas->getWidth(), $maxWidth
+            ));
+        } elseif ($isIllegalRatio) {
+            if (!$allowNewAspectDeviation) {
+                throw new \RuntimeException(sprintf(
+                    'Canvas calculation failed. Unable to reach target aspect ratio range during output canvas generation. The range of allowed aspect ratios is too narrow (%.8f - %.8f). We achieved a ratio of %.8f.',
+                    $minAspectRatio !== null ? $minAspectRatio : 0.0,
+                    $maxAspectRatio !== null ? $maxAspectRatio : INF,
+                    $canvas->getAspectRatio()
+                ));
+            } else {
+                // The user wants us to allow "near-misses", so we proceed...
+                $this->_debugDimensions($canvas->getWidth(), $canvas->getHeight(), 'CANVAS_FINAL: Allowing Deviating Aspect Ratio');
+            }
+        }
+
+        return [
+            'canvas'         => $canvas,
+            'mod2WidthDiff'  => $mod2WidthDiff,
+            'mod2HeightDiff' => $mod2HeightDiff,
+        ];
+    }
+
+    /**
+     * Calculates a new relative height using the target aspect ratio.
+     *
+     * Used internally by `_calculateNewCanvas()`.
+     *
+     * This algorithm aims at the highest-possible or lowest-possible resulting
+     * aspect ratio based on what's needed. It uses either `floor()` or `ceil()`
+     * depending on whether we need the resulting aspect ratio to be >= or <=
+     * the target aspect ratio.
+     *
+     * The principle behind this is the fact that removing height (via floor)
+     * will give us a higher aspect ratio. And adding height (via ceil) will
+     * give us a lower aspect ratio.
+     *
+     * If the target aspect ratio is square (1), height becomes equal to width.
+     *
+     * @param bool  $useFloorHeightRecalc
+     * @param float $targetAspectRatio
+     * @param int   $targetWidth
+     *
+     * @return int
+     */
+    protected function _accurateHeightRecalc(
+        $useFloorHeightRecalc,
+        $targetAspectRatio,
+        $targetWidth)
+    {
+        // Read the docs above to understand this CRITICALLY IMPORTANT code.
+        $targetHeight = $useFloorHeightRecalc
+                      ? (int) floor($targetWidth / $targetAspectRatio) // >=
+                      : (int) ceil($targetWidth / $targetAspectRatio); // <=
+
+        return $targetHeight;
+    }
+
+    /**
+     * Adjusts dimensions to create a Mod2-compatible canvas.
+     *
+     * Used internally by `_calculateNewCanvas()`.
+     *
+     * The reason why this function also takes the original input width/height
+     * is because it tries to maximize its usage of the available original pixel
+     * surface area while correcting the dimensions. It uses the extra
+     * information to know when it's safely able to grow the canvas beyond the
+     * given target width/height parameter values.
+     *
+     * @param int        $inputWidth
+     * @param int        $inputHeight
+     * @param bool       $useFloorHeightRecalc
+     * @param int        $targetWidth
+     * @param int        $targetHeight
+     * @param float      $targetAspectRatio
+     * @param int        $minWidth
+     * @param int        $maxWidth
+     * @param float|null $minAspectRatio
+     * @param float|null $maxAspectRatio
+     * @param bool       $allowNewAspectDeviation See constructor arg docs.
+     *
+     * @throws \RuntimeException If requested canvas couldn't be achieved, most
+     *                           commonly if you have chosen way too narrow
+     *                           aspect ratio ranges that cannot be perfectly
+     *                           reached by your input media, and you AREN'T
+     *                           running with `$allowNewAspectDeviation`.
+     *
+     * @return Dimensions
+     *
+     * @see MediaAutoResizer::_calculateNewCanvas()
+     */
+    protected function _calculateAdjustedMod2Canvas(
+        $inputWidth,
+        $inputHeight,
+        $useFloorHeightRecalc,
+        $targetWidth,
+        $targetHeight,
+        $targetAspectRatio,
+        $minWidth = 1,
+        $maxWidth = 99999,
+        $minAspectRatio = null,
+        $maxAspectRatio = null,
+        $allowNewAspectDeviation = false)
+    {
+        // Initialize to the calculated canvas size.
+        $mod2Width = $targetWidth;
+        $mod2Height = $targetHeight;
+        $this->_debugDimensions($mod2Width, $mod2Height, 'MOD2_CANVAS: Current Canvas Size');
+
+        // Determine if we're able to cut an extra pixel from the width if
+        // necessary, or if cutting would take us below the minimum width.
+        $canCutWidth = $mod2Width > $minWidth;
+
+        // To begin, we must correct the width if it's uneven. We'll only do
+        // this once, and then we'll leave the width at its new number. By
+        // keeping it static, we don't risk going over its min/max width
+        // limits. And by only varying one dimension (height) if multiple Mod2
+        // offset adjustments are needed, then we'll properly get a steadily
+        // increasing/decreasing aspect ratio (moving towards the target ratio).
+        if (!$this->_isNumberMod2($mod2Width)) {
+            // Always prefer cutting an extra pixel, rather than stretching
+            // by +1. But use +1 if cutting would take us below minimum width.
+            // NOTE: Another IMPORTANT reason to CUT width rather than extend
+            // is because in narrow cases (canvas close to original input size),
+            // the extra width proportionally increases total area (thus height
+            // too), and gives us less of the original pixels on the height-axis
+            // to play with when attempting to fix the height (and its ratio).
+            $mod2Width += ($canCutWidth ? -1 : 1);
+            $this->_debugDimensions($mod2Width, $mod2Height, 'MOD2_CANVAS: Width Mod2Fix');
+
+            // Calculate the new relative height based on the new width.
+            $mod2Height = $this->_accurateHeightRecalc($useFloorHeightRecalc, $targetAspectRatio, $mod2Width);
+            $this->_debugDimensions($mod2Width, $mod2Height, 'MOD2_CANVAS: Height Recalc From Width & Aspect');
+        }
+
+        // Ensure that the calculated height is also Mod2, but totally ignore
+        // the aspect ratio at this moment (we'll fix that later). Instead,
+        // we'll use the same pattern we'd use for width above. That way, if
+        // both width and height were uneven, they both get adjusted equally.
+        if (!$this->_isNumberMod2($mod2Height)) {
+            $mod2Height += ($canCutWidth ? -1 : 1);
+            $this->_debugDimensions($mod2Width, $mod2Height, 'MOD2_CANVAS: Height Mod2Fix');
+        }
+
+        // We will now analyze multiple different height alternatives to find
+        // which one gives us the best visual quality. This algorithm looks
+        // for the best qualities (with the most pixel area) first. It first
+        // tries the current height (offset 0, which is the closest to the
+        // pre-Mod2 adjusted canvas), then +2 pixels (gives more pixel area if
+        // this is possible), then -2 pixels (cuts but may be our only choice).
+        // After that, it checks 4, -4, 6 and -6 as well.
+        // NOTE: Every increased offset (+/-2, then +/-4, then +/- 6) USUALLY
+        // (but not always) causes more and more deviation from the intended
+        // cropping aspect ratio. So don't add any more steps after 6, since
+        // NOTHING will be THAT far off! Six was chosen as a good balance.
+        // NOTE: Every offset is checked for visual stretching and aspect ratio,
+        // and then rated into one of 3 categories: "perfect" (legal aspect
+        // ratio, no stretching), "stretch" (legal aspect ratio, but stretches),
+        // or "bad" (illegal aspect ratio).
+        $heightAlternatives = ['perfect' => [], 'stretch' => [], 'bad' => []];
+        static $offsetPriorities = [0, 2, -2, 4, -4, 6, -6];
+        foreach ($offsetPriorities as $offset) {
+            // Calculate the new height and its resulting aspect ratio.
+            $offsetMod2Height = $mod2Height + $offset;
+            $offsetMod2AspectRatio = $mod2Width / $offsetMod2Height;
+
+            // Check if the aspect ratio is legal.
+            $isLegalRatio = (($minAspectRatio === null || $offsetMod2AspectRatio >= $minAspectRatio)
+                             && ($maxAspectRatio === null || $offsetMod2AspectRatio <= $maxAspectRatio));
+
+            // Detect whether the height would need stretching. Stretching is
+            // defined as "not enough pixels in the input media to reach".
+            // NOTE: If the input media has been upscaled (such as a 64x64 image
+            // being turned into 320x320), then we will ALWAYS detect that media
+            // as needing stretching. That's intentional and correct, because
+            // such media will INDEED need stretching, so there's never going to
+            // be a perfect rating for it (where aspect ratio is legal AND zero
+            // stretching is needed to reach those dimensions).
+            // NOTE: The max() gets rid of negative values (cropping).
+            $stretchAmount = max(0, $offsetMod2Height - $inputHeight);
+
+            // Calculate the deviation from the target aspect ratio. The larger
+            // this number is, the further away from "the ideal canvas". The
+            // "perfect" answers will always deviate by different amount, and
+            // the most perfect one is the one with least deviation.
+            $ratioDeviation = abs($offsetMod2AspectRatio - $targetAspectRatio);
+
+            // Rate this height alternative and store it according to rating.
+            $rating = ($isLegalRatio && !$stretchAmount ? 'perfect' : ($isLegalRatio ? 'stretch' : 'bad'));
+            $heightAlternatives[$rating][] = [
+                'offset'         => $offset,
+                'height'         => $offsetMod2Height,
+                'ratio'          => $offsetMod2AspectRatio,
+                'isLegalRatio'   => $isLegalRatio,
+                'stretchAmount'  => $stretchAmount,
+                'ratioDeviation' => $ratioDeviation,
+                'rating'         => $rating,
+            ];
+            $this->_debugDimensions($mod2Width, $offsetMod2Height, sprintf(
+                'MOD2_CANVAS_CHECK: Testing Height Mod2Ratio (h%s%s = %s)',
+                ($offset >= 0 ? '+' : ''), $offset, $rating)
+            );
+        }
+
+        // Now pick the BEST height from our available choices (if any). We will
+        // pick the LEGAL height that has the LEAST amount of deviation from the
+        // ideal aspect ratio. In other words, the BEST-LOOKING aspect ratio!
+        // NOTE: If we find no legal (perfect or stretch) choices, we'll pick
+        // the most accurate (least deviation from ratio) of the bad choices.
+        $bestHeight = null;
+        foreach (['perfect', 'stretch', 'bad'] as $rating) {
+            if (!empty($heightAlternatives[$rating])) {
+                // Sort all alternatives by their amount of ratio deviation.
+                usort($heightAlternatives[$rating], function ($a, $b) {
+                    return ($a['ratioDeviation'] < $b['ratioDeviation'])
+                        ? -1 : (($a['ratioDeviation'] > $b['ratioDeviation']) ? 1 : 0);
+                });
+
+                // Pick the 1st array element, which has the least deviation!
+                $bestHeight = $heightAlternatives[$rating][0];
+                break;
+            }
+        }
+
+        // Process and apply the best-possible height we found.
+        $mod2Height = $bestHeight['height'];
+        $this->_debugDimensions($mod2Width, $mod2Height, sprintf(
+            'MOD2_CANVAS: Selected Most Ideal Height Mod2Ratio (h%s%s = %s)',
+            ($bestHeight['offset'] >= 0 ? '+' : ''), $bestHeight['offset'], $bestHeight['rating']
+        ));
+
+        // Decide what to do if there were no legal aspect ratios among our
+        // calculated choices. This can happen if the user gave us an insanely
+        // narrow range (such as "min/max ratio 1.6578" or whatever).
+        if ($bestHeight['rating'] === 'bad') {
+            if (!$allowNewAspectDeviation) {
+                throw new \RuntimeException(sprintf(
+                    'Canvas calculation failed. Unable to reach target aspect ratio range during Mod2 canvas conversion. The range of allowed aspect ratios is too narrow (%.8f - %.8f). We achieved a ratio of %.8f.',
+                    $minAspectRatio !== null ? $minAspectRatio : 0.0,
+                    $maxAspectRatio !== null ? $maxAspectRatio : INF,
+                    $mod2Width / $mod2Height
+                ));
+            } else {
+                // They WANT us to allow "near-misses", so we'll KEEP our best
+                // possible bad ratio here (the one that was closest to the
+                // target). We didn't find any more ideal aspect ratio (since
+                // all other attempts ALSO FAILED the aspect ratio ranges), so
+                // we have NO idea if they'd prefer any others! ;-)
+                $this->_debugDimensions($mod2Width, $mod2Height, sprintf(
+                    'MOD2_CANVAS: Allowing Deviating Height Mod2Ratio (h%s%s = %s)',
+                    ($bestHeight['offset'] >= 0 ? '+' : ''), $bestHeight['offset'], $bestHeight['rating']
+                ));
+            }
+        }
+
+        return new Dimensions($mod2Width, $mod2Height);
+    }
+
+    /**
+     * Checks whether a number is Mod2.
+     *
+     * @param int|float $number
+     *
+     * @return bool
+     */
+    protected function _isNumberMod2(
+        $number)
+    {
+        // NOTE: The modulo operator correctly returns ints even for float input such as 1.999.
+        return $number % 2 === 0;
     }
 
     /**
