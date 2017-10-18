@@ -475,80 +475,36 @@ class MediaAutoResizer
         $targetHeight = $inputHeight;
         $targetAspectRatio = $inputWidth / $inputHeight;
 
-        // Initialize the crop-shifting variables. These control what range of
-        // X/Y coordinates we'll copy from the ORIGINAL input to final canvas.
-        $x1 = $y1 = 0;
-        $x2 = $inputWidth;
-        $y2 = $inputHeight;
-
         // Check aspect ratio and crop/expand final canvas to fit aspect if needed.
         $useFloorHeightRecalc = true; // Height-behavior in any later re-calculations.
         if ($this->_minAspectRatio !== null && $targetAspectRatio < $this->_minAspectRatio) {
             $useFloorHeightRecalc = true; // Use floor() so height is above minAspectRatio.
             // Determine target ratio; in case of stories we always target 9:16.
-            $targetAspectRatio = $this->_targetFeed === 'story' ? self::BEST_STORY_RATIO : $this->_minAspectRatio;
+            $targetAspectRatio = $this->_targetFeed === 'story'
+                               ? self::BEST_STORY_RATIO : $this->_minAspectRatio;
             if ($this->_operation === self::CROP) {
                 // We need to limit the height, so floor is used intentionally to
                 // AVOID rounding height upwards to a still-illegal aspect ratio.
                 $targetHeight = (int) floor($targetWidth / $targetAspectRatio);
-
-                // We must also calculate cropped input height, for focus-shift math.
-                $inputCroppedHeight = (int) floor($inputWidth / $targetAspectRatio);
-
-                // Crop vertical media from top by default, to keep faces, etc.
-                $cropFocus = $this->_cropFocus !== null ? $this->_cropFocus : -50;
-
-                // Invert the cropFocus if this is vertically flipped media.
-                if ($this->_resizer->isVerFlipped()) {
-                    $cropFocus = -$cropFocus;
-                }
-
-                // Calculate difference and divide it by cropFocus to get shift.
-                $diff = $inputHeight - $inputCroppedHeight;
-                $y1 = (int) round($diff * (50 + $cropFocus) / 100);
-                $y2 = $y2 - ($diff - $y1);
             } elseif ($this->_operation === self::EXPAND) {
                 // We need to expand the width with left/right borders. We use
                 // ceil to guarantee that the final media is wide enough to be
                 // above the minimum allowed aspect ratio.
-                // NOTE: Beware that it may actually exceed maxAspectRatio if
-                // their values are very close to each other! For example with
-                // 450x600 input and min/max aspect of 1.2625, it'll create a
-                // 758x600 expanded media (ratio 1.2633). That's unavoidable.
                 $targetWidth = (int) ceil($targetHeight * $targetAspectRatio);
             }
         } elseif ($this->_maxAspectRatio !== null && $targetAspectRatio > $this->_maxAspectRatio) {
             $useFloorHeightRecalc = false; // Use ceil() so height is below maxAspectRatio.
             // Determine target ratio; in case of stories we always target 9:16.
-            $targetAspectRatio = $this->_targetFeed === 'story' ? self::BEST_STORY_RATIO : $this->_maxAspectRatio;
+            $targetAspectRatio = $this->_targetFeed === 'story'
+                               ? self::BEST_STORY_RATIO : $this->_maxAspectRatio;
             if ($this->_operation === self::CROP) {
                 // We need to limit the width. We use floor to guarantee cutting
                 // enough pixels, since our width exceeds the maximum allowed ratio.
                 $targetWidth = (int) floor($targetHeight * $targetAspectRatio);
-
-                // We must also calculate cropped input width, for focus-shift math.
-                $inputCroppedWidth = (int) floor($inputHeight * $targetAspectRatio);
-
-                // Crop horizontal media from center by default.
-                $cropFocus = $this->_cropFocus !== null ? $this->_cropFocus : 0;
-
-                // Invert the cropFocus if this is horizontally flipped media.
-                if ($this->_resizer->isHorFlipped()) {
-                    $cropFocus = -$cropFocus;
-                }
-
-                // Calculate difference and divide it by cropFocus to get shift.
-                $diff = $inputWidth - $inputCroppedWidth;
-                $x1 = (int) round($diff * (50 + $cropFocus) / 100);
-                $x2 = $x2 - ($diff - $x1);
             } elseif ($this->_operation === self::EXPAND) {
                 // We need to expand the height with top/bottom borders. We use
                 // ceil to guarantee that the final media is tall enough to be
                 // below the maximum allowed aspect ratio.
-                // NOTE: Beware that it may actually be below minAspectRatio if
-                // their values are very close to each other! For example with
-                // 600x450 input and min/max aspect of 0.8625, it'll create a
-                // 600x696 expanded media (ratio 0.86206). That's unavoidable.
                 $targetHeight = (int) ceil($targetWidth / $targetAspectRatio);
             }
         } else {
@@ -556,8 +512,11 @@ class MediaAutoResizer
             // we'll still need to set up a proper height re-calc variable if
             // our input needs to be re-scaled based on width limits further
             // below. So determine whether the input is closest to min or max.
-            $minAspectDistance = abs(($this->_minAspectRatio !== null ? $this->_minAspectRatio : 0) - $targetAspectRatio);
-            $maxAspectDistance = abs(($this->_maxAspectRatio !== null ? $this->_maxAspectRatio : 0) - $targetAspectRatio);
+            $minAspectDistance = abs(($this->_minAspectRatio !== null
+                ? $this->_minAspectRatio : 0) - $targetAspectRatio);
+            $maxAspectDistance = abs(($this->_maxAspectRatio !== null
+                ? $this->_maxAspectRatio : 0) - $targetAspectRatio);
+
             // If it's closest to minimum allowed ratio, we'll use floor() to
             // ensure the result is above the minimum ratio. Otherwise we'll use
             // ceil() to ensure that the result is below the maximum ratio.
