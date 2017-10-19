@@ -165,8 +165,11 @@ class MediaAutoResizer
      * deviate slightly from the min/max targets. See constructor for info. */
     protected $_allowNewAspectDeviation;
 
-    /** @var int Crop focus position (-50 .. 50) when cropping. */
-    protected $_cropFocus;
+    /** @var int Crop focus position (-50 .. 50) when cropping horizontally. */
+    protected $_horCropFocus;
+
+    /** @var int Crop focus position (-50 .. 50) when cropping vertically. */
+    protected $_verCropFocus;
 
     /** @var array Background color [R, G, B] for the final media. */
     protected $_bgColor;
@@ -191,8 +194,11 @@ class MediaAutoResizer
      * - "targetFeed" (int): One of the FEED_X constants. MUST be used if you're
      *   targeting stories. Defaults to `Constants::FEED_TIMELINE`.
      *
-     * - "cropFocus" (int): Crop focus position (-50 .. 50) when cropping. Uses
-     *   intelligent guess if not set.
+     * - "horCropFocus" (int): Crop focus position (-50 .. 50) when cropping
+     *   horizontally (reducing width). Uses intelligent guess if not set.
+     *
+     * - "verCropFocus" (int): Crop focus position (-50 .. 50) when cropping
+     *   vertically (reducing height). Uses intelligent guess if not set.
      *
      * - "minAspectRatio" (float): Minimum allowed aspect ratio. Uses
      *   auto-selected class constants if not set.
@@ -245,7 +251,8 @@ class MediaAutoResizer
     {
         // Assign variables for all options, to avoid bulky code repetition.
         $targetFeed = isset($options['targetFeed']) ? $options['targetFeed'] : Constants::FEED_TIMELINE;
-        $cropFocus = isset($options['cropFocus']) ? $options['cropFocus'] : null;
+        $horCropFocus = isset($options['horCropFocus']) ? $options['horCropFocus'] : null;
+        $verCropFocus = isset($options['verCropFocus']) ? $options['verCropFocus'] : null;
         $minAspectRatio = isset($options['minAspectRatio']) ? $options['minAspectRatio'] : null;
         $maxAspectRatio = isset($options['maxAspectRatio']) ? $options['maxAspectRatio'] : null;
         $useBestStoryRatio = isset($options['useBestStoryRatio']) ? (bool) $options['useBestStoryRatio'] : true;
@@ -264,11 +271,17 @@ class MediaAutoResizer
         }
         $this->_inputFile = $inputFile;
 
-        // Crop focus.
-        if ($cropFocus !== null && ($cropFocus < -50 || $cropFocus > 50)) {
-            throw new \InvalidArgumentException('Crop focus must be between -50 and 50.');
+        // Horizontal crop focus.
+        if ($horCropFocus !== null && (!is_int($horCropFocus) || $horCropFocus < -50 || $horCropFocus > 50)) {
+            throw new \InvalidArgumentException('Horizontal crop focus must be between -50 and 50.');
         }
-        $this->_cropFocus = $cropFocus;
+        $this->_horCropFocus = $horCropFocus;
+
+        // Vertical crop focus.
+        if ($verCropFocus !== null && (!is_int($verCropFocus) || $verCropFocus < -50 || $verCropFocus > 50)) {
+            throw new \InvalidArgumentException('Vertical crop focus must be between -50 and 50.');
+        }
+        $this->_verCropFocus = $verCropFocus;
 
         // Target feed. Turn it into a string for easier processing,
         // since we only care about story ratios vs general ratios.
