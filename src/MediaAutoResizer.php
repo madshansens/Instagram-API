@@ -24,10 +24,8 @@ use InstagramAPI\Media\Video\VideoResizer;
  *   ahead of time instead of automatically when PHP does its object garbage
  *   collection. This function is safe and won't delete the original input file.
  *
- * Remember to thank Abyr Valg for the brilliant media processing algorithm!
- *
- * @author Abyr Valg <valga.github@abyrga.ru>
  * @author SteveJobzniak (https://github.com/SteveJobzniak)
+ * @author Abyr Valg <valga.github@abyrga.ru>
  */
 class MediaAutoResizer
 {
@@ -525,17 +523,15 @@ class MediaAutoResizer
     protected function _process()
     {
         // Get the dimensions of the original input file.
-        $inputDimensions = $this->_resizer->getInputDimensions();
-        $inputWidth = (int) $inputDimensions->getWidth();
-        $inputHeight = (int) $inputDimensions->getHeight();
+        $inputCanvas = $this->_resizer->getInputDimensions();
 
-        // Create a new canvas with the desired dimensions.
+        // Create an output canvas with the desired dimensions.
         // WARNING: This creates a LEGAL canvas which MUST be followed EXACTLY.
-        $canvas = $this->_calculateNewCanvas( // Throws.
+        $canvasInfo = $this->_calculateNewCanvas( // Throws.
             $this->_targetFeed,
             $this->_operation,
-            $inputWidth,
-            $inputHeight,
+            $inputCanvas->getWidth(),
+            $inputCanvas->getHeight(),
             $this->_resizer->isMod2CanvasRequired(),
             $this->_resizer->getMinWidth(),
             $this->_resizer->getMaxWidth(),
@@ -543,43 +539,345 @@ class MediaAutoResizer
             $this->_maxAspectRatio,
             $this->_allowNewAspectDeviation
         );
+        $outputCanvas = $canvasInfo['canvas'];
 
         // Determine the media operation's resampling parameters and perform it.
+        // NOTE: This section is EXCESSIVELY commented to explain each step. The
+        // algorithm is pretty easy after you understand it. But without the
+        // detailed comments, future contributors may not understand any of it!
+        // "We'd rather have a WaLL oF TeXt for future reference, than bugs due
+        // to future misunderstandings!" - SteveJobzniak ;-)
         if ($this->_operation === self::CROP) {
-            // TODO: REWRITE THIS ALGORITHM.
-            $srcRect = new Rectangle($x1, $y1, $x2 - $x1, $y2 - $y1);
-            $dstRect = new Rectangle(0, 0, $canvas->getWidth(), $canvas->getHeight());
-        } elseif ($this->_operation === self::EXPAND) {
-            // For expansion, we'll calculate all operation parameters now. We
-            // ignore all of the various x/y and crop-focus parameters used by
-            // the cropping code above. None of them are used for expansion!
+            // Determine the IDEAL canvas dimensions as if Mod2 adjustments were
+            // not applied. That's NECESSARY for calculating an ACCURATE scale-
+            // change compared to the input, so that we can calculate how much
+            // the canvas has rescaled. WARNING: These are 1-dimensional scales,
+            // and only ONE value (the uncropped side) is valid for comparison.
+            $idealCanvas = new Dimensions($outputCanvas->getWidth() - $canvasInfo['mod2WidthDiff'],
+                                          $outputCanvas->getHeight() - $canvasInfo['mod2HeightDiff']);
+            $idealWidthScale = (float) ($idealCanvas->getWidth() / $inputCanvas->getWidth());
+            $idealHeightScale = (float) ($idealCanvas->getHeight() / $inputCanvas->getHeight());
+            $this->_debugDimensions(
+                $inputCanvas->getWidth(), $inputCanvas->getHeight(),
+                'CROP: Analyzing Original Input Canvas Size'
+            );
+            $this->_debugDimensions(
+                $idealCanvas->getWidth(), $idealCanvas->getHeight(),
+                'CROP: Analyzing Ideally Cropped (Non-Mod2-adjusted) Output Canvas Size'
+            );
+            $this->_debugText(
+                'CROP: Scale of Ideally Cropped Canvas vs Input Canvas',
+                'width=%.8f, height=%.8f',
+                $idealWidthScale, $idealHeightScale
+            );
 
+            // Now determine HOW the IDEAL canvas has been cropped compared to
+            // the INPUT canvas. But we can't just compare dimensions, since our
+            // algorithms may have cropped and THEN scaled UP the dimensions to
+            // legal values far above the input values, or scaled them DOWN and
+            // then Mod2-cropped at the new scale, etc. There are so many
+            // possibilities. That's also why we couldn't "just keep track of
+            // amount of pixels cropped during main algorithm". We MUST figure
+            // it out ourselves accurately HERE. We can't do it at any earlier
+            // stage, since cumulative rounding errors from width/height
+            // readjustments could drift us away from the target aspect ratio
+            // and could prevent pixel-perfect results UNLESS we calc it HERE.
+            //
+            // There's IS a great way to figure out the cropping. When the WIDTH
+            // of a canvas is reduced (making it more "portraity"), its aspect
+            // ratio number decreases. When the HEIGHT of a canvas is reduced
+            // (making it more "landscapey"), its aspect ratio number increases.
+            //
+            // And our canvas cropping algorithm only crops in ONE DIRECTION
+            // (width or height), so we only need to detect the aspect ratio
+            // change of the IDEAL (non-Mod2-adjusted) canvas, to know what
+            // happened. However, note that this CAN also trigger if the input
+            // had to be up/downscaled (to an imperfect final aspect), but that
+            // doesn't matter since this algorithm will STILL figure out the
+            // proper scale and croppings to use for the canvas. Because uneven,
+            // aspect-affecting scaling basically IS cropping the INPUT canvas!
+            if ($idealCanvas->getAspectRatio() === $inputCanvas->getAspectRatio()) {
+                // No sides have been cropped. So both width and height scales
+                // WILL be IDENTICAL, since NOTHING else would be able to create
+                // an identical aspect ratio again (otherwise the aspect ratio
+                // would have been warped (not equal)). So just pick either one.
+                // NOTE: Identical (uncropped ratio) DOESN'T mean that scale is
+                // going to be 1.0. It MAY be. Or the canvas MAY have been
+                // evenly expanded or evenly shrunk in both dimensions.
+                $hasCropped = 'nothing';
+                $overallRescale = $idealWidthScale; // $idealHeightScale IS identical.
+            } elseif ($idealCanvas->getAspectRatio() < $inputCanvas->getAspectRatio()) {
+                // The horizontal width has been cropped. Grab the height's
+                // scale, since that side is "unaffected" by the main cropping
+                // and should therefore have a scale of 1. Although it may have
+                // had up/down-scaling. In that case, the height scale will
+                // represent the amount of overall rescale change.
+                $hasCropped = 'width';
+                $overallRescale = $idealHeightScale;
+            } else { // Output aspect is > input.
+                // The vertical height has been cropped. Just like above, the
+                // "unaffected" side is what we'll use as our scale reference.
+                $hasCropped = 'height';
+                $overallRescale = $idealWidthScale;
+            }
+            $this->_debugText(
+                'CROP: Detecting Cropped Direction',
+                'cropped=%s, overallRescale=%.8f',
+                $hasCropped, $overallRescale
+            );
+
+            // Alright, now calculate the dimensions of the "IDEALLY CROPPED
+            // INPUT canvas", at INPUT canvas scale. These are the scenarios:
+            //
+            // - "hasCropped: nothing, scale is 1.0" = Nothing was cropped, and
+            //   nothing was scaled. Treat as "use whole INPUT canvas". This is
+            //   pixel-perfect.
+            //
+            // - "hasCropped: nothing, scale NOT 1.0" = Nothing was cropped, but
+            //   the whole canvas was up/down-scaled. We don't have to care at
+            //   all about that scaling and should treat it as "use whole INPUT
+            //   canvas" for crop calculation purposes. The cropped result will
+            //   later be scaled/stretched to the canvas size (up or down).
+            //
+            // - "hasCropped: width/height, scale is 1.0" = A single side was
+            //   cropped, and nothing was scaled. Treat as "use IDEALLY CROPPED
+            //   canvas". This is pixel-perfect.
+            //
+            // - "hasCropped: width/height, scale NOT 1.0" = A single side was
+            //   cropped, and then the whole canvas was up/down-scaled. Treat as
+            //   "use scale-fixed version of IDEALLY CROPPED canvas". The
+            //   cropped result will later be scaled/stretched to the canvas
+            //   size (up or down).
+            //
+            // There's an easy way to handle ALL of those scenarios: Just
+            // translate the IDEALLY CROPPED canvas back into INPUT-SCALED
+            // dimensions. Then we'll get a pixel-perfect "input crop" whenever
+            // scale is 1.0, since a scale of 1.0 gives the same result back.
+            // And we'll get a properly re-scaled result in all other cases.
+            //
+            // NOTE: This result CAN deviate from what was "actually cropped"
+            // during the main algorithm. That is TOTALLY INTENTIONAL AND IS THE
+            // INTENDED, PERFECT BEHAVIOR! Do NOT change this code! By always
+            // re-calculating here, we'll actually FIX rounding errors caused by
+            // the main algorithm's multiple steps, and will create better
+            // looking rescaling, and pixel-perfect unscaled croppings and
+            // pixel-perfect unscaled Mod2 adjustments!
+
+            // First calculate the overall IDEAL cropping applied to the INPUT
+            // canvas. If scale is 1.0 it will be used as-is (pixel-perfect).
+            $croppedInputCanvas = $idealCanvas->createScaled(1 / $overallRescale);
+            $this->_debugDimensions(
+                $croppedInputCanvas->getWidth(), $croppedInputCanvas->getHeight(),
+                'CROP: Rescaled Ideally Cropped Canvas to Input Dimension Space'
+            );
+
+            // Now re-scale the Mod2 adjustments to the INPUT canvas coordinate
+            // space too. If scale is 1.0 they'll be used as-is (pixel-perfect).
+            // If the scale is up/down, they'll be rounded to the next whole
+            // number. The rounding is INTENTIONAL, because if scaling was used
+            // for the IDEAL canvas then it DOESN'T MATTER how many exact pixels
+            // we crop, but round() gives us the BEST APPROXIMATION!
+            $rescaledMod2WidthDiff = (int) round($canvasInfo['mod2WidthDiff'] * (1 / $overallRescale));
+            $rescaledMod2HeightDiff = (int) round($canvasInfo['mod2HeightDiff'] * (1 / $overallRescale));
+            $this->_debugText(
+                'CROP: Rescaled Mod2 Adjustments to Input Dimension Space',
+                'width=%s, height=%s, widthRescaled=%s, heightRescaled=%s',
+                $canvasInfo['mod2WidthDiff'], $canvasInfo['mod2HeightDiff'],
+                $rescaledMod2WidthDiff, $rescaledMod2HeightDiff
+            );
+
+            // Apply the Mod2 adjustments to the input cropping that we'll
+            // perform. This ensures that ALL of the Mod2 croppings (in ANY
+            // dimension) will always be pixel-perfect when we're at scale 1.0!
+            $croppedInputCanvas = new Dimensions($croppedInputCanvas->getWidth() + $rescaledMod2WidthDiff,
+                                                 $croppedInputCanvas->getHeight() + $rescaledMod2HeightDiff);
+            $this->_debugDimensions(
+                $croppedInputCanvas->getWidth(), $croppedInputCanvas->getHeight(),
+                'CROP: Applied Mod2 Adjustments to Final Cropped Input Canvas'
+            );
+
+            // The "CROPPED INPUT canvas" is in the same dimensions/coordinate
+            // space as the "INPUT canvas". So ensure all dimensions are valid
+            // (don't exceed INPUT) and create the final "CROPPED INPUT canvas".
+            // NOTE: This is it... if the media is at scale 1.0, we now have a
+            // pixel-perfect, cropped canvas with ALL of the cropping and Mod2
+            // adjustments applied to it! And if we're at another scale, we have
+            // a perfectly recalculated, cropped canvas which took into account
+            // cropping, scaling and Mod2 adjustments. Advanced stuff! :-)
+            $croppedInputCanvasWidth = $croppedInputCanvas->getWidth() <= $inputCanvas->getWidth()
+                                     ? $croppedInputCanvas->getWidth() : $inputCanvas->getWidth();
+            $croppedInputCanvasHeight = $croppedInputCanvas->getHeight() <= $inputCanvas->getHeight()
+                                      ? $croppedInputCanvas->getHeight() : $inputCanvas->getHeight();
+            $croppedInputCanvas = new Dimensions($croppedInputCanvasWidth, $croppedInputCanvasHeight);
+            $this->_debugDimensions(
+                $croppedInputCanvas->getWidth(), $croppedInputCanvas->getHeight(),
+                'CROP: Clamped to Legal Input Max-Dimensions'
+            );
+
+            // Initialize the crop-shifting variables. They control the range of
+            // X/Y coordinates we'll copy from ORIGINAL INPUT to OUTPUT canvas.
+            // NOTE: This properly selects the entire INPUT media canvas area.
+            $x1 = $y1 = 0;
+            $x2 = $inputCanvas->getWidth();
+            $y2 = $inputCanvas->getHeight();
+            $this->_debugText(
+                'CROP: Initializing X/Y Variables to Full Input Canvas Size',
+                'x1=%s, x2=%s, y1=%s, y2=%s',
+                $x1, $x2, $y1, $y2
+            );
+
+            // Calculate the width and height diffs between the original INPUT
+            // canvas and the new CROPPED INPUT canvas. Negative values mean the
+            // output is smaller (which we'll handle by cropping), and larger
+            // values would mean the output is larger (which we'll handle by
+            // letting the OUTPUT canvas stretch the 100% uncropped original
+            // pixels of the INPUT in that direction, to fill the whole canvas).
+            // NOTE: Because of clamping of the CROPPED INPUT canvas above, this
+            // will actually never be a positive ("scale up") number. It will
+            // only be 0 or less. That's good, just be aware of it if editing!
+            $widthDiff = $croppedInputCanvas->getWidth() - $inputCanvas->getWidth();
+            $heightDiff = $croppedInputCanvas->getHeight() - $inputCanvas->getHeight();
+            $this->_debugText(
+                'CROP: Calculated Input Canvas Crop Amounts',
+                'width=%s px, height=%s px',
+                $widthDiff, $heightDiff
+            );
+
+            // After ALL of that work... we finally know how to crop the input
+            // canvas! Alright... handle cropping of the INPUT width and height!
+            // NOTE: The main canvas-creation algorithm only crops a single
+            // dimension (width or height), but its Mod2 adjustments may have
+            // caused BOTH to be cropped, which is why we MUST process both.
+            if ($widthDiff < 0) {
+                // Horizontal cropping. Focus on the center by default.
+                $horCropFocus = $this->_horCropFocus !== null ? $this->_horCropFocus : 0;
+                $this->_debugText('CROP: Horizontal Crop Focus', 'focus=%s', $horCropFocus);
+
+                // Invert the focus if this is horizontally flipped media.
+                if ($this->_resizer->isHorFlipped()) {
+                    $horCropFocus = -$horCropFocus;
+                    $this->_debugText(
+                        'CROP: Media is HorFlipped, Flipping Horizontal Crop Focus',
+                        'focus=%s',
+                        $horCropFocus
+                    );
+                }
+
+                // Calculate amount of pixels to crop and shift them as-focused.
+                // NOTE: Always use floor() to make uneven amounts lean at left.
+                $absWidthDiff = abs($widthDiff);
+                $x1 = (int) floor($absWidthDiff * (50 + $horCropFocus) / 100);
+                $x2 = $x2 - ($absWidthDiff - $x1);
+                $this->_debugText('CROP: Calculated New X Offsets', 'x1=%s, x2=%s', $x1, $x2);
+            }
+            if ($heightDiff < 0) {
+                // Vertical cropping. Focus on top by default (to keep faces).
+                $verCropFocus = $this->_verCropFocus !== null ? $this->_verCropFocus : -50;
+                $this->_debugText('CROP: Vertical Crop Focus', 'focus=%s', $verCropFocus);
+
+                // Invert the focus if this is vertically flipped media.
+                if ($this->_resizer->isVerFlipped()) {
+                    $verCropFocus = -$verCropFocus;
+                    $this->_debugText(
+                        'CROP: Media is VerFlipped, Flipping Vertical Crop Focus',
+                        'focus=%s',
+                        $verCropFocus
+                    );
+                }
+
+                // Calculate amount of pixels to crop and shift them as-focused.
+                // NOTE: Always use floor() to make uneven amounts lean at top.
+                $absHeightDiff = abs($heightDiff);
+                $y1 = (int) floor($absHeightDiff * (50 + $verCropFocus) / 100);
+                $y2 = $y2 - ($absHeightDiff - $y1);
+                $this->_debugText('CROP: Calculated New Y Offsets', 'y1=%s, y2=%s', $y1, $y2);
+            }
+
+            // Create a source rectangle which starts at the start-offsets
+            // (x1/y1) and lasts until the width and height of the desired area.
+            $srcRect = new Rectangle($x1, $y1, $x2 - $x1, $y2 - $y1);
+            $this->_debugText(
+                'CROP_SRC: Input Canvas Source Rectangle',
+                'x1=%s, x2=%s, y1=%s, y2=%s, width=%s, height=%s, aspect=%.8f',
+                $srcRect->getX1(), $srcRect->getX2(), $srcRect->getY1(), $srcRect->getY2(),
+                $srcRect->getWidth(), $srcRect->getHeight(), $srcRect->getAspectRatio()
+            );
+
+            // Create a destination rectangle which completely fills the entire
+            // output canvas from edge to edge. This ensures that any undersized
+            // or oversized input will be stretched properly in all directions.
+            //
+            // NOTE: Everything about our cropping/canvas algorithms is
+            // optimized so that stretching won't happen unless the media is so
+            // tiny that it's below the minimum width or so wide that it must be
+            // shrunk. Everything else WILL use sharp 1:1 pixels and pure
+            // cropping instead of stretching/shrinking. And when stretch/shrink
+            // is used, the aspect ratio is always perfectly maintained!
+            $dstRect = new Rectangle(0, 0, $outputCanvas->getWidth(), $outputCanvas->getHeight());
+            $this->_debugText(
+                'CROP_DST: Output Canvas Destination Rectangle',
+                'x1=%s, x2=%s, y1=%s, y2=%s, width=%s, height=%s, aspect=%.8f',
+                $dstRect->getX1(), $dstRect->getX2(), $dstRect->getY1(), $dstRect->getY2(),
+                $dstRect->getWidth(), $dstRect->getHeight(), $dstRect->getAspectRatio()
+            );
+        } elseif ($this->_operation === self::EXPAND) {
             // We'll copy the entire original input media onto the new canvas.
             // Always copy from the absolute top left of the original media.
-            $srcRect = new Rectangle(0, 0, $inputWidth, $inputHeight);
+            $srcRect = new Rectangle(0, 0, $inputCanvas->getWidth(), $inputCanvas->getHeight());
+            $this->_debugText(
+                'EXPAND_SRC: Input Canvas Source Rectangle',
+                'x1=%s, x2=%s, y1=%s, y2=%s, width=%s, height=%s, aspect=%.8f',
+                $srcRect->getX1(), $srcRect->getX2(), $srcRect->getY1(), $srcRect->getY2(),
+                $srcRect->getWidth(), $srcRect->getHeight(), $srcRect->getAspectRatio()
+            );
 
             // Determine the target dimensions to fit it on the new canvas,
             // because the input media's dimensions may have been too large.
             // This will not scale anything (uses scale=1) if the input fits.
-            // NOTE: We use ceil to guarantee that it'll never scale a side
-            // badly and leave a 1px gap between the media and canvas sides.
-            // Also note that ceil will never produce bad values, since PHP
-            // allows the dst_w/dst_h to exceed beyond canvas dimensions!
-            $scale = min($canvas->getWidth() / $srcRect->getWidth(), $canvas->getHeight() / $srcRect->getHeight());
-            $dst_w = (int) ceil($scale * $srcRect->getWidth());
-            $dst_h = (int) ceil($scale * $srcRect->getHeight());
+            $outputWidthScale = (float) ($outputCanvas->getWidth() / $inputCanvas->getWidth());
+            $outputHeightScale = (float) ($outputCanvas->getHeight() / $inputCanvas->getHeight());
+            $scale = min($outputWidthScale, $outputHeightScale);
+            $this->_debugText(
+                'EXPAND: Calculating Scale to Fit Input on Output Canvas',
+                'scale=%.8f',
+                $scale
+            );
+
+            // Calculate the scaled destination rectangle. Note that X/Y remain.
+            // NOTE: This internally uses ceil(), which guarantees that it'll
+            // never scale a side badly and leave a 1px gap between the media
+            // and canvas sides. Also note that ceil will never produce bad
+            // values, since PHP allows the dst_w/dst_h to exceed beyond canvas!
+            $dstRect = $srcRect->createScaled($scale);
+            $this->_debugDimensions(
+                $dstRect->getWidth(), $dstRect->getHeight(),
+                'EXPAND: Rescaled Input to Output Dimension Space'
+            );
 
             // Now calculate the centered destination offset on the canvas.
-            $dst_x = (int) floor(($canvas->getWidth() - $dst_w) / 2);
-            $dst_y = (int) floor(($canvas->getHeight() - $dst_h) / 2);
+            // NOTE: We use floor() to ensure that the result gets left-aligned
+            // perfectly, and prefers to lean towards towards the top as well.
+            $dst_x = (int) floor(($outputCanvas->getWidth() - $dstRect->getWidth()) / 2);
+            $dst_y = (int) floor(($outputCanvas->getHeight() - $dstRect->getHeight()) / 2);
+            $this->_debugText(
+                'EXPAND: Calculating Centered Destination on Output Canvas',
+                'dst_x=%s, dst_y=%s',
+                $dst_x, $dst_y
+            );
 
             // Build the final destination rectangle for the expanded canvas!
-            $dstRect = new Rectangle($dst_x, $dst_y, $dst_w, $dst_h);
+            $dstRect = new Rectangle($dst_x, $dst_y, $dstRect->getWidth(), $dstRect->getHeight());
+            $this->_debugText(
+                'EXPAND_DST: Output Canvas Destination Rectangle',
+                'x1=%s, x2=%s, y1=%s, y2=%s, width=%s, height=%s, aspect=%.8f',
+                $dstRect->getX1(), $dstRect->getX2(), $dstRect->getY1(), $dstRect->getY2(),
+                $dstRect->getWidth(), $dstRect->getHeight(), $dstRect->getAspectRatio()
+            );
         } else {
             throw new \RuntimeException(sprintf('Unsupported operation: %s.', $this->_operation));
         }
 
-        return $this->_resizer->resize($srcRect, $dstRect, $canvas);
+        return $this->_resizer->resize($srcRect, $dstRect, $outputCanvas);
     }
 
     /**
@@ -675,7 +973,7 @@ class MediaAutoResizer
         $targetWidth = (int) $inputWidth;
         $targetHeight = (int) $inputHeight;
         $targetAspectRatio = $inputWidth / $inputHeight;
-        $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS: Input Canvas Size');
+        $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_INPUT: Input Canvas Size');
 
         // Check aspect ratio and crop/expand the canvas to fit aspect if needed.
         $useFloorHeightRecalc = true; // Height-behavior in any later re-calculations.
@@ -803,7 +1101,7 @@ class MediaAutoResizer
 
         // Create the new canvas Dimensions object.
         $canvas = new Dimensions($targetWidth, $targetHeight);
-        $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_FINAL: Final Result');
+        $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_OUTPUT: Final Output Canvas Size');
 
         // We must now validate the canvas before returning it.
         // NOTE: Most of these are just strict sanity-checks to protect against
