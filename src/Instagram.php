@@ -221,13 +221,24 @@ class Instagram
         $truncatedDebug = false,
         array $storageConfig = [])
     {
-        // Prevent people from running this library on ancient PHP versions.
-        if (!defined('PHP_VERSION_ID')) { // Emulate version value if missing.
-            $version = explode('.', PHP_VERSION);
-            define('PHP_VERSION_ID', ($version[0] * 10000 + $version[1] * 100 + $version[2]));
+        // Prevent people from running this library on ancient PHP versions, and
+        // verify that people have the most critically important PHP extensions.
+        // NOTE: All of these are marked as requirements in composer.json, but
+        // some people install the library at home and then move it somewhere
+        // else without the requirements, and then blame us for their errors.
+        if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50600) {
+            throw new \InstagramAPI\Exception\InternalException(
+                'You must have PHP 5.6 or higher to use the Instagram API library.'
+            );
         }
-        if (PHP_VERSION_ID < 50600) {
-            throw new \InstagramAPI\Exception\InternalException('You must have PHP 5.6 or higher to use the Instagram API library.');
+        static $extensions = ['curl', 'mbstring', 'gd', 'exif', 'zlib'];
+        foreach ($extensions as $ext) {
+            if (!@extension_loaded($ext)) {
+                throw new \InstagramAPI\Exception\InternalException(sprintf(
+                    'You must have the "%s" PHP extension to use the Instagram API library.',
+                    $ext
+                ));
+            }
         }
 
         // Debugging options.
