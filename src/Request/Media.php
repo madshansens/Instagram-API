@@ -360,6 +360,36 @@ class Media extends RequestCollection
     }
 
     /**
+     * Get the replies to a specific media comment.
+     *
+     * You should be sure that the comment actually HAS more replies before
+     * calling this endpoint! In that case, the comment itself will have a
+     * non-zero "child comment count" value, as well as some "preview comments".
+     *
+     * If the number of preview comments doesn't match the full "child comments"
+     * count, then you are ready to call this endpoint to retrieve the rest of
+     * them. Do NOT call it frivolously for comments that have no child comments
+     * or where you already have all of them via the child comment previews!
+     *
+     * @param string      $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string      $commentId The parent comment's ID.
+     * @param null|string $maxId     Next "maximum ID", used for pagination.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\MediaCommentRepliesResponse
+     */
+    public function getCommentReplies(
+        $mediaId,
+        $commentId,
+        $maxId = null)
+    {
+        return $this->ig->request("media/{$mediaId}/comments/{$commentId}/child_comments/")
+            ->addParam('max_id', ($maxId !== null ? $maxId : ''))
+            ->getResponse(new Response\MediaCommentRepliesResponse());
+    }
+
+    /**
      * Delete a comment.
      *
      * @param string $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
