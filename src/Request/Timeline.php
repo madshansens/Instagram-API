@@ -248,7 +248,7 @@ class Timeline extends RequestCollection
             $request->addPost('recovered_from_crash', '1');
         }
 
-        if ($maxId) {
+        if ($maxId !== null) {
             $request->addPost('max_id', $maxId);
         } else {
             $request->addHeader('X-IG-INSTALLED-APPS', base64_encode(json_encode([
@@ -276,12 +276,18 @@ class Timeline extends RequestCollection
         $maxId = null,
         $minTimestamp = null)
     {
-        return $this->ig->request("feed/user/{$userId}/")
+        $request = $this->ig->request("feed/user/{$userId}/")
             ->addParam('rank_token', $this->ig->rank_token)
-            ->addParam('ranked_content', 'true')
-            ->addParam('max_id', ($maxId !== null ? $maxId : ''))
-            ->addParam('min_timestamp', ($minTimestamp !== null ? $minTimestamp : ''))
-            ->getResponse(new Response\UserFeedResponse());
+            ->addParam('ranked_content', 'true');
+
+        if ($maxId !== null) {
+            $request->addParam('max_id', $maxId);
+        }
+        if ($minTimestamp !== null) {
+            $request->addParam('min_timestamp', $minTimestamp);
+        }
+
+        return $request->getResponse(new Response\UserFeedResponse());
     }
 
     /**

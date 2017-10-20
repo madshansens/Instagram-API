@@ -74,7 +74,7 @@ class Discover extends RequestCollection
                  ->addParam('people_teaser_supported', '1')
                  ->addParam('rank_token', $this->ig->rank_token)
                  ->addParam('ranked_content', 'true');
-        // if ($maxId) { // NOTE: Popular feed DOESN'T properly support max_id.
+        // if ($maxId !== null) { // NOTE: Popular feed DOESN'T properly support max_id.
         //     $request->addParam('max_id', $maxId);
         // }
 
@@ -94,7 +94,7 @@ class Discover extends RequestCollection
         $maxId = null)
     {
         $request = $this->ig->request('discover/channels_home/');
-        if ($maxId) {
+        if ($maxId !== null) {
             $request->addParam('max_id', $maxId);
         }
 
