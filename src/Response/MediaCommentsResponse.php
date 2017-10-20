@@ -17,6 +17,7 @@ use InstagramAPI\Response;
  * @method string getMediaHeaderDisplay()
  * @method mixed getMessage()
  * @method string getNextMaxId()
+ * @method string getNextMinId()
  * @method mixed getPreviewComments()
  * @method string getStatus()
  * @method bool getThreadingEnabled()
@@ -31,6 +32,7 @@ use InstagramAPI\Response;
  * @method bool isMediaHeaderDisplay()
  * @method bool isMessage()
  * @method bool isNextMaxId()
+ * @method bool isNextMinId()
  * @method bool isPreviewComments()
  * @method bool isStatus()
  * @method bool isThreadingEnabled()
@@ -45,6 +47,7 @@ use InstagramAPI\Response;
  * @method $this setMediaHeaderDisplay(string $value)
  * @method $this setMessage(mixed $value)
  * @method $this setNextMaxId(string $value)
+ * @method $this setNextMinId(string $value)
  * @method $this setPreviewComments(mixed $value)
  * @method $this setStatus(string $value)
  * @method $this setThreadingEnabled(bool $value)
@@ -59,6 +62,7 @@ use InstagramAPI\Response;
  * @method $this unsetMediaHeaderDisplay()
  * @method $this unsetMessage()
  * @method $this unsetNextMaxId()
+ * @method $this unsetNextMinId()
  * @method $this unsetPreviewComments()
  * @method $this unsetStatus()
  * @method $this unsetThreadingEnabled()
@@ -71,6 +75,7 @@ class MediaCommentsResponse extends Response
         'comment_count'              => '',
         'comment_likes_enabled'      => '',
         'next_max_id'                => 'string',
+        'next_min_id'                => 'string',
         'caption'                    => 'Model\Caption',
         'has_more_comments'          => '',
         'caption_is_edited'          => '',

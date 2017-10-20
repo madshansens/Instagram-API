@@ -342,21 +342,58 @@ class Media extends RequestCollection
     /**
      * Get media comments.
      *
-     * @param string      $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param null|string $maxId   Next "maximum ID", used for pagination.
+     * Note that this endpoint supports both backwards and forwards pagination.
+     * The only one you should really care about is "max_id" for backwards
+     * ("load older comments") pagination in normal cases. By default, if no
+     * parameter is provided, Instagram gives you the latest page of comments
+     * and then paginates backwards via the "max_id" parameter (and the correct
+     * value for it is the "next_max_id" in the response).
      *
+     * However, if you come to the comments "from a Push notification" (uses the
+     * "target_comment_id" parameter), then the response will ALSO contain a
+     * "next_min_id" value. In that case, you can get newer comments (than the
+     * target comment) by using THAT value and the "min_id" parameter instead.
+     *
+     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param array  $options An associative array of optional parameters, including:
+     *                        "max_id" - next "maximum ID" (get older comments, before this ID), used for backwards pagination;
+     *                        "min_id" - next "minimum ID" (get newer comments, after this ID), used for forwards pagination;
+     *                        "target_comment_id" - used by comment Push notifications to retrieve the page with the specific comment.
+     *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\MediaCommentsResponse
      */
     public function getComments(
         $mediaId,
-        $maxId = null)
+        array $options = [])
     {
-        return $this->ig->request("media/{$mediaId}/comments/")
-            ->addParam('can_support_threading', true)
-            ->addParam('max_id', ($maxId !== null ? $maxId : ''))
-            ->getResponse(new Response\MediaCommentsResponse());
+        $request = $this->ig->request("media/{$mediaId}/comments/")
+            ->addParam('can_support_threading', true);
+
+        // Pagination.
+        if (isset($options['min_id']) && isset($options['max_id'])) {
+            throw new \InvalidArgumentException('You can use either "min_id" or "max_id", but not both at the same time.');
+        }
+        if (isset($options['min_id'])) {
+            $request->addParam('min_id', $options['min_id']);
+        }
+        if (isset($options['max_id'])) {
+            $request->addParam('max_id', $options['max_id']);
+        }
+
+        // Request specific comment (does NOT work together with pagination!).
+        // NOTE: If you try pagination params together with this param, then the
+        // server will reject the request completely and give nothing back!
+        if (isset($options['target_comment_id'])) {
+            if (isset($options['min_id']) || isset($options['max_id'])) {
+                throw new \InvalidArgumentException('You cannot use the "target_comment_id" parameter together with the "min_id" or "max_id" parameters.');
+            }
+            $request->addParam('target_comment_id', $options['target_comment_id']);
+        }
+
+        return $request->getResponse(new Response\MediaCommentsResponse());
     }
 
     /**
@@ -371,9 +408,10 @@ class Media extends RequestCollection
      * them. Do NOT call it frivolously for comments that have no child comments
      * or where you already have all of them via the child comment previews!
      *
-     * @param string      $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string      $commentId The parent comment's ID.
-     * @param null|string $maxId     Next "maximum ID", used for pagination.
+     * @param string $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string $commentId The parent comment's ID.
+     * @param array  $options   An associative array of optional parameters, including:
+     *                          "max_id" - next "maximum ID" (get older comments, before this ID), used for backwards pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -382,11 +420,15 @@ class Media extends RequestCollection
     public function getCommentReplies(
         $mediaId,
         $commentId,
-        $maxId = null)
+        array $options = [])
     {
-        return $this->ig->request("media/{$mediaId}/comments/{$commentId}/child_comments/")
-            ->addParam('max_id', ($maxId !== null ? $maxId : ''))
-            ->getResponse(new Response\MediaCommentRepliesResponse());
+        $request = $this->ig->request("media/{$mediaId}/comments/{$commentId}/child_comments/");
+
+        if (isset($options['max_id'])) {
+            $request->addParam('max_id', $options['max_id']);
+        }
+
+        return $request->getResponse(new Response\MediaCommentRepliesResponse());
     }
 
     /**
