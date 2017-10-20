@@ -1,7 +1,10 @@
 <?php
 
-namespace InstagramAPI\Media;
+namespace InstagramAPI\Media\Photo;
 
+use InstagramAPI\Media\Dimensions;
+use InstagramAPI\Media\Rectangle;
+use InstagramAPI\Media\ResizerInterface;
 use InstagramAPI\Utils;
 
 class PhotoResizer implements ResizerInterface

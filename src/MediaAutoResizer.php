@@ -3,10 +3,10 @@
 namespace InstagramAPI;
 
 use InstagramAPI\Media\Dimensions;
-use InstagramAPI\Media\PhotoResizer;
+use InstagramAPI\Media\Photo\PhotoResizer;
 use InstagramAPI\Media\Rectangle;
 use InstagramAPI\Media\ResizerInterface;
-use InstagramAPI\Media\VideoResizer;
+use InstagramAPI\Media\Video\VideoResizer;
 
 /**
  * Automatic media resizer.

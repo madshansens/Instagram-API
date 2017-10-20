@@ -2,8 +2,8 @@
 
 namespace InstagramAPI\Request\Metadata;
 
-use InstagramAPI\Media\PhotoDetails;
-use InstagramAPI\Media\VideoDetails;
+use InstagramAPI\Media\Photo\PhotoDetails;
+use InstagramAPI\Media\Video\VideoDetails;
 use InstagramAPI\Response\Model\VideoUploadUrl;
 use InstagramAPI\Response\UploadJobVideoResponse;
 use InstagramAPI\Response\UploadPhotoResponse;

@@ -1,6 +1,8 @@
 <?php
 
-namespace InstagramAPI\Media;
+namespace InstagramAPI\Media\Video;
+
+use InstagramAPI\Media\MediaDetails;
 
 class VideoDetails extends MediaDetails
 {
