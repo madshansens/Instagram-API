@@ -2,7 +2,6 @@
 
 namespace InstagramAPI\Request;
 
-use InstagramAPI\Constants;
 use InstagramAPI\Request;
 use InstagramAPI\Response;
 use InstagramAPI\Signatures;
@@ -355,8 +354,8 @@ class Media extends RequestCollection
         $maxId = null)
     {
         return $this->ig->request("media/{$mediaId}/comments/")
-            ->addParam('ig_sig_key_version', Constants::SIG_KEY_VERSION)
-            ->addParam('max_id', $maxId)
+            ->addParam('can_support_threading', true)
+            ->addParam('max_id', ($maxId !== null ? $maxId : ''))
             ->getResponse(new Response\MediaCommentsResponse());
     }
 
