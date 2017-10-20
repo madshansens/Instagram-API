@@ -1228,6 +1228,35 @@ class Utils
     }
 
     /**
+     * Creates an empty temp file with a unique filename.
+     *
+     * @param string $outputDir  Folder to place the temp file in.
+     * @param string $namePrefix (optional) What prefix to use for the temp file.
+     *
+     * @throws \RuntimeException If the file cannot be created.
+     *
+     * @return string
+     */
+    public static function createTempFile(
+        $outputDir,
+        $namePrefix = 'TEMP')
+    {
+        // Automatically generates a name like "INSTATEMP_" or "INSTAVID_" etc.
+        $finalPrefix = sprintf('INSTA%s_', $namePrefix);
+
+        // Try to create the file (detects errors).
+        $tmpFile = @tempnam($outputDir, $finalPrefix);
+        if (!is_string($tmpFile)) {
+            throw new \RuntimeException(sprintf(
+                'Unable to create temporary output file in "%s" (with prefix "%s").',
+                $outputDir, $finalPrefix
+            ));
+        }
+
+        return $tmpFile;
+    }
+
+    /**
      * Closes a file pointer if it's open.
      *
      * Always use this function instead of fclose()!

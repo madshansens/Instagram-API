@@ -174,9 +174,10 @@ class PhotoResizer implements ResizerInterface
                 @imagedestroy($resource);
             }
 
-            // Write the result to disk.
-            $outputFile = $this->_makeTempFile();
+            // Prepare output file.
+            $outputFile = Utils::createTempFile($this->_outputDir, 'IMG');
 
+            // Write the result to disk.
             try {
                 if (!imagejpeg($output, $outputFile, self::JPEG_QUALITY)) {
                     throw new \RuntimeException('Failed to create JPEG image file.');
@@ -367,15 +368,5 @@ class PhotoResizer implements ResizerInterface
         @imagedestroy($original);
 
         return $result;
-    }
-
-    /**
-     * Creates an empty temp file with a unique filename.
-     *
-     * @return string
-     */
-    protected function _makeTempFile()
-    {
-        return tempnam($this->_outputDir, 'IMG');
     }
 }

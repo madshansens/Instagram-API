@@ -140,8 +140,19 @@ class VideoResizer implements ResizerInterface
 
         try {
             // Prepare output file.
-            $outputFile = $this->_makeTempFile();
+            $outputFile = Utils::createTempFile($this->_outputDir, 'VID');
             // Attempt to process the input file.
+            // --------------------------------------------------------------
+            // WARNING: This calls ffmpeg, which can run for a long time. The
+            // user may be running in a CLI. In that case, if they press Ctrl-C
+            // to abort, PHP won't run ANY of our shutdown/destructor handlers!
+            // Therefore they'll still have the temp file if they abort ffmpeg
+            // conversion with Ctrl-C, since our auto-cleanup won't run. There's
+            // absolutely nothing good we can do about that (except a signal
+            // handler to interrupt their Ctrl-C, which is a terrible idea).
+            // Their OS should clear its temp folder periodically. Or if they
+            // use a custom temp folder, it's THEIR own job to clear it!
+            // --------------------------------------------------------------
             $this->_processVideo($srcRect, $dstRect, $canvas, $outputFile);
         } catch (\Exception $e) {
             if ($outputFile !== null && is_file($outputFile)) {
@@ -213,15 +224,5 @@ class VideoResizer implements ResizerInterface
 
             throw new \RuntimeException($errorMsg, $returnCode);
         }
-    }
-
-    /**
-     * Creates an empty temp file with a unique filename.
-     *
-     * @return string
-     */
-    protected function _makeTempFile()
-    {
-        return tempnam($this->_outputDir, 'VID');
     }
 }
