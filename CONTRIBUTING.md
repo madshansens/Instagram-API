@@ -11,6 +11,7 @@ These are just guidelines, not rules. Use your best judgment, and feel free to p
 
 - [Basic rules](#basic-rules)
   * [Git Setup](#git-setup)
+  * [Codestyle Command](#codestyle-command)
   * [Available Tasks](#available-tasks)
   * [Commits](#commits)
   * [Modifying anything in the existing code](#modifying-anything-in-the-existing-code)
@@ -46,6 +47,17 @@ If you are using a Linux/Mac/Unix system, you **MUST** install our git-hook in y
 ```
 ln -fs "../../.pre-commit.hook" .git/hooks/pre-commit
 ```
+
+
+### Codestyle Command
+
+Before committing any work, you **MUST** always run the codestyle fixer command in the root folder of the repository:
+
+```
+composer codestyle
+```
+
+That command will automatically fix all codestyle issues as well as generate various documentation, such as the class docs for all of the Responses and Model items.
 
 
 ### Available Tasks
