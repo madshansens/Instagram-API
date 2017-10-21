@@ -79,7 +79,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getMediaId()
  * @method string[] getMediaIds()
  * @method mixed getMediaInfos()
- * @method mixed getMediaType()
+ * @method int getMediaType()
  * @method mixed getMultiAuthorReelNames()
  * @method string getNextMaxId()
  * @method mixed getNumberOfQualities()
@@ -319,7 +319,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setMediaId(string $value)
  * @method $this setMediaIds(string[] $value)
  * @method $this setMediaInfos(mixed $value)
- * @method $this setMediaType(mixed $value)
+ * @method $this setMediaType(int $value)
  * @method $this setMultiAuthorReelNames(mixed $value)
  * @method $this setNextMaxId(string $value)
  * @method $this setNumberOfQualities(mixed $value)
@@ -497,7 +497,11 @@ class Item extends AutoPropertyMapper
     const JSON_PROPERTY_MAP = [
         'pk'                               => 'string',
         'id'                               => 'string',
-        'media_type'                       => '',
+        /*
+         * A number describing what type of media this is. Should be compared
+         * against the `Item::PHOTO`, `Item::VIDEO` and `Item::ALBUM` constants!
+         */
+        'media_type'                       => 'int',
         'code'                             => '',
         'visibility'                       => '',
         /*

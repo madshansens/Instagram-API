@@ -22,7 +22,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getLink()
  * @method mixed getLinkHintText()
  * @method mixed getLinkText()
- * @method mixed getMediaType()
+ * @method int getMediaType()
  * @method mixed getOriginalHeight()
  * @method mixed getOriginalWidth()
  * @method mixed getOverlaySubtitle()
@@ -76,7 +76,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setLink(mixed $value)
  * @method $this setLinkHintText(mixed $value)
  * @method $this setLinkText(mixed $value)
- * @method $this setMediaType(mixed $value)
+ * @method $this setMediaType(int $value)
  * @method $this setOriginalHeight(mixed $value)
  * @method $this setOriginalWidth(mixed $value)
  * @method $this setOverlaySubtitle(mixed $value)
@@ -132,7 +132,12 @@ class CarouselMedia extends AutoPropertyMapper
         'video_subtitles_uri' => '',
         'original_height'     => '',
         'original_width'      => '',
-        'media_type'          => '',
+        /*
+         * A number describing what type of media this is. Should be compared
+         * against the `CarouselMedia::PHOTO` and `CarouselMedia::VIDEO`
+         * constants!
+         */
+        'media_type'          => 'int',
         'usertags'            => 'Usertag',
         'preview'             => '',
         'headline'            => 'Headline',

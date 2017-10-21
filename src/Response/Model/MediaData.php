@@ -8,7 +8,7 @@ use InstagramAPI\AutoPropertyMapper;
  * MediaData.
  *
  * @method Image_Versions2 getImageVersions2()
- * @method mixed getMediaType()
+ * @method int getMediaType()
  * @method mixed getOriginalHeight()
  * @method mixed getOriginalWidth()
  * @method bool isImageVersions2()
@@ -16,7 +16,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isOriginalHeight()
  * @method bool isOriginalWidth()
  * @method $this setImageVersions2(Image_Versions2 $value)
- * @method $this setMediaType(mixed $value)
+ * @method $this setMediaType(int $value)
  * @method $this setOriginalHeight(mixed $value)
  * @method $this setOriginalWidth(mixed $value)
  * @method $this unsetImageVersions2()
@@ -30,6 +30,9 @@ class MediaData extends AutoPropertyMapper
         'image_versions2' => 'Image_Versions2',
         'original_width'  => '',
         'original_height' => '',
-        'media_type'      => '',
+        /*
+         * A number describing what type of media this is.
+         */
+        'media_type'      => 'int',
     ];
 }

@@ -8,7 +8,7 @@ use InstagramAPI\AutoPropertyMapper;
  * DirectThreadItemMedia.
  *
  * @method Image_Versions2 getImageVersions2()
- * @method mixed getMediaType()
+ * @method int getMediaType()
  * @method mixed getOriginalHeight()
  * @method mixed getOriginalWidth()
  * @method VideoVersions[] getVideoVersions()
@@ -18,7 +18,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isOriginalWidth()
  * @method bool isVideoVersions()
  * @method $this setImageVersions2(Image_Versions2 $value)
- * @method $this setMediaType(mixed $value)
+ * @method $this setMediaType(int $value)
  * @method $this setOriginalHeight(mixed $value)
  * @method $this setOriginalWidth(mixed $value)
  * @method $this setVideoVersions(VideoVersions[] $value)
@@ -34,7 +34,12 @@ class DirectThreadItemMedia extends AutoPropertyMapper
     const VIDEO = 2;
 
     const JSON_PROPERTY_MAP = [
-        'media_type'      => '',
+        /*
+         * A number describing what type of media this is. Should be compared
+         * against the `DirectThreadItemMedia::PHOTO` and
+         * `DirectThreadItemMedia::VIDEO` constants!
+         */
+        'media_type'      => 'int',
         'image_versions2' => 'Image_Versions2',
         'video_versions'  => 'VideoVersions[]',
         'original_width'  => '',
