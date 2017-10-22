@@ -7,7 +7,10 @@
             "php"
         ],
         "php-path-list": [
-            "./src"
+            "./src",
+            "./vendor/guzzlehttp",
+            "./vendor/lazyjsonmapper/lazyjsonmapper/src",
+            "./vendor/psr"
         ],
         "php-path-list-without-subdir": []
     }
