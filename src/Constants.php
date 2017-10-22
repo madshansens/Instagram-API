@@ -9,7 +9,6 @@ class Constants
         1 => 'https://i.instagram.com/api/v1/',
         2 => 'https://i.instagram.com/api/v2/',
     ];
-    const GRAPH_URL = 'https://graph.instagram.com/';
     const IG_VERSION = '12.0.0.7.91';
     const VERSION_CODE = '69950856';
     const IG_SIG_KEY = 'b4946d296abf005163e72346a6d33dd083cadde638e6ad9c5eb92e381b35784a';
@@ -41,7 +40,6 @@ class Constants
     const PACKAGE_NAME = 'com.instagram.android';
 
     // Instagram Analytics.
-    const ANALYTICS_ACCESS_TOKEN = '567067343352427|f249176f09e26ce54212b472dbab8fa8';
     const SURFACE_PARAM = 4715;
 
     // Internal Feedtype Constants. CRITICAL: EVERY value here MUST be unique!
