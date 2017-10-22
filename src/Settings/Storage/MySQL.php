@@ -49,7 +49,13 @@ class MySQL extends PDOStorage
      */
     protected function _enableUTF8()
     {
-        $this->_pdo->query('SET NAMES UTF8')->closeCursor();
+        // IMPORTANT: MySQL databases have two names for UTF-8! If you use
+        // "utf8", they only allow 1-3 byte encoding. But UTF-8 is actually a
+        // 1-4 byte format (things like Emojis need that final byte). Therefore,
+        // we MUST use their "utf8mb4" encoding instead. The "utf8mb4" storage
+        // needs are identical for 1-3 byte characters, but supports 4 bytes!
+        // See: https://dev.mysql.com/doc/refman/5.7/en/charset-unicode-utf8mb4.html
+        $this->_pdo->query("SET NAMES 'utf8mb4'")->closeCursor();
     }
 
     /**
@@ -72,15 +78,24 @@ class MySQL extends PDOStorage
         }
 
         // Create the database table. Throws in case of failure.
-        // NOTE: We store all settings as a JSON blob so that we support all
-        // current and future data without having to alter the table schema.
+        // NOTE: We store all settings as a binary JSON blob so that we support
+        // all current and future data without having to alter the table schema.
+        // NOTE: The username is a 100-character-max varchar, NOT 255! Why?
+        // Because MySQL has a 767-byte max limit for efficient indexes and
+        // "utf8mb4" uses 4 bytes per character, which means that 191 characters
+        // is the maximum safe amount (191 * 4 = 764)! We chose 150 as a nice
+        // number. Instagram's username limit is 30, so our limit is fine!
+        // NOTE: We use "utf8mb4_general_ci" which performs fast, general
+        // sorting, since we have no need for language-aware "unicode" sorting.
+        // NOTE: Lastly... note that our encoding only affects the "username"
+        // column. All other columns are numbers, binary blobs, etc!
         $this->_pdo->exec('CREATE TABLE `'.$this->_dbTableName.'` (
             id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(255) NOT NULL,
+            username VARCHAR(150) NOT NULL,
             settings MEDIUMBLOB NULL,
             cookies MEDIUMBLOB NULL,
             last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             UNIQUE KEY (username)
-        ) COLLATE="utf8_general_ci" ENGINE=InnoDB;');
+        ) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ENGINE=InnoDB;');
     }
 }
