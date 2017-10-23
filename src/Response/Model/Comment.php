@@ -26,7 +26,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method Comment[] getPreviewChildComments()
  * @method mixed getStatus()
  * @method mixed getText()
- * @method mixed getType()
+ * @method int getType()
  * @method User getUser()
  * @method string getUserId()
  * @method bool isBitFlags()
@@ -70,7 +70,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setPreviewChildComments(Comment[] $value)
  * @method $this setStatus(mixed $value)
  * @method $this setText(mixed $value)
- * @method $this setType(mixed $value)
+ * @method $this setType(int $value)
  * @method $this setUser(User $value)
  * @method $this setUserId(string $value)
  * @method $this unsetBitFlags()
@@ -98,6 +98,11 @@ use InstagramAPI\AutoPropertyMapper;
  */
 class Comment extends AutoPropertyMapper
 {
+    /** @var int Top-level comment. */
+    const PARENT = 0;
+    /** @var int Threaded reply to another comment. */
+    const CHILD = 2;
+
     const JSON_PROPERTY_MAP = [
         'status'                       => '',
         'user_id'                      => 'string',
@@ -112,7 +117,12 @@ class Comment extends AutoPropertyMapper
         'media_id'                     => 'string',
         'text'                         => '',
         'content_type'                 => '',
-        'type'                         => '',
+        /*
+         * A number describing what type of comment this is. Should be compared
+         * against the `Comment::PARENT` and `Comment::CHILD` constants. All
+         * replies are of type `CHILD`, and all parents are of type `PARENT`.
+         */
+        'type'                         => 'int',
         'comment_like_count'           => '',
         'has_liked_comment'            => '',
         'has_translation'              => '',
