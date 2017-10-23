@@ -665,7 +665,9 @@ class MediaAutoResizer
 
             // First calculate the overall IDEAL cropping applied to the INPUT
             // canvas. If scale is 1.0 it will be used as-is (pixel-perfect).
-            $croppedInputCanvas = $idealCanvas->createScaled(1 / $overallRescale);
+            // NOTE: We tell it to use round() so that the rescaled pixels are
+            // as close to the perfect aspect ratio as possible.
+            $croppedInputCanvas = $idealCanvas->withRescaling(1 / $overallRescale, 'round');
             $this->_debugDimensions(
                 $croppedInputCanvas->getWidth(), $croppedInputCanvas->getHeight(),
                 'CROP: Rescaled Ideally Cropped Canvas to Input Dimension Space'
@@ -844,11 +846,11 @@ class MediaAutoResizer
             );
 
             // Calculate the scaled destination rectangle. Note that X/Y remain.
-            // NOTE: This internally uses ceil(), which guarantees that it'll
+            // NOTE: We tell it to use ceil(), which guarantees that it'll
             // never scale a side badly and leave a 1px gap between the media
             // and canvas sides. Also note that ceil will never produce bad
             // values, since PHP allows the dst_w/dst_h to exceed beyond canvas!
-            $dstRect = $srcRect->createScaled($scale);
+            $dstRect = $srcRect->withRescaling($scale, 'ceil');
             $this->_debugDimensions(
                 $dstRect->getWidth(), $dstRect->getHeight(),
                 'EXPAND: Rescaled Input to Output Dimension Space'

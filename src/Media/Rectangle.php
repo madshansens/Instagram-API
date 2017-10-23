@@ -141,7 +141,7 @@ class Rectangle
      *
      * @return self
      */
-    public function createSwappedAxes()
+    public function withSwappedAxes()
     {
         return new self($this->_y, $this->_x, $this->_height, $this->_width);
     }
@@ -149,21 +149,29 @@ class Rectangle
     /**
      * Create a new, scale-adjusted object.
      *
-     * NOTE: The x/y offsets are not affected. Only the width and height.
+     * NOTE: The x1/y1 offsets are not affected. Only the width and height. But
+     * those new dimensions WILL affect the x2/y2 offsets, as you'd expect.
      *
-     * You can trust that this algorithm will always use `ceil()` to choose the
-     * maximum number of pixels necessary to fit everything at the new scale.
+     * @param float|int $newScale     The scale factor to apply.
+     * @param string    $roundingFunc One of `round` (default), `floor` or `ceil`.
      *
-     * @param float $newScale The scale factor to apply.
+     * @throws \InvalidArgumentException
      *
      * @return self
      */
-    public function createScaled(
-        $newScale = 1.0)
+    public function withRescaling(
+        $newScale = 1.0,
+        $roundingFunc = 'round')
     {
-        // NOTE: We MUST use ceil() to guarantee that all intended pixels fit.
-        $newWidth = (int) ceil($newScale * $this->_width);
-        $newHeight = (int) ceil($newScale * $this->_height);
+        if (!is_float($newScale) && !is_int($newScale)) {
+            throw new \InvalidArgumentException('The new scale must be a float or integer.');
+        }
+        if ($roundingFunc !== 'round' && $roundingFunc !== 'floor' && $roundingFunc !== 'ceil') {
+            throw new \InvalidArgumentException(sprintf('Invalid rounding function "%s".', $roundingFunc));
+        }
+
+        $newWidth = (int) $roundingFunc($newScale * $this->_width);
+        $newHeight = (int) $roundingFunc($newScale * $this->_height);
 
         return new self($this->_x, $this->_y, $newWidth, $newHeight);
     }

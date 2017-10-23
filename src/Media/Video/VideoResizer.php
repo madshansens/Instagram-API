@@ -85,11 +85,11 @@ class VideoResizer implements ResizerInterface
     }
 
     /**
-     * Check if the input video's pixel data is rotated.
+     * Check if the input video's axes are swapped.
      *
      * @return bool
      */
-    protected function _isRotated()
+    protected function _hasSwappedAxes()
     {
         // TODO: Research and implement how to handle rotated videos.
         // Videos can have metadata with a rotation flag:
@@ -129,8 +129,8 @@ class VideoResizer implements ResizerInterface
         $result = new Dimensions($this->_details->getWidth(), $this->_details->getHeight());
 
         // Swap to correct dimensions if the video pixels are stored rotated.
-        if ($this->_isRotated()) {
-            $result = $result->createSwappedAxes();
+        if ($this->_hasSwappedAxes()) {
+            $result = $result->withSwappedAxes();
         }
 
         return $result;

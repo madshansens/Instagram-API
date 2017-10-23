@@ -116,11 +116,11 @@ class PhotoResizer implements ResizerInterface
     }
 
     /**
-     * Check if the input image's pixel data is rotated.
+     * Check if the input photo's axes are swapped.
      *
      * @return bool
      */
-    protected function _isRotated()
+    protected function _hasSwappedAxes()
     {
         return in_array($this->_imageOrientation, [5, 6, 7, 8]);
     }
@@ -155,8 +155,8 @@ class PhotoResizer implements ResizerInterface
         $result = new Dimensions($this->_details->getWidth(), $this->_details->getHeight());
 
         // Swap to correct dimensions if the image pixels are stored rotated.
-        if ($this->_isRotated()) {
-            $result = $result->createSwappedAxes();
+        if ($this->_hasSwappedAxes()) {
+            $result = $result->withSwappedAxes();
         }
 
         return $result;
@@ -271,10 +271,10 @@ class PhotoResizer implements ResizerInterface
         Dimensions $canvas
     ) {
         // If our input image pixels are stored rotated, swap all coordinates.
-        if ($this->_isRotated()) {
-            $srcRect = $srcRect->createSwappedAxes();
-            $dstRect = $dstRect->createSwappedAxes();
-            $canvas = $canvas->createSwappedAxes();
+        if ($this->_hasSwappedAxes()) {
+            $srcRect = $srcRect->withSwappedAxes();
+            $dstRect = $dstRect->withSwappedAxes();
+            $canvas = $canvas->withSwappedAxes();
         }
 
         // Create an output canvas with our desired size.
