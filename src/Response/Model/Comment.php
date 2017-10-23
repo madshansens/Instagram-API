@@ -19,6 +19,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getHasMoreTailChildComments()
  * @method mixed getHasTranslation()
  * @method string getMediaId()
+ * @method string getNextMaxChildCursor()
  * @method User[] getOtherPreviewUsers()
  * @method string getParentCommentId()
  * @method string getPk()
@@ -40,6 +41,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isHasMoreTailChildComments()
  * @method bool isHasTranslation()
  * @method bool isMediaId()
+ * @method bool isNextMaxChildCursor()
  * @method bool isOtherPreviewUsers()
  * @method bool isParentCommentId()
  * @method bool isPk()
@@ -61,6 +63,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setHasMoreTailChildComments(bool $value)
  * @method $this setHasTranslation(mixed $value)
  * @method $this setMediaId(string $value)
+ * @method $this setNextMaxChildCursor(string $value)
  * @method $this setOtherPreviewUsers(User[] $value)
  * @method $this setParentCommentId(string $value)
  * @method $this setPk(string $value)
@@ -82,6 +85,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetHasMoreTailChildComments()
  * @method $this unsetHasTranslation()
  * @method $this unsetMediaId()
+ * @method $this unsetNextMaxChildCursor()
  * @method $this unsetOtherPreviewUsers()
  * @method $this unsetParentCommentId()
  * @method $this unsetPk()
@@ -130,6 +134,13 @@ class Comment extends AutoPropertyMapper
          * Previews of users in very long comment threads.
          */
         'other_preview_users'          => 'User[]',
+        /*
+         * This is somehow related to pagination of child-comments in CERTAIN
+         * comments with children. The value seems to ONLY appear when a comment
+         * has MORE child-comments than what exists in "preview_child_comments".
+         * So it probably somehow describes the missing child comments offset.
+         */
+        'next_max_child_cursor'        => 'string',
         'has_more_tail_child_comments' => 'bool',
         'has_more_head_child_comments' => 'bool',
     ];
