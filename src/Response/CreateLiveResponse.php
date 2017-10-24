@@ -34,7 +34,7 @@ use InstagramAPI\Response;
  * @method mixed getStreamVideoBitRate()
  * @method mixed getStreamVideoFps()
  * @method mixed getStreamVideoWidth()
- * @method mixed getUploadUrl()
+ * @method string getUploadUrl()
  * @method Model\_Message[] get_Messages()
  * @method bool isAllowResolutionChange()
  * @method bool isAvcRtmpPayload()
@@ -92,7 +92,7 @@ use InstagramAPI\Response;
  * @method $this setStreamVideoBitRate(mixed $value)
  * @method $this setStreamVideoFps(mixed $value)
  * @method $this setStreamVideoWidth(mixed $value)
- * @method $this setUploadUrl(mixed $value)
+ * @method $this setUploadUrl(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
  * @method $this unsetAllowResolutionChange()
  * @method $this unsetAvcRtmpPayload()
@@ -128,7 +128,7 @@ class CreateLiveResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'broadcast_id'                                          => 'string',
-        'upload_url'                                            => '',
+        'upload_url'                                            => 'string',
         'max_time_in_seconds'                                   => '',
         'speed_test_ui_timeout'                                 => '',
         'stream_network_speed_test_payload_chunk_size_in_bytes' => '',

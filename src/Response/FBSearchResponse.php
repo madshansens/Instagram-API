@@ -7,7 +7,7 @@ use InstagramAPI\Response;
 /**
  * FBSearchResponse.
  *
- * @method mixed getHasMore()
+ * @method bool getHasMore()
  * @method mixed getHashtags()
  * @method mixed getMessage()
  * @method mixed getPlaces()
@@ -23,7 +23,7 @@ use InstagramAPI\Response;
  * @method bool isStatus()
  * @method bool isUsers()
  * @method bool is_Messages()
- * @method $this setHasMore(mixed $value)
+ * @method $this setHasMore(bool $value)
  * @method $this setHashtags(mixed $value)
  * @method $this setMessage(mixed $value)
  * @method $this setPlaces(mixed $value)
@@ -43,7 +43,7 @@ use InstagramAPI\Response;
 class FBSearchResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
-        'has_more'   => '',
+        'has_more'   => 'bool',
         'hashtags'   => '',
         'users'      => '',
         'places'     => '',

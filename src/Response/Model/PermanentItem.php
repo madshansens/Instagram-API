@@ -15,7 +15,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method MediaData getMedia()
  * @method Item getMediaShare()
  * @method ReelShare getReelShare()
- * @method mixed getText()
+ * @method string getText()
  * @method mixed getTimestamp()
  * @method string getUserId()
  * @method bool isItemId()
@@ -37,7 +37,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setMedia(MediaData $value)
  * @method $this setMediaShare(Item $value)
  * @method $this setReelShare(ReelShare $value)
- * @method $this setText(mixed $value)
+ * @method $this setText(string $value)
  * @method $this setTimestamp(mixed $value)
  * @method $this setUserId(string $value)
  * @method $this unsetItemId()
@@ -59,7 +59,7 @@ class PermanentItem extends AutoPropertyMapper
         'user_id'     => 'string',
         'timestamp'   => '',
         'item_type'   => '',
-        'text'        => '',
+        'text'        => 'string',
         'location'    => 'Location',
         'like'        => '',
         'media'       => 'MediaData',

@@ -12,7 +12,7 @@ use InstagramAPI\Response;
  * @method mixed getErrorType()
  * @method mixed getMessage()
  * @method string getStatus()
- * @method mixed getUsername()
+ * @method string getUsername()
  * @method Model\_Message[] get_Messages()
  * @method bool isAvailable()
  * @method bool isError()
@@ -26,7 +26,7 @@ use InstagramAPI\Response;
  * @method $this setErrorType(mixed $value)
  * @method $this setMessage(mixed $value)
  * @method $this setStatus(string $value)
- * @method $this setUsername(mixed $value)
+ * @method $this setUsername(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
  * @method $this unsetAvailable()
  * @method $this unsetError()
@@ -39,7 +39,7 @@ use InstagramAPI\Response;
 class CheckUsernameResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
-        'username'   => '',
+        'username'   => 'string',
         'available'  => '',
         'error'      => '',
         'error_type' => '',

@@ -7,7 +7,7 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * Args.
  *
- * @method mixed getActionUrl()
+ * @method string getActionUrl()
  * @method mixed getClicked()
  * @method string getCommentId()
  * @method string[] getCommentIds()
@@ -21,7 +21,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getRequestCount()
  * @method string getSecondProfileId()
  * @method mixed getSecondProfileImage()
- * @method mixed getText()
+ * @method string getText()
  * @method mixed getTimestamp()
  * @method mixed getTuuid()
  * @method bool isActionUrl()
@@ -41,7 +41,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isText()
  * @method bool isTimestamp()
  * @method bool isTuuid()
- * @method $this setActionUrl(mixed $value)
+ * @method $this setActionUrl(string $value)
  * @method $this setClicked(mixed $value)
  * @method $this setCommentId(string $value)
  * @method $this setCommentIds(string[] $value)
@@ -55,7 +55,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setRequestCount(mixed $value)
  * @method $this setSecondProfileId(string $value)
  * @method $this setSecondProfileImage(mixed $value)
- * @method $this setText(mixed $value)
+ * @method $this setText(string $value)
  * @method $this setTimestamp(mixed $value)
  * @method $this setTuuid(mixed $value)
  * @method $this unsetActionUrl()
@@ -81,13 +81,13 @@ class Args extends AutoPropertyMapper
     const JSON_PROPERTY_MAP = [
         'media'                     => 'Media[]',
         'links'                     => 'Link[]',
-        'text'                      => '',
+        'text'                      => 'string',
         'profile_id'                => 'string',
         'profile_image'             => '',
         'timestamp'                 => '',
         'comment_id'                => 'string',
         'request_count'             => '',
-        'action_url'                => '',
+        'action_url'                => 'string',
         'destination'               => '',
         'inline_follow'             => 'InlineFollow',
         'comment_ids'               => 'string[]',

@@ -14,7 +14,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getIsBestie()
  * @method mixed getIsBlockingReel()
  * @method mixed getIsMutingReel()
- * @method mixed getIsPrivate()
+ * @method bool getIsPrivate()
  * @method mixed getOutgoingRequest()
  * @method bool isBlocking()
  * @method bool isFollowedBy()
@@ -32,7 +32,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setIsBestie(mixed $value)
  * @method $this setIsBlockingReel(mixed $value)
  * @method $this setIsMutingReel(mixed $value)
- * @method $this setIsPrivate(mixed $value)
+ * @method $this setIsPrivate(bool $value)
  * @method $this setOutgoingRequest(mixed $value)
  * @method $this unsetBlocking()
  * @method $this unsetFollowedBy()
@@ -51,7 +51,7 @@ class FriendshipStatus extends AutoPropertyMapper
         'followed_by'      => '',
         'incoming_request' => '',
         'outgoing_request' => '',
-        'is_private'       => '',
+        'is_private'       => 'bool',
         'is_blocking_reel' => '',
         'is_muting_reel'   => '',
         'blocking'         => '',

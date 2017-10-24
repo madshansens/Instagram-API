@@ -11,9 +11,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getActionInfo()
  * @method mixed getBackgroundColor()
  * @method mixed getBorderColor()
- * @method mixed getText()
+ * @method string getText()
  * @method mixed getTextColor()
- * @method mixed getUrl()
+ * @method string getUrl()
  * @method bool isAction()
  * @method bool isActionInfo()
  * @method bool isBackgroundColor()
@@ -25,9 +25,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setActionInfo(mixed $value)
  * @method $this setBackgroundColor(mixed $value)
  * @method $this setBorderColor(mixed $value)
- * @method $this setText(mixed $value)
+ * @method $this setText(string $value)
  * @method $this setTextColor(mixed $value)
- * @method $this setUrl(mixed $value)
+ * @method $this setUrl(string $value)
  * @method $this unsetAction()
  * @method $this unsetActionInfo()
  * @method $this unsetBackgroundColor()
@@ -39,8 +39,8 @@ use InstagramAPI\AutoPropertyMapper;
 class Button extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'text'             => '',
-        'url'              => '',
+        'text'             => 'string',
+        'url'              => 'string',
         'action'           => '',
         'background_color' => '',
         'border_color'     => '',

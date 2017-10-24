@@ -7,21 +7,21 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * VideoVersions.
  *
- * @method mixed getHeight()
+ * @method int getHeight()
  * @method string getId()
- * @method mixed getType()
- * @method mixed getUrl()
- * @method mixed getWidth()
+ * @method int getType()
+ * @method string getUrl()
+ * @method int getWidth()
  * @method bool isHeight()
  * @method bool isId()
  * @method bool isType()
  * @method bool isUrl()
  * @method bool isWidth()
- * @method $this setHeight(mixed $value)
+ * @method $this setHeight(int $value)
  * @method $this setId(string $value)
- * @method $this setType(mixed $value)
- * @method $this setUrl(mixed $value)
- * @method $this setWidth(mixed $value)
+ * @method $this setType(int $value)
+ * @method $this setUrl(string $value)
+ * @method $this setWidth(int $value)
  * @method $this unsetHeight()
  * @method $this unsetId()
  * @method $this unsetType()
@@ -31,10 +31,10 @@ use InstagramAPI\AutoPropertyMapper;
 class VideoVersions extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'url'    => '',
-        'type'   => '',
-        'width'  => '',
-        'height' => '',
+        'url'    => 'string',
+        'type'   => 'int', // Some kinda internal type ID, such as int(102).
+        'width'  => 'int',
+        'height' => 'int',
         'id'     => 'string',
     ];
 }

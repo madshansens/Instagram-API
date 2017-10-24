@@ -8,10 +8,10 @@ use InstagramAPI\AutoPropertyMapper;
  * Item.
  *
  * @method string getActorFbid()
- * @method mixed getAdAction()
+ * @method string getAdAction()
  * @method mixed getAdHeaderStyle()
  * @method string getAdId()
- * @method mixed getAdLinkType()
+ * @method int getAdLinkType()
  * @method AdMetadata[] getAdMetadata()
  * @method mixed getAlgorithm()
  * @method AndroidLinks[] getAndroidLinks()
@@ -31,8 +31,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getCollapseComments()
  * @method string getCollectionId()
  * @method mixed getCollectionName()
- * @method mixed getCommentCount()
- * @method mixed getCommentLikesEnabled()
+ * @method int getCommentCount()
+ * @method bool getCommentLikesEnabled()
  * @method bool getCommentThreadingEnabled()
  * @method mixed getCommentingDisabledForViewer()
  * @method Comment[] getComments()
@@ -45,13 +45,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getExploreContext()
  * @method mixed getExploreSourceToken()
  * @method mixed getFilterType()
- * @method mixed getForceOverlay()
+ * @method bool getForceOverlay()
  * @method Gating getGating()
- * @method mixed getHasAudio()
- * @method mixed getHasLiked()
- * @method mixed getHasMoreComments()
- * @method mixed getHasViewerSaved()
- * @method mixed getHideNuxText()
+ * @method bool getHasAudio()
+ * @method bool getHasLiked()
+ * @method bool getHasMoreComments()
+ * @method bool getHasViewerSaved()
+ * @method bool getHideNuxText()
  * @method mixed getITunesItem()
  * @method mixed getIcon()
  * @method string getId()
@@ -67,11 +67,11 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getLargeUrls()
  * @method float getLat()
  * @method string getLeadGenFormId()
- * @method mixed getLikeCount()
+ * @method int getLikeCount()
  * @method User[] getLikers()
- * @method mixed getLink()
- * @method mixed getLinkHintText()
- * @method mixed getLinkText()
+ * @method string getLink()
+ * @method string getLinkHintText()
+ * @method string getLinkText()
  * @method float getLng()
  * @method Location getLocation()
  * @method mixed getMaxNumVisiblePreviewComments()
@@ -85,16 +85,16 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getNumberOfQualities()
  * @method string getOrganicPostId()
  * @method mixed getOrganicTrackingToken()
- * @method mixed getOriginalHeight()
- * @method mixed getOriginalWidth()
- * @method mixed getOverlaySubtitle()
- * @method mixed getOverlayText()
- * @method mixed getOverlayTitle()
+ * @method int getOriginalHeight()
+ * @method int getOriginalWidth()
+ * @method string getOverlaySubtitle()
+ * @method string getOverlayText()
+ * @method string getOverlayTitle()
  * @method mixed getPhotoOfYou()
  * @method string getPk()
  * @method Placeholder getPlaceholder()
  * @method mixed getPlaybackDurationSecs()
- * @method mixed getPreview()
+ * @method string getPreview()
  * @method Comment[] getPreviewComments()
  * @method mixed getReelMentions()
  * @method ReelShare getReelShare()
@@ -120,7 +120,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method Usertag getUsertags()
  * @method mixed getValue()
  * @method mixed getVideoDashManifest()
- * @method mixed getVideoDuration()
+ * @method float getVideoDuration()
  * @method VideoVersions[] getVideoVersions()
  * @method mixed getViewCount()
  * @method mixed getViewerCount()
@@ -248,10 +248,10 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isViewers()
  * @method bool isVisibility()
  * @method $this setActorFbid(string $value)
- * @method $this setAdAction(mixed $value)
+ * @method $this setAdAction(string $value)
  * @method $this setAdHeaderStyle(mixed $value)
  * @method $this setAdId(string $value)
- * @method $this setAdLinkType(mixed $value)
+ * @method $this setAdLinkType(int $value)
  * @method $this setAdMetadata(AdMetadata[] $value)
  * @method $this setAlgorithm(mixed $value)
  * @method $this setAndroidLinks(AndroidLinks[] $value)
@@ -271,8 +271,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setCollapseComments(mixed $value)
  * @method $this setCollectionId(string $value)
  * @method $this setCollectionName(mixed $value)
- * @method $this setCommentCount(mixed $value)
- * @method $this setCommentLikesEnabled(mixed $value)
+ * @method $this setCommentCount(int $value)
+ * @method $this setCommentLikesEnabled(bool $value)
  * @method $this setCommentThreadingEnabled(bool $value)
  * @method $this setCommentingDisabledForViewer(mixed $value)
  * @method $this setComments(Comment[] $value)
@@ -285,13 +285,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setExploreContext(mixed $value)
  * @method $this setExploreSourceToken(mixed $value)
  * @method $this setFilterType(mixed $value)
- * @method $this setForceOverlay(mixed $value)
+ * @method $this setForceOverlay(bool $value)
  * @method $this setGating(Gating $value)
- * @method $this setHasAudio(mixed $value)
- * @method $this setHasLiked(mixed $value)
- * @method $this setHasMoreComments(mixed $value)
- * @method $this setHasViewerSaved(mixed $value)
- * @method $this setHideNuxText(mixed $value)
+ * @method $this setHasAudio(bool $value)
+ * @method $this setHasLiked(bool $value)
+ * @method $this setHasMoreComments(bool $value)
+ * @method $this setHasViewerSaved(bool $value)
+ * @method $this setHideNuxText(bool $value)
  * @method $this setITunesItem(mixed $value)
  * @method $this setIcon(mixed $value)
  * @method $this setId(string $value)
@@ -307,11 +307,11 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setLargeUrls(mixed $value)
  * @method $this setLat(float $value)
  * @method $this setLeadGenFormId(string $value)
- * @method $this setLikeCount(mixed $value)
+ * @method $this setLikeCount(int $value)
  * @method $this setLikers(User[] $value)
- * @method $this setLink(mixed $value)
- * @method $this setLinkHintText(mixed $value)
- * @method $this setLinkText(mixed $value)
+ * @method $this setLink(string $value)
+ * @method $this setLinkHintText(string $value)
+ * @method $this setLinkText(string $value)
  * @method $this setLng(float $value)
  * @method $this setLocation(Location $value)
  * @method $this setMaxNumVisiblePreviewComments(mixed $value)
@@ -325,16 +325,16 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setNumberOfQualities(mixed $value)
  * @method $this setOrganicPostId(string $value)
  * @method $this setOrganicTrackingToken(mixed $value)
- * @method $this setOriginalHeight(mixed $value)
- * @method $this setOriginalWidth(mixed $value)
- * @method $this setOverlaySubtitle(mixed $value)
- * @method $this setOverlayText(mixed $value)
- * @method $this setOverlayTitle(mixed $value)
+ * @method $this setOriginalHeight(int $value)
+ * @method $this setOriginalWidth(int $value)
+ * @method $this setOverlaySubtitle(string $value)
+ * @method $this setOverlayText(string $value)
+ * @method $this setOverlayTitle(string $value)
  * @method $this setPhotoOfYou(mixed $value)
  * @method $this setPk(string $value)
  * @method $this setPlaceholder(Placeholder $value)
  * @method $this setPlaybackDurationSecs(mixed $value)
- * @method $this setPreview(mixed $value)
+ * @method $this setPreview(string $value)
  * @method $this setPreviewComments(Comment[] $value)
  * @method $this setReelMentions(mixed $value)
  * @method $this setReelShare(ReelShare $value)
@@ -360,7 +360,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setUsertags(Usertag $value)
  * @method $this setValue(mixed $value)
  * @method $this setVideoDashManifest(mixed $value)
- * @method $this setVideoDuration(mixed $value)
+ * @method $this setVideoDuration(float $value)
  * @method $this setVideoVersions(VideoVersions[] $value)
  * @method $this setViewCount(mixed $value)
  * @method $this setViewerCount(mixed $value)
@@ -514,13 +514,13 @@ class Item extends AutoPropertyMapper
         'filter_type'                      => '',
         'attribution'                      => 'Attribution',
         'image_versions2'                  => 'Image_Versions2',
-        'original_width'                   => '',
-        'original_height'                  => '',
+        'original_width'                   => 'int',
+        'original_height'                  => 'int',
         'view_count'                       => '',
         'viewer_count'                     => '',
         'organic_tracking_token'           => '',
-        'comment_count'                    => '',
-        'has_more_comments'                => '',
+        'comment_count'                    => 'int',
+        'has_more_comments'                => 'bool',
         'max_num_visible_preview_comments' => '',
         /*
          * Preview of comments via feed replies.
@@ -551,13 +551,13 @@ class Item extends AutoPropertyMapper
         'caption_is_edited'                => '',
         'photo_of_you'                     => '',
         'video_versions'                   => 'VideoVersions[]',
-        'has_audio'                        => '',
-        'video_duration'                   => '',
+        'has_audio'                        => 'bool',
+        'video_duration'                   => 'float',
         'user'                             => 'User',
         'likers'                           => 'User[]',
-        'like_count'                       => '',
-        'preview'                          => '',
-        'has_liked'                        => '',
+        'like_count'                       => 'int',
+        'preview'                          => 'string',
+        'has_liked'                        => 'bool',
         'explore_context'                  => '',
         'explore_source_token'             => '',
         'explore'                          => 'Explore',
@@ -568,9 +568,9 @@ class Item extends AutoPropertyMapper
         'top_likers'                       => '',
         'suggested_users'                  => 'SuggestedUsers',
         'is_new_suggestion'                => '',
-        'comment_likes_enabled'            => '',
+        'comment_likes_enabled'            => 'bool',
         'can_viewer_save'                  => '',
-        'has_viewer_saved'                 => '',
+        'has_viewer_saved'                 => 'bool',
         'location'                         => 'Location',
         'lat'                              => 'float',
         'lng'                              => 'float',
@@ -579,7 +579,6 @@ class Item extends AutoPropertyMapper
         'channel'                          => 'Channel',
         'gating'                           => 'Gating',
         'story_hashtags'                   => '',
-        'ad_action'                        => '',
         'is_dash_eligible'                 => '',
         'video_dash_manifest'              => '',
         'number_of_qualities'              => '',
@@ -594,20 +593,21 @@ class Item extends AutoPropertyMapper
         'media_infos'                      => '',
         'value'                            => '',
         'collapse_comments'                => '',
-        'ad_metadata'                      => 'AdMetadata[]',
-        'link'                             => '',
-        'link_text'                        => '',
-        'link_hint_text'                   => '',
+        'link'                             => 'string',
+        'link_text'                        => 'string',
+        'link_hint_text'                   => 'string',
         'iTunesItem'                       => '',
-        'ad_link_type'                     => '',
         'ad_header_style'                  => '',
+        'ad_metadata'                      => 'AdMetadata[]',
+        'ad_action'                        => 'string',
+        'ad_link_type'                     => 'int',
         'dr_ad_type'                       => '',
         'android_links'                    => 'AndroidLinks[]',
-        'force_overlay'                    => '',
-        'hide_nux_text'                    => '',
-        'overlay_text'                     => '',
-        'overlay_title'                    => '',
-        'overlay_subtitle'                 => '',
+        'force_overlay'                    => 'bool',
+        'hide_nux_text'                    => 'bool',
+        'overlay_text'                     => 'string',
+        'overlay_title'                    => 'string',
+        'overlay_subtitle'                 => 'string',
         'playback_duration_secs'           => '',
         'url_expire_at_secs'               => '',
         'is_sidecar_child'                 => '',

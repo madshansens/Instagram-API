@@ -8,8 +8,8 @@ use InstagramAPI\Response;
  * DirectCreateGroupThreadResponse.
  *
  * @method mixed getCanonical()
- * @method mixed getHasNewer()
- * @method mixed getHasOlder()
+ * @method bool getHasNewer()
+ * @method bool getHasOlder()
  * @method Model\User getInviter()
  * @method mixed getIsPin()
  * @method Model\DirectThreadItem[] getItems()
@@ -48,8 +48,8 @@ use InstagramAPI\Response;
  * @method bool isViewerId()
  * @method bool is_Messages()
  * @method $this setCanonical(mixed $value)
- * @method $this setHasNewer(mixed $value)
- * @method $this setHasOlder(mixed $value)
+ * @method $this setHasNewer(bool $value)
+ * @method $this setHasOlder(bool $value)
  * @method $this setInviter(Model\User $value)
  * @method $this setIsPin(mixed $value)
  * @method $this setItems(Model\DirectThreadItem[] $value)
@@ -104,8 +104,8 @@ class DirectCreateGroupThreadResponse extends Response
         'viewer_id'        => 'string',
         'thread_title'     => '',
         'inviter'          => 'Model\User',
-        'has_older'        => '',
-        'has_newer'        => '',
+        'has_older'        => 'bool',
+        'has_newer'        => 'bool',
         'last_seen_at'     => '',
         'is_pin'           => '',
     ];

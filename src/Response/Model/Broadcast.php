@@ -10,10 +10,10 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getBroadcastMessage()
  * @method BroadcastOwner getBroadcastOwner()
  * @method mixed getBroadcastStatus()
- * @method mixed getCoverFrameUrl()
- * @method mixed getDashAbrPlaybackUrl()
+ * @method string getCoverFrameUrl()
+ * @method string getDashAbrPlaybackUrl()
  * @method mixed getDashManifest()
- * @method mixed getDashPlaybackUrl()
+ * @method string getDashPlaybackUrl()
  * @method mixed getEncodingTag()
  * @method mixed getExpireAt()
  * @method string getId()
@@ -24,7 +24,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getOrganicTrackingToken()
  * @method mixed getPublishedTime()
  * @method mixed getRankedPosition()
- * @method mixed getRtmpPlaybackUrl()
+ * @method string getRtmpPlaybackUrl()
  * @method mixed getSeenRankedPosition()
  * @method mixed getTotalUniqueViewerCount()
  * @method mixed getViewerCount()
@@ -52,10 +52,10 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setBroadcastMessage(mixed $value)
  * @method $this setBroadcastOwner(BroadcastOwner $value)
  * @method $this setBroadcastStatus(mixed $value)
- * @method $this setCoverFrameUrl(mixed $value)
- * @method $this setDashAbrPlaybackUrl(mixed $value)
+ * @method $this setCoverFrameUrl(string $value)
+ * @method $this setDashAbrPlaybackUrl(string $value)
  * @method $this setDashManifest(mixed $value)
- * @method $this setDashPlaybackUrl(mixed $value)
+ * @method $this setDashPlaybackUrl(string $value)
  * @method $this setEncodingTag(mixed $value)
  * @method $this setExpireAt(mixed $value)
  * @method $this setId(string $value)
@@ -66,7 +66,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setOrganicTrackingToken(mixed $value)
  * @method $this setPublishedTime(mixed $value)
  * @method $this setRankedPosition(mixed $value)
- * @method $this setRtmpPlaybackUrl(mixed $value)
+ * @method $this setRtmpPlaybackUrl(string $value)
  * @method $this setSeenRankedPosition(mixed $value)
  * @method $this setTotalUniqueViewerCount(mixed $value)
  * @method $this setViewerCount(mixed $value)
@@ -97,15 +97,15 @@ class Broadcast extends AutoPropertyMapper
     const JSON_PROPERTY_MAP = [
         'broadcast_owner'           => 'BroadcastOwner',
         'broadcast_status'          => '',
-        'cover_frame_url'           => '',
+        'cover_frame_url'           => 'string',
         'published_time'            => '',
         'broadcast_message'         => '',
         'muted'                     => '',
         'media_id'                  => 'string',
         'id'                        => 'string',
-        'rtmp_playback_url'         => '',
-        'dash_abr_playback_url'     => '',
-        'dash_playback_url'         => '',
+        'rtmp_playback_url'         => 'string',
+        'dash_abr_playback_url'     => 'string',
+        'dash_playback_url'         => 'string',
         'ranked_position'           => '',
         'organic_tracking_token'    => '',
         'seen_ranked_position'      => '',

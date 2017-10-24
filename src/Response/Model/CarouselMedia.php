@@ -7,32 +7,32 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * CarouselMedia.
  *
- * @method mixed getAdAction()
- * @method mixed getAdLinkType()
+ * @method string getAdAction()
+ * @method int getAdLinkType()
  * @method AdMetadata[] getAdMetadata()
  * @method AndroidLinks[] getAndroidLinks()
  * @method string getCarouselParentId()
  * @method mixed getDominantColor()
- * @method mixed getForceOverlay()
- * @method mixed getHasAudio()
+ * @method bool getForceOverlay()
+ * @method bool getHasAudio()
  * @method Headline getHeadline()
- * @method mixed getHideNuxText()
+ * @method bool getHideNuxText()
  * @method string getId()
  * @method Image_Versions2 getImageVersions2()
- * @method mixed getLink()
- * @method mixed getLinkHintText()
- * @method mixed getLinkText()
+ * @method string getLink()
+ * @method string getLinkHintText()
+ * @method string getLinkText()
  * @method int getMediaType()
- * @method mixed getOriginalHeight()
- * @method mixed getOriginalWidth()
- * @method mixed getOverlaySubtitle()
- * @method mixed getOverlayText()
- * @method mixed getOverlayTitle()
+ * @method int getOriginalHeight()
+ * @method int getOriginalWidth()
+ * @method string getOverlaySubtitle()
+ * @method string getOverlayText()
+ * @method string getOverlayTitle()
  * @method string getPk()
- * @method mixed getPreview()
+ * @method string getPreview()
  * @method Usertag getUsertags()
- * @method mixed getVideoDuration()
- * @method mixed getVideoSubtitlesUri()
+ * @method float getVideoDuration()
+ * @method string getVideoSubtitlesUri()
  * @method VideoVersions[] getVideoVersions()
  * @method bool isAdAction()
  * @method bool isAdLinkType()
@@ -61,32 +61,32 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isVideoDuration()
  * @method bool isVideoSubtitlesUri()
  * @method bool isVideoVersions()
- * @method $this setAdAction(mixed $value)
- * @method $this setAdLinkType(mixed $value)
+ * @method $this setAdAction(string $value)
+ * @method $this setAdLinkType(int $value)
  * @method $this setAdMetadata(AdMetadata[] $value)
  * @method $this setAndroidLinks(AndroidLinks[] $value)
  * @method $this setCarouselParentId(string $value)
  * @method $this setDominantColor(mixed $value)
- * @method $this setForceOverlay(mixed $value)
- * @method $this setHasAudio(mixed $value)
+ * @method $this setForceOverlay(bool $value)
+ * @method $this setHasAudio(bool $value)
  * @method $this setHeadline(Headline $value)
- * @method $this setHideNuxText(mixed $value)
+ * @method $this setHideNuxText(bool $value)
  * @method $this setId(string $value)
  * @method $this setImageVersions2(Image_Versions2 $value)
- * @method $this setLink(mixed $value)
- * @method $this setLinkHintText(mixed $value)
- * @method $this setLinkText(mixed $value)
+ * @method $this setLink(string $value)
+ * @method $this setLinkHintText(string $value)
+ * @method $this setLinkText(string $value)
  * @method $this setMediaType(int $value)
- * @method $this setOriginalHeight(mixed $value)
- * @method $this setOriginalWidth(mixed $value)
- * @method $this setOverlaySubtitle(mixed $value)
- * @method $this setOverlayText(mixed $value)
- * @method $this setOverlayTitle(mixed $value)
+ * @method $this setOriginalHeight(int $value)
+ * @method $this setOriginalWidth(int $value)
+ * @method $this setOverlaySubtitle(string $value)
+ * @method $this setOverlayText(string $value)
+ * @method $this setOverlayTitle(string $value)
  * @method $this setPk(string $value)
- * @method $this setPreview(mixed $value)
+ * @method $this setPreview(string $value)
  * @method $this setUsertags(Usertag $value)
- * @method $this setVideoDuration(mixed $value)
- * @method $this setVideoSubtitlesUri(mixed $value)
+ * @method $this setVideoDuration(float $value)
+ * @method $this setVideoSubtitlesUri(string $value)
  * @method $this setVideoVersions(VideoVersions[] $value)
  * @method $this unsetAdAction()
  * @method $this unsetAdLinkType()
@@ -127,11 +127,11 @@ class CarouselMedia extends AutoPropertyMapper
         'carousel_parent_id'  => 'string',
         'image_versions2'     => 'Image_Versions2',
         'video_versions'      => 'VideoVersions[]',
-        'has_audio'           => '',
-        'video_duration'      => '',
-        'video_subtitles_uri' => '',
-        'original_height'     => '',
-        'original_width'      => '',
+        'has_audio'           => 'bool',
+        'video_duration'      => 'float',
+        'video_subtitles_uri' => 'string',
+        'original_height'     => 'int',
+        'original_width'      => 'int',
         /*
          * A number describing what type of media this is. Should be compared
          * against the `CarouselMedia::PHOTO` and `CarouselMedia::VIDEO`
@@ -139,20 +139,20 @@ class CarouselMedia extends AutoPropertyMapper
          */
         'media_type'          => 'int',
         'usertags'            => 'Usertag',
-        'preview'             => '',
+        'preview'             => 'string',
         'headline'            => 'Headline',
-        'link'                => '',
-        'link_text'           => '',
-        'link_hint_text'      => '',
+        'link'                => 'string',
+        'link_text'           => 'string',
+        'link_hint_text'      => 'string',
         'android_links'       => 'AndroidLinks[]',
         'ad_metadata'         => 'AdMetadata[]',
-        'ad_action'           => '',
-        'ad_link_type'        => '',
-        'force_overlay'       => '',
-        'hide_nux_text'       => '',
-        'overlay_text'        => '',
-        'overlay_title'       => '',
-        'overlay_subtitle'    => '',
+        'ad_action'           => 'string',
+        'ad_link_type'        => 'int',
+        'force_overlay'       => 'bool',
+        'hide_nux_text'       => 'bool',
+        'overlay_text'        => 'string',
+        'overlay_title'       => 'string',
+        'overlay_subtitle'    => 'string',
         'dominant_color'      => '',
     ];
 }

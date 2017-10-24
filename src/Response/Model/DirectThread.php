@@ -9,8 +9,8 @@ use InstagramAPI\AutoPropertyMapper;
  *
  * @method ActionBadge getActionBadge()
  * @method mixed getCanonical()
- * @method mixed getHasNewer()
- * @method mixed getHasOlder()
+ * @method bool getHasNewer()
+ * @method bool getHasOlder()
  * @method User getInviter()
  * @method mixed getIsPin()
  * @method mixed getIsSpam()
@@ -57,8 +57,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isViewerId()
  * @method $this setActionBadge(ActionBadge $value)
  * @method $this setCanonical(mixed $value)
- * @method $this setHasNewer(mixed $value)
- * @method $this setHasOlder(mixed $value)
+ * @method $this setHasNewer(bool $value)
+ * @method $this setHasOlder(bool $value)
  * @method $this setInviter(User $value)
  * @method $this setIsPin(mixed $value)
  * @method $this setIsSpam(mixed $value)
@@ -109,13 +109,13 @@ class DirectThread extends AutoPropertyMapper
     const JSON_PROPERTY_MAP = [
         'named'                 => '',
         'users'                 => 'User[]',
-        'has_newer'             => '',
+        'has_newer'             => 'bool',
         'viewer_id'             => 'string',
         'thread_id'             => 'string',
         'last_activity_at'      => '',
         'newest_cursor'         => '',
         'is_spam'               => '',
-        'has_older'             => '',
+        'has_older'             => 'bool',
         'oldest_cursor'         => '',
         'left_users'            => 'User[]',
         'muted'                 => '',

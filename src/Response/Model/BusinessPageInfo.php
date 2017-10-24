@@ -7,19 +7,19 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * BusinessPageInfo.
  *
- * @method mixed getHasNextPage()
- * @method mixed getHasPreviousPage()
+ * @method bool getHasNextPage()
+ * @method bool getHasPreviousPage()
  * @method bool isHasNextPage()
  * @method bool isHasPreviousPage()
- * @method $this setHasNextPage(mixed $value)
- * @method $this setHasPreviousPage(mixed $value)
+ * @method $this setHasNextPage(bool $value)
+ * @method $this setHasPreviousPage(bool $value)
  * @method $this unsetHasNextPage()
  * @method $this unsetHasPreviousPage()
  */
 class BusinessPageInfo extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'has_next_page'     => '',
-        'has_previous_page' => '',
+        'has_next_page'     => 'bool',
+        'has_previous_page' => 'bool',
     ];
 }

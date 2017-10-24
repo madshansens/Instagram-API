@@ -12,7 +12,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getLock()
  * @method mixed getLogout()
  * @method mixed getNativeFlow()
- * @method mixed getUrl()
+ * @method string getUrl()
  * @method bool isApiPath()
  * @method bool isHideWebviewHeader()
  * @method bool isLock()
@@ -24,7 +24,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setLock(mixed $value)
  * @method $this setLogout(mixed $value)
  * @method $this setNativeFlow(mixed $value)
- * @method $this setUrl(mixed $value)
+ * @method $this setUrl(string $value)
  * @method $this unsetApiPath()
  * @method $this unsetHideWebviewHeader()
  * @method $this unsetLock()
@@ -35,7 +35,7 @@ use InstagramAPI\AutoPropertyMapper;
 class Challenge extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'url'                 => '',
+        'url'                 => 'string',
         'api_path'            => '',
         'hide_webview_header' => '',
         'lock'                => '',

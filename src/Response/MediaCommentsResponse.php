@@ -9,11 +9,11 @@ use InstagramAPI\Response;
  *
  * @method Model\Caption getCaption()
  * @method mixed getCaptionIsEdited()
- * @method mixed getCommentCount()
- * @method mixed getCommentLikesEnabled()
+ * @method int getCommentCount()
+ * @method bool getCommentLikesEnabled()
  * @method Model\Comment[] getComments()
- * @method mixed getHasMoreComments()
- * @method mixed getHasMoreHeadloadComments()
+ * @method bool getHasMoreComments()
+ * @method bool getHasMoreHeadloadComments()
  * @method string getMediaHeaderDisplay()
  * @method mixed getMessage()
  * @method string getNextMaxId()
@@ -39,11 +39,11 @@ use InstagramAPI\Response;
  * @method bool is_Messages()
  * @method $this setCaption(Model\Caption $value)
  * @method $this setCaptionIsEdited(mixed $value)
- * @method $this setCommentCount(mixed $value)
- * @method $this setCommentLikesEnabled(mixed $value)
+ * @method $this setCommentCount(int $value)
+ * @method $this setCommentLikesEnabled(bool $value)
  * @method $this setComments(Model\Comment[] $value)
- * @method $this setHasMoreComments(mixed $value)
- * @method $this setHasMoreHeadloadComments(mixed $value)
+ * @method $this setHasMoreComments(bool $value)
+ * @method $this setHasMoreHeadloadComments(bool $value)
  * @method $this setMediaHeaderDisplay(string $value)
  * @method $this setMessage(mixed $value)
  * @method $this setNextMaxId(string $value)
@@ -72,15 +72,15 @@ class MediaCommentsResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'comments'                   => 'Model\Comment[]',
-        'comment_count'              => '',
-        'comment_likes_enabled'      => '',
+        'comment_count'              => 'int',
+        'comment_likes_enabled'      => 'bool',
         'next_max_id'                => 'string',
         'next_min_id'                => 'string',
         'caption'                    => 'Model\Caption',
-        'has_more_comments'          => '',
+        'has_more_comments'          => 'bool',
         'caption_is_edited'          => '',
         'preview_comments'           => '',
-        'has_more_headload_comments' => '',
+        'has_more_headload_comments' => 'bool',
         'media_header_display'       => 'string',
         'threading_enabled'          => 'bool',
     ];

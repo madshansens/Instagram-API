@@ -7,15 +7,15 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * ImageCandidate.
  *
- * @method mixed getHeight()
- * @method mixed getUrl()
- * @method mixed getWidth()
+ * @method int getHeight()
+ * @method string getUrl()
+ * @method int getWidth()
  * @method bool isHeight()
  * @method bool isUrl()
  * @method bool isWidth()
- * @method $this setHeight(mixed $value)
- * @method $this setUrl(mixed $value)
- * @method $this setWidth(mixed $value)
+ * @method $this setHeight(int $value)
+ * @method $this setUrl(string $value)
+ * @method $this setWidth(int $value)
  * @method $this unsetHeight()
  * @method $this unsetUrl()
  * @method $this unsetWidth()
@@ -23,8 +23,8 @@ use InstagramAPI\AutoPropertyMapper;
 class ImageCandidate extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'url'    => '',
-        'width'  => '',
-        'height' => '',
+        'url'    => 'string',
+        'width'  => 'int',
+        'height' => 'int',
     ];
 }

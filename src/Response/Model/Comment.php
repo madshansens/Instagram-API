@@ -7,25 +7,25 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * Comment.
  *
- * @method mixed getBitFlags()
+ * @method int getBitFlags()
  * @method int getChildCommentCount()
- * @method mixed getCommentLikeCount()
- * @method mixed getContentType()
+ * @method int getCommentLikeCount()
+ * @method string getContentType()
  * @method string getCreatedAt()
  * @method string getCreatedAtUtc()
- * @method mixed getDidReportAsSpam()
- * @method mixed getHasLikedComment()
+ * @method bool getDidReportAsSpam()
+ * @method bool getHasLikedComment()
  * @method bool getHasMoreHeadChildComments()
  * @method bool getHasMoreTailChildComments()
- * @method mixed getHasTranslation()
+ * @method bool getHasTranslation()
  * @method string getMediaId()
  * @method string getNextMaxChildCursor()
  * @method User[] getOtherPreviewUsers()
  * @method string getParentCommentId()
  * @method string getPk()
  * @method Comment[] getPreviewChildComments()
- * @method mixed getStatus()
- * @method mixed getText()
+ * @method string getStatus()
+ * @method string getText()
  * @method int getType()
  * @method User getUser()
  * @method string getUserId()
@@ -51,25 +51,25 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isType()
  * @method bool isUser()
  * @method bool isUserId()
- * @method $this setBitFlags(mixed $value)
+ * @method $this setBitFlags(int $value)
  * @method $this setChildCommentCount(int $value)
- * @method $this setCommentLikeCount(mixed $value)
- * @method $this setContentType(mixed $value)
+ * @method $this setCommentLikeCount(int $value)
+ * @method $this setContentType(string $value)
  * @method $this setCreatedAt(string $value)
  * @method $this setCreatedAtUtc(string $value)
- * @method $this setDidReportAsSpam(mixed $value)
- * @method $this setHasLikedComment(mixed $value)
+ * @method $this setDidReportAsSpam(bool $value)
+ * @method $this setHasLikedComment(bool $value)
  * @method $this setHasMoreHeadChildComments(bool $value)
  * @method $this setHasMoreTailChildComments(bool $value)
- * @method $this setHasTranslation(mixed $value)
+ * @method $this setHasTranslation(bool $value)
  * @method $this setMediaId(string $value)
  * @method $this setNextMaxChildCursor(string $value)
  * @method $this setOtherPreviewUsers(User[] $value)
  * @method $this setParentCommentId(string $value)
  * @method $this setPk(string $value)
  * @method $this setPreviewChildComments(Comment[] $value)
- * @method $this setStatus(mixed $value)
- * @method $this setText(mixed $value)
+ * @method $this setStatus(string $value)
+ * @method $this setText(string $value)
  * @method $this setType(int $value)
  * @method $this setUser(User $value)
  * @method $this setUserId(string $value)
@@ -104,29 +104,29 @@ class Comment extends AutoPropertyMapper
     const CHILD = 2;
 
     const JSON_PROPERTY_MAP = [
-        'status'                       => '',
+        'status'                       => 'string',
         'user_id'                      => 'string',
         /*
          * Unix timestamp (UTC) of when the comment was posted.
          */
         'created_at_utc'               => 'string',
         'created_at'                   => 'string',
-        'bit_flags'                    => '',
+        'bit_flags'                    => 'int',
         'user'                         => 'User',
         'pk'                           => 'string',
         'media_id'                     => 'string',
-        'text'                         => '',
-        'content_type'                 => '',
+        'text'                         => 'string',
+        'content_type'                 => 'string',
         /*
          * A number describing what type of comment this is. Should be compared
          * against the `Comment::PARENT` and `Comment::CHILD` constants. All
          * replies are of type `CHILD`, and all parents are of type `PARENT`.
          */
         'type'                         => 'int',
-        'comment_like_count'           => '',
-        'has_liked_comment'            => '',
-        'has_translation'              => '',
-        'did_report_as_spam'           => '',
+        'comment_like_count'           => 'int',
+        'has_liked_comment'            => 'bool',
+        'has_translation'              => 'bool',
+        'did_report_as_spam'           => 'bool',
         /*
          * If this is a child in a thread, this is the ID of its parent thread.
          */

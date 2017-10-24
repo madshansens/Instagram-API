@@ -7,7 +7,7 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * DirectInbox.
  *
- * @method mixed getHasOlder()
+ * @method bool getHasOlder()
  * @method mixed getOldestCursor()
  * @method DirectThread[] getThreads()
  * @method mixed getUnseenCount()
@@ -17,7 +17,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isThreads()
  * @method bool isUnseenCount()
  * @method bool isUnseenCountTs()
- * @method $this setHasOlder(mixed $value)
+ * @method $this setHasOlder(bool $value)
  * @method $this setOldestCursor(mixed $value)
  * @method $this setThreads(DirectThread[] $value)
  * @method $this setUnseenCount(mixed $value)
@@ -32,7 +32,7 @@ class DirectInbox extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
         'unseen_count'    => '',
-        'has_older'       => '',
+        'has_older'       => 'bool',
         'oldest_cursor'   => '',
         'unseen_count_ts' => '', // Is a timestamp.
         'threads'         => 'DirectThread[]',

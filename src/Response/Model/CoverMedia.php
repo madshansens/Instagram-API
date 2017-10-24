@@ -10,8 +10,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getId()
  * @method Image_Versions2 getImageVersions2()
  * @method int getMediaType()
- * @method mixed getOriginalHeight()
- * @method mixed getOriginalWidth()
+ * @method int getOriginalHeight()
+ * @method int getOriginalWidth()
  * @method bool isId()
  * @method bool isImageVersions2()
  * @method bool isMediaType()
@@ -20,8 +20,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setId(string $value)
  * @method $this setImageVersions2(Image_Versions2 $value)
  * @method $this setMediaType(int $value)
- * @method $this setOriginalHeight(mixed $value)
- * @method $this setOriginalWidth(mixed $value)
+ * @method $this setOriginalHeight(int $value)
+ * @method $this setOriginalWidth(int $value)
  * @method $this unsetId()
  * @method $this unsetImageVersions2()
  * @method $this unsetMediaType()
@@ -37,7 +37,7 @@ class CoverMedia extends AutoPropertyMapper
          */
         'media_type'      => 'int',
         'image_versions2' => 'Image_Versions2',
-        'original_width'  => '',
-        'original_height' => '',
+        'original_width'  => 'int',
+        'original_height' => 'int',
     ];
 }

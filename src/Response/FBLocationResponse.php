@@ -7,7 +7,7 @@ use InstagramAPI\Response;
 /**
  * FBLocationResponse.
  *
- * @method mixed getHasMore()
+ * @method bool getHasMore()
  * @method Model\LocationItem[] getItems()
  * @method mixed getMessage()
  * @method mixed getRankToken()
@@ -19,7 +19,7 @@ use InstagramAPI\Response;
  * @method bool isRankToken()
  * @method bool isStatus()
  * @method bool is_Messages()
- * @method $this setHasMore(mixed $value)
+ * @method $this setHasMore(bool $value)
  * @method $this setItems(Model\LocationItem[] $value)
  * @method $this setMessage(mixed $value)
  * @method $this setRankToken(mixed $value)
@@ -35,7 +35,7 @@ use InstagramAPI\Response;
 class FBLocationResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
-        'has_more'   => '',
+        'has_more'   => 'bool',
         'items'      => 'Model\LocationItem[]',
         'rank_token' => '',
     ];

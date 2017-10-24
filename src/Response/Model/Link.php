@@ -11,7 +11,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getId()
  * @method LinkContext getLinkContext()
  * @method mixed getStart()
- * @method mixed getText()
+ * @method string getText()
  * @method mixed getType()
  * @method bool isEnd()
  * @method bool isId()
@@ -23,7 +23,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setId(string $value)
  * @method $this setLinkContext(LinkContext $value)
  * @method $this setStart(mixed $value)
- * @method $this setText(mixed $value)
+ * @method $this setText(string $value)
  * @method $this setType(mixed $value)
  * @method $this unsetEnd()
  * @method $this unsetId()
@@ -39,7 +39,7 @@ class Link extends AutoPropertyMapper
         'end'          => '',
         'id'           => 'string',
         'type'         => '',
-        'text'         => '',
+        'text'         => 'string',
         'link_context' => 'LinkContext',
     ];
 }

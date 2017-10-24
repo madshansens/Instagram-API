@@ -10,7 +10,7 @@ use InstagramAPI\Response;
  * @method mixed getAutoLoadMoreEnabled()
  * @method Model\Item[] getItems()
  * @method Model\Location getLocation()
- * @method mixed getMediaCount()
+ * @method int getMediaCount()
  * @method mixed getMessage()
  * @method mixed getMoreAvailable()
  * @method string getNextMaxId()
@@ -34,7 +34,7 @@ use InstagramAPI\Response;
  * @method $this setAutoLoadMoreEnabled(mixed $value)
  * @method $this setItems(Model\Item[] $value)
  * @method $this setLocation(Model\Location $value)
- * @method $this setMediaCount(mixed $value)
+ * @method $this setMediaCount(int $value)
  * @method $this setMessage(mixed $value)
  * @method $this setMoreAvailable(mixed $value)
  * @method $this setNextMaxId(string $value)
@@ -59,7 +59,7 @@ use InstagramAPI\Response;
 class LocationFeedResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
-        'media_count'            => '',
+        'media_count'            => 'int',
         'num_results'            => '',
         'auto_load_more_enabled' => '',
         'items'                  => 'Model\Item[]',

@@ -9,7 +9,7 @@ use InstagramAPI\AutoPropertyMapper;
  *
  * @method string getId()
  * @method mixed getImageHeight()
- * @method mixed getImageUrl()
+ * @method string getImageUrl()
  * @method mixed getImageWidth()
  * @method mixed getImageWidthRatio()
  * @method mixed getName()
@@ -25,7 +25,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isType()
  * @method $this setId(string $value)
  * @method $this setImageHeight(mixed $value)
- * @method $this setImageUrl(mixed $value)
+ * @method $this setImageUrl(string $value)
  * @method $this setImageWidth(mixed $value)
  * @method $this setImageWidthRatio(mixed $value)
  * @method $this setName(mixed $value)
@@ -50,6 +50,6 @@ class Stickers extends AutoPropertyMapper
         'type'                   => '',
         'image_width'            => '',
         'name'                   => '',
-        'image_url'              => '',
+        'image_url'              => 'string',
     ];
 }

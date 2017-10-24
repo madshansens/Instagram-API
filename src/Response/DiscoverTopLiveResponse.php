@@ -8,7 +8,7 @@ use InstagramAPI\Response;
  * DiscoverTopLiveResponse.
  *
  * @method mixed getAutoLoadMoreEnabled()
- * @method Model\BroadcastItem[] getBroadcasts()
+ * @method Model\Broadcast[] getBroadcasts()
  * @method mixed getMessage()
  * @method mixed getMoreAvailable()
  * @method string getNextMaxId()
@@ -22,7 +22,7 @@ use InstagramAPI\Response;
  * @method bool isStatus()
  * @method bool is_Messages()
  * @method $this setAutoLoadMoreEnabled(mixed $value)
- * @method $this setBroadcasts(Model\BroadcastItem[] $value)
+ * @method $this setBroadcasts(Model\Broadcast[] $value)
  * @method $this setMessage(mixed $value)
  * @method $this setMoreAvailable(mixed $value)
  * @method $this setNextMaxId(string $value)
@@ -40,7 +40,7 @@ class DiscoverTopLiveResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'auto_load_more_enabled' => '',
-        'broadcasts'             => 'Model\BroadcastItem[]',
+        'broadcasts'             => 'Model\Broadcast[]',
         'more_available'         => '',
         'next_max_id'            => 'string',
     ];

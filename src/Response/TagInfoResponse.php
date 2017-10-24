@@ -7,7 +7,7 @@ use InstagramAPI\Response;
 /**
  * TagInfoResponse.
  *
- * @method mixed getMediaCount()
+ * @method int getMediaCount()
  * @method mixed getMessage()
  * @method mixed getProfile()
  * @method string getStatus()
@@ -17,7 +17,7 @@ use InstagramAPI\Response;
  * @method bool isProfile()
  * @method bool isStatus()
  * @method bool is_Messages()
- * @method $this setMediaCount(mixed $value)
+ * @method $this setMediaCount(int $value)
  * @method $this setMessage(mixed $value)
  * @method $this setProfile(mixed $value)
  * @method $this setStatus(string $value)
@@ -32,6 +32,6 @@ class TagInfoResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'profile'     => '',
-        'media_count' => '',
+        'media_count' => 'int',
     ];
 }

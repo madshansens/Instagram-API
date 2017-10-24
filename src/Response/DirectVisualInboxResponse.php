@@ -7,8 +7,8 @@ use InstagramAPI\Response;
 /**
  * DirectVisualInboxResponse.
  *
- * @method mixed getHasMoreRead()
- * @method mixed getHasMoreUnread()
+ * @method bool getHasMoreRead()
+ * @method bool getHasMoreUnread()
  * @method mixed getMessage()
  * @method mixed getReadCursor()
  * @method string getStatus()
@@ -25,8 +25,8 @@ use InstagramAPI\Response;
  * @method bool isUnreadCursor()
  * @method bool isUnseenCount()
  * @method bool is_Messages()
- * @method $this setHasMoreRead(mixed $value)
- * @method $this setHasMoreUnread(mixed $value)
+ * @method $this setHasMoreRead(bool $value)
+ * @method $this setHasMoreUnread(bool $value)
  * @method $this setMessage(mixed $value)
  * @method $this setReadCursor(mixed $value)
  * @method $this setStatus(string $value)
@@ -48,9 +48,9 @@ class DirectVisualInboxResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'unseen_count'    => '',
-        'has_more_unread' => '',
+        'has_more_unread' => 'bool',
         'read_cursor'     => '',
-        'has_more_read'   => '',
+        'has_more_read'   => 'bool',
         'unread_cursor'   => '',
         'threads'         => 'Model\DirectThread[]',
     ];

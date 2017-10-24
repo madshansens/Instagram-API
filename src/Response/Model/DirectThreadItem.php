@@ -8,7 +8,7 @@ use InstagramAPI\AutoPropertyMapper;
  * DirectThreadItem.
  *
  * @method ActionLog getActionLog()
- * @method mixed getClientContext()
+ * @method string getClientContext()
  * @method DirectExpiringSummary getExpiringMediaActionSummary()
  * @method mixed getHideInThread()
  * @method string getItemId()
@@ -25,7 +25,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method DirectReactions getReactions()
  * @method ReelShare getReelShare()
  * @method string[] getSeenUserIds()
- * @method mixed getText()
+ * @method string getText()
  * @method mixed getTimestamp()
  * @method string getUserId()
  * @method bool isActionLog()
@@ -50,7 +50,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isTimestamp()
  * @method bool isUserId()
  * @method $this setActionLog(ActionLog $value)
- * @method $this setClientContext(mixed $value)
+ * @method $this setClientContext(string $value)
  * @method $this setExpiringMediaActionSummary(DirectExpiringSummary $value)
  * @method $this setHideInThread(mixed $value)
  * @method $this setItemId(string $value)
@@ -67,7 +67,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setReactions(DirectReactions $value)
  * @method $this setReelShare(ReelShare $value)
  * @method $this setSeenUserIds(string[] $value)
- * @method $this setText(mixed $value)
+ * @method $this setText(string $value)
  * @method $this setTimestamp(mixed $value)
  * @method $this setUserId(string $value)
  * @method $this unsetActionLog()
@@ -111,13 +111,13 @@ class DirectThreadItem extends AutoPropertyMapper
     const JSON_PROPERTY_MAP = [
         'item_id'                       => 'string',
         'item_type'                     => '',
-        'text'                          => '',
+        'text'                          => 'string',
         'media_share'                   => 'Item',
         'preview_medias'                => 'Item[]',
         'media'                         => 'DirectThreadItemMedia',
         'user_id'                       => 'string',
         'timestamp'                     => '',
-        'client_context'                => '',
+        'client_context'                => 'string',
         'hide_in_thread'                => '',
         'action_log'                    => 'ActionLog',
         'link'                          => 'DirectLink',

@@ -10,7 +10,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getButtonText()
  * @method mixed getCameraTarget()
  * @method mixed getCardId()
- * @method mixed getImageUrl()
+ * @method string getImageUrl()
  * @method mixed getMessage()
  * @method mixed getTitle()
  * @method bool isButtonText()
@@ -22,7 +22,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setButtonText(mixed $value)
  * @method $this setCameraTarget(mixed $value)
  * @method $this setCardId(mixed $value)
- * @method $this setImageUrl(mixed $value)
+ * @method $this setImageUrl(string $value)
  * @method $this setMessage(mixed $value)
  * @method $this setTitle(mixed $value)
  * @method $this unsetButtonText()
@@ -36,7 +36,7 @@ class DismissCard extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
         'card_id'       => '',
-        'image_url'     => '',
+        'image_url'     => 'string',
         'title'         => '',
         'message'       => '',
         'button_text'   => '',

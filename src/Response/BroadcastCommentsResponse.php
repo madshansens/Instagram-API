@@ -9,12 +9,12 @@ use InstagramAPI\Response;
  *
  * @method mixed getCaption()
  * @method mixed getCaptionIsEdited()
- * @method mixed getCommentCount()
- * @method mixed getCommentLikesEnabled()
+ * @method int getCommentCount()
+ * @method bool getCommentLikesEnabled()
  * @method mixed getCommentMuted()
  * @method Model\Comment[] getComments()
- * @method mixed getHasMoreComments()
- * @method mixed getHasMoreHeadloadComments()
+ * @method bool getHasMoreComments()
+ * @method bool getHasMoreHeadloadComments()
  * @method mixed getIsFirstFetch()
  * @method mixed getLiveSecondsPerComment()
  * @method mixed getMessage()
@@ -39,12 +39,12 @@ use InstagramAPI\Response;
  * @method bool is_Messages()
  * @method $this setCaption(mixed $value)
  * @method $this setCaptionIsEdited(mixed $value)
- * @method $this setCommentCount(mixed $value)
- * @method $this setCommentLikesEnabled(mixed $value)
+ * @method $this setCommentCount(int $value)
+ * @method $this setCommentLikesEnabled(bool $value)
  * @method $this setCommentMuted(mixed $value)
  * @method $this setComments(Model\Comment[] $value)
- * @method $this setHasMoreComments(mixed $value)
- * @method $this setHasMoreHeadloadComments(mixed $value)
+ * @method $this setHasMoreComments(bool $value)
+ * @method $this setHasMoreHeadloadComments(bool $value)
  * @method $this setIsFirstFetch(mixed $value)
  * @method $this setLiveSecondsPerComment(mixed $value)
  * @method $this setMessage(mixed $value)
@@ -72,14 +72,14 @@ class BroadcastCommentsResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'comments'                   => 'Model\Comment[]',
-        'comment_count'              => '',
+        'comment_count'              => 'int',
         'live_seconds_per_comment'   => '',
-        'has_more_headload_comments' => '',
+        'has_more_headload_comments' => 'bool',
         'is_first_fetch'             => '',
-        'comment_likes_enabled'      => '',
+        'comment_likes_enabled'      => 'bool',
         'pinned_comment'             => 'Model\Comment',
         'system_comments'            => '',
-        'has_more_comments'          => '',
+        'has_more_comments'          => 'bool',
         'caption_is_edited'          => '',
         'caption'                    => '',
         'comment_muted'              => '',

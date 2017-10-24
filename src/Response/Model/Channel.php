@@ -12,7 +12,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getContext()
  * @method mixed getHeader()
  * @method Item getMedia()
- * @method mixed getMediaCount()
+ * @method int getMediaCount()
  * @method mixed getTitle()
  * @method bool isChannelId()
  * @method bool isChannelType()
@@ -26,7 +26,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setContext(mixed $value)
  * @method $this setHeader(mixed $value)
  * @method $this setMedia(Item $value)
- * @method $this setMediaCount(mixed $value)
+ * @method $this setMediaCount(int $value)
  * @method $this setTitle(mixed $value)
  * @method $this unsetChannelId()
  * @method $this unsetChannelType()
@@ -43,7 +43,7 @@ class Channel extends AutoPropertyMapper
         'channel_type' => '',
         'title'        => '',
         'header'       => '',
-        'media_count'  => '',
+        'media_count'  => 'int',
         'media'        => 'Item',
         'context'      => '',
     ];

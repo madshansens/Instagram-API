@@ -7,12 +7,12 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * Effect.
  *
- * @method mixed getAssetUrl()
+ * @method string getAssetUrl()
  * @method string getEffectFileId()
  * @method string getEffectId()
  * @method string getId()
  * @method mixed getInstructions()
- * @method mixed getThumbnailUrl()
+ * @method string getThumbnailUrl()
  * @method mixed getTitle()
  * @method bool isAssetUrl()
  * @method bool isEffectFileId()
@@ -21,12 +21,12 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isInstructions()
  * @method bool isThumbnailUrl()
  * @method bool isTitle()
- * @method $this setAssetUrl(mixed $value)
+ * @method $this setAssetUrl(string $value)
  * @method $this setEffectFileId(string $value)
  * @method $this setEffectId(string $value)
  * @method $this setId(string $value)
  * @method $this setInstructions(mixed $value)
- * @method $this setThumbnailUrl(mixed $value)
+ * @method $this setThumbnailUrl(string $value)
  * @method $this setTitle(mixed $value)
  * @method $this unsetAssetUrl()
  * @method $this unsetEffectFileId()
@@ -43,8 +43,8 @@ class Effect extends AutoPropertyMapper
         'id'             => 'string',
         'effect_id'      => 'string',
         'effect_file_id' => 'string',
-        'asset_url'      => '',
-        'thumbnail_url'  => '',
+        'asset_url'      => 'string',
+        'thumbnail_url'  => 'string',
         'instructions'   => '',
     ];
 }

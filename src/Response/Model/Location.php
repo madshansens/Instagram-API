@@ -7,27 +7,27 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * Location.
  *
- * @method mixed getAddress()
- * @method mixed getCity()
+ * @method string getAddress()
+ * @method string getCity()
  * @method int getCountry()
  * @method string getCreatedAt()
  * @method mixed getEndTime()
  * @method int getEventCategory()
  * @method string getExternalId()
  * @method string getExternalIdSource()
- * @method mixed getExternalSource()
+ * @method string getExternalSource()
  * @method string getFacebookEventsId()
  * @method string getFacebookPlacesId()
  * @method float getLat()
  * @method float getLng()
  * @method Location getLocationDict()
- * @method mixed getName()
+ * @method string getName()
  * @method string getPk()
  * @method string getPlaceFbid()
  * @method string getPlaceName()
- * @method mixed getProfilePicUrl()
- * @method mixed getProfilePicUsername()
- * @method mixed getShortName()
+ * @method string getProfilePicUrl()
+ * @method string getProfilePicUsername()
+ * @method string getShortName()
  * @method mixed getStartTime()
  * @method mixed getTimeGranularity()
  * @method mixed getTimezone()
@@ -57,27 +57,27 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isTimeGranularity()
  * @method bool isTimezone()
  * @method bool isType()
- * @method $this setAddress(mixed $value)
- * @method $this setCity(mixed $value)
+ * @method $this setAddress(string $value)
+ * @method $this setCity(string $value)
  * @method $this setCountry(int $value)
  * @method $this setCreatedAt(string $value)
  * @method $this setEndTime(mixed $value)
  * @method $this setEventCategory(int $value)
  * @method $this setExternalId(string $value)
  * @method $this setExternalIdSource(string $value)
- * @method $this setExternalSource(mixed $value)
+ * @method $this setExternalSource(string $value)
  * @method $this setFacebookEventsId(string $value)
  * @method $this setFacebookPlacesId(string $value)
  * @method $this setLat(float $value)
  * @method $this setLng(float $value)
  * @method $this setLocationDict(Location $value)
- * @method $this setName(mixed $value)
+ * @method $this setName(string $value)
  * @method $this setPk(string $value)
  * @method $this setPlaceFbid(string $value)
  * @method $this setPlaceName(string $value)
- * @method $this setProfilePicUrl(mixed $value)
- * @method $this setProfilePicUsername(mixed $value)
- * @method $this setShortName(mixed $value)
+ * @method $this setProfilePicUrl(string $value)
+ * @method $this setProfilePicUsername(string $value)
+ * @method $this setShortName(string $value)
  * @method $this setStartTime(mixed $value)
  * @method $this setTimeGranularity(mixed $value)
  * @method $this setTimezone(mixed $value)
@@ -111,24 +111,24 @@ use InstagramAPI\AutoPropertyMapper;
 class Location extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'name'                 => '',
+        'name'                 => 'string',
         'external_id_source'   => 'string',
-        'external_source'      => '',
-        'address'              => '',
+        'external_source'      => 'string',
+        'address'              => 'string',
         'lat'                  => 'float',
         'lng'                  => 'float',
         'external_id'          => 'string',
         'facebook_places_id'   => 'string',
-        'city'                 => '',
+        'city'                 => 'string',
         'pk'                   => 'string',
-        'short_name'           => '',
+        'short_name'           => 'string',
         'facebook_events_id'   => 'string',
         'start_time'           => '',
         'end_time'             => '',
         'location_dict'        => 'Location',
         'type'                 => '',
-        'profile_pic_url'      => '',
-        'profile_pic_username' => '',
+        'profile_pic_url'      => 'string',
+        'profile_pic_username' => 'string',
         'time_granularity'     => '',
         'timezone'             => '',
         /*

@@ -12,7 +12,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getMentionedUserId()
  * @method mixed getStickerVersion()
  * @method mixed getStoryRankingToken()
- * @method mixed getText()
+ * @method string getText()
  * @method Item[] getTray()
  * @method mixed getType()
  * @method bool isBroadcasts()
@@ -28,7 +28,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setMentionedUserId(string $value)
  * @method $this setStickerVersion(mixed $value)
  * @method $this setStoryRankingToken(mixed $value)
- * @method $this setText(mixed $value)
+ * @method $this setText(string $value)
  * @method $this setTray(Item[] $value)
  * @method $this setType(mixed $value)
  * @method $this unsetBroadcasts()
@@ -47,7 +47,7 @@ class ReelShare extends AutoPropertyMapper
         'story_ranking_token' => '',
         'broadcasts'          => '',
         'sticker_version'     => '',
-        'text'                => '',
+        'text'                => 'string',
         'type'                => '',
         'media'               => 'Item',
         'mentioned_user_id'   => 'string',

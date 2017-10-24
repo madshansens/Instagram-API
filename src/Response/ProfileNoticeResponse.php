@@ -7,7 +7,7 @@ use InstagramAPI\Response;
 /**
  * ProfileNoticeResponse.
  *
- * @method mixed getHasChangePasswordMegaphone()
+ * @method bool getHasChangePasswordMegaphone()
  * @method mixed getMessage()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
@@ -15,7 +15,7 @@ use InstagramAPI\Response;
  * @method bool isMessage()
  * @method bool isStatus()
  * @method bool is_Messages()
- * @method $this setHasChangePasswordMegaphone(mixed $value)
+ * @method $this setHasChangePasswordMegaphone(bool $value)
  * @method $this setMessage(mixed $value)
  * @method $this setStatus(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
@@ -27,6 +27,6 @@ use InstagramAPI\Response;
 class ProfileNoticeResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
-        'has_change_password_megaphone' => '',
+        'has_change_password_megaphone' => 'bool',
     ];
 }

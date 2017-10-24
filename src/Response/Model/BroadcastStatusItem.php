@@ -8,8 +8,8 @@ use InstagramAPI\AutoPropertyMapper;
  * BroadcastStatusItem.
  *
  * @method mixed getBroadcastStatus()
- * @method mixed getCoverFrameUrl()
- * @method mixed getHasReducedVisibility()
+ * @method string getCoverFrameUrl()
+ * @method bool getHasReducedVisibility()
  * @method string getId()
  * @method mixed getViewerCount()
  * @method bool isBroadcastStatus()
@@ -18,8 +18,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isId()
  * @method bool isViewerCount()
  * @method $this setBroadcastStatus(mixed $value)
- * @method $this setCoverFrameUrl(mixed $value)
- * @method $this setHasReducedVisibility(mixed $value)
+ * @method $this setCoverFrameUrl(string $value)
+ * @method $this setHasReducedVisibility(bool $value)
  * @method $this setId(string $value)
  * @method $this setViewerCount(mixed $value)
  * @method $this unsetBroadcastStatus()
@@ -32,8 +32,8 @@ class BroadcastStatusItem extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
         'broadcast_status'       => '',
-        'has_reduced_visibility' => '',
-        'cover_frame_url'        => '',
+        'has_reduced_visibility' => 'bool',
+        'cover_frame_url'        => 'string',
         'viewer_count'           => '',
         'id'                     => 'string',
     ];

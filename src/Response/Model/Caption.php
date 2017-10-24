@@ -7,16 +7,16 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * Caption.
  *
- * @method mixed getBitFlags()
+ * @method int getBitFlags()
  * @method mixed getContentType()
  * @method string getCreatedAt()
  * @method string getCreatedAtUtc()
- * @method mixed getDidReportAsSpam()
- * @method mixed getHasTranslation()
+ * @method bool getDidReportAsSpam()
+ * @method bool getHasTranslation()
  * @method string getMediaId()
  * @method string getPk()
  * @method mixed getStatus()
- * @method mixed getText()
+ * @method string getText()
  * @method mixed getType()
  * @method User getUser()
  * @method string getUserId()
@@ -33,16 +33,16 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isType()
  * @method bool isUser()
  * @method bool isUserId()
- * @method $this setBitFlags(mixed $value)
+ * @method $this setBitFlags(int $value)
  * @method $this setContentType(mixed $value)
  * @method $this setCreatedAt(string $value)
  * @method $this setCreatedAtUtc(string $value)
- * @method $this setDidReportAsSpam(mixed $value)
- * @method $this setHasTranslation(mixed $value)
+ * @method $this setDidReportAsSpam(bool $value)
+ * @method $this setHasTranslation(bool $value)
  * @method $this setMediaId(string $value)
  * @method $this setPk(string $value)
  * @method $this setStatus(mixed $value)
- * @method $this setText(mixed $value)
+ * @method $this setText(string $value)
  * @method $this setType(mixed $value)
  * @method $this setUser(User $value)
  * @method $this setUserId(string $value)
@@ -67,14 +67,14 @@ class Caption extends AutoPropertyMapper
         'user_id'            => 'string',
         'created_at_utc'     => 'string',
         'created_at'         => 'string',
-        'bit_flags'          => '',
+        'bit_flags'          => 'int',
         'user'               => 'User',
         'content_type'       => '',
-        'text'               => '',
+        'text'               => 'string',
         'media_id'           => 'string',
         'pk'                 => 'string',
         'type'               => '',
-        'has_translation'    => '',
-        'did_report_as_spam' => '',
+        'has_translation'    => 'bool',
+        'did_report_as_spam' => 'bool',
     ];
 }
