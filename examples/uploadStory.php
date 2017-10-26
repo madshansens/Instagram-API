@@ -36,6 +36,9 @@ try {
 // "location_sticker" WILL ONLY work if you also add the "location" as shown
 // below.
 
+// NOTE: And "caption" will NOT be visible either! Like all the other story
+// metadata described above, YOU must manually draw the caption on your image.
+
 // If we want to attach a location, we must find a valid Location object first:
 try {
     $location = $ig->location->search('40.7439862', '-73.998511')->getVenues()[0];
