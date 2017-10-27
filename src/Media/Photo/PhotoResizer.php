@@ -66,15 +66,7 @@ class PhotoResizer implements ResizerInterface
     /** @var array Background color [R, G, B] for the final image. */
     protected $_bgColor;
 
-    /**
-     * Constructor.
-     *
-     * @param string $inputFile
-     * @param string $outputDir
-     * @param array  $bgColor
-     *
-     * @throws \InvalidArgumentException
-     */
+    /** {@inheritdoc} */
     public function __construct(
         $inputFile,
         $outputDir,
@@ -85,12 +77,6 @@ class PhotoResizer implements ResizerInterface
         $this->_bgColor = $bgColor;
 
         $this->_loadImageDetails();
-    }
-
-    /** {@inheritdoc} */
-    public function getMediaDetails()
-    {
-        return $this->_details;
     }
 
     /** {@inheritdoc} */

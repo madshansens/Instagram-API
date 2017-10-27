@@ -5,11 +5,16 @@ namespace InstagramAPI\Media;
 interface ResizerInterface
 {
     /**
-     * Get the media details.
+     * Constructor.
      *
-     * @return MediaDetails
+     * @param string $inputFile Path to the input file.
+     * @param string $outputDir Path to the output directory.
+     * @param array  $bgColor   Array with 3 color components [R, G, B] (0-255/0x00-0xFF) for the background.
      */
-    public function getMediaDetails();
+    public function __construct(
+        $inputFile,
+        $outputDir,
+        array $bgColor);
 
     /**
      * Check if media requires processing.
@@ -53,7 +58,7 @@ interface ResizerInterface
     public function isVerFlipped();
 
     /**
-     * Resizes the media.
+     * Resize the media.
      *
      * @param Rectangle  $srcRect Rectangle to copy from the input.
      * @param Rectangle  $dstRect Destination place and scale of copied pixels.

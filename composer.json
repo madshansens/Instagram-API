@@ -57,13 +57,17 @@
     "require-dev": {
         "react/http": "^0.7.2",
         "friendsofphp/php-cs-fixer": "^2.7.1",
-        "monolog/monolog": "^1.23"
+        "monolog/monolog": "^1.23",
+        "phpunit/phpunit": "^5.7 || ^6.2"
     },
     "scripts": {
         "codestyle": [
             "lazydoctor -c composer.json -pfo >/dev/null",
             "php-cs-fixer fix --config=.php_cs.dist --allow-risky yes",
             "php devtools/checkStyle.php x"
+        ],
+        "test": [
+            "phpunit tests"
         ]
     }
 }

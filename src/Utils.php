@@ -7,6 +7,7 @@ use Clue\React\Socks\Client as SocksProxy;
 use InstagramAPI\Media\MediaDetails;
 use InstagramAPI\Media\Photo\PhotoDetails;
 use InstagramAPI\Media\Photo\PhotoResizer;
+use InstagramAPI\Media\Video\FFmpegWrapper;
 use InstagramAPI\Media\Video\VideoDetails;
 use InstagramAPI\Media\Video\VideoResizer;
 use InstagramAPI\Response\Model\Item;
@@ -51,6 +52,13 @@ class Utils
      * @var string|bool|null
      */
     public static $ffmpegBin = null;
+
+    /**
+     * Wrapper for a ffmpeg binary.
+     *
+     * @var FFmpegWrapper
+     */
+    protected static $_ffmpegWrapper;
 
     /**
      * Name of the detected ffprobe executable, or FALSE if none found.
@@ -251,7 +259,7 @@ class Utils
     }
 
     /**
-     * Check for ffmpeg/avconv dependencies.
+     * Get a wrapper for ffmpeg/avconv binaries.
      *
      * TIP: If your binary isn't findable via the PATH environment locations,
      * you can manually set the correct path to it. Before calling any functions
@@ -260,9 +268,11 @@ class Utils
      *
      * \InstagramAPI\Utils::$ffmpegBin = '/home/exampleuser/ffmpeg/bin/ffmpeg';
      *
-     * @return string|bool Name of the library if present, otherwise FALSE.
+     * @throws \RuntimeException
+     *
+     * @return FFmpegWrapper
      */
-    public static function checkFFMPEG()
+    public static function getFFmpegWrapper()
     {
         // We only resolve this once per session and then cache the result.
         if (self::$ffmpegBin === null) {
@@ -279,7 +289,15 @@ class Utils
             }
         }
 
-        return self::$ffmpegBin;
+        if (self::$ffmpegBin === false) {
+            throw new \RuntimeException('You must have FFmpeg to process videos.');
+        }
+
+        if (self::$_ffmpegWrapper === null || self::$_ffmpegWrapper->getFFmpegBinary() !== self::$ffmpegBin) {
+            self::$_ffmpegWrapper = new FFmpegWrapper(self::$ffmpegBin);
+        }
+
+        return self::$_ffmpegWrapper;
     }
 
     /**
@@ -360,7 +378,7 @@ class Utils
      * @throws \InvalidArgumentException If the video file is missing.
      * @throws \RuntimeException         If FFmpeg isn't working properly.
      *
-     * @return array Video codec name, float duration, int width, height and filesize.
+     * @return array Video codec name, float duration, int width, height, rotation angle and filesize.
      */
     public static function getVideoFileDetails(
         $videoFilename)
@@ -412,6 +430,17 @@ class Utils
                 if (isset($videoDetails['duration'])) {
                     // NOTE: Duration is a float such as "230.138000".
                     $videoDetails['duration'] = (float) $streamInfo['duration'];
+                }
+
+                // Read rotation angle from tags.
+                if (isset($streamInfo['tags']) && is_array($streamInfo['tags'])) {
+                    $tags = array_change_key_case($streamInfo['tags'], CASE_LOWER);
+                    if (isset($tags['rotate'])) {
+                        $videoDetails['rotation'] = (int) $tags['rotate'];
+                    }
+                }
+                if (!isset($videoDetails['rotation'])) {
+                    $videoDetails['rotation'] = 0;
                 }
 
                 break; // Stop checking streams.
@@ -584,67 +613,6 @@ class Utils
 
         // Validate photo resolution and aspect ratio.
         self::throwIfIllegalMediaResolution($targetFeed, $photoDetails);
-    }
-
-    /**
-     * Generate a video icon/thumbnail from a video file.
-     *
-     * Automatically guarantees that the generated image follows Instagram's
-     * allowed image specifications, so that there won't be any upload issues.
-     *
-     * @param int    $targetFeed    One of the FEED_X constants.
-     * @param string $videoFilename Path to the video file.
-     *
-     * @throws \InvalidArgumentException If the video file is missing.
-     * @throws \RuntimeException         If FFmpeg isn't working properly, or
-     *                                   thumbnail MediaAutoResizer failed.
-     * @throws \Exception                If MediaAutoResizer failed.
-     *
-     * @return string The JPEG binary data for the generated thumbnail.
-     */
-    public static function createVideoIcon(
-        $targetFeed,
-        $videoFilename)
-    {
-        // The user must have FFmpeg.
-        $ffmpeg = self::checkFFMPEG();
-        if ($ffmpeg === false) {
-            throw new \RuntimeException('You must have FFmpeg to generate video thumbnails.');
-        }
-
-        // Check if input file exists.
-        if (empty($videoFilename) || !is_file($videoFilename)) {
-            throw new \InvalidArgumentException(sprintf('The video file "%s" does not exist on disk.', $videoFilename));
-        }
-
-        // Generate a temp thumbnail filename and delete if file already exists.
-        $tmpPath = self::$defaultTmpPath !== null
-                   ? self::$defaultTmpPath
-                   : sys_get_temp_dir();
-        $tmpFilename = $tmpPath.'/'.md5($videoFilename).'.jpg';
-        if (is_file($tmpFilename)) {
-            @unlink($tmpFilename);
-        }
-
-        try {
-            // Capture a video preview snapshot to that file via FFMPEG.
-            $command = escapeshellarg($ffmpeg).' -i '.escapeshellarg($videoFilename).' -f mjpeg -ss 00:00:01 -vframes 1 '.escapeshellarg($tmpFilename).' 2>&1';
-            @exec($command, $output, $statusCode);
-
-            // Check for processing errors.
-            if ($statusCode !== 0) {
-                throw new \RuntimeException('FFmpeg failed to generate a video thumbnail.');
-            }
-
-            // Automatically crop&resize the thumbnail to Instagram's requirements.
-            $resizer = new MediaAutoResizer($tmpFilename, ['targetFeed' => $targetFeed]);
-            $jpegContents = file_get_contents($resizer->getFile()); // Process&get.
-            $resizer->deleteFile();
-
-            return $jpegContents;
-        } finally {
-            @unlink($tmpFilename);
-        }
     }
 
     /**

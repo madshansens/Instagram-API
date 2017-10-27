@@ -43,32 +43,30 @@ class VideoResizer implements ResizerInterface
     /** @var array Background color [R, G, B] for the final video. */
     protected $_bgColor;
 
-    /**
-     * Constructor.
-     *
-     * @param string $inputFile
-     * @param string $outputDir
-     * @param array  $bgColor
-     *
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
-     */
+    /** @var string Output format definition. */
+    protected $_outputFormat;
+
+    /** @var FFmpegWrapper */
+    protected $_ffmpegWrapper;
+
+    /** {@inheritdoc} */
     public function __construct(
         $inputFile,
         $outputDir,
-        array $bgColor)
+        array $bgColor,
+        FFmpegWrapper $ffmpegWrapper = null)
     {
         $this->_inputFile = $inputFile;
         $this->_outputDir = $outputDir;
         $this->_bgColor = $bgColor;
 
-        $this->_loadVideoDetails();
-    }
+        $this->_ffmpegWrapper = $ffmpegWrapper;
+        if ($this->_ffmpegWrapper === null) {
+            $this->_ffmpegWrapper = Utils::getFFmpegWrapper();
+        }
+        $this->_outputFormat = '-c:a copy -f mp4';
 
-    /** {@inheritdoc} */
-    public function getMediaDetails()
-    {
-        return $this->_details;
+        $this->_loadVideoDetails();
     }
 
     /** {@inheritdoc} */
@@ -91,24 +89,19 @@ class VideoResizer implements ResizerInterface
      */
     protected function _hasSwappedAxes()
     {
-        // TODO: Research and implement how to handle rotated videos.
-        // Videos can have metadata with a rotation flag:
-        // https://addpipe.com/blog/mp4-rotation-metadata-in-mobile-video-files/
-        // But ffmpeg has some autorotation-code enabled by default, so we
-        // should check how it works: https://trac.ffmpeg.org/ticket/515
-        return false;
+        return $this->_details->getRotation() % 180;
     }
 
     /** {@inheritdoc} */
     public function isHorFlipped()
     {
-        return false;
+        return $this->_details->getRotation() === 90;
     }
 
     /** {@inheritdoc} */
     public function isVerFlipped()
     {
-        return false;
+        return $this->_details->getRotation() === 180;
     }
 
     /** {@inheritdoc} */
@@ -127,11 +120,6 @@ class VideoResizer implements ResizerInterface
     public function getInputDimensions()
     {
         $result = new Dimensions($this->_details->getWidth(), $this->_details->getHeight());
-
-        // Swap to correct dimensions if the video pixels are stored rotated.
-        if ($this->_hasSwappedAxes()) {
-            $result = $result->withSwappedAxes();
-        }
 
         return $result;
     }
@@ -194,10 +182,11 @@ class VideoResizer implements ResizerInterface
         Dimensions $canvas,
         $outputFile)
     {
-        // The user must have FFmpeg.
-        $ffmpeg = Utils::checkFFMPEG();
-        if ($ffmpeg === false) {
-            throw new \RuntimeException('You must have FFmpeg to resize videos.');
+        // Swap to correct dimensions if the video pixels are stored rotated.
+        if ($this->_hasSwappedAxes()) {
+            $srcRect = $srcRect->withSwappedAxes();
+            $dstRect = $dstRect->withSwappedAxes();
+            $canvas = $canvas->withSwappedAxes();
         }
 
         $bgColor = sprintf('0x%02X%02X%02X', ...$this->_bgColor);
@@ -207,28 +196,36 @@ class VideoResizer implements ResizerInterface
             sprintf('pad=w=%d:h=%d:x=%d:y=%d:color=%s', $canvas->getWidth(), $canvas->getHeight(), $dstRect->getX(), $dstRect->getY(), $bgColor),
         ];
 
+        $inputFormat = '';
+        $outputFormat = $this->_outputFormat;
+        if ($this->_details->getRotation()) {
+            if ($this->_ffmpegWrapper->hasNoAutorotate()) {
+                $inputFormat = '-noautorotate';
+            }
+            $outputFormat .= ' -metadata:s:v rotate=""';
+            switch ($this->_details->getRotation()) {
+                case 90:
+                    $filters[] = 'transpose=clock';
+                    break;
+                case 180:
+                    $filters[] = 'hflip';
+                    $filters[] = 'vflip';
+                    break;
+                case 270:
+                    $filters[] = 'transpose=cclock';
+                    break;
+            }
+        }
+
         // TODO: Force to h264 + aac audio, but if audio input is already aac then use "copy" for lossless audio processing.
         // Video format can't copy since we always need to re-encode due to video filtering.
-        $command = sprintf(
-            '%s -y -i %s -vf %s -c:a copy -f mp4 %s 2>&1',
-            $ffmpeg,
+        $this->_ffmpegWrapper->run(sprintf(
+            '%s -i %s -y -vf %s %s %s',
+            $inputFormat,
             escapeshellarg($this->_inputFile),
             escapeshellarg(implode(',', $filters)),
+            $outputFormat,
             escapeshellarg($outputFile)
-        );
-
-        exec($command, $output, $returnCode);
-        if ($returnCode) {
-            // Extract important error messages and build a summary of them.
-            $errorLines = [];
-            foreach ($output as $line) {
-                if (preg_match('/^(?:\[.+?\]\s+)?(?:fail|error|warn|critical)/i', $line)) {
-                    $errorLines[] = $line;
-                }
-            }
-            $errorMsg = sprintf('FFmpeg Errors: ["%s"], Command: "%s".', implode('"], ["', $errorLines), $command);
-
-            throw new \RuntimeException($errorMsg, $returnCode);
-        }
+        ));
     }
 }

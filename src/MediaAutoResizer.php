@@ -3,10 +3,9 @@
 namespace InstagramAPI;
 
 use InstagramAPI\Media\Dimensions;
-use InstagramAPI\Media\Photo\PhotoResizer;
 use InstagramAPI\Media\Rectangle;
+use InstagramAPI\Media\ResizerFactory;
 use InstagramAPI\Media\ResizerInterface;
-use InstagramAPI\Media\Video\VideoResizer;
 
 /**
  * Automatic media resizer.
@@ -25,7 +24,6 @@ use InstagramAPI\Media\Video\VideoResizer;
  *   collection. This function is safe and won't delete the original input file.
  *
  * @author SteveJobzniak (https://github.com/SteveJobzniak)
- * @author Abyr Valg <valga.github@abyrga.ru>
  */
 class MediaAutoResizer
 {
@@ -237,6 +235,9 @@ class MediaAutoResizer
      * - "debug" (bool) - Whether to output debugging info during calculation
      *   steps.
      *
+     * - "customResizer" (string) - Class name for a custom resizer. It must
+     *   implement ResizerInterface.
+     *
      * @param string $inputFile Path to an input file.
      * @param array  $options   An associative array of optional parameters. See constructor description.
      *
@@ -356,54 +357,42 @@ class MediaAutoResizer
         }
         $this->_tmpPath = realpath($tmpPath);
 
-        // Create an appropriate media resizer based on the input media type.
-        $fileType = $this->_determineFileType($this->_inputFile);
-        if ($fileType === 'image') {
-            $this->_resizer = new PhotoResizer($this->_inputFile, $this->_tmpPath, $this->_bgColor);
-        } elseif ($fileType === 'video') {
-            $this->_resizer = new VideoResizer($this->_inputFile, $this->_tmpPath, $this->_bgColor);
-        } else {
-            throw new \InvalidArgumentException('Unsupported input media type.');
-        }
+        // Init a resizer.
+        $this->_resizer = $this->_initResizer(isset($options['customResizer']) ? $options['customResizer'] : null);
     }
 
     /**
-     * Determines the media type of a file.
+     * Init a resizer.
      *
-     * @param string $filePath The file to evaluate.
+     * @param string|null $resizerClass
      *
-     * @return string|null Either "image", "video" or NULL (if another type).
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     *
+     * @return ResizerInterface
      */
-    protected function _determineFileType(
-        $filePath)
+    protected function _initResizer(
+        $resizerClass = null)
     {
-        $fileType = null;
-
-        // Use PHP's binary MIME-type heuristic if available. It ignores file
-        // extension and is therefore more accurate at finding the real type.
-        $mimeType = false;
-        if (function_exists('mime_content_type')) {
-            $mimeType = @mime_content_type($filePath);
-        }
-
-        // Now determine whether the file is an image or a video.
-        if ($mimeType !== false) {
-            if (strncmp($mimeType, 'image/', 6) === 0) {
-                $fileType = 'image';
-            } elseif (strncmp($mimeType, 'video/', 6) === 0) {
-                $fileType = 'video';
-            }
+        if ($resizerClass === null) {
+            $resizerClass = ResizerFactory::detectResizerForFile($this->_inputFile);
         } else {
-            // Fallback to guessing based on file-extension if MIME unavailable.
-            $extension = pathinfo($filePath, PATHINFO_EXTENSION);
-            if (preg_match('#^(jpe?g|png|gif|bmp)$#iD', $extension)) {
-                $fileType = 'image';
-            } elseif (preg_match('#^(3g2|3gp|asf|asx|avi|dvb|f4v|fli|flv|fvt|h261|h263|h264|jpgm|jpgv|jpm|m1v|m2v|m4u|m4v|mj2|mjp2|mk3d|mks|mkv|mng|mov|movie|mp4|mp4v|mpe|mpeg|mpg|mpg4|mxu|ogv|pyv|qt|smv|uvh|uvm|uvp|uvs|uvu|uvv|uvvh|uvvm|uvvp|uvvs|uvvu|uvvv|viv|vob|webm|wm|wmv|wmx|wvx)$#iD', $extension)) {
-                $fileType = 'video';
+            try {
+                $reflection = new \ReflectionClass($resizerClass);
+            } catch (\ReflectionException $e) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Unable to reflect class "%s" (Reason: "%s").',
+                    $resizerClass,
+                    $e->getMessage()
+                ));
+            }
+
+            if (!$reflection->implementsInterface(ResizerInterface::class)) {
+                throw new \InvalidArgumentException('The custom resizer class must implement ResizerInterface.');
             }
         }
 
-        return $fileType;
+        return new $resizerClass($this->_inputFile, $this->_tmpPath, $this->_bgColor);
     }
 
     /**
@@ -1119,7 +1108,7 @@ class MediaAutoResizer
         } elseif ($canvas->getWidth() < $minWidth) {
             throw new \RuntimeException(sprintf(
                 'Canvas calculation failed. Target width (%s) less than minimum allowed (%s).',
-                $canvas->getWidth(), $minWidth()
+                $canvas->getWidth(), $minWidth
             ));
         } elseif ($canvas->getWidth() > $maxWidth) {
             throw new \RuntimeException(sprintf(
