@@ -80,8 +80,8 @@ class MySQL extends PDOStorage
         // Create the database table. Throws in case of failure.
         // NOTE: We store all settings as a binary JSON blob so that we support
         // all current and future data without having to alter the table schema.
-        // NOTE: The username is a 100-character-max varchar, NOT 255! Why?
-        // Because MySQL has a 767-byte max limit for efficient indexes and
+        // NOTE: The username is a 150-character-max varchar, NOT 255! Why?
+        // Because MySQL has a 767-byte max limit for efficient indexes, and
         // "utf8mb4" uses 4 bytes per character, which means that 191 characters
         // is the maximum safe amount (191 * 4 = 764)! We chose 150 as a nice
         // number. Instagram's username limit is 30, so our limit is fine!
