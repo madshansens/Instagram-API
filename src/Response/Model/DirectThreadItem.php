@@ -28,6 +28,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getText()
  * @method mixed getTimestamp()
  * @method string getUserId()
+ * @method StoryShare getStoryShare()
+ * @method User getProfile()
  * @method bool isActionLog()
  * @method bool isClientContext()
  * @method bool isExpiringMediaActionSummary()
@@ -49,6 +51,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isText()
  * @method bool isTimestamp()
  * @method bool isUserId()
+ * @method bool isStoryShare()
+ * @method bool isProfile()
  * @method $this setActionLog(ActionLog $value)
  * @method $this setClientContext(string $value)
  * @method $this setExpiringMediaActionSummary(DirectExpiringSummary $value)
@@ -70,6 +74,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setText(string $value)
  * @method $this setTimestamp(mixed $value)
  * @method $this setUserId(string $value)
+ * @method $this setStoryShare(StoryShare $value)
+ * @method $this setProfile(User $value)
  * @method $this unsetActionLog()
  * @method $this unsetClientContext()
  * @method $this unsetExpiringMediaActionSummary()
@@ -91,6 +97,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetText()
  * @method $this unsetTimestamp()
  * @method $this unsetUserId()
+ * @method $this unsetStoryShare()
+ * @method $this unsetProfile()
  */
 class DirectThreadItem extends AutoPropertyMapper
 {
@@ -130,5 +138,7 @@ class DirectThreadItem extends AutoPropertyMapper
         'location'                      => 'Location',
         'like'                          => '',
         'live_video_share'              => '',
+        'profile'                       => 'User',
+        'story_share'                   => 'StoryShare',
     ];
 }
