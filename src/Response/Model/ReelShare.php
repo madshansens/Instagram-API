@@ -10,8 +10,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getBroadcasts()
  * @method Item getMedia()
  * @method string getMentionedUserId()
- * @method mixed getStickerVersion()
- * @method mixed getStoryRankingToken()
+ * @method int getStickerVersion()
+ * @method string getStoryRankingToken()
  * @method string getText()
  * @method Item[] getTray()
  * @method mixed getType()
@@ -26,8 +26,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setBroadcasts(mixed $value)
  * @method $this setMedia(Item $value)
  * @method $this setMentionedUserId(string $value)
- * @method $this setStickerVersion(mixed $value)
- * @method $this setStoryRankingToken(mixed $value)
+ * @method $this setStickerVersion(int $value)
+ * @method $this setStoryRankingToken(string $value)
  * @method $this setText(string $value)
  * @method $this setTray(Item[] $value)
  * @method $this setType(mixed $value)
@@ -44,9 +44,9 @@ class ReelShare extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
         'tray'                => 'Item[]',
-        'story_ranking_token' => '',
+        'story_ranking_token' => 'string',
         'broadcasts'          => '',
-        'sticker_version'     => '',
+        'sticker_version'     => 'int',
         'text'                => 'string',
         'type'                => '',
         'media'               => 'Item',
