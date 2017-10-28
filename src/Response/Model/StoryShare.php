@@ -7,26 +7,26 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * Item.
  *
+ * @method bool getIsLinked()
  * @method Item getMedia()
+ * @method string getMessage()
  * @method string getText()
  * @method string getTitle()
- * @method string getMessage()
- * @method bool getIsLinked()
+ * @method bool isIsLinked()
  * @method bool isMedia()
+ * @method bool isMessage()
  * @method bool isText()
  * @method bool isTitle()
- * @method bool isMessage()
- * @method bool isIsLinked()
+ * @method $this setIsLinked(bool $value)
  * @method $this setMedia(Item $value)
+ * @method $this setMessage(string $value)
  * @method $this setText(string $value)
  * @method $this setTitle(string $value)
- * @method $this setMessage(string $value)
- * @method $this setIsLinked(bool $value)
+ * @method $this unsetIsLinked()
  * @method $this unsetMedia()
+ * @method $this unsetMessage()
  * @method $this unsetText()
  * @method $this unsetTitle()
- * @method $this unsetMessage()
- * @method $this unsetIsLinked()
  */
 class StoryShare extends AutoPropertyMapper
 {
