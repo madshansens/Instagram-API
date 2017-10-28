@@ -314,7 +314,8 @@ class Instagram
      * @see http://docs.guzzlephp.org/en/latest/request-options.html#proxy
      *
      * @param string|array|null $value String or Array specifying a proxy in
-     *                                 Guzzle format, or NULL to disable proxying.
+     *                                 Guzzle format, or NULL to disable
+     *                                 proxying.
      */
     public function setProxy(
         $value)
@@ -340,8 +341,9 @@ class Instagram
      *
      * @see http://php.net/curl_setopt CURLOPT_INTERFACE
      *
-     * @param string|null $value Interface name, IP address or hostname, or NULL to
-     *                           disable override and let Guzzle use any interface.
+     * @param string|null $value Interface name, IP address or hostname, or NULL
+     *                           to disable override and let Guzzle use any
+     *                           interface.
      */
     public function setOutputInterface(
         $value)
@@ -362,42 +364,82 @@ class Instagram
     /**
      * Login to Instagram or automatically resume and refresh previous session.
      *
-     * Sets the active account for the class instance. You can call this multiple times to switch
-     * between multiple Instagram accounts.
+     * Sets the active account for the class instance. You can call this
+     * multiple times to switch between multiple Instagram accounts.
      *
-     * WARNING: You MUST run this function EVERY time your script runs! It handles automatic session
-     * resume and relogin and app session state refresh and other absolutely *vital* things that are
-     * important if you don't want to be banned from Instagram!
+     * WARNING: You MUST run this function EVERY time your script runs! It
+     * handles automatic session resume and relogin and app session state
+     * refresh and other absolutely *vital* things that are important if you
+     * don't want to be banned from Instagram!
      *
-     * WARNING: This function MAY return a CHALLENGE telling you that the account needs two-factor
-     * login before letting you log in! Read the two-factor login example to see how to handle that.
+     * WARNING: This function MAY return a CHALLENGE telling you that the
+     * account needs two-factor login before letting you log in! Read the
+     * two-factor login example to see how to handle that.
      *
      * @param string $username           Your Instagram username.
      * @param string $password           Your Instagram password.
-     * @param bool   $forceLogin         Force login to Instagram instead of resuming previous session.
-     * @param int    $appRefreshInterval How frequently login() should act like an Instagram app
-     *                                   that's been closed and reopened and needs to "refresh its
-     *                                   state", by asking for extended account state details.
-     *                                   Default: After 1800 seconds, meaning 30 minutes since the
-     *                                   last state-refreshing login() call.
-     *                                   This CANNOT be longer than 6 hours. Read _sendLoginFlow()!
-     *                                   The shorter your delay is the BETTER. You may even want to
-     *                                   set it to an even LOWER value than the default 30 minutes!
+     * @param int    $appRefreshInterval How frequently `login()` should act
+     *                                   like an Instagram app that's been
+     *                                   closed and reopened and needs to
+     *                                   "refresh its state", by asking for
+     *                                   extended account state details.
+     *                                   Default: After `1800` seconds, meaning
+     *                                   `30` minutes after the last
+     *                                   state-refreshing `login()` call.
+     *                                   This CANNOT be longer than `6` hours.
+     *                                   Read `_sendLoginFlow()`! The shorter
+     *                                   your delay is the BETTER. You may even
+     *                                   want to set it to an even LOWER value
+     *                                   than the default 30 minutes!
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\LoginResponse|null A login response if a full (re-)login happens,
-     *                                                   otherwise NULL if an existing session is resumed.
+     * @return \InstagramAPI\Response\LoginResponse|null A login response if a
+     *                                                   full (re-)login
+     *                                                   happens, otherwise
+     *                                                   `NULL` if an existing
+     *                                                   session is resumed.
      */
     public function login(
+        $username,
+        $password,
+        $appRefreshInterval = 1800)
+    {
+        if (empty($username) || empty($password)) {
+            throw new \InvalidArgumentException('You must provide a username and password to login().');
+        }
+
+        return $this->_login($username, $password, false, $appRefreshInterval);
+    }
+
+    /**
+     * Internal login handler.
+     *
+     * @param string $username
+     * @param string $password
+     * @param bool   $forceLogin         Force login to Instagram instead of
+     *                                   resuming previous session. Used
+     *                                   internally to do a new, full relogin
+     *                                   when we detect an expired/invalid
+     *                                   previous session.
+     * @param int    $appRefreshInterval
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\LoginResponse|null
+     *
+     * @see Instagram::login() The public login handler with a full description.
+     */
+    protected function _login(
         $username,
         $password,
         $forceLogin = false,
         $appRefreshInterval = 1800)
     {
         if (empty($username) || empty($password)) {
-            throw new \InvalidArgumentException('You must provide a username and password to login().');
+            throw new \InvalidArgumentException('You must provide a username and password to _login().');
         }
 
         // Switch the currently active user/pass if the details are different.
@@ -449,12 +491,15 @@ class Instagram
      * Finish a two-factor authenticated login.
      *
      * This function finishes a two-factor challenge that was provided by the
-     * regular login() function. If you successfully answer their challenge,
+     * regular `login()` function. If you successfully answer their challenge,
      * you will be logged in after this function call.
      *
-     * @param string $verificationCode    Verification code you have received via SMS.
-     * @param string $twoFactorIdentifier Two factor identifier, obtained in login() response. Format: "123456".
-     * @param int    $appRefreshInterval  See login() for description of this parameter.
+     * @param string $verificationCode    Verification code you have received
+     *                                    via SMS.
+     * @param string $twoFactorIdentifier Two factor identifier, obtained in
+     *                                    login() response. Format: `123456`.
+     * @param int    $appRefreshInterval  See `login()` for description of this
+     *                                    parameter.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -516,7 +561,12 @@ class Instagram
         // user's last-used device IF they've got a valid, good one stored.
         // But if they've got a BAD/none, this will create a brand-new device.
         $savedDeviceString = $this->settings->get('devicestring');
-        $this->device = new Devices\Device(Constants::IG_VERSION, Constants::VERSION_CODE, Constants::USER_AGENT_LOCALE, $savedDeviceString);
+        $this->device = new Devices\Device(
+            Constants::IG_VERSION,
+            Constants::VERSION_CODE,
+            Constants::USER_AGENT_LOCALE,
+            $savedDeviceString
+        );
 
         // Get active device string so that we can compare it to any saved one.
         $deviceString = $this->device->getDeviceString();
@@ -680,19 +730,27 @@ class Instagram
     /**
      * Sends login flow. This is required to emulate real device behavior.
      *
-     * @param bool $justLoggedIn
-     * @param int  $appRefreshInterval
+     * @param bool $justLoggedIn       Whether we have just performed a full
+     *                                 relogin (rather than doing a resume).
+     * @param int  $appRefreshInterval See `login()` for description of this
+     *                                 parameter.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\LoginResponse|null A login response if a full (re-)login is needed
-     *                                                   during the login flow attempt, otherwise NULL.
+     * @return \InstagramAPI\Response\LoginResponse|null A login response if a
+     *                                                   full (re-)login is
+     *                                                   needed during the login
+     *                                                   flow attempt, otherwise
+     *                                                   `NULL`.
      */
     protected function _sendLoginFlow(
         $justLoggedIn,
         $appRefreshInterval = 1800)
     {
+        if (!is_int($appRefreshInterval) || $appRefreshInterval < 0) {
+            throw new \InvalidArgumentException("Instagram's app state refresh interval must be a positive integer.");
+        }
         if ($appRefreshInterval > 21600) {
             throw new \InvalidArgumentException("Instagram's app state refresh interval is NOT allowed to be higher than 6 hours, and the lower the better!");
         }
@@ -746,7 +804,7 @@ class Instagram
             } catch (\InstagramAPI\Exception\LoginRequiredException $e) {
                 // If our session cookies are expired, we were now told to login,
                 // so handle that by running a forced relogin in that case!
-                return $this->login($this->username, $this->password, true, $appRefreshInterval);
+                return $this->_login($this->username, $this->password, true, $appRefreshInterval);
             }
 
             // Perform the "user has returned to their already-logged in app,
@@ -791,11 +849,11 @@ class Instagram
     /**
      * Log out of Instagram.
      *
-     * WARNING: Most people should NEVER call logout()! Our library emulates
+     * WARNING: Most people should NEVER call `logout()`! Our library emulates
      * the Instagram app for Android, where you are supposed to stay logged in
      * forever. By calling this function, you will tell Instagram that you are
      * logging out of the APP. But you SHOULDN'T do that! In almost 100% of all
-     * cases you want to *stay logged in* so that LOGIN() resumes your session!
+     * cases you want to *stay logged in* so that `login()` resumes your session!
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
