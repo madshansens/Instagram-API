@@ -76,6 +76,23 @@ class Instagram
     public $apiDeveloperDebug = false;
 
     /**
+     * Global flag for users who want to run the library incorrectly online.
+     *
+     * YOU ENABLE THIS AT YOUR OWN RISK! WE GIVE _ZERO_ SUPPORT FOR THIS MODE!
+     * EMBEDDING THE LIBRARY DIRECTLY IN A WEBPAGE (WITHOUT ANY INTERMEDIARY
+     * PROTECTIVE LAYER) CAN CAUSE ALL KINDS OF DAMAGE AND DATA CORRUPTION!
+     *
+     * YOU HAVE BEEN WARNED. ANY DATA CORRUPTION YOU CAUSE IS YOUR OWN PROBLEM!
+     *
+     * The right way to run the library online is described in `webwarning.htm`.
+     *
+     * @var bool
+     *
+     * @see Instagram::__construct()
+     */
+    public static $allowDangerousWebUsageAtMyOwnRisk = false;
+
+    /**
      * UUID.
      *
      * @var string
@@ -221,6 +238,24 @@ class Instagram
         $truncatedDebug = false,
         array $storageConfig = [])
     {
+        // Disable incorrect web usage by default. People should never embed
+        // this application emulator library directly in a webpage, or they
+        // might cause all kinds of damage and data corruption. They should
+        // use an intermediary layer such as a database or a permanent process!
+        // NOTE: People can disable this safety via the flag at their own risk.
+        if (!self::$allowDangerousWebUsageAtMyOwnRisk && (!defined('PHP_SAPI') || PHP_SAPI !== 'cli')) {
+            // IMPORTANT: We do NOT throw any exception here for users who are
+            // running the library via a webpage. Many webservers are configured
+            // to hide all PHP errors, and would just give the user a totally
+            // blank webpage with "Error 500" if we throw here, which would just
+            // confuse the newbies even more. Instead, we output a HTML warning
+            // message for people who try to run the library on a webpage.
+            echo file_get_contents(__DIR__.'/../webwarning.htm');
+            echo '<p>If you truly want to enable <em>incorrect</em> website usage by directly embedding this application emulator library in your page, then you can do that <strong>AT YOUR OWN RISK</strong> by setting the following flag <em>before</em> you create the <code>Instagram()</code> object:</p>'.PHP_EOL;
+            echo '<p><code>\InstagramAPI\Instagram::$allowDangerousWebUsageAtMyOwnRisk = true;</code></p>'.PHP_EOL;
+            exit(0); // Exit without error to avoid triggering Error 500.
+        }
+
         // Prevent people from running this library on ancient PHP versions, and
         // verify that people have the most critically important PHP extensions.
         // NOTE: All of these are marked as requirements in composer.json, but
