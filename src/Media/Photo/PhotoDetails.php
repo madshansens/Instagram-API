@@ -34,6 +34,13 @@ class PhotoDetails extends MediaDetails
      */
     const MAX_WIDTH = 1080;
 
+    /**
+     * Default orientation to use if no EXIF JPG orientation exists.
+     *
+     * This value represents a non-rotated, non-flipped image.
+     *
+     * @var int
+     */
     const DEFAULT_ORIENTATION = 1;
 
     /** @var int */
