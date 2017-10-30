@@ -15,4 +15,10 @@ class DirectStoryConstraints extends StoryConstraints
     {
         return DirectConstraints::MIN_DURATION;
     }
+
+    /** {@inheritdoc} */
+    public function getMaxDuration()
+    {
+        return DirectConstraints::MAX_DURATION;
+    }
 }
