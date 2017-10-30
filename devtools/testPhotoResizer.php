@@ -50,7 +50,8 @@ foreach (['Landscape', 'Portrait'] as $orientation) {
         runTest($inputFile, $outputFile, [
             'minAspectRatio' => 1, // Square.
             'maxAspectRatio' => 1,
-            'cropFocus'      => -35, // Always use the same focus, to look for orientation errors.
+            'horCropFocus'   => -35, // Always use the same focus, to look for orientation errors.
+            'verCropFocus'   => -35, // This combo aims at the upper left corner.
             'operation'      => MediaResizer::CROP,
         ]);
 
