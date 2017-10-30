@@ -2,6 +2,7 @@
 
 namespace InstagramAPI\Request\Metadata;
 
+use InstagramAPI\Media\Constraints\ConstraintsFactory;
 use InstagramAPI\Media\Photo\PhotoDetails;
 use InstagramAPI\Media\Video\VideoDetails;
 use InstagramAPI\Response\Model\VideoUploadUrl;
@@ -85,10 +86,10 @@ final class Internal
         // Figure out the video file details.
         // NOTE: We do this first, since it validates whether the video file is
         // valid and lets us avoid wasting time uploading totally invalid files!
-        $this->_videoDetails = new VideoDetails($videoFilename, Utils::getVideoFileDetails($videoFilename));
+        $this->_videoDetails = new VideoDetails($videoFilename);
 
         // Validate the video details and throw if Instagram won't allow it.
-        Utils::throwIfIllegalVideoDetails($targetFeed, $this->_videoDetails);
+        $this->_videoDetails->validate(ConstraintsFactory::createFor($targetFeed));
 
         return $this->_videoDetails;
     }
@@ -111,10 +112,10 @@ final class Internal
         // Figure out the photo file details.
         // NOTE: We do this first, since it validates whether the photo file is
         // valid and lets us avoid wasting time uploading totally invalid files!
-        $this->_photoDetails = new PhotoDetails($photoFilename, Utils::getPhotoFileDetails($photoFilename));
+        $this->_photoDetails = new PhotoDetails($photoFilename);
 
         // Validate the photo details and throw if Instagram won't allow it.
-        Utils::throwIfIllegalPhotoDetails($targetFeed, $this->_photoDetails);
+        $this->_photoDetails->validate(ConstraintsFactory::createFor($targetFeed));
 
         return $this->_photoDetails;
     }

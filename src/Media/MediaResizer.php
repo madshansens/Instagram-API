@@ -1,11 +1,9 @@
 <?php
 
-namespace InstagramAPI;
+namespace InstagramAPI\Media;
 
-use InstagramAPI\Media\Dimensions;
-use InstagramAPI\Media\Rectangle;
-use InstagramAPI\Media\ResizerFactory;
-use InstagramAPI\Media\ResizerInterface;
+use InstagramAPI\Constants;
+use InstagramAPI\Media\Constraints\ConstraintsFactory;
 
 /**
  * Automatic media resizer.
@@ -25,109 +23,13 @@ use InstagramAPI\Media\ResizerInterface;
  *
  * @author SteveJobzniak (https://github.com/SteveJobzniak)
  */
-class MediaAutoResizer
+abstract class MediaResizer
 {
     /** @var int Crop Operation. */
     const CROP = 1;
 
     /** @var int Expand Operation. */
     const EXPAND = 2;
-
-    /**
-     * Lowest allowed general media aspect ratio (4:5, meaning portrait).
-     *
-     * These are decided by Instagram. Not by us!
-     *
-     * A different value (MIN_STORY_RATIO) will be used for story media.
-     *
-     * @var float
-     *
-     * @see https://help.instagram.com/1469029763400082
-     */
-    const MIN_RATIO = 0.8;
-
-    /**
-     * Highest allowed general media aspect ratio (1.91:1, meaning landscape).
-     *
-     * These are decided by Instagram. Not by us!
-     *
-     * A different value (MAX_STORY_RATIO) will be used for story media.
-     *
-     * @var float
-     */
-    const MAX_RATIO = 1.91;
-
-    /**
-     * Lowest allowed story aspect ratio.
-     *
-     * This range was decided through community research, which revealed that
-     * all Instagram stories are in ~9:16 (0.5625, widescreen portrait) ratio,
-     * with a small range of similar portrait ratios also being used sometimes.
-     *
-     * We have selected a photo/video story aspect range which supports all
-     * story media aspects that are commonly used by the app: 0.56 - 0.67.
-     * (That's ~1080x1611 to ~1080x1928.)
-     *
-     * However, note that we'll target the "best story aspect ratio range"
-     * by default and that you must manually disable that constructor option
-     * to get this extended story aspect range, if you REALLY want it...
-     *
-     * @var float
-     *
-     * @see https://github.com/mgp25/Instagram-API/issues/1420#issuecomment-318146010
-     */
-    const MIN_STORY_RATIO = 0.56;
-
-    /**
-     * Highest allowed story aspect ratio.
-     *
-     * This range was decided through community research.
-     *
-     * @var float
-     */
-    const MAX_STORY_RATIO = 0.67;
-
-    /**
-     * The best story aspect ratio.
-     *
-     * This is exactly 9:16 ratio, meaning a standard widescreen phone viewed in
-     * portrait mode. It is the most common story ratio on Instagram, and it's
-     * the one that looks the best on most devices. All other ratios will look
-     * "cropped" when viewed on 16:9 widescreen devices, since the app "zooms"
-     * the story until it fills the screen without any black bars. So unless the
-     * story is exactly 16:9, it won't look great on 16:9 screens.
-     *
-     * Every manufacturer uses 16:9 screens. Even Apple since the iPhone 5.
-     *
-     * Therefore, this will be the final target aspect ratio used EVERY time
-     * that media destined for a story feed is outside of the allowed range!
-     * That's because it doesn't make sense to let people target non-9:16 final
-     * story aspect ratios, since only 9:16 stories look good on most devices!
-     *
-     * @var float
-     */
-    const BEST_STORY_RATIO = 0.5625;
-
-    /**
-     * Lowest ratio allowed when enforcing the best story aspect ratio.
-     *
-     * These constants are used instead of MIN_STORY_RATIO and MAX_STORY_RATIO
-     * whenever the user tells us to "use the best ~9:16 story ratio" (which is
-     * enabled by default). We need to allow a bit above/below it to prevent
-     * pointless processing when the media is a few pixels off from the perfect
-     * ratio, since the perfect story ratio is often impossible to hit unless
-     * the input media is already exactly 720x1280 or 1080x1920.
-     *
-     * @var float
-     */
-    const BEST_MIN_STORY_RATIO = 0.56;
-
-    /**
-     * Highest ratio allowed when enforcing the best story aspect ratio.
-     *
-     * @var float
-     */
-    const BEST_MAX_STORY_RATIO = 0.565;
 
     /**
      * Override for the default temp path used by all class instances.
@@ -138,7 +40,7 @@ class MediaAutoResizer
      * TIP: If your default system temp folder isn't writable, it's NECESSARY
      * for you to set this value to another, writable path, like this:
      *
-     * \InstagramAPI\MediaAutoResizer::$defaultTmpPath = '/home/example/foo/';
+     * \InstagramAPI\MediaResizer::$defaultTmpPath = '/home/example/foo/';
      */
     public static $defaultTmpPath = null;
 
@@ -147,9 +49,6 @@ class MediaAutoResizer
 
     /** @var string Input file path. */
     protected $_inputFile;
-
-    /** @var string Target feed (either "story" or "general"). */
-    protected $_targetFeed;
 
     /** @var float|null Minimum allowed aspect ratio. */
     protected $_minAspectRatio;
@@ -176,11 +75,18 @@ class MediaAutoResizer
     /** @var string Path to a tmp directory. */
     protected $_tmpPath;
 
+    /** @var ConstraintsInterface Target feed's specific constraints. */
+    protected $_constraints;
+
     /** @var string Output file path. */
     protected $_outputFile;
 
-    /** @var ResizerInterface The media resizer for our input file. */
-    protected $_resizer;
+    /** @var MediaDetails The media details for our input file. */
+    protected $_details;
+
+    /** @var float|null Optional forced aspect ratio target in case of
+     * input being outside allowed min/max range. */
+    protected $_forceTargetAspectRatio;
 
     /**
      * Constructor.
@@ -202,8 +108,11 @@ class MediaAutoResizer
      * - "maxAspectRatio" (float): Maximum allowed aspect ratio. Uses
      *   auto-selected class constants if not set.
      *
-     * - "useBestStoryRatio" (bool): Enabled by default and affects which
-     *   min/max aspect class constants are auto-selected for stories.
+     * - "useRecommendedRatio" (bool): Whether to use the recommended aspect
+     *   ratio for the media type and target feed. Some targets use the
+     *   recommended ratio by default, and others disable it by default.
+     *   Therefore, you do NOT need to set this option manually unless you
+     *   have a very special reason to do so!
      *
      * - "allowNewAspectDeviation" (bool): Whether to allow the new aspect ratio
      *   (during processing) to deviate slightly from the min/max targets.
@@ -235,14 +144,10 @@ class MediaAutoResizer
      * - "debug" (bool) - Whether to output debugging info during calculation
      *   steps.
      *
-     * - "customResizer" (string) - Class name for a custom resizer. It must
-     *   implement ResizerInterface.
-     *
      * @param string $inputFile Path to an input file.
      * @param array  $options   An associative array of optional parameters. See constructor description.
      *
      * @throws \InvalidArgumentException
-     * @throws \RuntimeException
      */
     public function __construct(
         $inputFile,
@@ -254,7 +159,7 @@ class MediaAutoResizer
         $verCropFocus = isset($options['verCropFocus']) ? $options['verCropFocus'] : null;
         $minAspectRatio = isset($options['minAspectRatio']) ? $options['minAspectRatio'] : null;
         $maxAspectRatio = isset($options['maxAspectRatio']) ? $options['maxAspectRatio'] : null;
-        $useBestStoryRatio = isset($options['useBestStoryRatio']) ? (bool) $options['useBestStoryRatio'] : true;
+        $useRecommendedRatio = isset($options['useRecommendedRatio']) ? (bool) $options['useRecommendedRatio'] : null;
         $allowNewAspectDeviation = isset($options['allowNewAspectDeviation']) ? (bool) $options['allowNewAspectDeviation'] : false;
         $bgColor = isset($options['bgColor']) ? $options['bgColor'] : null;
         $operation = isset($options['operation']) ? $options['operation'] : null;
@@ -282,53 +187,54 @@ class MediaAutoResizer
         }
         $this->_verCropFocus = $verCropFocus;
 
-        // Target feed. Turn it into a string for easier processing,
-        // since we only care about story ratios vs general ratios.
-        switch ($targetFeed) {
-        case Constants::FEED_STORY:
-        case Constants::FEED_DIRECT_STORY:
-            $targetFeed = 'story';
-            break;
-        default:
-            $targetFeed = 'general';
+        // Create constraints and determine whether to use recommended aspect ratio.
+        $this->_constraints = ConstraintsFactory::createFor($targetFeed);
+        if ($useRecommendedRatio === null) {
+            // No value is provided, so let's guess it.
+            if ($minAspectRatio !== null || $maxAspectRatio !== null) {
+                // If we have at least one custom ratio, we must not use recommended ratio.
+                $useRecommendedRatio = false;
+            } else {
+                // Use the recommended value from constraints.
+                $useRecommendedRatio = $this->_constraints->useRecommendedRatioByDefault();
+            }
         }
-        $this->_targetFeed = $targetFeed;
 
         // Determine the legal min/max aspect ratios for the target feed.
-        if ($targetFeed === 'story') {
-            if ($useBestStoryRatio) { // On by default.
-                $allowedMinRatio = self::BEST_MIN_STORY_RATIO;
-                $allowedMaxRatio = self::BEST_MAX_STORY_RATIO;
-            } else {
-                $allowedMinRatio = self::MIN_STORY_RATIO;
-                $allowedMaxRatio = self::MAX_STORY_RATIO;
-            }
+        if ($useRecommendedRatio === true) {
+            $this->_forceTargetAspectRatio = $this->_constraints->getRecommendedRatio();
+            $deviation = $this->_constraints->getRecommendedRatioDeviation();
+            $minAspectRatio = $this->_forceTargetAspectRatio - $deviation;
+            $maxAspectRatio = $this->_forceTargetAspectRatio + $deviation;
         } else {
-            $allowedMinRatio = self::MIN_RATIO;
-            $allowedMaxRatio = self::MAX_RATIO;
-        }
+            $this->_forceTargetAspectRatio = null;
+            $allowedMinRatio = $this->_constraints->getMinAspectRatio();
+            $allowedMaxRatio = $this->_constraints->getMaxAspectRatio();
 
-        // Select allowed aspect ratio range based on defaults and user input.
-        if ($minAspectRatio !== null && ($minAspectRatio < $allowedMinRatio || $minAspectRatio > $allowedMaxRatio)) {
-            throw new \InvalidArgumentException(sprintf('Minimum aspect ratio must be between %.3f and %.3f.',
-                $allowedMinRatio, $allowedMaxRatio));
-        } elseif ($minAspectRatio === null) {
-            $minAspectRatio = $allowedMinRatio;
-        }
-        if ($maxAspectRatio !== null && ($maxAspectRatio < $allowedMinRatio || $maxAspectRatio > $allowedMaxRatio)) {
-            throw new \InvalidArgumentException(sprintf('Maximum aspect ratio must be between %.3f and %.3f.',
-                $allowedMinRatio, $allowedMaxRatio));
-        } elseif ($maxAspectRatio === null) {
-            $maxAspectRatio = $allowedMaxRatio;
-        }
-        if ($minAspectRatio !== null && $maxAspectRatio !== null && $minAspectRatio > $maxAspectRatio) {
-            throw new \InvalidArgumentException('Maximum aspect ratio must be greater than or equal to minimum.');
+            // Select allowed aspect ratio range based on defaults and user input.
+            if ($minAspectRatio !== null && ($minAspectRatio < $allowedMinRatio || $minAspectRatio > $allowedMaxRatio)) {
+                throw new \InvalidArgumentException(sprintf('Minimum aspect ratio must be between %.3f and %.3f.',
+                    $allowedMinRatio, $allowedMaxRatio));
+            }
+            if ($minAspectRatio === null) {
+                $minAspectRatio = $allowedMinRatio;
+            }
+            if ($maxAspectRatio !== null && ($maxAspectRatio < $allowedMinRatio || $maxAspectRatio > $allowedMaxRatio)) {
+                throw new \InvalidArgumentException(sprintf('Maximum aspect ratio must be between %.3f and %.3f.',
+                    $allowedMinRatio, $allowedMaxRatio));
+            }
+            if ($maxAspectRatio === null) {
+                $maxAspectRatio = $allowedMaxRatio;
+            }
+            if ($minAspectRatio !== null && $maxAspectRatio !== null && $minAspectRatio > $maxAspectRatio) {
+                throw new \InvalidArgumentException('Maximum aspect ratio must be greater than or equal to minimum.');
+            }
         }
         $this->_minAspectRatio = $minAspectRatio;
         $this->_maxAspectRatio = $maxAspectRatio;
 
         // Allow the aspect ratio of the final, new canvas to deviate slightly?
-        $this->_allowNewAspectDeviation = (bool) $allowNewAspectDeviation;
+        $this->_allowNewAspectDeviation = $allowNewAspectDeviation;
 
         // Background color.
         if ($bgColor !== null && (!is_array($bgColor) || count($bgColor) !== 3 || !isset($bgColor[0]) || !isset($bgColor[1]) || !isset($bgColor[2]))) {
@@ -356,43 +262,6 @@ class MediaAutoResizer
             throw new \InvalidArgumentException(sprintf('Directory %s does not exist or is not writable.', $tmpPath));
         }
         $this->_tmpPath = realpath($tmpPath);
-
-        // Init a resizer.
-        $this->_resizer = $this->_initResizer(isset($options['customResizer']) ? $options['customResizer'] : null);
-    }
-
-    /**
-     * Init a resizer.
-     *
-     * @param string|null $resizerClass
-     *
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
-     *
-     * @return ResizerInterface
-     */
-    protected function _initResizer(
-        $resizerClass = null)
-    {
-        if ($resizerClass === null) {
-            $resizerClass = ResizerFactory::detectResizerForFile($this->_inputFile);
-        } else {
-            try {
-                $reflection = new \ReflectionClass($resizerClass);
-            } catch (\ReflectionException $e) {
-                throw new \InvalidArgumentException(sprintf(
-                    'Unable to reflect class "%s" (Reason: "%s").',
-                    $resizerClass,
-                    $e->getMessage()
-                ));
-            }
-
-            if (!$reflection->implementsInterface(ResizerInterface::class)) {
-                throw new \InvalidArgumentException('The custom resizer class must implement ResizerInterface.');
-            }
-        }
-
-        return new $resizerClass($this->_inputFile, $this->_tmpPath, $this->_bgColor);
     }
 
     /**
@@ -445,7 +314,7 @@ class MediaAutoResizer
      *
      * @return string The path to the media file.
      *
-     * @see MediaAutoResizer::_shouldProcess() For the criteria that determines processing.
+     * @see MediaResizer::_shouldProcess() For the criteria that determines processing.
      */
     public function getFile()
     {
@@ -459,25 +328,11 @@ class MediaAutoResizer
     /**
      * Checks whether we should process the input file.
      *
-     * @throws \RuntimeException
-     *
      * @return bool
      */
     protected function _shouldProcess()
     {
-        $inputDimensions = $this->_resizer->getInputDimensions();
-        $inputWidth = $inputDimensions->getWidth();
-        $inputAspectRatio = $inputWidth / $inputDimensions->getHeight();
-
-        // Process if width < minimum allowed.
-        if ($inputWidth < $this->_resizer->getMinWidth()) {
-            return true;
-        }
-
-        // Process if width > maximum allowed.
-        if ($inputWidth > $this->_resizer->getMaxWidth()) {
-            return true;
-        }
+        $inputAspectRatio = $this->_details->getAspectRatio();
 
         // Process if aspect ratio < minimum allowed.
         if ($this->_minAspectRatio !== null && $inputAspectRatio < $this->_minAspectRatio) {
@@ -489,18 +344,35 @@ class MediaAutoResizer
             return true;
         }
 
-        // Process if the media resizer sees any other problems with the input
-        // file (such as needing rotation or media format transcoding).
+        // Process if the media can't be uploaded to Instagram as is.
         // NOTE: Nobody is allowed to call `isMod2CanvasRequired()` here. That
         // isn't its purpose. Whether a final Mod2 canvas is required for actual
         // resizing has NOTHING to do with whether the input file is ok.
-        if ($this->_resizer->isProcessingRequired()) {
+        try {
+            $this->_details->validate($this->_constraints);
+
+            return false;
+        } catch (\Exception $e) {
             return true;
         }
-
-        // No need to do any processing.
-        return false;
     }
+
+    /**
+     * Whether this resizer requires Mod2 width and height canvas dimensions.
+     *
+     * If this returns FALSE, the calculated `MediaResizer` canvas passed to
+     * this resizer during processing _may_ contain uneven width and/or height
+     * as the selected output dimensions.
+     *
+     * Therefore, this function must return TRUE if (and ONLY IF) perfectly even
+     * dimensions are necessary for this particular resizer's output format.
+     *
+     * For example, JPEG images accept any dimensions and must therefore return
+     * FALSE. But H264 videos require EVEN dimensions and must return TRUE.
+     *
+     * @return bool
+     */
+    abstract protected function _isMod2CanvasRequired();
 
     /**
      * Process the input file and create the new file.
@@ -512,20 +384,20 @@ class MediaAutoResizer
     protected function _process()
     {
         // Get the dimensions of the original input file.
-        $inputCanvas = $this->_resizer->getInputDimensions();
+        $inputCanvas = new Dimensions($this->_details->getWidth(), $this->_details->getHeight());
 
         // Create an output canvas with the desired dimensions.
         // WARNING: This creates a LEGAL canvas which MUST be followed EXACTLY.
         $canvasInfo = $this->_calculateNewCanvas( // Throws.
-            $this->_targetFeed,
             $this->_operation,
             $inputCanvas->getWidth(),
             $inputCanvas->getHeight(),
-            $this->_resizer->isMod2CanvasRequired(),
-            $this->_resizer->getMinWidth(),
-            $this->_resizer->getMaxWidth(),
+            $this->_isMod2CanvasRequired(),
+            $this->_details->getMinAllowedWidth(),
+            $this->_details->getMaxAllowedWidth(),
             $this->_minAspectRatio,
             $this->_maxAspectRatio,
+            $this->_forceTargetAspectRatio,
             $this->_allowNewAspectDeviation
         );
         $outputCanvas = $canvasInfo['canvas'];
@@ -745,7 +617,7 @@ class MediaAutoResizer
                 $this->_debugText('CROP: Horizontal Crop Focus', 'focus=%s', $horCropFocus);
 
                 // Invert the focus if this is horizontally flipped media.
-                if ($this->_resizer->isHorFlipped()) {
+                if ($this->_details->isHorizontallyFlipped()) {
                     $horCropFocus = -$horCropFocus;
                     $this->_debugText(
                         'CROP: Media is HorFlipped, Flipping Horizontal Crop Focus',
@@ -767,7 +639,7 @@ class MediaAutoResizer
                 $this->_debugText('CROP: Vertical Crop Focus', 'focus=%s', $verCropFocus);
 
                 // Invert the focus if this is vertically flipped media.
-                if ($this->_resizer->isVerFlipped()) {
+                if ($this->_details->isVerticallyFlipped()) {
                     $verCropFocus = -$verCropFocus;
                     $this->_debugText(
                         'CROP: Media is VerFlipped, Flipping Vertical Crop Focus',
@@ -868,8 +740,22 @@ class MediaAutoResizer
             throw new \RuntimeException(sprintf('Unsupported operation: %s.', $this->_operation));
         }
 
-        return $this->_resizer->resize($srcRect, $dstRect, $outputCanvas);
+        return $this->_resize($srcRect, $dstRect, $outputCanvas);
     }
+
+    /**
+     * Resize the media.
+     *
+     * @param Rectangle  $srcRect Rectangle to copy from the input.
+     * @param Rectangle  $dstRect Destination place and scale of copied pixels.
+     * @param Dimensions $canvas  The size of the destination canvas.
+     *
+     * @return string The path to the output file.
+     */
+    abstract protected function _resize(
+        Rectangle $srcRect,
+        Rectangle $dstRect,
+        Dimensions $canvas);
 
     /**
      * Calculate a new canvas based on input size and requested modifications.
@@ -889,7 +775,6 @@ class MediaAutoResizer
      * must be aware of such "enlarged" canvases and should handle them by
      * stretching the input if necessary.
      *
-     * @param string     $targetFeed
      * @param int        $operation
      * @param int        $inputWidth
      * @param int        $inputHeight
@@ -898,6 +783,9 @@ class MediaAutoResizer
      * @param int        $maxWidth
      * @param float|null $minAspectRatio
      * @param float|null $maxAspectRatio
+     * @param float|null $forceTargetAspectRatio  Optional forced aspect ratio
+     *                                            target in case of input being
+     *                                            outside allowed min/max range.
      * @param bool       $allowNewAspectDeviation See constructor arg docs.
      *
      * @throws \RuntimeException If requested canvas couldn't be achieved, most
@@ -912,7 +800,6 @@ class MediaAutoResizer
      *               compared to the ideal canvas.
      */
     protected function _calculateNewCanvas(
-        $targetFeed,
         $operation,
         $inputWidth,
         $inputHeight,
@@ -921,6 +808,7 @@ class MediaAutoResizer
         $maxWidth = 99999,
         $minAspectRatio = null,
         $maxAspectRatio = null,
+        $forceTargetAspectRatio = null,
         $allowNewAspectDeviation = false)
     {
         /*
@@ -947,7 +835,7 @@ class MediaAutoResizer
          *
          * This warning is here to save your time, and ours.
          *
-         * If you are interested in helping out with the MediaAutoResizer, then
+         * If you are interested in helping out with the MediaResizer, then
          * that's GREAT! But in that case we require that you fully read through
          * the algorithm below and all of its comments about 50 times over a 3-4
          * day period - until you understand every single step perfectly. The
@@ -972,8 +860,7 @@ class MediaAutoResizer
             // Use floor() so that height will always be above minAspectRatio.
             $useFloorHeightRecalc = true;
             // Determine target ratio; in case of stories we always target 9:16.
-            $targetAspectRatio = $targetFeed === 'story'
-                               ? self::BEST_STORY_RATIO : $minAspectRatio;
+            $targetAspectRatio = $forceTargetAspectRatio !== null ? $forceTargetAspectRatio : $minAspectRatio;
 
             if ($operation === self::CROP) {
                 // We need to limit the height, so floor is used intentionally to
@@ -991,8 +878,7 @@ class MediaAutoResizer
             // Use ceil() so that height will always be below maxAspectRatio.
             $useFloorHeightRecalc = false;
             // Determine target ratio; in case of stories we always target 9:16.
-            $targetAspectRatio = $targetFeed === 'story'
-                               ? self::BEST_STORY_RATIO : $maxAspectRatio;
+            $targetAspectRatio = $forceTargetAspectRatio !== null ? $forceTargetAspectRatio : $maxAspectRatio;
 
             if ($operation === self::CROP) {
                 // We need to limit the width. We use floor to guarantee cutting
@@ -1202,7 +1088,7 @@ class MediaAutoResizer
      *
      * @return Dimensions
      *
-     * @see MediaAutoResizer::_calculateNewCanvas()
+     * @see MediaResizer::_calculateNewCanvas()
      */
     protected function _calculateAdjustedMod2Canvas(
         $inputWidth,

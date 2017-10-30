@@ -86,8 +86,8 @@ try {
     // ratio needed by Instagram stories. You have nothing to worry about, since
     // the class uses temporary files if the input needs processing, and it
     // never overwrites your original file. There are many other options for
-    // the MediaAutoResizer class, so you should read its class documentation!
-    $resizer = new \InstagramAPI\MediaAutoResizer($photoFilename, ['targetFeed' => \InstagramAPI\Constants::FEED_STORY]);
+    // the PhotoResizer class, so you should read its class documentation!
+    $resizer = new \InstagramAPI\Media\Photo\PhotoResizer($photoFilename, ['targetFeed' => \InstagramAPI\Constants::FEED_STORY]);
     $ig->story->uploadPhoto($resizer->getFile(), $metadata);
 
     // NOTE: Providing metadata for story uploads is OPTIONAL. If you just want

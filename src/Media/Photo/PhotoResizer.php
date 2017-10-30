@@ -3,39 +3,15 @@
 namespace InstagramAPI\Media\Photo;
 
 use InstagramAPI\Media\Dimensions;
+use InstagramAPI\Media\MediaResizer;
 use InstagramAPI\Media\Rectangle;
-use InstagramAPI\Media\ResizerInterface;
 use InstagramAPI\Utils;
 
-class PhotoResizer implements ResizerInterface
+/**
+ * @property PhotoDetails $_details
+ */
+class PhotoResizer extends MediaResizer
 {
-    /**
-     * Minimum allowed image width.
-     *
-     * These are decided by Instagram. Not by us!
-     *
-     * This value is the same for both stories and general media.
-     *
-     * @var int
-     *
-     * @see https://help.instagram.com/1631821640426723
-     */
-    const MIN_WIDTH = 320;
-
-    /**
-     * Maximum allowed image width.
-     *
-     * These are decided by Instagram. Not by us!
-     *
-     * This value is the same for both stories and general media.
-     *
-     * Note that Instagram doesn't enforce any max-height. Instead, it checks
-     * the width and aspect ratio which ensures that the height is legal too.
-     *
-     * @var int
-     */
-    const MAX_WIDTH = 1080;
-
     /**
      * Output JPEG quality.
      *
@@ -51,105 +27,32 @@ class PhotoResizer implements ResizerInterface
      */
     const JPEG_QUALITY = 95;
 
-    /** @var string Input file path. */
-    protected $_inputFile;
-
-    /** @var PhotoDetails Media details for the input file. */
-    protected $_details;
-
-    /** @var int|null Orientation of the original image. */
-    protected $_imageOrientation;
-
-    /** @var string Output directory. */
-    protected $_outputDir;
-
-    /** @var array Background color [R, G, B] for the final image. */
-    protected $_bgColor;
-
-    /** {@inheritdoc} */
+    /**
+     * Constructor.
+     *
+     * @param string $inputFile Path to an input file.
+     * @param array  $options   An associative array of optional parameters.
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @see MediaResizer::__construct() description for the list of parameters.
+     */
     public function __construct(
         $inputFile,
-        $outputDir,
-        array $bgColor)
+        array $options = [])
     {
-        $this->_inputFile = $inputFile;
-        $this->_outputDir = $outputDir;
-        $this->_bgColor = $bgColor;
-
-        $this->_loadImageDetails();
+        parent::__construct($inputFile, $options);
+        $this->_details = new PhotoDetails($inputFile);
     }
 
     /** {@inheritdoc} */
-    public function isProcessingRequired()
+    protected function _isMod2CanvasRequired()
     {
-        // Process everything that's not already a JPEG file.
-        if (!$this->_isJpeg()) {
-            return true;
-        }
-
-        // Process if image requires reorientation.
-        if ($this->_imageOrientation !== null && $this->_imageOrientation != 1) {
-            return true;
-        }
-
         return false;
     }
 
     /** {@inheritdoc} */
-    public function isMod2CanvasRequired()
-    {
-        return false;
-    }
-
-    /**
-     * Check if the input photo's axes are swapped.
-     *
-     * @return bool
-     */
-    protected function _hasSwappedAxes()
-    {
-        return in_array($this->_imageOrientation, [5, 6, 7, 8]);
-    }
-
-    /** {@inheritdoc} */
-    public function isHorFlipped()
-    {
-        return in_array($this->_imageOrientation, [2, 3, 6, 7]);
-    }
-
-    /** {@inheritdoc} */
-    public function isVerFlipped()
-    {
-        return in_array($this->_imageOrientation, [3, 4, 7, 8]);
-    }
-
-    /** {@inheritdoc} */
-    public function getMinWidth()
-    {
-        return self::MIN_WIDTH;
-    }
-
-    /** {@inheritdoc} */
-    public function getMaxWidth()
-    {
-        return self::MAX_WIDTH;
-    }
-
-    /** {@inheritdoc} */
-    public function getInputDimensions()
-    {
-        $result = new Dimensions($this->_details->getWidth(), $this->_details->getHeight());
-
-        // Swap to correct dimensions if the image pixels are stored rotated.
-        if ($this->_hasSwappedAxes()) {
-            $result = $result->withSwappedAxes();
-        }
-
-        return $result;
-    }
-
-    /** {@inheritdoc} */
-    public function resize(
+    protected function _resize(
         Rectangle $srcRect,
         Rectangle $dstRect,
         Dimensions $canvas)
@@ -166,11 +69,11 @@ class PhotoResizer implements ResizerInterface
                 @imagedestroy($resource);
             }
 
-            // Prepare output file.
-            $outputFile = Utils::createTempFile($this->_outputDir, 'IMG');
-
             // Write the result to disk.
             try {
+                // Prepare output file.
+                $outputFile = Utils::createTempFile($this->_tmpPath, 'IMG');
+
                 if (!imagejpeg($output, $outputFile, self::JPEG_QUALITY)) {
                     throw new \RuntimeException('Failed to create JPEG image file.');
                 }
@@ -186,19 +89,6 @@ class PhotoResizer implements ResizerInterface
         }
 
         return $outputFile;
-    }
-
-    /**
-     * @throws \InvalidArgumentException
-     */
-    protected function _loadImageDetails()
-    {
-        $this->_details = new PhotoDetails($this->_inputFile, Utils::getPhotoFileDetails($this->_inputFile));
-
-        // Detect JPEG EXIF orientation if it exists.
-        if ($this->_isJpeg() && ($exif = @exif_read_data($this->_inputFile)) !== false) {
-            $this->_imageOrientation = isset($exif['Orientation']) ? $exif['Orientation'] : null;
-        }
     }
 
     /**
@@ -232,14 +122,6 @@ class PhotoResizer implements ResizerInterface
     }
 
     /**
-     * @return bool
-     */
-    protected function _isJpeg()
-    {
-        return $this->_details->getType() === IMAGETYPE_JPEG;
-    }
-
-    /**
      * @param resource   $source  The original image loaded as a resource.
      * @param Rectangle  $srcRect Rectangle to copy from the input.
      * @param Rectangle  $dstRect Destination place and scale of copied pixels.
@@ -257,7 +139,7 @@ class PhotoResizer implements ResizerInterface
         Dimensions $canvas
     ) {
         // If our input image pixels are stored rotated, swap all coordinates.
-        if ($this->_hasSwappedAxes()) {
+        if ($this->_details->hasSwappedAxes()) {
             $srcRect = $srcRect->withSwappedAxes();
             $dstRect = $dstRect->withSwappedAxes();
             $canvas = $canvas->withSwappedAxes();
@@ -293,29 +175,7 @@ class PhotoResizer implements ResizerInterface
         }
 
         // Handle image rotation.
-        switch ($this->_imageOrientation) {
-            case 2:
-                $output = $this->_rotateResource($output, 0, $bgColor, IMG_FLIP_HORIZONTAL);
-                break;
-            case 3:
-                $output = $this->_rotateResource($output, 0, $bgColor, IMG_FLIP_BOTH);
-                break;
-            case 4:
-                $output = $this->_rotateResource($output, 0, $bgColor, IMG_FLIP_VERTICAL);
-                break;
-            case 5:
-                $output = $this->_rotateResource($output, 90, $bgColor, IMG_FLIP_HORIZONTAL);
-                break;
-            case 6:
-                $output = $this->_rotateResource($output, -90, $bgColor);
-                break;
-            case 7:
-                $output = $this->_rotateResource($output, -90, $bgColor, IMG_FLIP_HORIZONTAL);
-                break;
-            case 8:
-                $output = $this->_rotateResource($output, 90, $bgColor);
-                break;
-        }
+        $output = $this->_rotateResource($output, $bgColor);
 
         return $output;
     }
@@ -324,9 +184,7 @@ class PhotoResizer implements ResizerInterface
      * Wrapper for PHP's imagerotate function.
      *
      * @param resource $original
-     * @param int      $angle
      * @param int      $bgColor
-     * @param int|null $flip
      *
      * @throws \RuntimeException
      *
@@ -334,15 +192,38 @@ class PhotoResizer implements ResizerInterface
      */
     protected function _rotateResource(
         $original,
-        $angle,
-        $bgColor,
-        $flip = null)
+        $bgColor)
     {
-        // Flip the image resource if needed. Does not create a new resource.
-        if ($flip !== null) {
-            if (imageflip($original, $flip) === false) {
-                throw new \RuntimeException('Failed to flip image.');
+        $angle = 0;
+        $flip = null;
+        // Find out angle and flip.
+        if ($this->_details->hasSwappedAxes()) {
+            if ($this->_details->isHorizontallyFlipped() && $this->_details->isVerticallyFlipped()) {
+                $angle = -90;
+                $flip = IMG_FLIP_HORIZONTAL;
+            } elseif ($this->_details->isHorizontallyFlipped()) {
+                $angle = -90;
+            } elseif ($this->_details->isVerticallyFlipped()) {
+                $angle = 90;
+            } else {
+                $angle = -90;
+                $flip = IMG_FLIP_VERTICAL;
             }
+        } else {
+            if ($this->_details->isHorizontallyFlipped() && $this->_details->isVerticallyFlipped()) {
+                $flip = IMG_FLIP_BOTH;
+            } elseif ($this->_details->isHorizontallyFlipped()) {
+                $flip = IMG_FLIP_HORIZONTAL;
+            } elseif ($this->_details->isVerticallyFlipped()) {
+                $flip = IMG_FLIP_VERTICAL;
+            } else {
+                // Do nothing.
+            }
+        }
+
+        // Flip the image resource if needed. Does not create a new resource.
+        if ($flip !== null && imageflip($original, $flip) === false) {
+            throw new \RuntimeException('Failed to flip image.');
         }
 
         // Return original resource if no rotation is needed.

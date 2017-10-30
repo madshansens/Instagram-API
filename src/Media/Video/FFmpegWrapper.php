@@ -10,6 +10,9 @@ class FFmpegWrapper
     /** @var bool */
     protected $_hasNoAutorotate;
 
+    /** @var bool */
+    protected $_hasLibFdkAac;
+
     /**
      * Run a command and wrap errors into an Exception (if any).
      *
@@ -34,6 +37,28 @@ class FFmpegWrapper
     }
 
     /**
+     * Check whether ffmpeg has specified audio encoder.
+     *
+     * @param string $encoder
+     *
+     * @return bool
+     */
+    protected function _hasAudioEncoder(
+        $encoder)
+    {
+        try {
+            $this->run(sprintf(
+                '-f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -c:a %s -t 1 -f null -',
+                escapeshellarg($encoder)
+            ));
+
+            return true;
+        } catch (\RuntimeException $e) {
+            return false;
+        }
+    }
+
+    /**
      * Fetch the features set from the ffmpeg binary.
      */
     protected function _fetchFeatures()
@@ -44,6 +69,8 @@ class FFmpegWrapper
         } catch (\RuntimeException $e) {
             $this->_hasNoAutorotate = false;
         }
+
+        $this->_hasLibFdkAac = $this->_hasAudioEncoder('libfdk_aac');
     }
 
     /**
@@ -77,5 +104,15 @@ class FFmpegWrapper
     public function hasNoAutorotate()
     {
         return $this->_hasNoAutorotate;
+    }
+
+    /**
+     * Check whether ffmpeg has libfdk_aac audio encoder.
+     *
+     * @return bool
+     */
+    public function hasLibFdkAac()
+    {
+        return $this->_hasLibFdkAac;
     }
 }

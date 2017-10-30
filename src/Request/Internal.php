@@ -12,7 +12,6 @@ use InstagramAPI\Exception\LoginRequiredException;
 use InstagramAPI\Exception\NetworkException;
 use InstagramAPI\Exception\ThrottledException;
 use InstagramAPI\Media\Video\ThumbResizer;
-use InstagramAPI\MediaAutoResizer;
 use InstagramAPI\Request;
 use InstagramAPI\Request\Metadata\Internal as InternalMetadata;
 use InstagramAPI\Response;
@@ -114,10 +113,7 @@ class Internal extends RequestCollection
             try {
                 $videoFilename = $internalMetadata->getVideoDetails()->getFilename();
                 // Automatically crop&resize the thumbnail to Instagram's requirements.
-                $resizer = new MediaAutoResizer($videoFilename, [
-                    'targetFeed'    => $targetFeed,
-                    'customResizer' => ThumbResizer::class,
-                ]);
+                $resizer = new ThumbResizer($videoFilename, ['targetFeed' => $targetFeed]);
 
                 $photoData = file_get_contents($resizer->getFile()); // Process&get.
             } catch (\Exception $e) {

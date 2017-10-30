@@ -38,7 +38,7 @@ try {
     // You have nothing to worry about, since the class uses temporary files if
     // the input needs processing, and it never overwrites your original file.
     // Also note that it has lots of options, so read its class documentation!
-    $resizer = new \InstagramAPI\MediaAutoResizer($photoFilename);
+    $resizer = new \InstagramAPI\Media\Photo\PhotoResizer($photoFilename);
     $ig->timeline->uploadPhoto($resizer->getFile(), ['caption' => $captionText]);
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";

@@ -5,10 +5,11 @@ date_default_timezone_set('UTC');
 
 require __DIR__.'/../vendor/autoload.php';
 
-use InstagramAPI\MediaAutoResizer;
+use InstagramAPI\Media\MediaResizer;
+use InstagramAPI\Media\Photo\PhotoResizer;
 
 /*
- * This script ensures that the MediaAutoResizer works properly, by testing all
+ * This script ensures that the PhotoResizer works properly, by testing all
  * of the 8 different JPEG EXIF orientations and ensuring they all correctly
  * produce identical results regardless of pixel orientation/flipping flags.
  *
@@ -21,7 +22,7 @@ function runTest(
     $options)
 {
     printf("* Processing: '%s'. Output: '%s'.\n", $inputFile, $outputFile);
-    $resizer = new MediaAutoResizer($inputFile, $options);
+    $resizer = new PhotoResizer($inputFile, $options);
     if (!copy($resizer->getFile(), $outputFile)) {
         throw new \RuntimeException(sprintf('Failed to write to "%s".', $outputFile));
     }
@@ -50,7 +51,7 @@ foreach (['Landscape', 'Portrait'] as $orientation) {
             'minAspectRatio' => 1, // Square.
             'maxAspectRatio' => 1,
             'cropFocus'      => -35, // Always use the same focus, to look for orientation errors.
-            'operation'      => MediaAutoResizer::CROP,
+            'operation'      => MediaResizer::CROP,
         ]);
 
         // Run the expansion test...
@@ -58,7 +59,7 @@ foreach (['Landscape', 'Portrait'] as $orientation) {
         runTest($inputFile, $outputFile, [
             'minAspectRatio' => 1, // Square.
             'maxAspectRatio' => 1,
-            'operation'      => MediaAutoResizer::EXPAND,
+            'operation'      => MediaResizer::EXPAND,
         ]);
     }
 }
