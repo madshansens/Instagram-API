@@ -7,7 +7,7 @@ use InstagramAPI\Response;
 /**
  * FriendshipsShowManyResponse.
  *
- * @method Model\FriendshipStatus[] getFriendshipStatuses()
+ * @method Model\UnpredictableKeys\FriendshipStatusUnpredictableContainer getFriendshipStatuses()
  * @method mixed getMessage()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
@@ -15,7 +15,7 @@ use InstagramAPI\Response;
  * @method bool isMessage()
  * @method bool isStatus()
  * @method bool is_Messages()
- * @method $this setFriendshipStatuses(Model\FriendshipStatus[] $value)
+ * @method $this setFriendshipStatuses(Model\UnpredictableKeys\FriendshipStatusUnpredictableContainer $value)
  * @method $this setMessage(mixed $value)
  * @method $this setStatus(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
@@ -27,6 +27,6 @@ use InstagramAPI\Response;
 class FriendshipsShowManyResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
-        'friendship_statuses' => 'Model\FriendshipStatus[]',
+        'friendship_statuses' => 'Model\UnpredictableKeys\FriendshipStatusUnpredictableContainer',
     ];
 }

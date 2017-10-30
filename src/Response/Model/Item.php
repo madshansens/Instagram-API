@@ -59,6 +59,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getImportedTakenAt()
  * @method mixed getImpressionToken()
  * @method Injected getInjected()
+ * @method string getInventorySource()
  * @method mixed getIsAd4ad()
  * @method mixed getIsDashEligible()
  * @method mixed getIsNewSuggestion()
@@ -179,6 +180,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isImportedTakenAt()
  * @method bool isImpressionToken()
  * @method bool isInjected()
+ * @method bool isInventorySource()
  * @method bool isIsAd4ad()
  * @method bool isIsDashEligible()
  * @method bool isIsNewSuggestion()
@@ -299,6 +301,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setImportedTakenAt(mixed $value)
  * @method $this setImpressionToken(mixed $value)
  * @method $this setInjected(Injected $value)
+ * @method $this setInventorySource(string $value)
  * @method $this setIsAd4ad(mixed $value)
  * @method $this setIsDashEligible(mixed $value)
  * @method $this setIsNewSuggestion(mixed $value)
@@ -419,6 +422,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetImportedTakenAt()
  * @method $this unsetImpressionToken()
  * @method $this unsetInjected()
+ * @method $this unsetInventorySource()
  * @method $this unsetIsAd4ad()
  * @method $this unsetIsDashEligible()
  * @method $this unsetIsNewSuggestion()
@@ -637,6 +641,7 @@ class Item extends AutoPropertyMapper
         'story_feed_media'                 => '',
         'can_reshare'                      => 'bool',
         'supports_reel_reactions'          => 'bool',
+        'inventory_source'                 => 'string',
     ];
 
     /**

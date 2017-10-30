@@ -7,15 +7,15 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * FriendshipStatus.
  *
- * @method mixed getBlocking()
- * @method mixed getFollowedBy()
- * @method mixed getFollowing()
- * @method mixed getIncomingRequest()
- * @method mixed getIsBestie()
- * @method mixed getIsBlockingReel()
- * @method mixed getIsMutingReel()
+ * @method bool getBlocking()
+ * @method bool getFollowedBy()
+ * @method bool getFollowing()
+ * @method bool getIncomingRequest()
+ * @method bool getIsBestie()
+ * @method bool getIsBlockingReel()
+ * @method bool getIsMutingReel()
  * @method bool getIsPrivate()
- * @method mixed getOutgoingRequest()
+ * @method bool getOutgoingRequest()
  * @method bool isBlocking()
  * @method bool isFollowedBy()
  * @method bool isFollowing()
@@ -25,15 +25,15 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isIsMutingReel()
  * @method bool isIsPrivate()
  * @method bool isOutgoingRequest()
- * @method $this setBlocking(mixed $value)
- * @method $this setFollowedBy(mixed $value)
- * @method $this setFollowing(mixed $value)
- * @method $this setIncomingRequest(mixed $value)
- * @method $this setIsBestie(mixed $value)
- * @method $this setIsBlockingReel(mixed $value)
- * @method $this setIsMutingReel(mixed $value)
+ * @method $this setBlocking(bool $value)
+ * @method $this setFollowedBy(bool $value)
+ * @method $this setFollowing(bool $value)
+ * @method $this setIncomingRequest(bool $value)
+ * @method $this setIsBestie(bool $value)
+ * @method $this setIsBlockingReel(bool $value)
+ * @method $this setIsMutingReel(bool $value)
  * @method $this setIsPrivate(bool $value)
- * @method $this setOutgoingRequest(mixed $value)
+ * @method $this setOutgoingRequest(bool $value)
  * @method $this unsetBlocking()
  * @method $this unsetFollowedBy()
  * @method $this unsetFollowing()
@@ -47,14 +47,14 @@ use InstagramAPI\AutoPropertyMapper;
 class FriendshipStatus extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'following'        => '',
-        'followed_by'      => '',
-        'incoming_request' => '',
-        'outgoing_request' => '',
+        'following'        => 'bool',
+        'followed_by'      => 'bool',
+        'incoming_request' => 'bool',
+        'outgoing_request' => 'bool',
         'is_private'       => 'bool',
-        'is_blocking_reel' => '',
-        'is_muting_reel'   => '',
-        'blocking'         => '',
-        'is_bestie'        => '',
+        'is_blocking_reel' => 'bool',
+        'is_muting_reel'   => 'bool',
+        'blocking'         => 'bool',
+        'is_bestie'        => 'bool',
     ];
 }
