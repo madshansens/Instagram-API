@@ -7,14 +7,14 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * Attribution.
  *
- * @method mixed getName()
+ * @method string getName()
  * @method bool isName()
- * @method $this setName(mixed $value)
+ * @method $this setName(string $value)
  * @method $this unsetName()
  */
 class Attribution extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'name' => '',
+        'name' => 'string',
     ];
 }

@@ -97,7 +97,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getPlaybackDurationSecs()
  * @method string getPreview()
  * @method Comment[] getPreviewComments()
- * @method ReelMentions[] getReelMentions()
+ * @method ReelMention[] getReelMentions()
  * @method ReelShare getReelShare()
  * @method string[] getSavedCollectionIds()
  * @method string getSocialContext()
@@ -339,7 +339,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setPlaybackDurationSecs(mixed $value)
  * @method $this setPreview(string $value)
  * @method $this setPreviewComments(Comment[] $value)
- * @method $this setReelMentions(ReelMentions[] $value)
+ * @method $this setReelMentions(ReelMention[] $value)
  * @method $this setReelShare(ReelShare $value)
  * @method $this setSavedCollectionIds(string[] $value)
  * @method $this setSocialContext(string $value)
@@ -518,6 +518,7 @@ class Item extends AutoPropertyMapper
         'filter_type'                      => 'int',
         'attribution'                      => 'Attribution',
         'image_versions2'                  => 'Image_Versions2',
+        'video_versions'                   => 'VideoVersions[]',
         'original_width'                   => 'int',
         'original_height'                  => 'int',
         /*
@@ -547,7 +548,7 @@ class Item extends AutoPropertyMapper
          */
         'comments'                         => 'Comment[]',
         'comments_disabled'                => '',
-        'reel_mentions'                    => 'ReelMentions[]',
+        'reel_mentions'                    => 'ReelMention[]',
         'story_cta'                        => 'StoryCta[]',
         'caption_position'                 => 'float',
         'expiring_at'                      => '', // TODO, INVESTIGATE: sometimes int, sometimes float
@@ -558,7 +559,6 @@ class Item extends AutoPropertyMapper
         'caption'                          => 'Caption',
         'caption_is_edited'                => 'bool',
         'photo_of_you'                     => 'bool',
-        'video_versions'                   => 'VideoVersions[]',
         'has_audio'                        => 'bool',
         'video_duration'                   => 'float',
         'user'                             => 'User',

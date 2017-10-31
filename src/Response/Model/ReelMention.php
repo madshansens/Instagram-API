@@ -6,7 +6,7 @@ use InstagramAPI\AutoPropertyMapper;
 use InstagramAPI\Response\PropertyCollection;
 
 /**
- * ReelMentions.
+ * ReelMention.
  *
  * @method float getHeight()
  * @method int getIsPinned()
@@ -37,7 +37,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method $this unsetX()
  * @method $this unsetY()
  */
-class ReelMentions extends AutoPropertyMapper
+class ReelMention extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
         PropertyCollection\Sticker::class,
