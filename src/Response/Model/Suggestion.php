@@ -7,14 +7,14 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * Suggestion.
  *
- * @method mixed getAlgorithm()
+ * @method string getAlgorithm()
  * @method mixed getCaption()
  * @method mixed getIcon()
- * @method mixed getIsNewSuggestion()
+ * @method bool getIsNewSuggestion()
  * @method string[] getLargeUrls()
  * @method mixed getMediaIds()
  * @method mixed getMediaInfos()
- * @method mixed getSocialContext()
+ * @method string getSocialContext()
  * @method string[] getThumbnailUrls()
  * @method User getUser()
  * @method mixed getValue()
@@ -29,14 +29,14 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isThumbnailUrls()
  * @method bool isUser()
  * @method bool isValue()
- * @method $this setAlgorithm(mixed $value)
+ * @method $this setAlgorithm(string $value)
  * @method $this setCaption(mixed $value)
  * @method $this setIcon(mixed $value)
- * @method $this setIsNewSuggestion(mixed $value)
+ * @method $this setIsNewSuggestion(bool $value)
  * @method $this setLargeUrls(string[] $value)
  * @method $this setMediaIds(mixed $value)
  * @method $this setMediaInfos(mixed $value)
- * @method $this setSocialContext(mixed $value)
+ * @method $this setSocialContext(string $value)
  * @method $this setThumbnailUrls(string[] $value)
  * @method $this setUser(User $value)
  * @method $this setValue(mixed $value)
@@ -56,8 +56,8 @@ class Suggestion extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
         'media_infos'       => '',
-        'social_context'    => '',
-        'algorithm'         => '',
+        'social_context'    => 'string',
+        'algorithm'         => 'string',
         'thumbnail_urls'    => 'string[]',
         'value'             => '',
         'caption'           => '',
@@ -65,6 +65,6 @@ class Suggestion extends AutoPropertyMapper
         'large_urls'        => 'string[]',
         'media_ids'         => '',
         'icon'              => '',
-        'is_new_suggestion' => '',
+        'is_new_suggestion' => 'bool',
     ];
 }

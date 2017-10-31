@@ -21,7 +21,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getMediaId()
  * @method mixed getMuted()
  * @method mixed getNumberOfQualities()
- * @method mixed getOrganicTrackingToken()
+ * @method string getOrganicTrackingToken()
  * @method mixed getPublishedTime()
  * @method mixed getRankedPosition()
  * @method string getRtmpPlaybackUrl()
@@ -63,7 +63,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setMediaId(string $value)
  * @method $this setMuted(mixed $value)
  * @method $this setNumberOfQualities(mixed $value)
- * @method $this setOrganicTrackingToken(mixed $value)
+ * @method $this setOrganicTrackingToken(string $value)
  * @method $this setPublishedTime(mixed $value)
  * @method $this setRankedPosition(mixed $value)
  * @method $this setRtmpPlaybackUrl(string $value)
@@ -107,7 +107,7 @@ class Broadcast extends AutoPropertyMapper
         'dash_abr_playback_url'     => 'string',
         'dash_playback_url'         => 'string',
         'ranked_position'           => '',
-        'organic_tracking_token'    => '',
+        'organic_tracking_token'    => 'string',
         'seen_ranked_position'      => '',
         'viewer_count'              => '',
         'dash_manifest'             => '',

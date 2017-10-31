@@ -8,7 +8,7 @@ use InstagramAPI\Response;
  * BroadcastCommentsResponse.
  *
  * @method mixed getCaption()
- * @method mixed getCaptionIsEdited()
+ * @method bool getCaptionIsEdited()
  * @method int getCommentCount()
  * @method bool getCommentLikesEnabled()
  * @method mixed getCommentMuted()
@@ -38,7 +38,7 @@ use InstagramAPI\Response;
  * @method bool isSystemComments()
  * @method bool is_Messages()
  * @method $this setCaption(mixed $value)
- * @method $this setCaptionIsEdited(mixed $value)
+ * @method $this setCaptionIsEdited(bool $value)
  * @method $this setCommentCount(int $value)
  * @method $this setCommentLikesEnabled(bool $value)
  * @method $this setCommentMuted(mixed $value)
@@ -80,7 +80,7 @@ class BroadcastCommentsResponse extends Response
         'pinned_comment'             => 'Model\Comment',
         'system_comments'            => '',
         'has_more_comments'          => 'bool',
-        'caption_is_edited'          => '',
+        'caption_is_edited'          => 'bool',
         'caption'                    => '',
         'comment_muted'              => '',
     ];

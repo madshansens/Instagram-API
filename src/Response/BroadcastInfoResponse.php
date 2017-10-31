@@ -13,7 +13,7 @@ use InstagramAPI\Response;
  * @method string getId()
  * @method string getMediaId()
  * @method mixed getMessage()
- * @method mixed getOrganicTrackingToken()
+ * @method string getOrganicTrackingToken()
  * @method mixed getPublishedTime()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
@@ -33,7 +33,7 @@ use InstagramAPI\Response;
  * @method $this setId(string $value)
  * @method $this setMediaId(string $value)
  * @method $this setMessage(mixed $value)
- * @method $this setOrganicTrackingToken(mixed $value)
+ * @method $this setOrganicTrackingToken(string $value)
  * @method $this setPublishedTime(mixed $value)
  * @method $this setStatus(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
@@ -53,7 +53,7 @@ class BroadcastInfoResponse extends Response
     const JSON_PROPERTY_MAP = [
         'id'                     => 'string',
         'broadcast_message'      => '',
-        'organic_tracking_token' => '',
+        'organic_tracking_token' => 'string',
         'published_time'         => '',
         'broadcast_status'       => '',
         'media_id'               => 'string',

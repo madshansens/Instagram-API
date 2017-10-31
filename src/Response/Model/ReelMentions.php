@@ -5,51 +5,46 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
- * StoryLocation.
+ * ReelMentions.
  *
- * @method string getAttribution()
  * @method float getHeight()
  * @method int getIsPinned()
- * @method Location getLocation()
  * @method float getRotation()
+ * @method User getUser()
  * @method float getWidth()
  * @method float getX()
  * @method float getY()
- * @method bool isAttribution()
  * @method bool isHeight()
  * @method bool isIsPinned()
- * @method bool isLocation()
  * @method bool isRotation()
+ * @method bool isUser()
  * @method bool isWidth()
  * @method bool isX()
  * @method bool isY()
- * @method $this setAttribution(string $value)
  * @method $this setHeight(float $value)
  * @method $this setIsPinned(int $value)
- * @method $this setLocation(Location $value)
  * @method $this setRotation(float $value)
+ * @method $this setUser(User $value)
  * @method $this setWidth(float $value)
  * @method $this setX(float $value)
  * @method $this setY(float $value)
- * @method $this unsetAttribution()
  * @method $this unsetHeight()
  * @method $this unsetIsPinned()
- * @method $this unsetLocation()
  * @method $this unsetRotation()
+ * @method $this unsetUser()
  * @method $this unsetWidth()
  * @method $this unsetX()
  * @method $this unsetY()
  */
-class StoryLocation extends AutoPropertyMapper
+class ReelMentions extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'x'           => 'float',
-        'y'           => 'float',
-        'width'       => 'float',
-        'height'      => 'float',
-        'rotation'    => 'float',
-        'is_pinned'   => 'int',
-        'location'    => 'Location',
-        'attribution' => 'string',
+        'x'         => 'float',
+        'y'         => 'float',
+        'width'     => 'float',
+        'height'    => 'float',
+        'rotation'  => 'float',
+        'is_pinned' => 'int',
+        'user'      => 'User',
     ];
 }

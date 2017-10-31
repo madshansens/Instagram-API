@@ -81,7 +81,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getShowConversionEditEntry()
  * @method mixed getShowFeedBizConversionIcon()
  * @method mixed getShowInsightsTerms()
- * @method mixed getSocialContext()
+ * @method string getSocialContext()
  * @method mixed getUnseenCount()
  * @method string getUserId()
  * @method string getUsername()
@@ -243,7 +243,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setShowConversionEditEntry(mixed $value)
  * @method $this setShowFeedBizConversionIcon(mixed $value)
  * @method $this setShowInsightsTerms(mixed $value)
- * @method $this setSocialContext(mixed $value)
+ * @method $this setSocialContext(string $value)
  * @method $this setUnseenCount(mixed $value)
  * @method $this setUserId(string $value)
  * @method $this setUsername(string $value)
@@ -353,7 +353,7 @@ class User extends AutoPropertyMapper
         'unseen_count'                        => '',
         'mutual_followers_count'              => '',
         'follower_count'                      => 'int',
-        'social_context'                      => '',
+        'social_context'                      => 'string',
         'media_count'                         => 'int',
         'following_count'                     => 'int',
         'is_business'                         => 'bool',

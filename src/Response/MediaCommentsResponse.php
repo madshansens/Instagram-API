@@ -8,7 +8,7 @@ use InstagramAPI\Response;
  * MediaCommentsResponse.
  *
  * @method Model\Caption getCaption()
- * @method mixed getCaptionIsEdited()
+ * @method bool getCaptionIsEdited()
  * @method int getCommentCount()
  * @method bool getCommentLikesEnabled()
  * @method Model\Comment[] getComments()
@@ -38,7 +38,7 @@ use InstagramAPI\Response;
  * @method bool isThreadingEnabled()
  * @method bool is_Messages()
  * @method $this setCaption(Model\Caption $value)
- * @method $this setCaptionIsEdited(mixed $value)
+ * @method $this setCaptionIsEdited(bool $value)
  * @method $this setCommentCount(int $value)
  * @method $this setCommentLikesEnabled(bool $value)
  * @method $this setComments(Model\Comment[] $value)
@@ -78,7 +78,7 @@ class MediaCommentsResponse extends Response
         'next_min_id'                => 'string',
         'caption'                    => 'Model\Caption',
         'has_more_comments'          => 'bool',
-        'caption_is_edited'          => '',
+        'caption_is_edited'          => 'bool',
         'preview_comments'           => '',
         'has_more_headload_comments' => 'bool',
         'media_header_display'       => 'string',
