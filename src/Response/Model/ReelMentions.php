@@ -3,6 +3,7 @@
 namespace InstagramAPI\Response\Model;
 
 use InstagramAPI\AutoPropertyMapper;
+use InstagramAPI\Response\PropertyCollection;
 
 /**
  * ReelMentions.
@@ -39,12 +40,7 @@ use InstagramAPI\AutoPropertyMapper;
 class ReelMentions extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'x'         => 'float',
-        'y'         => 'float',
-        'width'     => 'float',
-        'height'    => 'float',
-        'rotation'  => 'float',
-        'is_pinned' => 'int',
+        PropertyCollection\Sticker::class,
         'user'      => 'User',
     ];
 }
