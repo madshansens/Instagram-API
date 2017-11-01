@@ -44,6 +44,8 @@ class Direct extends RequestCollection
     /**
      * Get visual inbox data.
      *
+     * `NOTE:` This "visual" endpoint is only used for Direct stories.
+     *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\DirectVisualInboxResponse
@@ -252,6 +254,8 @@ class Direct extends RequestCollection
 
     /**
      * Get direct visual thread.
+     *
+     * `NOTE:` This "visual" endpoint is only used for Direct stories.
      *
      * @param string      $threadId Thread ID.
      * @param string|null $cursorId Next "cursor ID", used for pagination.
@@ -927,6 +931,8 @@ class Direct extends RequestCollection
 
     /**
      * Marks visual items from given thread as seen.
+     *
+     * `NOTE:` This "visual" endpoint is only used for Direct stories.
      *
      * @param string          $threadId      Thread ID.
      * @param string|string[] $threadItemIds One or more thread item IDs.
