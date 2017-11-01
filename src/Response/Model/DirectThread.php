@@ -25,6 +25,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getNewestCursor()
  * @method mixed getOldestCursor()
  * @method mixed getPending()
+ * @method string getPendingScore()
  * @method string getThreadId()
  * @method mixed getThreadTitle()
  * @method mixed getThreadType()
@@ -49,6 +50,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isNewestCursor()
  * @method bool isOldestCursor()
  * @method bool isPending()
+ * @method bool isPendingScore()
  * @method bool isThreadId()
  * @method bool isThreadTitle()
  * @method bool isThreadType()
@@ -73,6 +75,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setNewestCursor(mixed $value)
  * @method $this setOldestCursor(mixed $value)
  * @method $this setPending(mixed $value)
+ * @method $this setPendingScore(string $value)
  * @method $this setThreadId(string $value)
  * @method $this setThreadTitle(mixed $value)
  * @method $this setThreadType(mixed $value)
@@ -97,6 +100,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetNewestCursor()
  * @method $this unsetOldestCursor()
  * @method $this unsetPending()
+ * @method $this unsetPendingScore()
  * @method $this unsetThreadId()
  * @method $this unsetThreadTitle()
  * @method $this unsetThreadType()
@@ -131,5 +135,6 @@ class DirectThread extends AutoPropertyMapper
         'last_activity_at_secs' => '',
         'last_permanent_item'   => 'PermanentItem',
         'is_pin'                => '',
+        'pending_score'         => 'string',
     ];
 }
