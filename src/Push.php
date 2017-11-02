@@ -12,23 +12,95 @@ use Psr\Log\NullLogger;
 use React\EventLoop\LoopInterface;
 
 /**
- * The following events are emitted:
- *  - incoming - New PUSH notification has been received.
- *  - like - Someone has liked your media.
- *  - comment - Someone has commented on your media.
- *  - direct_v2_message - Someone has messaged you.
- *  - usertag - You have been tagged in some photo.
- *  - mentioned_comment - You have been mentioned in some comment.
- *  - new_follower - Someone has started following you.
- *  - live_broadcast - Someone you know has started live broadcast.
- *  - live_broadcast_revoke - Someone you know has stopped live broadcast.
- *  - follow_request_approved - Your follow request has been approved.
- *  - comment_like - Your comment has been liked by someone.
- *  - private_user_follow_request - Someone wants to follow you.
- *  - post - Someone you know has posted something.
- *  - comment_on_tag - Someone has commented on photo you are tagged in.
- *  - ...
- *  - error - An event of severity "error" occurred.
+ * The following events are emitted.
+ *
+ *   Posts:
+ *     - post - "USERNAME just shared a post."
+ *       media?id=1111111111111111111_1111111111
+ *     - first_post - "See NAME's first Instagram post."
+ *       user?username=USERNAME
+ *     - resurrected_user_post - "USERNAME posted for the first time in a while. Be the first to add a comment."
+ *       media?id=1111111111111111111_1111111111
+ *     - recent_follow_post - "USERNAME just shared a post."
+ *       media?id=1111111111111111111_1111111111
+ *     - fb_first_post - "Your Facebook friend NAME just shared their first Instagram post"
+ *       user?username=USERNAME
+ *
+ *   Stories:
+ *     - first_reel_post - "See USERNAME's first story on Instagram."
+ *       user?username=USERNAME&launch_reel=1
+ *     - resurrected_reel_post - "USERNAME added to their story for the first time in a while."
+ *       user?username=USERNAME&launch_reel=1
+ *     - story_poll_vote - "USERNAME voted YES to "POLL". Currently: 2 YES, 1 NO"
+ *       user?username=USERNAME&launch_reel=1&media_id=1111111111111111111_1111111111&include_viewers=1
+ *     - story_poll_close - "Your poll, "POLL" ends in an hour. Results so far: 2 YES, 1 NO"
+ *       user?username=USERNAME&launch_reel=1&media_id=1111111111111111111_1111111111&include_viewers=1
+ *     - story_producer_expire_media - "Your story has NUMBER views. Find out who's seen it before it disappears."
+ *       user?username=USERNAME&launch_reel=1
+ *
+ *   Followers and contacts:
+ *     - new_follower - "NAME (USERNAME) started following you."
+ *       user?username=USERNAME
+ *     - private_user_follow_request - "NAME (@USERNAME) has requested to follow you."
+ *       user?username=USERNAME
+ *     - follow_request_approved - "USERNAME accepted your follow request. Now you can see their photos and videos."
+ *       user?username=USERNAME
+ *     - contactjoined - "Your Facebook friend NAME is on Instagram as USERNAME."
+ *       user?username=USERNAME
+ *     - fb_friend_connected - "Your Facebook friend NAME is on Instagram as USERNAME."
+ *       user?username=USERNAME
+ *
+ *   Comments:
+ *     - comment - "USERNAME commented: "TEXT""
+ *       media?id=1111111111111111111_1111111111&forced_preview_comment_id=11111111111111111
+ *     - mentioned_comment - "USERNAME mentioned you in a comment: TEXT..."
+ *       media?id=1111111111111111111_1111111111
+ *     - comment_on_tag - "USERNAME commented on a post you're tagged in."
+ *       media?id=1111111111111111111 <- Yep, no author ID here.
+ *     - comment_subscribed - "USERNAME also commented on USERNAME's post: "TEXT""
+ *       comments_v2?media_id=1111111111111111111_1111111111&target_comment_id=11111111111111111
+ *
+ *   Likes:
+ *     - like - "USERNAME liked your post."
+ *       media?id=1111111111111111111_1111111111
+ *     - like_on_tag - "USERNAME liked a post you're tagged in."
+ *       media?id=1111111111111111111_1111111111
+ *     - comment_like - "USERNAME liked your comment: "TEXT...""
+ *       media?id=1111111111111111111_1111111111&forced_preview_comment_id=11111111111111111
+ *
+ *   Direct:
+ *     - direct_v2_message - "USERNAME sent you a message."
+ *       direct_v2?id=11111111111111111111111111111111111111&x=11111111111111111111111111111111111
+ *     - direct_v2_message - "USERNAME wants to send you a message."
+ *       direct_v2?id=11111111111111111111111111111111111111&t=p
+ *
+ *   Live:
+ *     - live_broadcast - "USERNAME started a live video. Watch it before it ends!"
+ *       broadcast?id=11111111111111111&reel_id=1111111111&published_time=1234567890
+ *     - live_broadcast_revoke
+ *       broadcast?id=11111111111111111&reel_id=1111111111&published_time=1234567890
+ *
+ *   Business:
+ *     - aymt - "Your promotion has ended."
+ *       media?id=1111111111111111111_1111111111
+ *     - ad_preview - "Your ad is ready to preview"
+ *       media?id=1111111111111111111_1111111111
+ *
+ *   Unsorted:
+ *     - usertag - "USERNAME tagged you in a post"
+ *       media?id=1111111111111111111_1111111111
+ *     - video_view_count - "People viewed your video more than NUMBER times."
+ *       media?id=1111111111111111111_1111111111
+ *     - copyright_video - "Your video may have copyrighted content that belongs to someone else."
+ *       news
+ *     - report_updated - "Your support request from DATE was just updated."
+ *       news
+ *
+ *   System:
+ *     - silent_push - Some kind of service push that does nothing. Nothing important, I hope.
+ *     - incoming - The event that catches all pushes. Useful for debugging and logging.
+ *     - warning - An exception of severity "warning" occured.
+ *     - error - An exception of severity "error" occurred. It's not guaranteed that the Push client will continue to work.
  */
 class Push implements EventEmitterInterface
 {
