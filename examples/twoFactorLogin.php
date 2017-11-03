@@ -24,7 +24,7 @@ try {
         // You should replace this line with the logic you want.
         // The verification code will be sent by Instagram via SMS.
         $verificationCode = trim(fgets(STDIN));
-        $ig->finishTwoFactorLogin($verificationCode, $twoFactorIdentifier);
+        $ig->finishTwoFactorLogin($username, $password, $twoFactorIdentifier, $verificationCode);
     }
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";
