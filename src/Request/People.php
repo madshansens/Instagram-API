@@ -441,9 +441,11 @@ class People extends RequestCollection
     public function linkAddressBook(
         array $contacts)
     {
-        return $this->ig->request('address_book/link/?include=extra_display_name,thumbnails')
+        return $this->ig->request('address_book/link/')
             ->setSignedPost(false)
             ->addPost('contacts', json_encode($contacts))
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\LinkAddressBookResponse());
     }
 
