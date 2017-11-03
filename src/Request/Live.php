@@ -332,7 +332,7 @@ class Live extends RequestCollection
     /**
      * Create a live broadcast.
      *
-     * Read the description of start() for proper usage.
+     * Read the description of `start()` for proper usage.
      *
      * @param int    $previewWidth     (optional) Width.
      * @param int    $previewHeight    (optional) Height.
@@ -343,6 +343,7 @@ class Live extends RequestCollection
      * @return \InstagramAPI\Response\CreateLiveResponse
      *
      * @see Live::start()
+     * @see Live::end()
      */
     public function create(
         $previewWidth = 720,
@@ -363,16 +364,17 @@ class Live extends RequestCollection
     /**
      * Start a live broadcast.
      *
-     * Note that you MUST first call create() to get a broadcast-ID and its RTMP
-     * upload-URL. Next, simply begin sending your actual video broadcast to the
-     * stream-upload URL. And then call start() with the broadcast-ID to make
-     * the stream available to viewers.
+     * Note that you MUST first call `create()` to get a broadcast-ID and its
+     * RTMP upload-URL. Next, simply begin sending your actual video broadcast
+     * to the stream-upload URL. And then call `start()` with the broadcast-ID
+     * to make the stream available to viewers.
      *
      * Also note that broadcasting to the video stream URL must be done via
      * other software, since it ISN'T (and won't be) handled by this library!
      *
-     * Lastly, note that stopping the stream is done via RTMP signals, which
-     * your broadcasting software MUST output properly (FFmpeg DOESN'T do it!).
+     * Lastly, note that stopping the stream is done either via RTMP signals,
+     * which your broadcasting software MUST output properly (FFmpeg DOESN'T do
+     * it without special patching!), OR by calling the `end()` function.
      *
      * @param string $broadcastId       The broadcast ID in Instagram's internal format (ie "17854587811139572").
      * @param bool   $sendNotifications (optional) Whether to send notifications about the broadcast to your followers.
@@ -382,6 +384,7 @@ class Live extends RequestCollection
      * @return \InstagramAPI\Response\StartLiveResponse
      *
      * @see Live::create()
+     * @see Live::end()
      */
     public function start(
         $broadcastId,
@@ -395,13 +398,19 @@ class Live extends RequestCollection
     }
 
     /**
-     * Ends a live broadcast.
+     * End a live broadcast.
+     *
+     * `NOTE:` To end your broadcast, you MUST use the `broadcast_id` value
+     * which was assigned to you in the `create()` response.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\GenericResponse
+     *
+     * @see Live::create()
+     * @see Live::start()
      */
     public function end(
         $broadcastId)
