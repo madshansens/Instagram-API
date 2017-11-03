@@ -52,6 +52,12 @@ try {
         .substr($stream->getUploadUrl(), 42)
         .'"'
     );
+
+    // End the broadcast stream.
+    $ig->live->end($stream->getBroadcastId());
+    // Once the broadcast has ended, you can optionally add the finished broadcast
+    // to your post-live feed (saved replay).
+    $ig->live->addToPostLive($stream->getBroadcastId());
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";
 }
