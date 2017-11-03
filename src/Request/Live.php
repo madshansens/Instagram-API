@@ -395,6 +395,25 @@ class Live extends RequestCollection
     }
 
     /**
+     * Ends a live broadcast.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function end(
+        $broadcastId)
+    {
+        return $this->ig->request("live/{$broadcastId}/start/")
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
      * Add a finished broadcast to your post-live feed (saved replay).
      *
      * The broadcast must have ended before you can call this function.
