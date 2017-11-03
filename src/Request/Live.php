@@ -406,7 +406,7 @@ class Live extends RequestCollection
     public function end(
         $broadcastId)
     {
-        return $this->ig->request("live/{$broadcastId}/start/")
+        return $this->ig->request("live/{$broadcastId}/end_broadcast/")
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
