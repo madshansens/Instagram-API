@@ -65,7 +65,7 @@ class UserAgent
         $string)
     {
         $result = '';
-        for ($i = 0; $i < strlen($string); $i++) {
+        for ($i = 0; $i < strlen($string); ++$i) {
             $char = $string[$i];
             if ($char === '&') {
                 $result .= '&amp;';

@@ -117,7 +117,7 @@ class Utils
         $string)
     {
         $result = 0;
-        for ($i = 0, $len = strlen($string); $i < $len; $i++) {
+        for ($i = 0, $len = strlen($string); $i < $len; ++$i) {
             $result = (-$result + ($result << 5) + ord($string[$i])) & 0xFFFFFFFF;
         }
         if (PHP_INT_SIZE > 4) {
