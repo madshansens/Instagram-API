@@ -33,10 +33,6 @@ try {
     // alternatives are valid too, like OBS (Open Broadcaster Software,
     // https://obsproject.com).
     //
-    // In case you are using FFMPEG, you need to patch FFMPEG in order to
-    // add the stop feature, which will tell Instagram that the stream has
-    // ended. Otherwise your stream never ends!
-    //
     // For more information on FFMPEG, see:
     // https://github.com/mgp25/Instagram-API/issues/1488#issuecomment-324271177
     // and for OBS, see:
@@ -54,7 +50,11 @@ try {
     );
 
     // End the broadcast stream.
+    // NOTE: Instagram will ALSO end the stream if your broadcasting software
+    // itself sends a RTMP signal to end the stream. FFmpeg doesn't do that
+    // (without patching), but OBS sends such a packet. So be aware of that.
     $ig->live->end($stream->getBroadcastId());
+
     // Once the broadcast has ended, you can optionally add the finished broadcast
     // to your post-live feed (saved replay).
     $ig->live->addToPostLive($stream->getBroadcastId());
