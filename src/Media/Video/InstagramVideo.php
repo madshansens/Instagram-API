@@ -3,14 +3,16 @@
 namespace InstagramAPI\Media\Video;
 
 use InstagramAPI\Media\Dimensions;
-use InstagramAPI\Media\MediaResizer;
+use InstagramAPI\Media\InstagramMedia;
 use InstagramAPI\Media\Rectangle;
 use InstagramAPI\Utils;
 
 /**
+ * Automatically prepares a video file according to Instagram's rules.
+ *
  * @property VideoDetails $_details
  */
-class VideoResizer extends MediaResizer
+class InstagramVideo extends InstagramMedia
 {
     /** @var FFmpegWrapper */
     protected $_ffmpegWrapper;
@@ -25,7 +27,7 @@ class VideoResizer extends MediaResizer
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      *
-     * @see MediaResizer::__construct() description for the list of parameters.
+     * @see InstagramMedia::__construct() description for the list of parameters.
      */
     public function __construct(
         $inputFile,
@@ -50,7 +52,7 @@ class VideoResizer extends MediaResizer
     }
 
     /** {@inheritdoc} */
-    protected function _resize(
+    protected function _createOutputFile(
         Rectangle $srcRect,
         Rectangle $dstRect,
         Dimensions $canvas)

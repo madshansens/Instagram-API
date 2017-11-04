@@ -3,14 +3,16 @@
 namespace InstagramAPI\Media\Photo;
 
 use InstagramAPI\Media\Dimensions;
-use InstagramAPI\Media\MediaResizer;
+use InstagramAPI\Media\InstagramMedia;
 use InstagramAPI\Media\Rectangle;
 use InstagramAPI\Utils;
 
 /**
+ * Automatically prepares a photo file according to Instagram's rules.
+ *
  * @property PhotoDetails $_details
  */
-class PhotoResizer extends MediaResizer
+class InstagramPhoto extends InstagramMedia
 {
     /**
      * Output JPEG quality.
@@ -35,7 +37,7 @@ class PhotoResizer extends MediaResizer
      *
      * @throws \InvalidArgumentException
      *
-     * @see MediaResizer::__construct() description for the list of parameters.
+     * @see InstagramMedia::__construct() description for the list of parameters.
      */
     public function __construct(
         $inputFile,
@@ -52,7 +54,7 @@ class PhotoResizer extends MediaResizer
     }
 
     /** {@inheritdoc} */
-    protected function _resize(
+    protected function _createOutputFile(
         Rectangle $srcRect,
         Rectangle $dstRect,
         Dimensions $canvas)

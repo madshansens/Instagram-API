@@ -2,6 +2,9 @@
 
 namespace InstagramAPI\Media\Constraints;
 
+/**
+ * Instagram's direct messaging story media constraints.
+ */
 class DirectStoryConstraints extends StoryConstraints
 {
     /** {@inheritdoc} */

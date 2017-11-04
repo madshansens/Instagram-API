@@ -2,7 +2,10 @@
 
 namespace InstagramAPI\Media\Video;
 
-class ThumbResizer extends VideoResizer
+/**
+ * Automatically creates a video thumbnail according to Instagram's rules.
+ */
+class InstagramThumbnail extends InstagramVideo
 {
     /** {@inheritdoc} */
     protected function _shouldProcess()

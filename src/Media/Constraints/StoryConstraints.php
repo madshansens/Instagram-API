@@ -4,6 +4,9 @@ namespace InstagramAPI\Media\Constraints;
 
 use InstagramAPI\Media\ConstraintsInterface;
 
+/**
+ * Instagram's story media constraints.
+ */
 class StoryConstraints implements ConstraintsInterface
 {
     /**
@@ -17,9 +20,9 @@ class StoryConstraints implements ConstraintsInterface
      * story media aspects that are commonly used by the app: 0.56 - 0.67.
      * (That's ~1080x1611 to ~1080x1928.)
      *
-     * However, if you're using our media resizer classes, please note that
+     * However, if you're using our media processing classes, please note that
      * they will target the "best story aspect ratio range" by default, and
-     * that you must manually disable that constructor option in the resizer
+     * that you must manually disable that constructor option in the class
      * to get this extended story aspect range, if you REALLY want it...
      *
      * @var float

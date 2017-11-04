@@ -33,13 +33,14 @@ try {
 
     // If you want to guarantee that the file is valid (correct format, codecs,
     // width, height and aspect ratio), then you can run it through our
-    // automatic video resizer class. It only does any work when the input
-    // video file is invalid, so you may want to always use it.
-    // You have nothing to worry about, since the class uses temporary files if
-    // the input needs processing, and it never overwrites your original file.
+    // automatic video processing class. It only does any work when the input
+    // video file is invalid, so you may want to always use it. You have nothing
+    // to worry about, since the class uses temporary files if the input needs
+    // processing, and it never overwrites your original file.
+    //
     // Also note that it has lots of options, so read its class documentation!
-    $resizer = new \InstagramAPI\Media\Video\VideoResizer($videoFilename);
-    $ig->timeline->uploadVideo($resizer->getFile(), ['caption' => $captionText]);
+    $video = new \InstagramAPI\Media\Video\InstagramVideo($videoFilename);
+    $ig->timeline->uploadVideo($video->getFile(), ['caption' => $captionText]);
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";
 }

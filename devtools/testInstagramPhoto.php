@@ -5,11 +5,11 @@ date_default_timezone_set('UTC');
 
 require __DIR__.'/../vendor/autoload.php';
 
-use InstagramAPI\Media\MediaResizer;
-use InstagramAPI\Media\Photo\PhotoResizer;
+use InstagramAPI\Media\InstagramMedia;
+use InstagramAPI\Media\Photo\InstagramPhoto;
 
 /*
- * This script ensures that the PhotoResizer works properly, by testing all
+ * This script ensures that InstagramPhoto works properly, by testing all
  * of the 8 different JPEG EXIF orientations and ensuring they all correctly
  * produce identical results regardless of pixel orientation/flipping flags.
  *
@@ -22,8 +22,8 @@ function runTest(
     $options)
 {
     printf("* Processing: '%s'. Output: '%s'.\n", $inputFile, $outputFile);
-    $resizer = new PhotoResizer($inputFile, $options);
-    if (!copy($resizer->getFile(), $outputFile)) {
+    $photo = new InstagramPhoto($inputFile, $options);
+    if (!copy($photo->getFile(), $outputFile)) {
         throw new \RuntimeException(sprintf('Failed to write to "%s".', $outputFile));
     }
 }
@@ -52,7 +52,7 @@ foreach (['Landscape', 'Portrait'] as $orientation) {
             'maxAspectRatio' => 1,
             'horCropFocus'   => -35, // Always use the same focus, to look for orientation errors.
             'verCropFocus'   => -35, // This combo aims at the upper left corner.
-            'operation'      => MediaResizer::CROP,
+            'operation'      => InstagramMedia::CROP,
         ]);
 
         // Run the expansion test...
@@ -60,7 +60,7 @@ foreach (['Landscape', 'Portrait'] as $orientation) {
         runTest($inputFile, $outputFile, [
             'minAspectRatio' => 1, // Square.
             'maxAspectRatio' => 1,
-            'operation'      => MediaResizer::EXPAND,
+            'operation'      => InstagramMedia::EXPAND,
         ]);
     }
 }

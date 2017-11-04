@@ -2,6 +2,9 @@
 
 namespace InstagramAPI\Media\Constraints;
 
+/**
+ * Instagram's direct messaging general media constraints.
+ */
 class DirectConstraints extends TimelineConstraints
 {
     /**

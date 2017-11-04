@@ -33,13 +33,14 @@ try {
 
     // However, if you want to guarantee that the file is valid (correct format,
     // width, height and aspect ratio), then you can run it through our
-    // automatic media resizer class. It is pretty fast, and only does any work
-    // when the input image file is invalid, so you may want to always use it.
+    // automatic photo processing class. It is pretty fast, and only does any
+    // work when the input file is invalid, so you may want to always use it.
     // You have nothing to worry about, since the class uses temporary files if
     // the input needs processing, and it never overwrites your original file.
+    //
     // Also note that it has lots of options, so read its class documentation!
-    $resizer = new \InstagramAPI\Media\Photo\PhotoResizer($photoFilename);
-    $ig->timeline->uploadPhoto($resizer->getFile(), ['caption' => $captionText]);
+    $photo = new \InstagramAPI\Media\Photo\InstagramPhoto($photoFilename);
+    $ig->timeline->uploadPhoto($photo->getFile(), ['caption' => $captionText]);
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";
 }

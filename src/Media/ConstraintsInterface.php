@@ -2,6 +2,9 @@
 
 namespace InstagramAPI\Media;
 
+/**
+ * Represents Instagram's media constraints.
+ */
 interface ConstraintsInterface
 {
     /**

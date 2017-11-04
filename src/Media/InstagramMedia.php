@@ -6,24 +6,26 @@ use InstagramAPI\Constants;
 use InstagramAPI\Media\Constraints\ConstraintsFactory;
 
 /**
- * Automatic media resizer.
+ * Automatically prepares a media file according to Instagram's rules.
  *
- * Resizes and crops/expands a media file to match Instagram's requirements,
- * if necessary. You can also use this with your own parameters, to force your
- * media into different aspects, ie square, or for adding borders to media.
+ * Validates, transcodes, resizes and crops/expands a media file to match
+ * Instagram's requirements, if necessary. You can also use this with your own
+ * parameters, to force your media into different aspects, ie square, or for
+ * adding colored borders to media, and so on... Read the constructor options!
  *
  * Usage:
  *
- * - Create an instance of the class with your media file and requirements.
- * - Call getFile() to get the path to a media file matching the requirements.
+ * - Create an instance of the appropriate subclass (such as `InstagramPhoto` or
+ *   `InstagramVideo`) with your media file and requirements.
+ * - Call `getFile()` to get the path to a media file matching the requirements.
  *   This will be the same as the input file if no processing was required.
- * - Optionally, call deleteFile() if you want to delete the temporary file
+ * - Optionally, call `deleteFile()` if you want to delete the temporary file
  *   ahead of time instead of automatically when PHP does its object garbage
  *   collection. This function is safe and won't delete the original input file.
  *
  * @author SteveJobzniak (https://github.com/SteveJobzniak)
  */
-abstract class MediaResizer
+abstract class InstagramMedia
 {
     /** @var int Crop Operation. */
     const CROP = 1;
@@ -40,7 +42,7 @@ abstract class MediaResizer
      * TIP: If your default system temp folder isn't writable, it's NECESSARY
      * for you to set this value to another, writable path, like this:
      *
-     * \InstagramAPI\MediaResizer::$defaultTmpPath = '/home/example/foo/';
+     * \InstagramAPI\InstagramMedia::$defaultTmpPath = '/home/example/foo/';
      */
     public static $defaultTmpPath = null;
 
@@ -145,7 +147,8 @@ abstract class MediaResizer
      *   steps.
      *
      * @param string $inputFile Path to an input file.
-     * @param array  $options   An associative array of optional parameters. See constructor description.
+     * @param array  $options   An associative array of optional parameters.
+     *                          See constructor description.
      *
      * @throws \InvalidArgumentException
      */
@@ -314,7 +317,7 @@ abstract class MediaResizer
      *
      * @return string The path to the media file.
      *
-     * @see MediaResizer::_shouldProcess() For the criteria that determines processing.
+     * @see InstagramMedia::_shouldProcess() The criteria that determines processing.
      */
     public function getFile()
     {
@@ -358,14 +361,14 @@ abstract class MediaResizer
     }
 
     /**
-     * Whether this resizer requires Mod2 width and height canvas dimensions.
+     * Whether this processor requires Mod2 width and height canvas dimensions.
      *
-     * If this returns FALSE, the calculated `MediaResizer` canvas passed to
-     * this resizer during processing _may_ contain uneven width and/or height
-     * as the selected output dimensions.
+     * If this returns FALSE, the calculated `InstagramMedia` canvas passed to
+     * this processor _may_ contain uneven width and/or height as the selected
+     * output dimensions.
      *
      * Therefore, this function must return TRUE if (and ONLY IF) perfectly even
-     * dimensions are necessary for this particular resizer's output format.
+     * dimensions are necessary for this particular processor's output format.
      *
      * For example, JPEG images accept any dimensions and must therefore return
      * FALSE. But H264 videos require EVEN dimensions and must return TRUE.
@@ -740,11 +743,11 @@ abstract class MediaResizer
             throw new \RuntimeException(sprintf('Unsupported operation: %s.', $this->_operation));
         }
 
-        return $this->_resize($srcRect, $dstRect, $outputCanvas);
+        return $this->_createOutputFile($srcRect, $dstRect, $outputCanvas);
     }
 
     /**
-     * Resize the media.
+     * Create the new media file.
      *
      * @param Rectangle  $srcRect Rectangle to copy from the input.
      * @param Rectangle  $dstRect Destination place and scale of copied pixels.
@@ -752,7 +755,7 @@ abstract class MediaResizer
      *
      * @return string The path to the output file.
      */
-    abstract protected function _resize(
+    abstract protected function _createOutputFile(
         Rectangle $srcRect,
         Rectangle $dstRect,
         Dimensions $canvas);
@@ -822,9 +825,9 @@ abstract class MediaResizer
          * tweaked and tweaked and tweaked to balance everything perfectly!
          *
          * Unfortunately, this file also seems to attract a lot of beginners.
-         * Maybe because a "media resizer" seems "fun and easy". But that would
-         * be an incorrect guess. It's the most serious algorithm in the whole
-         * project. If you break it, *YOU* break people's uploads.
+         * Maybe because a "media processor" seems "fun and easy". But that
+         * would be an incorrect guess. It's the most serious algorithm in the
+         * whole project. If you break it, *YOU* break people's uploads.
          *
          * We have had many random, new contributors just jumping in and adding
          * zero-effort code everywhere in here, and breaking the whole balance,
@@ -835,11 +838,11 @@ abstract class MediaResizer
          *
          * This warning is here to save your time, and ours.
          *
-         * If you are interested in helping out with the MediaResizer, then
+         * If you are interested in helping out with the media algorithms, then
          * that's GREAT! But in that case we require that you fully read through
-         * the algorithm below and all of its comments about 50 times over a 3-4
-         * day period - until you understand every single step perfectly. The
-         * comments will help make it clearer the more you read...
+         * the algorithms below and all of its comments about 50 times over a
+         * 3-4 day period - until you understand every single step perfectly.
+         * The comments will help make it clearer the more you read...
          *
          *                                               ...and make an effort.
          *
@@ -1088,7 +1091,7 @@ abstract class MediaResizer
      *
      * @return Dimensions
      *
-     * @see MediaResizer::_calculateNewCanvas()
+     * @see InstagramMedia::_calculateNewCanvas()
      */
     protected function _calculateAdjustedMod2Canvas(
         $inputWidth,

@@ -11,7 +11,7 @@ use InstagramAPI\Exception\InstagramException;
 use InstagramAPI\Exception\LoginRequiredException;
 use InstagramAPI\Exception\NetworkException;
 use InstagramAPI\Exception\ThrottledException;
-use InstagramAPI\Media\Video\ThumbResizer;
+use InstagramAPI\Media\Video\InstagramThumbnail;
 use InstagramAPI\Request;
 use InstagramAPI\Request\Metadata\Internal as InternalMetadata;
 use InstagramAPI\Response;
@@ -113,9 +113,9 @@ class Internal extends RequestCollection
             try {
                 $videoFilename = $internalMetadata->getVideoDetails()->getFilename();
                 // Automatically crop&resize the thumbnail to Instagram's requirements.
-                $resizer = new ThumbResizer($videoFilename, ['targetFeed' => $targetFeed]);
+                $thumb = new InstagramThumbnail($videoFilename, ['targetFeed' => $targetFeed]);
 
-                $photoData = file_get_contents($resizer->getFile()); // Process&get.
+                $photoData = file_get_contents($thumb->getFile()); // Process&get.
             } catch (\Exception $e) {
                 // Re-package as InternalException, but keep the stack trace.
                 throw new \InstagramAPI\Exception\InternalException($e->getMessage(), 0, $e);

@@ -4,6 +4,9 @@ namespace InstagramAPI\Media\Constraints;
 
 use InstagramAPI\Media\ConstraintsInterface;
 
+/**
+ * Instagram's timeline general media constraints.
+ */
 class TimelineConstraints implements ConstraintsInterface
 {
     /**
