@@ -4,6 +4,8 @@ namespace InstagramAPI\Media;
 
 use InstagramAPI\Constants;
 use InstagramAPI\Media\Constraints\ConstraintsFactory;
+use InstagramAPI\Media\Geometry\Dimensions;
+use InstagramAPI\Media\Geometry\Rectangle;
 
 /**
  * Automatically prepares a media file according to Instagram's rules.

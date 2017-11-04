@@ -1,6 +1,6 @@
 <?php
 
-namespace InstagramAPI\Media;
+namespace InstagramAPI\Media\Geometry;
 
 class Rectangle
 {
