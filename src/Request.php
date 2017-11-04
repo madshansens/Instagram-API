@@ -5,6 +5,8 @@ namespace InstagramAPI;
 use GuzzleHttp\Psr7\MultipartStream;
 use GuzzleHttp\Psr7\Request as HttpRequest;
 use GuzzleHttp\Psr7\Stream;
+use InstagramAPI\Exception\InstagramException;
+use InstagramAPI\Exception\LoginRequiredException;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use function GuzzleHttp\Psr7\stream_for;
@@ -306,8 +308,6 @@ class Request
      * @param string|null $filename Filename to use in Content-Disposition header.
      * @param array       $headers  An associative array of headers.
      *
-     * @throws \InvalidArgumentException
-     *
      * @return self
      */
     public function addFileData(
@@ -468,7 +468,8 @@ class Request
      *
      * @param array $file
      *
-     * @throws \BadMethodCallException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      *
      * @return StreamInterface
      */
@@ -476,16 +477,16 @@ class Request
         array $file)
     {
         if (isset($file['contents'])) {
-            $result = stream_for($file['contents']);
+            $result = stream_for($file['contents']); // Throws.
         } elseif (isset($file['filepath'])) {
             $handle = fopen($file['filepath'], 'rb');
             if ($handle === false) {
                 throw new \RuntimeException(sprintf('Could not open file "%s" for reading.', $file['filepath']));
             }
             $this->_handles[] = $handle;
-            $result = stream_for($handle);
+            $result = stream_for($handle); // Throws.
         } else {
-            throw new \BadMethodCallException('No data for stream creation.');
+            throw new \InvalidArgumentException('No data for stream creation.');
         }
 
         return $result;
@@ -494,8 +495,8 @@ class Request
     /**
      * Convert the request's data into its HTTP POST multipart body contents.
      *
+     * @throws \InvalidArgumentException
      * @throws \RuntimeException
-     * @throws \BadMethodCallException
      *
      * @return MultipartStream
      */
@@ -516,7 +517,7 @@ class Request
                 $file = $this->_files[$key];
                 $element = [
                     'name'     => $key,
-                    'contents' => $this->_getStreamForFile($file),
+                    'contents' => $this->_getStreamForFile($file), // Throws.
                     'filename' => isset($file['filename']) ? $file['filename'] : null,
                     'headers'  => isset($file['headers']) ? $file['headers'] : [],
                 ];
@@ -524,7 +525,10 @@ class Request
             $elements[] = $element;
         }
 
-        return new MultipartStream($elements, Utils::generateMultipartBoundary());
+        return new MultipartStream( // Throws.
+            $elements,
+            Utils::generateMultipartBoundary()
+        );
     }
 
     /**
@@ -553,17 +557,24 @@ class Request
     /**
      * Convert the request's data into its HTTP POST urlencoded body contents.
      *
+     * @throws \InvalidArgumentException
+     *
      * @return Stream
      */
     protected function _getUrlencodedBody()
     {
         $this->_headers['Content-Type'] = Constants::CONTENT_TYPE;
 
-        return stream_for(http_build_query(Utils::reorderByHashCode($this->_posts)));
+        return stream_for( // Throws.
+            http_build_query(Utils::reorderByHashCode($this->_posts))
+        );
     }
 
     /**
      * Convert the request's data into its HTTP POST body contents.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      *
      * @return StreamInterface|null The body stream if POST request; otherwise NULL if GET request.
      */
@@ -583,9 +594,9 @@ class Request
         }
         // Switch between multipart (at least one file) or urlencoded body.
         if (!count($this->_files)) {
-            $result = $this->_getUrlencodedBody();
+            $result = $this->_getUrlencodedBody(); // Throws.
         } else {
-            $result = $this->_getMultipartBody();
+            $result = $this->_getMultipartBody(); // Throws.
         }
 
         return $result;
@@ -593,6 +604,9 @@ class Request
 
     /**
      * Build HTTP request object.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      *
      * @return HttpRequest
      */
@@ -609,14 +623,19 @@ class Request
                 .(strpos($endpoint, '?') === false ? '?' : '&')
                 .http_build_query(Utils::reorderByHashCode($this->_params));
         }
-        // Add default headers.
+        // Add default headers (if enabled).
         $this->_addDefaultHeaders();
         /** @var StreamInterface|null $postData The POST body stream; is NULL if GET request instead. */
-        $postData = $this->_getRequestBody();
+        $postData = $this->_getRequestBody(); // Throws.
         // Determine request method.
         $method = $postData !== null ? 'POST' : 'GET';
         // Build HTTP request object.
-        return new HttpRequest($method, $endpoint, $this->_headers, $postData);
+        return new HttpRequest( // Throws (they didn't document that properly).
+            $method,
+            $endpoint,
+            $this->_headers,
+            $postData
+        );
     }
 
     /**
@@ -625,19 +644,23 @@ class Request
      * Remember to ALWAYS call this function at the top of any API request that
      * requires the user to be logged in!
      *
-     * @throws \InstagramAPI\Exception\LoginRequiredException
+     * @throws LoginRequiredException
      */
     protected function _throwIfNotLoggedIn()
     {
         // Check the cached login state. May not reflect what will happen on the
         // server. But it's the best we can check without trying the actual request!
         if (!$this->_parent->isMaybeLoggedIn) {
-            throw new \InstagramAPI\Exception\LoginRequiredException('User not logged in. Please call login() and then try again.');
+            throw new LoginRequiredException('User not logged in. Please call login() and then try again.');
         }
     }
 
     /**
      * Perform the request and get its raw HTTP response.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws InstagramException
      *
      * @return HttpResponseInterface
      */
@@ -653,7 +676,10 @@ class Request
             $this->_resetHandles();
 
             try {
-                $this->_httpResponse = $this->_parent->client->api($this->_buildHttpRequest(), $this->_guzzleOptions);
+                $this->_httpResponse = $this->_parent->client->api( // Throws.
+                    $this->_buildHttpRequest(), // Throws.
+                    $this->_guzzleOptions
+                );
             } finally {
                 $this->_closeHandles();
             }
@@ -667,12 +693,16 @@ class Request
      *
      * @param bool $assoc When FALSE, decode to object instead of associative array.
      *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws InstagramException
+     *
      * @return mixed
      */
     public function getRawResponse(
         $assoc = true)
     {
-        $httpResponse = $this->getHttpResponse();
+        $httpResponse = $this->getHttpResponse(); // Throws.
         $body = $httpResponse->getBody();
 
         // Handle API endpoints that respond with multiple JSON objects.
@@ -694,7 +724,9 @@ class Request
      *
      * @param Response $responseObject An instance of a class object whose properties to fill with the response.
      *
-     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws InstagramException
      *
      * @return Response The provided responseObject with all JSON properties filled.
      */
@@ -702,10 +734,10 @@ class Request
         Response $responseObject)
     {
         // Check for API response success and put its response in the object.
-        $this->_parent->client->mapServerResponse(
+        $this->_parent->client->mapServerResponse( // Throws.
             $responseObject,
-            $this->getRawResponse(),
-            $this->getHttpResponse()
+            $this->getRawResponse(), // Throws.
+            $this->getHttpResponse() // Throws.
         );
 
         return $responseObject;
