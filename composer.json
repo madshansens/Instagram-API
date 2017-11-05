@@ -33,6 +33,11 @@
             "InstagramAPI\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "InstagramAPI\\Tests\\": "tests/"
+        }
+    },
     "require": {
         "php": ">=5.6",
         "lazyjsonmapper/lazyjsonmapper": "^1.6.1",

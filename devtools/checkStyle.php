@@ -31,7 +31,7 @@ $styleChecker = new styleChecker(
         'devtools',
         'examples',
         'src',
-        //'tests',
+        'tests',
     ],
     $onlyShowInvalidFiles
 );

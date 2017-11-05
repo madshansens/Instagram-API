@@ -32,8 +32,6 @@ class Mqtt implements PersistentInterface
     /* GraphQL subscription topics */
     const TYPING_TOPIC_TEMPLATE = '1/graphqlsubscriptions/17867973967082385/{"input_data": {"user_id":%s}}';
 
-    const INVALID_SEQUENCE_ID = -1;
-
     /** @var EventEmitterInterface */
     protected $_target;
 
@@ -74,8 +72,6 @@ class Mqtt implements PersistentInterface
     protected $_msgTypeBlacklist;
     /** @var bool */
     protected $_graphQlEnabled;
-    /** @var int */
-    protected $_sequenceId;
 
     /**
      * Constructor.
@@ -108,8 +104,6 @@ class Mqtt implements PersistentInterface
 
         $this->_shutdown = false;
         $this->_client = $this->_getClient();
-
-        $this->_sequenceId = self::INVALID_SEQUENCE_ID;
     }
 
     /** {@inheritdoc} */
@@ -234,41 +228,20 @@ class Mqtt implements PersistentInterface
     }
 
     /**
-     * Send command.
+     * Send the command.
      *
-     * @param string $command
+     * @param CommandInterface $command
      *
-     * @return bool
-     */
-    protected function _sendCommand(
-        $command)
-    {
-        $this->_publish(Mqtt\Topics::SEND_MESSAGE, $command, Mqtt\QosLevel::FIRE_AND_FORGET);
-
-        return true;
-    }
-
-    /**
-     * Proxy for _sendCommand().
-     *
-     * @param string $command
-     *
-     * @return bool
+     * @throws \LogicException
      */
     public function sendCommand(
-        $command)
+        CommandInterface $command)
     {
         if (!$this->_isConnected()) {
-            return false;
+            throw new \LogicException('Tried to send the command while offline.');
         }
 
-        try {
-            return $this->_sendCommand($command);
-        } catch (\Exception $e) {
-            $this->_logger->error($e->getMessage());
-
-            return false;
-        }
+        $this->_publish($command->getTopic(), Realtime::jsonEncode($command), $command->getQosLevel());
     }
 
     /**
@@ -547,39 +520,6 @@ class Mqtt implements PersistentInterface
     }
 
     /**
-     * Subscribe to Iris.
-     */
-    protected function _subscribeToIris()
-    {
-        if (!$this->_irisEnabled || $this->_sequenceId === self::INVALID_SEQUENCE_ID || $this->_sequenceId === null) {
-            return;
-        }
-        $this->_logger->info(sprintf('Subscribing to iris with sequence %d', $this->_sequenceId));
-        $command = [
-            'seq_id' => $this->_sequenceId,
-        ];
-        $this->_publish(Mqtt\Topics::IRIS_SUB, Realtime::jsonEncode($command), Mqtt\QosLevel::ACKNOWLEDGED_DELIVERY);
-    }
-
-    /**
-     * Update Iris sequence ID.
-     *
-     * @param int $sequenceId
-     */
-    public function updateSequenceId(
-        $sequenceId)
-    {
-        if ($sequenceId === null || $sequenceId === self::INVALID_SEQUENCE_ID || $this->_sequenceId == $sequenceId) {
-            return;
-        }
-        $this->_sequenceId = $sequenceId;
-        $this->_logger->info(sprintf('Sequence updated to %d', $this->_sequenceId));
-        if ($this->_isConnected()) {
-            $this->_subscribeToIris();
-        }
-    }
-
-    /**
      * Subscribe to all topics.
      */
     protected function _subscribe()
@@ -591,7 +531,6 @@ class Mqtt implements PersistentInterface
             ];
             $this->_publish(Mqtt\Topics::PUBSUB, Realtime::jsonEncode($command), Mqtt\QosLevel::ACKNOWLEDGED_DELIVERY);
         }
-        $this->_subscribeToIris();
         if (count($this->_graphqlTopics)) {
             $this->_logger->info(sprintf('Subscribing to graphql topics %s', implode(', ', $this->_graphqlTopics)));
             $command = [
