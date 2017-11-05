@@ -501,7 +501,7 @@ class Utils
                         }
                         break;
                     case 'font_size':
-                        if (!is_float($v) || $v !== 35.0) {
+                        if (!is_float($v) || ($v < 17.5 || $v > 35.0)) {
                             throw new \InvalidArgumentException(sprintf('Invalid value "%s" for tallies array-key "%s".', $v, $k));
                         }
                         break;
