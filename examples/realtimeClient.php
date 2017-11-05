@@ -45,7 +45,7 @@ $rtc->on('direct-story-screenshot', function ($threadId, \InstagramAPI\Realtime\
     printf('[RTC] %s has taken screenshot of story %s%s', $screenshot->getActionUserDict()->getUsername(), $threadId, PHP_EOL);
 });
 $rtc->on('direct-story-action', function ($threadId, \InstagramAPI\Response\Model\ActionBadge $storyAction) {
-    printf('[RTC] Story has badge %s%s', $threadId, $storyAction->getActionType(), PHP_EOL);
+    printf('[RTC] Story in thread %s has badge %s now%s', $threadId, $storyAction->getActionType(), PHP_EOL);
 });
 $rtc->on('thread-created', function ($threadId, \InstagramAPI\Response\Model\DirectThread $thread) {
     printf('[RTC] Thread %s has been created%s', $threadId, PHP_EOL);
