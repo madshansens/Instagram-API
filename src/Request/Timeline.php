@@ -139,14 +139,14 @@ class Timeline extends RequestCollection
 
             switch ($item['type']) {
             case 'photo':
-                $itemInternalMetadata->setPhotoUploadResponse($this->ig->internal->uploadPhotoData(Constants::FEED_TIMELINE_ALBUM, $itemInternalMetadata));
+                $this->ig->internal->uploadPhotoData(Constants::FEED_TIMELINE_ALBUM, $itemInternalMetadata);
                 break;
             case 'video':
                 // Attempt to upload the video data.
                 $itemInternalMetadata = $this->ig->internal->uploadVideo(Constants::FEED_TIMELINE_ALBUM, $item['file'], $itemInternalMetadata);
 
                 // Attempt to upload the thumbnail, associated with our video's ID.
-                $itemInternalMetadata->setPhotoUploadResponse($this->ig->internal->uploadPhotoData(Constants::FEED_TIMELINE_ALBUM, $itemInternalMetadata));
+                $this->ig->internal->uploadPhotoData(Constants::FEED_TIMELINE_ALBUM, $itemInternalMetadata);
             }
 
             $media[$key]['internalMetadata'] = $itemInternalMetadata;

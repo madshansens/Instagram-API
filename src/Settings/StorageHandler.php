@@ -68,6 +68,7 @@ class StorageHandler
         'ig_android_skywalker_live_event_start_end',
         'ig_android_gqls_typing_indicator',
         'ig_android_upload_reliability_universe',
+        'ig_android_photo_fbupload_universe',
     ];
 
     /**

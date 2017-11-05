@@ -92,7 +92,7 @@ class Internal extends RequestCollection
         }
 
         // Perform the upload.
-        $internalMetadata->setPhotoUploadResponse($this->uploadPhotoData($targetFeed, $internalMetadata));
+        $this->uploadPhotoData($targetFeed, $internalMetadata);
 
         // Configure the uploaded image and attach it to our timeline/story.
         $configure = $this->configureSinglePhoto($targetFeed, $internalMetadata, $externalMetadata);
@@ -109,8 +109,6 @@ class Internal extends RequestCollection
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      * @throws \InstagramAPI\Exception\UploadFailedException
-     *
-     * @return \InstagramAPI\Response\UploadPhotoResponse
      */
     public function uploadPhotoData(
         $targetFeed,
@@ -121,45 +119,31 @@ class Internal extends RequestCollection
             throw new \InvalidArgumentException(sprintf('Bad target feed "%s".', $targetFeed));
         }
 
-        $isVideoThumbnail = false;
         // Determine which file contents to upload.
-        if ($internalMetadata->getPhotoDetails() !== null) {
-            $photoData = file_get_contents($internalMetadata->getPhotoDetails()->getFilename());
-        } elseif ($internalMetadata->getVideoDetails() !== null) {
+        if ($internalMetadata->getPhotoDetails() === null) {
             // Generate a thumbnail from a video file.
             try {
-                $videoFilename = $internalMetadata->getVideoDetails()->getFilename();
                 // Automatically crop&resize the thumbnail to Instagram's requirements.
-                $thumb = new InstagramThumbnail($videoFilename, ['targetFeed' => $targetFeed]);
-
-                $photoData = file_get_contents($thumb->getFile()); // Process&get.
+                $videoThumbnail = new InstagramThumbnail(
+                    $internalMetadata->getVideoDetails()->getFilename(),
+                    ['targetFeed' => $targetFeed]
+                );
+                $internalMetadata->setPhotoDetails($targetFeed, $videoThumbnail->getFile());
             } catch (\Exception $e) {
                 // Re-package as InternalException, but keep the stack trace.
                 throw new \InstagramAPI\Exception\InternalException($e->getMessage(), 0, $e);
             }
-            $isVideoThumbnail = true;
-        } else {
-            throw new \InvalidArgumentException('Could not find any photo file to upload (the photoDetails and videoDetails are both unset).');
         }
 
         try {
-            // Prepare payload for the upload request.
-            $request = $this->ig->request('upload/photo/')
-                ->setSignedPost(false)
-                ->addPost('upload_id', $internalMetadata->getUploadId())
-                ->addPost('_uuid', $this->ig->uuid)
-                ->addPost('_csrftoken', $this->ig->client->getToken())
-                ->addPost('image_compression', '{"lib_name":"jt","lib_version":"1.3.0","quality":"87"}')
-                ->addFileData('photo', $photoData, 'pending_media_'.Utils::generateUploadId().'.jpg');
-
-            if ($targetFeed === Constants::FEED_TIMELINE_ALBUM) {
-                $request->addPost('is_sidecar', '1');
-                if ($isVideoThumbnail) {
-                    $request->addPost('media_type', '2');
-                }
+            // Upload photo file with one of our photo uploaders.
+            if ($this->_useResumablePhotoUploader($targetFeed, $internalMetadata)) {
+                $this->_uploadResumablePhoto($targetFeed, $internalMetadata);
+            } else {
+                $internalMetadata->setPhotoUploadResponse(
+                    $this->_uploadPhotoInOnePiece($targetFeed, $internalMetadata)
+                );
             }
-
-            return $request->getResponse(new Response\UploadPhotoResponse());
         } catch (InstagramException $e) {
             // Pass Instagram's error as is.
             throw $e;
@@ -245,7 +229,7 @@ class Internal extends RequestCollection
 
         // Critically important internal library-generated metadata parameters:
         /** @var string The ID of the entry to configure. */
-        $uploadId = $internalMetadata->getPhotoUploadResponse()->getUploadId();
+        $uploadId = $internalMetadata->getUploadId();
         /** @var int Width of the photo. */
         $photoWidth = $internalMetadata->getPhotoDetails()->getWidth();
         /** @var int Height of the photo. */
@@ -456,7 +440,7 @@ class Internal extends RequestCollection
         $internalMetadata = $this->uploadVideo($targetFeed, $videoFilename, $internalMetadata);
 
         // Attempt to upload the thumbnail, associated with our video's ID.
-        $internalMetadata->setPhotoUploadResponse($this->uploadPhotoData($targetFeed, $internalMetadata));
+        $this->uploadPhotoData($targetFeed, $internalMetadata);
 
         // Configure the uploaded video and attach it to our timeline/story.
         try {
@@ -1311,6 +1295,114 @@ class Internal extends RequestCollection
     }
 
     /**
+     * Performs an upload of a photo file, without support for retries.
+     *
+     * @param int              $targetFeed       One of the FEED_X constants.
+     * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\UploadPhotoResponse
+     */
+    protected function _uploadPhotoInOnePiece(
+        $targetFeed,
+        InternalMetadata $internalMetadata)
+    {
+        // Prepare payload for the upload request.
+        $request = $this->ig->request('upload/photo/')
+            ->setSignedPost(false)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addFile(
+                'photo',
+                $internalMetadata->getPhotoDetails()->getFilename(),
+                'pending_media_'.Utils::generateUploadId().'.jpg'
+            );
+
+        foreach ($this->_getPhotoUploadParams($targetFeed, $internalMetadata) as $key => $value) {
+            $request->addPost($key, $value);
+        }
+        /** @var Response\UploadPhotoResponse $response */
+        $response = $request->getResponse(new Response\UploadPhotoResponse());
+
+        return $response;
+    }
+
+    /**
+     * Performs a resumable upload of a photo file, with support for retries.
+     *
+     * @param int              $targetFeed       One of the FEED_X constants.
+     * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \LogicException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    protected function _uploadResumablePhoto(
+        $targetFeed,
+        InternalMetadata $internalMetadata)
+    {
+        $photoDetails = $internalMetadata->getPhotoDetails();
+
+        $endpoint = sprintf('https://i.instagram.com/rupload_igphoto/%s_%d_%d',
+            $internalMetadata->getUploadId(),
+            0,
+            Utils::hashCode($photoDetails->getFilename())
+        );
+
+        $uploadParams = $this->_getPhotoUploadParams($targetFeed, $internalMetadata);
+        $uploadParams = Utils::reorderByHashCode($uploadParams);
+
+        $offsetTemplate = new Request($this->ig, $endpoint);
+        $offsetTemplate
+            ->setAddDefaultHeaders(false)
+            ->addHeader('X_FB_PHOTO_WATERFALL_ID', Signatures::generateUUID(true))
+            ->addHeader('X-Instagram-Rupload-Params', json_encode($uploadParams));
+
+        $uploadTemplate = clone $offsetTemplate;
+        $uploadTemplate
+            ->addHeader('X-Entity-Type', 'image/jpeg')
+            ->addHeader('X-Entity-Name', basename(parse_url($endpoint, PHP_URL_PATH)))
+            ->addHeader('X-Entity-Length', $photoDetails->getFilesize());
+
+        return $this->_uploadResumableMedia(
+            $photoDetails,
+            $offsetTemplate,
+            $uploadTemplate
+        );
+    }
+
+    /**
+     * Determine whether to use resumable photo uploader based on target feed and internal metadata.
+     *
+     * @param int              $targetFeed       One of the FEED_X constants.
+     * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
+     *
+     * @return bool
+     */
+    protected function _useResumablePhotoUploader(
+        $targetFeed,
+        InternalMetadata $internalMetadata)
+    {
+        switch ($targetFeed) {
+            case Constants::FEED_TIMELINE_ALBUM:
+                $result = false;
+                break;
+            default:
+                $result = $this->ig->isExperimentEnabled(
+                    'ig_android_photo_fbupload_universe',
+                    'is_enabled_fbupload_photo');
+        }
+
+        return $result;
+    }
+
+    /**
      * Get the first missing range (start-end) from a HTTP "Range" header.
      *
      * @param string $ranges
@@ -1577,7 +1669,6 @@ class Internal extends RequestCollection
             ->addHeader('X_FB_VIDEO_WATERFALL_ID', Signatures::generateUUID(true))
             ->addHeader('X-Instagram-Rupload-Params', json_encode($uploadParams));
 
-
         $uploadTemplate = clone $offsetTemplate;
         $uploadTemplate
             ->addHeader('X-Entity-Type', 'video/mp4')
@@ -1636,7 +1727,38 @@ class Internal extends RequestCollection
     }
 
     /**
-     * Get params for upload job.
+     * Get params for photo upload job.
+     *
+     * @param int              $targetFeed       One of the FEED_X constants.
+     * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
+     *
+     * @return array
+     */
+    protected function _getPhotoUploadParams(
+        $targetFeed,
+        InternalMetadata $internalMetadata)
+    {
+        // Common params.
+        $result = [
+            'upload_id'         => (string) $internalMetadata->getUploadId(),
+            'image_compression' => '{"lib_name":"jt","lib_version":"1.3.0","quality":"87"}',
+            'media_type'        => $internalMetadata->getVideoDetails() !== null
+                ? (string) Response\Model\Item::VIDEO
+                : (string) Response\Model\Item::PHOTO,
+        ];
+        // Target feed's specific params.
+        switch ($targetFeed) {
+            case Constants::FEED_TIMELINE_ALBUM:
+                $result['is_sidecar'] = '1';
+                break;
+            default:
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get params for video upload job.
      *
      * @param int              $targetFeed       One of the FEED_X constants.
      * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
