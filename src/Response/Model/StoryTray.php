@@ -22,6 +22,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method Owner getOwner()
  * @method mixed getPrefetchCount()
  * @method mixed getRankedPosition()
+ * @method string getReelType()
  * @method string getSeen()
  * @method mixed getSeenRankedPosition()
  * @method mixed getShowNuxTooltip()
@@ -42,6 +43,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isOwner()
  * @method bool isPrefetchCount()
  * @method bool isRankedPosition()
+ * @method bool isReelType()
  * @method bool isSeen()
  * @method bool isSeenRankedPosition()
  * @method bool isShowNuxTooltip()
@@ -62,6 +64,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setOwner(Owner $value)
  * @method $this setPrefetchCount(mixed $value)
  * @method $this setRankedPosition(mixed $value)
+ * @method $this setReelType(string $value)
  * @method $this setSeen(string $value)
  * @method $this setSeenRankedPosition(mixed $value)
  * @method $this setShowNuxTooltip(mixed $value)
@@ -82,6 +85,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetOwner()
  * @method $this unsetPrefetchCount()
  * @method $this unsetRankedPosition()
+ * @method $this unsetReelType()
  * @method $this unsetSeen()
  * @method $this unsetSeenRankedPosition()
  * @method $this unsetShowNuxTooltip()
@@ -118,5 +122,6 @@ class StoryTray extends AutoPropertyMapper
         'dismiss_card'         => 'DismissCard',
         'can_reshare'          => '',
         'has_besties_media'    => 'bool',
+        'reel_type'            => 'string',
     ];
 }

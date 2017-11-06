@@ -62,6 +62,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getInventorySource()
  * @method mixed getIsAd4ad()
  * @method int getIsDashEligible()
+ * @method bool getIsEof()
  * @method bool getIsNewSuggestion()
  * @method bool getIsReelMedia()
  * @method mixed getIsSidecarChild()
@@ -183,6 +184,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isInventorySource()
  * @method bool isIsAd4ad()
  * @method bool isIsDashEligible()
+ * @method bool isIsEof()
  * @method bool isIsNewSuggestion()
  * @method bool isIsReelMedia()
  * @method bool isIsSidecarChild()
@@ -304,6 +306,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setInventorySource(string $value)
  * @method $this setIsAd4ad(mixed $value)
  * @method $this setIsDashEligible(int $value)
+ * @method $this setIsEof(bool $value)
  * @method $this setIsNewSuggestion(bool $value)
  * @method $this setIsReelMedia(bool $value)
  * @method $this setIsSidecarChild(mixed $value)
@@ -425,6 +428,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetInventorySource()
  * @method $this unsetIsAd4ad()
  * @method $this unsetIsDashEligible()
+ * @method $this unsetIsEof()
  * @method $this unsetIsNewSuggestion()
  * @method $this unsetIsReelMedia()
  * @method $this unsetIsSidecarChild()
@@ -646,6 +650,7 @@ class Item extends AutoPropertyMapper
         'can_reshare'                      => 'bool',
         'supports_reel_reactions'          => 'bool',
         'inventory_source'                 => 'string',
+        'is_eof'                           => 'bool',
     ];
 
     /**
