@@ -119,20 +119,9 @@ class Internal extends RequestCollection
             throw new \InvalidArgumentException(sprintf('Bad target feed "%s".', $targetFeed));
         }
 
-        // Determine which file contents to upload.
+        // Make sure we have photo details.
         if ($internalMetadata->getPhotoDetails() === null) {
-            // Generate a thumbnail from a video file.
-            try {
-                // Automatically crop&resize the thumbnail to Instagram's requirements.
-                $videoThumbnail = new InstagramThumbnail(
-                    $internalMetadata->getVideoDetails()->getFilename(),
-                    ['targetFeed' => $targetFeed]
-                );
-                $internalMetadata->setPhotoDetails($targetFeed, $videoThumbnail->getFile());
-            } catch (\Exception $e) {
-                // Re-package as InternalException, but keep the stack trace.
-                throw new \InstagramAPI\Exception\InternalException($e->getMessage(), 0, $e);
-            }
+            throw new \InvalidArgumentException('Photo details are missing from the internal metadata.');
         }
 
         try {
@@ -440,7 +429,7 @@ class Internal extends RequestCollection
         $internalMetadata = $this->uploadVideo($targetFeed, $videoFilename, $internalMetadata);
 
         // Attempt to upload the thumbnail, associated with our video's ID.
-        $this->uploadPhotoData($targetFeed, $internalMetadata);
+        $this->uploadVideoThumbnail($targetFeed, $internalMetadata);
 
         // Configure the uploaded video and attach it to our timeline/story.
         try {
@@ -464,6 +453,46 @@ class Internal extends RequestCollection
         }
 
         return $configure;
+    }
+
+    /**
+     * Performs a resumable upload of a photo file, with support for retries.
+     *
+     * @param int              $targetFeed       One of the FEED_X constants.
+     * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException
+     */
+    public function uploadVideoThumbnail(
+        $targetFeed,
+        InternalMetadata $internalMetadata)
+    {
+        if ($internalMetadata->getVideoDetails() === null) {
+            throw new \InvalidArgumentException('Video details are missing from the internal metadata.');
+        }
+
+        try {
+            // Automatically crop&resize the thumbnail to Instagram's requirements.
+            $videoThumbnail = new InstagramThumbnail(
+                $internalMetadata->getVideoDetails()->getFilename(),
+                ['targetFeed' => $targetFeed]
+            );
+            // Validate and upload the thumbnail.
+            $internalMetadata->setPhotoDetails($targetFeed, $videoThumbnail->getFile());
+            $this->uploadPhotoData($targetFeed, $internalMetadata);
+        } catch (InstagramException $e) {
+            // Pass Instagram's error as is.
+            throw $e;
+        } catch (\Exception $e) {
+            // Wrap runtime errors.
+            throw new UploadFailedException(
+                sprintf('Upload of video thumbnail failed: %s', $e->getMessage()),
+                $e->getCode(),
+                $e
+            );
+        }
     }
 
     /**

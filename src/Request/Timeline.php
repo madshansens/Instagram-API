@@ -146,7 +146,7 @@ class Timeline extends RequestCollection
                 $itemInternalMetadata = $this->ig->internal->uploadVideo(Constants::FEED_TIMELINE_ALBUM, $item['file'], $itemInternalMetadata);
 
                 // Attempt to upload the thumbnail, associated with our video's ID.
-                $this->ig->internal->uploadPhotoData(Constants::FEED_TIMELINE_ALBUM, $itemInternalMetadata);
+                $this->ig->internal->uploadVideoThumbnail(Constants::FEED_TIMELINE_ALBUM, $itemInternalMetadata);
             }
 
             $media[$key]['internalMetadata'] = $itemInternalMetadata;
