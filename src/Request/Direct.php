@@ -3,6 +3,8 @@
 namespace InstagramAPI\Request;
 
 use InstagramAPI\Constants;
+use InstagramAPI\Exception\InstagramException;
+use InstagramAPI\Exception\UploadFailedException;
 use InstagramAPI\Request\Metadata\Internal as InternalMetadata;
 use InstagramAPI\Response;
 use InstagramAPI\Signatures;
@@ -629,18 +631,33 @@ class Direct extends RequestCollection
         }
 
         // Send the uploaded video to recipients.
-        /** @var \InstagramAPI\Response\DirectSendItemResponse $result */
-        $result = $this->ig->internal->configureWithRetries(
-            $videoFilename,
-            function () use ($internalMetadata, $recipients, $options) {
-                $videoUploadResponse = $internalMetadata->getVideoUploadResponse();
-                // Attempt to configure video parameters (which sends it to the thread).
-                return $this->_sendDirectItem('video', $recipients, array_merge($options, [
-                    'upload_id'    => $internalMetadata->getUploadId(),
-                    'video_result' => $videoUploadResponse !== null ? $videoUploadResponse->getResult() : '',
-                ]));
-            }
-        );
+        try {
+            /** @var \InstagramAPI\Response\DirectSendItemResponse $result */
+            $result = $this->ig->internal->configureWithRetries(
+                function () use ($internalMetadata, $recipients, $options) {
+                    $videoUploadResponse = $internalMetadata->getVideoUploadResponse();
+                    // Attempt to configure video parameters (which sends it to the thread).
+                    return $this->_sendDirectItem('video', $recipients, array_merge($options, [
+                        'upload_id'    => $internalMetadata->getUploadId(),
+                        'video_result' => $videoUploadResponse !== null ? $videoUploadResponse->getResult() : '',
+                    ]));
+                }
+            );
+        } catch (InstagramException $e) {
+            // Pass Instagram's error as is.
+            throw $e;
+        } catch (\Exception $e) {
+            // Wrap runtime errors.
+            throw new UploadFailedException(
+                sprintf(
+                    'Upload of "%s" failed: %s',
+                    $internalMetadata->getPhotoDetails()->getBasename(),
+                    $e->getMessage()
+                ),
+                $e->getCode(),
+                $e
+            );
+        }
 
         return $result;
     }

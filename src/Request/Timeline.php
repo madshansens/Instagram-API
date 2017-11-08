@@ -3,6 +3,8 @@
 namespace InstagramAPI\Request;
 
 use InstagramAPI\Constants;
+use InstagramAPI\Exception\InstagramException;
+use InstagramAPI\Exception\UploadFailedException;
 use InstagramAPI\Request\Metadata\Internal as InternalMetadata;
 use InstagramAPI\Response;
 use InstagramAPI\Utils;
@@ -153,13 +155,24 @@ class Timeline extends RequestCollection
         // Generate an uploadId (via internal metadata) for the album.
         $albumInternalMetadata = new InternalMetadata();
         // Configure the uploaded album and attach it to our timeline.
-        /** @var \InstagramAPI\Response\ConfigureResponse $configure */
-        $configure = $this->ig->internal->configureWithRetries(
-            'album',
-            function () use ($media, $albumInternalMetadata, $externalMetadata) {
-                return $this->ig->internal->configureTimelineAlbum($media, $albumInternalMetadata, $externalMetadata);
-            }
-        );
+        try {
+            /** @var \InstagramAPI\Response\ConfigureResponse $configure */
+            $configure = $this->ig->internal->configureWithRetries(
+                function () use ($media, $albumInternalMetadata, $externalMetadata) {
+                    return $this->ig->internal->configureTimelineAlbum($media, $albumInternalMetadata, $externalMetadata);
+                }
+            );
+        } catch (InstagramException $e) {
+            // Pass Instagram's error as is.
+            throw $e;
+        } catch (\Exception $e) {
+            // Wrap runtime errors.
+            throw new UploadFailedException(
+                sprintf('Upload of the album failed: %s', $e->getMessage()),
+                $e->getCode(),
+                $e
+            );
+        }
 
         return $configure;
     }
