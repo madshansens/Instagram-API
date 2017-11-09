@@ -167,8 +167,8 @@ class VideoDetails extends MediaDetails
         }
 
         // Now analyze all streams to find the first video stream.
-        // We ignore all audio and subtitle streams.
-        $foundVideoStream = false;
+        $width = null;
+        $height = null;
         foreach ($probeResult['streams'] as $streamIdx => $streamInfo) {
             if (!isset($streamInfo['codec_type'])) {
                 continue;
@@ -203,11 +203,6 @@ class VideoDetails extends MediaDetails
             }
         }
 
-        // Make sure we have found at least one video stream.
-        if (!$foundVideoStream) {
-            throw new \RuntimeException(sprintf('FFprobe failed to detect any video format details. Is "%s" a valid video file?', $filename));
-        }
-
         // Sometimes there is no duration in stream info, so we should check the format.
         if ($this->_duration === null && isset($probeResult['format']['duration'])) {
             $this->_duration = (float) $probeResult['format']['duration'];
@@ -234,6 +229,14 @@ class VideoDetails extends MediaDetails
         // WARNING TO CONTRIBUTORS: $mediaFilename is for ERROR DISPLAY to
         // users. Do NOT use it to read from the hard disk!
         $mediaFilename = $this->getBasename();
+
+        // Make sure we have found at least one video stream.
+        if ($this->_videoCodec === null) {
+            throw new \InvalidArgumentException(sprintf(
+                'Instagram requires video with at least one video stream. Your file "%s" doesn\'t have any.',
+                $mediaFilename
+            ));
+        }
 
         // Check the video stream. We should have at least one.
         if ($this->_videoCodec !== 'h264') {

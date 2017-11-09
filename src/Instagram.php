@@ -952,6 +952,25 @@ class Instagram
     }
 
     /**
+     * Get a parameter value for the given experiment.
+     *
+     * @param string $experiment
+     * @param string $param
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    public function getExperimentParam(
+        $experiment,
+        $param,
+        $default = null)
+    {
+        return isset($this->experiments[$experiment][$param])
+            ? $this->experiments[$experiment][$param]
+            : $default;
+    }
+
+    /**
      * Create a custom API request.
      *
      * Used internally, but can also be used by end-users if they want

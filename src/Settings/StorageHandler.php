@@ -70,6 +70,9 @@ class StorageHandler
         'ig_android_gqls_typing_indicator',
         'ig_android_upload_reliability_universe',
         'ig_android_photo_fbupload_universe',
+        'ig_android_video_segmented_upload_universe',
+        'ig_android_direct_video_segmented_upload_universe',
+        'ig_android_reel_raven_video_segmented_upload_universe',
     ];
 
     /**
