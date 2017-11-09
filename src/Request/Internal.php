@@ -12,6 +12,7 @@ use InstagramAPI\Exception\LoginRequiredException;
 use InstagramAPI\Exception\NetworkException;
 use InstagramAPI\Exception\ThrottledException;
 use InstagramAPI\Exception\UploadFailedException;
+use InstagramAPI\Media\MediaDetails;
 use InstagramAPI\Media\Video\InstagramThumbnail;
 use InstagramAPI\Request;
 use InstagramAPI\Request\Metadata\Internal as InternalMetadata;
@@ -395,7 +396,7 @@ class Internal extends RequestCollection
         }
 
         try {
-            if ($this->_useResumableUploader($targetFeed, $internalMetadata)) {
+            if ($this->_useResumableVideoUploader($targetFeed, $internalMetadata)) {
                 $this->_uploadResumableVideo($targetFeed, $internalMetadata);
             } else {
                 // Request parameters for uploading a new video.
@@ -1236,6 +1237,80 @@ class Internal extends RequestCollection
     }
 
     /**
+     * Performs a resumable upload of a media file, with support for retries.
+     *
+     * @param MediaDetails $mediaDetails
+     * @param Request      $offsetTemplate
+     * @param Request      $uploadTemplate
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \LogicException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return Response\GenericResponse
+     */
+    protected function _uploadResumableMedia(
+        MediaDetails $mediaDetails,
+        Request $offsetTemplate,
+        Request $uploadTemplate)
+    {
+        // Open file handle.
+        $handle = fopen($mediaDetails->getFilename(), 'rb');
+        if ($handle === false) {
+            throw new \RuntimeException('Failed to open media file for reading.');
+        }
+
+        try {
+            $length = $mediaDetails->getFilesize();
+
+            // Create a stream for the opened file handle.
+            $stream = new Stream($handle, ['size' => $length]);
+
+            $attempt = 0;
+            while (true) {
+                // Check for max retry-limit, and throw if we exceeded it.
+                if (++$attempt > self::MAX_RESUMABLE_RETRIES) {
+                    throw new \RuntimeException('All retries have failed.');
+                }
+
+                try {
+                    // Get current offset.
+                    $offsetRequest = clone $offsetTemplate;
+                    /** @var Response\ResumableOffsetResponse $offsetResponse */
+                    $offsetResponse = $offsetRequest->getResponse(new Response\ResumableOffsetResponse());
+                    $offset = $offsetResponse->getOffset();
+
+                    // Resume upload from given offset.
+                    $uploadRequest = clone $uploadTemplate;
+                    $uploadRequest
+                        ->addHeader('Offset', $offset)
+                        ->setBody(new LimitStream($stream, $length - $offset, $offset));
+                    /** @var Response\GenericResponse $response */
+                    $response = $uploadRequest->getResponse(new Response\GenericResponse());
+
+                    return $response;
+                } catch (ThrottledException $e) {
+                    throw $e;
+                } catch (LoginRequiredException $e) {
+                    throw $e;
+                } catch (FeedbackRequiredException $e) {
+                    throw $e;
+                } catch (CheckpointRequiredException $e) {
+                    throw $e;
+                } catch (\Exception $e) {
+                    // Ignore everything else.
+                }
+            }
+        } finally {
+            Utils::safe_fclose($handle);
+        }
+
+        // We are never supposed to get here!
+        throw new \LogicException('Something went wrong during media upload.');
+    }
+
+    /**
      * Get the first missing range (start-end) from a HTTP "Range" header.
      *
      * @param string $ranges
@@ -1484,10 +1559,12 @@ class Internal extends RequestCollection
             );
         }
 
+        $videoDetails = $internalMetadata->getVideoDetails();
+
         $endpoint = sprintf('https://i.instagram.com/rupload_igvideo/%s_%d_%d?target=%s',
             $internalMetadata->getUploadId(),
             0,
-            Utils::hashCode($internalMetadata->getVideoDetails()->getFilename()),
+            Utils::hashCode($videoDetails->getFilename()),
             $rurCookie->getValue()
         );
 
@@ -1497,82 +1574,32 @@ class Internal extends RequestCollection
         $offsetTemplate = new Request($this->ig, $endpoint);
         $offsetTemplate
             ->setAddDefaultHeaders(false)
-            // TODO: Store waterfall ID in internalMetadata?
             ->addHeader('X_FB_VIDEO_WATERFALL_ID', Signatures::generateUUID(true))
             ->addHeader('X-Instagram-Rupload-Params', json_encode($uploadParams));
 
-        $videoDetails = $internalMetadata->getVideoDetails();
-        $length = $videoDetails->getFilesize();
+
         $uploadTemplate = clone $offsetTemplate;
         $uploadTemplate
             ->addHeader('X-Entity-Type', 'video/mp4')
             ->addHeader('X-Entity-Name', basename(parse_url($endpoint, PHP_URL_PATH)))
-            ->addHeader('X-Entity-Length', $length);
+            ->addHeader('X-Entity-Length', $videoDetails->getFilesize());
 
-        $attempt = 0;
-
-        // Open file handle.
-        $handle = fopen($internalMetadata->getVideoDetails()->getFilename(), 'rb');
-        if ($handle === false) {
-            throw new \RuntimeException('Failed to open video file for reading.');
-        }
-
-        try {
-            // Create a stream for the opened file handle.
-            $stream = new Stream($handle);
-
-            while (true) {
-                // Check for max retry-limit, and throw if we exceeded it.
-                if (++$attempt > self::MAX_RESUMABLE_RETRIES) {
-                    throw new \RuntimeException('All retries have failed.');
-                }
-
-                try {
-                    // Get current offset.
-                    $offsetRequest = clone $offsetTemplate;
-                    /** @var Response\ResumableOffsetResponse $offsetResponse */
-                    $offsetResponse = $offsetRequest->getResponse(new Response\ResumableOffsetResponse());
-                    $offset = $offsetResponse->getOffset();
-
-                    // Resume upload from given offset.
-                    $uploadRequest = clone $uploadTemplate;
-                    $uploadRequest
-                        ->addHeader('Offset', $offset)
-                        ->setBody(new LimitStream($stream, $length - $offset, $offset));
-                    /** @var Response\GenericResponse $response */
-                    $response = $uploadRequest->getResponse(new Response\GenericResponse());
-
-                    return $response;
-                } catch (ThrottledException $e) {
-                    throw $e;
-                } catch (LoginRequiredException $e) {
-                    throw $e;
-                } catch (FeedbackRequiredException $e) {
-                    throw $e;
-                } catch (CheckpointRequiredException $e) {
-                    throw $e;
-                } catch (\Exception $e) {
-                    // Ignore everything else.
-                }
-            }
-        } finally {
-            // Guaranteed to release handle even if something bad happens above!
-            Utils::safe_fclose($handle);
-        }
-
-        // We are never supposed to get here!
-        throw new \LogicException('Something went wrong during video upload.');
+        return $this->_uploadResumableMedia(
+            $videoDetails,
+            $offsetTemplate,
+            $uploadTemplate
+        );
     }
 
     /**
-     * Determine whether to use resumable uploader based on target feed and internal metadata.
+     * Determine whether to use resumable video uploader based on target feed and internal metadata.
      *
      * @param int              $targetFeed       One of the FEED_X constants.
      * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
      *
      * @return bool
      */
-    protected function _useResumableUploader(
+    protected function _useResumableVideoUploader(
         $targetFeed,
         InternalMetadata $internalMetadata)
     {
