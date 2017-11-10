@@ -39,6 +39,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getCommentsDisabled()
  * @method CoverMedia getCoverMedia()
  * @method string getDeviceTimestamp()
+ * @method string getDominantColor()
  * @method int getDrAdType()
  * @method mixed getExpiringAt()
  * @method Explore getExplore()
@@ -161,6 +162,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isCommentsDisabled()
  * @method bool isCoverMedia()
  * @method bool isDeviceTimestamp()
+ * @method bool isDominantColor()
  * @method bool isDrAdType()
  * @method bool isExpiringAt()
  * @method bool isExplore()
@@ -283,6 +285,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setCommentsDisabled(mixed $value)
  * @method $this setCoverMedia(CoverMedia $value)
  * @method $this setDeviceTimestamp(string $value)
+ * @method $this setDominantColor(string $value)
  * @method $this setDrAdType(int $value)
  * @method $this setExpiringAt(mixed $value)
  * @method $this setExplore(Explore $value)
@@ -405,6 +408,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetCommentsDisabled()
  * @method $this unsetCoverMedia()
  * @method $this unsetDeviceTimestamp()
+ * @method $this unsetDominantColor()
  * @method $this unsetDrAdType()
  * @method $this unsetExpiringAt()
  * @method $this unsetExplore()
@@ -651,6 +655,10 @@ class Item extends AutoPropertyMapper
         'supports_reel_reactions'          => 'bool',
         'inventory_source'                 => 'string',
         'is_eof'                           => 'bool',
+        /*
+         * HTML color string such as "#812A2A".
+         */
+        'dominant_color'                   => 'string',
     ];
 
     /**

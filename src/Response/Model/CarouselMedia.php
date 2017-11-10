@@ -12,7 +12,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method AdMetadata[] getAdMetadata()
  * @method AndroidLinks[] getAndroidLinks()
  * @method string getCarouselParentId()
- * @method mixed getDominantColor()
+ * @method string getDominantColor()
  * @method bool getForceOverlay()
  * @method bool getHasAudio()
  * @method Headline getHeadline()
@@ -66,7 +66,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setAdMetadata(AdMetadata[] $value)
  * @method $this setAndroidLinks(AndroidLinks[] $value)
  * @method $this setCarouselParentId(string $value)
- * @method $this setDominantColor(mixed $value)
+ * @method $this setDominantColor(string $value)
  * @method $this setForceOverlay(bool $value)
  * @method $this setHasAudio(bool $value)
  * @method $this setHeadline(Headline $value)
@@ -153,6 +153,9 @@ class CarouselMedia extends AutoPropertyMapper
         'overlay_text'        => 'string',
         'overlay_title'       => 'string',
         'overlay_subtitle'    => 'string',
-        'dominant_color'      => '',
+        /*
+         * HTML color string such as "#812A2A".
+         */
+        'dominant_color'      => 'string',
     ];
 }
