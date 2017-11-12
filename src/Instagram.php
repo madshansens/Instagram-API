@@ -728,9 +728,13 @@ class Instagram
     {
         // Calling this non-token API will put a csrftoken in our cookie
         // jar. We must do this before any functions that require a token.
-        $this->internal->syncDeviceFeatures(true);
         $this->internal->readMsisdnHeader();
+        $this->internal->syncDeviceFeatures(true);
+        // NOTE: Uncomment when IG Version >= 21.
+        //$this->internal->getTokenHash();
         $this->internal->logAttribution();
+        // NOTE: Uncomment when IG Version >= 21.
+        //$this->account->setContactPointPrefill();
     }
 
     /**

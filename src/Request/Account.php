@@ -427,6 +427,22 @@ class Account extends RequestCollection
     }
 
     /**
+     * Set contact point prefill.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function setContactPointPrefill()
+    {
+        return $this->ig->request('accounts/contact_point_prefill/')
+            ->addPost('phone_id', $this->ig->phone_id)
+            ->addPost('usage', 'edit_profile')
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
      * Get account badge notifications.
      *
      * TODO: We have no idea what this does. The response is always empty.
