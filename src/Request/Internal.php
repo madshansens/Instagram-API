@@ -944,8 +944,6 @@ class Internal extends RequestCollection
     /**
      * Reads MSISDN header.
      *
-     * WARNING. DON'T USE. UNDER RESEARCH.
-     *
      * @param string $subnoKey Encoded subscriber number.
      *
      * @throws \InstagramAPI\Exception\InstagramException
@@ -989,6 +987,22 @@ class Internal extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken());
 
         return $request->getResponse(new Response\MsisdnHeaderResponse());
+    }
+
+    /**
+     * Get hash token.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\TokenHashResponse
+     */
+    public function getTokenHash()
+    {
+        $request = $this->ig->request('zr/token/result/')
+            ->setNeedsAuth(false)
+            ->addParam('token_hash', '');
+
+        return $request->getResponse(new Response\TokenHashResponse());
     }
 
     /**
