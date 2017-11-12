@@ -1,16 +1,14 @@
 <?php
 
-namespace InstagramAPI\Realtime\Event;
+namespace InstagramAPI\Realtime\Payload\Event;
 
-use Evenement\EventEmitterInterface;
-use InstagramAPI\Realtime\Event as RealtimeEvent;
-use Psr\Log\LoggerInterface;
+use InstagramAPI\Realtime\Payload\RealtimeEvent;
 
 /**
- * Patch.
+ * PatchEvent.
  *
- * @method Patch\Op[] getData()
- * @method mixed getEvent()
+ * @method PatchEventOp[] getData()
+ * @method string getEvent()
  * @method bool getLazy()
  * @method int getMessageType()
  * @method int getNumEndpoints()
@@ -21,8 +19,8 @@ use Psr\Log\LoggerInterface;
  * @method bool isMessageType()
  * @method bool isNumEndpoints()
  * @method bool isSeqId()
- * @method $this setData(Patch\Op[] $value)
- * @method $this setEvent(mixed $value)
+ * @method $this setData(PatchEventOp[] $value)
+ * @method $this setEvent(string $value)
  * @method $this setLazy(bool $value)
  * @method $this setMessageType(int $value)
  * @method $this setNumEndpoints(int $value)
@@ -34,23 +32,13 @@ use Psr\Log\LoggerInterface;
  * @method $this unsetNumEndpoints()
  * @method $this unsetSeqId()
  */
-class Patch extends RealtimeEvent
+class PatchEvent extends RealtimeEvent
 {
     const JSON_PROPERTY_MAP = [
-        'data'          => 'Patch\Op[]',
+        'data'          => 'PatchEventOp[]',
         'message_type'  => 'int',
         'seq_id'        => 'int',
         'lazy'          => 'bool',
         'num_endpoints' => 'int',
     ];
-
-    /** {@inheritdoc} */
-    public function handle(
-        EventEmitterInterface $target,
-        LoggerInterface $logger)
-    {
-        foreach ($this->_getProperty('data') as $op) {
-            $op->handle($target, $logger);
-        }
-    }
 }

@@ -8,7 +8,6 @@ use BinSoul\Net\Mqtt\DefaultMessage;
 use BinSoul\Net\Mqtt\Message;
 use Evenement\EventEmitterInterface;
 use Fbns\Client\AuthInterface;
-use InstagramAPI\Client as HttpClient;
 use InstagramAPI\Constants;
 use InstagramAPI\Devices\DeviceInterface;
 use InstagramAPI\React\PersistentInterface;
@@ -73,6 +72,11 @@ class Mqtt implements PersistentInterface
     /** @var bool */
     protected $_graphQlEnabled;
 
+    /** @var ParserInterface[] */
+    protected $_parsers;
+    /** @var HandlerInterface[] */
+    protected $_handlers;
+
     /**
      * Constructor.
      *
@@ -104,6 +108,20 @@ class Mqtt implements PersistentInterface
 
         $this->_shutdown = false;
         $this->_client = $this->_getClient();
+
+        $this->_parsers = [
+            Mqtt\Topics::PUBSUB                => new Parser\SkywalkerParser(),
+            Mqtt\Topics::SEND_MESSAGE_RESPONSE => new Parser\JsonParser(Handler\DirectHandler::MODULE),
+            Mqtt\Topics::IRIS_SUB_RESPONSE     => new Parser\JsonParser(Handler\IrisHandler::MODULE),
+            Mqtt\Topics::MESSAGE_SYNC          => new Parser\IrisParser(),
+            Mqtt\Topics::REALTIME_SUB          => new Parser\GraphQlParser(),
+            Mqtt\Topics::GRAPHQL               => new Parser\GraphQlParser(),
+        ];
+        $this->_handlers = [
+            Handler\DirectHandler::MODULE => new Handler\DirectHandler($this->_target),
+            Handler\LiveHandler::MODULE   => new Handler\LiveHandler($this->_target),
+            Handler\IrisHandler::MODULE   => new Handler\IrisHandler($this->_target),
+        ];
     }
 
     /** {@inheritdoc} */
@@ -242,89 +260,6 @@ class Mqtt implements PersistentInterface
         }
 
         $this->_publish($command->getTopic(), Realtime::jsonEncode($command), $command->getQosLevel());
-    }
-
-    /**
-     * Process incoming action.
-     *
-     * @param array $message
-     */
-    protected function _processAction(
-        array $message)
-    {
-        $this->_logger->info(sprintf('Received action "%s"', $message['action']));
-        switch ($message['action']) {
-            case Action::ACK:
-                /** @var Action\Ack $action */
-                $action = new Action\Ack($message);
-                break;
-            default:
-                $this->_logger->warning(sprintf('Action "%s" is ignored (unknown type)', $message['action']));
-
-                return;
-        }
-        $action->handle($this->_target, $this->_logger);
-    }
-
-    /**
-     * Process incoming event.
-     *
-     * @param array $message
-     */
-    protected function _processEvent(
-        array $message)
-    {
-        $this->_logger->info(sprintf('Received event "%s"', $message['event']));
-        switch ($message['event']) {
-            case Event::PATCH:
-                /** @var Event\Patch $event */
-                $event = new Event\Patch($message);
-                break;
-            default:
-                $this->_logger->warning(sprintf('Event "%s" is ignored (unknown type)', $message['event']));
-
-                return;
-        }
-        $event->handle($this->_target, $this->_logger);
-    }
-
-    /**
-     * Process single incoming message.
-     *
-     * @param array $message
-     */
-    protected function _processSingleMessage(
-        array $message)
-    {
-        if (isset($message['event'])) {
-            $this->_processEvent($message);
-        } elseif (isset($message['action'])) {
-            $this->_processAction($message);
-        } else {
-            $this->_logger->warning('Invalid message (both event and action are missing)');
-        }
-    }
-
-    /**
-     * Process incoming message.
-     *
-     * @param string $message
-     */
-    protected function _processMessage(
-        $message)
-    {
-        $this->_logger->info(sprintf('Received message %s', $message));
-        // TODO: Rewrite this in a nicer way? Such as checking for keys on the
-        // decoded array to determine if key [0] exists (hence a multi-message)?
-        $isMultiMessages = is_string($message) && $message !== '' && $message[0] === '[';
-        $message = HttpClient::api_body_decode($message);
-        if (!$isMultiMessages) {
-            $this->_processSingleMessage($message);
-        } else {
-            foreach ($message as $singleMessage) {
-                $this->_processSingleMessage($singleMessage);
-            }
-        }
     }
 
     /**
@@ -583,6 +518,27 @@ class Mqtt implements PersistentInterface
     }
 
     /**
+     * Maps topic ID to human readable name.
+     *
+     * @param string $topic
+     *
+     * @return string
+     */
+    protected function _unmapTopic(
+        $topic)
+    {
+        if (array_key_exists($topic, Mqtt\Topics::ID_TO_TOPIC_MAP)) {
+            $result = Mqtt\Topics::ID_TO_TOPIC_MAP[$topic];
+            $this->_logger->debug(sprintf('Topic ID "%s" has been unmapped to "%s"', $topic, $result));
+        } else {
+            $result = $topic;
+            $this->_logger->warning(sprintf('Topic ID "%s" does not exist in the enum', $topic));
+        }
+
+        return $result;
+    }
+
+    /**
      * @param string $topic
      * @param string $payload
      * @param int    $qosLevel
@@ -592,7 +548,7 @@ class Mqtt implements PersistentInterface
         $payload,
         $qosLevel)
     {
-        $this->_logger->info(sprintf('Sending message %s to topic %s', $payload, $topic));
+        $this->_logger->debug(sprintf('Sending message "%s" to topic "%s"', $payload, $topic));
         $payload = zlib_encode($payload, ZLIB_ENCODING_DEFLATE, 9);
         // We need to map human readable topic name to its ID because of bandwidth saving.
         $topic = $this->_mapTopic($topic);
@@ -607,62 +563,68 @@ class Mqtt implements PersistentInterface
     protected function _onReceive(
         Message $msg)
     {
-        $topic = $msg->getTopic();
         $payload = @zlib_decode($msg->getPayload());
         if ($payload === false) {
-            $this->_logger->warning('Failed to inflate payload');
+            $this->_logger->warning('Failed to inflate the payload');
 
             return;
         }
-        switch ($topic) {
-            case Mqtt\Topics::PUBSUB:
-            case Mqtt\Topics::PUBSUB_ID:
-                $skywalker = new Mqtt\Skywalker($payload);
-                if (!in_array($skywalker->getType(), [Mqtt\Skywalker::TYPE_DIRECT, Mqtt\Skywalker::TYPE_LIVE])) {
-                    $this->_logger->warning(sprintf('Received Skywalker message with unsupported type %d', $skywalker->getType()));
+        $this->_handleMessage($this->_unmapTopic($msg->getTopic()), $payload);
+    }
 
-                    return;
-                }
-                $payload = $skywalker->getPayload();
-                break;
-            case Mqtt\Topics::GRAPHQL:
-            case Mqtt\Topics::GRAPHQL_ID:
-            case Mqtt\Topics::REALTIME_SUB:
-            case Mqtt\Topics::REALTIME_SUB_ID:
-                $graphQl = new Mqtt\GraphQl($payload);
-                if (!in_array($graphQl->getTopic(), [Mqtt\GraphQl::TOPIC_DIRECT])) {
-                    $this->_logger->warning(sprintf('Received GraphQL message with unsupported topic %s', $graphQl->getTopic()));
+    /**
+     * @param string $topic
+     * @param string $payload
+     */
+    protected function _handleMessage(
+        $topic,
+        $payload)
+    {
+        $this->_logger->debug(
+            sprintf('Received a message from topic "%s"', $topic),
+            [base64_encode($payload)]
+        );
+        if (!isset($this->_parsers[$topic])) {
+            $this->_logger->warning(
+                sprintf('No parser for topic "%s" found, skipping the message(s)', $topic),
+                [base64_encode($payload)]
+            );
 
-                    return;
-                }
-                $payload = $graphQl->getPayload();
-                break;
-            case Mqtt\Topics::IRIS_SUB_RESPONSE:
-            case Mqtt\Topics::IRIS_SUB_RESPONSE_ID:
-                $json = HttpClient::api_body_decode($payload);
-                if (!is_array($json)) {
-                    $this->_logger->warning(sprintf('Failed to decode Iris JSON: %s', json_last_error_msg()));
-
-                    return;
-                }
-                /** @var Mqtt\Iris $iris */
-                $iris = new Mqtt\Iris($json);
-                if (!$iris->isSucceeded()) {
-                    $this->_logger->warning(sprintf('Failed to subscribe to Iris (%d): %s', $iris->getErrorType(), $iris->getErrorMessage()));
-                }
-
-                return;
-            case Mqtt\Topics::SEND_MESSAGE_RESPONSE:
-            case Mqtt\Topics::SEND_MESSAGE_RESPONSE_ID:
-            case Mqtt\Topics::MESSAGE_SYNC:
-            case Mqtt\Topics::MESSAGE_SYNC_ID:
-                break;
-            default:
-                $this->_logger->warning(sprintf('Received message from unsupported topic "%s"', $topic));
-
-                return;
+            return;
         }
-        $this->_processMessage($payload);
+
+        try {
+            $messages = $this->_parsers[$topic]->parseMessage($topic, $payload);
+        } catch (\Exception $e) {
+            $this->_logger->warning($e->getMessage(), [$topic, base64_encode($payload)]);
+
+            return;
+        }
+
+        foreach ($messages as $message) {
+            $module = $message->getModule();
+            if (!isset($this->_handlers[$module])) {
+                $this->_logger->warning(
+                    sprintf('No handler for module "%s" found, skipping the message', $module),
+                    [$message->getData()]
+                );
+
+                continue;
+            }
+
+            $this->_logger->info(
+                sprintf('Processing a message for module "%s"', $module),
+                [$message->getData()]
+            );
+
+            try {
+                $this->_handlers[$module]->handleMessage($message);
+            } catch (Handler\HandlerException $e) {
+                $this->_logger->warning($e->getMessage(), [$message->getData()]);
+            } catch (\Exception $e) {
+                $this->_target->emit('warning', [$e]);
+            }
+        }
     }
 
     /** {@inheritdoc} */

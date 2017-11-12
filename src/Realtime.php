@@ -30,7 +30,8 @@ use React\EventLoop\LoopInterface;
  *  - thread-item-removed - An existing item has been removed from thread.
  *  - client-context-ack - Acknowledgment for client_context has been received.
  *  - unseen-count-update - Unseen count indicator has been updated.
- *  - error - An event of severity "error" occurred.
+ *  - warning - An exception of severity "warning" occurred.
+ *  - error - An exception of severity "error" occurred.
  */
 class Realtime implements EventEmitterInterface
 {

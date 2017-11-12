@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI\Realtime\Event\Payload;
+namespace InstagramAPI\Realtime\Payload;
 
 use InstagramAPI\AutoPropertyMapper;
 
 /**
- * Activity.
+ * ThreadActivity.
  *
  * @method mixed getActivityStatus()
  * @method string getSenderId()
@@ -24,7 +24,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetTimestamp()
  * @method $this unsetTtl()
  */
-class Activity extends AutoPropertyMapper
+class ThreadActivity extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
         'timestamp'       => '',

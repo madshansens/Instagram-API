@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI\Realtime\Event\Payload;
+namespace InstagramAPI\Realtime\Payload;
 
 use InstagramAPI\AutoPropertyMapper;
 
 /**
- * Live.
+ * LiveBroadcast.
  *
  * @method string getBroadcastId()
  * @method string getBroadcastMessage()
@@ -28,7 +28,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetIsPeriodic()
  * @method $this unsetUser()
  */
-class Live extends AutoPropertyMapper
+class LiveBroadcast extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
         'user'                 => '\InstagramAPI\Response\Model\User',

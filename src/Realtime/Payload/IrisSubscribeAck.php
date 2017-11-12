@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI\Realtime\Mqtt;
+namespace InstagramAPI\Realtime\Payload;
 
 use InstagramAPI\AutoPropertyMapper;
 
 /**
- * Iris.
+ * IrisSubscribeAck.
  *
  * @method string getErrorMessage()
  * @method int getErrorType()
@@ -24,7 +24,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetSeqId()
  * @method $this unsetSucceeded()
  */
-class Iris extends AutoPropertyMapper
+class IrisSubscribeAck extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
         'seq_id'        => 'int',

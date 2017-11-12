@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI\Realtime\Event\Payload;
+namespace InstagramAPI\Realtime\Payload;
 
 use InstagramAPI\AutoPropertyMapper;
 
 /**
- * Notify.
+ * ThreadAction.
  *
  * @method \InstagramAPI\Response\Model\ActionLog getActionLog()
  * @method string getUserId()
@@ -16,7 +16,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetActionLog()
  * @method $this unsetUserId()
  */
-class Notify extends AutoPropertyMapper
+class ThreadAction extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
         'user_id'    => 'string',

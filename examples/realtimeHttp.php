@@ -140,10 +140,10 @@ class RealtimeHttpServer
     /**
      * Called when ACK has been received.
      *
-     * @param \InstagramAPI\Realtime\Action\Ack $ack
+     * @param \InstagramAPI\Realtime\Payload\Action\AckAction $ack
      */
     public function onClientContextAck(
-        \InstagramAPI\Realtime\Action\Ack $ack)
+        \InstagramAPI\Realtime\Payload\Action\AckAction $ack)
     {
         $context = $ack->getPayload()->getClientContext();
         $this->_logger->info(sprintf('Received ACK for %s with status %s', $context, $ack->getStatus()));
@@ -180,7 +180,7 @@ class RealtimeHttpServer
         });
         // Set up promise.
         return $deferred->promise()
-            ->then(function (\InstagramAPI\Realtime\Action\Ack $ack) use ($timeout) {
+            ->then(function (\InstagramAPI\Realtime\Payload\Action\AckAction $ack) use ($timeout) {
                 // Cancel reject timer.
                 $timeout->cancel();
                 // Reply with info from $ack.

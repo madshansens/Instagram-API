@@ -1,11 +1,11 @@
 <?php
 
-namespace InstagramAPI\Realtime\Event\Payload;
+namespace InstagramAPI\Realtime\Payload;
 
 use InstagramAPI\AutoPropertyMapper;
 
 /**
- * Screenshot.
+ * StoryScreenshot.
  *
  * @method \InstagramAPI\Response\Model\User getActionUserDict()
  * @method int getMediaType()
@@ -16,7 +16,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetActionUserDict()
  * @method $this unsetMediaType()
  */
-class Screenshot extends AutoPropertyMapper
+class StoryScreenshot extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
         'action_user_dict' => '\InstagramAPI\Response\Model\User',
