@@ -1081,7 +1081,7 @@ class Utils
             }
         } elseif (is_string($config)) {
             $context['cafile'] = $config;
-            if (!file_exists($config)) {
+            if (!is_file($config)) {
                 throw new \RuntimeException(sprintf('SSL CA bundle not found: "%s".', $config));
             }
         } elseif ($config === false) {

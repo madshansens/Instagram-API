@@ -283,7 +283,17 @@ class Memcached implements StorageInterface
     }
 
     /**
-     * Load all cookies for the currently active user.
+     * Get the cookiefile disk path (only if a file-based cookie jar is wanted).
+     *
+     * {@inheritdoc}
+     */
+    public function getUserCookiesFilePath()
+    {
+        return null; // NULL = We will handle the cookie loading/saving.
+    }
+
+    /**
+     * (Non-cookiefile) Load all cookies for the currently active user.
      *
      * {@inheritdoc}
      */
@@ -293,7 +303,7 @@ class Memcached implements StorageInterface
     }
 
     /**
-     * Save all cookies for the currently active user.
+     * (Non-cookiefile) Save all cookies for the currently active user.
      *
      * {@inheritdoc}
      */

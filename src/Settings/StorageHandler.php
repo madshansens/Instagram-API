@@ -5,6 +5,7 @@ namespace InstagramAPI\Settings;
 use Fbns\Client\Auth\DeviceAuth;
 use Fbns\Client\AuthInterface;
 use InstagramAPI\Exception\SettingsException;
+use InstagramAPI\Utils;
 
 /**
  * Advanced, modular settings storage engine.
@@ -93,6 +94,9 @@ class StorageHandler
 
     /** @var array Cache for the current user's key-value settings pairs. */
     private $_userSettings;
+
+    /** @var string|null Location of the cookiefile if file-based jar wanted. */
+    private $_cookiesFilePath;
 
     /**
      * Constructor.
@@ -268,6 +272,14 @@ class StorageHandler
                 $this->_userSettings[$key] = (string) $value;
             }
         }
+
+        // Determine what type of cookie storage the backend wants for the user.
+        // NOTE: Do NOT validate file existence, since we'll create if missing.
+        $cookiesFilePath = $this->_storage->getUserCookiesFilePath();
+        if ($cookiesFilePath !== null && (!is_string($cookiesFilePath) || !strlen($cookiesFilePath))) {
+            $cookiesFilePath = null; // Disable since it isn't a non-empty string.
+        }
+        $this->_cookiesFilePath = $cookiesFilePath;
     }
 
     /**
@@ -289,14 +301,13 @@ class StorageHandler
     }
 
     /**
-     * Erase all device-specific settings.
+     * Erase all device-specific settings and all cookies.
      *
      * This is useful when assigning a new Android device to the account, upon
      * which it's very important that we erase all previous, device-specific
      * settings so that our account still looks natural to Instagram.
      *
-     * Note that cookies will NOT be erased, since that action isn't supported
-     * by all storage backends. Ignoring old cookies is the job of the caller!
+     * Note that ALL cookies will be erased too, to clear out the old session.
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */
@@ -304,9 +315,11 @@ class StorageHandler
     {
         foreach (self::PERSISTENT_KEYS as $key) {
             if (!in_array($key, self::KEEP_KEYS_WHEN_ERASING_DEVICE)) {
-                $this->set($key, '');
+                $this->set($key, ''); // Erase the setting.
             }
         }
+
+        $this->setCookies(''); // Erase all cookies.
     }
 
     /**
@@ -412,44 +425,57 @@ class StorageHandler
      *
      * @throws \InstagramAPI\Exception\SettingsException
      *
-     * @return array Cookies with their "format" ("cookiefile", "cookiestring")
-     *               and a "data" field pointing to the file (if "cookiefile")
-     *               or containing the raw cookie data (if "cookiestring"). The
-     *               cookiestring will be an empty string if no cookies exist.
+     * @return string|null A previously-stored, raw cookie data string
+     *                     (non-empty), or NULL if no cookies exist for
+     *                     the active user.
      */
     public function getCookies()
     {
         $this->_throwIfNoActiveUser();
 
-        // Load and parse the cookie format.
-        $cookieFormat = 'cookiestring'; // Assume regular raw cookie-string.
-        $cookieData = $this->_storage->loadUserCookies();
-        if (!is_string($cookieData)) {
-            $cookieData = ''; // No cookies exist.
-        }
-        if (strncmp($cookieData, 'cookiefile:', 11) === 0) {
-            $cookieFormat = 'cookiefile';
-            $cookieData = substr($cookieData, strpos($cookieData, ':') + 1);
+        // Read the cookies via the appropriate backend method.
+        $userCookies = null;
+        if ($this->_cookiesFilePath === null) { // Backend storage.
+            $userCookies = $this->_storage->loadUserCookies();
+        } else { // Cookiefile on disk.
+            if (empty($this->_cookiesFilePath)) { // Just for extra safety.
+                throw new SettingsException(
+                    'Cookie file format requested, but no file path provided.'
+                );
+            }
+
+            // Ensure that the cookie file's folder exists and is writable.
+            $this->_createCookiesFileDirectory();
+
+            // Read the existing cookie jar file if it already exists.
+            if (is_file($this->_cookiesFilePath)) {
+                $rawData = file_get_contents($this->_cookiesFilePath);
+                if ($rawData !== false) {
+                    $userCookies = $rawData;
+                }
+            }
         }
 
-        return [
-            'format' => $cookieFormat,
-            'data'   => $cookieData,
-        ];
+        // Ensure that we'll always return NULL if no cookies exist.
+        if ($userCookies !== null && !strlen($userCookies)) {
+            $userCookies = null;
+        }
+
+        return $userCookies;
     }
 
     /**
      * Save all cookies for the currently active user.
      *
      * Can only be executed after setActiveUser(). Note that this function is
-     * called frequently! But it is ONLY called if a non-"cookiefile" answer
-     * was returned by the getCookies() call.
+     * called frequently!
      *
      * NOTE: It is very important that the owner of this SettingsHandler either
      * continuously calls "setCookies", or better yet listens to the "closeUser"
      * callback to save all cookies in bulk to storage at the end of a session.
      *
-     * @param string $rawData An encoded string with all cookie data.
+     * @param string $rawData An encoded string with all cookie data. Use an
+     *                        empty string to erase currently stored cookies.
      *
      * @throws \InstagramAPI\Exception\SettingsException
      */
@@ -459,7 +485,50 @@ class StorageHandler
         $this->_throwIfNoActiveUser();
         $this->_throwIfNotString($rawData);
 
-        return $this->_storage->saveUserCookies($rawData);
+        if ($this->_cookiesFilePath === null) { // Backend storage.
+            $this->_storage->saveUserCookies($rawData);
+        } else { // Cookiefile on disk.
+            if (strlen($rawData)) { // Update cookies (new value is non-empty).
+                // Perform an atomic diskwrite, which prevents accidental
+                // truncation if the script is ever interrupted mid-write.
+                $this->_createCookiesFileDirectory(); // Ensures dir exists.
+                $written = Utils::atomicWrite($this->_cookiesFilePath, $rawData);
+                if ($written === false) {
+                    throw new SettingsException(sprintf(
+                        'The "%s" cookie file is not writable.',
+                        $this->_cookiesFilePath
+                    ));
+                }
+            } else { // Delete cookies (empty string).
+                // Delete any existing cookie jar since the new data is empty.
+                if (is_file($this->_cookiesFilePath) && !@unlink($this->_cookiesFilePath)) {
+                    throw new SettingsException(sprintf(
+                        'Unable to delete the "%s" cookie file.',
+                        $this->_cookiesFilePath
+                    ));
+                }
+            }
+        }
+    }
+
+    /**
+     * Ensures the whole directory path to the cookie file exists/is writable.
+     *
+     * @throws \InstagramAPI\Exception\SettingsException
+     */
+    protected function _createCookiesFileDirectory()
+    {
+        if ($this->_cookiesFilePath === null) {
+            return;
+        }
+
+        $cookieDir = dirname($this->_cookiesFilePath); // Can be "." in case of CWD.
+        if (!Utils::createFolder($cookieDir)) {
+            throw new SettingsException(sprintf(
+                'The "%s" cookie folder is not writable.',
+                $cookieDir
+            ));
+        }
     }
 
     /**

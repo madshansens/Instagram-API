@@ -635,7 +635,7 @@ class Instagram
             || empty($this->settings->get('uuid')) // one of the critically...
             || empty($this->settings->get('phone_id')) // ...important device...
             || empty($this->settings->get('device_id'))) { // ...parameters.
-            // Erase all previously stored device-specific settings.
+            // Erase all previously stored device-specific settings and cookies.
             $this->settings->eraseDeviceSettings();
 
             // Save the chosen device string to settings.

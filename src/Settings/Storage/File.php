@@ -153,7 +153,7 @@ class File implements StorageInterface
     {
         $userSettings = [];
 
-        if (!file_exists($this->_settingsFile)) {
+        if (!is_file($this->_settingsFile)) {
             return $userSettings; // Nothing to load.
         }
 
@@ -209,29 +209,40 @@ class File implements StorageInterface
      */
     public function hasUserCookies()
     {
-        return file_exists($this->_cookiesFile);
+        return is_file($this->_cookiesFile)
+            && filesize($this->_cookiesFile) > 0;
     }
 
     /**
-     * Load all cookies for the currently active user.
+     * Get the cookiefile disk path (only if a file-based cookie jar is wanted).
+     *
+     * {@inheritdoc}
+     */
+    public function getUserCookiesFilePath()
+    {
+        // Tell the caller to use a file-based cookie jar.
+        return $this->_cookiesFile;
+    }
+
+    /**
+     * (Non-cookiefile) Load all cookies for the currently active user.
      *
      * {@inheritdoc}
      */
     public function loadUserCookies()
     {
-        // Tell the caller to use a file-based cookie jar.
-        return 'cookiefile:'.$this->_cookiesFile;
+        // Never called for "cookiefile" format.
     }
 
     /**
-     * Save all cookies for the currently active user.
+     * (Non-cookiefile) Save all cookies for the currently active user.
      *
      * {@inheritdoc}
      */
     public function saveUserCookies(
         $rawData)
     {
-        // Never called for "cookiefile:" format.
+        // Never called for "cookiefile" format.
     }
 
     /**

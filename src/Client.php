@@ -8,7 +8,6 @@ use GuzzleHttp\HandlerStack;
 use InstagramAPI\Exception\InstagramException;
 use InstagramAPI\Exception\LoginRequiredException;
 use InstagramAPI\Exception\ServerMessageThrower;
-use InstagramAPI\Exception\SettingsException;
 use LazyJsonMapper\Exception\LazyJsonMapperException;
 use Psr\Http\Message\RequestInterface as HttpRequestInterface;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
@@ -95,22 +94,6 @@ class Client
     private $_cookieJar;
 
     /**
-     * The cookie format expected by the current settings storage.
-     *
-     * @var string
-     */
-    private $_settingsCookieFormat;
-
-    /**
-     * The disk path for file-based cookie jars.
-     *
-     * Only used when the cookieformat is set to "cookiefile".
-     *
-     * @var string|null
-     */
-    private $_settingsCookieFilePath;
-
-    /**
      * The timestamp of when we last saved our cookie jar to disk.
      *
      * Used for automatically saving the jar after any API call, after enough
@@ -118,7 +101,7 @@ class Client
      *
      * @var int
      */
-    private $_settingsCookieLastSaved;
+    private $_cookieJarLastSaved;
 
     /**
      * Constructor.
@@ -198,56 +181,16 @@ class Client
         // Mark any previous cookie jar for garbage collection.
         $this->_cookieJar = null;
 
-        // Get all cookies for the currently active user.
-        $userCookies = $this->_parent->settings->getCookies();
-        $this->_settingsCookieFormat = $userCookies['format'];
-        $this->_settingsCookieFilePath = null;
-
-        // Get the raw cookie string from the storage backend.
-        $cookieString = '';
-        if ($userCookies['format'] == 'cookiefile') {
-            $this->_settingsCookieFilePath = $userCookies['data'];
-            if (empty($this->_settingsCookieFilePath)) {
-                throw new SettingsException(
-                    'Cookie file format requested, but no file path provided.'
-                );
-            }
-
-            // Ensure that the whole directory path to the cookie file exists.
-            $cookieDir = dirname($this->_settingsCookieFilePath); // Can be "." in case of CWD.
-            if (!Utils::createFolder($cookieDir)) {
-                throw new SettingsException(sprintf(
-                    'The "%s" cookie folder is not writable.',
-                    $cookieDir
-                ));
-            }
-
-            // Process the existing cookie jar file if it already exists.
-            if (is_file($this->_settingsCookieFilePath)) {
-                if ($resetCookieJar) {
-                    // Delete existing cookie jar since this is a reset.
-                    @unlink($this->_settingsCookieFilePath);
-                } else {
-                    // Read the existing cookies from disk.
-                    $rawData = file_get_contents($this->_settingsCookieFilePath);
-                    if ($rawData !== false) {
-                        $cookieString = $rawData;
-                    }
-                }
-            }
-        } else {
-            // Delete existing cookie data from the storage if this is a reset.
-            if ($resetCookieJar) {
-                $userCookies['data'] = '';
-                $this->_parent->settings->setCookies('');
-            }
-
-            // Read the existing cookies provided by the storage.
-            $cookieString = $userCookies['data'];
+        // Delete all current cookies from the storage if this is a reset.
+        if ($resetCookieJar) {
+            $this->_parent->settings->setCookies('');
         }
 
+        // Get all cookies for the currently active user.
+        $cookieData = $this->_parent->settings->getCookies();
+
         // Attempt to restore the cookies, otherwise create a new, empty jar.
-        $restoredCookies = @json_decode($cookieString, true);
+        $restoredCookies = is_string($cookieData) ? @json_decode($cookieData, true) : null;
         if (!is_array($restoredCookies)) {
             $restoredCookies = [];
         }
@@ -257,7 +200,7 @@ class Client
 
         // Reset the "last saved" timestamp to the current time to prevent
         // auto-saving the cookies again immediately after this jar is loaded.
-        $this->_settingsCookieLastSaved = time();
+        $this->_cookieJarLastSaved = time();
     }
 
     /**
@@ -348,27 +291,12 @@ class Client
      */
     public function saveCookieJar()
     {
+        // Tell the settings storage to persist the latest cookies.
         $newCookies = $this->getCookieJarAsJSON();
-        if ($this->_settingsCookieFormat != 'cookiefile') {
-            // Tell non-file settings storage to persist the latest cookies.
-            $this->_parent->settings->setCookies($newCookies);
-        } else {
-            // This is a file-based cookie storage. It's our job to write it.
-            if (!empty($this->_settingsCookieFilePath)) {
-                // Perform an atomic diskwrite, which prevents accidental
-                // truncation if the script is ever interrupted mid-write.
-                $written = Utils::atomicWrite($this->_settingsCookieFilePath, $newCookies);
-                if ($written === false) {
-                    throw new SettingsException(sprintf(
-                        'The "%s" cookie file is not writable.',
-                        $this->_settingsCookieFilePath
-                    ));
-                }
-            }
-        }
+        $this->_parent->settings->setCookies($newCookies);
 
         // Reset the "last saved" timestamp to the current time.
-        $this->_settingsCookieLastSaved = time();
+        $this->_cookieJarLastSaved = time();
     }
 
     /**
@@ -689,7 +617,7 @@ class Client
 
         // We'll periodically auto-save our cookies at certain intervals. This
         // complements the "onCloseUser" and "login()/logout()" force-saving.
-        if ((time() - $this->_settingsCookieLastSaved) > self::COOKIE_AUTOSAVE_INTERVAL) {
+        if ((time() - $this->_cookieJarLastSaved) > self::COOKIE_AUTOSAVE_INTERVAL) {
             $this->saveCookieJar();
         }
 
