@@ -340,7 +340,8 @@ abstract class PDOStorage implements StorageInterface
      */
     public function getUserCookiesFilePath()
     {
-        return null; // NULL = We will handle the cookie loading/saving.
+        // NULL = We (the backend) will handle the cookie loading/saving.
+        return null;
     }
 
     /**
