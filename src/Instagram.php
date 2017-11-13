@@ -731,7 +731,7 @@ class Instagram
         $this->internal->readMsisdnHeader();
         $this->internal->syncDeviceFeatures(true);
         // NOTE: Uncomment when IG Version >= 21.
-        //$this->internal->getTokenHash();
+        //$this->internal->getTokenResult();
         $this->internal->logAttribution();
         // NOTE: Uncomment when IG Version >= 21.
         //$this->account->setContactPointPrefill();

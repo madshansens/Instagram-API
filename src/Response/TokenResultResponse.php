@@ -5,7 +5,7 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * TokenHashResponse.
+ * TokenResultResponse.
  *
  * @method mixed getMessage()
  * @method string getStatus()
@@ -24,7 +24,7 @@ use InstagramAPI\Response;
  * @method $this unsetToken()
  * @method $this unset_Messages()
  */
-class TokenHashResponse extends Response
+class TokenResultResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'token' => 'Model\Token',

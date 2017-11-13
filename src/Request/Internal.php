@@ -990,19 +990,19 @@ class Internal extends RequestCollection
     }
 
     /**
-     * Get hash token.
+     * Get token hash result.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\TokenHashResponse
+     * @return \InstagramAPI\Response\TokenResultResponse
      */
-    public function getTokenHash()
+    public function getTokenResult()
     {
         $request = $this->ig->request('zr/token/result/')
             ->setNeedsAuth(false)
             ->addParam('token_hash', '');
 
-        return $request->getResponse(new Response\TokenHashResponse());
+        return $request->getResponse(new Response\TokenResultResponse());
     }
 
     /**
