@@ -12,7 +12,10 @@ use InstagramAPI\Constants;
 use InstagramAPI\Devices\DeviceInterface;
 use InstagramAPI\React\PersistentInterface;
 use InstagramAPI\React\PersistentTrait;
-use InstagramAPI\Realtime;
+use InstagramAPI\Realtime\Command\UpdateSubscriptions;
+use InstagramAPI\Realtime\Subscription\GraphQl\DirectTypingSubscription;
+use InstagramAPI\Realtime\Subscription\Skywalker\DirectSubscription;
+use InstagramAPI\Realtime\Subscription\Skywalker\LiveSubscription;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
@@ -23,13 +26,6 @@ class Mqtt implements PersistentInterface
     use PersistentTrait;
 
     const REALTIME_CLIENT_TYPE = 'mqtt';
-
-    /* PubSub topics */
-    const DIRECT_TOPIC_TEMPLATE = 'ig/u/v1/%s';
-    const LIVE_TOPIC_TEMPLATE = 'ig/live_notification_subscribe/%s';
-
-    /* GraphQL subscription topics */
-    const TYPING_TOPIC_TEMPLATE = '1/graphqlsubscriptions/17867973967082385/{"input_data": {"user_id":%s}}';
 
     /** @var EventEmitterInterface */
     protected $_target;
@@ -55,10 +51,8 @@ class Mqtt implements PersistentInterface
     /** @var LoggerInterface */
     protected $_logger;
 
-    /** @var string[] */
-    protected $_pubsubTopics;
-    /** @var string[] */
-    protected $_graphqlTopics;
+    /** @var SubscriptionInterface[][] */
+    protected $_subscriptions;
 
     /** @var ReactMqttClient */
     protected $_client;
@@ -70,7 +64,7 @@ class Mqtt implements PersistentInterface
     /** @var string|null */
     protected $_msgTypeBlacklist;
     /** @var bool */
-    protected $_graphQlEnabled;
+    protected $_graphQlTypingEnabled;
 
     /** @var ParserInterface[] */
     protected $_parsers;
@@ -104,6 +98,8 @@ class Mqtt implements PersistentInterface
         $this->_loop = $loop;
         $this->_logger = $logger;
 
+        $this->_subscriptions = [];
+
         $this->_loadExperiments($experiments);
 
         $this->_shutdown = false;
@@ -134,6 +130,92 @@ class Mqtt implements PersistentInterface
     public function isActive()
     {
         return !$this->_shutdown;
+    }
+
+    /**
+     * Add a subscription to the list.
+     *
+     * @param SubscriptionInterface $subscription
+     */
+    public function addSubscription(
+        SubscriptionInterface $subscription)
+    {
+        $this->_doAddSubscription($subscription, true);
+    }
+
+    /**
+     * Remove a subscription from the list.
+     *
+     * @param SubscriptionInterface $subscription
+     */
+    public function removeSubscription(
+        SubscriptionInterface $subscription)
+    {
+        $this->_doRemoveSubscription($subscription, true);
+    }
+
+    /**
+     * Add a subscription to the list and send a command (optional).
+     *
+     * @param SubscriptionInterface $subscription
+     * @param bool                  $sendCommand
+     */
+    protected function _doAddSubscription(
+        SubscriptionInterface $subscription,
+        $sendCommand)
+    {
+        $topic = $subscription->getTopic();
+        $id = $subscription->getId();
+
+        // Check whether we already subscribed to it.
+        if (isset($this->_subscriptions[$topic][$id])) {
+            return;
+        }
+
+        // Add the subscription to the list.
+        if (!isset($this->_subscriptions[$topic])) {
+            $this->_subscriptions[$topic] = [];
+        }
+        $this->_subscriptions[$topic][$id] = $subscription;
+
+        // Send a command when needed.
+        if (!$sendCommand || $this->_isConnected()) {
+            return;
+        }
+
+        $this->_updateSubscriptions($topic, [$subscription], []);
+    }
+
+    /**
+     * Remove a subscription from the list and send a command (optional).
+     *
+     * @param SubscriptionInterface $subscription
+     * @param bool                  $sendCommand
+     */
+    protected function _doRemoveSubscription(
+        SubscriptionInterface $subscription,
+        $sendCommand)
+    {
+        $topic = $subscription->getTopic();
+        $id = $subscription->getId();
+
+        // Check whether we are subscribed to it.
+        if (!isset($this->_subscriptions[$topic][$id])) {
+            return;
+        }
+
+        // Remove the subscription from the list.
+        unset($this->_subscriptions[$topic][$id]);
+        if (!count($this->_subscriptions[$topic])) {
+            unset($this->_subscriptions[$topic]);
+        }
+
+        // Send a command when needed.
+        if (!$sendCommand || $this->_isConnected()) {
+            return;
+        }
+
+        $this->_updateSubscriptions($topic, [], [$subscription]);
     }
 
     /**
@@ -259,7 +341,11 @@ class Mqtt implements PersistentInterface
             throw new \LogicException('Tried to send the command while offline.');
         }
 
-        $this->_publish($command->getTopic(), Realtime::jsonEncode($command), $command->getQosLevel());
+        $this->_publish(
+            $command->getTopic(),
+            json_encode($command, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            $command->getQosLevel()
+        );
     }
 
     /**
@@ -284,21 +370,19 @@ class Mqtt implements PersistentInterface
         $this->_mqttLiveEnabled = $this->_isFeatureEnabled($liveFeatures, 'is_enabled');
 
         // GraphQL features.
-        $graphqlFeatures = isset($experiments['ig_android_gqls_typing_indicator'])
+        $graphQlTyping = isset($experiments['ig_android_gqls_typing_indicator'])
             ? $experiments['ig_android_gqls_typing_indicator'] : [];
-        $this->_graphQlEnabled = $this->_isFeatureEnabled($graphqlFeatures, 'is_enabled');
+        $this->_graphQlTypingEnabled = $this->_isFeatureEnabled($graphQlTyping, 'is_enabled');
 
         // Set up PubSub topics.
-        $this->_pubsubTopics = [];
         if ($this->_mqttLiveEnabled) {
-            $this->_pubsubTopics[] = sprintf(self::LIVE_TOPIC_TEMPLATE, $this->_auth->getUserId());
+            $this->_doAddSubscription(new LiveSubscription($this->_auth->getUserId()), false);
         }
-        $this->_pubsubTopics[] = sprintf(self::DIRECT_TOPIC_TEMPLATE, $this->_auth->getUserId());
+        $this->_doAddSubscription(new DirectSubscription($this->_auth->getUserId()), false);
 
         // Set up GraphQL topics.
-        $this->_graphqlTopics = [];
-        if ($this->_graphQlEnabled) {
-            $this->_graphqlTopics[] = sprintf(self::TYPING_TOPIC_TEMPLATE, $this->_auth->getUserId());
+        if ($this->_graphQlTypingEnabled) {
+            $this->_doAddSubscription(new DirectTypingSubscription($this->_auth->getUserId()), false);
         }
     }
 
@@ -321,7 +405,7 @@ class Mqtt implements PersistentInterface
         if ($this->_msgTypeBlacklist !== null && strlen($this->_msgTypeBlacklist)) {
             $msgTypeBlacklist = $this->_msgTypeBlacklist;
         }
-        if ($this->_graphQlEnabled) {
+        if ($this->_graphQlTypingEnabled) {
             if (strlen($msgTypeBlacklist)) {
                 $msgTypeBlacklist .= ', typing_type';
             } else {
@@ -351,7 +435,7 @@ class Mqtt implements PersistentInterface
         $topics = [
             Mqtt\Topics::PUBSUB,
         ];
-        if ($this->_graphQlEnabled) {
+        if ($this->_graphQlTypingEnabled) {
             $topics[] = Mqtt\Topics::REALTIME_SUB;
         }
         $topics[] = Mqtt\Topics::SEND_MESSAGE_RESPONSE;
@@ -433,7 +517,7 @@ class Mqtt implements PersistentInterface
         $client->on('connect', function () {
             $this->_logger->info('Connected to a broker');
             $this->_setKeepaliveTimer();
-            $this->_subscribe();
+            $this->_restoreAllSubscriptions();
         });
         $client->on('ping', function () {
             $this->_logger->info('Ping flow completed');
@@ -455,44 +539,48 @@ class Mqtt implements PersistentInterface
     }
 
     /**
+     * Mass update subscriptions statuses.
+     *
+     * @param string                  $topic
+     * @param SubscriptionInterface[] $subscribe
+     * @param SubscriptionInterface[] $unsubscribe
+     */
+    protected function _updateSubscriptions(
+        $topic,
+        array $subscribe,
+        array $unsubscribe)
+    {
+        if (count($subscribe)) {
+            $this->_logger->info(sprintf('Subscribing to %s topics %s', $topic, implode(', ', $subscribe)));
+        }
+        if (count($unsubscribe)) {
+            $this->_logger->info(sprintf('Unsubscribing from %s topics %s', $topic, implode(', ', $subscribe)));
+        }
+
+        try {
+            $this->sendCommand(new UpdateSubscriptions($topic, $subscribe, $unsubscribe));
+        } catch (\Exception $e) {
+            $this->_logger->warning($e->getMessage());
+        }
+    }
+
+    /**
      * Subscribe to all topics.
      */
-    protected function _subscribe()
+    protected function _restoreAllSubscriptions()
     {
-        if (count($this->_pubsubTopics)) {
-            $this->_logger->info(sprintf('Subscribing to pubsub topics %s', implode(', ', $this->_pubsubTopics)));
-            $command = [
-                'sub' => $this->_pubsubTopics,
-            ];
-            $this->_publish(Mqtt\Topics::PUBSUB, Realtime::jsonEncode($command), Mqtt\QosLevel::ACKNOWLEDGED_DELIVERY);
-        }
-        if (count($this->_graphqlTopics)) {
-            $this->_logger->info(sprintf('Subscribing to graphql topics %s', implode(', ', $this->_graphqlTopics)));
-            $command = [
-                'sub' => $this->_graphqlTopics,
-            ];
-            $this->_publish(Mqtt\Topics::REALTIME_SUB, Realtime::jsonEncode($command), Mqtt\QosLevel::ACKNOWLEDGED_DELIVERY);
+        foreach ($this->_subscriptions as $topic => $subscriptions) {
+            $this->_updateSubscriptions($topic, $subscriptions, []);
         }
     }
 
     /**
      * Unsubscribe from all topics.
      */
-    protected function _unsubscribe()
+    protected function _removeAllSubscriptions()
     {
-        if (count($this->_pubsubTopics)) {
-            $this->_logger->info(sprintf('Unsubscribing from pubsub topics %s', implode(', ', $this->_pubsubTopics)));
-            $command = [
-                'unsub' => $this->_pubsubTopics,
-            ];
-            $this->_publish(Mqtt\Topics::PUBSUB, Realtime::jsonEncode($command), Mqtt\QosLevel::ACKNOWLEDGED_DELIVERY);
-        }
-        if (count($this->_graphqlTopics)) {
-            $this->_logger->info(sprintf('Unsubscribing from graphql topics %s', implode(', ', $this->_graphqlTopics)));
-            $command = [
-                'unsub' => $this->_graphqlTopics,
-            ];
-            $this->_publish(Mqtt\Topics::REALTIME_SUB, Realtime::jsonEncode($command), Mqtt\QosLevel::ACKNOWLEDGED_DELIVERY);
+        foreach ($this->_subscriptions as $topic => $subscriptions) {
+            $this->_updateSubscriptions($topic, [], $subscriptions);
         }
     }
 

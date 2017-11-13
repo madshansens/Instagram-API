@@ -281,19 +281,6 @@ class Realtime implements EventEmitterInterface
     }
 
     /**
-     * Proxy for json_encode() with some necessary flags.
-     *
-     * @param mixed $data
-     *
-     * @return string
-     */
-    public static function jsonEncode(
-        $data)
-    {
-        return json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-    }
-
-    /**
      * Receive offline messages starting from the sequence ID.
      *
      * @param int $sequenceId
