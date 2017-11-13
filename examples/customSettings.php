@@ -30,7 +30,9 @@ exit;
 
 // 1. Choosing a built-in storage backend (one of "file", "mysql", "sqlite" or
 // "memcached"), and using the automatic, default settings for that backend:
-$ig = new \InstagramAPI\Instagram($debug, $truncatedDebug, ['storage' => 'mysql']);
+$ig = new \InstagramAPI\Instagram($debug, $truncatedDebug, [
+    'storage' => 'mysql',
+]);
 
 // 2. You can read src/Settings/Factory.php for valid settings for each backend.
 // Here's an example of how to change the default storage location for "file":
@@ -63,7 +65,58 @@ $ig = new \InstagramAPI\Instagram($debug, $truncatedDebug, [
 // Carefully read through their descriptions and use them wisely. If you're sure
 // that you dare to use them, then you can access them via $ig->settings->...
 
-// 6. Lastly... if you want to implement your own completely custom storage,
+// 6. Yet another super advanced topic is the ability to copy data between
+// backends. For example if you want to move all of your data from a File
+// backend to a database, or vice versa. That kind of action is not supported
+// natively by us, but you CAN do it by directly interfacing with the storages!
+
+// First, you MUST manually build a list of all users you want to migrate.
+// You can either hardcode this list. Or get it via something like a directory
+// scan (to look at existing folders in a File backend storage path), or a
+// database query to get all "username" values from the old database. If you're
+// using a database, you will have to connect to it manually and query it
+// yourself! There's no way to do it automatically! Just build this array any
+// way you want to do it!
+$migrateUsers = [
+    'someuser',
+    'another.user',
+    'very_awesome_user123',
+];
+
+// Secondly, you must connect to your old and new storages. These are just
+// example values. The array format is the exact same as what's given to the
+// `Instagram()` constructor! And if you give an empty array, you'll use the
+// same default File backend that the main class uses! So if you want to migrate
+// from that, you should just set oldStorage to `createHandler([])`!
+$oldStorage = \InstagramAPI\Settings\Factory::createHandler([
+    'storage'     => 'sqlite',
+    'dbfilename'  => 'app/instagram.sqlite',
+    'dbtablename' => 'instagram_sessions',
+]);
+$newStorage = \InstagramAPI\Settings\Factory::createHandler([
+    'storage'     => 'file',
+    'basefolder'  => 'some/path/',
+]);
+
+// Now just run the migration process. This will copy all cookies and settings
+// from the old storage to the new storage, for all of the "migrateUsers".
+foreach ($migrateUsers as $user) {
+    if (!$oldStorage->hasUser($user)) {
+        die("Unable to migrate '{$user}' from old storage (user doesn't exist).\n");
+    }
+
+    echo "Migrating '{$user}'.\n";
+
+    $oldStorage->setActiveUser($user);
+    $newStorage->setActiveUser($user);
+
+    $newStorage->setCookies((string) $oldStorage->getCookies());
+    foreach (\InstagramAPI\Settings\StorageHandler::PERSISTENT_KEYS as $key) {
+        $newStorage->set($key, (string) $oldStorage->get($key));
+    }
+}
+
+// 7. Lastly... if you want to implement your own completely CUSTOM STORAGE,
 // then you simply have to do one thing: Implement the StorageInterface class
 // interface. But be very sure to STRICTLY follow ALL rules for storage backends
 // described in that interface's docs, otherwise your custom backend WON'T work.
