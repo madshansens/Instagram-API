@@ -13,8 +13,8 @@ use InstagramAPI\Response;
  * @method mixed getMessage()
  * @method mixed getMoreAvailable()
  * @method string getNextMaxId()
- * @method mixed getNumResults()
- * @method mixed getRankToken()
+ * @method int getNumResults()
+ * @method string getRankToken()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
  * @method bool isAutoLoadMoreEnabled()
@@ -33,8 +33,8 @@ use InstagramAPI\Response;
  * @method $this setMessage(mixed $value)
  * @method $this setMoreAvailable(mixed $value)
  * @method $this setNextMaxId(string $value)
- * @method $this setNumResults(mixed $value)
- * @method $this setRankToken(mixed $value)
+ * @method $this setNumResults(int $value)
+ * @method $this setRankToken(string $value)
  * @method $this setStatus(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
  * @method $this unsetAutoLoadMoreEnabled()
@@ -51,12 +51,12 @@ use InstagramAPI\Response;
 class ExploreResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
-        'num_results'            => '',
+        'num_results'            => 'int',
         'auto_load_more_enabled' => '',
         'items'                  => 'Model\ExploreItem[]',
         'more_available'         => '',
         'next_max_id'            => 'string',
         'max_id'                 => 'string',
-        'rank_token'             => '',
+        'rank_token'             => 'string',
     ];
 }

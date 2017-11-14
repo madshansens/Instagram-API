@@ -13,7 +13,7 @@ use InstagramAPI\Response;
  * @method mixed getMoreAvailable()
  * @method mixed getNewPhotos()
  * @method string getNextMaxId()
- * @method mixed getNumResults()
+ * @method int getNumResults()
  * @method mixed getRequiresReview()
  * @method string getStatus()
  * @method mixed getTotalCount()
@@ -35,7 +35,7 @@ use InstagramAPI\Response;
  * @method $this setMoreAvailable(mixed $value)
  * @method $this setNewPhotos(mixed $value)
  * @method $this setNextMaxId(string $value)
- * @method $this setNumResults(mixed $value)
+ * @method $this setNumResults(int $value)
  * @method $this setRequiresReview(mixed $value)
  * @method $this setStatus(string $value)
  * @method $this setTotalCount(mixed $value)
@@ -55,7 +55,7 @@ use InstagramAPI\Response;
 class UsertagsResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
-        'num_results'            => '',
+        'num_results'            => 'int',
         'auto_load_more_enabled' => '',
         'items'                  => 'Model\Item[]',
         'more_available'         => '',

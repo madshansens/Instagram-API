@@ -13,7 +13,7 @@ use InstagramAPI\Response;
  * @method mixed getMessage()
  * @method mixed getMoreAvailable()
  * @method string getNextMaxId()
- * @method mixed getNumResults()
+ * @method int getNumResults()
  * @method mixed getPatches()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
@@ -33,7 +33,7 @@ use InstagramAPI\Response;
  * @method $this setMessage(mixed $value)
  * @method $this setMoreAvailable(mixed $value)
  * @method $this setNextMaxId(string $value)
- * @method $this setNumResults(mixed $value)
+ * @method $this setNumResults(int $value)
  * @method $this setPatches(mixed $value)
  * @method $this setStatus(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
@@ -56,7 +56,7 @@ class LikeFeedResponse extends Response
         'more_available'         => '',
         'patches'                => '',
         'last_counted_at'        => '',
-        'num_results'            => '',
+        'num_results'            => 'int',
         'next_max_id'            => 'string',
     ];
 }

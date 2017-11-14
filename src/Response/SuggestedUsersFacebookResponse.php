@@ -8,7 +8,7 @@ use InstagramAPI\Response;
  * SuggestedUsersFacebookResponse.
  *
  * @method mixed getMessage()
- * @method mixed getRankToken()
+ * @method string getRankToken()
  * @method string getStatus()
  * @method Model\Suggested[] getSuggested()
  * @method Model\_Message[] get_Messages()
@@ -18,7 +18,7 @@ use InstagramAPI\Response;
  * @method bool isSuggested()
  * @method bool is_Messages()
  * @method $this setMessage(mixed $value)
- * @method $this setRankToken(mixed $value)
+ * @method $this setRankToken(string $value)
  * @method $this setStatus(string $value)
  * @method $this setSuggested(Model\Suggested[] $value)
  * @method $this set_Messages(Model\_Message[] $value)
@@ -32,6 +32,6 @@ class SuggestedUsersFacebookResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'suggested'  => 'Model\Suggested[]',
-        'rank_token' => '',
+        'rank_token' => 'string',
     ];
 }

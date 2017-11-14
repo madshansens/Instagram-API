@@ -9,7 +9,7 @@ use InstagramAPI\Response;
  *
  * @method bool getHasMore()
  * @method mixed getMessage()
- * @method mixed getRankToken()
+ * @method string getRankToken()
  * @method Model\Tag[] getResults()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
@@ -21,7 +21,7 @@ use InstagramAPI\Response;
  * @method bool is_Messages()
  * @method $this setHasMore(bool $value)
  * @method $this setMessage(mixed $value)
- * @method $this setRankToken(mixed $value)
+ * @method $this setRankToken(string $value)
  * @method $this setResults(Model\Tag[] $value)
  * @method $this setStatus(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
@@ -37,6 +37,6 @@ class SearchTagResponse extends Response
     const JSON_PROPERTY_MAP = [
         'has_more'   => 'bool',
         'results'    => 'Model\Tag[]',
-        'rank_token' => '',
+        'rank_token' => 'string',
     ];
 }

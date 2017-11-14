@@ -10,7 +10,7 @@ use InstagramAPI\Response;
  * @method mixed getExpires()
  * @method mixed getFiltered()
  * @method mixed getMessage()
- * @method mixed getRankToken()
+ * @method string getRankToken()
  * @method Model\DirectRankedRecipient[] getRankedRecipients()
  * @method string getRequestId()
  * @method string getStatus()
@@ -26,7 +26,7 @@ use InstagramAPI\Response;
  * @method $this setExpires(mixed $value)
  * @method $this setFiltered(mixed $value)
  * @method $this setMessage(mixed $value)
- * @method $this setRankToken(mixed $value)
+ * @method $this setRankToken(string $value)
  * @method $this setRankedRecipients(Model\DirectRankedRecipient[] $value)
  * @method $this setRequestId(string $value)
  * @method $this setStatus(string $value)
@@ -47,6 +47,6 @@ class DirectRankedRecipientsResponse extends Response
         'ranked_recipients' => 'Model\DirectRankedRecipient[]',
         'filtered'          => '',
         'request_id'        => 'string',
-        'rank_token'        => '',
+        'rank_token'        => 'string',
     ];
 }

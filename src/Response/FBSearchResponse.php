@@ -11,7 +11,7 @@ use InstagramAPI\Response;
  * @method mixed getHashtags()
  * @method mixed getMessage()
  * @method mixed getPlaces()
- * @method mixed getRankToken()
+ * @method string getRankToken()
  * @method string getStatus()
  * @method mixed getUsers()
  * @method Model\_Message[] get_Messages()
@@ -27,7 +27,7 @@ use InstagramAPI\Response;
  * @method $this setHashtags(mixed $value)
  * @method $this setMessage(mixed $value)
  * @method $this setPlaces(mixed $value)
- * @method $this setRankToken(mixed $value)
+ * @method $this setRankToken(string $value)
  * @method $this setStatus(string $value)
  * @method $this setUsers(mixed $value)
  * @method $this set_Messages(Model\_Message[] $value)
@@ -47,6 +47,6 @@ class FBSearchResponse extends Response
         'hashtags'   => '',
         'users'      => '',
         'places'     => '',
-        'rank_token' => '',
+        'rank_token' => 'string',
     ];
 }

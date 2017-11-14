@@ -10,8 +10,8 @@ use InstagramAPI\Response;
  * @method bool getHasMore()
  * @method mixed getMessage()
  * @method string getNextMaxId()
- * @method mixed getNumResults()
- * @method mixed getRankToken()
+ * @method int getNumResults()
+ * @method string getRankToken()
  * @method string getStatus()
  * @method Model\User[] getUsers()
  * @method Model\_Message[] get_Messages()
@@ -26,8 +26,8 @@ use InstagramAPI\Response;
  * @method $this setHasMore(bool $value)
  * @method $this setMessage(mixed $value)
  * @method $this setNextMaxId(string $value)
- * @method $this setNumResults(mixed $value)
- * @method $this setRankToken(mixed $value)
+ * @method $this setNumResults(int $value)
+ * @method $this setRankToken(string $value)
  * @method $this setStatus(string $value)
  * @method $this setUsers(Model\User[] $value)
  * @method $this set_Messages(Model\_Message[] $value)
@@ -44,9 +44,9 @@ class SearchUserResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'has_more'    => 'bool',
-        'num_results' => '',
+        'num_results' => 'int',
         'next_max_id' => 'string',
         'users'       => 'Model\User[]',
-        'rank_token'  => '',
+        'rank_token'  => 'string',
     ];
 }

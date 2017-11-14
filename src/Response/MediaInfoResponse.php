@@ -11,7 +11,7 @@ use InstagramAPI\Response;
  * @method Model\Item[] getItems()
  * @method mixed getMessage()
  * @method mixed getMoreAvailable()
- * @method mixed getNumResults()
+ * @method int getNumResults()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
  * @method bool isAutoLoadMoreEnabled()
@@ -25,7 +25,7 @@ use InstagramAPI\Response;
  * @method $this setItems(Model\Item[] $value)
  * @method $this setMessage(mixed $value)
  * @method $this setMoreAvailable(mixed $value)
- * @method $this setNumResults(mixed $value)
+ * @method $this setNumResults(int $value)
  * @method $this setStatus(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
  * @method $this unsetAutoLoadMoreEnabled()
@@ -40,7 +40,7 @@ class MediaInfoResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'auto_load_more_enabled' => '',
-        'num_results'            => '',
+        'num_results'            => 'int',
         'more_available'         => '',
         'items'                  => 'Model\Item[]',
     ];

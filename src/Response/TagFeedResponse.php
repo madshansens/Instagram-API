@@ -12,7 +12,7 @@ use InstagramAPI\Response;
  * @method mixed getMessage()
  * @method mixed getMoreAvailable()
  * @method string getNextMaxId()
- * @method mixed getNumResults()
+ * @method int getNumResults()
  * @method Model\Item[] getRankedItems()
  * @method string getStatus()
  * @method Model\StoryTray getStory()
@@ -32,7 +32,7 @@ use InstagramAPI\Response;
  * @method $this setMessage(mixed $value)
  * @method $this setMoreAvailable(mixed $value)
  * @method $this setNextMaxId(string $value)
- * @method $this setNumResults(mixed $value)
+ * @method $this setNumResults(int $value)
  * @method $this setRankedItems(Model\Item[] $value)
  * @method $this setStatus(string $value)
  * @method $this setStory(Model\StoryTray $value)
@@ -51,7 +51,7 @@ use InstagramAPI\Response;
 class TagFeedResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
-        'num_results'            => '',
+        'num_results'            => 'int',
         'ranked_items'           => 'Model\Item[]',
         'auto_load_more_enabled' => '',
         'items'                  => 'Model\Item[]',
