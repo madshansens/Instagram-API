@@ -67,8 +67,7 @@ class Hashtag extends RequestCollection
         $request = $this->ig->request('tags/search/')
             ->addParam('q', $query)
             ->addParam('timezone_offset', date('Z'))
-            ->addParam('count', 30)
-            ->addParam('rank_token', $this->ig->rank_token);
+            ->addParam('count', 30);
 
         if (!empty($excludeList)) {
             // Safely restrict the amount of excludes we allow. Their server

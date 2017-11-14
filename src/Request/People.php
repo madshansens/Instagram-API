@@ -2,7 +2,6 @@
 
 namespace InstagramAPI\Request;
 
-use InstagramAPI\Constants;
 use InstagramAPI\Response;
 
 /**
@@ -355,21 +354,34 @@ class People extends RequestCollection
     /**
      * Search for Instagram users.
      *
-     * @param string $query The username or full name to search for.
+     * @param string         $query       The username or full name to search for.
+     * @param string[]|int[] $excludeList Array of numerical user IDs (ie "4021088339")
+     *                                    to exclude from the response, allowing you to skip users
+     *                                    from a previous call to get more results.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\SearchUserResponse
      */
     public function search(
-        $query)
+        $query,
+        array $excludeList = [])
     {
-        return $this->ig->request('users/search/')
-            ->addParam('ig_sig_key_version', Constants::SIG_KEY_VERSION)
-            ->addParam('is_typeahead', true)
-            ->addParam('query', $query)
-            ->addParam('rank_token', $this->ig->rank_token)
-            ->getResponse(new Response\SearchUserResponse());
+        $request = $this->ig->request('users/search/')
+            ->addParam('q', $query)
+            ->addParam('timezone_offset', date('Z'))
+            ->addParam('count', 30);
+
+        if (!empty($excludeList)) {
+            // Safely restrict the amount of excludes we allow. Their server
+            // HATES high numbers; at around 150 they will literally DISCONNECT
+            // you from the API server without even answering the endpoint call!
+            if (count($excludeList) > 65) { // Arbitrary safe number: 2*30 (two pages) of results plus a bit extra.
+                throw new \InvalidArgumentException('You are not allowed to provide more than 65 user IDs to exclude from the search.');
+            }
+            $request->addParam('exclude_list', '['.implode(', ', $excludeList).']');
+        }
+        $request->getResponse(new Response\SearchUserResponse());
     }
 
     /**
