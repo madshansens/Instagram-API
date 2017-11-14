@@ -359,6 +359,9 @@ class People extends RequestCollection
      *                                    to exclude from the response, allowing you to skip users
      *                                    from a previous call to get more results.
      *
+     * @throws \InvalidArgumentException                  If invalid query or
+     *                                                    trying to exclude too
+     *                                                    many user IDs.
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\SearchUserResponse
@@ -367,6 +370,11 @@ class People extends RequestCollection
         $query,
         array $excludeList = [])
     {
+        // Do basic query validation.
+        if (!is_string($query) || !strlen($query)) {
+            throw new \InvalidArgumentException('Query must be a non-empty string.');
+        }
+
         $request = $this->ig->request('users/search/')
             ->addParam('q', $query)
             ->addParam('timezone_offset', date('Z'))
@@ -381,7 +389,8 @@ class People extends RequestCollection
             }
             $request->addParam('exclude_list', '['.implode(', ', $excludeList).']');
         }
-        $request->getResponse(new Response\SearchUserResponse());
+
+        return $request->getResponse(new Response\SearchUserResponse());
     }
 
     /**
