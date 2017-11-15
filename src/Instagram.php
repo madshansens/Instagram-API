@@ -832,7 +832,7 @@ class Instagram
         // You have been warned.
         if ($justLoggedIn) {
             // Perform the "user has just done a full login" API flow.
-            $this->people->getAutoCompleteUserList();
+            $this->people->getBootstrapUsers();
             $this->story->getReelsTrayFeed();
             $this->timeline->getTimelineFeed();
             $this->direct->getRecentRecipients();
@@ -874,7 +874,7 @@ class Instagram
                 $this->settings->set('session_id', $this->session_id);
 
                 // Do the rest of the "user is re-opening the app" API flow...
-                $this->people->getAutoCompleteUserList();
+                $this->people->getBootstrapUsers();
                 $this->story->getReelsTrayFeed();
                 $this->direct->getRankedRecipients('reshare', true);
                 $this->direct->getRankedRecipients('raven', true);

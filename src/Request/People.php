@@ -120,22 +120,29 @@ class People extends RequestCollection
     }
 
     /**
-     * Retrieve list of all friends.
+     * Retrieve bootstrap user data.
      *
      * WARNING: This is a special, very heavily throttled API endpoint.
      * Instagram REQUIRES that you wait several minutes between calls to it.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\AutoCompleteUserListResponse|null Will be NULL if throttled by Instagram.
+     * @return \InstagramAPI\Response\BootstrapUserResponse|null Will be NULL if throttled by Instagram.
      */
-    public function getAutoCompleteUserList()
+    public function getBootstrapUsers()
     {
-        try {
-            $request = $this->ig->request('friendships/autocomplete_user_list/')
-                ->addParam('version', '2');
+        $surfaces = [
+            'coefficient_direct_recipients_ranking_variant_2',
+            'coefficient_direct_recipients_ranking',
+            'coefficient_ios_section_test_bootstrap_ranking',
+            'autocomplete_user_list',
+        ];
 
-            return $request->getResponse(new Response\AutoCompleteUserListResponse());
+        try {
+            $request = $this->ig->request('scores/bootstrap/users/')
+                ->addParam('surfaces', '["'.implode('","', $surfaces).'"]');
+
+            return $request->getResponse(new Response\BootstrapUserResponse());
         } catch (\InstagramAPI\Exception\ThrottledException $e) {
             // Throttling is so common that we'll simply return NULL in that case.
             return;
