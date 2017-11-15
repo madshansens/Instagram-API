@@ -89,7 +89,7 @@ class Realtime implements EventEmitterInterface
             new Connector($this->_instagram, $this->_loop),
             new Auth($this->_instagram),
             $this->_instagram->device,
-            $this->_instagram->experiments,
+            $this->_instagram,
             $this->_loop,
             $this->_logger
         );

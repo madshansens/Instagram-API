@@ -17,7 +17,7 @@ namespace InstagramAPI;
  * @author mgp25: Founder, Reversing, Project Leader (https://github.com/mgp25)
  * @author SteveJobzniak (https://github.com/SteveJobzniak)
  */
-class Instagram
+class Instagram implements ExperimentsInterface
 {
     /**
      * Experiments refresh interval in sec.

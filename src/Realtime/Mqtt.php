@@ -10,6 +10,7 @@ use Evenement\EventEmitterInterface;
 use Fbns\Client\AuthInterface;
 use InstagramAPI\Constants;
 use InstagramAPI\Devices\DeviceInterface;
+use InstagramAPI\ExperimentsInterface;
 use InstagramAPI\React\PersistentInterface;
 use InstagramAPI\React\PersistentTrait;
 use InstagramAPI\Realtime\Command\UpdateSubscriptions;
@@ -38,6 +39,9 @@ class Mqtt implements PersistentInterface
 
     /** @var DeviceInterface */
     protected $_device;
+
+    /** @var ExperimentsInterface */
+    protected $_experiments;
 
     /** @var LoopInterface */
     protected $_loop;
@@ -78,7 +82,7 @@ class Mqtt implements PersistentInterface
      * @param ConnectorInterface    $connector
      * @param AuthInterface         $auth
      * @param DeviceInterface       $device
-     * @param array                 $experiments
+     * @param ExperimentsInterface  $experiments
      * @param LoopInterface         $loop
      * @param LoggerInterface       $logger
      */
@@ -87,7 +91,7 @@ class Mqtt implements PersistentInterface
         ConnectorInterface $connector,
         AuthInterface $auth,
         DeviceInterface $device,
-        array $experiments,
+        ExperimentsInterface $experiments,
         LoopInterface $loop,
         LoggerInterface $logger)
     {
@@ -101,6 +105,7 @@ class Mqtt implements PersistentInterface
         $this->_subscriptions = [];
 
         $this->_loadExperiments($experiments);
+        $this->_initSubscriptions();
 
         $this->_shutdown = false;
         $this->_client = $this->_getClient();
@@ -309,25 +314,6 @@ class Mqtt implements PersistentInterface
     }
 
     /**
-     * Check if feature is enabled.
-     *
-     * @param array  $params
-     * @param string $feature
-     *
-     * @return bool
-     */
-    protected function _isFeatureEnabled(
-        array $params,
-        $feature)
-    {
-        if (!isset($params[$feature])) {
-            return false;
-        }
-
-        return in_array($params[$feature], ['enabled', 'true', '1']);
-    }
-
-    /**
      * Send the command.
      *
      * @param CommandInterface $command
@@ -349,40 +335,57 @@ class Mqtt implements PersistentInterface
     }
 
     /**
-     * Load experiments.
+     * Load the experiments.
      *
-     * @param array $experiments
+     * @param ExperimentsInterface $experiments
      */
     protected function _loadExperiments(
-        array $experiments)
+        ExperimentsInterface $experiments)
     {
+        $this->_experiments = $experiments;
+
         // Direct features.
-        $directFeatures = isset($experiments['ig_android_realtime_iris'])
-            ? $experiments['ig_android_realtime_iris'] : [];
-        $this->_irisEnabled = $this->_isFeatureEnabled($directFeatures, 'is_direct_over_iris_enabled');
-        if (isset($directFeatures['pubsub_msg_type_blacklist'])) {
-            $this->_msgTypeBlacklist = $directFeatures['pubsub_msg_type_blacklist'];
-        }
+        $this->_irisEnabled = $experiments->isExperimentEnabled(
+            'ig_android_realtime_iris',
+            'is_direct_over_iris_enabled'
+        );
+        $this->_msgTypeBlacklist = $experiments->getExperimentParam(
+            'ig_android_realtime_iris',
+            'pubsub_msg_type_blacklist',
+            ''
+        );
 
         // Live features.
-        $liveFeatures = isset($experiments['ig_android_skywalker_live_event_start_end'])
-            ? $experiments['ig_android_skywalker_live_event_start_end'] : [];
-        $this->_mqttLiveEnabled = $this->_isFeatureEnabled($liveFeatures, 'is_enabled');
+        $this->_mqttLiveEnabled = $experiments->isExperimentEnabled(
+            'ig_android_skywalker_live_event_start_end',
+            'is_enabled'
+        );
 
         // GraphQL features.
-        $graphQlTyping = isset($experiments['ig_android_gqls_typing_indicator'])
-            ? $experiments['ig_android_gqls_typing_indicator'] : [];
-        $this->_graphQlTypingEnabled = $this->_isFeatureEnabled($graphQlTyping, 'is_enabled');
+        $this->_graphQlTypingEnabled = $experiments->isExperimentEnabled(
+            'ig_android_gqls_typing_indicator',
+            'is_enabled'
+        );
+    }
 
+    protected function _initSubscriptions()
+    {
         // Set up PubSub topics.
+        $liveSubscription = new LiveSubscription($this->_auth->getUserId());
         if ($this->_mqttLiveEnabled) {
-            $this->_doAddSubscription(new LiveSubscription($this->_auth->getUserId()), false);
+            $this->_doAddSubscription($liveSubscription, false);
+        } else {
+            $this->_doRemoveSubscription($liveSubscription, false);
         }
+        // Direct subscription is always enabled.
         $this->_doAddSubscription(new DirectSubscription($this->_auth->getUserId()), false);
 
         // Set up GraphQL topics.
+        $graphQlTypingSubscription = new DirectTypingSubscription($this->_auth->getUserId());
         if ($this->_graphQlTypingEnabled) {
-            $this->_doAddSubscription(new DirectTypingSubscription($this->_auth->getUserId()), false);
+            $this->_doAddSubscription($graphQlTypingSubscription, false);
+        } else {
+            $this->_doRemoveSubscription($graphQlTypingSubscription, false);
         }
     }
 
@@ -402,17 +405,17 @@ class Mqtt implements PersistentInterface
         ];
         // PubSub message type blacklist.
         $msgTypeBlacklist = '';
-        if ($this->_msgTypeBlacklist !== null && strlen($this->_msgTypeBlacklist)) {
+        if ($this->_msgTypeBlacklist !== null && $this->_msgTypeBlacklist !== '') {
             $msgTypeBlacklist = $this->_msgTypeBlacklist;
         }
         if ($this->_graphQlTypingEnabled) {
-            if (strlen($msgTypeBlacklist)) {
+            if ($msgTypeBlacklist !== '') {
                 $msgTypeBlacklist .= ', typing_type';
             } else {
                 $msgTypeBlacklist = 'typing_type';
             }
         }
-        if (strlen($msgTypeBlacklist)) {
+        if ($msgTypeBlacklist !== '') {
             $result['pubsub_msg_type_blacklist'] = $msgTypeBlacklist;
         }
         // Accept-Language should be last one.
