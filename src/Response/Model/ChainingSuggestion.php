@@ -2,10 +2,8 @@
 
 namespace InstagramAPI\Response\Model;
 
-use InstagramAPI\AutoPropertyMapper;
-
 /**
- * User.
+ * ChainingSuggestion.
  *
  * @method string getAddressStreet()
  * @method mixed getAggregatePromoteEngagement()
@@ -22,6 +20,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getCanCreateSponsorTags()
  * @method mixed getCanSeeOrganicInsights()
  * @method string getCategory()
+ * @method ChainingInfo getChainingInfo()
  * @method ChainingSuggestion[] getChainingSuggestions()
  * @method string getCityId()
  * @method string getCityName()
@@ -69,6 +68,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getPageName()
  * @method mixed getPhoneNumber()
  * @method string getPk()
+ * @method string getProfileChainingSecondaryLabel()
  * @method mixed getProfileContext()
  * @method Link[] getProfileContextLinksWithUserIds()
  * @method string[] getProfileContextMutualFollowIds()
@@ -104,6 +104,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isCanCreateSponsorTags()
  * @method bool isCanSeeOrganicInsights()
  * @method bool isCategory()
+ * @method bool isChainingInfo()
  * @method bool isChainingSuggestions()
  * @method bool isCityId()
  * @method bool isCityName()
@@ -151,6 +152,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isPageName()
  * @method bool isPhoneNumber()
  * @method bool isPk()
+ * @method bool isProfileChainingSecondaryLabel()
  * @method bool isProfileContext()
  * @method bool isProfileContextLinksWithUserIds()
  * @method bool isProfileContextMutualFollowIds()
@@ -186,6 +188,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setCanCreateSponsorTags(mixed $value)
  * @method $this setCanSeeOrganicInsights(mixed $value)
  * @method $this setCategory(string $value)
+ * @method $this setChainingInfo(ChainingInfo $value)
  * @method $this setChainingSuggestions(ChainingSuggestion[] $value)
  * @method $this setCityId(string $value)
  * @method $this setCityName(string $value)
@@ -233,6 +236,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setPageName(mixed $value)
  * @method $this setPhoneNumber(mixed $value)
  * @method $this setPk(string $value)
+ * @method $this setProfileChainingSecondaryLabel(string $value)
  * @method $this setProfileContext(mixed $value)
  * @method $this setProfileContextLinksWithUserIds(Link[] $value)
  * @method $this setProfileContextMutualFollowIds(string[] $value)
@@ -268,6 +272,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetCanCreateSponsorTags()
  * @method $this unsetCanSeeOrganicInsights()
  * @method $this unsetCategory()
+ * @method $this unsetChainingInfo()
  * @method $this unsetChainingSuggestions()
  * @method $this unsetCityId()
  * @method $this unsetCityName()
@@ -315,6 +320,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetPageName()
  * @method $this unsetPhoneNumber()
  * @method $this unsetPk()
+ * @method $this unsetProfileChainingSecondaryLabel()
  * @method $this unsetProfileContext()
  * @method $this unsetProfileContextLinksWithUserIds()
  * @method $this unsetProfileContextMutualFollowIds()
@@ -336,96 +342,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetUsertagsCount()
  * @method $this unsetZip()
  */
-class User extends AutoPropertyMapper
+class ChainingSuggestion extends User
 {
     const JSON_PROPERTY_MAP = [
-        'username'                            => 'string',
-        'has_anonymous_profile_picture'       => 'bool',
-        'is_favorite'                         => 'bool',
-        'profile_pic_url'                     => 'string',
-        'full_name'                           => 'string',
-        'user_id'                             => 'string',
-        'pk'                                  => 'string',
-        'id'                                  => 'string',
-        'is_verified'                         => 'bool',
-        'is_private'                          => 'bool',
-        'coeff_weight'                        => '',
-        'friendship_status'                   => 'FriendshipStatus',
-        'hd_profile_pic_versions'             => 'ImageCandidate[]',
-        'byline'                              => '',
-        'search_social_context'               => '',
-        'unseen_count'                        => '',
-        'mutual_followers_count'              => '',
-        'follower_count'                      => 'int',
-        'social_context'                      => 'string',
-        'media_count'                         => 'int',
-        'following_count'                     => 'int',
-        'is_business'                         => 'bool',
-        'usertags_count'                      => 'int',
-        'profile_context'                     => '',
-        'biography'                           => 'string',
-        'geo_media_count'                     => 'int',
-        'is_unpublished'                      => 'bool',
-        'allow_contacts_sync'                 => '',
-        'show_feed_biz_conversion_icon'       => '',
-        'profile_pic_id'                      => 'string',
-        'auto_expand_chaining'                => '',
-        'can_boost_post'                      => '',
-        'is_profile_action_needed'            => 'bool',
-        'has_chaining'                        => 'bool',
-        'chaining_suggestions'                => 'ChainingSuggestion[]',
-        'include_direct_blacklist_status'     => '',
-        'can_see_organic_insights'            => '',
-        'can_convert_to_business'             => '',
-        'convert_from_pages'                  => '',
-        'show_business_conversion_icon'       => '',
-        'show_conversion_edit_entry'          => '',
-        'show_insights_terms'                 => '',
-        'can_create_sponsor_tags'             => '',
-        'hd_profile_pic_url_info'             => 'ImageCandidate',
-        'usertag_review_enabled'              => '',
-        'profile_context_mutual_follow_ids'   => 'string[]',
-        'profile_context_links_with_user_ids' => 'Link[]',
-        'has_biography_translation'           => 'bool',
-        'business_contact_method'             => 'string',
-        /*
-         * Business category.
-         */
-        'category'                            => 'string',
-        'direct_messaging'                    => 'string',
-        'page_name'                           => '',
-        'fb_page_call_to_action_id'           => 'string',
-        'is_call_to_action_enabled'           => 'bool',
-        'public_phone_country_code'           => 'string',
-        'public_phone_number'                 => 'string',
-        'contact_phone_number'                => 'string',
-        'latitude'                            => 'float',
-        'longitude'                           => 'float',
-        'address_street'                      => 'string',
-        'zip'                                 => 'string',
-        'city_id'                             => 'string', // 64-bit number.
-        'city_name'                           => 'string',
-        'public_email'                        => 'string',
-        'is_needy'                            => 'bool',
-        'external_url'                        => 'string',
-        'external_lynx_url'                   => 'string',
-        'email'                               => '',
-        'country_code'                        => '',
-        'birthday'                            => '',
-        'national_number'                     => '',
-        'gender'                              => '',
-        'phone_number'                        => '',
-        'needs_email_confirm'                 => '',
-        'is_active'                           => 'bool',
-        'block_at'                            => '',
-        'aggregate_promote_engagement'        => '',
-        'fbuid'                               => '',
-        'page_id'                             => 'string',
-        /*
-         * Unix "taken_at" timestamp of the newest item in their story reel.
-         */
-        'latest_reel_media'                   => 'string',
-        'has_unseen_besties_media'            => 'bool',
-        'allowed_commenter_type'              => '',
-    ];
+       'chaining_info'                    => 'ChainingInfo',
+       /*
+        * This currently always contains the same value as "full_name".
+        */
+       'profile_chaining_secondary_label' => 'string',
+   ];
 }
