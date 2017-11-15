@@ -9,6 +9,8 @@ use InstagramAPI\AutoPropertyMapper;
  *
  * @method ActionBadge getActionBadge()
  * @method mixed getCanonical()
+ * @method int getExpiringMediaReceiveCount()
+ * @method int getExpiringMediaSendCount()
  * @method bool getHasNewer()
  * @method bool getHasOlder()
  * @method User getInviter()
@@ -26,6 +28,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getOldestCursor()
  * @method mixed getPending()
  * @method string getPendingScore()
+ * @method int getReshareReceiveCount()
+ * @method int getReshareSendCount()
  * @method string getThreadId()
  * @method mixed getThreadTitle()
  * @method mixed getThreadType()
@@ -34,6 +38,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getViewerId()
  * @method bool isActionBadge()
  * @method bool isCanonical()
+ * @method bool isExpiringMediaReceiveCount()
+ * @method bool isExpiringMediaSendCount()
  * @method bool isHasNewer()
  * @method bool isHasOlder()
  * @method bool isInviter()
@@ -51,6 +57,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isOldestCursor()
  * @method bool isPending()
  * @method bool isPendingScore()
+ * @method bool isReshareReceiveCount()
+ * @method bool isReshareSendCount()
  * @method bool isThreadId()
  * @method bool isThreadTitle()
  * @method bool isThreadType()
@@ -59,6 +67,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isViewerId()
  * @method $this setActionBadge(ActionBadge $value)
  * @method $this setCanonical(mixed $value)
+ * @method $this setExpiringMediaReceiveCount(int $value)
+ * @method $this setExpiringMediaSendCount(int $value)
  * @method $this setHasNewer(bool $value)
  * @method $this setHasOlder(bool $value)
  * @method $this setInviter(User $value)
@@ -76,6 +86,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setOldestCursor(mixed $value)
  * @method $this setPending(mixed $value)
  * @method $this setPendingScore(string $value)
+ * @method $this setReshareReceiveCount(int $value)
+ * @method $this setReshareSendCount(int $value)
  * @method $this setThreadId(string $value)
  * @method $this setThreadTitle(mixed $value)
  * @method $this setThreadType(mixed $value)
@@ -84,6 +96,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setViewerId(string $value)
  * @method $this unsetActionBadge()
  * @method $this unsetCanonical()
+ * @method $this unsetExpiringMediaReceiveCount()
+ * @method $this unsetExpiringMediaSendCount()
  * @method $this unsetHasNewer()
  * @method $this unsetHasOlder()
  * @method $this unsetInviter()
@@ -101,6 +115,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetOldestCursor()
  * @method $this unsetPending()
  * @method $this unsetPendingScore()
+ * @method $this unsetReshareReceiveCount()
+ * @method $this unsetReshareSendCount()
  * @method $this unsetThreadId()
  * @method $this unsetThreadTitle()
  * @method $this unsetThreadType()
@@ -111,30 +127,34 @@ use InstagramAPI\AutoPropertyMapper;
 class DirectThread extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'named'                 => '',
-        'users'                 => 'User[]',
-        'has_newer'             => 'bool',
-        'viewer_id'             => 'string',
-        'thread_id'             => 'string',
-        'last_activity_at'      => '',
-        'newest_cursor'         => '',
-        'is_spam'               => '',
-        'has_older'             => 'bool',
-        'oldest_cursor'         => '',
-        'left_users'            => 'User[]',
-        'muted'                 => '',
-        'items'                 => 'DirectThreadItem[]',
-        'thread_type'           => '',
-        'thread_title'          => '',
-        'canonical'             => '',
-        'inviter'               => 'User',
-        'pending'               => '',
-        'last_seen_at'          => 'UnpredictableKeys\DirectThreadLastSeenAtUnpredictableContainer',
-        'unseen_count'          => '',
-        'action_badge'          => 'ActionBadge',
-        'last_activity_at_secs' => '',
-        'last_permanent_item'   => 'PermanentItem',
-        'is_pin'                => '',
-        'pending_score'         => 'string',
+        'named'                         => '',
+        'users'                         => 'User[]',
+        'has_newer'                     => 'bool',
+        'viewer_id'                     => 'string',
+        'thread_id'                     => 'string',
+        'last_activity_at'              => '',
+        'newest_cursor'                 => '',
+        'is_spam'                       => '',
+        'has_older'                     => 'bool',
+        'oldest_cursor'                 => '',
+        'left_users'                    => 'User[]',
+        'muted'                         => '',
+        'items'                         => 'DirectThreadItem[]',
+        'thread_type'                   => '',
+        'thread_title'                  => '',
+        'canonical'                     => '',
+        'inviter'                       => 'User',
+        'pending'                       => '',
+        'last_seen_at'                  => 'UnpredictableKeys\DirectThreadLastSeenAtUnpredictableContainer',
+        'unseen_count'                  => '',
+        'action_badge'                  => 'ActionBadge',
+        'last_activity_at_secs'         => '',
+        'last_permanent_item'           => 'PermanentItem',
+        'is_pin'                        => '',
+        'pending_score'                 => 'string',
+        'expiring_media_receive_count'  => 'int',
+        'expiring_media_send_count'     => 'int',
+        'reshare_receive_count'         => 'int',
+        'reshare_send_count'            => 'int',
     ];
 }
