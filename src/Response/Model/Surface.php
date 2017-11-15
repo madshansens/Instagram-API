@@ -27,6 +27,10 @@ use InstagramAPI\AutoPropertyMapper;
 class Surface extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
+        /*
+         * Scores is an array of int/float numbers keyed by user id.
+         * It determines how important each user is for sorting purposes.
+         */
         'scores'         => '',
         'rank_token'     => 'string',
         'ttl_secs'       => 'int',

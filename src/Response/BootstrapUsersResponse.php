@@ -5,7 +5,7 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * BootstrapUserResponse.
+ * BootstrapUsersResponse.
  *
  * @method mixed getMessage()
  * @method string getStatus()
@@ -28,7 +28,7 @@ use InstagramAPI\Response;
  * @method $this unsetUsers()
  * @method $this unset_Messages()
  */
-class BootstrapUserResponse extends Response
+class BootstrapUsersResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'surfaces' => 'Model\Surface[]',

@@ -120,14 +120,14 @@ class People extends RequestCollection
     }
 
     /**
-     * Retrieve bootstrap user data.
+     * Retrieve bootstrap user data (autocompletion user list).
      *
      * WARNING: This is a special, very heavily throttled API endpoint.
      * Instagram REQUIRES that you wait several minutes between calls to it.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\BootstrapUserResponse|null Will be NULL if throttled by Instagram.
+     * @return \InstagramAPI\Response\BootstrapUsersResponse|null Will be NULL if throttled by Instagram.
      */
     public function getBootstrapUsers()
     {
@@ -140,12 +140,12 @@ class People extends RequestCollection
 
         try {
             $request = $this->ig->request('scores/bootstrap/users/')
-                ->addParam('surfaces', '["'.implode('","', $surfaces).'"]');
+                ->addParam('surfaces', json_encode($surfaces));
 
-            return $request->getResponse(new Response\BootstrapUserResponse());
+            return $request->getResponse(new Response\BootstrapUsersResponse());
         } catch (\InstagramAPI\Exception\ThrottledException $e) {
             // Throttling is so common that we'll simply return NULL in that case.
-            return;
+            return null;
         }
     }
 
