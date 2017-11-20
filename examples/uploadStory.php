@@ -78,6 +78,9 @@ $metadata = [
         'location_id'   => $location->getExternalId(),
     ],
     'location' => $location,
+
+    // (optional) You can use story links ONLY if you have a business account with >= 10k followers.
+    // 'link' => 'https://github.com/mgp25/Instagram-API',
 ];
 
 try {
