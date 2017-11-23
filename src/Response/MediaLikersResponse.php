@@ -9,7 +9,7 @@ use InstagramAPI\Response;
  *
  * @method mixed getMessage()
  * @method string getStatus()
- * @method mixed getUserCount()
+ * @method int getUserCount()
  * @method Model\User[] getUsers()
  * @method Model\_Message[] get_Messages()
  * @method bool isMessage()
@@ -19,7 +19,7 @@ use InstagramAPI\Response;
  * @method bool is_Messages()
  * @method $this setMessage(mixed $value)
  * @method $this setStatus(string $value)
- * @method $this setUserCount(mixed $value)
+ * @method $this setUserCount(int $value)
  * @method $this setUsers(Model\User[] $value)
  * @method $this set_Messages(Model\_Message[] $value)
  * @method $this unsetMessage()
@@ -31,7 +31,7 @@ use InstagramAPI\Response;
 class MediaLikersResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
-        'user_count' => '',
+        'user_count' => 'int',
         'users'      => 'Model\User[]',
     ];
 }

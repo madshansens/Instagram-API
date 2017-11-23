@@ -7,11 +7,11 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * TopLive.
  *
- * @method BroadcastOwner[] getBroadcastOwners()
+ * @method User[] getBroadcastOwners()
  * @method mixed getRankedPosition()
  * @method bool isBroadcastOwners()
  * @method bool isRankedPosition()
- * @method $this setBroadcastOwners(BroadcastOwner[] $value)
+ * @method $this setBroadcastOwners(User[] $value)
  * @method $this setRankedPosition(mixed $value)
  * @method $this unsetBroadcastOwners()
  * @method $this unsetRankedPosition()
@@ -19,7 +19,7 @@ use InstagramAPI\AutoPropertyMapper;
 class TopLive extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'broadcast_owners' => 'BroadcastOwner[]',
+        'broadcast_owners' => 'User[]',
         'ranked_position'  => '',
     ];
 }

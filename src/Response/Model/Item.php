@@ -117,7 +117,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getTakenAt()
  * @method mixed getThumbnailUrls()
  * @method mixed getTopLikers()
- * @method mixed getTotalViewerCount()
+ * @method int getTotalViewerCount()
  * @method mixed getUrlExpireAtSecs()
  * @method User getUser()
  * @method Usertag getUsertags()
@@ -126,7 +126,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method float getVideoDuration()
  * @method VideoVersions[] getVideoVersions()
  * @method int getViewCount()
- * @method mixed getViewerCount()
+ * @method int getViewerCount()
  * @method mixed getViewerCursor()
  * @method User[] getViewers()
  * @method mixed getVisibility()
@@ -363,7 +363,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setTakenAt(string $value)
  * @method $this setThumbnailUrls(mixed $value)
  * @method $this setTopLikers(mixed $value)
- * @method $this setTotalViewerCount(mixed $value)
+ * @method $this setTotalViewerCount(int $value)
  * @method $this setUrlExpireAtSecs(mixed $value)
  * @method $this setUser(User $value)
  * @method $this setUsertags(Usertag $value)
@@ -372,7 +372,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setVideoDuration(float $value)
  * @method $this setVideoVersions(VideoVersions[] $value)
  * @method $this setViewCount(int $value)
- * @method $this setViewerCount(mixed $value)
+ * @method $this setViewerCount(int $value)
  * @method $this setViewerCursor(mixed $value)
  * @method $this setViewers(User[] $value)
  * @method $this setVisibility(mixed $value)
@@ -534,7 +534,7 @@ class Item extends AutoPropertyMapper
          * it to an int instead to make the number easier to manage.
          */
         'view_count'                       => 'int',
-        'viewer_count'                     => '',
+        'viewer_count'                     => 'int',
         'organic_tracking_token'           => 'string',
         'comment_count'                    => 'int',
         'has_more_comments'                => 'bool',
@@ -636,7 +636,7 @@ class Item extends AutoPropertyMapper
         'boost_unavailable_reason'         => '',
         'viewers'                          => 'User[]',
         'viewer_cursor'                    => '',
-        'total_viewer_count'               => '',
+        'total_viewer_count'               => 'int',
         'multi_author_reel_names'          => '',
         'reel_share'                       => 'ReelShare',
         'story_polls'                      => '',

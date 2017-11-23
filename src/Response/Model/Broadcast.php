@@ -7,27 +7,27 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * Broadcast.
  *
- * @method mixed getBroadcastMessage()
- * @method BroadcastOwner getBroadcastOwner()
- * @method mixed getBroadcastStatus()
+ * @method string getBroadcastMessage()
+ * @method User getBroadcastOwner()
+ * @method string getBroadcastStatus()
  * @method string getCoverFrameUrl()
  * @method string getDashAbrPlaybackUrl()
- * @method mixed getDashManifest()
+ * @method string getDashManifest()
  * @method string getDashPlaybackUrl()
- * @method mixed getEncodingTag()
- * @method mixed getExpireAt()
+ * @method string getEncodingTag()
+ * @method string getExpireAt()
  * @method string getId()
- * @method mixed getInternalOnly()
+ * @method bool getInternalOnly()
  * @method string getMediaId()
  * @method mixed getMuted()
- * @method mixed getNumberOfQualities()
+ * @method int getNumberOfQualities()
  * @method string getOrganicTrackingToken()
- * @method mixed getPublishedTime()
+ * @method string getPublishedTime()
  * @method mixed getRankedPosition()
  * @method string getRtmpPlaybackUrl()
  * @method mixed getSeenRankedPosition()
- * @method mixed getTotalUniqueViewerCount()
- * @method mixed getViewerCount()
+ * @method int getTotalUniqueViewerCount()
+ * @method int getViewerCount()
  * @method bool isBroadcastMessage()
  * @method bool isBroadcastOwner()
  * @method bool isBroadcastStatus()
@@ -49,27 +49,27 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isSeenRankedPosition()
  * @method bool isTotalUniqueViewerCount()
  * @method bool isViewerCount()
- * @method $this setBroadcastMessage(mixed $value)
- * @method $this setBroadcastOwner(BroadcastOwner $value)
- * @method $this setBroadcastStatus(mixed $value)
+ * @method $this setBroadcastMessage(string $value)
+ * @method $this setBroadcastOwner(User $value)
+ * @method $this setBroadcastStatus(string $value)
  * @method $this setCoverFrameUrl(string $value)
  * @method $this setDashAbrPlaybackUrl(string $value)
- * @method $this setDashManifest(mixed $value)
+ * @method $this setDashManifest(string $value)
  * @method $this setDashPlaybackUrl(string $value)
- * @method $this setEncodingTag(mixed $value)
- * @method $this setExpireAt(mixed $value)
+ * @method $this setEncodingTag(string $value)
+ * @method $this setExpireAt(string $value)
  * @method $this setId(string $value)
- * @method $this setInternalOnly(mixed $value)
+ * @method $this setInternalOnly(bool $value)
  * @method $this setMediaId(string $value)
  * @method $this setMuted(mixed $value)
- * @method $this setNumberOfQualities(mixed $value)
+ * @method $this setNumberOfQualities(int $value)
  * @method $this setOrganicTrackingToken(string $value)
- * @method $this setPublishedTime(mixed $value)
+ * @method $this setPublishedTime(string $value)
  * @method $this setRankedPosition(mixed $value)
  * @method $this setRtmpPlaybackUrl(string $value)
  * @method $this setSeenRankedPosition(mixed $value)
- * @method $this setTotalUniqueViewerCount(mixed $value)
- * @method $this setViewerCount(mixed $value)
+ * @method $this setTotalUniqueViewerCount(int $value)
+ * @method $this setViewerCount(int $value)
  * @method $this unsetBroadcastMessage()
  * @method $this unsetBroadcastOwner()
  * @method $this unsetBroadcastStatus()
@@ -95,11 +95,14 @@ use InstagramAPI\AutoPropertyMapper;
 class Broadcast extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'broadcast_owner'           => 'BroadcastOwner',
-        'broadcast_status'          => '',
+        'broadcast_owner'           => 'User',
+        /*
+         * A string such as "active" or "post_live".
+         */
+        'broadcast_status'          => 'string',
         'cover_frame_url'           => 'string',
-        'published_time'            => '',
-        'broadcast_message'         => '',
+        'published_time'            => 'string',
+        'broadcast_message'         => 'string',
         'muted'                     => '',
         'media_id'                  => 'string',
         'id'                        => 'string',
@@ -109,12 +112,15 @@ class Broadcast extends AutoPropertyMapper
         'ranked_position'           => '',
         'organic_tracking_token'    => 'string',
         'seen_ranked_position'      => '',
-        'viewer_count'              => '',
-        'dash_manifest'             => '',
-        'expire_at'                 => '',
-        'encoding_tag'              => '',
-        'total_unique_viewer_count' => '',
-        'internal_only'             => '',
-        'number_of_qualities'       => '',
+        'viewer_count'              => 'int',
+        'dash_manifest'             => 'string',
+        /*
+         * Unix timestamp of when the "post_live" will expire.
+         */
+        'expire_at'                 => 'string',
+        'encoding_tag'              => 'string',
+        'total_unique_viewer_count' => 'int',
+        'internal_only'             => 'bool',
+        'number_of_qualities'       => 'int',
     ];
 }

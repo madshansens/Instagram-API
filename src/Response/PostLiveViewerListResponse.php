@@ -10,7 +10,7 @@ use InstagramAPI\Response;
  * @method mixed getMessage()
  * @method mixed getNextMaxId()
  * @method string getStatus()
- * @method mixed getTotalViewerCount()
+ * @method int getTotalViewerCount()
  * @method Model\User[] getUsers()
  * @method Model\_Message[] get_Messages()
  * @method bool isMessage()
@@ -22,7 +22,7 @@ use InstagramAPI\Response;
  * @method $this setMessage(mixed $value)
  * @method $this setNextMaxId(mixed $value)
  * @method $this setStatus(string $value)
- * @method $this setTotalViewerCount(mixed $value)
+ * @method $this setTotalViewerCount(int $value)
  * @method $this setUsers(Model\User[] $value)
  * @method $this set_Messages(Model\_Message[] $value)
  * @method $this unsetMessage()
@@ -37,6 +37,6 @@ class PostLiveViewerListResponse extends Response
     const JSON_PROPERTY_MAP = [
         'users'              => 'Model\User[]',
         'next_max_id'        => '',
-        'total_viewer_count' => '',
+        'total_viewer_count' => 'int',
     ];
 }

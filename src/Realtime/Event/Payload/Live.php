@@ -8,7 +8,7 @@ use InstagramAPI\AutoPropertyMapper;
  * Live.
  *
  * @method string getBroadcastId()
- * @method mixed getBroadcastMessage()
+ * @method string getBroadcastMessage()
  * @method mixed getDisplayNotification()
  * @method mixed getIsPeriodic()
  * @method \InstagramAPI\Response\Model\User getUser()
@@ -18,7 +18,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isIsPeriodic()
  * @method bool isUser()
  * @method $this setBroadcastId(string $value)
- * @method $this setBroadcastMessage(mixed $value)
+ * @method $this setBroadcastMessage(string $value)
  * @method $this setDisplayNotification(mixed $value)
  * @method $this setIsPeriodic(mixed $value)
  * @method $this setUser(\InstagramAPI\Response\Model\User $value)
@@ -34,7 +34,7 @@ class Live extends AutoPropertyMapper
         'user'                 => '\InstagramAPI\Response\Model\User',
         'broadcast_id'         => 'string',
         'is_periodic'          => '',
-        'broadcast_message'    => '',
+        'broadcast_message'    => 'string',
         'display_notification' => '',
     ];
 }
