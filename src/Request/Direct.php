@@ -4,6 +4,7 @@ namespace InstagramAPI\Request;
 
 use InstagramAPI\Constants;
 use InstagramAPI\Exception\InstagramException;
+use InstagramAPI\Exception\ThrottledException;
 use InstagramAPI\Exception\UploadFailedException;
 use InstagramAPI\Request\Metadata\Internal as InternalMetadata;
 use InstagramAPI\Response;
@@ -193,29 +194,37 @@ class Direct extends RequestCollection
     /**
      * Get ranked list of recipients.
      *
+     * WARNING: This is a special, very heavily throttled API endpoint.
+     * Instagram REQUIRES that you wait several minutes between calls to it.
+     *
      * @param string      $mode        Either "reshare" or "raven".
      * @param bool        $showThreads Whether to include existing threads into response.
      * @param null|string $query       (optional) The user to search for.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\DirectRankedRecipientsResponse
+     * @return \InstagramAPI\Response\DirectRankedRecipientsResponse|null Will be NULL if throttled by Instagram.
      */
     public function getRankedRecipients(
         $mode,
         $showThreads,
         $query = null)
     {
-        $request = $this->ig->request('direct_v2/ranked_recipients/')
-            ->addParam('mode', $mode)
-            ->addParam('show_threads', $showThreads ? 'true' : 'false')
-            ->addParam('use_unified_inbox', 'true');
-        if ($query !== null) {
-            $request->addParam('query', $query);
-        }
+        try {
+            $request = $this->ig->request('direct_v2/ranked_recipients/')
+                ->addParam('mode', $mode)
+                ->addParam('show_threads', $showThreads ? 'true' : 'false')
+                ->addParam('use_unified_inbox', 'true');
+            if ($query !== null) {
+                $request->addParam('query', $query);
+            }
 
-        return $request
-            ->getResponse(new Response\DirectRankedRecipientsResponse());
+            return $request
+                ->getResponse(new Response\DirectRankedRecipientsResponse());
+        } catch (ThrottledException $e) {
+            // Throttling is so common that we'll simply return NULL in that case.
+            return null;
+        }
     }
 
     /**

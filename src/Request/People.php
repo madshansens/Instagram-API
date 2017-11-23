@@ -2,6 +2,7 @@
 
 namespace InstagramAPI\Request;
 
+use InstagramAPI\Exception\ThrottledException;
 use InstagramAPI\Response;
 
 /**
@@ -143,7 +144,7 @@ class People extends RequestCollection
                 ->addParam('surfaces', json_encode($surfaces));
 
             return $request->getResponse(new Response\BootstrapUsersResponse());
-        } catch (\InstagramAPI\Exception\ThrottledException $e) {
+        } catch (ThrottledException $e) {
             // Throttling is so common that we'll simply return NULL in that case.
             return null;
         }
