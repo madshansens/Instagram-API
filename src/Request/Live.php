@@ -262,6 +262,44 @@ class Live extends RequestCollection
     }
 
     /**
+     * Enable viewer comments on your live broadcast.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\EnableDisableLiveCommentsResponse
+     */
+    public function enableComments(
+        $broadcastId)
+    {
+        return $this->ig->request("live/{$broadcastId}/unmute_comment/")
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\EnableDisableLiveCommentsResponse());
+    }
+
+    /**
+     * Disable viewer comments on your live broadcast.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\EnableDisableLiveCommentsResponse
+     */
+    public function disableComments(
+        $broadcastId)
+    {
+        return $this->ig->request("live/{$broadcastId}/mute_comment/")
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\EnableDisableLiveCommentsResponse());
+    }
+
+    /**
      * Like a broadcast.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
