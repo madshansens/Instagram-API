@@ -14,11 +14,24 @@ class FFmpegWrapper
     protected $_hasLibFdkAac;
 
     /**
+     * Constructor.
+     *
+     * @param string $ffmpegBinary
+     */
+    public function __construct(
+        $ffmpegBinary)
+    {
+        $this->_ffmpegBinary = $ffmpegBinary;
+    }
+
+    /**
      * Run a command and wrap errors into an Exception (if any).
      *
      * @param string $command
      *
      * @throws \RuntimeException
+     *
+     * @return string[]
      */
     public function run(
         $command)
@@ -34,6 +47,63 @@ class FFmpegWrapper
 
             throw new \RuntimeException($errorMsg, $returnCode);
         }
+
+        return $output;
+    }
+
+    /**
+     * Get the ffmpeg version.
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
+     */
+    public function version()
+    {
+        return $this->run('-version')[0];
+    }
+
+    /**
+     * Get a path to the ffmpeg binary.
+     *
+     * @return string
+     */
+    public function getFFmpegBinary()
+    {
+        return $this->_ffmpegBinary;
+    }
+
+    /**
+     * Check whether ffmpeg has -noautorotate flag.
+     *
+     * @return bool
+     */
+    public function hasNoAutorotate()
+    {
+        if ($this->_hasNoAutorotate === null) {
+            try {
+                $this->run('-noautorotate -f lavfi -i color=color=red -t 1 -f null -');
+                $this->_hasNoAutorotate = true;
+            } catch (\RuntimeException $e) {
+                $this->_hasNoAutorotate = false;
+            }
+        }
+
+        return $this->_hasNoAutorotate;
+    }
+
+    /**
+     * Check whether ffmpeg has libfdk_aac audio encoder.
+     *
+     * @return bool
+     */
+    public function hasLibFdkAac()
+    {
+        if ($this->_hasLibFdkAac === null) {
+            $this->_hasLibFdkAac = $this->_hasAudioEncoder('libfdk_aac');
+        }
+
+        return $this->_hasLibFdkAac;
     }
 
     /**
@@ -56,63 +126,5 @@ class FFmpegWrapper
         } catch (\RuntimeException $e) {
             return false;
         }
-    }
-
-    /**
-     * Fetch the features set from the ffmpeg binary.
-     */
-    protected function _fetchFeatures()
-    {
-        try {
-            $this->run('-noautorotate -f lavfi -i color=color=red -t 1 -f null -');
-            $this->_hasNoAutorotate = true;
-        } catch (\RuntimeException $e) {
-            $this->_hasNoAutorotate = false;
-        }
-
-        $this->_hasLibFdkAac = $this->_hasAudioEncoder('libfdk_aac');
-    }
-
-    /**
-     * FFmpegWrapper constructor.
-     *
-     * @param string $ffmpegBinary
-     */
-    public function __construct(
-        $ffmpegBinary)
-    {
-        $this->_ffmpegBinary = $ffmpegBinary;
-
-        $this->_fetchFeatures();
-    }
-
-    /**
-     * Get a path to the ffmpeg binary.
-     *
-     * @return string
-     */
-    public function getFFmpegBinary()
-    {
-        return $this->_ffmpegBinary;
-    }
-
-    /**
-     * Check whether ffmpeg has -noautorotate flag.
-     *
-     * @return bool
-     */
-    public function hasNoAutorotate()
-    {
-        return $this->_hasNoAutorotate;
-    }
-
-    /**
-     * Check whether ffmpeg has libfdk_aac audio encoder.
-     *
-     * @return bool
-     */
-    public function hasLibFdkAac()
-    {
-        return $this->_hasLibFdkAac;
     }
 }
