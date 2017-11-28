@@ -741,13 +741,21 @@ class People extends RequestCollection
     /**
      * Get a list of all blocked users.
      *
+     * @param null|string $maxId Next "maximum ID", used for pagination.
+     *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\BlockedListResponse
      */
-    public function getBlockedList()
+    public function getBlockedList(
+        $maxId = null)
     {
-        return $this->ig->request('users/blocked_list/')->getResponse(new Response\BlockedListResponse());
+        $request = $this->ig->request('users/blocked_list/');
+        if ($maxId !== null) {
+            $request->addParam('max_id', $maxId);
+        }
+
+        return $request->getResponse(new Response\BlockedListResponse());
     }
 
     /**
