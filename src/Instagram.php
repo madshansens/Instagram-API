@@ -3,7 +3,7 @@
 namespace InstagramAPI;
 
 /**
- * Instagram's Private API v3.
+ * Instagram's Private API v4.
  *
  * TERMS OF USE:
  * - This code is in no way affiliated with, authorized, maintained, sponsored
