@@ -1849,6 +1849,7 @@ class Internal extends RequestCollection
         // There is no need to segment short videos.
         $minDuration = $this->ig->getExperimentParam(
             'ig_android_video_segmented_upload_universe',
+            // NOTE: This typo is intentional. Instagram named it that way.
             'min_duration_threashold_sec_for_segmentation',
             10
         );
