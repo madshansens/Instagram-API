@@ -17,7 +17,7 @@ class IrisHandler extends AbstractHandler implements HandlerInterface
         $iris = new IrisSubscribeAck($message->getData());
         if (!$iris->isSucceeded()) {
             throw new HandlerException(sprintf(
-                'Failed to subscribe to Iris (%d): %s',
+                'Failed to subscribe to Iris (%d): %s.',
                 $iris->getErrorType(),
                 $iris->getErrorMessage()
             ));

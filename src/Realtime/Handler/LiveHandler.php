@@ -23,7 +23,7 @@ class LiveHandler extends AbstractHandler implements HandlerInterface
         if (isset($data['event'])) {
             $this->_processEvent($data);
         } else {
-            throw new HandlerException('Invalid message (event type is missing)');
+            throw new HandlerException('Invalid message (event type is missing).');
         }
     }
 
@@ -43,7 +43,7 @@ class LiveHandler extends AbstractHandler implements HandlerInterface
                 $this->_handlePatchOp($op);
             }
         } else {
-            throw new HandlerException(sprintf('Unknown event type "%s"', $message['event']));
+            throw new HandlerException(sprintf('Unknown event type "%s".', $message['event']));
         }
     }
 
@@ -65,7 +65,7 @@ class LiveHandler extends AbstractHandler implements HandlerInterface
                 $event = 'live-stopped';
                 break;
             default:
-                throw new HandlerException(sprintf('Unsupported live broadcast op: "%s"', $op->getOp()));
+                throw new HandlerException(sprintf('Unsupported live broadcast op: "%s".', $op->getOp()));
         }
         if (!$this->_hasListeners($event)) {
             return;
@@ -73,7 +73,7 @@ class LiveHandler extends AbstractHandler implements HandlerInterface
 
         $json = HttpClient::api_body_decode($op->getValue());
         if (!is_array($json)) {
-            throw new HandlerException(sprintf('Failed to decode live broadcast JSON: %s', json_last_error_msg()));
+            throw new HandlerException(sprintf('Failed to decode live broadcast JSON: %s.', json_last_error_msg()));
         }
 
         $this->_target->emit($event, [new LiveBroadcast($json)]);
