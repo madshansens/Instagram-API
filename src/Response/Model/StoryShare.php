@@ -5,7 +5,7 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
- * Item.
+ * StoryShare.
  *
  * @method bool getIsLinked()
  * @method Item getMedia()
