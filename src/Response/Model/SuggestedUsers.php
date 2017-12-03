@@ -14,7 +14,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getNetegoType()
  * @method Suggestion[] getSuggestions()
  * @method mixed getTitle()
- * @method mixed getTrackingToken()
+ * @method string getTrackingToken()
  * @method mixed getType()
  * @method mixed getUpsellFbPos()
  * @method mixed getViewAllText()
@@ -36,7 +36,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setNetegoType(mixed $value)
  * @method $this setSuggestions(Suggestion[] $value)
  * @method $this setTitle(mixed $value)
- * @method $this setTrackingToken(mixed $value)
+ * @method $this setTrackingToken(string $value)
  * @method $this setType(mixed $value)
  * @method $this setUpsellFbPos(mixed $value)
  * @method $this setViewAllText(mixed $value)
@@ -60,7 +60,7 @@ class SuggestedUsers extends AutoPropertyMapper
         'title'              => '',
         'auto_dvance'        => '',
         'type'               => '',
-        'tracking_token'     => '',
+        'tracking_token'     => 'string',
         'landing_site_type'  => '',
         'landing_site_title' => '',
         'upsell_fb_pos'      => '',

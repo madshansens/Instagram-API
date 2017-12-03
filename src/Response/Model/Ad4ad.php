@@ -11,7 +11,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getId()
  * @method Item getMedia()
  * @method mixed getTitle()
- * @method mixed getTrackingToken()
+ * @method string getTrackingToken()
  * @method mixed getType()
  * @method bool isFooter()
  * @method bool isId()
@@ -23,7 +23,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setId(string $value)
  * @method $this setMedia(Item $value)
  * @method $this setTitle(mixed $value)
- * @method $this setTrackingToken(mixed $value)
+ * @method $this setTrackingToken(string $value)
  * @method $this setType(mixed $value)
  * @method $this unsetFooter()
  * @method $this unsetId()
@@ -40,6 +40,6 @@ class Ad4ad extends AutoPropertyMapper
         'media'          => 'Item',
         'footer'         => '',
         'id'             => 'string',
-        'tracking_token' => '',
+        'tracking_token' => 'string',
     ];
 }
