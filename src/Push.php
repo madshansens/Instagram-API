@@ -25,11 +25,17 @@ use React\EventLoop\LoopInterface;
  *       media?id=1111111111111111111_1111111111
  *     - fb_first_post - "Your Facebook friend NAME just shared their first Instagram post"
  *       user?username=USERNAME
+ *     - first_bestie_post - "USERNAME just shared a post with their close friends list."
+ *       media?id=1111111111111111111_1111111111
+ *     - follower_activity_with_location - "USERNAME tagged LOCATION in a post."
+ *       media?id=1111111111111111111 <- Yep, no author ID here.
  *
  *   Stories:
  *     - first_reel_post - "See USERNAME's first story on Instagram."
  *       user?username=USERNAME&launch_reel=1
  *     - resurrected_reel_post - "USERNAME added to their story for the first time in a while."
+ *       user?username=USERNAME&launch_reel=1
+ *     - first_bestie_post - "USERNAME just shared a post with their close friends list."
  *       user?username=USERNAME&launch_reel=1
  *     - story_poll_vote - "USERNAME voted YES to "POLL". Currently: 2 YES, 1 NO"
  *       user?username=USERNAME&launch_reel=1&media_id=1111111111111111111_1111111111&include_viewers=1
@@ -46,6 +52,8 @@ use React\EventLoop\LoopInterface;
  *     - follow_request_approved - "USERNAME accepted your follow request. Now you can see their photos and videos."
  *       user?username=USERNAME
  *     - contactjoined - "Your Facebook friend NAME is on Instagram as USERNAME."
+ *       user?username=USERNAME
+ *     - contact_joined_email - "NAME, one of your contacts, is on Instagram as @USERNAME. Would you like to follow them?"
  *       user?username=USERNAME
  *     - fb_friend_connected - "Your Facebook friend NAME is on Instagram as USERNAME."
  *       user?username=USERNAME
@@ -73,17 +81,25 @@ use React\EventLoop\LoopInterface;
  *       direct_v2?id=11111111111111111111111111111111111111&x=11111111111111111111111111111111111
  *     - direct_v2_message - "USERNAME wants to send you a message."
  *       direct_v2?id=11111111111111111111111111111111111111&t=p
+ *     - direct_v2_message - "USERNAME sent you a photo."
+ *       direct_v2?id=11111111111111111111111111111111111111&x=11111111111111111111111111111111111&t=ds
  *
  *   Live:
  *     - live_broadcast - "USERNAME started a live video. Watch it before it ends!"
+ *       broadcast?id=11111111111111111&reel_id=1111111111&published_time=1234567890
+ *     - live_with_broadcast - "USERNAME1 is going live now with USERNAME2."
  *       broadcast?id=11111111111111111&reel_id=1111111111&published_time=1234567890
  *     - live_broadcast_revoke
  *       broadcast?id=11111111111111111&reel_id=1111111111&published_time=1234567890
  *
  *   Business:
- *     - aymt - "Your promotion has ended."
- *       media?id=1111111111111111111_1111111111
+ *     - aymt - "Your promotion was approved." or "Your promotion has ended." or internationalized message.
+ *       media?id=1111111111111111111 <- Yep, no author ID here.
  *     - ad_preview - "Your ad is ready to preview"
+ *       media?id=1111111111111111111_1111111111
+ *     - branded_content_tagged - "USERNAME tagged you as a business partner on a post."
+ *       media?id=1111111111111111111_1111111111
+ *     - branded_content_untagged - "USERNAME removed you as a business partner on a post."
  *       media?id=1111111111111111111_1111111111
  *
  *   Unsorted:
