@@ -694,21 +694,18 @@ class Request
     }
 
     /**
-     * Return JSON-decoded HTTP response.
-     *
-     * @param bool $assoc When FALSE, decode to object instead of associative array.
+     * Return the raw HTTP response body.
      *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws InstagramException
      *
-     * @return mixed
+     * @return string
      */
-    public function getRawResponse(
-        $assoc = true)
+    public function getRawResponse()
     {
         $httpResponse = $this->getHttpResponse(); // Throws.
-        $body = $httpResponse->getBody();
+        $body = (string) $httpResponse->getBody();
 
         // Handle API endpoints that respond with multiple JSON objects.
         // NOTE: We simply merge all JSON objects into a single object. This
@@ -720,8 +717,30 @@ class Request
             $body = str_replace("}\r\n{", ',', $body);
         }
 
+        return $body;
+    }
+
+    /**
+     * Return safely JSON-decoded HTTP response.
+     *
+     * This uses a special decoder which handles 64-bit numbers correctly.
+     *
+     * @param bool $assoc When FALSE, decode to object instead of associative array.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws InstagramException
+     *
+     * @return mixed
+     */
+    public function getDecodedResponse(
+        $assoc = true)
+    {
         // Important: Special JSON decoder.
-        return Client::api_body_decode((string) $body, $assoc);
+        return Client::api_body_decode(
+            $this->getRawResponse(), // Throws.
+            $assoc
+        );
     }
 
     /**
