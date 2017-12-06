@@ -429,21 +429,25 @@ class Client
      *
      * @param Response              $responseObject An instance of a class object whose
      *                                              properties to fill with the response.
-     * @param mixed                 $serverResponse A decoded JSON response from
-     *                                              Instagram's server.
+     * @param string                $rawResponse    A raw JSON response string
+     *                                              from Instagram's server.
      * @param HttpResponseInterface $httpResponse   HTTP response object.
      *
      * @throws InstagramException In case of invalid or failed API response.
      */
     public function mapServerResponse(
         Response $responseObject,
-        $serverResponse,
+        $rawResponse,
         HttpResponseInterface $httpResponse)
     {
+        // Attempt to decode the raw JSON to an array.
+        // Important: Special JSON decoder which handles 64-bit numbers!
+        $jsonArray = $this->api_body_decode($rawResponse, true);
+
         // If the server response is not an array, it means that JSON decoding
         // failed or some other bad thing happened. So analyze the HTTP status
         // code (if available) to see what really happened.
-        if (!is_array($serverResponse)) {
+        if (!is_array($jsonArray)) {
             $httpStatusCode = $httpResponse !== null ? $httpResponse->getStatusCode() : null;
             switch ($httpStatusCode) {
                 case 400:
@@ -459,7 +463,7 @@ class Client
         try {
             // Assign the new object data. Only throws if custom _init() fails.
             // NOTE: False = assign data without automatic analysis.
-            $responseObject->assignObjectData($serverResponse, false); // Throws.
+            $responseObject->assignObjectData($jsonArray, false); // Throws.
 
             // Use API developer debugging? We'll throw if class lacks property
             // definitions, or if they can't be mapped as defined in the class
@@ -485,6 +489,30 @@ class Client
                 }
             }
         } catch (LazyJsonMapperException $e) {
+            // Since there was a problem, let's help our developers by
+            // displaying the server's JSON data in a human-readable format,
+            // which makes it easy to see the structure and necessary changes
+            // and speeds up the job of updating responses and models.
+            try {
+                // Decode to stdClass to properly preserve empty objects `{}`,
+                // otherwise they would appear as empty `[]` arrays in output.
+                $jsonObject = $this->api_body_decode($rawResponse, false);
+                if (is_object($jsonObject)) {
+                    $prettyJson = @json_encode(
+                        $jsonObject,
+                        JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                    );
+                    if ($prettyJson !== false) {
+                        Debug::printResponse(
+                            'Human-Readable Response:'.PHP_EOL.$prettyJson,
+                            false // Not truncated.
+                        );
+                    }
+                }
+            } catch (\Exception $e) {
+                // Ignore errors.
+            }
+
             // Exceptions will only be thrown if API developer debugging is
             // enabled and finds a problem. Either way, we should re-wrap the
             // exception to our native type instead. The message gives enough
@@ -753,7 +781,7 @@ class Client
         $json,
         $assoc = true)
     {
-        return json_decode($json, $assoc, 512, JSON_BIGINT_AS_STRING);
+        return @json_decode($json, $assoc, 512, JSON_BIGINT_AS_STRING);
     }
 
     /**
