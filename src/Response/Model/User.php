@@ -77,6 +77,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getPublicEmail()
  * @method string getPublicPhoneCountryCode()
  * @method string getPublicPhoneNumber()
+ * @method string getReelAutoArchive()
  * @method mixed getSearchSocialContext()
  * @method mixed getShowBusinessConversionIcon()
  * @method mixed getShowConversionEditEntry()
@@ -159,6 +160,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isPublicEmail()
  * @method bool isPublicPhoneCountryCode()
  * @method bool isPublicPhoneNumber()
+ * @method bool isReelAutoArchive()
  * @method bool isSearchSocialContext()
  * @method bool isShowBusinessConversionIcon()
  * @method bool isShowConversionEditEntry()
@@ -241,6 +243,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setPublicEmail(string $value)
  * @method $this setPublicPhoneCountryCode(string $value)
  * @method $this setPublicPhoneNumber(string $value)
+ * @method $this setReelAutoArchive(string $value)
  * @method $this setSearchSocialContext(mixed $value)
  * @method $this setShowBusinessConversionIcon(mixed $value)
  * @method $this setShowConversionEditEntry(mixed $value)
@@ -323,6 +326,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetPublicEmail()
  * @method $this unsetPublicPhoneCountryCode()
  * @method $this unsetPublicPhoneNumber()
+ * @method $this unsetReelAutoArchive()
  * @method $this unsetSearchSocialContext()
  * @method $this unsetShowBusinessConversionIcon()
  * @method $this unsetShowConversionEditEntry()
@@ -427,5 +431,6 @@ class User extends AutoPropertyMapper
         'latest_reel_media'                   => 'string',
         'has_unseen_besties_media'            => 'bool',
         'allowed_commenter_type'              => '',
+        'reel_auto_archive'                   => 'string',
     ];
 }
