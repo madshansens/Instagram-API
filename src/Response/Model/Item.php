@@ -116,6 +116,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getSupportsReelReactions()
  * @method string getTakenAt()
  * @method mixed getThumbnailUrls()
+ * @method string[] getTopFollowers()
+ * @method int getTopFollowersCount()
  * @method mixed getTopLikers()
  * @method int getTotalViewerCount()
  * @method mixed getUrlExpireAtSecs()
@@ -239,6 +241,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isSupportsReelReactions()
  * @method bool isTakenAt()
  * @method bool isThumbnailUrls()
+ * @method bool isTopFollowers()
+ * @method bool isTopFollowersCount()
  * @method bool isTopLikers()
  * @method bool isTotalViewerCount()
  * @method bool isUrlExpireAtSecs()
@@ -362,6 +366,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setSupportsReelReactions(bool $value)
  * @method $this setTakenAt(string $value)
  * @method $this setThumbnailUrls(mixed $value)
+ * @method $this setTopFollowers(string[] $value)
+ * @method $this setTopFollowersCount(int $value)
  * @method $this setTopLikers(mixed $value)
  * @method $this setTotalViewerCount(int $value)
  * @method $this setUrlExpireAtSecs(mixed $value)
@@ -485,6 +491,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetSupportsReelReactions()
  * @method $this unsetTakenAt()
  * @method $this unsetThumbnailUrls()
+ * @method $this unsetTopFollowers()
+ * @method $this unsetTopFollowersCount()
  * @method $this unsetTopLikers()
  * @method $this unsetTotalViewerCount()
  * @method $this unsetUrlExpireAtSecs()
@@ -655,6 +663,8 @@ class Item extends AutoPropertyMapper
         'supports_reel_reactions'          => 'bool',
         'inventory_source'                 => 'string',
         'is_eof'                           => 'bool',
+        'top_followers'                    => 'string[]',
+        'top_followers_count'              => 'int',
         /*
          * HTML color string such as "#812A2A".
          */

@@ -8,6 +8,8 @@ use InstagramAPI\Response\PropertyCollection;
 /**
  * StoryHashtag.
  *
+ * @method string getAttribution()
+ * @method string getCustomTitle()
  * @method Hashtag getHashtag()
  * @method float getHeight()
  * @method int getIsPinned()
@@ -15,6 +17,8 @@ use InstagramAPI\Response\PropertyCollection;
  * @method float getWidth()
  * @method float getX()
  * @method float getY()
+ * @method bool isAttribution()
+ * @method bool isCustomTitle()
  * @method bool isHashtag()
  * @method bool isHeight()
  * @method bool isIsPinned()
@@ -22,6 +26,8 @@ use InstagramAPI\Response\PropertyCollection;
  * @method bool isWidth()
  * @method bool isX()
  * @method bool isY()
+ * @method $this setAttribution(string $value)
+ * @method $this setCustomTitle(string $value)
  * @method $this setHashtag(Hashtag $value)
  * @method $this setHeight(float $value)
  * @method $this setIsPinned(int $value)
@@ -29,6 +35,8 @@ use InstagramAPI\Response\PropertyCollection;
  * @method $this setWidth(float $value)
  * @method $this setX(float $value)
  * @method $this setY(float $value)
+ * @method $this unsetAttribution()
+ * @method $this unsetCustomTitle()
  * @method $this unsetHashtag()
  * @method $this unsetHeight()
  * @method $this unsetIsPinned()
@@ -41,6 +49,8 @@ class StoryHashtag extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
         PropertyCollection\Sticker::class,
-        'hashtag'   => 'Hashtag',
+        'hashtag'       => 'Hashtag',
+        'attribution'   => 'string',
+        'custom_title'  => 'string',
     ];
 }
