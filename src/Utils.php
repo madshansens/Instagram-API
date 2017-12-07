@@ -408,6 +408,21 @@ class Utils
     }
 
     /**
+     * Verifies a rank token.
+     *
+     * @param string $rankToken
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function throwIfInvalidRankToken(
+        $rankToken
+    ) {
+        if (!Signatures::isValidUUID($rankToken)) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not a valid rank token.', $rankToken));
+        }
+    }
+
+    /**
      * Verifies an array of story poll.
      *
      * @param array[] $storyPoll Array with story poll key-value pairs.

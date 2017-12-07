@@ -73,6 +73,7 @@ class StorageHandler
         'ig_android_video_segmented_upload_universe',
         'ig_android_direct_video_segmented_upload_universe',
         'ig_android_reel_raven_video_segmented_upload_universe',
+        'ig_android_ad_async_ads_universe',
     ];
 
     /**

@@ -995,13 +995,13 @@ class Internal extends RequestCollection
     }
 
     /**
-     * Get token hash result.
+     * Get zero rating token hash result.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\TokenResultResponse
      */
-    public function getTokenResult()
+    public function getZeroRatingTokenResult()
     {
         $request = $this->ig->request('zr/token/result/')
             ->setNeedsAuth(false)
@@ -1081,9 +1081,6 @@ class Internal extends RequestCollection
     public function getProfileNotice()
     {
         return $this->ig->request('users/profile_notice/')
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\ProfileNoticeResponse());
     }
 

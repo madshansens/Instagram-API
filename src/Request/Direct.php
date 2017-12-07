@@ -52,25 +52,15 @@ class Direct extends RequestCollection
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\DirectVisualInboxResponse
+     *
+     * @deprecated Visual inbox has been superseded by the unified inbox.
+     * @see Direct::getInbox()
      */
     public function getVisualInbox()
     {
         return $this->ig->request('direct_v2/visual_inbox/')
             ->addParam('persistentBadging', 'true')
             ->getResponse(new Response\DirectVisualInboxResponse());
-    }
-
-    /**
-     * Get direct share inbox.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\DirectShareInboxResponse
-     */
-    public function getShareInbox()
-    {
-        return $this->ig->request('direct_share/inbox/?')
-            ->getResponse(new Response\DirectShareInboxResponse());
     }
 
     /**
@@ -228,16 +218,33 @@ class Direct extends RequestCollection
     }
 
     /**
-     * Get recent recipients.
+     * Get a thread by the recipients list.
      *
+     * @param string[]|int[] $users Array of numerical UserPK IDs.
+     *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\DirectRecentRecipientsResponse
+     * @return \InstagramAPI\Response\DirectThreadResponse
      */
-    public function getRecentRecipients()
+    public function getThreadByParticipants(
+        array $users)
     {
-        return $this->ig->request('direct_share/recent_recipients/')
-            ->getResponse(new Response\DirectRecentRecipientsResponse());
+        if (!count($users)) {
+            throw new \InvalidArgumentException('Please provide at least one participant.');
+        }
+        foreach ($users as $user) {
+            if (!is_scalar($user)) {
+                throw new \InvalidArgumentException('User identifier must be scalar.');
+            }
+            if (!ctype_digit($user) && (!is_int($user) || $user < 0)) {
+                throw new \InvalidArgumentException(sprintf('"%s" is not a valid user identifier.', $user));
+            }
+        }
+        $request = $this->ig->request('direct_v2/threads/get_by_participants/')
+            ->addParam('recipient_users', '['.implode(',', $users).']');
+
+        return $request->getResponse(new Response\DirectThreadResponse());
     }
 
     /**
@@ -274,6 +281,9 @@ class Direct extends RequestCollection
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\DirectVisualThreadResponse
+     *
+     * @deprecated Visual inbox has been superseded by the unified inbox.
+     * @see Direct::getThread()
      */
     public function getVisualThread(
         $threadId,
@@ -979,6 +989,37 @@ class Direct extends RequestCollection
         }
 
         return $this->ig->request("direct_v2/visual_threads/{$threadId}/item_seen/")
+            ->addPost('item_ids', '['.implode(',', $threadItemIds).']')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
+     * Marks visual items from given thread as replayed.
+     *
+     * `NOTE:` This "visual" endpoint is only used for Direct stories.
+     *
+     * @param string          $threadId      Thread ID.
+     * @param string|string[] $threadItemIds One or more thread item IDs.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function markVisualItemsReplayed(
+        $threadId,
+        $threadItemIds)
+    {
+        if (!is_array($threadItemIds)) {
+            $threadItemIds = [$threadItemIds];
+        } elseif (!count($threadItemIds)) {
+            throw new \InvalidArgumentException('Please provide at least one thread item ID.');
+        }
+
+        return $this->ig->request("direct_v2/visual_threads/{$threadId}/item_replayed/")
             ->addPost('item_ids', '['.implode(',', $threadItemIds).']')
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)

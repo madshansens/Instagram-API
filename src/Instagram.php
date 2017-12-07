@@ -153,13 +153,6 @@ class Instagram implements ExperimentsInterface
     public $isMaybeLoggedIn = false;
 
     /**
-     * Rank token.
-     *
-     * @var string
-     */
-    public $rank_token;
-
-    /**
      * Raw API communication/networking class.
      *
      * @var Client
@@ -680,11 +673,9 @@ class Instagram implements ExperimentsInterface
         if (!$resetCookieJar && $this->settings->isMaybeLoggedIn()) {
             $this->isMaybeLoggedIn = true;
             $this->account_id = $this->settings->get('account_id');
-            $this->rank_token = $this->account_id.'_'.$this->uuid;
         } else {
             $this->isMaybeLoggedIn = false;
             $this->account_id = null;
-            $this->rank_token = null;
         }
 
         // Configures Client for current user AND updates isMaybeLoggedIn state
@@ -715,7 +706,6 @@ class Instagram implements ExperimentsInterface
         $this->isMaybeLoggedIn = true;
         $this->account_id = $response->getLoggedInUser()->getPk();
         $this->settings->set('account_id', $this->account_id);
-        $this->rank_token = $this->account_id.'_'.$this->uuid;
         $this->settings->set('last_login', time());
     }
 
@@ -730,11 +720,9 @@ class Instagram implements ExperimentsInterface
         // jar. We must do this before any functions that require a token.
         $this->internal->readMsisdnHeader();
         $this->internal->syncDeviceFeatures(true);
-        // NOTE: Uncomment when IG Version >= 21.
-        //$this->internal->getTokenResult();
+        $this->internal->getZeroRatingTokenResult();
         $this->internal->logAttribution();
-        // NOTE: Uncomment when IG Version >= 21.
-        //$this->account->setContactPointPrefill();
+        $this->account->setContactPointPrefill('prefill');
     }
 
     /**
@@ -832,17 +820,15 @@ class Instagram implements ExperimentsInterface
         // You have been warned.
         if ($justLoggedIn) {
             // Perform the "user has just done a full login" API flow.
+            $this->internal->getZeroRatingTokenResult();
             $this->people->getBootstrapUsers();
             $this->story->getReelsTrayFeed();
-            $this->timeline->getTimelineFeed();
-            $this->direct->getRecentRecipients();
+            $this->timeline->getTimelineFeed(null, ['recovered_from_crash' => true]);
             $this->internal->syncUserFeatures();
             $this->_registerPushChannels();
             $this->direct->getRankedRecipients('reshare', true);
             $this->direct->getRankedRecipients('raven', true);
             $this->direct->getInbox();
-            $this->direct->getVisualInbox();
-            // bootstrap users
             $this->internal->getProfileNotice();
             //$this->internal->getMegaphoneLog();
             $this->people->getRecentActivityInbox();
@@ -851,11 +837,14 @@ class Instagram implements ExperimentsInterface
             $this->discover->getExploreFeed(null, true);
             //$this->internal->getFacebookOTA();
         } else {
+            $lastLoginTime = $this->settings->get('last_login');
+            $isSessionExpired = $lastLoginTime === null || (time() - $lastLoginTime) > $appRefreshInterval;
+
             // Act like a real logged in app client refreshing its news timeline.
             // This also lets us detect if we're still logged in with a valid session.
             try {
                 $this->timeline->getTimelineFeed(null, [
-                    'is_pull_to_refresh' => mt_rand(1, 3) < 3,
+                    'is_pull_to_refresh' => $isSessionExpired ? null : mt_rand(1, 3) < 3,
                 ]);
             } catch (\InstagramAPI\Exception\LoginRequiredException $e) {
                 // If our session cookies are expired, we were now told to login,
@@ -865,8 +854,7 @@ class Instagram implements ExperimentsInterface
 
             // Perform the "user has returned to their already-logged in app,
             // so refresh all feeds to check for news" API flow.
-            $lastLoginTime = $this->settings->get('last_login');
-            if ($lastLoginTime === null || (time() - $lastLoginTime) > $appRefreshInterval) {
+            if ($isSessionExpired) {
                 $this->settings->set('last_login', time());
 
                 // Generate and save a new application session ID.
@@ -879,7 +867,6 @@ class Instagram implements ExperimentsInterface
                 $this->direct->getRankedRecipients('reshare', true);
                 $this->direct->getRankedRecipients('raven', true);
                 $this->_registerPushChannels();
-                $this->direct->getRecentRecipients();
                 //$this->internal->getMegaphoneLog();
                 $this->direct->getInbox();
                 $this->people->getRecentActivityInbox();

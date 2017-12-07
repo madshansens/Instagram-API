@@ -72,6 +72,7 @@ class Push extends RequestCollection
         foreach ($preferences as $key => $value) {
             $request->addPost($key, $value);
         }
-        $request->getResponse(new Response\PushPreferencesResponse());
+
+        return $request->getResponse(new Response\PushPreferencesResponse());
     }
 }

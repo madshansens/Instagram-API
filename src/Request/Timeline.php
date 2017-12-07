@@ -200,8 +200,15 @@ class Timeline extends RequestCollection
         $maxId = null,
         array $options = null)
     {
+        $asyncAds = $this->ig->isExperimentEnabled(
+            'ig_android_ad_async_ads_universe',
+            'is_enabled'
+        );
+
         $request = $this->ig->request('feed/timeline/')
             ->setSignedPost(false)
+            //->addHeader('X-CM-Bandwidth-KBPS', '-1.000')
+            //->addHeader('X-CM-Latency', '0.000')
             ->addHeader('X-Ads-Opt-Out', '0')
             ->addHeader('X-Google-AD-ID', $this->ig->advertising_id)
             ->addHeader('X-DEVICE-ID', $this->ig->uuid)
@@ -211,15 +218,35 @@ class Timeline extends RequestCollection
             ->addPost('phone_id', $this->ig->phone_id)
             ->addPost('battery_level', '100')
             ->addPost('is_charging', '1')
-            ->addPost('timezone_offset', date('Z'));
+            ->addPost('will_sound_on', '1')
+            ->addPost('is_on_screen', 'true')
+            ->addPost('timezone_offset', date('Z'))
+            ->addPost('is_async_ads', (string) (int) $asyncAds)
+            ->addPost('is_async_ads_double_request', (string) (int) ($asyncAds && $this->ig->isExperimentEnabled(
+                'ig_android_ad_async_ads_universe',
+                'is_double_request_enabled'
+            )))
+            ->addPost('is_async_ads_rti', (string) (int) ($asyncAds && $this->ig->isExperimentEnabled(
+                'ig_android_ad_async_ads_universe',
+                'is_rti_enabled'
+            )));
 
         if (isset($options['latest_story_pk'])) {
             $request->addPost('latest_story_pk', $options['latest_story_pk']);
         }
 
-        if (isset($options['is_pull_to_refresh'])) {
-            $request->addPost('is_pull_to_refresh', $options['is_pull_to_refresh'] ? '1' : '0');
+        if ($maxId !== null) {
+            $request->addPost('reason', 'pagination');
+            $request->addPost('max_id', $maxId);
+            $request->addPost('is_pull_to_refresh', '0');
+        } elseif (!empty($options['is_pull_to_refresh'])) {
+            $request->addPost('reason', 'pull_to_refresh');
+            $request->addPost('is_pull_to_refresh', '1');
+        } elseif (isset($options['is_pull_to_refresh'])) {
+            $request->addPost('reason', 'warm_start_fetch');
+            $request->addPost('is_pull_to_refresh', '0');
         } else {
+            $request->addPost('reason', 'cold_start_fetch');
             $request->addPost('is_pull_to_refresh', '0');
         }
 
@@ -253,21 +280,12 @@ class Timeline extends RequestCollection
             $request->addPost('feed_view_info', '');
         }
 
-        if (isset($options['push_disabled']) && $options['push_disabled']) {
+        if (!empty($options['push_disabled'])) {
             $request->addPost('push_disabled', 'true');
         }
 
-        if (isset($options['recovered_from_crash']) && $options['recovered_from_crash']) {
+        if (!empty($options['recovered_from_crash'])) {
             $request->addPost('recovered_from_crash', '1');
-        }
-
-        if ($maxId !== null) {
-            $request->addPost('max_id', $maxId);
-        } else {
-            $request->addHeader('X-IG-INSTALLED-APPS', base64_encode(json_encode([
-                '1' => 0, // com.instagram.boomerang
-                '2' => 0, // com.instagram.layout
-            ])));
         }
 
         return $request->getResponse(new Response\TimelineFeedResponse());
@@ -276,9 +294,8 @@ class Timeline extends RequestCollection
     /**
      * Get a user's timeline feed.
      *
-     * @param string      $userId       Numerical UserPK ID.
-     * @param null|string $maxId        Next "maximum ID", used for pagination.
-     * @param null|int    $minTimestamp Minimum timestamp.
+     * @param string      $userId Numerical UserPK ID.
+     * @param null|string $maxId  Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -286,18 +303,12 @@ class Timeline extends RequestCollection
      */
     public function getUserFeed(
         $userId,
-        $maxId = null,
-        $minTimestamp = null)
+        $maxId = null)
     {
-        $request = $this->ig->request("feed/user/{$userId}/")
-            ->addParam('rank_token', $this->ig->rank_token)
-            ->addParam('ranked_content', 'true');
+        $request = $this->ig->request("feed/user/{$userId}/");
 
         if ($maxId !== null) {
             $request->addParam('max_id', $maxId);
-        }
-        if ($minTimestamp !== null) {
-            $request->addParam('min_timestamp', $minTimestamp);
         }
 
         return $request->getResponse(new Response\UserFeedResponse());
@@ -306,18 +317,16 @@ class Timeline extends RequestCollection
     /**
      * Get your own timeline feed.
      *
-     * @param null|string $maxId        Next "maximum ID", used for pagination.
-     * @param null|int    $minTimestamp Minimum timestamp.
+     * @param null|string $maxId Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\UserFeedResponse
      */
     public function getSelfUserFeed(
-        $maxId = null,
-        $minTimestamp = null)
+        $maxId = null)
     {
-        return $this->getUserFeed($this->ig->account_id, $maxId, $minTimestamp);
+        return $this->getUserFeed($this->ig->account_id, $maxId);
     }
 
     /**

@@ -71,6 +71,9 @@ class Story extends RequestCollection
     public function getReelsTrayFeed()
     {
         return $this->ig->request('feed/reels_tray/')
+            ->setSignedPost(false)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\ReelsTrayFeedResponse());
     }
 
@@ -223,9 +226,6 @@ class Story extends RequestCollection
     public function getReelSettings()
     {
         return $this->ig->request('users/reel_settings/')
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\ReelSettingsResponse());
     }
 

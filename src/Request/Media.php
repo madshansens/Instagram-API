@@ -648,9 +648,6 @@ class Media extends RequestCollection
     public function getBlockedMedia()
     {
         return $this->ig->request('media/blocked/')
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\BlockedMediaResponse());
     }
 

@@ -379,21 +379,21 @@ class Client
     /**
      * Output debugging information.
      *
-     * @param string      $method        "GET" or "POST".
-     * @param string      $url           The URL or endpoint used for the request.
-     * @param string|null $uploadedBody  What was sent to the server. Use NULL to
-     *                                   avoid displaying it.
-     * @param int|null    $uploadedBytes How many bytes were uploaded. Use NULL to
-     *                                   avoid displaying it.
-     * @param object      $response      The Guzzle response object from the request.
-     * @param string      $responseBody  The actual text-body reply from the server.
+     * @param string                $method        "GET" or "POST".
+     * @param string                $url           The URL or endpoint used for the request.
+     * @param string|null           $uploadedBody  What was sent to the server. Use NULL to
+     *                                             avoid displaying it.
+     * @param int|null              $uploadedBytes How many bytes were uploaded. Use NULL to
+     *                                             avoid displaying it.
+     * @param HttpResponseInterface $response      The Guzzle response object from the request.
+     * @param string                $responseBody  The actual text-body reply from the server.
      */
     protected function _printDebug(
         $method,
         $url,
         $uploadedBody,
         $uploadedBytes,
-        $response,
+        HttpResponseInterface $response,
         $responseBody)
     {
         Debug::printRequest($method, $url);
@@ -412,9 +412,11 @@ class Client
 
         // Display the number of bytes received from the response, and status code.
         if ($response->hasHeader('x-encoded-content-length')) {
-            $bytes = Utils::formatBytes($response->getHeader('x-encoded-content-length')[0]);
+            $bytes = Utils::formatBytes((int) $response->getHeaderLine('x-encoded-content-length'));
+        } elseif ($response->hasHeader('Content-Length')) {
+            $bytes = Utils::formatBytes((int) $response->getHeaderLine('Content-Length'));
         } else {
-            $bytes = Utils::formatBytes($response->getHeader('Content-Length')[0]);
+            $bytes = 0;
         }
         Debug::printHttpCode($response->getStatusCode(), $bytes);
 
@@ -612,8 +614,9 @@ class Client
      * @param HttpRequestInterface $request       HTTP request to send.
      * @param array                $guzzleOptions Extra Guzzle options for this request.
      *
-     * @throws \InstagramAPI\Exception\NetworkException   For any network/socket related errors.
-     * @throws \InstagramAPI\Exception\ThrottledException When we're throttled by server.
+     * @throws \InstagramAPI\Exception\NetworkException                For any network/socket related errors.
+     * @throws \InstagramAPI\Exception\ThrottledException              When we're throttled by server.
+     * @throws \InstagramAPI\Exception\RequestHeadersTooLargeException When request is too large.
      *
      * @return HttpResponseInterface
      */
@@ -637,6 +640,9 @@ class Client
         switch ($httpCode) {
         case 429: // "429 Too Many Requests"
             throw new \InstagramAPI\Exception\ThrottledException('Throttled by Instagram because of too many API requests.');
+            break;
+        case 431: // "431 Request Header Fields Too Large"
+            throw new \InstagramAPI\Exception\RequestHeadersTooLargeException('The request start-line and/or headers are too large to process.');
             break;
         // WARNING: Do NOT detect 404 and other higher-level HTTP errors here,
         // since we catch those later during steps like mapServerResponse()

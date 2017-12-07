@@ -2,7 +2,9 @@
 
 namespace InstagramAPI\Request;
 
+use InstagramAPI\Exception\RequestHeadersTooLargeException;
 use InstagramAPI\Response;
+use InstagramAPI\Signatures;
 use InstagramAPI\Utils;
 
 /**
@@ -47,6 +49,7 @@ class Hashtag extends RequestCollection
      * @param string[]|int[] $excludeList Array of numerical hashtag IDs (ie "17841562498105353")
      *                                    to exclude from the response, allowing you to skip tags
      *                                    from a previous call to get more results.
+     * @param string|null    $rankToken   (When paginating) The rank token from the previous page's response.
      *
      * @throws \InvalidArgumentException                  If invalid query or
      *                                                    trying to exclude too
@@ -54,32 +57,40 @@ class Hashtag extends RequestCollection
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\SearchTagResponse
+     *
+     * @see SearchTagResponse::getRankToken() To get a rank token from the response.
+     * @see examples/paginateWithExclusion.php For an example.
      */
     public function search(
         $query,
-        array $excludeList = [])
+        array $excludeList = [],
+        $rankToken = null)
     {
         // Do basic query validation. Do NOT use throwIfInvalidHashtag here.
-        if (!is_string($query) || !strlen($query)) {
+        if (!is_string($query) || $query === '') {
             throw new \InvalidArgumentException('Query must be a non-empty string.');
         }
 
-        $request = $this->ig->request('tags/search/')
-            ->addParam('q', $query)
-            ->addParam('timezone_offset', date('Z'))
-            ->addParam('count', 30);
+        $request = $this->_paginateWithExclusion(
+            $this->ig->request('tags/search/')
+                ->addParam('q', $query)
+                ->addParam('timezone_offset', date('Z')),
+            $excludeList,
+            $rankToken
+        );
 
-        if (!empty($excludeList)) {
-            // Safely restrict the amount of excludes we allow. Their server
-            // HATES high numbers; at around 150 they will literally DISCONNECT
-            // you from the API server without even answering the endpoint call!
-            if (count($excludeList) > 65) { // Arbitrary safe number: 2*30 (two pages) of results plus a bit extra.
-                throw new \InvalidArgumentException('You are not allowed to provide more than 65 hashtags to exclude from the search.');
-            }
-            $request->addParam('exclude_list', '['.implode(', ', $excludeList).']');
+        try {
+            /** @var Response\SearchTagResponse $result */
+            $result = $request->getResponse(new Response\SearchTagResponse());
+        } catch (RequestHeadersTooLargeException $e) {
+            $result = new Response\SearchTagResponse([
+                'has_more'   => false,
+                'results'    => [],
+                'rank_token' => $rankToken,
+            ]);
         }
 
-        return $request->getResponse(new Response\SearchTagResponse());
+        return $result;
     }
 
     /**
@@ -106,21 +117,28 @@ class Hashtag extends RequestCollection
     /**
      * Get the feed for a hashtag.
      *
-     * @param string      $hashtag The hashtag, not including the "#".
-     * @param null|string $maxId   Next "maximum ID", used for pagination.
+     * @param string      $hashtag   The hashtag, not including the "#".
+     * @param string      $rankToken The feed UUID. You must use the same value for all pages of the feed.
+     * @param null|string $maxId     Next "maximum ID", used for pagination.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\TagFeedResponse
+     *
+     * @see Signatures::generateUUID() To create a UUID.
+     * @see examples/rankTokenUsage.php For an example.
      */
     public function getFeed(
         $hashtag,
+        $rankToken,
         $maxId = null)
     {
         Utils::throwIfInvalidHashtag($hashtag);
+        Utils::throwIfInvalidRankToken($rankToken);
         $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
-        $hashtagFeed = $this->ig->request("feed/tag/{$urlHashtag}/");
+        $hashtagFeed = $this->ig->request("feed/tag/{$urlHashtag}/")
+            ->addParam('rank_token', $rankToken);
         if ($maxId !== null) {
             $hashtagFeed->addParam('max_id', $maxId);
         }

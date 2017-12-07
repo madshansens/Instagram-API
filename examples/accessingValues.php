@@ -22,7 +22,7 @@ try {
 }
 
 try {
-    $feed = $ig->discover->getPopularFeed();
+    $feed = $ig->discover->getExploreFeed();
 
     // Let's begin by looking at a beautiful debug output of what's available in
     // the response! This is very helpful for figuring out what a response has!
@@ -33,13 +33,13 @@ try {
     // properties are supported, as well as how to call the functions! :-)
     $feed->printPropertyDescriptions();
 
-    // The getPopularFeed() has an "items" property, which we need. As we saw
+    // The getExploreFeed() has an "items" property, which we need. As we saw
     // above, we should get it via "getItems()". The property list above told us
     // that it will return an array of "Item" objects. Therefore it's an ARRAY!
     $items = $feed->getItems();
 
-    // Let's get the first item from the array...!
-    $firstItem = $items[0];
+    // Let's get the media item from the first item of the explore-items array...!
+    $firstItem = $items[0]->getMedia();
 
     // We can look at that item too, if we want to... Let's do it! Note that
     // when we list supported properties, it shows everything supported by an

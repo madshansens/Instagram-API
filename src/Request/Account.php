@@ -429,23 +429,25 @@ class Account extends RequestCollection
     /**
      * Set contact point prefill.
      *
+     * @param string $usage Either "prefill" or "auto_confirmation".
+     *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\GenericResponse
      */
-    public function setContactPointPrefill()
+    public function setContactPointPrefill(
+        $usage)
     {
         return $this->ig->request('accounts/contact_point_prefill/')
+            ->setNeedsAuth(false)
             ->addPost('phone_id', $this->ig->phone_id)
-            ->addPost('usage', 'edit_profile')
+            ->addPost('usage', $usage)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\GenericResponse());
     }
 
     /**
-     * Get account badge notifications.
-     *
-     * TODO: We have no idea what this does. The response is always empty.
+     * Get account badge notifications for the "Switch account" menu.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
