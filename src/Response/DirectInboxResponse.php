@@ -13,6 +13,7 @@ use InstagramAPI\Response;
  * @method mixed getPendingRequestsTotal()
  * @method Model\User[] getPendingRequestsUsers()
  * @method string getSeqId()
+ * @method string getSnapshotAtMs()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
  * @method bool isInbox()
@@ -21,6 +22,7 @@ use InstagramAPI\Response;
  * @method bool isPendingRequestsTotal()
  * @method bool isPendingRequestsUsers()
  * @method bool isSeqId()
+ * @method bool isSnapshotAtMs()
  * @method bool isStatus()
  * @method bool is_Messages()
  * @method $this setInbox(Model\DirectInbox $value)
@@ -29,6 +31,7 @@ use InstagramAPI\Response;
  * @method $this setPendingRequestsTotal(mixed $value)
  * @method $this setPendingRequestsUsers(Model\User[] $value)
  * @method $this setSeqId(string $value)
+ * @method $this setSnapshotAtMs(string $value)
  * @method $this setStatus(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
  * @method $this unsetInbox()
@@ -37,6 +40,7 @@ use InstagramAPI\Response;
  * @method $this unsetPendingRequestsTotal()
  * @method $this unsetPendingRequestsUsers()
  * @method $this unsetSeqId()
+ * @method $this unsetSnapshotAtMs()
  * @method $this unsetStatus()
  * @method $this unset_Messages()
  */
@@ -48,5 +52,6 @@ class DirectInboxResponse extends Response
         'pending_requests_users' => 'Model\User[]',
         'inbox'                  => 'Model\DirectInbox',
         'megaphone'              => 'Model\Megaphone',
+        'snapshot_at_ms'         => 'string',
     ];
 }

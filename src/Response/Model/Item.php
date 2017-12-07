@@ -44,6 +44,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getExpiringAt()
  * @method Explore getExplore()
  * @method string getExploreContext()
+ * @method bool getExploreHideComments()
  * @method string getExploreSourceToken()
  * @method int getFilterType()
  * @method bool getForceOverlay()
@@ -169,6 +170,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isExpiringAt()
  * @method bool isExplore()
  * @method bool isExploreContext()
+ * @method bool isExploreHideComments()
  * @method bool isExploreSourceToken()
  * @method bool isFilterType()
  * @method bool isForceOverlay()
@@ -294,6 +296,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setExpiringAt(mixed $value)
  * @method $this setExplore(Explore $value)
  * @method $this setExploreContext(string $value)
+ * @method $this setExploreHideComments(bool $value)
  * @method $this setExploreSourceToken(string $value)
  * @method $this setFilterType(int $value)
  * @method $this setForceOverlay(bool $value)
@@ -419,6 +422,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetExpiringAt()
  * @method $this unsetExplore()
  * @method $this unsetExploreContext()
+ * @method $this unsetExploreHideComments()
  * @method $this unsetExploreSourceToken()
  * @method $this unsetFilterType()
  * @method $this unsetForceOverlay()
@@ -584,6 +588,7 @@ class Item extends AutoPropertyMapper
         'has_liked'                        => 'bool',
         'explore_context'                  => 'string',
         'explore_source_token'             => 'string',
+        'explore_hide_comments'            => 'bool',
         'explore'                          => 'Explore',
         'impression_token'                 => 'string',
         'usertags'                         => 'Usertag',

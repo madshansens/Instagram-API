@@ -10,8 +10,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method Args getArgs()
  * @method Counts getCounts()
  * @method string getPk()
- * @method mixed getStoryType()
- * @method mixed getType()
+ * @method int getStoryType()
+ * @method int getType()
  * @method bool isArgs()
  * @method bool isCounts()
  * @method bool isPk()
@@ -20,8 +20,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setArgs(Args $value)
  * @method $this setCounts(Counts $value)
  * @method $this setPk(string $value)
- * @method $this setStoryType(mixed $value)
- * @method $this setType(mixed $value)
+ * @method $this setStoryType(int $value)
+ * @method $this setType(int $value)
  * @method $this unsetArgs()
  * @method $this unsetCounts()
  * @method $this unsetPk()
@@ -34,7 +34,7 @@ class Story extends AutoPropertyMapper
         'pk'         => 'string',
         'counts'     => 'Counts',
         'args'       => 'Args',
-        'type'       => '',
-        'story_type' => '',
+        'type'       => 'int',
+        'story_type' => 'int',
     ];
 }
