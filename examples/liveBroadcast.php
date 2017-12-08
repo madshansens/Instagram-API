@@ -38,16 +38,27 @@ try {
     // and for OBS, see:
     // https://github.com/mgp25/Instagram-API/issues/1488#issuecomment-333365636
 
+    // Get FFmpeg handler and ensure that the application exists on this system.
+    // NOTE: Look in `\InstagramAPI\Utils` if you want a custom ffmpeg path.
+    $ffmpeg = \InstagramAPI\Utils::getFFmpegWrapper();
+
+    // Tell Instagram that we want to perform a livestream.
     $stream = $ig->live->create();
     $ig->live->start($stream->getBroadcastId());
 
-    exec(
-        'ffmpeg -rtbufsize 256M -re -i '
-        .escapeshellarg($videoFilename)
-        .' -acodec libmp3lame -ar 44100 -b:a 128k -pix_fmt yuv420p -profile:v baseline -s 720x1280 -bufsize 6000k -vb 400k -maxrate 1500k -deinterlace -vcodec libx264 -preset veryfast -g 30 -r 30 -f flv "rtmp://live-upload.instagram.com:80/rtmp'
-        .substr($stream->getUploadUrl(), 42)
-        .'"'
+    // Switch from RTMPS to RTMP upload URL, since RTMPS doesn't work well.
+    $streamUploadUrl = preg_replace(
+        '#^rtmps://([^/]+?):443/#ui',
+        'rtmp://\1:80/',
+        $stream->getUploadUrl()
     );
+
+    // Broadcast the entire video file.
+    $ffmpeg->run(sprintf(
+        '-rtbufsize 256M -re -i %s -acodec libmp3lame -ar 44100 -b:a 128k -pix_fmt yuv420p -profile:v baseline -s 720x1280 -bufsize 6000k -vb 400k -maxrate 1500k -deinterlace -vcodec libx264 -preset veryfast -g 30 -r 30 -f flv %s',
+        escapeshellarg($videoFilename),
+        escapeshellarg($streamUploadUrl)
+    ));
 
     // End the broadcast stream.
     // NOTE: Instagram will ALSO end the stream if your broadcasting software
@@ -55,8 +66,8 @@ try {
     // (without patching), but OBS sends such a packet. So be aware of that.
     $ig->live->end($stream->getBroadcastId());
 
-    // Once the broadcast has ended, you can optionally add the finished broadcast
-    // to your post-live feed (saved replay).
+    // Once the broadcast has ended, you can optionally add the finished
+    // broadcast to your post-live feed (saved replay).
     $ig->live->addToPostLive($stream->getBroadcastId());
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";
