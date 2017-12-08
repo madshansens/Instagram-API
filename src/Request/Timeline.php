@@ -183,13 +183,20 @@ class Timeline extends RequestCollection
      * This is the feed of recent timeline posts from people you follow.
      *
      * @param null|string $maxId   Next "maximum ID", used for pagination.
-     * @param null|array  $options An associative array with following keys (all of them are optional):
-     *                             "latest_story_pk" The media ID in Instagram's internal format (ie "3482384834_43294").
-     *                             "seen_posts" One or more seen media IDs.
-     *                             "unseen_posts" One or more unseen media IDs.
-     *                             "is_pull_to_refresh" Whether this call was triggered by refresh.
-     *                             "push_disabled" Whether user has disabled PUSH.
-     *                             "recovered_from_crash" Whether app has recovered from crash.
+     * @param null|array  $options An associative array with following keys (all
+     *                             of them are optional):
+     *                             "latest_story_pk" The media ID in Instagram's
+     *                             internal format (ie "3482384834_43294");
+     *                             "seen_posts" One or more seen media IDs;
+     *                             "unseen_posts" One or more unseen media IDs;
+     *                             "is_pull_to_refresh" Whether this call was
+     *                             triggered by a refresh;
+     *                             "push_disabled" Whether user has disabled
+     *                             PUSH;
+     *                             "recovered_from_crash" Whether the app has
+     *                             recovered from a crash/was killed by Android
+     *                             memory manager/force closed by user/just
+     *                             installed for the first time;
      *                             "feed_view_info" DON'T USE IT YET.
      *
      * @throws \InstagramAPI\Exception\InstagramException
