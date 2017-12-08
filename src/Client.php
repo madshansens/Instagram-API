@@ -498,6 +498,8 @@ class Client
             try {
                 // Decode to stdClass to properly preserve empty objects `{}`,
                 // otherwise they would appear as empty `[]` arrays in output.
+                // NOTE: Large >32-bit numbers will be transformed into strings,
+                // which helps us see which numeric values need "string" type.
                 $jsonObject = $this->api_body_decode($rawResponse, false);
                 if (is_object($jsonObject)) {
                     $prettyJson = @json_encode(
