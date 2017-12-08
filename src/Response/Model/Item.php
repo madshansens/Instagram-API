@@ -110,6 +110,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getStoryEvents()
  * @method mixed getStoryFeedMedia()
  * @method StoryHashtag[] getStoryHashtags()
+ * @method bool getStoryIsSavedToArchive()
  * @method StoryLocation[] getStoryLocations()
  * @method mixed getStoryPollVoterInfos()
  * @method mixed getStoryPolls()
@@ -117,6 +118,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getSupportsReelReactions()
  * @method string getTakenAt()
  * @method mixed getThumbnailUrls()
+ * @method int getTimezoneOffset()
  * @method string[] getTopFollowers()
  * @method int getTopFollowersCount()
  * @method mixed getTopLikers()
@@ -236,6 +238,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isStoryEvents()
  * @method bool isStoryFeedMedia()
  * @method bool isStoryHashtags()
+ * @method bool isStoryIsSavedToArchive()
  * @method bool isStoryLocations()
  * @method bool isStoryPollVoterInfos()
  * @method bool isStoryPolls()
@@ -243,6 +246,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isSupportsReelReactions()
  * @method bool isTakenAt()
  * @method bool isThumbnailUrls()
+ * @method bool isTimezoneOffset()
  * @method bool isTopFollowers()
  * @method bool isTopFollowersCount()
  * @method bool isTopLikers()
@@ -362,6 +366,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setStoryEvents(mixed $value)
  * @method $this setStoryFeedMedia(mixed $value)
  * @method $this setStoryHashtags(StoryHashtag[] $value)
+ * @method $this setStoryIsSavedToArchive(bool $value)
  * @method $this setStoryLocations(StoryLocation[] $value)
  * @method $this setStoryPollVoterInfos(mixed $value)
  * @method $this setStoryPolls(mixed $value)
@@ -369,6 +374,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setSupportsReelReactions(bool $value)
  * @method $this setTakenAt(string $value)
  * @method $this setThumbnailUrls(mixed $value)
+ * @method $this setTimezoneOffset(int $value)
  * @method $this setTopFollowers(string[] $value)
  * @method $this setTopFollowersCount(int $value)
  * @method $this setTopLikers(mixed $value)
@@ -488,6 +494,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetStoryEvents()
  * @method $this unsetStoryFeedMedia()
  * @method $this unsetStoryHashtags()
+ * @method $this unsetStoryIsSavedToArchive()
  * @method $this unsetStoryLocations()
  * @method $this unsetStoryPollVoterInfos()
  * @method $this unsetStoryPolls()
@@ -495,6 +502,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetSupportsReelReactions()
  * @method $this unsetTakenAt()
  * @method $this unsetThumbnailUrls()
+ * @method $this unsetTimezoneOffset()
  * @method $this unsetTopFollowers()
  * @method $this unsetTopFollowersCount()
  * @method $this unsetTopLikers()
@@ -670,6 +678,8 @@ class Item extends AutoPropertyMapper
         'is_eof'                           => 'bool',
         'top_followers'                    => 'string[]',
         'top_followers_count'              => 'int',
+        'story_is_saved_to_archive'        => 'bool',
+        'timezone_offset'                  => 'int',
         /*
          * HTML color string such as "#812A2A".
          */
