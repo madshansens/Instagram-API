@@ -18,6 +18,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getHasMoreHeadChildComments()
  * @method bool getHasMoreTailChildComments()
  * @method bool getHasTranslation()
+ * @method string getInlineComposerDisplayCondition()
  * @method string getMediaId()
  * @method string getNextMaxChildCursor()
  * @method User[] getOtherPreviewUsers()
@@ -40,6 +41,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isHasMoreHeadChildComments()
  * @method bool isHasMoreTailChildComments()
  * @method bool isHasTranslation()
+ * @method bool isInlineComposerDisplayCondition()
  * @method bool isMediaId()
  * @method bool isNextMaxChildCursor()
  * @method bool isOtherPreviewUsers()
@@ -62,6 +64,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setHasMoreHeadChildComments(bool $value)
  * @method $this setHasMoreTailChildComments(bool $value)
  * @method $this setHasTranslation(bool $value)
+ * @method $this setInlineComposerDisplayCondition(string $value)
  * @method $this setMediaId(string $value)
  * @method $this setNextMaxChildCursor(string $value)
  * @method $this setOtherPreviewUsers(User[] $value)
@@ -84,6 +87,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetHasMoreHeadChildComments()
  * @method $this unsetHasMoreTailChildComments()
  * @method $this unsetHasTranslation()
+ * @method $this unsetInlineComposerDisplayCondition()
  * @method $this unsetMediaId()
  * @method $this unsetNextMaxChildCursor()
  * @method $this unsetOtherPreviewUsers()
@@ -104,54 +108,55 @@ class Comment extends AutoPropertyMapper
     const CHILD = 2;
 
     const JSON_PROPERTY_MAP = [
-        'status'                       => 'string',
-        'user_id'                      => 'string',
+        'status'                            => 'string',
+        'user_id'                           => 'string',
         /*
          * Unix timestamp (UTC) of when the comment was posted.
          */
-        'created_at_utc'               => 'string',
-        'created_at'                   => 'string',
-        'bit_flags'                    => 'int',
-        'user'                         => 'User',
-        'pk'                           => 'string',
-        'media_id'                     => 'string',
-        'text'                         => 'string',
-        'content_type'                 => 'string',
+        'created_at_utc'                    => 'string',
+        'created_at'                        => 'string',
+        'bit_flags'                         => 'int',
+        'user'                              => 'User',
+        'pk'                                => 'string',
+        'media_id'                          => 'string',
+        'text'                              => 'string',
+        'content_type'                      => 'string',
         /*
          * A number describing what type of comment this is. Should be compared
          * against the `Comment::PARENT` and `Comment::CHILD` constants. All
          * replies are of type `CHILD`, and all parents are of type `PARENT`.
          */
-        'type'                         => 'int',
-        'comment_like_count'           => 'int',
-        'has_liked_comment'            => 'bool',
-        'has_translation'              => 'bool',
-        'did_report_as_spam'           => 'bool',
+        'type'                              => 'int',
+        'comment_like_count'                => 'int',
+        'has_liked_comment'                 => 'bool',
+        'has_translation'                   => 'bool',
+        'did_report_as_spam'                => 'bool',
         /*
          * If this is a child in a thread, this is the ID of its parent thread.
          */
-        'parent_comment_id'            => 'string',
+        'parent_comment_id'                 => 'string',
         /*
          * Number of child comments in this comment thread.
          */
-        'child_comment_count'          => 'int',
+        'child_comment_count'               => 'int',
         /*
          * Previews of some of the child comments. Compare it to the child
          * comment count. If there are more, you must request the comment thread.
          */
-        'preview_child_comments'       => 'Comment[]',
+        'preview_child_comments'            => 'Comment[]',
         /*
          * Previews of users in very long comment threads.
          */
-        'other_preview_users'          => 'User[]',
+        'other_preview_users'               => 'User[]',
+        'inline_composer_display_condition' => 'string',
         /*
          * This is somehow related to pagination of child-comments in CERTAIN
          * comments with children. The value seems to ONLY appear when a comment
          * has MORE child-comments than what exists in "preview_child_comments".
          * So it probably somehow describes the missing child comments offset.
          */
-        'next_max_child_cursor'        => 'string',
-        'has_more_tail_child_comments' => 'bool',
-        'has_more_head_child_comments' => 'bool',
+        'next_max_child_cursor'             => 'string',
+        'has_more_tail_child_comments'      => 'bool',
+        'has_more_head_child_comments'      => 'bool',
     ];
 }

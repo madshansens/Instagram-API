@@ -17,6 +17,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getLatestReelMedia()
  * @method Location getLocation()
  * @method mixed getPrefetchCount()
+ * @method string getReelType()
  * @method string getSeen()
  * @method User getUser()
  * @method bool isBroadcast()
@@ -29,6 +30,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isLatestReelMedia()
  * @method bool isLocation()
  * @method bool isPrefetchCount()
+ * @method bool isReelType()
  * @method bool isSeen()
  * @method bool isUser()
  * @method $this setBroadcast(Broadcast $value)
@@ -41,6 +43,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setLatestReelMedia(string $value)
  * @method $this setLocation(Location $value)
  * @method $this setPrefetchCount(mixed $value)
+ * @method $this setReelType(string $value)
  * @method $this setSeen(string $value)
  * @method $this setUser(User $value)
  * @method $this unsetBroadcast()
@@ -53,6 +56,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetLatestReelMedia()
  * @method $this unsetLocation()
  * @method $this unsetPrefetchCount()
+ * @method $this unsetReelType()
  * @method $this unsetSeen()
  * @method $this unsetUser()
  */
@@ -71,6 +75,7 @@ class Reel extends AutoPropertyMapper
         'can_reply'         => 'bool',
         'can_reshare'       => 'bool',
         'has_besties_media' => 'bool', // Uses int(0) for false and 1 for true.
+        'reel_type'         => 'string',
         'location'          => 'Location',
         /*
          * Unix "taken_at" timestamp of the newest item in their story reel.
