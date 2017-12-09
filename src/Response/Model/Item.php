@@ -46,6 +46,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getExploreContext()
  * @method bool getExploreHideComments()
  * @method string getExploreSourceToken()
+ * @method string getFbPageUrl()
  * @method int getFilterType()
  * @method bool getForceOverlay()
  * @method Gating getGating()
@@ -174,6 +175,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isExploreContext()
  * @method bool isExploreHideComments()
  * @method bool isExploreSourceToken()
+ * @method bool isFbPageUrl()
  * @method bool isFilterType()
  * @method bool isForceOverlay()
  * @method bool isGating()
@@ -302,6 +304,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setExploreContext(string $value)
  * @method $this setExploreHideComments(bool $value)
  * @method $this setExploreSourceToken(string $value)
+ * @method $this setFbPageUrl(string $value)
  * @method $this setFilterType(int $value)
  * @method $this setForceOverlay(bool $value)
  * @method $this setGating(Gating $value)
@@ -430,6 +433,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetExploreContext()
  * @method $this unsetExploreHideComments()
  * @method $this unsetExploreSourceToken()
+ * @method $this unsetFbPageUrl()
  * @method $this unsetFilterType()
  * @method $this unsetForceOverlay()
  * @method $this unsetGating()
@@ -645,6 +649,7 @@ class Item extends AutoPropertyMapper
         'overlay_text'                     => 'string',
         'overlay_title'                    => 'string',
         'overlay_subtitle'                 => 'string',
+        'fb_page_url'                      => 'string',
         'playback_duration_secs'           => '',
         'url_expire_at_secs'               => '',
         'is_sidecar_child'                 => '',
