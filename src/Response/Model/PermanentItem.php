@@ -7,6 +7,7 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * PermanentItem.
  *
+ * @method string getClientContext()
  * @method string getItemId()
  * @method mixed getItemType()
  * @method mixed getLike()
@@ -18,6 +19,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getText()
  * @method mixed getTimestamp()
  * @method string getUserId()
+ * @method bool isClientContext()
  * @method bool isItemId()
  * @method bool isItemType()
  * @method bool isLike()
@@ -29,6 +31,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isText()
  * @method bool isTimestamp()
  * @method bool isUserId()
+ * @method $this setClientContext(string $value)
  * @method $this setItemId(string $value)
  * @method $this setItemType(mixed $value)
  * @method $this setLike(mixed $value)
@@ -40,6 +43,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setText(string $value)
  * @method $this setTimestamp(mixed $value)
  * @method $this setUserId(string $value)
+ * @method $this unsetClientContext()
  * @method $this unsetItemId()
  * @method $this unsetItemType()
  * @method $this unsetLike()
@@ -55,16 +59,17 @@ use InstagramAPI\AutoPropertyMapper;
 class PermanentItem extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'item_id'     => 'string',
-        'user_id'     => 'string',
-        'timestamp'   => '',
-        'item_type'   => '',
-        'text'        => 'string',
-        'location'    => 'Location',
-        'like'        => '',
-        'media'       => 'MediaData',
-        'link'        => 'Link',
-        'media_share' => 'Item',
-        'reel_share'  => 'ReelShare',
+        'item_id'        => 'string',
+        'user_id'        => 'string',
+        'timestamp'      => '',
+        'item_type'      => '',
+        'text'           => 'string',
+        'location'       => 'Location',
+        'like'           => '',
+        'media'          => 'MediaData',
+        'link'           => 'Link',
+        'media_share'    => 'Item',
+        'reel_share'     => 'ReelShare',
+        'client_context' => 'string',
     ];
 }
