@@ -94,6 +94,50 @@ class Hashtag extends RequestCollection
     }
 
     /**
+     * Follow hashtag.
+     *
+     * @param string $hashtag The hashtag, not including the "#".
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\TagRelatedResponse
+     */
+    public function follow(
+        $hashtag)
+    {
+        Utils::throwIfInvalidHashtag($hashtag);
+        $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
+        return $this->ig->request("tags/follow/{$urlHashtag}/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
+     * Unfollow hashtag.
+     *
+     * @param string $hashtag The hashtag, not including the "#".
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\TagRelatedResponse
+     */
+    public function unfollow(
+        $hashtag)
+    {
+        Utils::throwIfInvalidHashtag($hashtag);
+        $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
+        return $this->ig->request("tags/unfollow/{$urlHashtag}/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
      * Get related hashtags.
      *
      * @param string $hashtag The hashtag, not including the "#".
