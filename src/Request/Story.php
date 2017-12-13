@@ -232,9 +232,13 @@ class Story extends RequestCollection
     /**
      * Set your story settings.
      *
-     * @param string $messagePrefs Who can reply to your story. Valid values are "anyone" (meaning
-     *                             your followers), "following" (followers that you follow back),
-     *                             or "off" (meaning that nobody can reply to your story).
+     * @param string      $messagePrefs      Who can reply to your story. Valid values are "anyone" (meaning
+     *                                       your followers), "following" (followers that you follow back),
+     *                                       or "off" (meaning that nobody can reply to your story).
+     * @param null|bool   $allowStoryReshare Allow story reshare.
+     * @param null|string $autoArchive       Auto archive stories for viewing them later. It will appear in your
+     *                                       archive once it has disappeared from your story feed. Valid values
+     *                                       "on" and "off".
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -242,17 +246,34 @@ class Story extends RequestCollection
      * @return \InstagramAPI\Response\ReelSettingsResponse
      */
     public function setReelSettings(
-        $messagePrefs)
+        $messagePrefs,
+        $allowStoryReshare = null,
+        $autoArchive = null)
     {
         if (!in_array($messagePrefs, ['anyone', 'following', 'off'])) {
             throw new \InvalidArgumentException('You must provide a valid message preference value.');
         }
 
-        return $this->ig->request('users/set_reel_settings/')
+        $request = $this->ig->request('users/set_reel_settings/')
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('message_prefs', $messagePrefs)
-            ->getResponse(new Response\ReelSettingsResponse());
+            ->addPost('message_prefs', $messagePrefs);
+
+        if ($allowStoryReshare !== null) {
+            if (!is_bool($allowStoryReshare)) {
+                throw new \InvalidArgumentException('You must provide a valid value for allowing story reshare.');
+            }
+            $request->addPost('allow_story_reshare', $allowStoryReshare);
+        }
+
+        if ($autoArchive !== null) {
+            if (!in_array($autoArchive, ['on', 'off'])) {
+                throw new \InvalidArgumentException('You must provide a valid value for auto archive.');
+            }
+            $request->addPost('reel_auto_archive', $autoArchive);
+        }
+
+        return $request->getResponse(new Response\ReelSettingsResponse());
     }
 }
