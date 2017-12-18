@@ -20,6 +20,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getCanBoostPost()
  * @method mixed getCanConvertToBusiness()
  * @method mixed getCanCreateSponsorTags()
+ * @method bool getCanLinkEntitiesInBio()
  * @method mixed getCanSeeOrganicInsights()
  * @method string getCategory()
  * @method ChainingSuggestion[] getChainingSuggestions()
@@ -28,9 +29,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getCoeffWeight()
  * @method string getContactPhoneNumber()
  * @method mixed getConvertFromPages()
- * @method mixed getCountryCode()
+ * @method int getCountryCode()
  * @method string getDirectMessaging()
- * @method mixed getEmail()
+ * @method string getEmail()
  * @method string getExternalLynxUrl()
  * @method string getExternalUrl()
  * @method string getFbPageCallToActionId()
@@ -39,7 +40,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method int getFollowingCount()
  * @method FriendshipStatus getFriendshipStatus()
  * @method string getFullName()
- * @method mixed getGender()
+ * @method int getGender()
  * @method int getGeoMediaCount()
  * @method bool getHasAnonymousProfilePicture()
  * @method bool getHasBiographyTranslation()
@@ -61,13 +62,14 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getLatestReelMedia()
  * @method float getLatitude()
  * @method float getLongitude()
+ * @method int getMaxNumLinkedEntitiesInBio()
  * @method int getMediaCount()
  * @method mixed getMutualFollowersCount()
- * @method mixed getNationalNumber()
+ * @method string getNationalNumber()
  * @method mixed getNeedsEmailConfirm()
  * @method string getPageId()
  * @method mixed getPageName()
- * @method mixed getPhoneNumber()
+ * @method string getPhoneNumber()
  * @method string getPk()
  * @method mixed getProfileContext()
  * @method Link[] getProfileContextLinksWithUserIds()
@@ -80,7 +82,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getReelAutoArchive()
  * @method mixed getSearchSocialContext()
  * @method mixed getShowBusinessConversionIcon()
- * @method mixed getShowConversionEditEntry()
+ * @method bool getShowConversionEditEntry()
  * @method mixed getShowFeedBizConversionIcon()
  * @method mixed getShowInsightsTerms()
  * @method string getSocialContext()
@@ -103,6 +105,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isCanBoostPost()
  * @method bool isCanConvertToBusiness()
  * @method bool isCanCreateSponsorTags()
+ * @method bool isCanLinkEntitiesInBio()
  * @method bool isCanSeeOrganicInsights()
  * @method bool isCategory()
  * @method bool isChainingSuggestions()
@@ -144,6 +147,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isLatestReelMedia()
  * @method bool isLatitude()
  * @method bool isLongitude()
+ * @method bool isMaxNumLinkedEntitiesInBio()
  * @method bool isMediaCount()
  * @method bool isMutualFollowersCount()
  * @method bool isNationalNumber()
@@ -186,6 +190,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setCanBoostPost(mixed $value)
  * @method $this setCanConvertToBusiness(mixed $value)
  * @method $this setCanCreateSponsorTags(mixed $value)
+ * @method $this setCanLinkEntitiesInBio(bool $value)
  * @method $this setCanSeeOrganicInsights(mixed $value)
  * @method $this setCategory(string $value)
  * @method $this setChainingSuggestions(ChainingSuggestion[] $value)
@@ -194,9 +199,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setCoeffWeight(mixed $value)
  * @method $this setContactPhoneNumber(string $value)
  * @method $this setConvertFromPages(mixed $value)
- * @method $this setCountryCode(mixed $value)
+ * @method $this setCountryCode(int $value)
  * @method $this setDirectMessaging(string $value)
- * @method $this setEmail(mixed $value)
+ * @method $this setEmail(string $value)
  * @method $this setExternalLynxUrl(string $value)
  * @method $this setExternalUrl(string $value)
  * @method $this setFbPageCallToActionId(string $value)
@@ -205,7 +210,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setFollowingCount(int $value)
  * @method $this setFriendshipStatus(FriendshipStatus $value)
  * @method $this setFullName(string $value)
- * @method $this setGender(mixed $value)
+ * @method $this setGender(int $value)
  * @method $this setGeoMediaCount(int $value)
  * @method $this setHasAnonymousProfilePicture(bool $value)
  * @method $this setHasBiographyTranslation(bool $value)
@@ -227,13 +232,14 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setLatestReelMedia(string $value)
  * @method $this setLatitude(float $value)
  * @method $this setLongitude(float $value)
+ * @method $this setMaxNumLinkedEntitiesInBio(int $value)
  * @method $this setMediaCount(int $value)
  * @method $this setMutualFollowersCount(mixed $value)
- * @method $this setNationalNumber(mixed $value)
+ * @method $this setNationalNumber(string $value)
  * @method $this setNeedsEmailConfirm(mixed $value)
  * @method $this setPageId(string $value)
  * @method $this setPageName(mixed $value)
- * @method $this setPhoneNumber(mixed $value)
+ * @method $this setPhoneNumber(string $value)
  * @method $this setPk(string $value)
  * @method $this setProfileContext(mixed $value)
  * @method $this setProfileContextLinksWithUserIds(Link[] $value)
@@ -246,7 +252,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setReelAutoArchive(string $value)
  * @method $this setSearchSocialContext(mixed $value)
  * @method $this setShowBusinessConversionIcon(mixed $value)
- * @method $this setShowConversionEditEntry(mixed $value)
+ * @method $this setShowConversionEditEntry(bool $value)
  * @method $this setShowFeedBizConversionIcon(mixed $value)
  * @method $this setShowInsightsTerms(mixed $value)
  * @method $this setSocialContext(string $value)
@@ -269,6 +275,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetCanBoostPost()
  * @method $this unsetCanConvertToBusiness()
  * @method $this unsetCanCreateSponsorTags()
+ * @method $this unsetCanLinkEntitiesInBio()
  * @method $this unsetCanSeeOrganicInsights()
  * @method $this unsetCategory()
  * @method $this unsetChainingSuggestions()
@@ -310,6 +317,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetLatestReelMedia()
  * @method $this unsetLatitude()
  * @method $this unsetLongitude()
+ * @method $this unsetMaxNumLinkedEntitiesInBio()
  * @method $this unsetMediaCount()
  * @method $this unsetMutualFollowersCount()
  * @method $this unsetNationalNumber()
@@ -347,6 +355,7 @@ class User extends AutoPropertyMapper
         'has_anonymous_profile_picture'       => 'bool',
         'is_favorite'                         => 'bool',
         'profile_pic_url'                     => 'string',
+        'profile_pic_id'                      => 'string',
         'full_name'                           => 'string',
         'user_id'                             => 'string',
         'pk'                                  => 'string',
@@ -372,7 +381,6 @@ class User extends AutoPropertyMapper
         'is_unpublished'                      => 'bool',
         'allow_contacts_sync'                 => '',
         'show_feed_biz_conversion_icon'       => '',
-        'profile_pic_id'                      => 'string',
         'auto_expand_chaining'                => '',
         'can_boost_post'                      => '',
         'is_profile_action_needed'            => 'bool',
@@ -383,7 +391,7 @@ class User extends AutoPropertyMapper
         'can_convert_to_business'             => '',
         'convert_from_pages'                  => '',
         'show_business_conversion_icon'       => '',
-        'show_conversion_edit_entry'          => '',
+        'show_conversion_edit_entry'          => 'bool',
         'show_insights_terms'                 => '',
         'can_create_sponsor_tags'             => '',
         'hd_profile_pic_url_info'             => 'ImageCandidate',
@@ -391,6 +399,8 @@ class User extends AutoPropertyMapper
         'profile_context_mutual_follow_ids'   => 'string[]',
         'profile_context_links_with_user_ids' => 'Link[]',
         'has_biography_translation'           => 'bool',
+        'can_link_entities_in_bio'            => 'bool',
+        'max_num_linked_entities_in_bio'      => 'int',
         'business_contact_method'             => 'string',
         /*
          * Business category.
@@ -413,12 +423,12 @@ class User extends AutoPropertyMapper
         'is_needy'                            => 'bool',
         'external_url'                        => 'string',
         'external_lynx_url'                   => 'string',
-        'email'                               => '',
-        'country_code'                        => '',
+        'email'                               => 'string',
+        'country_code'                        => 'int',
         'birthday'                            => '',
-        'national_number'                     => '',
-        'gender'                              => '',
-        'phone_number'                        => '',
+        'national_number'                     => 'string', // Really int, but may be >32bit.
+        'gender'                              => 'int',
+        'phone_number'                        => 'string',
         'needs_email_confirm'                 => '',
         'is_active'                           => 'bool',
         'block_at'                            => '',
