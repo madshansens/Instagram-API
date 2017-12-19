@@ -9,6 +9,7 @@ use InstagramAPI\AutoPropertyMapper;
  *
  * @method int getCarrierId()
  * @method string getCarrierName()
+ * @method mixed getEnabledWalletDefsKeys()
  * @method mixed getFeatures()
  * @method string getRequestTime()
  * @method mixed getRewriteRules()
@@ -16,6 +17,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method int getTtl()
  * @method bool isCarrierId()
  * @method bool isCarrierName()
+ * @method bool isEnabledWalletDefsKeys()
  * @method bool isFeatures()
  * @method bool isRequestTime()
  * @method bool isRewriteRules()
@@ -23,6 +25,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isTtl()
  * @method $this setCarrierId(int $value)
  * @method $this setCarrierName(string $value)
+ * @method $this setEnabledWalletDefsKeys(mixed $value)
  * @method $this setFeatures(mixed $value)
  * @method $this setRequestTime(string $value)
  * @method $this setRewriteRules(mixed $value)
@@ -30,6 +33,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setTtl(int $value)
  * @method $this unsetCarrierId()
  * @method $this unsetCarrierName()
+ * @method $this unsetEnabledWalletDefsKeys()
  * @method $this unsetFeatures()
  * @method $this unsetRequestTime()
  * @method $this unsetRewriteRules()
@@ -39,12 +43,13 @@ use InstagramAPI\AutoPropertyMapper;
 class Token extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'carrier_name'      => 'string',
-        'carrier_id'        => 'int',
-        'ttl'               => 'int',
-        'features'          => '',
-        'request_time'      => 'string',
-        'token_hash'        => 'string',
-        'rewrite_rules'     => '',
+        'carrier_name'             => 'string',
+        'carrier_id'               => 'int',
+        'ttl'                      => 'int',
+        'features'                 => '',
+        'request_time'             => 'string',
+        'token_hash'               => 'string',
+        'rewrite_rules'            => '',
+        'enabled_wallet_defs_keys' => '',
     ];
 }
