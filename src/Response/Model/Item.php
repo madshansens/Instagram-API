@@ -101,6 +101,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getPlaybackDurationSecs()
  * @method string getPreview()
  * @method Comment[] getPreviewComments()
+ * @method ProductTags getProductTags()
  * @method ReelMention[] getReelMentions()
  * @method ReelShare getReelShare()
  * @method string[] getSavedCollectionIds()
@@ -230,6 +231,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isPlaybackDurationSecs()
  * @method bool isPreview()
  * @method bool isPreviewComments()
+ * @method bool isProductTags()
  * @method bool isReelMentions()
  * @method bool isReelShare()
  * @method bool isSavedCollectionIds()
@@ -359,6 +361,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setPlaybackDurationSecs(mixed $value)
  * @method $this setPreview(string $value)
  * @method $this setPreviewComments(Comment[] $value)
+ * @method $this setProductTags(ProductTags $value)
  * @method $this setReelMentions(ReelMention[] $value)
  * @method $this setReelShare(ReelShare $value)
  * @method $this setSavedCollectionIds(string[] $value)
@@ -488,6 +491,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetPlaybackDurationSecs()
  * @method $this unsetPreview()
  * @method $this unsetPreviewComments()
+ * @method $this unsetProductTags()
  * @method $this unsetReelMentions()
  * @method $this unsetReelShare()
  * @method $this unsetSavedCollectionIds()
@@ -685,6 +689,7 @@ class Item extends AutoPropertyMapper
         'top_followers_count'              => 'int',
         'story_is_saved_to_archive'        => 'bool',
         'timezone_offset'                  => 'int',
+        'product_tags'                     => 'ProductTags',
         /*
          * HTML color string such as "#812A2A".
          */
