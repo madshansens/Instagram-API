@@ -1277,7 +1277,7 @@ class Internal extends RequestCollection
      * @throws \LogicException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return Response\GenericResponse
+     * @return Response\ResumableUploadResponse
      */
     protected function _uploadResumableMedia(
         MediaDetails $mediaDetails,
@@ -1315,8 +1315,8 @@ class Internal extends RequestCollection
                     $uploadRequest
                         ->addHeader('Offset', $offset)
                         ->setBody(new LimitStream($stream, $length - $offset, $offset));
-                    /** @var Response\GenericResponse $response */
-                    $response = $uploadRequest->getResponse(new Response\GenericResponse());
+                    /** @var Response\ResumableUploadResponse $response */
+                    $response = $uploadRequest->getResponse(new Response\ResumableUploadResponse());
 
                     return $response;
                 } catch (ThrottledException $e) {
