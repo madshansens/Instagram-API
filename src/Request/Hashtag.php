@@ -191,6 +191,47 @@ class Hashtag extends RequestCollection
     }
 
     /**
+     * Get list of tags that a user is following.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\HashtagsResponse
+     */
+    public function getFollowing(
+        $userId)
+    {
+        return $this->ig->request("users/{$userId}/following_tags_info/")
+            ->getResponse(new Response\HashtagsResponse());
+    }
+
+    /**
+     * Get list of tags that you are following.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\HashtagsResponse
+     */
+    public function getSelfFollowing()
+    {
+        return $this->getFollowing($this->ig->account_id);
+    }
+
+    /**
+     * Get list of tags that are suggested to follow to.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\HashtagsResponse
+     */
+    public function getFollowSuggestions()
+    {
+        return $this->ig->request('tags/suggested/')
+            ->getResponse(new Response\HashtagsResponse());
+    }
+
+    /**
      * Mark TagFeedResponse story media items as seen.
      *
      * The "story" property of a `TagFeedResponse` only gives you a list of
