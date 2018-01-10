@@ -77,6 +77,10 @@ $rtc->on('client-context-ack', function (\InstagramAPI\Realtime\Payload\Action\A
 $rtc->on('unseen-count-update', function ($inbox, \InstagramAPI\Response\Model\DirectSeenItemPayload $payload) {
     printf('[RTC] Updating unseen count in %s to %d%s', $inbox, $payload->getCount(), PHP_EOL);
 });
+$rtc->on('presence', function (\InstagramAPI\Response\Model\UserPresence $presence) {
+    $action = $presence->getIsActive() ? 'is now using' : 'just closed';
+    printf('[RTC] User %s %s one of Instagram apps%s', $presence->getUserId(), $action, PHP_EOL);
+});
 $rtc->on('error', function (\Exception $e) use ($rtc, $loop) {
     printf('[!!!] Got fatal error from Realtime: %s%s', $e->getMessage(), PHP_EOL);
     $rtc->stop();

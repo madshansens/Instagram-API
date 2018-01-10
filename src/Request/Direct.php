@@ -182,6 +182,19 @@ class Direct extends RequestCollection
     }
 
     /**
+     * Get a list of activity statuses for users who you follow or message.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\PresencesResponse
+     */
+    public function getPresences()
+    {
+        return $this->ig->request('direct_v2/get_presence/')
+            ->getResponse(new Response\PresencesResponse());
+    }
+
+    /**
      * Get ranked list of recipients.
      *
      * WARNING: This is a special, very heavily throttled API endpoint.

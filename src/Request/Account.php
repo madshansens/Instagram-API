@@ -410,6 +410,59 @@ class Account extends RequestCollection
     }
 
     /**
+     * Get presence status.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\PresenceStatusResponse
+     */
+    public function getPresenceStatus()
+    {
+        return $this->ig->request('accounts/get_presence_disabled/')
+            ->setSignedGet(true)
+            ->getResponse(new Response\PresenceStatusResponse());
+    }
+
+    /**
+     * Enable presence.
+     *
+     * Allow accounts you follow and anyone you message to see when you were
+     * last active on Instagram apps.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function enablePresence()
+    {
+        return $this->ig->request('accounts/set_presence_disabled/')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('disabled', '0')
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
+     * Disable presence.
+     *
+     * You won't be able to see the activity status of other accounts.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\PresenceStatusResponse
+     */
+    public function disablePresence()
+    {
+        return $this->ig->request('accounts/set_presence_disabled/')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('disabled', '1')
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
      * Tell Instagram to send you a message to verify your email address.
      *
      * @throws \InstagramAPI\Exception\InstagramException

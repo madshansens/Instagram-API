@@ -7,6 +7,7 @@ use Fbns\Client\Thrift\Reader;
 use InstagramAPI\Client;
 use InstagramAPI\Realtime\Message;
 use InstagramAPI\Realtime\ParserInterface;
+use InstagramAPI\Realtime\Subscription\GraphQl\AppPresenceSubscription;
 
 class GraphQlParser implements ParserInterface
 {
@@ -18,7 +19,8 @@ class GraphQlParser implements ParserInterface
     const MODULE_DIRECT = 'direct';
 
     const TOPIC_TO_MODULE_ENUM = [
-        self::TOPIC_DIRECT => self::MODULE_DIRECT,
+        self::TOPIC_DIRECT             => self::MODULE_DIRECT,
+        AppPresenceSubscription::QUERY => AppPresenceSubscription::ID,
     ];
 
     /**

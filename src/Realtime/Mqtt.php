@@ -14,9 +14,11 @@ use InstagramAPI\ExperimentsInterface;
 use InstagramAPI\React\PersistentInterface;
 use InstagramAPI\React\PersistentTrait;
 use InstagramAPI\Realtime\Command\UpdateSubscriptions;
+use InstagramAPI\Realtime\Subscription\GraphQl\AppPresenceSubscription;
 use InstagramAPI\Realtime\Subscription\GraphQl\DirectTypingSubscription;
 use InstagramAPI\Realtime\Subscription\Skywalker\DirectSubscription;
 use InstagramAPI\Realtime\Subscription\Skywalker\LiveSubscription;
+use InstagramAPI\Signatures;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
@@ -69,6 +71,10 @@ class Mqtt implements PersistentInterface
     protected $_msgTypeBlacklist;
     /** @var bool */
     protected $_graphQlTypingEnabled;
+    /** @var bool */
+    protected $_inboxPresenceEnabled;
+    /** @var bool */
+    protected $_threadPresenceEnabled;
 
     /** @var ParserInterface[] */
     protected $_parsers;
@@ -119,9 +125,10 @@ class Mqtt implements PersistentInterface
             Mqtt\Topics::GRAPHQL               => new Parser\GraphQlParser(),
         ];
         $this->_handlers = [
-            Handler\DirectHandler::MODULE => new Handler\DirectHandler($this->_target),
-            Handler\LiveHandler::MODULE   => new Handler\LiveHandler($this->_target),
-            Handler\IrisHandler::MODULE   => new Handler\IrisHandler($this->_target),
+            Handler\DirectHandler::MODULE   => new Handler\DirectHandler($this->_target),
+            Handler\LiveHandler::MODULE     => new Handler\LiveHandler($this->_target),
+            Handler\IrisHandler::MODULE     => new Handler\IrisHandler($this->_target),
+            Handler\PresenceHandler::MODULE => new Handler\PresenceHandler($this->_target),
         ];
     }
 
@@ -366,10 +373,21 @@ class Mqtt implements PersistentInterface
             'ig_android_gqls_typing_indicator',
             'is_enabled'
         );
+
+        // Presence features.
+        $this->_inboxPresenceEnabled = $experiments->isExperimentEnabled(
+            'ig_android_direct_inbox_presence',
+            'is_enabled'
+        );
+        $this->_threadPresenceEnabled = $experiments->isExperimentEnabled(
+            'ig_android_direct_thread_presence',
+            'is_enabled'
+        );
     }
 
     protected function _initSubscriptions()
     {
+        $subscriptionId = Signatures::generateUUID();
         // Set up PubSub topics.
         $liveSubscription = new LiveSubscription($this->_auth->getUserId());
         if ($this->_mqttLiveEnabled) {
@@ -387,6 +405,12 @@ class Mqtt implements PersistentInterface
         } else {
             $this->_doRemoveSubscription($graphQlTypingSubscription, false);
         }
+        $appPresenceSubscription = new AppPresenceSubscription($subscriptionId);
+        if ($this->_inboxPresenceEnabled || $this->_threadPresenceEnabled) {
+            $this->_doAddSubscription($appPresenceSubscription, false);
+        } else {
+            $this->_doRemoveSubscription($appPresenceSubscription, false);
+        }
     }
 
     /**
@@ -400,9 +424,18 @@ class Mqtt implements PersistentInterface
             'platform'      => Constants::PLATFORM,
             'app_version'   => Constants::IG_VERSION,
             'capabilities'  => Constants::X_IG_Capabilities,
-            'User-Agent'    => $this->_device->getUserAgent(),
-            'ig_mqtt_route' => 'django',
         ];
+        // Everclear subscriptions.
+        $everclearSubscriptions = [];
+        if ($this->_inboxPresenceEnabled) {
+            $everclearSubscriptions[AppPresenceSubscription::ID] = AppPresenceSubscription::QUERY;
+        }
+        if (count($everclearSubscriptions)) {
+            $result['everclear_subscriptions'] = json_encode($everclearSubscriptions);
+        }
+        // Maintaining the order.
+        $result['User-Agent'] = $this->_device->getUserAgent();
+        $result['ig_mqtt_route'] = 'django';
         // PubSub message type blacklist.
         $msgTypeBlacklist = '';
         if ($this->_msgTypeBlacklist !== null && $this->_msgTypeBlacklist !== '') {
@@ -418,7 +451,7 @@ class Mqtt implements PersistentInterface
         if ($msgTypeBlacklist !== '') {
             $result['pubsub_msg_type_blacklist'] = $msgTypeBlacklist;
         }
-        // Accept-Language should be last one.
+        // Accept-Language must be the last one.
         $result['Accept-Language'] = Constants::ACCEPT_LANGUAGE;
 
         return $result;
