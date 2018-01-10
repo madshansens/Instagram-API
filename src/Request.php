@@ -105,6 +105,15 @@ class Request
     protected $_signedPost;
 
     /**
+     * Whether this API call needs signing of the GET params.
+     *
+     * Off by default.
+     *
+     * @var bool
+     */
+    protected $_signedGet;
+
+    /**
      * Whether this API endpoint responds with multiple JSON objects.
      *
      * Off by default.
@@ -157,6 +166,7 @@ class Request
         $this->_guzzleOptions = [];
         $this->_needsAuth = true;
         $this->_signedPost = true;
+        $this->_signedGet = false;
         $this->_isMultiResponse = false;
         $this->_excludeSigned = [];
         $this->_defaultHeaders = true;
@@ -439,7 +449,7 @@ class Request
     }
 
     /**
-     * Set signed request flag.
+     * Set signed request data flag.
      *
      * @param bool $signedPost
      *
@@ -449,6 +459,21 @@ class Request
         $signedPost = true)
     {
         $this->_signedPost = $signedPost;
+
+        return $this;
+    }
+
+    /**
+     * Set signed request params flag.
+     *
+     * @param bool $signedGet
+     *
+     * @return self
+     */
+    public function setSignedGet(
+        $signedGet = false)
+    {
+        $this->_signedGet = $signedGet;
 
         return $this;
     }
@@ -621,6 +646,10 @@ class Request
         // Determine the URI to use (it's either relative to API, or a full URI).
         if (strncmp($endpoint, 'http:', 5) !== 0 && strncmp($endpoint, 'https:', 6) !== 0) {
             $endpoint = Constants::API_URLS[$this->_apiVersion].$endpoint;
+        }
+        // Check signed request params flag.
+        if ($this->_signedGet) {
+            $this->_params = Signatures::signData($this->_params);
         }
         // Generate the final endpoint URL, by adding any custom query params.
         if (count($this->_params)) {
