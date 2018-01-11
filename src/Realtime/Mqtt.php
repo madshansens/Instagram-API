@@ -48,6 +48,9 @@ class Mqtt implements PersistentInterface
     /** @var LoopInterface */
     protected $_loop;
 
+    /** @var array */
+    protected $_additionalOptions;
+
     /** @var TimerInterface */
     protected $_keepaliveTimer;
 
@@ -75,6 +78,8 @@ class Mqtt implements PersistentInterface
     protected $_inboxPresenceEnabled;
     /** @var bool */
     protected $_threadPresenceEnabled;
+    /** @var bool */
+    protected $_regionHintEnabled;
 
     /** @var ParserInterface[] */
     protected $_parsers;
@@ -91,6 +96,7 @@ class Mqtt implements PersistentInterface
      * @param ExperimentsInterface  $experiments
      * @param LoopInterface         $loop
      * @param LoggerInterface       $logger
+     * @param array                 $additionalOptions
      */
     public function __construct(
         EventEmitterInterface $target,
@@ -99,7 +105,8 @@ class Mqtt implements PersistentInterface
         DeviceInterface $device,
         ExperimentsInterface $experiments,
         LoopInterface $loop,
-        LoggerInterface $logger)
+        LoggerInterface $logger,
+        array $additionalOptions = [])
     {
         $this->_target = $target;
         $this->_connector = $connector;
@@ -107,6 +114,7 @@ class Mqtt implements PersistentInterface
         $this->_device = $device;
         $this->_loop = $loop;
         $this->_logger = $logger;
+        $this->_additionalOptions = $additionalOptions;
 
         $this->_subscriptions = [];
 
@@ -123,12 +131,14 @@ class Mqtt implements PersistentInterface
             Mqtt\Topics::MESSAGE_SYNC          => new Parser\IrisParser(),
             Mqtt\Topics::REALTIME_SUB          => new Parser\GraphQlParser(),
             Mqtt\Topics::GRAPHQL               => new Parser\GraphQlParser(),
+            Mqtt\Topics::REGION_HINT           => new Parser\RegionHintParser(),
         ];
         $this->_handlers = [
-            Handler\DirectHandler::MODULE   => new Handler\DirectHandler($this->_target),
-            Handler\LiveHandler::MODULE     => new Handler\LiveHandler($this->_target),
-            Handler\IrisHandler::MODULE     => new Handler\IrisHandler($this->_target),
-            Handler\PresenceHandler::MODULE => new Handler\PresenceHandler($this->_target),
+            Handler\DirectHandler::MODULE     => new Handler\DirectHandler($this->_target),
+            Handler\LiveHandler::MODULE       => new Handler\LiveHandler($this->_target),
+            Handler\IrisHandler::MODULE       => new Handler\IrisHandler($this->_target),
+            Handler\PresenceHandler::MODULE   => new Handler\PresenceHandler($this->_target),
+            Handler\RegionHintHandler::MODULE => new Handler\RegionHintHandler($this->_target),
         ];
     }
 
@@ -164,6 +174,19 @@ class Mqtt implements PersistentInterface
         SubscriptionInterface $subscription)
     {
         $this->_doRemoveSubscription($subscription, true);
+    }
+
+    /**
+     * Set an additional option.
+     *
+     * @param string $option
+     * @param mixed  $value
+     */
+    public function setAdditionalOption(
+        $option,
+        $value)
+    {
+        $this->_additionalOptions[$option] = $value;
     }
 
     /**
@@ -383,6 +406,12 @@ class Mqtt implements PersistentInterface
             'ig_android_direct_thread_presence',
             'is_enabled'
         );
+
+        // Various features.
+        $this->_regionHintEnabled = $experiments->isExperimentEnabled(
+            'ig_android_mqtt_region_hint_universe',
+            'is_enabled'
+        );
     }
 
     protected function _initSubscriptions()
@@ -458,6 +487,31 @@ class Mqtt implements PersistentInterface
     }
 
     /**
+     * Get a list of topics to subscribe at connect.
+     *
+     * @return string[]
+     */
+    protected function _getSubscribeTopics()
+    {
+        $topics = [
+            Mqtt\Topics::PUBSUB,
+        ];
+        if ($this->_regionHintEnabled) {
+            $topics[] = Mqtt\Topics::REGION_HINT;
+        }
+        if ($this->_graphQlTypingEnabled) {
+            $topics[] = Mqtt\Topics::REALTIME_SUB;
+        }
+        $topics[] = Mqtt\Topics::SEND_MESSAGE_RESPONSE;
+        if ($this->_irisEnabled) {
+            $topics[] = Mqtt\Topics::IRIS_SUB_RESPONSE;
+            $topics[] = Mqtt\Topics::MESSAGE_SYNC;
+        }
+
+        return $topics;
+    }
+
+    /**
      * Returns username for MQTT connection.
      *
      * @return string
@@ -468,18 +522,7 @@ class Mqtt implements PersistentInterface
         $sessionId = (microtime(true) - strtotime('Last Monday')) * 1000;
         // Random buster-string to avoid clashing with other data.
         $randNum = mt_rand(1000000, 9999999);
-        $topics = [
-            Mqtt\Topics::PUBSUB,
-        ];
-        if ($this->_graphQlTypingEnabled) {
-            $topics[] = Mqtt\Topics::REALTIME_SUB;
-        }
-        $topics[] = Mqtt\Topics::SEND_MESSAGE_RESPONSE;
-        if ($this->_irisEnabled) {
-            $topics[] = Mqtt\Topics::IRIS_SUB_RESPONSE;
-            $topics[] = Mqtt\Topics::MESSAGE_SYNC;
-        }
-        $result = json_encode([
+        $fields = [
             // USER_ID
             'u'                 => '%ACCOUNT_ID_'.$randNum.'%',
             // AGENT
@@ -511,13 +554,18 @@ class Mqtt implements PersistentInterface
             // APP_ID
             'aid'               => Constants::FACEBOOK_ANALYTICS_APPLICATION_ID,
             // SUBSCRIBE_TOPICS
-            'st'                => $topics,
-            // CLIENT_STACK
-            'clientStack'       => 3,
-            // APP_SPECIFIC_INFO
-            'app_specific_info' => $this->_getAppSpecificInfo(),
-        ]);
-        $result = strtr($result, [
+            'st'                => $this->_getSubscribeTopics(),
+        ];
+        // REGION_PREFERENCE
+        if (!empty($this->_additionalOptions['datacenter'])) {
+            $fields['dc'] = $this->_additionalOptions['datacenter'];
+        }
+        // Maintaining the order.
+        $fields['clientStack'] = 3;
+        $fields['app_specific_info'] = $this->_getAppSpecificInfo();
+        // Account and session IDs must be a number, but int size is platform dependent in PHP,
+        // so we are replacing JSON strings with plain strings in JSON encoded data.
+        $result = strtr(json_encode($fields), [
             json_encode('%ACCOUNT_ID_'.$randNum.'%') => $this->_auth->getUserId(),
             json_encode('%SESSION_ID_'.$randNum.'%') => round($sessionId),
         ]);

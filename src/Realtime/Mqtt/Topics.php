@@ -28,6 +28,9 @@ class Topics
     const GRAPHQL = '/graphql';
     const GRAPHQL_ID = '9';
 
+    const REGION_HINT = '/t_region_hint';
+    const REGION_HINT_ID = '150';
+
     const ID_TO_TOPIC_MAP = [
         self::PUBSUB_ID                => self::PUBSUB,
         self::SEND_MESSAGE_ID          => self::SEND_MESSAGE,
@@ -37,6 +40,7 @@ class Topics
         self::MESSAGE_SYNC_ID          => self::MESSAGE_SYNC,
         self::REALTIME_SUB_ID          => self::REALTIME_SUB,
         self::GRAPHQL_ID               => self::GRAPHQL,
+        self::REGION_HINT_ID           => self::REGION_HINT,
     ];
 
     const TOPIC_TO_ID_MAP = [
@@ -48,5 +52,6 @@ class Topics
         self::MESSAGE_SYNC          => self::MESSAGE_SYNC_ID,
         self::REALTIME_SUB          => self::REALTIME_SUB_ID,
         self::GRAPHQL               => self::GRAPHQL_ID,
+        self::REGION_HINT           => self::REGION_HINT_ID,
     ];
 }

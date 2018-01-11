@@ -30,6 +30,7 @@ use React\EventLoop\LoopInterface;
  *  - thread-item-removed - An existing item has been removed from thread.
  *  - client-context-ack - Acknowledgment for client_context has been received.
  *  - unseen-count-update - Unseen count indicator has been updated.
+ *  - region-hint - Preferred data center has been changed.
  *  - warning - An exception of severity "warning" occurred.
  *  - error - An exception of severity "error" occurred.
  */
@@ -74,15 +75,24 @@ class Realtime implements EventEmitterInterface
             $this->_logger = new NullLogger();
         }
 
-        $this->_client = $this->_getClient();
+        $this->_client = $this->_buildMqttClient([
+            'datacenter' => $instagram->settings->get('datacenter'),
+        ]);
+        $this->on('region-hint', function ($region) {
+            $this->_instagram->settings->set('datacenter', $region);
+            $this->_client->setAdditionalOption('datacenter', $region);
+        });
     }
 
     /**
      * Create a new MQTT client.
      *
+     * @param array $additionalOptions
+     *
      * @return Realtime\Mqtt
      */
-    protected function _getClient()
+    protected function _buildMqttClient(
+        array $additionalOptions = [])
     {
         return new Realtime\Mqtt(
             $this,
@@ -91,7 +101,8 @@ class Realtime implements EventEmitterInterface
             $this->_instagram->device,
             $this->_instagram,
             $this->_loop,
-            $this->_logger
+            $this->_logger,
+            $additionalOptions
         );
     }
 
