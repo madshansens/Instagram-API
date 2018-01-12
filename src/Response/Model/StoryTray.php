@@ -27,6 +27,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getSeenRankedPosition()
  * @method mixed getShowNuxTooltip()
  * @method mixed getSourceToken()
+ * @method string getUniqueIntegerReelId()
  * @method User getUser()
  * @method bool isCanReply()
  * @method bool isCanReshare()
@@ -48,6 +49,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isSeenRankedPosition()
  * @method bool isShowNuxTooltip()
  * @method bool isSourceToken()
+ * @method bool isUniqueIntegerReelId()
  * @method bool isUser()
  * @method $this setCanReply(mixed $value)
  * @method $this setCanReshare(mixed $value)
@@ -69,6 +71,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setSeenRankedPosition(mixed $value)
  * @method $this setShowNuxTooltip(mixed $value)
  * @method $this setSourceToken(mixed $value)
+ * @method $this setUniqueIntegerReelId(string $value)
  * @method $this setUser(User $value)
  * @method $this unsetCanReply()
  * @method $this unsetCanReshare()
@@ -90,6 +93,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetSeenRankedPosition()
  * @method $this unsetShowNuxTooltip()
  * @method $this unsetSourceToken()
+ * @method $this unsetUniqueIntegerReelId()
  * @method $this unsetUser()
  */
 class StoryTray extends AutoPropertyMapper
@@ -109,19 +113,20 @@ class StoryTray extends AutoPropertyMapper
         /*
          * Unix "taken_at" timestamp of the newest item in their story reel.
          */
-        'latest_reel_media'    => 'string',
-        'ranked_position'      => '',
-        'is_nux'               => '',
-        'show_nux_tooltip'     => '',
-        'muted'                => '',
-        'prefetch_count'       => '',
-        'location'             => 'Location',
-        'source_token'         => '',
-        'owner'                => 'Owner',
-        'nux_id'               => 'string',
-        'dismiss_card'         => 'DismissCard',
-        'can_reshare'          => '',
-        'has_besties_media'    => 'bool',
-        'reel_type'            => 'string',
+        'latest_reel_media'      => 'string',
+        'ranked_position'        => '',
+        'is_nux'                 => '',
+        'show_nux_tooltip'       => '',
+        'muted'                  => '',
+        'prefetch_count'         => '',
+        'location'               => 'Location',
+        'source_token'           => '',
+        'owner'                  => 'Owner',
+        'nux_id'                 => 'string',
+        'dismiss_card'           => 'DismissCard',
+        'can_reshare'            => '',
+        'has_besties_media'      => 'bool',
+        'reel_type'              => 'string',
+        'unique_integer_reel_id' => 'string',
     ];
 }
