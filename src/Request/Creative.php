@@ -43,7 +43,7 @@ class Creative extends RequestCollection
         if ($location !== null) {
             $request
                 ->addPost('lat', $location['lat'])
-                ->addPost('lng', $location['lat'])
+                ->addPost('lng', $location['lng'])
                 ->addPost('horizontalAccuracy', $location['horizontalAccuracy']);
         }
 
