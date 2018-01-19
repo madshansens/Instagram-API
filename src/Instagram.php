@@ -835,7 +835,7 @@ class Instagram implements ExperimentsInterface
             $this->internal->getQPFetch();
             $this->media->getBlockedMedia();
             $this->discover->getExploreFeed(null, true);
-            //$this->internal->getFacebookOTA();
+            $this->internal->getFacebookOTA();
         } else {
             $lastLoginTime = $this->settings->get('last_login');
             $isSessionExpired = $lastLoginTime === null || (time() - $lastLoginTime) > $appRefreshInterval;

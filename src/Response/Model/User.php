@@ -85,6 +85,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getPublicPhoneCountryCode()
  * @method string getPublicPhoneNumber()
  * @method string getReelAutoArchive()
+ * @method bool getScreenshotted()
  * @method mixed getSearchSocialContext()
  * @method bool getShowBestiesBadge()
  * @method mixed getShowBusinessConversionIcon()
@@ -176,6 +177,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isPublicPhoneCountryCode()
  * @method bool isPublicPhoneNumber()
  * @method bool isReelAutoArchive()
+ * @method bool isScreenshotted()
  * @method bool isSearchSocialContext()
  * @method bool isShowBestiesBadge()
  * @method bool isShowBusinessConversionIcon()
@@ -267,6 +269,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setPublicPhoneCountryCode(string $value)
  * @method $this setPublicPhoneNumber(string $value)
  * @method $this setReelAutoArchive(string $value)
+ * @method $this setScreenshotted(bool $value)
  * @method $this setSearchSocialContext(mixed $value)
  * @method $this setShowBestiesBadge(bool $value)
  * @method $this setShowBusinessConversionIcon(mixed $value)
@@ -358,6 +361,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetPublicPhoneCountryCode()
  * @method $this unsetPublicPhoneNumber()
  * @method $this unsetReelAutoArchive()
+ * @method $this unsetScreenshotted()
  * @method $this unsetSearchSocialContext()
  * @method $this unsetShowBestiesBadge()
  * @method $this unsetShowBusinessConversionIcon()
@@ -472,5 +476,6 @@ class User extends AutoPropertyMapper
         'has_profile_video_feed'              => 'bool',
         'is_video_creator'                    => 'bool',
         'show_besties_badge'                  => 'bool',
+        'screenshotted'                       => 'bool',
     ];
 }

@@ -55,6 +55,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getHasMoreComments()
  * @method bool getHasViewerSaved()
  * @method bool getHideNuxText()
+ * @method string[] getHighlightReelIds()
  * @method mixed getITunesItem()
  * @method mixed getIcon()
  * @method string getId()
@@ -125,6 +126,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string[] getTopFollowers()
  * @method int getTopFollowersCount()
  * @method mixed getTopLikers()
+ * @method int getTotalScreenshotCount()
  * @method int getTotalViewerCount()
  * @method mixed getUrlExpireAtSecs()
  * @method User getUser()
@@ -186,6 +188,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isHasMoreComments()
  * @method bool isHasViewerSaved()
  * @method bool isHideNuxText()
+ * @method bool isHighlightReelIds()
  * @method bool isITunesItem()
  * @method bool isIcon()
  * @method bool isId()
@@ -256,6 +259,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isTopFollowers()
  * @method bool isTopFollowersCount()
  * @method bool isTopLikers()
+ * @method bool isTotalScreenshotCount()
  * @method bool isTotalViewerCount()
  * @method bool isUrlExpireAtSecs()
  * @method bool isUser()
@@ -317,6 +321,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setHasMoreComments(bool $value)
  * @method $this setHasViewerSaved(bool $value)
  * @method $this setHideNuxText(bool $value)
+ * @method $this setHighlightReelIds(string[] $value)
  * @method $this setITunesItem(mixed $value)
  * @method $this setIcon(mixed $value)
  * @method $this setId(string $value)
@@ -387,6 +392,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setTopFollowers(string[] $value)
  * @method $this setTopFollowersCount(int $value)
  * @method $this setTopLikers(mixed $value)
+ * @method $this setTotalScreenshotCount(int $value)
  * @method $this setTotalViewerCount(int $value)
  * @method $this setUrlExpireAtSecs(mixed $value)
  * @method $this setUser(User $value)
@@ -448,6 +454,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetHasMoreComments()
  * @method $this unsetHasViewerSaved()
  * @method $this unsetHideNuxText()
+ * @method $this unsetHighlightReelIds()
  * @method $this unsetITunesItem()
  * @method $this unsetIcon()
  * @method $this unsetId()
@@ -518,6 +525,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetTopFollowers()
  * @method $this unsetTopFollowersCount()
  * @method $this unsetTopLikers()
+ * @method $this unsetTotalScreenshotCount()
  * @method $this unsetTotalViewerCount()
  * @method $this unsetUrlExpireAtSecs()
  * @method $this unsetUser()
@@ -695,6 +703,8 @@ class Item extends AutoPropertyMapper
         'timezone_offset'                   => 'int',
         'product_tags'                      => 'ProductTags',
         'inline_composer_display_condition' => 'string',
+        'highlight_reel_ids'                => 'string[]',
+        'total_screenshot_count'            => 'int',
         /*
          * HTML color string such as "#812A2A".
          */

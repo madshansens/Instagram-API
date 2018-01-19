@@ -9,6 +9,7 @@ use InstagramAPI\AutoPropertyMapper;
  *
  * @method mixed getCanReply()
  * @method mixed getCanReshare()
+ * @method CoverMedia getCoverMedia()
  * @method DismissCard getDismissCard()
  * @method mixed getExpiringAt()
  * @method bool getHasBestiesMedia()
@@ -27,10 +28,12 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getSeenRankedPosition()
  * @method mixed getShowNuxTooltip()
  * @method mixed getSourceToken()
+ * @method string getTitle()
  * @method string getUniqueIntegerReelId()
  * @method User getUser()
  * @method bool isCanReply()
  * @method bool isCanReshare()
+ * @method bool isCoverMedia()
  * @method bool isDismissCard()
  * @method bool isExpiringAt()
  * @method bool isHasBestiesMedia()
@@ -49,10 +52,12 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isSeenRankedPosition()
  * @method bool isShowNuxTooltip()
  * @method bool isSourceToken()
+ * @method bool isTitle()
  * @method bool isUniqueIntegerReelId()
  * @method bool isUser()
  * @method $this setCanReply(mixed $value)
  * @method $this setCanReshare(mixed $value)
+ * @method $this setCoverMedia(CoverMedia $value)
  * @method $this setDismissCard(DismissCard $value)
  * @method $this setExpiringAt(mixed $value)
  * @method $this setHasBestiesMedia(bool $value)
@@ -71,10 +76,12 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setSeenRankedPosition(mixed $value)
  * @method $this setShowNuxTooltip(mixed $value)
  * @method $this setSourceToken(mixed $value)
+ * @method $this setTitle(string $value)
  * @method $this setUniqueIntegerReelId(string $value)
  * @method $this setUser(User $value)
  * @method $this unsetCanReply()
  * @method $this unsetCanReshare()
+ * @method $this unsetCoverMedia()
  * @method $this unsetDismissCard()
  * @method $this unsetExpiringAt()
  * @method $this unsetHasBestiesMedia()
@@ -93,6 +100,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetSeenRankedPosition()
  * @method $this unsetShowNuxTooltip()
  * @method $this unsetSourceToken()
+ * @method $this unsetTitle()
  * @method $this unsetUniqueIntegerReelId()
  * @method $this unsetUser()
  */
@@ -128,5 +136,7 @@ class StoryTray extends AutoPropertyMapper
         'has_besties_media'      => 'bool',
         'reel_type'              => 'string',
         'unique_integer_reel_id' => 'string',
+        'cover_media'            => 'CoverMedia',
+        'title'                  => 'string',
     ];
 }
