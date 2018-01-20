@@ -43,6 +43,8 @@ use React\EventLoop\LoopInterface;
  *       user?username=USERNAME&launch_reel=1&media_id=1111111111111111111_1111111111&include_viewers=1
  *     - story_producer_expire_media - "Your story has NUMBER views. Find out who's seen it before it disappears."
  *       user?username=USERNAME&launch_reel=1
+ *     - story_poll_result_share - "Your poll is almost over, and YES is winning. See and share the results."
+ *       user?username=USERNAME&launch_reel=1&media_id=1111111111111111111_1111111111&include_viewers=1
  *
  *   Followers and contacts:
  *     - new_follower - "NAME (USERNAME) started following you."
@@ -57,6 +59,8 @@ use React\EventLoop\LoopInterface;
  *       user?username=USERNAME
  *     - fb_friend_connected - "Your Facebook friend NAME is on Instagram as USERNAME."
  *       user?username=USERNAME
+ *     - follower_follow - "USERNAME1 and USERNAME2 followed NAME on Instagram. See their posts."
+ *       user?username=USERNAME
  *
  *   Comments:
  *     - comment - "USERNAME commented: "TEXT""
@@ -67,6 +71,8 @@ use React\EventLoop\LoopInterface;
  *       media?id=1111111111111111111 <- Yep, no author ID here.
  *     - comment_subscribed - "USERNAME also commented on USERNAME's post: "TEXT""
  *       comments_v2?media_id=1111111111111111111_1111111111&target_comment_id=11111111111111111
+ *     - comment_subscribed_on_like - "USERNAME commented on a post you liked: TEXT"
+ *       comments_v2?media_id=1111111111111111111_1111111111&target_comment_id=11111111111111111"
  *
  *   Likes:
  *     - like - "USERNAME liked your post."
@@ -101,6 +107,8 @@ use React\EventLoop\LoopInterface;
  *       media?id=1111111111111111111_1111111111
  *     - branded_content_untagged - "USERNAME removed you as a business partner on a post."
  *       media?id=1111111111111111111_1111111111
+ *     - business_profile - "Add a website so customers can learn about your business."
+ *       editprofile?user_id=1111111111
  *
  *   Unsorted:
  *     - usertag - "USERNAME tagged you in a post"
