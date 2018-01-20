@@ -96,7 +96,9 @@ class Mqtt implements PersistentInterface
      * @param ExperimentsInterface  $experiments
      * @param LoopInterface         $loop
      * @param LoggerInterface       $logger
-     * @param array                 $additionalOptions
+     * @param array                 $additionalOptions Supported options:
+     *                                                 - disable_presence
+     *                                                 - datacenter
      */
     public function __construct(
         EventEmitterInterface $target,
@@ -435,7 +437,7 @@ class Mqtt implements PersistentInterface
             $this->_doRemoveSubscription($graphQlTypingSubscription, false);
         }
         $appPresenceSubscription = new AppPresenceSubscription($subscriptionId);
-        if ($this->_inboxPresenceEnabled || $this->_threadPresenceEnabled) {
+        if (($this->_inboxPresenceEnabled || $this->_threadPresenceEnabled) && empty($this->_additionalOptions['disable_presence'])) {
             $this->_doAddSubscription($appPresenceSubscription, false);
         } else {
             $this->_doRemoveSubscription($appPresenceSubscription, false);

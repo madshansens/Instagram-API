@@ -75,9 +75,7 @@ class Realtime implements EventEmitterInterface
             $this->_logger = new NullLogger();
         }
 
-        $this->_client = $this->_buildMqttClient([
-            'datacenter' => $instagram->settings->get('datacenter'),
-        ]);
+        $this->_client = $this->_buildMqttClient();
         $this->on('region-hint', function ($region) {
             $this->_instagram->settings->set('datacenter', $region);
             $this->_client->setAdditionalOption('datacenter', $region);
@@ -85,15 +83,18 @@ class Realtime implements EventEmitterInterface
     }
 
     /**
-     * Create a new MQTT client.
-     *
-     * @param array $additionalOptions
+     * Build a new MQTT client.
      *
      * @return Realtime\Mqtt
      */
-    protected function _buildMqttClient(
-        array $additionalOptions = [])
+    protected function _buildMqttClient()
     {
+        $additionalOptions = [
+            'datacenter'       => $this->_instagram->settings->get('datacenter'),
+            // TODO store presence in settings (?)
+            //'disable_presence' => $this->_instagram->account->getPresenceStatus()->getDisabled(),
+        ];
+
         return new Realtime\Mqtt(
             $this,
             new Connector($this->_instagram, $this->_loop),
