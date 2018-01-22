@@ -62,5 +62,7 @@ use InstagramAPI\Response;
  */
 class TagInfoResponse extends Response
 {
-    const JSON_PROPERTY_MAP = Model\Hashtag::JSON_PROPERTY_MAP;
+    const JSON_PROPERTY_MAP = [
+        Model\Hashtag::class, // Import property map.
+    ];
 }
