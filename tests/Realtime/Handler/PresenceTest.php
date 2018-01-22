@@ -10,7 +10,7 @@ use InstagramAPI\Realtime\Message;
 use InstagramAPI\Response\Model\UserPresence;
 use PHPUnit\Framework\TestCase;
 
-class PresenseTest extends TestCase
+class PresenceTest extends TestCase
 {
     /**
      * @param $payload
