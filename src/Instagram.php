@@ -197,6 +197,8 @@ class Instagram implements ExperimentsInterface
     public $discover;
     /** @var Request\Hashtag Collection of Hashtag related functions. */
     public $hashtag;
+    /** @var Request\Highlight Collection of Highlight related functions. */
+    public $highlight;
     /** @var Request\Internal Collection of Internal (non-public) functions. */
     public $internal;
     /** @var Request\Live Collection of Live related functions. */
@@ -281,6 +283,7 @@ class Instagram implements ExperimentsInterface
         $this->direct = new Request\Direct($this);
         $this->discover = new Request\Discover($this);
         $this->hashtag = new Request\Hashtag($this);
+        $this->highlight = new Request\Highlight($this);
         $this->internal = new Request\Internal($this);
         $this->live = new Request\Live($this);
         $this->location = new Request\Location($this);
