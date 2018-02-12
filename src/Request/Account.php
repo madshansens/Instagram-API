@@ -480,6 +480,55 @@ class Account extends RequestCollection
     }
 
     /**
+     * Tell Instagram to send you an SMS code to verify your phone number.
+     *
+     * @param string $phoneNumber Phone number with country code. Format: +34123456789.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\RequestSMSCodeResponse
+     */
+    public function requestSMSVerificationCode(
+        $phoneNumber)
+    {
+        $cleanNumber = '+'.preg_replace('/[^0-9]/', '', $phoneNumber);
+
+        return $this->ig->request('accounts/send_sms_code/')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('phone_number', $cleanNumber)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\RequestSMSCodeResponse());
+    }
+
+    /**
+     * Send the SMS code you received to verify the phone number.
+     *
+     * @param string $phoneNumber      Phone number with country code. Format: +34123456789.
+     * @param string $verificationCode The code sent to your phone via Account::requestSMSVerificationCode().
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\SendSMSVerificationCodeResponse
+     *
+     * * @see Account::requestSMSVerificationCode()
+     */
+    public function sendSMSVerificationCode(
+        $phoneNumber,
+        $verificationCode)
+    {
+        $cleanNumber = '+'.preg_replace('/[^0-9]/', '', $phoneNumber);
+
+        return $this->ig->request('accounts/verify_sms_code/')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('phone_number', $cleanNumber)
+            ->addPost('verification_code', $verificationCode)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\SendSMSVerificationCodeResponse());
+    }
+
+    /**
      * Set contact point prefill.
      *
      * @param string $usage Either "prefill" or "auto_confirmation".
