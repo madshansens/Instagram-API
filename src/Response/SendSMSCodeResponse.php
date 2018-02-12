@@ -5,7 +5,7 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * RequestSMSCodeResponse.
+ * SendSMSCodeResponse.
  *
  * @method mixed getMessage()
  * @method bool getPhoneNumberValid()
@@ -28,7 +28,7 @@ use InstagramAPI\Response;
  * @method $this unsetStatus()
  * @method $this unset_Messages()
  */
-class RequestSMSCodeResponse extends Response
+class SendSMSCodeResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'phone_number_valid'          => 'bool',

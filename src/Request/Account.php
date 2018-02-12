@@ -339,11 +339,11 @@ class Account extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\RequestTwoFactorResponse
+     * @return \InstagramAPI\Response\SendTwoFactorEnableSMSResponse
      *
      * @see Account::enableTwoFactorSMS()
      */
-    public function requestTwoFactorSMS(
+    public function sendTwoFactorEnableSMS(
         $phoneNumber)
     {
         $cleanNumber = '+'.preg_replace('/[^0-9]/', '', $phoneNumber);
@@ -354,7 +354,7 @@ class Account extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('device_id', $this->ig->device_id)
             ->addPost('phone_number', $cleanNumber)
-            ->getResponse(new Response\RequestTwoFactorResponse());
+            ->getResponse(new Response\SendTwoFactorEnableSMSResponse());
     }
 
     /**
@@ -366,13 +366,13 @@ class Account extends RequestCollection
      *          PHONE NUMBER! WITHOUT THE CODES, YOU RISK LOSING YOUR ACCOUNT!
      *
      * @param string $phoneNumber      Phone number with country code. Format: +34123456789.
-     * @param string $verificationCode The code sent to your phone via Account::requestTwoFactorSMS().
+     * @param string $verificationCode The code sent to your phone via `Account::sendTwoFactorEnableSMS()`.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\AccountSecurityInfoResponse
      *
-     * @see Account::requestTwoFactorSMS()
+     * @see Account::sendTwoFactorEnableSMS()
      * @see Account::getSecurityInfo()
      */
     public function enableTwoFactorSMS(
@@ -388,7 +388,7 @@ class Account extends RequestCollection
             ->addPost('device_id', $this->ig->device_id)
             ->addPost('phone_number', $cleanNumber)
             ->addPost('verification_code', $verificationCode)
-            ->getResponse(new Response\EnableTwoFactorResponse());
+            ->getResponse(new Response\EnableTwoFactorSMSResponse());
 
         return $this->getSecurityInfo();
     }
@@ -398,7 +398,7 @@ class Account extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\DisableTwoFactorResponse
+     * @return \InstagramAPI\Response\DisableTwoFactorSMSResponse
      */
     public function disableTwoFactorSMS()
     {
@@ -406,7 +406,7 @@ class Account extends RequestCollection
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->getResponse(new Response\DisableTwoFactorResponse());
+            ->getResponse(new Response\DisableTwoFactorSMSResponse());
     }
 
     /**
@@ -486,9 +486,9 @@ class Account extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\RequestSMSCodeResponse
+     * @return \InstagramAPI\Response\SendSMSCodeResponse
      */
-    public function requestSMSVerificationCode(
+    public function sendSMSCode(
         $phoneNumber)
     {
         $cleanNumber = '+'.preg_replace('/[^0-9]/', '', $phoneNumber);
@@ -498,22 +498,22 @@ class Account extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('phone_number', $cleanNumber)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->getResponse(new Response\RequestSMSCodeResponse());
+            ->getResponse(new Response\SendSMSCodeResponse());
     }
 
     /**
-     * Send the SMS code you received to verify the phone number.
+     * Submit the SMS code you received to verify your phone number.
      *
      * @param string $phoneNumber      Phone number with country code. Format: +34123456789.
-     * @param string $verificationCode The code sent to your phone via Account::requestSMSVerificationCode().
+     * @param string $verificationCode The code sent to your phone via `Account::sendSMSCode()`.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\SendSMSVerificationCodeResponse
+     * @return \InstagramAPI\Response\VerifySMSCodeResponse
      *
-     * * @see Account::requestSMSVerificationCode()
+     * @see Account::sendSMSCode()
      */
-    public function sendSMSVerificationCode(
+    public function verifySMSCode(
         $phoneNumber,
         $verificationCode)
     {
@@ -525,7 +525,7 @@ class Account extends RequestCollection
             ->addPost('phone_number', $cleanNumber)
             ->addPost('verification_code', $verificationCode)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->getResponse(new Response\SendSMSVerificationCodeResponse());
+            ->getResponse(new Response\VerifySMSCodeResponse());
     }
 
     /**

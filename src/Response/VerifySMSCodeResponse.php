@@ -5,7 +5,7 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * SendSMSVerificationCodeResponse.
+ * VerifySMSCodeResponse.
  *
  * @method mixed getMessage()
  * @method string getPhoneNumber()
@@ -28,7 +28,7 @@ use InstagramAPI\Response;
  * @method $this unsetVerified()
  * @method $this unset_Messages()
  */
-class SendSMSVerificationCodeResponse extends Response
+class VerifySMSCodeResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'verified'     => 'bool',

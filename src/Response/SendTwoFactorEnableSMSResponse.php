@@ -5,7 +5,7 @@ namespace InstagramAPI\Response;
 use InstagramAPI\Response;
 
 /**
- * RequestTwoFactorResponse.
+ * SendTwoFactorEnableSMSResponse.
  *
  * @method mixed getMessage()
  * @method mixed getObfuscatedPhoneNumber()
@@ -28,7 +28,7 @@ use InstagramAPI\Response;
  * @method $this unsetStatus()
  * @method $this unset_Messages()
  */
-class RequestTwoFactorResponse extends Response
+class SendTwoFactorEnableSMSResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'phone_verification_settings' => 'Model\PhoneVerificationSettings',
