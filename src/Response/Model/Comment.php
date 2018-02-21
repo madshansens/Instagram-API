@@ -112,9 +112,19 @@ class Comment extends AutoPropertyMapper
         'user_id'                           => 'string',
         /*
          * Unix timestamp (UTC) of when the comment was posted.
+         * Yes, this is the UTC timestamp even though it's not named "utc"!
+         */
+        'created_at'                        => 'string',
+        /*
+         * WARNING: DO NOT USE THIS VALUE! It is NOT a real UTC timestamp.
+         * Instagram has messed up their values of "created_at" vs "created_at_utc".
+         * In `getComments()`, both have identical values. In `getCommentReplies()`,
+         * both are identical too. But in the `getComments()` "reply previews",
+         * their "created_at_utc" values are completely wrong (always +8 hours into
+         * the future, beyond the real UTC time). So just ignore this bad value!
+         * The real app only reads "created_at" for showing comment timestamps!
          */
         'created_at_utc'                    => 'string',
-        'created_at'                        => 'string',
         'bit_flags'                         => 'int',
         'user'                              => 'User',
         'pk'                                => 'string',
