@@ -1836,6 +1836,13 @@ class Internal extends RequestCollection
         $targetFeed,
         InternalMetadata $internalMetadata)
     {
+        // escapeshellarg() on Windows does some strange replacements,
+        // so it is better to disable the segmented uploader there,
+        // since we have the resumable uploader as a fallback.
+        if (defined(PHP_WINDOWS_VERSION_MAJOR)) {
+            return false;
+        }
+
         // We need to have ffmpeg to segment the video.
         try {
             Utils::getFFmpegWrapper()->version();
