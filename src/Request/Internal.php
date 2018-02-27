@@ -210,7 +210,7 @@ class Internal extends RequestCollection
         /** @var array Hashtags to use for the media. ONLY STORY MEDIA! */
         $hashtags = (isset($externalMetadata['hashtags']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['hashtags'] : null;
         /** @var array Mentions to use for the media. ONLY STORY MEDIA! */
-        $storyMentions = (isset($externalMetadata['story_mentions']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_mentions'] : null;
+        $storyMentions = (isset($externalMetadata['reel_mentions']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['reel_mentions'] : null;
         /** @var array Story poll to use for the media. ONLY STORY MEDIA! */
         $storyPoll = (isset($externalMetadata['story_polls']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_polls'] : null;
 
@@ -585,7 +585,7 @@ class Internal extends RequestCollection
         /** @var array Hashtags to use for the media. ONLY STORY MEDIA! */
         $hashtags = (isset($externalMetadata['hashtags']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['hashtags'] : null;
         /** @var array Mentions to use for the media. ONLY STORY MEDIA! */
-        $storyMentions = (isset($externalMetadata['story_mentions']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_mentions'] : null;
+        $storyMentions = (isset($externalMetadata['reel_mentions']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['reel_mentions'] : null;
         /** @var array Story poll to use for the media. ONLY STORY MEDIA! */
         $storyPoll = (isset($externalMetadata['story_polls']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_polls'] : null;
 
