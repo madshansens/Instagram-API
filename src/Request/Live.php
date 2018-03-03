@@ -82,6 +82,8 @@ class Live extends RequestCollection
     /**
      * Get the viewer list of a broadcast.
      *
+     * WARNING: You MUST be the owner of the broadcast. Otherwise Instagram won't send any API reply!
+     *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
      *
      * @throws \InstagramAPI\Exception\InstagramException
