@@ -72,7 +72,9 @@ use React\EventLoop\LoopInterface;
  *     - comment_subscribed - "USERNAME also commented on USERNAME's post: "TEXT""
  *       comments_v2?media_id=1111111111111111111_1111111111&target_comment_id=11111111111111111
  *     - comment_subscribed_on_like - "USERNAME commented on a post you liked: TEXT"
- *       comments_v2?media_id=1111111111111111111_1111111111&target_comment_id=11111111111111111"
+ *       comments_v2?media_id=1111111111111111111_1111111111&target_comment_id=11111111111111111
+ *     - reply_to_comment_with_threading - "USERNAME replied to your comment on your post: "TEXT""
+ *       comments_v2?media_id=1111111111111111111_1111111111&target_comment_id=11111111111111111
  *
  *   Likes:
  *     - like - "USERNAME liked your post."

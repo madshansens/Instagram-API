@@ -21,6 +21,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getInlineComposerDisplayCondition()
  * @method string getMediaId()
  * @method string getNextMaxChildCursor()
+ * @method string getNextMinChildCursor()
+ * @method int getNumHeadChildComments()
+ * @method int getNumTailChildComments()
  * @method User[] getOtherPreviewUsers()
  * @method string getParentCommentId()
  * @method string getPk()
@@ -44,6 +47,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isInlineComposerDisplayCondition()
  * @method bool isMediaId()
  * @method bool isNextMaxChildCursor()
+ * @method bool isNextMinChildCursor()
+ * @method bool isNumHeadChildComments()
+ * @method bool isNumTailChildComments()
  * @method bool isOtherPreviewUsers()
  * @method bool isParentCommentId()
  * @method bool isPk()
@@ -67,6 +73,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setInlineComposerDisplayCondition(string $value)
  * @method $this setMediaId(string $value)
  * @method $this setNextMaxChildCursor(string $value)
+ * @method $this setNextMinChildCursor(string $value)
+ * @method $this setNumHeadChildComments(int $value)
+ * @method $this setNumTailChildComments(int $value)
  * @method $this setOtherPreviewUsers(User[] $value)
  * @method $this setParentCommentId(string $value)
  * @method $this setPk(string $value)
@@ -90,6 +99,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetInlineComposerDisplayCondition()
  * @method $this unsetMediaId()
  * @method $this unsetNextMaxChildCursor()
+ * @method $this unsetNextMinChildCursor()
+ * @method $this unsetNumHeadChildComments()
+ * @method $this unsetNumTailChildComments()
  * @method $this unsetOtherPreviewUsers()
  * @method $this unsetParentCommentId()
  * @method $this unsetPk()
@@ -160,13 +172,20 @@ class Comment extends AutoPropertyMapper
         'other_preview_users'               => 'User[]',
         'inline_composer_display_condition' => 'string',
         /*
-         * This is somehow related to pagination of child-comments in CERTAIN
-         * comments with children. The value seems to ONLY appear when a comment
-         * has MORE child-comments than what exists in "preview_child_comments".
-         * So it probably somehow describes the missing child comments offset.
+         * When "has_more_tail_child_comments" is true, you can use the value
+         * in "next_max_child_cursor" as "max_id" parameter to load up to
+         * "num_tail_child_comments" older child-comments.
          */
-        'next_max_child_cursor'             => 'string',
         'has_more_tail_child_comments'      => 'bool',
+        'next_max_child_cursor'             => 'string',
+        'num_tail_child_comments'           => 'int',
+        /*
+         * When "has_more_head_child_comments" is true, you can use the value
+         * in "next_min_child_cursor" as "min_id" parameter to load up to
+         * "num_head_child_comments" newer child-comments.
+         */
         'has_more_head_child_comments'      => 'bool',
+        'next_min_child_cursor'             => 'string',
+        'num_head_child_comments'           => 'int',
     ];
 }
