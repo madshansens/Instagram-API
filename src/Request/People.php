@@ -522,11 +522,12 @@ class People extends RequestCollection
     public function discoverPeople()
     {
         return $this->ig->request('discover/ayml/')
+            ->setSignedPost(false)
+            ->addPost('phone_id', $this->ig->phone_id)
+            ->addPost('module', 'discover_people')
             ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('paginate', true)
-            ->addPost('module', 'discover_people')
             ->getResponse(new Response\DiscoverPeopleResponse());
     }
 
