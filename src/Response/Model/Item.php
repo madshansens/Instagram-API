@@ -125,7 +125,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method int getTimezoneOffset()
  * @method string[] getTopFollowers()
  * @method int getTopFollowersCount()
- * @method mixed getTopLikers()
+ * @method string[] getTopLikers()
  * @method int getTotalScreenshotCount()
  * @method int getTotalViewerCount()
  * @method mixed getUrlExpireAtSecs()
@@ -391,7 +391,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setTimezoneOffset(int $value)
  * @method $this setTopFollowers(string[] $value)
  * @method $this setTopFollowersCount(int $value)
- * @method $this setTopLikers(mixed $value)
+ * @method $this setTopLikers(string[] $value)
  * @method $this setTotalScreenshotCount(int $value)
  * @method $this setTotalViewerCount(int $value)
  * @method $this setUrlExpireAtSecs(mixed $value)
@@ -622,7 +622,7 @@ class Item extends AutoPropertyMapper
         'usertags'                          => 'Usertag',
         'media'                             => 'Media',
         'stories'                           => 'Stories',
-        'top_likers'                        => '',
+        'top_likers'                        => 'string[]',
         'suggested_users'                   => 'SuggestedUsers',
         'is_new_suggestion'                 => 'bool',
         'comment_likes_enabled'             => 'bool',
