@@ -8,7 +8,7 @@ use InstagramAPI\Response;
  * ReelsMediaResponse.
  *
  * @method mixed getMessage()
- * @method Model\Reel[] getReels()
+ * @method Model\UnpredictableKeys\ReelUnpredictableContainer getReels()
  * @method Model\Reel[] getReelsMedia()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
@@ -18,7 +18,7 @@ use InstagramAPI\Response;
  * @method bool isStatus()
  * @method bool is_Messages()
  * @method $this setMessage(mixed $value)
- * @method $this setReels(Model\Reel[] $value)
+ * @method $this setReels(Model\UnpredictableKeys\ReelUnpredictableContainer $value)
  * @method $this setReelsMedia(Model\Reel[] $value)
  * @method $this setStatus(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
@@ -32,6 +32,6 @@ class ReelsMediaResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'reels_media' => 'Model\Reel[]',
-        'reels'       => 'Model\Reel[]',
+        'reels'       => 'Model\UnpredictableKeys\ReelUnpredictableContainer',
     ];
 }
