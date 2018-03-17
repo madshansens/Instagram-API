@@ -200,6 +200,54 @@ class Utils
     }
 
     /**
+     * Converts a hours/minutes/seconds timestamp to seconds.
+     *
+     * @param string $timeStr Either `HH:MM:SS` (24h-clock) or `MM:SS` or `SS`.
+     *
+     * @throws \InvalidArgumentException If any part of the input is invalid.
+     *
+     * @return int The number of seconds.
+     */
+    public static function hmsTimeToSeconds(
+        $timeStr)
+    {
+        $sec = 0;
+        foreach (array_reverse(explode(':', $timeStr)) as $offsetKey => $v) {
+            if ($offsetKey > 2) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Invalid input "%s" with too many components (max 3 is allowed "HH:MM:SS").',
+                    $timeStr
+                ));
+            }
+
+            if ($v === '' || !ctype_digit($v)) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Invalid non-digit or empty component "%s" in time string "%s".',
+                    $v, $timeStr
+                ));
+            }
+
+            // Convert the value to integer and cap minutes/seconds to 60 (but
+            // allow any number of hours).
+            $v = (int) $v;
+            $maxValue = $offsetKey < 2 ? 60 : -1;
+            if ($maxValue >= 0 && $v > $maxValue) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Invalid time component "%d" (its allowed range is 0-%d) in time string "%s".',
+                    $v, $maxValue, $timeStr
+                ));
+            }
+
+            // Multiply the current component of the "01:02:03" string with the
+            // power of its offset. Hour-offset will be 2, Minutes 1 and Secs 0;
+            // and "pow(60, 0)" will return 1 which is why seconds work too.
+            $sec += pow(60, $offsetKey) * $v;
+        }
+
+        return $sec;
+    }
+
+    /**
      * Builds an Instagram media location JSON object in the correct format.
      *
      * This function is used whenever we need to send a location to Instagram's
