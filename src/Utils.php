@@ -202,16 +202,23 @@ class Utils
     /**
      * Converts a hours/minutes/seconds timestamp to seconds.
      *
-     * @param string $timeStr Either `HH:MM:SS` (24h-clock) or `MM:SS` or `SS`.
+     * @param string $timeStr Either `HH:MM:SS[.###]` (24h-clock) or
+     *                        `MM:SS[.###]` or `SS[.###]`. The `[.###]` is for
+     *                        optional millisecond precision if wanted, such as
+     *                        `00:01:01.149`.
      *
      * @throws \InvalidArgumentException If any part of the input is invalid.
      *
-     * @return int The number of seconds.
+     * @return float The number of seconds, with decimals (milliseconds).
      */
     public static function hmsTimeToSeconds(
         $timeStr)
     {
-        $sec = 0;
+        if (!is_string($timeStr)) {
+            throw new \InvalidArgumentException('Invalid non-string timestamp.');
+        }
+
+        $sec = 0.0;
         foreach (array_reverse(explode(':', $timeStr)) as $offsetKey => $v) {
             if ($offsetKey > 2) {
                 throw new \InvalidArgumentException(sprintf(
@@ -220,16 +227,23 @@ class Utils
                 ));
             }
 
-            if ($v === '' || !ctype_digit($v)) {
+            // Parse component (supports "01" or "01.123" (milli-precision)).
+            if ($v === '' || !preg_match('/^\d+(?:\.\d+)?$/', $v)) {
                 throw new \InvalidArgumentException(sprintf(
                     'Invalid non-digit or empty component "%s" in time string "%s".',
                     $v, $timeStr
                 ));
             }
+            if ($offsetKey !== 0 && strpos($v, '.') !== false) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Unexpected period in time component "%s" in time string "%s". Only the seconds-component supports milliseconds.',
+                    $v, $timeStr
+                ));
+            }
 
-            // Convert the value to integer and cap minutes/seconds to 60 (but
+            // Convert the value to float and cap minutes/seconds to 60 (but
             // allow any number of hours).
-            $v = (int) $v;
+            $v = (float) $v;
             $maxValue = $offsetKey < 2 ? 60 : -1;
             if ($maxValue >= 0 && $v > $maxValue) {
                 throw new \InvalidArgumentException(sprintf(
