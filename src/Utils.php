@@ -262,6 +262,42 @@ class Utils
     }
 
     /**
+     * Converts seconds to a hours/minutes/seconds timestamp.
+     *
+     * @param int|float $sec The number of seconds. Can have fractions (millis).
+     *
+     * @throws \InvalidArgumentException If any part of the input is invalid.
+     *
+     * @return string The time formatted as `HH:MM:SS.###` (`###` is millis).
+     */
+    public static function hmsTimeFromSeconds(
+        $sec)
+    {
+        if (!is_int($sec) && !is_float($sec)) {
+            throw new \InvalidArgumentException('Seconds must be a number.');
+        }
+
+        $wasNegative = false;
+        if ($sec < 0) {
+            $wasNegative = true;
+            $sec = abs($sec);
+        }
+
+        $result = sprintf(
+            '%02d:%02d:%06.3f', // "%06f" is because it counts the whole string.
+            floor($sec / 3600),
+            floor(fmod($sec / 60, 60)),
+            fmod($sec, 60)
+        );
+
+        if ($wasNegative) {
+            $result = '-'.$result;
+        }
+
+        return $result;
+    }
+
+    /**
      * Builds an Instagram media location JSON object in the correct format.
      *
      * This function is used whenever we need to send a location to Instagram's
