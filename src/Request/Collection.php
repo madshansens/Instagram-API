@@ -28,6 +28,22 @@ class Collection extends RequestCollection
     }
 
     /**
+     * Get the feed of one of your collections.
+     *
+     * @param string $collectionId The collection ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GetCollectionsListResponse
+     */
+    public function getFeed(
+        $collectionId)
+    {
+        return $this->ig->request("feed/collection/{$collectionId}/")
+            ->getResponse(new Response\GetCollectionsListResponse());
+    }
+
+    /**
      * Create a new collection of your bookmarked (saved) media.
      *
      * @param string   $name       Name of the collection.
