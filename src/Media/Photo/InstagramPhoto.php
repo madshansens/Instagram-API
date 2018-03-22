@@ -44,7 +44,7 @@ class InstagramPhoto extends InstagramMedia
         array $options = [])
     {
         parent::__construct($inputFile, $options);
-        $this->_details = new PhotoDetails($inputFile);
+        $this->_details = new PhotoDetails($this->_inputFile);
     }
 
     /** {@inheritdoc} */

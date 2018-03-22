@@ -35,14 +35,12 @@ class InstagramVideo extends InstagramMedia
         FFmpegWrapper $ffmpegWrapper = null)
     {
         parent::__construct($inputFile, $options);
-        $this->_details = new VideoDetails($inputFile);
+        $this->_details = new VideoDetails($this->_inputFile);
 
         $this->_ffmpegWrapper = $ffmpegWrapper;
         if ($this->_ffmpegWrapper === null) {
             $this->_ffmpegWrapper = Utils::getFFmpegWrapper();
         }
-
-        $this->_details = new VideoDetails($this->_inputFile);
     }
 
     /** {@inheritdoc} */
