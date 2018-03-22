@@ -113,13 +113,14 @@ class InstagramVideo extends InstagramMedia
             sprintf('pad=w=%d:h=%d:x=%d:y=%d:color=%s', $canvas->getWidth(), $canvas->getHeight(), $dstRect->getX(), $dstRect->getY(), $bgColor),
         ];
 
-        $inputFormat = '';
+        // Get the flags to apply to the input file.
+        $inputFlags = $this->_getInputFlags();
 
         // Rotate the video (if needed to).
         $rotationFilters = $this->_getRotationFilters();
         if (count($rotationFilters)) {
             if ($this->_ffmpegWrapper->hasNoAutorotate()) {
-                $inputFormat = '-noautorotate';
+                $inputFlags[] = '-noautorotate';
             }
             $filters = array_merge($filters, $rotationFilters);
         }
@@ -127,20 +128,30 @@ class InstagramVideo extends InstagramMedia
         // Video format can't copy since we always need to re-encode due to video filtering.
         $this->_ffmpegWrapper->run(sprintf(
             '%s -i %s -y -vf %s %s %s',
-            $inputFormat,
+            implode(' ', $inputFlags),
             escapeshellarg($this->_inputFile),
             escapeshellarg(implode(',', $filters)),
-            $this->_getOutputFormat(),
+            implode(' ', $this->_getOutputFlags()),
             escapeshellarg($outputFile)
         ));
     }
 
     /**
-     * Get the output format.
+     * Get the input flags (placed before the input filename).
      *
-     * @return string
+     * @return string[]
      */
-    protected function _getOutputFormat()
+    protected function _getInputFlags()
+    {
+        return [];
+    }
+
+    /**
+     * Get the output flags (placed before the output filename).
+     *
+     * @return string[]
+     */
+    protected function _getOutputFlags()
     {
         $result = [
             '-metadata:s:v rotate=""', // Strip rotation from metadata.
@@ -173,7 +184,7 @@ class InstagramVideo extends InstagramMedia
             $times = ceil($this->_constraints->getMinDuration() / $this->_details->getDuration());
         }
 
-        return implode(' ', $result);
+        return $result;
     }
 
     /**

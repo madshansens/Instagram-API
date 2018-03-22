@@ -434,7 +434,7 @@ class Internal extends RequestCollection
         $internalMetadata = $this->uploadVideo($targetFeed, $videoFilename, $internalMetadata);
 
         // Attempt to upload the thumbnail, associated with our video's ID.
-        $this->uploadVideoThumbnail($targetFeed, $internalMetadata);
+        $this->uploadVideoThumbnail($targetFeed, $internalMetadata, $externalMetadata);
 
         // Configure the uploaded video and attach it to our timeline/story.
         try {
@@ -465,6 +465,7 @@ class Internal extends RequestCollection
      *
      * @param int              $targetFeed       One of the FEED_X constants.
      * @param InternalMetadata $internalMetadata Internal library-generated metadata object.
+     * @param array            $externalMetadata (optional) User-provided metadata key-value pairs.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -472,7 +473,8 @@ class Internal extends RequestCollection
      */
     public function uploadVideoThumbnail(
         $targetFeed,
-        InternalMetadata $internalMetadata)
+        InternalMetadata $internalMetadata,
+        array $externalMetadata = [])
     {
         if ($internalMetadata->getVideoDetails() === null) {
             throw new \InvalidArgumentException('Video details are missing from the internal metadata.');
@@ -480,9 +482,13 @@ class Internal extends RequestCollection
 
         try {
             // Automatically crop&resize the thumbnail to Instagram's requirements.
+            $options = ['targetFeed' => $targetFeed];
+            if (isset($externalMetadata['thumbnail_timestamp'])) {
+                $options['thumbnailTimestamp'] = $externalMetadata['thumbnail_timestamp'];
+            }
             $videoThumbnail = new InstagramThumbnail(
                 $internalMetadata->getVideoDetails()->getFilename(),
-                ['targetFeed' => $targetFeed]
+                $options
             );
             // Validate and upload the thumbnail.
             $internalMetadata->setPhotoDetails($targetFeed, $videoThumbnail->getFile());
