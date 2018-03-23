@@ -32,20 +32,32 @@ class InstagramThumbnail extends InstagramVideo
     {
         parent::__construct($inputFile, $options, $ffmpegWrapper);
 
-        // Handle custom thumbnail timestamp (only supported by timeline media).
-        // NOTE: Like the real app, which only allows custom covers on timeline.
-        $this->_thumbnailTimestamp = 1.0; // Default: 00:00:01.000
-        if (
-            isset($options['targetFeed'])
-            && $options['targetFeed'] === Constants::FEED_TIMELINE
-            && isset($options['thumbnailTimestamp'])
-        ) {
-            $customTimestamp = $options['thumbnailTimestamp'];
-            // If custom timestamp is a number, use as-is. Otherwise assume it's
-            // a "HH:MM:SS[.000]" string and attempt to convert. Throws if bad.
-            $this->_thumbnailTimestamp = is_int($customTimestamp) || is_float($customTimestamp)
-                                       ? (float) $customTimestamp
-                                       : Utils::hmsTimeToSeconds($customTimestamp);
+        // The timeline and most feeds have the thumbnail at "00:00:01.000".
+        $this->_thumbnailTimestamp = 1.0; // Default.
+
+        // Handle per-feed timestamps and custom thumbnail timestamps.
+        if (isset($options['targetFeed'])) {
+            switch ($options['targetFeed']) {
+            case Constants::FEED_STORY:
+            case Constants::FEED_DIRECT_STORY:
+                // Stories always have the thumbnail at "00:00:00.000" instead.
+                $this->_thumbnailTimestamp = 0.0;
+                break;
+            case Constants::FEED_TIMELINE: // NOTE: This is NOT for albums!
+                // Handle custom timestamp (only supported by timeline media).
+                // NOTE: Matches real app which only customizes timeline covers.
+                if (isset($options['thumbnailTimestamp'])) {
+                    $customTimestamp = $options['thumbnailTimestamp'];
+                    // If custom timestamp is a number, use as-is. Else assume
+                    // a "HH:MM:SS[.000]" string and convert it. Throws if bad.
+                    $this->_thumbnailTimestamp = is_int($customTimestamp) || is_float($customTimestamp)
+                                               ? (float) $customTimestamp
+                                               : Utils::hmsTimeToSeconds($customTimestamp);
+                }
+                break;
+            default:
+                // Keep the default.
+            }
         }
 
         // Ensure the timestamp is 0+ and never longer than the video duration.
