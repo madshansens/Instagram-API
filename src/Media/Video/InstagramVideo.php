@@ -113,35 +113,64 @@ class InstagramVideo extends InstagramMedia
             sprintf('pad=w=%d:h=%d:x=%d:y=%d:color=%s', $canvas->getWidth(), $canvas->getHeight(), $dstRect->getX(), $dstRect->getY(), $bgColor),
         ];
 
-        // Get the flags to apply to the input file.
-        $inputFlags = $this->_getInputFlags();
+        $attempt = 0;
+        do {
+            ++$attempt;
 
-        // Rotate the video (if needed to).
-        $rotationFilters = $this->_getRotationFilters();
-        if (count($rotationFilters)) {
-            if ($this->_ffmpegWrapper->hasNoAutorotate()) {
-                $inputFlags[] = '-noautorotate';
+            // Reset the messageline-array to avoid mixing runs.
+            $ffmpegOutput = [];
+
+            // Get the flags to apply to the input file.
+            $inputFlags = $this->_getInputFlags($attempt);
+
+            // Rotate the video (if needed to).
+            $rotationFilters = $this->_getRotationFilters();
+            if (count($rotationFilters)) {
+                if ($this->_ffmpegWrapper->hasNoAutorotate()) {
+                    $inputFlags[] = '-noautorotate';
+                }
+                $filters = array_merge($filters, $rotationFilters);
             }
-            $filters = array_merge($filters, $rotationFilters);
-        }
 
-        // Video format can't copy since we always need to re-encode due to video filtering.
-        $this->_ffmpegWrapper->run(sprintf(
-            '%s -i %s -y -vf %s %s %s',
-            implode(' ', $inputFlags),
-            escapeshellarg($this->_inputFile),
-            escapeshellarg(implode(',', $filters)),
-            implode(' ', $this->_getOutputFlags()),
-            escapeshellarg($outputFile)
-        ));
+            // Video format can't copy since we always need to re-encode due to video filtering.
+            $ffmpegOutput = $this->_ffmpegWrapper->run(sprintf(
+                '-y %s -i %s -vf %s %s %s',
+                implode(' ', $inputFlags),
+                escapeshellarg($this->_inputFile),
+                escapeshellarg(implode(',', $filters)),
+                implode(' ', $this->_getOutputFlags($attempt)),
+                escapeshellarg($outputFile)
+            ));
+        } while ($this->_ffmpegMustRunAgain($attempt, $ffmpegOutput));
+    }
+
+    /**
+     * Internal function to determine whether ffmpeg needs to run again.
+     *
+     * @param int      $attempt      Which ffmpeg attempt just executed.
+     * @param string[] $ffmpegOutput Array of error strings from the attempt.
+     *
+     * @throws \RuntimeException If this function wants to give up and determines
+     *                           that we cannot succeed and should throw completely.
+     *
+     * @return bool TRUE to run again, FALSE to accept the current output.
+     */
+    protected function _ffmpegMustRunAgain(
+        $attempt,
+        array $ffmpegOutput)
+    {
+        return false;
     }
 
     /**
      * Get the input flags (placed before the input filename).
      *
+     * @param int $attempt The current ffmpeg execution attempt.
+     *
      * @return string[]
      */
-    protected function _getInputFlags()
+    protected function _getInputFlags(
+        $attempt)
     {
         return [];
     }
@@ -149,9 +178,12 @@ class InstagramVideo extends InstagramMedia
     /**
      * Get the output flags (placed before the output filename).
      *
+     * @param int $attempt The current ffmpeg execution attempt.
+     *
      * @return string[]
      */
-    protected function _getOutputFlags()
+    protected function _getOutputFlags(
+        $attempt)
     {
         $result = [
             '-metadata:s:v rotate=""', // Strip rotation from metadata.
