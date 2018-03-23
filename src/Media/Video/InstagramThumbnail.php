@@ -85,19 +85,51 @@ class InstagramThumbnail extends InstagramVideo
     }
 
     /** {@inheritdoc} */
-    protected function _getInputFlags()
+    protected function _ffmpegMustRunAgain(
+        $attempt,
+        array $ffmpegOutput)
+    {
+        // If this was the first run, we must look for the "first frame is no
+        // keyframe" error. It is a rare error which can happen when the user
+        // wants to extract a frame from a timestamp that is before the first
+        // keyframe of the video file. Most files can extract frames even at
+        // `00:00:00.000`, but certain files may have garbage at the start of
+        // the file, and thus extracting a garbage / empty / broken frame and
+        // showing this error. The solution is to omit the `-ss` timestamp for
+        // such files to automatically make ffmpeg extract the 1st VALID frame.
+        if ($attempt === 1) {
+            foreach ($ffmpegOutput as $line) {
+                // Example: `[flv @ 0x7fc9cc002e00] warning: first frame is no keyframe`.
+                if (strpos($line, ': first frame is no keyframe') !== false) {
+                    return true;
+                }
+            }
+        }
+
+        // If this was the 2nd run or there was no error, accept result as-is.
+        return false;
+    }
+
+    /** {@inheritdoc} */
+    protected function _getInputFlags(
+        $attempt)
     {
         // The seektime *must* be specified here, before the input file.
         // Otherwise ffmpeg will do a slow conversion of the whole file
         // (but discarding converted frames) until it gets to target time.
         // See: https://trac.ffmpeg.org/wiki/Seeking
-        return [
-            sprintf('-ss %s', $this->getTimestampString()),
-        ];
+        // IMPORTANT: WE ONLY APPLY THE SEEK-COMMAND ON THE *FIRST* ATTEMPT. SEE
+        // COMMENTS IN `_ffmpegMustRunAgain()` FOR MORE INFORMATION ABOUT WHY.
+        return $attempt > 1
+            ? []
+            : [
+                sprintf('-ss %s', $this->getTimestampString()),
+            ];
     }
 
     /** {@inheritdoc} */
-    protected function _getOutputFlags()
+    protected function _getOutputFlags(
+        $attempt)
     {
         return [
             '-f mjpeg',
