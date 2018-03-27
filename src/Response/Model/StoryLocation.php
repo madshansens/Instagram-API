@@ -16,6 +16,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method float getWidth()
  * @method float getX()
  * @method float getY()
+ * @method float getZ()
  * @method bool isAttribution()
  * @method bool isHeight()
  * @method bool isIsPinned()
@@ -24,6 +25,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method bool isWidth()
  * @method bool isX()
  * @method bool isY()
+ * @method bool isZ()
  * @method $this setAttribution(string $value)
  * @method $this setHeight(float $value)
  * @method $this setIsPinned(int $value)
@@ -32,6 +34,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method $this setWidth(float $value)
  * @method $this setX(float $value)
  * @method $this setY(float $value)
+ * @method $this setZ(float $value)
  * @method $this unsetAttribution()
  * @method $this unsetHeight()
  * @method $this unsetIsPinned()
@@ -40,6 +43,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method $this unsetWidth()
  * @method $this unsetX()
  * @method $this unsetY()
+ * @method $this unsetZ()
  */
 class StoryLocation extends AutoPropertyMapper
 {

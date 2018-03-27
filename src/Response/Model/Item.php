@@ -19,6 +19,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getBoostUnavailableReason()
  * @method mixed getBoostedStatus()
  * @method bool getCanReshare()
+ * @method bool getCanViewerReshare()
  * @method bool getCanViewerSave()
  * @method Caption getCaption()
  * @method bool getCaptionIsEdited()
@@ -38,6 +39,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method Comment[] getComments()
  * @method mixed getCommentsDisabled()
  * @method CoverMedia getCoverMedia()
+ * @method mixed getCreativeConfig()
  * @method string getDeviceTimestamp()
  * @method string getDominantColor()
  * @method int getDrAdType()
@@ -65,11 +67,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method Injected getInjected()
  * @method string getInlineComposerDisplayCondition()
  * @method string getInventorySource()
+ * @method IOSLinks[] getIosLinks()
  * @method mixed getIsAd4ad()
  * @method int getIsDashEligible()
  * @method bool getIsEof()
  * @method bool getIsNewSuggestion()
  * @method bool getIsReelMedia()
+ * @method mixed getIsSeen()
  * @method mixed getIsSidecarChild()
  * @method mixed getLargeUrls()
  * @method float getLat()
@@ -118,6 +122,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method StoryLocation[] getStoryLocations()
  * @method mixed getStoryPollVoterInfos()
  * @method mixed getStoryPolls()
+ * @method mixed getStorySliders()
+ * @method mixed getStorySoundOn()
  * @method SuggestedUsers getSuggestedUsers()
  * @method bool getSupportsReelReactions()
  * @method string getTakenAt()
@@ -152,6 +158,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isBoostUnavailableReason()
  * @method bool isBoostedStatus()
  * @method bool isCanReshare()
+ * @method bool isCanViewerReshare()
  * @method bool isCanViewerSave()
  * @method bool isCaption()
  * @method bool isCaptionIsEdited()
@@ -171,6 +178,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isComments()
  * @method bool isCommentsDisabled()
  * @method bool isCoverMedia()
+ * @method bool isCreativeConfig()
  * @method bool isDeviceTimestamp()
  * @method bool isDominantColor()
  * @method bool isDrAdType()
@@ -198,11 +206,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isInjected()
  * @method bool isInlineComposerDisplayCondition()
  * @method bool isInventorySource()
+ * @method bool isIosLinks()
  * @method bool isIsAd4ad()
  * @method bool isIsDashEligible()
  * @method bool isIsEof()
  * @method bool isIsNewSuggestion()
  * @method bool isIsReelMedia()
+ * @method bool isIsSeen()
  * @method bool isIsSidecarChild()
  * @method bool isLargeUrls()
  * @method bool isLat()
@@ -251,6 +261,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isStoryLocations()
  * @method bool isStoryPollVoterInfos()
  * @method bool isStoryPolls()
+ * @method bool isStorySliders()
+ * @method bool isStorySoundOn()
  * @method bool isSuggestedUsers()
  * @method bool isSupportsReelReactions()
  * @method bool isTakenAt()
@@ -285,6 +297,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setBoostUnavailableReason(mixed $value)
  * @method $this setBoostedStatus(mixed $value)
  * @method $this setCanReshare(bool $value)
+ * @method $this setCanViewerReshare(bool $value)
  * @method $this setCanViewerSave(bool $value)
  * @method $this setCaption(Caption $value)
  * @method $this setCaptionIsEdited(bool $value)
@@ -304,6 +317,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setComments(Comment[] $value)
  * @method $this setCommentsDisabled(mixed $value)
  * @method $this setCoverMedia(CoverMedia $value)
+ * @method $this setCreativeConfig(mixed $value)
  * @method $this setDeviceTimestamp(string $value)
  * @method $this setDominantColor(string $value)
  * @method $this setDrAdType(int $value)
@@ -331,11 +345,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setInjected(Injected $value)
  * @method $this setInlineComposerDisplayCondition(string $value)
  * @method $this setInventorySource(string $value)
+ * @method $this setIosLinks(IOSLinks[] $value)
  * @method $this setIsAd4ad(mixed $value)
  * @method $this setIsDashEligible(int $value)
  * @method $this setIsEof(bool $value)
  * @method $this setIsNewSuggestion(bool $value)
  * @method $this setIsReelMedia(bool $value)
+ * @method $this setIsSeen(mixed $value)
  * @method $this setIsSidecarChild(mixed $value)
  * @method $this setLargeUrls(mixed $value)
  * @method $this setLat(float $value)
@@ -384,6 +400,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setStoryLocations(StoryLocation[] $value)
  * @method $this setStoryPollVoterInfos(mixed $value)
  * @method $this setStoryPolls(mixed $value)
+ * @method $this setStorySliders(mixed $value)
+ * @method $this setStorySoundOn(mixed $value)
  * @method $this setSuggestedUsers(SuggestedUsers $value)
  * @method $this setSupportsReelReactions(bool $value)
  * @method $this setTakenAt(string $value)
@@ -418,6 +436,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetBoostUnavailableReason()
  * @method $this unsetBoostedStatus()
  * @method $this unsetCanReshare()
+ * @method $this unsetCanViewerReshare()
  * @method $this unsetCanViewerSave()
  * @method $this unsetCaption()
  * @method $this unsetCaptionIsEdited()
@@ -437,6 +456,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetComments()
  * @method $this unsetCommentsDisabled()
  * @method $this unsetCoverMedia()
+ * @method $this unsetCreativeConfig()
  * @method $this unsetDeviceTimestamp()
  * @method $this unsetDominantColor()
  * @method $this unsetDrAdType()
@@ -464,11 +484,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetInjected()
  * @method $this unsetInlineComposerDisplayCondition()
  * @method $this unsetInventorySource()
+ * @method $this unsetIosLinks()
  * @method $this unsetIsAd4ad()
  * @method $this unsetIsDashEligible()
  * @method $this unsetIsEof()
  * @method $this unsetIsNewSuggestion()
  * @method $this unsetIsReelMedia()
+ * @method $this unsetIsSeen()
  * @method $this unsetIsSidecarChild()
  * @method $this unsetLargeUrls()
  * @method $this unsetLat()
@@ -517,6 +539,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetStoryLocations()
  * @method $this unsetStoryPollVoterInfos()
  * @method $this unsetStoryPolls()
+ * @method $this unsetStorySliders()
+ * @method $this unsetStorySoundOn()
  * @method $this unsetSuggestedUsers()
  * @method $this unsetSupportsReelReactions()
  * @method $this unsetTakenAt()
@@ -594,117 +618,123 @@ class Item extends AutoPropertyMapper
          * won't delete it, since some other feed MAY use this property for ITS
          * Item object.
          */
-        'comments'                          => 'Comment[]',
-        'comments_disabled'                 => '',
-        'reel_mentions'                     => 'ReelMention[]',
-        'story_cta'                         => 'StoryCta[]',
-        'caption_position'                  => 'float',
-        'expiring_at'                       => '', // TODO, INVESTIGATE: sometimes int, sometimes float
-        'is_reel_media'                     => 'bool',
-        'next_max_id'                       => 'string',
-        'carousel_media'                    => 'CarouselMedia[]',
-        'carousel_media_type'               => '',
-        'caption'                           => 'Caption',
-        'caption_is_edited'                 => 'bool',
-        'photo_of_you'                      => 'bool',
-        'has_audio'                         => 'bool',
-        'video_duration'                    => 'float',
-        'user'                              => 'User',
-        'likers'                            => 'User[]',
-        'like_count'                        => 'int',
-        'preview'                           => 'string',
-        'has_liked'                         => 'bool',
-        'explore_context'                   => 'string',
-        'explore_source_token'              => 'string',
-        'explore_hide_comments'             => 'bool',
-        'explore'                           => 'Explore',
-        'impression_token'                  => 'string',
-        'usertags'                          => 'Usertag',
-        'media'                             => 'Media',
-        'stories'                           => 'Stories',
-        'top_likers'                        => 'string[]',
-        'suggested_users'                   => 'SuggestedUsers',
-        'is_new_suggestion'                 => 'bool',
-        'comment_likes_enabled'             => 'bool',
-        'can_viewer_save'                   => 'bool',
-        'has_viewer_saved'                  => 'bool',
-        'location'                          => 'Location',
-        'lat'                               => 'float',
-        'lng'                               => 'float',
-        'story_locations'                   => 'StoryLocation[]',
-        'channel'                           => 'Channel',
-        'gating'                            => 'Gating',
-        'story_hashtags'                    => 'StoryHashtag[]',
-        'is_dash_eligible'                  => 'int',
-        'video_dash_manifest'               => 'string',
-        'number_of_qualities'               => 'int',
-        'injected'                          => 'Injected',
-        'placeholder'                       => 'Placeholder',
-        'algorithm'                         => 'string',
-        'social_context'                    => 'string',
-        'icon'                              => '',
-        'media_ids'                         => 'string[]',
-        'media_id'                          => 'string',
-        'thumbnail_urls'                    => '',
-        'large_urls'                        => '',
-        'media_infos'                       => '',
-        'value'                             => 'float',
-        'collapse_comments'                 => 'bool',
-        'link'                              => 'string',
-        'link_text'                         => 'string',
-        'link_hint_text'                    => 'string',
-        'iTunesItem'                        => '',
-        'ad_header_style'                   => 'int',
-        'ad_metadata'                       => 'AdMetadata[]',
-        'ad_action'                         => 'string',
-        'ad_link_type'                      => 'int',
-        'dr_ad_type'                        => 'int',
-        'android_links'                     => 'AndroidLinks[]',
-        'force_overlay'                     => 'bool',
-        'hide_nux_text'                     => 'bool',
-        'overlay_text'                      => 'string',
-        'overlay_title'                     => 'string',
-        'overlay_subtitle'                  => 'string',
-        'fb_page_url'                       => 'string',
-        'playback_duration_secs'            => '',
-        'url_expire_at_secs'                => '',
-        'is_sidecar_child'                  => '',
-        'comment_threading_enabled'         => 'bool',
-        'collection_id'                     => 'string',
-        'collection_name'                   => '',
-        'cover_media'                       => 'CoverMedia',
-        'saved_collection_ids'              => 'string[]',
-        'boosted_status'                    => '',
-        'boost_unavailable_reason'          => '',
-        'viewers'                           => 'User[]',
-        'viewer_cursor'                     => '',
-        'total_viewer_count'                => 'int',
-        'multi_author_reel_names'           => '',
-        'reel_share'                        => 'ReelShare',
-        'story_polls'                       => '',
-        'organic_post_id'                   => 'string',
-        'sponsor_tags'                      => 'User[]',
-        'story_poll_voter_infos'            => '',
-        'imported_taken_at'                 => '',
-        'lead_gen_form_id'                  => 'string',
-        'ad_id'                             => 'string',
-        'actor_fbid'                        => 'string',
-        'is_ad4ad'                          => '',
-        'commenting_disabled_for_viewer'    => '',
-        'story_events'                      => '',
-        'story_feed_media'                  => '',
-        'can_reshare'                       => 'bool',
-        'supports_reel_reactions'           => 'bool',
-        'inventory_source'                  => 'string',
-        'is_eof'                            => 'bool',
-        'top_followers'                     => 'string[]',
-        'top_followers_count'               => 'int',
-        'story_is_saved_to_archive'         => 'bool',
-        'timezone_offset'                   => 'int',
-        'product_tags'                      => 'ProductTags',
-        'inline_composer_display_condition' => 'string',
-        'highlight_reel_ids'                => 'string[]',
-        'total_screenshot_count'            => 'int',
+        'comments'                                 => 'Comment[]',
+        'comments_disabled'                        => '',
+        'reel_mentions'                            => 'ReelMention[]',
+        'story_cta'                                => 'StoryCta[]',
+        'caption_position'                         => 'float',
+        'expiring_at'                              => '', // TODO, INVESTIGATE: sometimes int, sometimes float
+        'is_reel_media'                            => 'bool',
+        'next_max_id'                              => 'string',
+        'carousel_media'                           => 'CarouselMedia[]',
+        'carousel_media_type'                      => '',
+        'caption'                                  => 'Caption',
+        'caption_is_edited'                        => 'bool',
+        'photo_of_you'                             => 'bool',
+        'has_audio'                                => 'bool',
+        'video_duration'                           => 'float',
+        'user'                                     => 'User',
+        'likers'                                   => 'User[]',
+        'like_count'                               => 'int',
+        'preview'                                  => 'string',
+        'has_liked'                                => 'bool',
+        'explore_context'                          => 'string',
+        'explore_source_token'                     => 'string',
+        'explore_hide_comments'                    => 'bool',
+        'explore'                                  => 'Explore',
+        'impression_token'                         => 'string',
+        'usertags'                                 => 'Usertag',
+        'media'                                    => 'Media',
+        'stories'                                  => 'Stories',
+        'top_likers'                               => 'string[]',
+        'suggested_users'                          => 'SuggestedUsers',
+        'is_new_suggestion'                        => 'bool',
+        'comment_likes_enabled'                    => 'bool',
+        'can_viewer_save'                          => 'bool',
+        'has_viewer_saved'                         => 'bool',
+        'location'                                 => 'Location',
+        'lat'                                      => 'float',
+        'lng'                                      => 'float',
+        'story_locations'                          => 'StoryLocation[]',
+        'channel'                                  => 'Channel',
+        'gating'                                   => 'Gating',
+        'story_hashtags'                           => 'StoryHashtag[]',
+        'is_dash_eligible'                         => 'int',
+        'video_dash_manifest'                      => 'string',
+        'number_of_qualities'                      => 'int',
+        'injected'                                 => 'Injected',
+        'placeholder'                              => 'Placeholder',
+        'algorithm'                                => 'string',
+        'social_context'                           => 'string',
+        'icon'                                     => '',
+        'media_ids'                                => 'string[]',
+        'media_id'                                 => 'string',
+        'thumbnail_urls'                           => '',
+        'large_urls'                               => '',
+        'media_infos'                              => '',
+        'value'                                    => 'float',
+        'collapse_comments'                        => 'bool',
+        'link'                                     => 'string',
+        'link_text'                                => 'string',
+        'link_hint_text'                           => 'string',
+        'iTunesItem'                               => '',
+        'ad_header_style'                          => 'int',
+        'ad_metadata'                              => 'AdMetadata[]',
+        'ad_action'                                => 'string',
+        'ad_link_type'                             => 'int',
+        'dr_ad_type'                               => 'int',
+        'android_links'                            => 'AndroidLinks[]',
+        'ios_links'                                => 'IOSLinks[]',
+        'force_overlay'                            => 'bool',
+        'hide_nux_text'                            => 'bool',
+        'overlay_text'                             => 'string',
+        'overlay_title'                            => 'string',
+        'overlay_subtitle'                         => 'string',
+        'fb_page_url'                              => 'string',
+        'playback_duration_secs'                   => '',
+        'url_expire_at_secs'                       => '',
+        'is_sidecar_child'                         => '',
+        'comment_threading_enabled'                => 'bool',
+        'collection_id'                            => 'string',
+        'collection_name'                          => '',
+        'cover_media'                              => 'CoverMedia',
+        'saved_collection_ids'                     => 'string[]',
+        'boosted_status'                           => '',
+        'boost_unavailable_reason'                 => '',
+        'viewers'                                  => 'User[]',
+        'viewer_cursor'                            => '',
+        'total_viewer_count'                       => 'int',
+        'multi_author_reel_names'                  => '',
+        'reel_share'                               => 'ReelShare',
+        'story_polls'                              => '',
+        'organic_post_id'                          => 'string',
+        'sponsor_tags'                             => 'User[]',
+        'story_poll_voter_infos'                   => '',
+        'imported_taken_at'                        => '',
+        'lead_gen_form_id'                         => 'string',
+        'ad_id'                                    => 'string',
+        'actor_fbid'                               => 'string',
+        'is_ad4ad'                                 => '',
+        'commenting_disabled_for_viewer'           => '',
+        'story_events'                             => '',
+        'story_feed_media'                         => '',
+        'can_reshare'                              => 'bool',
+        'can_viewer_reshare'                       => 'bool',
+        'is_seen'                                  => '', // TODO: Not sure what type... is always NULL...
+        'creative_config'                          => '', // TODO: Not sure what type... is always NULL...
+        'story_sliders'                            => '', // TODO: Not sure what type... is always []...
+        'story_sound_on'                           => '', // TODO: Not sure what type... is always []...
+        'supports_reel_reactions'                  => 'bool',
+        'inventory_source'                         => 'string',
+        'is_eof'                                   => 'bool',
+        'top_followers'                            => 'string[]',
+        'top_followers_count'                      => 'int',
+        'story_is_saved_to_archive'                => 'bool',
+        'timezone_offset'                          => 'int',
+        'product_tags'                             => 'ProductTags',
+        'inline_composer_display_condition'        => 'string',
+        'highlight_reel_ids'                       => 'string[]',
+        'total_screenshot_count'                   => 'int',
         /*
          * HTML color string such as "#812A2A".
          */

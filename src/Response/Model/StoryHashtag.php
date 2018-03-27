@@ -17,6 +17,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method float getWidth()
  * @method float getX()
  * @method float getY()
+ * @method float getZ()
  * @method bool isAttribution()
  * @method bool isCustomTitle()
  * @method bool isHashtag()
@@ -26,6 +27,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method bool isWidth()
  * @method bool isX()
  * @method bool isY()
+ * @method bool isZ()
  * @method $this setAttribution(string $value)
  * @method $this setCustomTitle(string $value)
  * @method $this setHashtag(Hashtag $value)
@@ -35,6 +37,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method $this setWidth(float $value)
  * @method $this setX(float $value)
  * @method $this setY(float $value)
+ * @method $this setZ(float $value)
  * @method $this unsetAttribution()
  * @method $this unsetCustomTitle()
  * @method $this unsetHashtag()
@@ -44,6 +47,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method $this unsetWidth()
  * @method $this unsetX()
  * @method $this unsetY()
+ * @method $this unsetZ()
  */
 class StoryHashtag extends AutoPropertyMapper
 {

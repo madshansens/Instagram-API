@@ -15,6 +15,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method float getWidth()
  * @method float getX()
  * @method float getY()
+ * @method float getZ()
  * @method bool isHeight()
  * @method bool isIsPinned()
  * @method bool isRotation()
@@ -22,6 +23,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method bool isWidth()
  * @method bool isX()
  * @method bool isY()
+ * @method bool isZ()
  * @method $this setHeight(float $value)
  * @method $this setIsPinned(int $value)
  * @method $this setRotation(float $value)
@@ -29,6 +31,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method $this setWidth(float $value)
  * @method $this setX(float $value)
  * @method $this setY(float $value)
+ * @method $this setZ(float $value)
  * @method $this unsetHeight()
  * @method $this unsetIsPinned()
  * @method $this unsetRotation()
@@ -36,6 +39,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method $this unsetWidth()
  * @method $this unsetX()
  * @method $this unsetY()
+ * @method $this unsetZ()
  */
 class ReelMention extends AutoPropertyMapper
 {
