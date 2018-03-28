@@ -144,7 +144,7 @@ class VideoDetails extends MediaDetails
         // The user must have FFprobe.
         $ffprobe = Utils::checkFFPROBE();
         if ($ffprobe === false) {
-            throw new \RuntimeException('You must have FFprobe to analyze video details.');
+            throw new \RuntimeException('You must have FFprobe to analyze video details. Ensure that its binary-folder exists in your PATH environment variable, or manually set its full path via "\InstagramAPI\Utils::$ffprobeBin = \'/home/exampleuser/ffmpeg/bin/ffprobe\';" at the start of your script.');
         }
 
         // Load with FFPROBE. Shows details as JSON and exits.

@@ -377,7 +377,7 @@ class Utils
         }
 
         if (self::$ffmpegBin === false) {
-            throw new \RuntimeException('You must have FFmpeg to process videos.');
+            throw new \RuntimeException('You must have FFmpeg to process videos. Ensure that its binary-folder exists in your PATH environment variable, or manually set its full path via "\InstagramAPI\Utils::$ffmpegBin = \'/home/exampleuser/ffmpeg/bin/ffmpeg\';" at the start of your script.');
         }
 
         if (self::$_ffmpegWrapper === null || self::$_ffmpegWrapper->getFFmpegBinary() !== self::$ffmpegBin) {
