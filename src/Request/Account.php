@@ -31,6 +31,35 @@ class Account extends RequestCollection
     }
 
     /**
+     * Edit your biography. This function allows you to add mentions and hashtags to your biography.
+     *
+     * WARNING: Keep in mind anyone can see your biography!
+     *
+     * @param string $biography Biography text. Use "" for nothing.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\UserInfoResponse
+     *
+     * @see Account::editProfile() should be called after calling this function.
+     */
+    public function setBiography(
+        $biography)
+    {
+        if (strlen($biography) > 150) {
+            throw new InvalidArgumentException('Please provide a valid value for biography, it must be less than 151 characters');
+        }
+
+        return $this->ig->request('accounts/set_biography/')
+            ->addPost('raw_text', $biography)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\UserInfoResponse());
+    }
+
+    /**
      * Edit your profile.
      *
      * Warning: You must provide ALL parameters to this function. The values
