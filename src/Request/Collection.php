@@ -108,7 +108,7 @@ class Collection extends RequestCollection
             $postData['name'] = $params['name'];
         }
         if (isset($params['add_media']) && is_array($params['add_media']) && !empty($params['add_media'])) {
-            $postData['add_media'] = json_encode(array_values($params['add_media']));
+            $postData['added_media_ids'] = json_encode(array_values($params['add_media']));
             if (isset($params['module_name']) && $params['module_name'] !== '') {
                 $postData['module_name'] = $params['module_name'];
             } else {
