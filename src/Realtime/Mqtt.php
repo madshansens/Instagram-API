@@ -262,7 +262,7 @@ class Mqtt implements PersistentInterface
     {
         if ($this->_keepaliveTimer !== null) {
             if ($this->_keepaliveTimer->isActive()) {
-                $this->_logger->info('Existing keepalive timer has been canceled.');
+                $this->_logger->debug('Existing keepalive timer has been canceled.');
                 $this->_keepaliveTimer->cancel();
             }
             $this->_keepaliveTimer = null;
@@ -276,7 +276,7 @@ class Mqtt implements PersistentInterface
     {
         $this->_cancelKeepaliveTimer();
         $keepaliveInterval = Mqtt\Config::MQTT_KEEPALIVE;
-        $this->_logger->info(sprintf('Setting up keepalive timer to %d seconds', $keepaliveInterval));
+        $this->_logger->debug(sprintf('Setting up keepalive timer to %d seconds', $keepaliveInterval));
         $this->_keepaliveTimer = $this->_loop->addTimer($keepaliveInterval, function () {
             $this->_logger->info('Keepalive timer has been fired.');
             $this->_disconnect();
@@ -606,11 +606,11 @@ class Mqtt implements PersistentInterface
             $this->_restoreAllSubscriptions();
         });
         $client->on('ping', function () {
-            $this->_logger->info('Ping flow completed');
+            $this->_logger->debug('Ping flow completed');
             $this->_setKeepaliveTimer();
         });
         $client->on('publish', function () {
-            $this->_logger->info('Publish flow completed');
+            $this->_logger->debug('Publish flow completed');
             $this->_setKeepaliveTimer();
         });
         $client->on('message', function (Message $message) {
@@ -722,7 +722,7 @@ class Mqtt implements PersistentInterface
         $payload,
         $qosLevel)
     {
-        $this->_logger->debug(sprintf('Sending message "%s" to topic "%s"', $payload, $topic));
+        $this->_logger->info(sprintf('Sending message "%s" to topic "%s"', $payload, $topic));
         $payload = zlib_encode($payload, ZLIB_ENCODING_DEFLATE, 9);
         // We need to map human readable topic name to its ID because of bandwidth saving.
         $topic = $this->_mapTopic($topic);
