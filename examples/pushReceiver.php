@@ -36,10 +36,20 @@ $push->on('like', function (\InstagramAPI\Push\Notification $push) {
     printf('Media ID: %s%s', $push->getActionParam('id'), PHP_EOL);
 });
 $push->on('comment', function (\InstagramAPI\Push\Notification $push) {
+    switch ($push->getActionPath()) {
+        case 'comments_v2':
+            $mediaId = $push->getActionParam('media_id');
+            $commentId = $push->getActionParam('target_comment_id');
+            break;
+        case 'media':
+        default:
+            $mediaId = $push->getActionParam('id');
+            $commentId = $push->getActionParam('forced_preview_comment_id');
+    }
     printf(
         'Media ID: %s. Comment ID: %s.%s',
-        $push->getActionParam('id'),
-        $push->getActionParam('forced_preview_comment_id'),
+        $mediaId,
+        $commentId,
         PHP_EOL
     );
 });

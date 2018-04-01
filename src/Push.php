@@ -45,6 +45,8 @@ use React\EventLoop\LoopInterface;
  *       user?username=USERNAME&launch_reel=1
  *     - story_poll_result_share - "Your poll is almost over, and YES is winning. See and share the results."
  *       user?username=USERNAME&launch_reel=1&media_id=1111111111111111111_1111111111&include_viewers=1
+ *     - story_daily_digest - "USERNAME1, USERNAME2 and USERNAME3 recently added to their stories."
+ *       mainfeed?launch_reel_user_ids=1111111111,2222222222,3333333333,4444444444
  *
  *   Followers and contacts:
  *     - new_follower - "NAME (USERNAME) started following you."
@@ -61,12 +63,16 @@ use React\EventLoop\LoopInterface;
  *       user?username=USERNAME
  *     - follower_follow - "USERNAME1 and USERNAME2 followed NAME on Instagram. See their posts."
  *       user?username=USERNAME
+ *     - follower_activity_reminders - "USERNAME1, USERNAME2 and others shared NUMBER photos."
+ *       mainfeed
  *
  *   Comments:
  *     - comment - "USERNAME commented: "TEXT""
  *       media?id=1111111111111111111_1111111111&forced_preview_comment_id=11111111111111111
+ *       comments_v2?media_id=1111111111111111111_1111111111&target_comment_id=11111111111111111
  *     - mentioned_comment - "USERNAME mentioned you in a comment: TEXT..."
  *       media?id=1111111111111111111_1111111111
+ *       comments_v2?media_id=1111111111111111111_1111111111
  *     - comment_on_tag - "USERNAME commented on a post you're tagged in."
  *       media?id=1111111111111111111 <- Yep, no author ID here.
  *     - comment_subscribed - "USERNAME also commented on USERNAME's post: "TEXT""
@@ -120,6 +126,10 @@ use React\EventLoop\LoopInterface;
  *     - copyright_video - "Your video may have copyrighted content that belongs to someone else."
  *       news
  *     - report_updated - "Your support request from DATE was just updated."
+ *       news
+ *     - promote_account - "Check out today's photo from TEXT."
+ *       user?username=USERNAME
+ *     - unseen_notification_reminders
  *       news
  *
  *   System:
