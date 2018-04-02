@@ -12,11 +12,17 @@ class Highlight extends RequestCollection
     /**
      * Get highlight feed.
      *
+     * NOTE: Sometimes, a highlight doesn't have any `items` property. To get
+     * the list of items in that situation, you must submit its `id` (such as
+     * `highlight:123882132324123`) to the `Story::getReelsMediaFeed()` API.
+     *
      * @param string $userId Numerical UserPK ID.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\HighlightFeedResponse
+     *
+     * @see Story::getReelsMediaFeed() To get highlight items when they aren't included in this response.
      */
     public function getUserFeed(
         $userId)
@@ -28,9 +34,15 @@ class Highlight extends RequestCollection
     /**
      * Get self highlight feed.
      *
+     * NOTE: Sometimes, a highlight doesn't have any `items` property. Read
+     * `Highlight::getUserFeed()` for more information about what to do.
+     *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\HighlightFeedResponse
+     *
+     * @see Highlight::getUserFeed()
+     * @see Story::getReelsMediaFeed() To get highlight items when they aren't included in this response.
      */
     public function getSelfUserFeed()
     {

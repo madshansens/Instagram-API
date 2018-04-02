@@ -126,28 +126,37 @@ class Story extends RequestCollection
     }
 
     /**
-     * Get multiple users' story feeds at once.
+     * Get multiple users' story feeds (or specific highlight-details) at once.
      *
-     * @param string|string[] $userList List of numerical UserPK IDs.
+     * NOTE: Normally, you would only use this endpoint for stories (by passing
+     * UserPK IDs as the parameter). But if you're looking at people's highlight
+     * feeds (via `Highlight::getUserFeed()`), you may also sometimes discover
+     * highlight entries that don't have any `items` array. In that case, you
+     * are supposed to get the items for those highlights via this endpoint!
+     * Simply pass their `id` values as the argument to this API to get details.
+     *
+     * @param string|string[] $feedList List of numerical UserPK IDs, OR highlight IDs (such as `highlight:123882132324123`).
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\ReelsMediaResponse
+     *
+     * @see Highlight::getUserFeed() More info about when to use this API for highlight-details.
      */
     public function getReelsMediaFeed(
-        $userList)
+        $feedList)
     {
-        if (!is_array($userList)) {
-            $userList = [$userList];
+        if (!is_array($feedList)) {
+            $feedList = [$feedList];
         }
 
-        foreach ($userList as &$value) {
+        foreach ($feedList as &$value) {
             $value = (string) $value;
         }
         unset($value); // Clear reference.
 
         return $this->ig->request('feed/reels_media/')
-            ->addPost('user_ids', $userList) // Must be string[] array.
+            ->addPost('user_ids', $feedList) // Must be string[] array.
             ->getResponse(new Response\ReelsMediaResponse());
     }
 
