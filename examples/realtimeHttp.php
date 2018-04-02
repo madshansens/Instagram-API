@@ -8,6 +8,9 @@
  * Also, https://github.com/Seldaek/monolog is required:
  * $ composer require monolog/monolog
  *
+ * Lastly, if you have a 32-bit PHP build, you have to enable the GMP extension:
+ * http://php.net/manual/en/book.gmp.php
+ *
  * Usage:
  * # mark item 456 in thread 123 as seen
  * $ curl -i 'http://127.0.0.1:1307/seen?threadId=123&threadItemId=456'

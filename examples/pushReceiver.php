@@ -5,7 +5,7 @@
  * You need https://github.com/Seldaek/monolog to run this example:
  * $ composer require monolog/monolog
  *
- * Also, if you have 32-bit PHP build, you have to enable GMP extension:
+ * Also, if you have a 32-bit PHP build, you have to enable the GMP extension:
  * http://php.net/manual/en/book.gmp.php
  */
 
