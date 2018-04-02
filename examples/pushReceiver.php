@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * IMPORTANT!
+ * You need https://github.com/Seldaek/monolog to run this example:
+ * $ composer require monolog/monolog
+ *
+ * Also, if you have 32-bit PHP build, you have to enable GMP extension:
+ * http://php.net/manual/en/book.gmp.php
+ */
+
 set_time_limit(0);
 date_default_timezone_set('UTC');
 

@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * IMPORTANT!
+ * You need https://github.com/Seldaek/monolog to run this example:
+ * $ composer require monolog/monolog
+ */
+
 set_time_limit(0);
 date_default_timezone_set('UTC');
 

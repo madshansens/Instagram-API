@@ -2,8 +2,11 @@
 
 /*
  * IMPORTANT!
- * You need https://github.com/reactphp/http in order to run this example.
+ * You need https://github.com/reactphp/http to run this example:
  * $ composer require react/http "^0.7"
+ *
+ * Also, https://github.com/Seldaek/monolog is required:
+ * $ composer require monolog/monolog
  *
  * Usage:
  * # mark item 456 in thread 123 as seen
