@@ -7,7 +7,7 @@ use InstagramAPI\Response;
 /**
  * CommentResponse.
  *
- * @method mixed getComment()
+ * @method Model\Comment getComment()
  * @method mixed getMessage()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
@@ -15,7 +15,7 @@ use InstagramAPI\Response;
  * @method bool isMessage()
  * @method bool isStatus()
  * @method bool is_Messages()
- * @method $this setComment(mixed $value)
+ * @method $this setComment(Model\Comment $value)
  * @method $this setMessage(mixed $value)
  * @method $this setStatus(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
@@ -27,6 +27,6 @@ use InstagramAPI\Response;
 class CommentResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
-        'comment' => '',
+        'comment' => 'Model\Comment',
     ];
 }

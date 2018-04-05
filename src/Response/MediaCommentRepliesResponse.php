@@ -14,6 +14,8 @@ use InstagramAPI\Response;
  * @method mixed getMessage()
  * @method string getNextMaxChildCursor()
  * @method string getNextMinChildCursor()
+ * @method int getNumHeadChildComments()
+ * @method int getNumTailChildComments()
  * @method Model\Comment getParentComment()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
@@ -24,6 +26,8 @@ use InstagramAPI\Response;
  * @method bool isMessage()
  * @method bool isNextMaxChildCursor()
  * @method bool isNextMinChildCursor()
+ * @method bool isNumHeadChildComments()
+ * @method bool isNumTailChildComments()
  * @method bool isParentComment()
  * @method bool isStatus()
  * @method bool is_Messages()
@@ -34,6 +38,8 @@ use InstagramAPI\Response;
  * @method $this setMessage(mixed $value)
  * @method $this setNextMaxChildCursor(string $value)
  * @method $this setNextMinChildCursor(string $value)
+ * @method $this setNumHeadChildComments(int $value)
+ * @method $this setNumTailChildComments(int $value)
  * @method $this setParentComment(Model\Comment $value)
  * @method $this setStatus(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
@@ -44,6 +50,8 @@ use InstagramAPI\Response;
  * @method $this unsetMessage()
  * @method $this unsetNextMaxChildCursor()
  * @method $this unsetNextMinChildCursor()
+ * @method $this unsetNumHeadChildComments()
+ * @method $this unsetNumTailChildComments()
  * @method $this unsetParentComment()
  * @method $this unsetStatus()
  * @method $this unset_Messages()
@@ -57,9 +65,21 @@ class MediaCommentRepliesResponse extends Response
          */
         'child_comment_count'          => 'int',
         'child_comments'               => 'Model\Comment[]',
-        'has_more_tail_child_comments' => 'bool',
-        'has_more_head_child_comments' => 'bool',
-        'next_min_child_cursor'        => 'string',
-        'next_max_child_cursor'        => 'string',
+        /*
+         * When "has_more_tail_child_comments" is true, you can use the value
+         * in "next_max_child_cursor" as "max_id" parameter to load up to
+         * "num_tail_child_comments" older child-comments.
+         */
+        'has_more_tail_child_comments'      => 'bool',
+        'next_max_child_cursor'             => 'string',
+        'num_tail_child_comments'           => 'int',
+        /*
+         * When "has_more_head_child_comments" is true, you can use the value
+         * in "next_min_child_cursor" as "min_id" parameter to load up to
+         * "num_head_child_comments" newer child-comments.
+         */
+        'has_more_head_child_comments'      => 'bool',
+        'next_min_child_cursor'             => 'string',
+        'num_head_child_comments'           => 'int',
     ];
 }
