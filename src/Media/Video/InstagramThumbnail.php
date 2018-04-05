@@ -16,9 +16,9 @@ class InstagramThumbnail extends InstagramVideo
     /**
      * Constructor.
      *
-     * @param string             $inputFile     Path to an input file.
-     * @param array              $options       An associative array of optional parameters.
-     * @param FFmpegWrapper|null $ffmpegWrapper Custom FFmpeg wrapper.
+     * @param string      $inputFile Path to an input file.
+     * @param array       $options   An associative array of optional parameters.
+     * @param FFmpeg|null $ffmpeg    Custom FFmpeg wrapper.
      *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
@@ -28,9 +28,9 @@ class InstagramThumbnail extends InstagramVideo
     public function __construct(
         $inputFile,
         array $options = [],
-        FFmpegWrapper $ffmpegWrapper = null)
+        FFmpeg $ffmpeg = null)
     {
-        parent::__construct($inputFile, $options, $ffmpegWrapper);
+        parent::__construct($inputFile, $options, $ffmpeg);
 
         // The timeline and most feeds have the thumbnail at "00:00:01.000".
         $this->_thumbnailTimestamp = 1.0; // Default.

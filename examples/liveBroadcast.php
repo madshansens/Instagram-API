@@ -39,8 +39,10 @@ try {
     // https://github.com/mgp25/Instagram-API/issues/1488#issuecomment-333365636
 
     // Get FFmpeg handler and ensure that the application exists on this system.
-    // NOTE: Look in `\InstagramAPI\Utils` if you want a custom ffmpeg path.
-    $ffmpeg = \InstagramAPI\Utils::getFFmpegWrapper();
+    // NOTE: You can supply custom path to the ffmpeg binary, or just leave NULL
+    // to autodetect it.
+    $ffmpegPath = null;
+    $ffmpeg = \InstagramAPI\Media\Video\FFmpeg::factory($ffmpegPath);
 
     // Tell Instagram that we want to perform a livestream.
     $stream = $ig->live->create();

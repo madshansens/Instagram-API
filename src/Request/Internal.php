@@ -13,7 +13,7 @@ use InstagramAPI\Exception\NetworkException;
 use InstagramAPI\Exception\ThrottledException;
 use InstagramAPI\Exception\UploadFailedException;
 use InstagramAPI\Media\MediaDetails;
-use InstagramAPI\Media\Video\FFmpegWrapper;
+use InstagramAPI\Media\Video\FFmpeg;
 use InstagramAPI\Media\Video\InstagramThumbnail;
 use InstagramAPI\Media\Video\VideoDetails;
 use InstagramAPI\Request;
@@ -1851,7 +1851,7 @@ class Internal extends RequestCollection
 
         // We need to have ffmpeg to segment the video.
         try {
-            Utils::getFFmpegWrapper()->version();
+            FFmpeg::factory();
         } catch (\Exception $e) {
             return false;
         }
@@ -2023,9 +2023,9 @@ class Internal extends RequestCollection
     /**
      * Split the video file into segments.
      *
-     * @param VideoDetails       $videoDetails
-     * @param FFmpegWrapper|null $ffMpegWrapper
-     * @param string|null        $outputDirectory
+     * @param VideoDetails $videoDetails
+     * @param FFmpeg|null  $ffmpeg
+     * @param string|null  $outputDirectory
      *
      * @throws \Exception
      *
@@ -2033,11 +2033,11 @@ class Internal extends RequestCollection
      */
     protected function _splitVideoIntoSegments(
         VideoDetails $videoDetails,
-        FFmpegWrapper $ffMpegWrapper = null,
+        FFmpeg $ffmpeg = null,
         $outputDirectory = null)
     {
-        if ($ffMpegWrapper === null) {
-            $ffMpegWrapper = Utils::getFFmpegWrapper();
+        if ($ffmpeg === null) {
+            $ffmpeg = FFmpeg::factory();
         }
         if ($outputDirectory === null) {
             $outputDirectory = Utils::$defaultTmpPath === null ? sys_get_temp_dir() : Utils::$defaultTmpPath;
@@ -2057,7 +2057,7 @@ class Internal extends RequestCollection
 
         try {
             // Split the video stream into a multiple segments by time.
-            $ffMpegWrapper->run(sprintf(
+            $ffmpeg->run(sprintf(
                 '-i %s -c:v copy -an -dn -sn -f segment -segment_time %d -segment_format mp4 %s',
                 escapeshellarg($videoDetails->getFilename()),
                 (int) $this->ig->getExperimentParam(
@@ -2074,7 +2074,7 @@ class Internal extends RequestCollection
             ));
 
             // Save the audio stream in one segment.
-            $ffMpegWrapper->run(sprintf(
+            $ffmpeg->run(sprintf(
                 '-i %s -c:a copy -vn -dn -sn -f mp4 %s',
                 escapeshellarg($videoDetails->getFilename()),
                 escapeshellarg(sprintf(

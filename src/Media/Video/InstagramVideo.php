@@ -14,15 +14,15 @@ use InstagramAPI\Utils;
  */
 class InstagramVideo extends InstagramMedia
 {
-    /** @var FFmpegWrapper */
-    protected $_ffmpegWrapper;
+    /** @var FFmpeg */
+    protected $_ffmpeg;
 
     /**
      * Constructor.
      *
-     * @param string             $inputFile     Path to an input file.
-     * @param array              $options       An associative array of optional parameters.
-     * @param FFmpegWrapper|null $ffmpegWrapper Custom FFmpeg wrapper.
+     * @param string      $inputFile Path to an input file.
+     * @param array       $options   An associative array of optional parameters.
+     * @param FFmpeg|null $ffmpeg    Custom FFmpeg wrapper.
      *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
@@ -32,14 +32,14 @@ class InstagramVideo extends InstagramMedia
     public function __construct(
         $inputFile,
         array $options = [],
-        FFmpegWrapper $ffmpegWrapper = null)
+        FFmpeg $ffmpeg = null)
     {
         parent::__construct($inputFile, $options);
         $this->_details = new VideoDetails($this->_inputFile);
 
-        $this->_ffmpegWrapper = $ffmpegWrapper;
-        if ($this->_ffmpegWrapper === null) {
-            $this->_ffmpegWrapper = Utils::getFFmpegWrapper();
+        $this->_ffmpeg = $ffmpeg;
+        if ($this->_ffmpeg === null) {
+            $this->_ffmpeg = FFmpeg::factory();
         }
     }
 
@@ -126,14 +126,14 @@ class InstagramVideo extends InstagramMedia
             // Rotate the video (if needed to).
             $rotationFilters = $this->_getRotationFilters();
             if (count($rotationFilters)) {
-                if ($this->_ffmpegWrapper->hasNoAutorotate()) {
+                if ($this->_ffmpeg->hasNoAutorotate()) {
                     $inputFlags[] = '-noautorotate';
                 }
                 $filters = array_merge($filters, $rotationFilters);
             }
 
             // Video format can't copy since we always need to re-encode due to video filtering.
-            $ffmpegOutput = $this->_ffmpegWrapper->run(sprintf(
+            $ffmpegOutput = $this->_ffmpeg->run(sprintf(
                 '-y %s -i %s -vf %s %s %s',
                 implode(' ', $inputFlags),
                 escapeshellarg($this->_inputFile),
@@ -195,7 +195,7 @@ class InstagramVideo extends InstagramMedia
 
         // Force AAC for the audio.
         if ($this->_details->getAudioCodec() !== 'aac') {
-            if ($this->_ffmpegWrapper->hasLibFdkAac()) {
+            if ($this->_ffmpeg->hasLibFdkAac()) {
                 $result[] = '-c:a libfdk_aac -vbr 4';
             } else {
                 // The encoder 'aac' is experimental but experimental codecs are not enabled,

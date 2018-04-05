@@ -2,7 +2,7 @@
 
 namespace InstagramAPI;
 
-use InstagramAPI\Media\Video\FFmpegWrapper;
+use InstagramAPI\Media\Video\FFmpeg;
 use InstagramAPI\Response\Model\Item;
 use InstagramAPI\Response\Model\Location;
 
@@ -36,18 +36,14 @@ class Utils
     const BOUNDARY_LENGTH = 30;
 
     /**
-     * Name of the detected ffmpeg executable, or FALSE if none found.
+     * Name of the detected ffmpeg executable.
      *
-     * @var string|bool|null
+     * @var string|null
+     *
+     * @deprecated
+     * @see FFmpeg::$defaultBinary
      */
     public static $ffmpegBin = null;
-
-    /**
-     * Wrapper for a ffmpeg binary.
-     *
-     * @var FFmpegWrapper
-     */
-    protected static $_ffmpegWrapper;
 
     /**
      * Name of the detected ffprobe executable, or FALSE if none found.
@@ -343,48 +339,6 @@ class Utils
         $obj = self::reorderByHashCode($obj);
 
         return json_encode($obj);
-    }
-
-    /**
-     * Get a wrapper for ffmpeg/avconv binaries.
-     *
-     * TIP: If your binary isn't findable via the PATH environment locations,
-     * you can manually set the correct path to it. Before calling any functions
-     * that need FFmpeg, you must simply assign a manual value (ONCE) to tell us
-     * where to find your FFmpeg, like this:
-     *
-     * \InstagramAPI\Utils::$ffmpegBin = '/home/exampleuser/ffmpeg/bin/ffmpeg';
-     *
-     * @throws \RuntimeException
-     *
-     * @return FFmpegWrapper
-     */
-    public static function getFFmpegWrapper()
-    {
-        // We only resolve this once per session and then cache the result.
-        if (self::$ffmpegBin === null) {
-            @exec('ffmpeg -version 2>&1', $output, $statusCode);
-            if ($statusCode === 0) {
-                self::$ffmpegBin = 'ffmpeg';
-            } else {
-                @exec('avconv -version 2>&1', $output, $statusCode);
-                if ($statusCode === 0) {
-                    self::$ffmpegBin = 'avconv';
-                } else {
-                    self::$ffmpegBin = false; // Nothing found!
-                }
-            }
-        }
-
-        if (self::$ffmpegBin === false) {
-            throw new \RuntimeException('You must have FFmpeg to process videos. Ensure that its binary-folder exists in your PATH environment variable, or manually set its full path via "\InstagramAPI\Utils::$ffmpegBin = \'/home/exampleuser/ffmpeg/bin/ffmpeg\';" at the start of your script.');
-        }
-
-        if (self::$_ffmpegWrapper === null || self::$_ffmpegWrapper->getFFmpegBinary() !== self::$ffmpegBin) {
-            self::$_ffmpegWrapper = new FFmpegWrapper(self::$ffmpegBin);
-        }
-
-        return self::$_ffmpegWrapper;
     }
 
     /**
