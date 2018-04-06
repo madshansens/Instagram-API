@@ -446,12 +446,17 @@ class Account extends RequestCollection
     }
 
     /**
-     * Request a new security code SMS for Two Factor login.
-     * NOTE: Instagram can only send you a code every 60 seconds.
+     * Request a new security code SMS for a Two Factor login account.
+     *
+     * NOTE: You should first attempt to `login()` which will automatically send
+     * you a two factor SMS. This function is just for asking for a new SMS if
+     * the old code has expired.
+     *
+     * NOTE: Instagram can only send you a new code every 60 seconds.
      *
      * @param string $username            Your Instagram username.
      * @param string $twoFactorIdentifier Two factor identifier, obtained in
-     *                                    login() response.
+     *                                    `login()` response.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
