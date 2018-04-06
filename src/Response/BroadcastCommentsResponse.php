@@ -79,6 +79,9 @@ class BroadcastCommentsResponse extends Response
         'comment_count'              => 'int',
         'live_seconds_per_comment'   => 'int',
         'has_more_headload_comments' => 'bool',
+        /*
+         * NOTE: Instagram sends "True" or "False" as a string in this property.
+         */
         'is_first_fetch'             => 'string',
         'comment_likes_enabled'      => 'bool',
         'pinned_comment'             => 'Model\Comment',

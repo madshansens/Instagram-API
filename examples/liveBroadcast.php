@@ -57,55 +57,61 @@ try {
     );
 
     // Broadcast the entire video file.
-    // NOTE: The video is broadcasted asynchronously.
+    // NOTE: The video is broadcasted asynchronously (in the background).
     $broadcastProcess = $ffmpeg->runAsync(sprintf(
         '-rtbufsize 256M -re -i %s -acodec libmp3lame -ar 44100 -b:a 128k -pix_fmt yuv420p -profile:v baseline -s 720x1280 -bufsize 6000k -vb 400k -maxrate 1500k -deinterlace -vcodec libx264 -preset veryfast -g 30 -r 30 -f flv %s',
         escapeshellarg($videoFilename),
         escapeshellarg($streamUploadUrl)
     ));
 
-    // The following while loop performs different requests to obtain live information of the broadcast.
-    // NOTE: This is required if you want the comments and the likes to appear in the post-live feed.
-    // NOTE: These requests are sent while the video is being broadcasted.
+    // The following loop performs important requests to obtain information
+    // about the broadcast while it is ongoing.
+    // NOTE: This is REQUIRED if you want the comments and likes to appear
+    // in your saved post-live feed.
+    // NOTE: These requests are sent *while* the video is being broadcasted.
     $lastCommentTs = 0;
-    $lastLikeTS = 0;
-    while ($broadcastProcess->isRunning()) {
+    $lastLikeTs = 0;
+    do {
         // Get broadcast comments.
-        // The latest comment timestamp is required for the next getComments() request.
-        // There are two types of comments: System comments and user comments.
-        // We compare both and keep the latest timestamp.
-        $commentsData = $ig->live->getComments($broadcastId, $lastCommentTs);
+        // - The latest comment timestamp will be required for the next
+        //   getComments() request.
+        // - There are two types of comments: System comments and user comments.
+        //   We compare both and keep the newest (most recent) timestamp.
+        $commentsResponse = $ig->live->getComments($broadcastId, $lastCommentTs);
+        $systemComments = $commentsResponse->getSystemComments();
+        $comments = $commentsResponse->getComments();
+        if (!empty($systemComments)) {
+            $lastCommentTs = end($systemComments)->getCreatedAt();
+        }
+        if (!empty($comments) && end($comments)->getCreatedAt() > $lastCommentTs) {
+            $lastCommentTs = end($comments)->getCreatedAt();
+        }
 
-        $systemComments = $commentsData->getSystemComments();
-        $comments = $commentsData->getComments();
-        if ($systemComments) {
-            $lastCommentTS = end($systemComments)->getCreatedAt();
-        }
-        if ($comments) {
-            $lastCommentTs = end($comments)->getCreatedAt() > $lastCommentTs ? end($comments)->getCreatedAt() : $lastCommentTs;
-        }
         // Get broadcast heartbeat and viewer count.
         $ig->live->getHeartbeatAndViewerCount($broadcastId);
+
         // Get broadcast like count.
-        // The latest like timestamp is required for the next getLikeCount() request.
-        $likes = $ig->live->getLikeCount($broadcastId, $lastLikeTS);
-        $lastLikeTS = $likes->getLikeTs();
+        // - The latest like timestamp will be required for the next
+        //   getLikeCount() request.
+        $likeCountResponse = $ig->live->getLikeCount($broadcastId, $lastLikeTs);
+        $lastLikeTs = $likeCountResponse->getLikeTs();
+
         sleep(2);
-    }
+    } while ($broadcastProcess->isRunning());
 
     // Get the final viewer list of the broadcast.
-    // NOTE: You should only use this after the broadcast has ended.
+    // NOTE: You should only use this after the broadcast has stopped uploading.
     $ig->live->getFinalViewerList($broadcastId);
 
     // End the broadcast stream.
     // NOTE: Instagram will ALSO end the stream if your broadcasting software
     // itself sends a RTMP signal to end the stream. FFmpeg doesn't do that
     // (without patching), but OBS sends such a packet. So be aware of that.
-    $ig->live->end($stream->getBroadcastId());
+    $ig->live->end($broadcastId);
 
     // Once the broadcast has ended, you can optionally add the finished
     // broadcast to your post-live feed (saved replay).
-    $ig->live->addToPostLive($stream->getBroadcastId());
+    $ig->live->addToPostLive($broadcastId);
 } catch (\Exception $e) {
     echo 'Something went wrong: '.$e->getMessage()."\n";
 }
