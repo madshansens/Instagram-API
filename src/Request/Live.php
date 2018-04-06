@@ -225,8 +225,9 @@ class Live extends RequestCollection
     /**
      * Get broadcast comments.
      *
-     * @param string $broadcastId   The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param int    $lastCommentTs Last comments timestamp (optional).
+     * @param string $broadcastId       The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param int    $lastCommentTs     Last comments timestamp (optional).
+     * @param int    $commentsRequested Number of comments requested (optional).
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -234,10 +235,12 @@ class Live extends RequestCollection
      */
     public function getComments(
         $broadcastId,
-        $lastCommentTs = 0)
+        $lastCommentTs = 0,
+        $commentsRequested = 3)
     {
         return $this->ig->request("live/{$broadcastId}/get_comment/")
             ->addParam('last_comment_ts', $lastCommentTs)
+            ->addParam('num_comments_requested', $commentsRequested)
             ->getResponse(new Response\BroadcastCommentsResponse());
     }
 

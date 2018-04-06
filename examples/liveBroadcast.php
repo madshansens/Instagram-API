@@ -46,7 +46,8 @@ try {
 
     // Tell Instagram that we want to perform a livestream.
     $stream = $ig->live->create();
-    $ig->live->start($stream->getBroadcastId());
+    $broadcastId = $stream->getBroadcastId();
+    $ig->live->start($broadcastId);
 
     // Switch from RTMPS to RTMP upload URL, since RTMPS doesn't work well.
     $streamUploadUrl = preg_replace(
@@ -56,11 +57,45 @@ try {
     );
 
     // Broadcast the entire video file.
-    $ffmpeg->run(sprintf(
+    // NOTE: The video is broadcasted asynchronously.
+    $broadcastProcess = $ffmpeg->runAsync(sprintf(
         '-rtbufsize 256M -re -i %s -acodec libmp3lame -ar 44100 -b:a 128k -pix_fmt yuv420p -profile:v baseline -s 720x1280 -bufsize 6000k -vb 400k -maxrate 1500k -deinterlace -vcodec libx264 -preset veryfast -g 30 -r 30 -f flv %s',
         escapeshellarg($videoFilename),
         escapeshellarg($streamUploadUrl)
     ));
+
+    // The following while loop performs different requests to obtain live information of the broadcast.
+    // NOTE: This is required if you want the comments and the likes to appear in the post-live feed.
+    // NOTE: These requests are sent while the video is being broadcasted.
+    $lastCommentTs = 0;
+    $lastLikeTS = 0;
+    while ($broadcastProcess->isRunning()) {
+        // Get broadcast comments.
+        // The latest comment timestamp is required for the next getComments() request.
+        // There are two types of comments: System comments and user comments.
+        // We compare both and keep the latest timestamp.
+        $commentsData = $ig->live->getComments($broadcastId, $lastCommentTs);
+
+        $systemComments = $commentsData->getSystemComments();
+        $comments = $commentsData->getComments();
+        if ($systemComments) {
+            $lastCommentTS = end($systemComments)->getCreatedAt();
+        }
+        if ($comments) {
+            $lastCommentTs = end($comments)->getCreatedAt() > $lastCommentTs ? end($comments)->getCreatedAt() : $lastCommentTs;
+        }
+        // Get broadcast heartbeat and viewer count.
+        $ig->live->getHeartbeatAndViewerCount($broadcastId);
+        // Get broadcast like count.
+        // The latest like timestamp is required for the next getLikeCount() request.
+        $likes = $ig->live->getLikeCount($broadcastId, $lastLikeTS);
+        $lastLikeTS = $likes->getLikeTs();
+        sleep(2);
+    }
+
+    // Get the final viewer list of the broadcast.
+    // NOTE: You should only use this after the broadcast has ended.
+    $ig->live->getFinalViewerList($broadcastId);
 
     // End the broadcast stream.
     // NOTE: Instagram will ALSO end the stream if your broadcasting software
