@@ -2073,17 +2073,19 @@ class Internal extends RequestCollection
                 ))
             ));
 
-            // Save the audio stream in one segment.
-            $ffmpeg->run(sprintf(
-                '-i %s -c:a copy -vn -dn -sn -f mp4 %s',
-                escapeshellarg($videoDetails->getFilename()),
-                escapeshellarg(sprintf(
-                    '%s%s%s_1audio.000.mp4',
-                    $outputDirectory,
-                    DIRECTORY_SEPARATOR,
-                    $prefix
-                ))
-            ));
+            if ($videoDetails->getAudioCodec() !== null) {
+                // Save the audio stream in one segment.
+                $ffmpeg->run(sprintf(
+                    '-i %s -c:a copy -vn -dn -sn -f mp4 %s',
+                    escapeshellarg($videoDetails->getFilename()),
+                    escapeshellarg(sprintf(
+                        '%s%s%s_1audio.000.mp4',
+                        $outputDirectory,
+                        DIRECTORY_SEPARATOR,
+                        $prefix
+                    ))
+                ));
+            }
         } catch (\RuntimeException $e) {
             // Find and remove all segments (if any).
             $files = glob($pattern, GLOB_BRACE);
