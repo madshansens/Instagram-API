@@ -446,6 +446,31 @@ class Account extends RequestCollection
     }
 
     /**
+     * Request a new security code SMS for Two Factor login.
+     * NOTE: Instagram can only send you a code every 60 seconds.
+     *
+     * @param string $username            Your Instagram username.
+     * @param string $twoFactorIdentifier Two factor identifier, obtained in
+     *                                    login() response.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\TwoFactorLoginSMSResponse
+     */
+    public function sendTwoFactorLoginSMS(
+        $username,
+        $twoFactorIdentifier)
+    {
+        return $this->ig->request('accounts/send_two_factor_login_sms/')
+            ->addPost('two_factor_identifier', $twoFactorIdentifier)
+            ->addPost('username', $username)
+            ->addPost('device_id', $this->ig->device_id)
+            ->addPost('guid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\TwoFactorLoginSMSResponse());
+    }
+
+    /**
      * Get presence status.
      *
      * @throws \InstagramAPI\Exception\InstagramException
