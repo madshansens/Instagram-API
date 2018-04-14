@@ -832,6 +832,7 @@ class Instagram implements ExperimentsInterface
             $this->direct->getRankedRecipients('reshare', true);
             $this->direct->getRankedRecipients('raven', true);
             $this->direct->getInbox();
+            $this->account->getPresenceStatus();
             $this->internal->getProfileNotice();
             //$this->internal->getMegaphoneLog();
             $this->people->getRecentActivityInbox();
@@ -872,6 +873,7 @@ class Instagram implements ExperimentsInterface
                 $this->_registerPushChannels();
                 //$this->internal->getMegaphoneLog();
                 $this->direct->getInbox();
+                $this->account->getPresenceStatus();
                 $this->people->getRecentActivityInbox();
                 $this->internal->getProfileNotice();
                 $this->discover->getExploreFeed();

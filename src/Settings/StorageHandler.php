@@ -40,6 +40,7 @@ class StorageHandler
         'last_login', // Tracks time elapsed since our last login state refresh.
         'last_experiments', // Tracks time elapsed since our last experiments refresh.
         'datacenter', // Preferred data center (region-based).
+        'presence_disabled', // Whether the presence feature has been disabled by user.
     ];
 
     /**

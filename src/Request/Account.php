@@ -2,6 +2,7 @@
 
 namespace InstagramAPI\Request;
 
+use InstagramAPI\Exception\SettingsException;
 use InstagramAPI\Response;
 
 /**
@@ -476,6 +477,21 @@ class Account extends RequestCollection
     }
 
     /**
+     * Save presence status to the storage.
+     *
+     * @param bool $disabled
+     */
+    protected function _savePresenceStatus(
+        $disabled)
+    {
+        try {
+            $this->ig->settings->set('presence_disabled', $disabled ? '1' : '0');
+        } catch (SettingsException $e) {
+            // Ignore storage errors.
+        }
+    }
+
+    /**
      * Get presence status.
      *
      * @throws \InstagramAPI\Exception\InstagramException
@@ -484,9 +500,14 @@ class Account extends RequestCollection
      */
     public function getPresenceStatus()
     {
-        return $this->ig->request('accounts/get_presence_disabled/')
+        /** @var Response\PresenceStatusResponse $result */
+        $result = $this->ig->request('accounts/get_presence_disabled/')
             ->setSignedGet(true)
             ->getResponse(new Response\PresenceStatusResponse());
+
+        $this->_savePresenceStatus($result->getDisabled());
+
+        return $result;
     }
 
     /**
@@ -501,12 +522,17 @@ class Account extends RequestCollection
      */
     public function enablePresence()
     {
-        return $this->ig->request('accounts/set_presence_disabled/')
+        /** @var Response\GenericResponse $result */
+        $result = $this->ig->request('accounts/set_presence_disabled/')
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('disabled', '0')
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\GenericResponse());
+
+        $this->_savePresenceStatus(false);
+
+        return $result;
     }
 
     /**
@@ -516,16 +542,21 @@ class Account extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\PresenceStatusResponse
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function disablePresence()
     {
-        return $this->ig->request('accounts/set_presence_disabled/')
+        /** @var Response\GenericResponse $result */
+        $result = $this->ig->request('accounts/set_presence_disabled/')
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('disabled', '1')
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\GenericResponse());
+
+        $this->_savePresenceStatus(true);
+
+        return $result;
     }
 
     /**

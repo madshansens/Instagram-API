@@ -91,8 +91,7 @@ class Realtime implements EventEmitterInterface
     {
         $additionalOptions = [
             'datacenter'       => $this->_instagram->settings->get('datacenter'),
-            // TODO store presence in settings (?)
-            //'disable_presence' => $this->_instagram->account->getPresenceStatus()->getDisabled(),
+            'disable_presence' => (bool) $this->_instagram->settings->get('presence_disabled'),
         ];
 
         return new Realtime\Mqtt(
