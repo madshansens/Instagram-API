@@ -30,8 +30,6 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getClientCacheKey()
  * @method string getCode()
  * @method bool getCollapseComments()
- * @method string getCollectionId()
- * @method mixed getCollectionName()
  * @method int getCommentCount()
  * @method bool getCommentLikesEnabled()
  * @method bool getCommentThreadingEnabled()
@@ -169,8 +167,6 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isClientCacheKey()
  * @method bool isCode()
  * @method bool isCollapseComments()
- * @method bool isCollectionId()
- * @method bool isCollectionName()
  * @method bool isCommentCount()
  * @method bool isCommentLikesEnabled()
  * @method bool isCommentThreadingEnabled()
@@ -308,8 +304,6 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setClientCacheKey(string $value)
  * @method $this setCode(string $value)
  * @method $this setCollapseComments(bool $value)
- * @method $this setCollectionId(string $value)
- * @method $this setCollectionName(mixed $value)
  * @method $this setCommentCount(int $value)
  * @method $this setCommentLikesEnabled(bool $value)
  * @method $this setCommentThreadingEnabled(bool $value)
@@ -447,8 +441,6 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetClientCacheKey()
  * @method $this unsetCode()
  * @method $this unsetCollapseComments()
- * @method $this unsetCollectionId()
- * @method $this unsetCollectionName()
  * @method $this unsetCommentCount()
  * @method $this unsetCommentLikesEnabled()
  * @method $this unsetCommentThreadingEnabled()
@@ -695,8 +687,6 @@ class Item extends AutoPropertyMapper
         'url_expire_at_secs'                       => '',
         'is_sidecar_child'                         => '',
         'comment_threading_enabled'                => 'bool',
-        'collection_id'                            => 'string',
-        'collection_name'                          => '',
         'cover_media'                              => 'CoverMedia',
         'saved_collection_ids'                     => 'string[]',
         'boosted_status'                           => '',

@@ -17,30 +17,43 @@ class Collection extends RequestCollection
     /**
      * Get a list of all of your collections.
      *
+     * @param null|string $maxId Next "maximum ID", used for pagination.
+     *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\GetCollectionsListResponse
      */
-    public function getList()
+    public function getList(
+        $maxId = null)
     {
-        return $this->ig->request('collections/list/')
-            ->getResponse(new Response\GetCollectionsListResponse());
+        $request = $this->ig->request('collections/list/');
+        if ($maxId !== null) {
+            $request->addParam('max_id', $maxId);
+        }
+
+        return $request->getResponse(new Response\GetCollectionsListResponse());
     }
 
     /**
      * Get the feed of one of your collections.
      *
-     * @param string $collectionId The collection ID.
+     * @param string      $collectionId The collection ID.
+     * @param null|string $maxId        Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\GetCollectionsListResponse
+     * @return \InstagramAPI\Response\CollectionFeedResponse
      */
     public function getFeed(
-        $collectionId)
+        $collectionId,
+        $maxId = null)
     {
-        return $this->ig->request("feed/collection/{$collectionId}/")
-            ->getResponse(new Response\GetCollectionsListResponse());
+        $request = $this->ig->request("feed/collection/{$collectionId}/");
+        if ($maxId !== null) {
+            $request->addParam('max_id', $maxId);
+        }
+
+        return $request->getResponse(new Response\CollectionFeedResponse());
     }
 
     /**
@@ -92,7 +105,11 @@ class Collection extends RequestCollection
      * Edit the name of a collection or add more saved media to an existing collection.
      *
      * @param string $collectionId The collection ID.
-     * @param array  $params       User-provided key-value pairs. string 'name', string[] 'add_media', string 'module_name' (optional).
+     * @param array  $params       User-provided key-value pairs:
+     *                             string 'name',
+     *                             string 'cover_media_id',
+     *                             string[] 'add_media',
+     *                             string 'module_name' (optional).
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -107,7 +124,10 @@ class Collection extends RequestCollection
         if (isset($params['name']) && $params['name'] !== '') {
             $postData['name'] = $params['name'];
         }
-        if (isset($params['add_media']) && is_array($params['add_media']) && !empty($params['add_media'])) {
+        if (!empty($params['cover_media_id'])) {
+            $postData['cover_media_id'] = $params['cover_media_id'];
+        }
+        if (!empty($params['add_media']) && is_array($params['add_media'])) {
             $postData['added_media_ids'] = json_encode(array_values($params['add_media']));
             if (isset($params['module_name']) && $params['module_name'] !== '') {
                 $postData['module_name'] = $params['module_name'];
