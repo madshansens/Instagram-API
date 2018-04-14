@@ -12,6 +12,11 @@ class FFmpeg
         'avconv',
     ];
 
+    const WINDOWS_BINARIES = [
+        'ffmpeg.exe',
+        'avconv.exe',
+    ];
+
     /** @var string|null */
     public static $defaultBinary;
 
@@ -201,7 +206,7 @@ class FFmpeg
      */
     protected static function _autoDetectBinary()
     {
-        $binaries = self::BINARIES;
+        $binaries = defined('PHP_WINDOWS_VERSION_MAJOR') ? self::WINDOWS_BINARIES : self::BINARIES;
         if (self::$defaultBinary !== null) {
             array_unshift($binaries, self::$defaultBinary);
         }
@@ -211,7 +216,7 @@ class FFmpeg
         }
 
         $instance = null;
-        foreach (self::BINARIES as $binary) {
+        foreach ($binaries as $binary) {
             if (isset(self::$_instances[$binary])) {
                 return self::$_instances[$binary];
             }
