@@ -21,6 +21,7 @@ use InstagramAPI\Request\Metadata\Internal as InternalMetadata;
 use InstagramAPI\Response;
 use InstagramAPI\Signatures;
 use InstagramAPI\Utils;
+use Winbox\Args;
 use function GuzzleHttp\Psr7\stream_for;
 
 /**
@@ -1842,13 +1843,6 @@ class Internal extends RequestCollection
         $targetFeed,
         InternalMetadata $internalMetadata)
     {
-        // escapeshellarg() on Windows does some strange replacements,
-        // so it is better to disable the segmented uploader there,
-        // since we have the resumable uploader as a fallback.
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
-            return false;
-        }
-
         // We need to have ffmpeg to segment the video.
         try {
             FFmpeg::factory();
@@ -2059,13 +2053,13 @@ class Internal extends RequestCollection
             // Split the video stream into a multiple segments by time.
             $ffmpeg->run(sprintf(
                 '-i %s -c:v copy -an -dn -sn -f segment -segment_time %d -segment_format mp4 %s',
-                escapeshellarg($videoDetails->getFilename()),
+                Args::escape($videoDetails->getFilename()),
                 (int) $this->ig->getExperimentParam(
                     'ig_android_video_segmented_upload_universe',
                     'segment_duration_sec',
                     5
                 ),
-                escapeshellarg(sprintf(
+                Args::escape(sprintf(
                     '%s%s%s_0video.%%03d.mp4',
                     $outputDirectory,
                     DIRECTORY_SEPARATOR,
@@ -2077,8 +2071,8 @@ class Internal extends RequestCollection
                 // Save the audio stream in one segment.
                 $ffmpeg->run(sprintf(
                     '-i %s -c:a copy -vn -dn -sn -f mp4 %s',
-                    escapeshellarg($videoDetails->getFilename()),
-                    escapeshellarg(sprintf(
+                    Args::escape($videoDetails->getFilename()),
+                    Args::escape(sprintf(
                         '%s%s%s_1audio.000.mp4',
                         $outputDirectory,
                         DIRECTORY_SEPARATOR,

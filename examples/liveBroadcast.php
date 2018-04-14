@@ -60,8 +60,8 @@ try {
     // NOTE: The video is broadcasted asynchronously (in the background).
     $broadcastProcess = $ffmpeg->runAsync(sprintf(
         '-rtbufsize 256M -re -i %s -acodec libmp3lame -ar 44100 -b:a 128k -pix_fmt yuv420p -profile:v baseline -s 720x1280 -bufsize 6000k -vb 400k -maxrate 1500k -deinterlace -vcodec libx264 -preset veryfast -g 30 -r 30 -f flv %s',
-        escapeshellarg($videoFilename),
-        escapeshellarg($streamUploadUrl)
+        \Winbox\Args::escape($videoFilename),
+        \Winbox\Args::escape($streamUploadUrl)
     ));
 
     // The following loop performs important requests to obtain information

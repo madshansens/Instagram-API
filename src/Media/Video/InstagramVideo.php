@@ -6,6 +6,7 @@ use InstagramAPI\Media\Geometry\Dimensions;
 use InstagramAPI\Media\Geometry\Rectangle;
 use InstagramAPI\Media\InstagramMedia;
 use InstagramAPI\Utils;
+use Winbox\Args;
 
 /**
  * Automatically prepares a video file according to Instagram's rules.
@@ -136,10 +137,10 @@ class InstagramVideo extends InstagramMedia
             $ffmpegOutput = $this->_ffmpeg->run(sprintf(
                 '-y %s -i %s -vf %s %s %s',
                 implode(' ', $inputFlags),
-                escapeshellarg($this->_inputFile),
-                escapeshellarg(implode(',', $filters)),
+                Args::escape($this->_inputFile),
+                Args::escape(implode(',', $filters)),
                 implode(' ', $this->_getOutputFlags($attempt)),
-                escapeshellarg($outputFile)
+                Args::escape($outputFile)
             ));
         } while ($this->_ffmpegMustRunAgain($attempt, $ffmpegOutput));
     }

@@ -5,6 +5,7 @@ namespace InstagramAPI\Media\Video;
 use InstagramAPI\Media\ConstraintsInterface;
 use InstagramAPI\Media\MediaDetails;
 use InstagramAPI\Utils;
+use Winbox\Args;
 
 class VideoDetails extends MediaDetails
 {
@@ -148,7 +149,11 @@ class VideoDetails extends MediaDetails
         }
 
         // Load with FFPROBE. Shows details as JSON and exits.
-        $command = escapeshellarg($ffprobe).' -v quiet -print_format json -show_format -show_streams '.escapeshellarg($filename);
+        $command = sprintf(
+            '%s -v quiet -print_format json -show_format -show_streams %s',
+            Args::escape($ffprobe),
+            Args::escape($filename)
+        );
         $jsonInfo = @shell_exec($command);
 
         // Check for processing errors.

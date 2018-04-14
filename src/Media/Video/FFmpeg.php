@@ -4,6 +4,7 @@ namespace InstagramAPI\Media\Video;
 
 use InstagramAPI\Utils;
 use Symfony\Component\Process\Process;
+use Winbox\Args;
 
 class FFmpeg
 {
@@ -114,7 +115,7 @@ class FFmpeg
     public function runAsync(
         $command)
     {
-        $fullCommand = sprintf('%s -v error %s', escapeshellarg($this->_ffmpegBinary), $command);
+        $fullCommand = sprintf('%s -v error %s', Args::escape($this->_ffmpegBinary), $command);
 
         $process = new Process($fullCommand);
         $process->start();
@@ -190,7 +191,7 @@ class FFmpeg
         try {
             $this->run(sprintf(
                 '-f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -c:a %s -t 1 -f null -',
-                escapeshellarg($encoder)
+                Args::escape($encoder)
             ));
 
             return true;
