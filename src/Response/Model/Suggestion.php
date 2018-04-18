@@ -17,7 +17,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getSocialContext()
  * @method string[] getThumbnailUrls()
  * @method User getUser()
- * @method mixed getValue()
+ * @method float getValue()
  * @method bool isAlgorithm()
  * @method bool isCaption()
  * @method bool isIcon()
@@ -39,7 +39,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setSocialContext(string $value)
  * @method $this setThumbnailUrls(string[] $value)
  * @method $this setUser(User $value)
- * @method $this setValue(mixed $value)
+ * @method $this setValue(float $value)
  * @method $this unsetAlgorithm()
  * @method $this unsetCaption()
  * @method $this unsetIcon()
@@ -59,7 +59,7 @@ class Suggestion extends AutoPropertyMapper
         'social_context'    => 'string',
         'algorithm'         => 'string',
         'thumbnail_urls'    => 'string[]',
-        'value'             => '',
+        'value'             => 'float',
         'caption'           => '',
         'user'              => 'User',
         'large_urls'        => 'string[]',

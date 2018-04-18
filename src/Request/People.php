@@ -515,20 +515,28 @@ class People extends RequestCollection
      * This matches you with other people using multiple algorithms such as
      * "friends of friends", "location", "people using similar hashtags", etc.
      *
+     * @param null|string $maxId Next "maximum ID", used for pagination.
+     *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\DiscoverPeopleResponse
      */
-    public function discoverPeople()
+    public function discoverPeople(
+        $maxId = null)
     {
-        return $this->ig->request('discover/ayml/')
+        $request = $this->ig->request('discover/ayml/')
             ->setSignedPost(false)
             ->addPost('phone_id', $this->ig->phone_id)
             ->addPost('module', 'discover_people')
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('paginate', true)
-            ->getResponse(new Response\DiscoverPeopleResponse());
+            ->addPost('paginate', true);
+
+        if ($maxId !== null) {
+            $request->addPost('max_id', $maxId);
+        }
+
+        return $request->getResponse(new Response\DiscoverPeopleResponse());
     }
 
     /**
