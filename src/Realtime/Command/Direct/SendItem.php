@@ -48,6 +48,11 @@ abstract class SendItem extends DirectCommand
             SendText::TYPE,
             SendLike::TYPE,
             SendReaction::TYPE,
+            SendPost::TYPE,
+            SendStory::TYPE,
+            SendProfile::TYPE,
+            SendLocation::TYPE,
+            SendHashtag::TYPE,
         ];
     }
 }

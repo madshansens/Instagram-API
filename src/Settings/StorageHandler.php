@@ -79,6 +79,7 @@ class StorageHandler
         'ig_android_direct_inbox_presence',
         'ig_android_direct_thread_presence',
         'ig_android_mqtt_region_hint_universe',
+        'ig_android_rtc_reshare',
     ];
 
     /**
