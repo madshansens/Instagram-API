@@ -4,6 +4,7 @@ namespace InstagramAPI;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\HandlerStack;
 use InstagramAPI\Exception\InstagramException;
 use InstagramAPI\Exception\LoginRequiredException;
@@ -239,12 +240,14 @@ class Client
     {
         $foundCookie = null;
         if ($this->_cookieJar instanceof CookieJar) {
+            /** @var SetCookie $cookie */
             foreach ($this->_cookieJar->getIterator() as $cookie) {
-                if ($cookie->getName() == $name
-                    && ($domain === null || $cookie->getDomain() == $domain)
-                    && ($path === null || $cookie->getPath() == $path)) {
+                if ($cookie->getName() === $name
+                    && ($domain === null || $cookie->matchesDomain($domain))
+                    && ($path === null || $cookie->matchesPath($path))) {
                     $foundCookie = $cookie;
-                    break;
+                    // break is omitted intentionally, because we might have more than
+                    // one cookie with the same name, so we will return the last one.
                 }
             }
         }
