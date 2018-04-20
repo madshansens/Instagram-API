@@ -2,6 +2,7 @@
 - You will be asked some questions and requested to provide some information, please read them **carefully** and answer completely.
 - Put an `x` into all the boxes [ ] relevant to your issue (like so [x]).
 - Use the *Preview* tab to see how your issue will actually look like, before sending it.
+- Understand that we will *CLOSE* (without answering) *all* issues related to `challenge_required`, `checkpoint_required`, `feedback_required` or `sentry_block`. They've already been answered in the Wiki and *countless* closed tickets in the past!
 - Do not post screenshots of error messages or code.
 
 ---
