@@ -217,8 +217,8 @@ class Client
     public function getToken()
     {
         $cookie = $this->getCookie('csrftoken', 'i.instagram.com');
-        if ($cookie === null || $cookie->getExpires() <= time()) {
-            return; // Ugh, StyleCI doesn't allow "return null;" for clarity. ;)
+        if ($cookie === null || $cookie->getValue() === '') {
+            return null;
         }
 
         return $cookie->getValue();
