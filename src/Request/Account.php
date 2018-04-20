@@ -2,6 +2,7 @@
 
 namespace InstagramAPI\Request;
 
+use InstagramAPI\Exception\InternalException;
 use InstagramAPI\Exception\SettingsException;
 use InstagramAPI\Response;
 
@@ -100,14 +101,21 @@ class Account extends RequestCollection
         $newUsername = null)
     {
         // We must mark the profile for editing before doing the main request.
-        $this->ig->request('accounts/current_user/')
+        $userResponse = $this->ig->request('accounts/current_user/')
             ->addParam('edit', true)
             ->getResponse(new Response\UserInfoResponse());
+
+        // Get the current user's name from the response.
+        $currentUser = $userResponse->getUser();
+        if (!$currentUser || !is_string($currentUser->getUsername())) {
+            throw new InternalException('Unable to find current account username while preparing profile edit.');
+        }
+        $oldUsername = $currentUser->getUsername();
 
         // Determine the desired username value.
         $username = is_string($newUsername) && strlen($newUsername) > 0
                   ? $newUsername
-                  : $this->ig->username;
+                  : $oldUsername; // Keep current name.
 
         return $this->ig->request('accounts/edit_profile/')
             ->addPost('_uuid', $this->ig->uuid)
