@@ -584,6 +584,56 @@ class Instagram implements ExperimentsInterface
     }
 
     /**
+     * Request a new security code SMS for a Two Factor login account.
+     *
+     * NOTE: You should first attempt to `login()` which will automatically send
+     * you a two factor SMS. This function is just for asking for a new SMS if
+     * the old code has expired.
+     *
+     * NOTE: Instagram can only send you a new code every 60 seconds.
+     *
+     * @param string $username            Your Instagram username.
+     * @param string $password            Your Instagram password.
+     * @param string $twoFactorIdentifier Two factor identifier, obtained in
+     *                                    `login()` response.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\TwoFactorLoginSMSResponse
+     */
+    public function sendTwoFactorLoginSMS(
+        $username,
+        $password,
+        $twoFactorIdentifier)
+    {
+        if (empty($username) || empty($password)) {
+            throw new \InvalidArgumentException('You must provide a username and password to sendTwoFactorLoginSMS().');
+        }
+        if (empty($twoFactorIdentifier)) {
+            throw new \InvalidArgumentException('You must provide a two-factor identifier to sendTwoFactorLoginSMS().');
+        }
+
+        // Switch the currently active user/pass if the details are different.
+        // NOTE: The password IS NOT actually necessary for THIS
+        // endpoint, but this extra step helps people who statelessly embed the
+        // library directly into a webpage, so they can `sendTwoFactorLoginSMS()`
+        // on their second page load without having to begin any new `login()`
+        // call (since they did that in their previous webpage's library calls).
+        if ($this->username !== $username || $this->password !== $password) {
+            $this->_setUser($username, $password);
+        }
+
+        return $this->ig->request('accounts/send_two_factor_login_sms/')
+            ->setNeedsAuth(false)
+            ->addPost('two_factor_identifier', $twoFactorIdentifier)
+            ->addPost('username', $username)
+            ->addPost('device_id', $this->ig->device_id)
+            ->addPost('guid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\TwoFactorLoginSMSResponse());
+    }
+
+    /**
      * Set the active account for the class instance.
      *
      * We can call this multiple times to switch between multiple accounts.
