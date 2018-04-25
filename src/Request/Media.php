@@ -656,6 +656,30 @@ class Media extends RequestCollection
     }
 
     /**
+     * Report media as spam.
+     *
+     * @param string $mediaId    The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string $sourceName (optional) Source of the media.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function reportAsSpam(
+        $mediaId,
+        $sourceName = 'feed_contextual_chain')
+    {
+        return $this->ig->request("media/{$mediaId}/flag_media/")
+            ->addPost('media_id', $mediaId)
+            ->addPost('source_name', $sourceName)
+            ->addPost('reason_id', '1')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
      * Validate and update the parameters for a like or unlike request.
      *
      * @param string  $type      What type of request this is (can be "like" or "unlike").
