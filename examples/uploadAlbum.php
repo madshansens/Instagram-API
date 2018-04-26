@@ -54,6 +54,54 @@ try {
     exit(0);
 }
 
+////// NORMALIZE MEDIA //////
+// All album files must have the same aspect ratio.
+// We copy the app's behavior by using the first file
+// as template for all subsequent ones.
+$mediaOptions = [
+    'targetFeed' => \InstagramAPI\Constants::FEED_TIMELINE_ALBUM,
+    // Uncomment to expand media instead of cropping it.
+    //'operation' => \InstagramAPI\Media\InstagramMedia::EXPAND,
+];
+foreach ($media as &$item) {
+    /** @var \InstagramAPI\Media\InstagramMedia|null $validMedia */
+    $validMedia = null;
+    switch ($item['type']) {
+        case 'photo':
+            $validMedia = new \InstagramAPI\Media\Photo\InstagramPhoto($item['file'], $mediaOptions);
+            break;
+        case 'video':
+            $validMedia = new \InstagramAPI\Media\Video\InstagramVideo($item['file'], $mediaOptions);
+            break;
+        default:
+            // Ignore unknown media type.
+    }
+    if ($validMedia === null) {
+        continue;
+    }
+
+    try {
+        $item['file'] = $validMedia->getFile();
+        // We must prevent the object from destructing too early,
+        // because it will remove the processed file.
+        $item['__media'] = $validMedia;
+    } catch (\Exception $e) {
+        continue;
+    }
+    if (!isset($mediaOptions['minAspectRatio'])) {
+        /** @var \InstagramAPI\Media\MediaDetails $mediaDetails */
+        $mediaDetails = $validMedia instanceof \InstagramAPI\Media\Photo\InstagramPhoto
+            ? new \InstagramAPI\Media\Photo\PhotoDetails($item['file'])
+            : new \InstagramAPI\Media\Video\VideoDetails($item['file']);
+        $aspectRatio = $mediaDetails->getAspectRatio();
+        $mediaOptions['minAspectRatio'] = $aspectRatio;
+        $mediaOptions['maxAspectRatio'] = $aspectRatio;
+        $mediaOptions['allowNewAspectDeviation'] = false;
+    }
+}
+unset($item);
+/////////////////////////////
+
 try {
     $ig->timeline->uploadAlbum($media, ['caption' => $captionText]);
 } catch (\Exception $e) {
