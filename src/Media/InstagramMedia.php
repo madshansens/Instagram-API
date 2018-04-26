@@ -130,7 +130,7 @@ abstract class InstagramMedia
      *   specific final ratios in MOST cases (due to the original dimensions of
      *   your input media). The ONLY ratio that is 100% sure to ALWAYS be
      *   perfectly reachable is 1:1 (square). Other ratios may not be perfectly
-     *   possible. But by setting this option to `FALSE`, you will tell our
+     *   possible. But by setting this option to `TRUE`, you will tell our
      *   processing to allow such "slight missteps" and permit the final
      *   "closest-possible canvas" we've calculated anyway. We will still get as
      *   close as absolutely possible. For example, we may instead reach

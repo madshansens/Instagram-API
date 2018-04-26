@@ -82,9 +82,10 @@ foreach ($media as &$item) {
 
     try {
         $item['file'] = $validMedia->getFile();
-        // We must prevent the object from destructing too early,
-        // because it will remove the processed file.
-        $item['__media'] = $validMedia;
+        // We must prevent the InstagramMedia object from destructing too early,
+        // because the media class auto-deletes the processed file during their
+        // destructor's cleanup (so we wouldn't be able to upload those files).
+        $item['__media'] = $validMedia; // Save object in an unused array key.
     } catch (\Exception $e) {
         continue;
     }
@@ -96,7 +97,22 @@ foreach ($media as &$item) {
         $aspectRatio = $mediaDetails->getAspectRatio();
         $mediaOptions['minAspectRatio'] = $aspectRatio;
         $mediaOptions['maxAspectRatio'] = $aspectRatio;
-        $mediaOptions['allowNewAspectDeviation'] = false;
+        // When we tell the media processor to resize all media to an exact
+        // aspect ratio (by setting BOTH min and max to the same value above),
+        // we're actually asking for something that is almost always IMPOSSIBLE
+        // to achieve unless ALL of the input media files were the EXACT same
+        // original input size. That's because pixels cannot be subdivided into
+        // smaller fractions than "1" (and therefore, hitting super-exact ratios
+        // is usually impossible). So in MOST cases, when we ask for something
+        // like "1.25385" ratio (ie. the ratio from the first file), other files
+        // may at-best become a TINY fraction of a percent off, such as "1.2543"
+        // instead. Therefore we MUST enable "allowNewAspectDeviation", which
+        // tells the media processor to aim at the CLOSEST possible aspect ratio
+        // but will allow itself to be sliiiightly off from the target when it's
+        // impossible to hit the exact ratio. The album will still look perfect.
+        // WARNING: If you DON'T enable this feature, the media processor will
+        // throw exceptions on every impossible media file!
+        $mediaOptions['allowNewAspectDeviation'] = true;
     }
 }
 unset($item);
