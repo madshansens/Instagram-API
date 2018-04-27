@@ -634,7 +634,15 @@ class Instagram implements ExperimentsInterface
     }
 
     /**
-     * Request information of the available methods (EMAIL or SMS) to reset the account's password.
+     * Request information about available password recovery methods for an account.
+     *
+     * This will tell you things such as whether SMS or EMAIL-based recovery is
+     * available for the given account name.
+     *
+     * `WARNING:` You can call this function without having called `login()`,
+     * but be aware that a user database entry will be created for every
+     * username you try to look up. This is ONLY meant for recovering your OWN
+     * accounts.
      *
      * @param string $username Your Instagram username.
      *
@@ -645,6 +653,22 @@ class Instagram implements ExperimentsInterface
     public function userLookup(
         $username)
     {
+        if (empty($username) || !is_string($username)) {
+            throw new \InvalidArgumentException('You must provide a username to userLookup().');
+        }
+
+        // Switch the currently active user/pass if the username is different.
+        // NOTE: Creates a user database (device) for the user if they're new!
+        // NOTE: Because we don't know their password, we'll mark the user as
+        // having "NOPASSWORD" as pwd. The user will fix that when/if they call
+        // `login()` with the ACTUAL password, which will tell us what it is.
+        // We CANNOT use an empty string since `_setUser()` will not allow that!
+        // NOTE: If the user tries to look up themselves WHILE they are logged
+        // in, we'll correctly NOT call `_setUser()` since they're already set.
+        if ($this->username !== $username) {
+            $this->_setUser($username, 'NOPASSWORD');
+        }
+
         return $this->request('users/lookup/')
             ->setNeedsAuth(false)
             ->addPost('q', $username)

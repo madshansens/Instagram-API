@@ -18,7 +18,7 @@ use InstagramAPI\Response;
  * @method string getPhoneNumber()
  * @method string getStatus()
  * @method Model\User getUser()
- * @method int getUserId()
+ * @method string getUserId()
  * @method Model\_Message[] get_Messages()
  * @method bool isCanEmailReset()
  * @method bool isCanSmsReset()
@@ -44,7 +44,7 @@ use InstagramAPI\Response;
  * @method $this setPhoneNumber(string $value)
  * @method $this setStatus(string $value)
  * @method $this setUser(Model\User $value)
- * @method $this setUserId(int $value)
+ * @method $this setUserId(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
  * @method $this unsetCanEmailReset()
  * @method $this unsetCanSmsReset()
@@ -68,7 +68,7 @@ class UsersLookupResponse extends Response
         'has_valid_phone' => 'bool',
         'can_email_reset' => 'bool',
         'can_sms_reset'   => 'bool',
-        'user_id'         => 'int',
+        'user_id'         => 'string',
         'lookup_source'   => 'string',
         'email'           => 'string',
         'phone_number'    => 'string',
