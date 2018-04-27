@@ -680,6 +680,30 @@ class Media extends RequestCollection
     }
 
     /**
+     * Report comment as spam.
+     *
+     * @param string $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string $commentId The comment's ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function reportComment(
+        $mediaId,
+        $commentId)
+    {
+        return $this->ig->request("media/{$mediaId}/comment/{$commentId}/flag/")
+            ->addPost('media_id', $mediaId)
+            ->addPost('comment_id', $commentId)
+            ->addPost('reason', '1')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
      * Validate and update the parameters for a like or unlike request.
      *
      * @param string  $type      What type of request this is (can be "like" or "unlike").
