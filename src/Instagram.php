@@ -634,6 +634,29 @@ class Instagram implements ExperimentsInterface
     }
 
     /**
+     * Request information of the available methods (EMAIL or SMS) to reset the account's password.
+     *
+     * @param string $username Your Instagram username.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\UsersLookupResponse
+     */
+    public function userLookup(
+        $username)
+    {
+        return $this->request('users/lookup/')
+            ->setNeedsAuth(false)
+            ->addPost('q', $username)
+            ->addPost('directly_sign_in', true)
+            ->addPost('username', $username)
+            ->addPost('device_id', $this->device_id)
+            ->addPost('guid', $this->uuid)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->getResponse(new Response\UsersLookupResponse());
+    }
+
+    /**
      * Set the active account for the class instance.
      *
      * We can call this multiple times to switch between multiple accounts.
