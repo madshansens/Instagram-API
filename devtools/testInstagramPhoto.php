@@ -48,19 +48,17 @@ foreach (['Landscape', 'Portrait'] as $orientation) {
         // Run the cropping test...
         $outputFile = sprintf('%s/result_crop_%s', $testImageFolder, $fileName);
         runTest($inputFile, $outputFile, [
-            'minAspectRatio' => 1, // Square.
-            'maxAspectRatio' => 1,
-            'horCropFocus'   => -35, // Always use the same focus, to look for orientation errors.
-            'verCropFocus'   => -35, // This combo aims at the upper left corner.
-            'operation'      => InstagramMedia::CROP,
+            'forceAspectRatio' => 1.0, // Square.
+            'horCropFocus'     => -35, // Always use the same focus, to look for orientation errors.
+            'verCropFocus'     => -35, // This combo aims at the upper left corner.
+            'operation'        => InstagramMedia::CROP,
         ]);
 
         // Run the expansion test...
         $outputFile = sprintf('%s/result_expand_%s', $testImageFolder, $fileName);
         runTest($inputFile, $outputFile, [
-            'minAspectRatio' => 1, // Square.
-            'maxAspectRatio' => 1,
-            'operation'      => InstagramMedia::EXPAND,
+            'forceAspectRatio' => 1.0, // Square.
+            'operation'        => InstagramMedia::EXPAND,
         ]);
     }
 }
