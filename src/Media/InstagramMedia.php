@@ -44,7 +44,11 @@ abstract class InstagramMedia
      * TIP: If your default system temp folder isn't writable, it's NECESSARY
      * for you to set this value to another, writable path, like this:
      *
+     * ```
      * \InstagramAPI\InstagramMedia::$defaultTmpPath = '/home/example/foo/';
+     * ```
+     *
+     * @var string|null
      */
     public static $defaultTmpPath = null;
 
@@ -88,9 +92,14 @@ abstract class InstagramMedia
     /** @var MediaDetails The media details for our input file. */
     protected $_details;
 
-    /** @var float|null Optional forced aspect ratio target in case of
-     * input being outside allowed min/max range. */
+    /** @var float|null Optional forced aspect ratio target to apply in case of
+     * input being outside allowed min/max range (OR if the input deviates too
+     * much from this target, in case this target ratio was user-provided). */
     protected $_forceTargetAspectRatio;
+
+    /** @var bool Whether the user specified the "forced target ratio"
+     * themselves, which means we should be VERY strict about applying it. */
+    protected $_hasUserForceTargetAspectRatio;
 
     /**
      * Constructor.
@@ -107,34 +116,62 @@ abstract class InstagramMedia
      *   vertically (reducing height). Uses intelligent guess if not set.
      *
      * - "minAspectRatio" (float): Minimum allowed aspect ratio. Uses
-     *   auto-selected class constants if not set.
+     *   auto-selected class constants (with the correct, legal Instagram
+     *   aspect ratio limits for your chosen target feed) if not set.
      *
      * - "maxAspectRatio" (float): Maximum allowed aspect ratio. Uses
-     *   auto-selected class constants if not set.
+     *   auto-selected class constants (with the correct, legal Instagram
+     *   aspect ratio limits for your chosen target feed) if not set.
+     *
+     * - "forceAspectRatio" (float): Tell the media processor to enforce a
+     *   specific aspect ratio target. This custom value MUST be within the
+     *   "minAspectRatio" to "maxAspectRatio" range! NOTE: When your goal is to
+     *   generate a custom media aspect ratio, you should normally ONLY specify
+     *   THIS parameter and should NEVER tamper with the min/max aspect ratio
+     *   limits! Because when you're specifying a custom forced ratio here, we
+     *   WILL ALWAYS verify/process the media as-necessary to fit your desired
+     *   ratio (EVEN if the input media was "already valid" within the overall,
+     *   larger legal min/max ratio ranges). ALSO NOTE: We WON'T process input
+     *   media when it's already VERY close to the desired target ratio. The
+     *   ONLY custom aspect ratio value that is 100% guaranteed to be FULLY
+     *   ENFORCED is `1.0` (square). If you specify ANY other ratio, we will
+     *   accept a VERY SMALL deviation when the media is already almost exactly
+     *   at the desired ratio. This is done to prevent pointless "impossible
+     *   processing", since achieving EXACT non-`1.0` ratios is almost always
+     *   IMPOSSIBLE, so it's not worth trying with media that's already very
+     *   close. The reason why non-`1.0` ratios are impossibly hard to hit in
+     *   MOST cases, is because pixels cannot be subdivided into smaller
+     *   fractions than "1 whole pixel", so in most cases when we ask for
+     *   something like `1.25385` ratio and we have an input file such as
+     *   `640x512` (`1.25` ratio), it is PHYSICALLY IMPOSSIBLE to achieve a
+     *   `1.25385` ratio with that input and we could AT BEST reach a tiny
+     *   fraction away from that target; such as `641x512` (`1.251953125`
+     *   ratio), `639x512` (`1.248046875` ratio), `640x513` (`1.247563353`
+     *   ratio) or `640x511` (`1.252446184` ratio). So whether you CAN hit your
+     *   EXACT desired non-`1.0` ratio or NOT depends 100% on your input file's
+     *   resolution! That's why we passthrough files that are already super
+     *   close to the desired ratio. Either way, such a tiny difference in
+     *   aspect ratio won't be visible to the eye, so if you are using this
+     *   "target ratio" feature for creating Instagram albums where all media
+     *   has the same aspect ratio, the final result WILL still look perfect.
      *
      * - "useRecommendedRatio" (bool): Whether to use the recommended aspect
-     *   ratio for the media type and target feed. Some targets use the
-     *   recommended ratio by default, and others disable it by default.
-     *   Therefore, you do NOT need to set this option manually unless you
-     *   have a very special reason to do so!
+     *   ratio for your specific media type and target feed (such as using an
+     *   appropriate `9:16` portrait widescreen for stories). Some targets use
+     *   the recommended ratio by default, and others disable this by default.
+     *   Therefore, you do NOT need to set this option manually unless you have
+     *   a VERY special reason to do so! NOTE: This will ALWAYS be set to
+     *   `FALSE` if you're using the "forceAspectRatio" parameter!
      *
-     * - "allowNewAspectDeviation" (bool): Whether to allow the new aspect ratio
-     *   (during processing) to deviate slightly from the min/max targets.
-     *   Normally, we will ENSURE that the resulting canvas PERFECTLY fits
-     *   within the provided minimum and maximum aspect ratio ranges. However,
-     *   if you want to resize your media to an "exact" static ratio such as
-     *   "minAspectRatio:1.25, maxAspectRatio:1.25" (or perhaps to a min/max
-     *   ratio from another piece of media, if you want all media to be changed
-     *   to the same size), then your result would almost always violate that
-     *   request since it would be IMPOSSIBLE to achieve such perfect and
-     *   specific final ratios in MOST cases (due to the original dimensions of
-     *   your input media). The ONLY ratio that is 100% sure to ALWAYS be
-     *   perfectly reachable is 1:1 (square). Other ratios may not be perfectly
-     *   possible. But by setting this option to `TRUE`, you will tell our
-     *   processing to allow such "slight missteps" and permit the final
-     *   "closest-possible canvas" we've calculated anyway. We will still get as
-     *   close as absolutely possible. For example, we may instead reach
-     *   "1.25385" in the "1.25" example.
+     * - "allowNewAspectDeviation" (bool): Whether to allow the new, final
+     *   aspect ratio (during processing) to deviate slightly from the MIN/MAX
+     *   limits. By setting this option to `TRUE`, you will tell our processing
+     *   to allow "slightly too high/slightly too low" final aspect ratios
+     *   (instead of throwing an exception) and to still permit the final
+     *   "closest-possible canvas" we've calculated anyway. You should NEVER
+     *   need to use this feature, but if you have manually configured extremely
+     *   narrow min/max aspect ratio parameters (which your input media CANNOT
+     *   be tweaked to fit perfectly within) then you MAY want to enable this.
      *
      * - "bgColor" (array) - Array with 3 color components `[R, G, B]`
      *   (0-255/0x00-0xFF) for the background. Uses white if not set.
@@ -164,6 +201,7 @@ abstract class InstagramMedia
         $verCropFocus = isset($options['verCropFocus']) ? $options['verCropFocus'] : null;
         $minAspectRatio = isset($options['minAspectRatio']) ? $options['minAspectRatio'] : null;
         $maxAspectRatio = isset($options['maxAspectRatio']) ? $options['maxAspectRatio'] : null;
+        $userForceTargetAspectRatio = isset($options['forceAspectRatio']) ? $options['forceAspectRatio'] : null;
         $useRecommendedRatio = isset($options['useRecommendedRatio']) ? (bool) $options['useRecommendedRatio'] : null;
         $allowNewAspectDeviation = isset($options['allowNewAspectDeviation']) ? (bool) $options['allowNewAspectDeviation'] : false;
         $bgColor = isset($options['bgColor']) ? $options['bgColor'] : null;
@@ -192,27 +230,42 @@ abstract class InstagramMedia
         }
         $this->_verCropFocus = $verCropFocus;
 
-        // Create constraints and determine whether to use recommended aspect ratio.
+        // Does the user want to override (force) the final "target aspect ratio" choice?
+        // NOTE: This will be used to override `$this->_forceTargetAspectRatio`.
+        $this->_hasUserForceTargetAspectRatio = false;
+        if ($userForceTargetAspectRatio !== null) {
+            if (!is_float($userForceTargetAspectRatio) && !is_int($userForceTargetAspectRatio)) {
+                throw new \InvalidArgumentException('Custom target aspect ratio must be a float or integer.');
+            }
+            $userForceTargetAspectRatio = (float) $userForceTargetAspectRatio;
+            $this->_hasUserForceTargetAspectRatio = true;
+            $useRecommendedRatio = false; // We forcibly disable this too, to avoid risk of future bugs.
+        }
+
+        // Create constraints and determine whether to use "recommended target aspect ratio" (if one is available for feed).
         $this->_constraints = ConstraintsFactory::createFor($targetFeed);
-        if ($useRecommendedRatio === null) {
+        if (!$this->_hasUserForceTargetAspectRatio && $useRecommendedRatio === null) {
             // No value is provided, so let's guess it.
             if ($minAspectRatio !== null || $maxAspectRatio !== null) {
                 // If we have at least one custom ratio, we must not use recommended ratio.
                 $useRecommendedRatio = false;
             } else {
-                // Use the recommended value from constraints.
+                // Use the recommended value from constraints (either on or off, depending on which target feed).
                 $useRecommendedRatio = $this->_constraints->useRecommendedRatioByDefault();
             }
         }
 
         // Determine the legal min/max aspect ratios for the target feed.
-        if ($useRecommendedRatio === true) {
+        if (!$this->_hasUserForceTargetAspectRatio && $useRecommendedRatio === true) {
             $this->_forceTargetAspectRatio = $this->_constraints->getRecommendedRatio();
             $deviation = $this->_constraints->getRecommendedRatioDeviation();
             $minAspectRatio = $this->_forceTargetAspectRatio - $deviation;
             $maxAspectRatio = $this->_forceTargetAspectRatio + $deviation;
         } else {
-            $this->_forceTargetAspectRatio = null;
+            // If the user hasn't specified a custom target aspect ratio, this
+            // "force" value will remain NULL (and the target ratio will be
+            // auto-calculated by the canvas generation algorithms instead).
+            $this->_forceTargetAspectRatio = $userForceTargetAspectRatio;
             $allowedMinRatio = $this->_constraints->getMinAspectRatio();
             $allowedMaxRatio = $this->_constraints->getMaxAspectRatio();
 
@@ -234,11 +287,17 @@ abstract class InstagramMedia
             if ($minAspectRatio !== null && $maxAspectRatio !== null && $minAspectRatio > $maxAspectRatio) {
                 throw new \InvalidArgumentException('Maximum aspect ratio must be greater than or equal to minimum.');
             }
+
+            // Validate custom target aspect ratio if provided by user.
+            if ($this->_hasUserForceTargetAspectRatio && ($this->_forceTargetAspectRatio < $minAspectRatio || $this->_forceTargetAspectRatio > $maxAspectRatio)) {
+                throw new \InvalidArgumentException(sprintf('Custom target aspect ratio (%.5f) must be between %.3f and %.3f.',
+                                                            $this->_forceTargetAspectRatio, $minAspectRatio, $maxAspectRatio));
+            }
         }
         $this->_minAspectRatio = $minAspectRatio;
         $this->_maxAspectRatio = $maxAspectRatio;
 
-        // Allow the aspect ratio of the final, new canvas to deviate slightly?
+        // Allow the aspect ratio of the final, new canvas to deviate slightly from the min/max range?
         $this->_allowNewAspectDeviation = $allowNewAspectDeviation;
 
         // Background color.
@@ -347,6 +406,29 @@ abstract class InstagramMedia
         // Process if aspect ratio > maximum allowed.
         if ($this->_maxAspectRatio !== null && $inputAspectRatio > $this->_maxAspectRatio) {
             return true;
+        }
+
+        // Process if USER provided the custom aspect ratio target and input deviates too much.
+        if ($this->_hasUserForceTargetAspectRatio) {
+            if ($this->_forceTargetAspectRatio == 1.0) {
+                // User wants a SQUARE canvas, which can ALWAYS be achieved (by
+                // making both sides equal). Process input if not EXACTLY square.
+                // WARNING: Comparison here and above MUST use `!=` (NOT strict
+                // `!==`) to support both int(1) and float(1.0) values!
+                if ($inputAspectRatio != 1.0) {
+                    return true;
+                }
+            } else {
+                // User wants a non-square canvas, which is almost always
+                // IMPOSSIBLE to achieve perfectly. Only process if input
+                // deviates too much from the desired target.
+                $acceptableDeviation = 0.003; // Allow a very narrow range around the user's target.
+                $acceptableMinAspectRatio = $this->_forceTargetAspectRatio - $acceptableDeviation;
+                $acceptableMaxAspectRatio = $this->_forceTargetAspectRatio + $acceptableDeviation;
+                if ($inputAspectRatio < $acceptableMinAspectRatio || $inputAspectRatio > $acceptableMaxAspectRatio) {
+                    return true;
+                }
+            }
         }
 
         // Process if the media can't be uploaded to Instagram as is.
@@ -789,8 +871,9 @@ abstract class InstagramMedia
      * @param float|null $minAspectRatio
      * @param float|null $maxAspectRatio
      * @param float|null $forceTargetAspectRatio  Optional forced aspect ratio
-     *                                            target in case of input being
-     *                                            outside allowed min/max range.
+     *                                            target (ALWAYS applied,
+     *                                            except if input is already
+     *                                            EXACTLY this ratio).
      * @param bool       $allowNewAspectDeviation See constructor arg docs.
      *
      * @throws \RuntimeException If requested canvas couldn't be achieved, most
@@ -853,6 +936,10 @@ abstract class InstagramMedia
          * Thank you.
          */
 
+        if ($forceTargetAspectRatio !== null) {
+            $this->_debugText('SPECIAL_PARAMETERS: Forced Target Aspect Ratio', 'forceTargetAspectRatio=%.5f', $forceTargetAspectRatio);
+        }
+
         // Initialize target canvas to original input dimensions & aspect ratio.
         $targetWidth = (int) $inputWidth;
         $targetHeight = (int) $inputHeight;
@@ -860,60 +947,77 @@ abstract class InstagramMedia
         $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_INPUT: Input Canvas Size');
 
         // Check aspect ratio and crop/expand the canvas to fit aspect if needed.
-        $useFloorHeightRecalc = true; // Height-behavior in any later re-calculations.
-        if ($minAspectRatio !== null && $targetAspectRatio < $minAspectRatio) {
-            // Use floor() so that height will always be above minAspectRatio.
-            $useFloorHeightRecalc = true;
-            // Determine target ratio; in case of stories we always target 9:16.
+        if (
+            ($minAspectRatio !== null && $targetAspectRatio < $minAspectRatio)
+            || ($forceTargetAspectRatio !== null && $targetAspectRatio < $forceTargetAspectRatio)
+        ) {
+            // Determine target ratio; uses forced aspect ratio if set,
+            // otherwise we target the MINIMUM allowed ratio (since we're < it)).
             $targetAspectRatio = $forceTargetAspectRatio !== null ? $forceTargetAspectRatio : $minAspectRatio;
 
             if ($operation === self::CROP) {
                 // We need to limit the height, so floor is used intentionally to
-                // AVOID rounding height upwards to a still-illegal aspect ratio.
+                // AVOID rounding height upwards to a still-too-low aspect ratio.
                 $targetHeight = (int) floor($targetWidth / $targetAspectRatio);
-                $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_CROPPED: Aspect Was < MIN');
+                $this->_debugDimensions($targetWidth, $targetHeight, sprintf('CANVAS_CROPPED: %s', $forceTargetAspectRatio === null ? 'Aspect Was < MIN' : 'Applying Forced Aspect for INPUT < TARGET'));
             } elseif ($operation === self::EXPAND) {
                 // We need to expand the width with left/right borders. We use
                 // ceil to guarantee that the final media is wide enough to be
                 // above the minimum allowed aspect ratio.
                 $targetWidth = (int) ceil($targetHeight * $targetAspectRatio);
-                $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_EXPANDED: Aspect Was < MIN');
+                $this->_debugDimensions($targetWidth, $targetHeight, sprintf('CANVAS_EXPANDED: %s', $forceTargetAspectRatio === null ? 'Aspect Was < MIN' : 'Applying Forced Aspect for INPUT < TARGET'));
             }
-        } elseif ($maxAspectRatio !== null && $targetAspectRatio > $maxAspectRatio) {
-            // Use ceil() so that height will always be below maxAspectRatio.
-            $useFloorHeightRecalc = false;
-            // Determine target ratio; in case of stories we always target 9:16.
+        } elseif (
+            ($maxAspectRatio !== null && $targetAspectRatio > $maxAspectRatio)
+            || ($forceTargetAspectRatio !== null && $targetAspectRatio > $forceTargetAspectRatio)
+        ) {
+            // Determine target ratio; uses forced aspect ratio if set,
+            // otherwise we target the MAXIMUM allowed ratio (since we're > it)).
             $targetAspectRatio = $forceTargetAspectRatio !== null ? $forceTargetAspectRatio : $maxAspectRatio;
 
             if ($operation === self::CROP) {
                 // We need to limit the width. We use floor to guarantee cutting
                 // enough pixels, since our width exceeds the maximum allowed ratio.
                 $targetWidth = (int) floor($targetHeight * $targetAspectRatio);
-                $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_CROPPED: Aspect Was > MAX');
+                $this->_debugDimensions($targetWidth, $targetHeight, sprintf('CANVAS_CROPPED: %s', $forceTargetAspectRatio === null ? 'Aspect Was > MAX' : 'Applying Forced Aspect for INPUT > TARGET'));
             } elseif ($operation === self::EXPAND) {
                 // We need to expand the height with top/bottom borders. We use
                 // ceil to guarantee that the final media is tall enough to be
                 // below the maximum allowed aspect ratio.
                 $targetHeight = (int) ceil($targetWidth / $targetAspectRatio);
-                $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_EXPANDED: Aspect Was > MAX');
+                $this->_debugDimensions($targetWidth, $targetHeight, sprintf('CANVAS_EXPANDED: %s', $forceTargetAspectRatio === null ? 'Aspect Was > MAX' : 'Applying Forced Aspect for INPUT > TARGET'));
             }
         } else {
             $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS: Aspect Ratio Already Legal');
-
-            // The media's aspect ratio is already within the legal range, but
-            // we'll still need to set up a proper height re-calc variable if
-            // our input needs to be re-scaled based on width limits further
-            // below. So determine whether the input is closest to min or max.
-            $minAspectDistance = abs(($minAspectRatio !== null
-                ? $minAspectRatio : 0) - $targetAspectRatio);
-            $maxAspectDistance = abs(($maxAspectRatio !== null
-                ? $maxAspectRatio : 0) - $targetAspectRatio);
-
-            // If it's closest to minimum allowed ratio, we'll use floor() to
-            // ensure the result is above the minimum ratio. Otherwise we'll use
-            // ceil() to ensure that the result is below the maximum ratio.
-            $useFloorHeightRecalc = ($minAspectDistance < $maxAspectDistance);
         }
+
+        // Determine whether the final target ratio is closest to either the
+        // legal MINIMUM or the legal MAXIMUM aspect ratio limits.
+        // NOTE: The target ratio will actually still be set to the original
+        // input media's ratio in case of no aspect ratio adjustments above.
+        // NOTE: If min and/or max ratios were not provided, we default min to
+        // `0` and max to `9999999` to ensure that we properly detect the "least
+        // distance" direction even when only one (or neither) of the two "range
+        // limit values" were provided.
+        $minAspectDistance = abs(($minAspectRatio !== null
+                                  ? $minAspectRatio : 0) - $targetAspectRatio);
+        $maxAspectDistance = abs(($maxAspectRatio !== null
+                                  ? $maxAspectRatio : 9999999) - $targetAspectRatio);
+        $isClosestToMinAspect = ($minAspectDistance <= $maxAspectDistance);
+
+        // We MUST now set up the correct height re-calculation behavior for the
+        // later algorithm steps. This is used whenever our canvas needs to be
+        // re-scaled by any other code below. If our chosen, final target ratio
+        // is closest to the minimum allowed legal ratio, we'll always use
+        // floor() on the height to ensure that the height value becomes as low
+        // as possible (since having LESS height compared to width is what
+        // causes the aspect ratio value to grow), to ensure that the final
+        // result's ratio (after any additional adjustments) will ALWAYS be
+        // ABOVE the minimum legal ratio (minAspectRatio). Otherwise we'll
+        // instead use ceil() on the height (since having more height causes the
+        // aspect ratio value to shrink), to ensure that the result is always
+        // BELOW the maximum ratio (maxAspectRatio).
+        $useFloorHeightRecalc = $isClosestToMinAspect;
 
         // Verify square target ratios by ensuring canvas is now a square.
         // NOTE: This is just a sanity check against wrong code above. It will
@@ -923,7 +1027,9 @@ abstract class InstagramMedia
         // then made identical thanks to the fact that X / 1 = X, and X * 1 = X.
         // NOTE: It's worth noting that our squares are always the size of the
         // shortest side when cropping or the longest side when expanding.
-        if ($targetAspectRatio === 1 && $targetWidth !== $targetHeight) { // Ratio 1 = Square.
+        // WARNING: Comparison MUST use `==` (NOT strict `===`) to support both
+        // int(1) and float(1.0) values!
+        if ($targetAspectRatio == 1.0 && $targetWidth !== $targetHeight) { // Ratio 1 = Square.
             $targetWidth = $targetHeight = $operation === self::CROP
                          ? min($targetWidth, $targetHeight)
                          : max($targetWidth, $targetHeight);
