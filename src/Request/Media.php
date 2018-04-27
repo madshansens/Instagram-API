@@ -665,7 +665,7 @@ class Media extends RequestCollection
      *
      * @return \InstagramAPI\Response\GenericResponse
      */
-    public function reportAsSpam(
+    public function report(
         $mediaId,
         $sourceName = 'feed_contextual_chain')
     {
@@ -680,7 +680,7 @@ class Media extends RequestCollection
     }
 
     /**
-     * Report comment as spam.
+     * Report a media comment as spam.
      *
      * @param string $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param string $commentId The comment's ID.
