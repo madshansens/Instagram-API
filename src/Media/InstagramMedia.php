@@ -123,7 +123,7 @@ abstract class InstagramMedia
      *   auto-selected class constants (with the correct, legal Instagram
      *   aspect ratio limits for your chosen target feed) if not set.
      *
-     * - "forceAspectRatio" (float): Tell the media processor to enforce a
+     * - "forceAspectRatio" (float|int): Tell the media processor to enforce a
      *   specific aspect ratio target. This custom value MUST be within the
      *   "minAspectRatio" to "maxAspectRatio" range! NOTE: When your goal is to
      *   generate a custom media aspect ratio, you should normally ONLY specify
@@ -205,9 +205,9 @@ abstract class InstagramMedia
         $useRecommendedRatio = isset($options['useRecommendedRatio']) ? (bool) $options['useRecommendedRatio'] : null;
         $allowNewAspectDeviation = isset($options['allowNewAspectDeviation']) ? (bool) $options['allowNewAspectDeviation'] : false;
         $bgColor = isset($options['bgColor']) ? $options['bgColor'] : null;
-        $operation = isset($options['operation']) ? $options['operation'] : null;
-        $tmpPath = isset($options['tmpPath']) ? $options['tmpPath'] : null;
-        $debug = isset($options['debug']) ? $options['debug'] : null;
+        $operation = isset($options['operation']) ? $options['operation'] : self::CROP;
+        $tmpPath = isset($options['tmpPath']) ? (string) $options['tmpPath'] : null;
+        $debug = isset($options['debug']) ? $options['debug'] : false;
 
         // Debugging.
         $this->_debug = $debug === true;
@@ -229,6 +229,14 @@ abstract class InstagramMedia
             throw new \InvalidArgumentException('Vertical crop focus must be between -50 and 50.');
         }
         $this->_verCropFocus = $verCropFocus;
+
+        // Minimum and maximum aspect ratio range.
+        if ($minAspectRatio !== null && !is_float($minAspectRatio)) {
+            throw new \InvalidArgumentException('Minimum aspect ratio must be a floating point number.');
+        }
+        if ($maxAspectRatio !== null && !is_float($maxAspectRatio)) {
+            throw new \InvalidArgumentException('Maximum aspect ratio must be a floating point number.');
+        }
 
         // Does the user want to override (force) the final "target aspect ratio" choice?
         // NOTE: This will be used to override `$this->_forceTargetAspectRatio`.
@@ -288,10 +296,16 @@ abstract class InstagramMedia
                 throw new \InvalidArgumentException('Maximum aspect ratio must be greater than or equal to minimum.');
             }
 
-            // Validate custom target aspect ratio if provided by user.
-            if ($this->_hasUserForceTargetAspectRatio && ($this->_forceTargetAspectRatio < $minAspectRatio || $this->_forceTargetAspectRatio > $maxAspectRatio)) {
-                throw new \InvalidArgumentException(sprintf('Custom target aspect ratio (%.5f) must be between %.3f and %.3f.',
-                                                            $this->_forceTargetAspectRatio, $minAspectRatio, $maxAspectRatio));
+            // Validate custom target aspect ratio legality if provided by user.
+            if ($this->_hasUserForceTargetAspectRatio) {
+                if ($minAspectRatio !== null && $this->_forceTargetAspectRatio < $minAspectRatio) {
+                    throw new \InvalidArgumentException(sprintf('Custom target aspect ratio (%.5f) must be greater than or equal to the minimum aspect ratio (%.5f).',
+                                                                $this->_forceTargetAspectRatio, $minAspectRatio));
+                }
+                if ($maxAspectRatio !== null && $this->_forceTargetAspectRatio > $maxAspectRatio) {
+                    throw new \InvalidArgumentException(sprintf('Custom target aspect ratio (%.5f) must be lesser than or equal to the maximum aspect ratio (%.5f).',
+                                                                $this->_forceTargetAspectRatio, $maxAspectRatio));
+                }
             }
         }
         $this->_minAspectRatio = $minAspectRatio;
@@ -309,10 +323,8 @@ abstract class InstagramMedia
         $this->_bgColor = $bgColor;
 
         // Media operation.
-        if ($operation !== null && $operation !== self::CROP && $operation !== self::EXPAND) {
+        if ($operation !== self::CROP && $operation !== self::EXPAND) {
             throw new \InvalidArgumentException('The operation must be one of the class constants CROP or EXPAND.');
-        } elseif ($operation === null) {
-            $operation = self::CROP;
         }
         $this->_operation = $operation;
 
