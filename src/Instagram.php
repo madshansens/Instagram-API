@@ -653,21 +653,8 @@ class Instagram implements ExperimentsInterface
     public function userLookup(
         $username)
     {
-        if (empty($username) || !is_string($username)) {
-            throw new \InvalidArgumentException('You must provide a username to userLookup().');
-        }
-
-        // Switch the currently active user/pass if the username is different.
-        // NOTE: Creates a user database (device) for the user if they're new!
-        // NOTE: Because we don't know their password, we'll mark the user as
-        // having "NOPASSWORD" as pwd. The user will fix that when/if they call
-        // `login()` with the ACTUAL password, which will tell us what it is.
-        // We CANNOT use an empty string since `_setUser()` will not allow that!
-        // NOTE: If the user tries to look up themselves WHILE they are logged
-        // in, we'll correctly NOT call `_setUser()` since they're already set.
-        if ($this->username !== $username) {
-            $this->_setUser($username, 'NOPASSWORD');
-        }
+        // Set active user (without pwd), and create database entry if new user.
+        $this->_setUserWithoutPassword($username);
 
         return $this->request('users/lookup/')
             ->setNeedsAuth(false)
@@ -681,7 +668,7 @@ class Instagram implements ExperimentsInterface
     }
 
     /**
-     * Send recovery EMAIL to get back into your account.
+     * Request a recovery EMAIL to get back into your account.
      *
      * `WARNING:` You can call this function without having called `login()`,
      * but be aware that a user database entry will be created for every
@@ -697,26 +684,13 @@ class Instagram implements ExperimentsInterface
     public function sendRecoveryEmail(
         $username)
     {
-        if (empty($username) || !is_string($username)) {
-            throw new \InvalidArgumentException('You must provide a username to userLookup().');
-        }
+        // Set active user (without pwd), and create database entry if new user.
+        $this->_setUserWithoutPassword($username);
 
+        // Verify that they can use the recovery email option.
         $userLookup = $this->userLookup($username);
-
         if (!$userLookup->getCanEmailReset()) {
-            throw new \InstagramAPI\Exception\InstagramException('Your account has not a verified email to send the recovery email.');
-        }
-
-        // Switch the currently active user/pass if the username is different.
-        // NOTE: Creates a user database (device) for the user if they're new!
-        // NOTE: Because we don't know their password, we'll mark the user as
-        // having "NOPASSWORD" as pwd. The user will fix that when/if they call
-        // `login()` with the ACTUAL password, which will tell us what it is.
-        // We CANNOT use an empty string since `_setUser()` will not allow that!
-        // NOTE: If the user tries to look up themselves WHILE they are logged
-        // in, we'll correctly NOT call `_setUser()` since they're already set.
-        if ($this->username !== $username) {
-            $this->_setUser($username, 'NOPASSWORD');
+            throw new \InstagramAPI\Exception\InternalException('Email recovery is not available, since your account lacks a verified email address.');
         }
 
         return $this->request('accounts/send_recovery_flow_email/')
@@ -730,7 +704,7 @@ class Instagram implements ExperimentsInterface
     }
 
     /**
-     * Send recovery SMS to get back into your account.
+     * Request a recovery SMS to get back into your account.
      *
      * `WARNING:` You can call this function without having called `login()`,
      * but be aware that a user database entry will be created for every
@@ -746,26 +720,13 @@ class Instagram implements ExperimentsInterface
     public function sendRecoverySMS(
         $username)
     {
-        if (empty($username) || !is_string($username)) {
-            throw new \InvalidArgumentException('You must provide a username to userLookup().');
-        }
+        // Set active user (without pwd), and create database entry if new user.
+        $this->_setUserWithoutPassword($username);
 
+        // Verify that they can use the recovery SMS option.
         $userLookup = $this->userLookup($username);
-
         if (!$userLookup->getHasValidPhone() || !$userLookup->getCanSmsReset()) {
-            throw new \InstagramAPI\Exception\InstagramException('Your account has not a verified phone number to send the recovery SMS.');
-        }
-
-        // Switch the currently active user/pass if the username is different.
-        // NOTE: Creates a user database (device) for the user if they're new!
-        // NOTE: Because we don't know their password, we'll mark the user as
-        // having "NOPASSWORD" as pwd. The user will fix that when/if they call
-        // `login()` with the ACTUAL password, which will tell us what it is.
-        // We CANNOT use an empty string since `_setUser()` will not allow that!
-        // NOTE: If the user tries to look up themselves WHILE they are logged
-        // in, we'll correctly NOT call `_setUser()` since they're already set.
-        if ($this->username !== $username) {
-            $this->_setUser($username, 'NOPASSWORD');
+            throw new \InstagramAPI\Exception\InternalException('SMS recovery is not available, since your account lacks a verified phone number.');
         }
 
         return $this->request('users/lookup_phone/')
@@ -878,6 +839,49 @@ class Instagram implements ExperimentsInterface
         // Must be done last here, so that isMaybeLoggedIn is properly updated!
         // NOTE: If we generated a new device we start a new cookie jar.
         $this->client->updateFromCurrentSettings($resetCookieJar);
+    }
+
+    /**
+     * Set the active account for the class instance, without knowing password.
+     *
+     * This internal function is used by all unauthenticated pre-login functions
+     * whenever they need to perform unauthenticated requests, such as looking
+     * up a user's account recovery options.
+     *
+     * `WARNING:` A user database entry will be created for every username you
+     * set as the active user, exactly like the normal `_setUser()` function.
+     * This is necessary so that we generate a user-device and data storage for
+     * each given username, which gives us necessary data such as a "device ID"
+     * for the new user's virtual device, to use in various API-call parameters.
+     *
+     * `WARNING:` This function CANNOT be used for performing logins, since
+     * Instagram will validate the password and will reject the missing
+     * password. It is ONLY meant to be used for *RECOVERY* PRE-LOGIN calls that
+     * need device parameters when the user DOESN'T KNOW their password yet.
+     *
+     * @param string $username Your Instagram username.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     */
+    protected function _setUserWithoutPassword(
+        $username)
+    {
+        if (empty($username) || !is_string($username)) {
+            throw new \InvalidArgumentException('You must provide a username.');
+        }
+
+        // Switch the currently active user/pass if the username is different.
+        // NOTE: Creates a user database (device) for the user if they're new!
+        // NOTE: Because we don't know their password, we'll mark the user as
+        // having "NOPASSWORD" as pwd. The user will fix that when/if they call
+        // `login()` with the ACTUAL password, which will tell us what it is.
+        // We CANNOT use an empty string since `_setUser()` will not allow that!
+        // NOTE: If the user tries to look up themselves WHILE they are logged
+        // in, we'll correctly NOT call `_setUser()` since they're already set.
+        if ($this->username !== $username) {
+            $this->_setUser($username, 'NOPASSWORD');
+        }
     }
 
     /**
