@@ -953,9 +953,10 @@ abstract class InstagramMedia
         }
 
         // Initialize target canvas to original input dimensions & aspect ratio.
+        // NOTE: MUST `float`-cast to FORCE float even when dividing EQUAL ints.
         $targetWidth = (int) $inputWidth;
         $targetHeight = (int) $inputHeight;
-        $targetAspectRatio = $inputWidth / $inputHeight;
+        $targetAspectRatio = (float) ($inputWidth / $inputHeight);
         $this->_debugDimensions($targetWidth, $targetHeight, 'CANVAS_INPUT: Input Canvas Size');
 
         // Check aspect ratio and crop/expand the canvas to fit aspect if needed.
@@ -1285,8 +1286,9 @@ abstract class InstagramMedia
         static $offsetPriorities = [0, 2, -2, 4, -4, 6, -6];
         foreach ($offsetPriorities as $offset) {
             // Calculate the new height and its resulting aspect ratio.
+            // NOTE: MUST `float`-cast to FORCE float even when dividing EQUAL ints.
             $offsetMod2Height = $mod2Height + $offset;
-            $offsetMod2AspectRatio = $mod2Width / $offsetMod2Height;
+            $offsetMod2AspectRatio = (float) ($mod2Width / $offsetMod2Height);
 
             // Check if the aspect ratio is legal.
             $isLegalRatio = (($minAspectRatio === null || $offsetMod2AspectRatio >= $minAspectRatio)
@@ -1362,7 +1364,7 @@ abstract class InstagramMedia
                     'Canvas calculation failed. Unable to reach target aspect ratio range during Mod2 canvas conversion. The range of allowed aspect ratios is too narrow (%.8f - %.8f). We achieved a ratio of %.8f.',
                     $minAspectRatio !== null ? $minAspectRatio : 0.0,
                     $maxAspectRatio !== null ? $maxAspectRatio : INF,
-                    $mod2Width / $mod2Height
+                    (float) ($mod2Width / $mod2Height)
                 ));
             } else {
                 // They WANT us to allow "near-misses", so we'll KEEP our best
@@ -1438,7 +1440,7 @@ abstract class InstagramMedia
             // rounding errors can make rejected ratios look valid.
             "[\033[1;33m%s\033[0m] w=%s h=%s (aspect %.8f)\n",
             $stepDescription !== null ? $stepDescription : 'DEBUG',
-            $width, $height, $width / $height
+            $width, $height, (float) ($width / $height)
         );
     }
 }

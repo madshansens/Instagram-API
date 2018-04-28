@@ -37,7 +37,8 @@ abstract class MediaDetails
      */
     public function getAspectRatio()
     {
-        return $this->getWidth() / $this->getHeight();
+        // NOTE: MUST `float`-cast to FORCE float even when dividing EQUAL ints.
+        return (float) ($this->getWidth() / $this->getHeight());
     }
 
     /**

@@ -244,7 +244,7 @@ Examples of GOOD variable names:
 
 ```php
 $endpoint = $this->url.'?'.http_build_query($this->params);
-$this->_aspectRatio = $this->_width / $this->_height;
+$this->_aspectRatio = (float) ($this->_width / $this->_height);
 $width = floor($this->_height * $this->_maxAspectRatio);
 ```
 

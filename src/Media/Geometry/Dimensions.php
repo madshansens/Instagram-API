@@ -25,7 +25,8 @@ class Dimensions
     {
         $this->_width = (int) $width;
         $this->_height = (int) $height;
-        $this->_aspectRatio = $this->_width / $this->_height;
+        // NOTE: MUST `float`-cast to FORCE float even when dividing EQUAL ints.
+        $this->_aspectRatio = (float) ($this->_width / $this->_height);
     }
 
     /**
@@ -51,7 +52,7 @@ class Dimensions
     /**
      * Get stored aspect ratio for these dimensions.
      *
-     * @return int
+     * @return float
      */
     public function getAspectRatio()
     {

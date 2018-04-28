@@ -37,7 +37,8 @@ class Rectangle
         $this->_y = (int) $y;
         $this->_width = (int) $width;
         $this->_height = (int) $height;
-        $this->_aspectRatio = $this->_width / $this->_height;
+        // NOTE: MUST `float`-cast to FORCE float even when dividing EQUAL ints.
+        $this->_aspectRatio = (float) ($this->_width / $this->_height);
     }
 
     /**
@@ -129,7 +130,7 @@ class Rectangle
     /**
      * Get stored aspect ratio for this rectangle.
      *
-     * @return int
+     * @return float
      */
     public function getAspectRatio()
     {

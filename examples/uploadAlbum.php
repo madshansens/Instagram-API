@@ -95,8 +95,7 @@ foreach ($media as &$item) {
         $mediaDetails = $validMedia instanceof \InstagramAPI\Media\Photo\InstagramPhoto
             ? new \InstagramAPI\Media\Photo\PhotoDetails($item['file'])
             : new \InstagramAPI\Media\Video\VideoDetails($item['file']);
-        $aspectRatio = $mediaDetails->getAspectRatio();
-        $mediaOptions['forceAspectRatio'] = $aspectRatio;
+        $mediaOptions['forceAspectRatio'] = $mediaDetails->getAspectRatio();
     }
 }
 unset($item);
