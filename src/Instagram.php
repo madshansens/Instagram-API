@@ -681,6 +681,102 @@ class Instagram implements ExperimentsInterface
     }
 
     /**
+     * Send recovery EMAIL to get back into your account.
+     *
+     * `WARNING:` You can call this function without having called `login()`,
+     * but be aware that a user database entry will be created for every
+     * username you try to look up. This is ONLY meant for recovering your OWN
+     * accounts.
+     *
+     * @param string $username Your Instagram username.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\RecoveryResponse
+     */
+    public function sendRecoveryEmail(
+        $username)
+    {
+        if (empty($username) || !is_string($username)) {
+            throw new \InvalidArgumentException('You must provide a username to userLookup().');
+        }
+
+        $userLookup = $this->userLookup($username);
+
+        if (!$userLookup->getCanEmailReset()) {
+            throw new \InstagramAPI\Exception\InstagramException('Your account has not a verified email to send the recovery email.');
+        }
+
+        // Switch the currently active user/pass if the username is different.
+        // NOTE: Creates a user database (device) for the user if they're new!
+        // NOTE: Because we don't know their password, we'll mark the user as
+        // having "NOPASSWORD" as pwd. The user will fix that when/if they call
+        // `login()` with the ACTUAL password, which will tell us what it is.
+        // We CANNOT use an empty string since `_setUser()` will not allow that!
+        // NOTE: If the user tries to look up themselves WHILE they are logged
+        // in, we'll correctly NOT call `_setUser()` since they're already set.
+        if ($this->username !== $username) {
+            $this->_setUser($username, 'NOPASSWORD');
+        }
+
+        return $this->request('accounts/send_recovery_flow_email/')
+            ->setNeedsAuth(false)
+            ->addPost('query', $username)
+            ->addPost('adid', $this->advertising_id)
+            ->addPost('username', $username)
+            ->addPost('device_id', $this->device_id)
+            ->addPost('guid', $this->uuid)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->getResponse(new Response\RecoveryResponse());
+    }
+
+    /**
+     * Send recovery SMS to get back into your account.
+     *
+     * `WARNING:` You can call this function without having called `login()`,
+     * but be aware that a user database entry will be created for every
+     * username you try to look up. This is ONLY meant for recovering your OWN
+     * accounts.
+     *
+     * @param string $username Your Instagram username.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\RecoveryResponse
+     */
+    public function sendRecoverySMS(
+        $username)
+    {
+        if (empty($username) || !is_string($username)) {
+            throw new \InvalidArgumentException('You must provide a username to userLookup().');
+        }
+
+        $userLookup = $this->userLookup($username);
+
+        if (!$userLookup->getHasValidPhone() || !$userLookup->getCanSmsReset()) {
+            throw new \InstagramAPI\Exception\InstagramException('Your account has not a verified phone number to send the recovery SMS.');
+        }
+
+        // Switch the currently active user/pass if the username is different.
+        // NOTE: Creates a user database (device) for the user if they're new!
+        // NOTE: Because we don't know their password, we'll mark the user as
+        // having "NOPASSWORD" as pwd. The user will fix that when/if they call
+        // `login()` with the ACTUAL password, which will tell us what it is.
+        // We CANNOT use an empty string since `_setUser()` will not allow that!
+        // NOTE: If the user tries to look up themselves WHILE they are logged
+        // in, we'll correctly NOT call `_setUser()` since they're already set.
+        if ($this->username !== $username) {
+            $this->_setUser($username, 'NOPASSWORD');
+        }
+
+        return $this->request('users/lookup_phone/')
+            ->setNeedsAuth(false)
+            ->addPost('query', $username)
+            ->addPost('_csrftoken', $this->client->getToken())
+            ->getResponse(new Response\RecoveryResponse());
+    }
+
+    /**
      * Set the active account for the class instance.
      *
      * We can call this multiple times to switch between multiple accounts.
