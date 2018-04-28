@@ -723,7 +723,6 @@ class Instagram implements ExperimentsInterface
             ->setNeedsAuth(false)
             ->addPost('query', $username)
             ->addPost('adid', $this->advertising_id)
-            ->addPost('username', $username)
             ->addPost('device_id', $this->device_id)
             ->addPost('guid', $this->uuid)
             ->addPost('_csrftoken', $this->client->getToken())
