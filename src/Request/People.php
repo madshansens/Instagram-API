@@ -706,6 +706,31 @@ class People extends RequestCollection
     }
 
     /**
+     * Report an user as spam.
+     *
+     * @param string $userId     Numerical UserPK ID.
+     * @param string $sourceName (optional) Source of the media.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function report(
+        $userId,
+        $sourceName = 'profile')
+    {
+        return $this->ig->request("users/{$userId}/flag_user/")
+            ->addPost('reason_id', 1)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('user_id', $userId)
+            ->addPost('source_name', $sourceName)
+            ->addPost('is_spam', true)
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
      * Block a user.
      *
      * @param string $userId Numerical UserPK ID.
