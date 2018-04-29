@@ -706,10 +706,10 @@ class People extends RequestCollection
     }
 
     /**
-     * Report an user as spam.
+     * Report a user as spam.
      *
      * @param string $userId     Numerical UserPK ID.
-     * @param string $sourceName (optional) Source of the media.
+     * @param string $sourceName (optional) Source app-module of the report.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
