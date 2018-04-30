@@ -58,7 +58,7 @@ class Signatures
         }
         unset($value); // Clear reference.
         // Reorder and convert data to JSON string.
-        $data = json_encode(Utils::reorderByHashCode($data), JSON_FORCE_OBJECT);
+        $data = json_encode((object) Utils::reorderByHashCode($data));
         // Sign data.
         $result['ig_sig_key_version'] = Constants::SIG_KEY_VERSION;
         $result['signed_body'] = self::generateSignature($data).'.'.$data;
