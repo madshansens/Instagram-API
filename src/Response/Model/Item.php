@@ -75,6 +75,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getIsSidecarChild()
  * @method mixed getLargeUrls()
  * @method float getLat()
+ * @method string getLatestReelMedia()
  * @method string getLeadGenFormId()
  * @method int getLikeCount()
  * @method User[] getLikers()
@@ -85,6 +86,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method Location getLocation()
  * @method int getMaxNumVisiblePreviewComments()
  * @method Media getMedia()
+ * @method int getMediaCount()
  * @method string getMediaId()
  * @method string[] getMediaIds()
  * @method mixed getMediaInfos()
@@ -108,6 +110,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method ProductTags getProductTags()
  * @method ReelMention[] getReelMentions()
  * @method ReelShare getReelShare()
+ * @method string getReelType()
  * @method string[] getSavedCollectionIds()
  * @method string getSocialContext()
  * @method User[] getSponsorTags()
@@ -126,6 +129,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getSupportsReelReactions()
  * @method string getTakenAt()
  * @method mixed getThumbnailUrls()
+ * @method string getTimestamp()
  * @method int getTimezoneOffset()
  * @method string[] getTopFollowers()
  * @method int getTopFollowersCount()
@@ -212,6 +216,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isIsSidecarChild()
  * @method bool isLargeUrls()
  * @method bool isLat()
+ * @method bool isLatestReelMedia()
  * @method bool isLeadGenFormId()
  * @method bool isLikeCount()
  * @method bool isLikers()
@@ -222,6 +227,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isLocation()
  * @method bool isMaxNumVisiblePreviewComments()
  * @method bool isMedia()
+ * @method bool isMediaCount()
  * @method bool isMediaId()
  * @method bool isMediaIds()
  * @method bool isMediaInfos()
@@ -245,6 +251,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isProductTags()
  * @method bool isReelMentions()
  * @method bool isReelShare()
+ * @method bool isReelType()
  * @method bool isSavedCollectionIds()
  * @method bool isSocialContext()
  * @method bool isSponsorTags()
@@ -263,6 +270,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isSupportsReelReactions()
  * @method bool isTakenAt()
  * @method bool isThumbnailUrls()
+ * @method bool isTimestamp()
  * @method bool isTimezoneOffset()
  * @method bool isTopFollowers()
  * @method bool isTopFollowersCount()
@@ -349,6 +357,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setIsSidecarChild(mixed $value)
  * @method $this setLargeUrls(mixed $value)
  * @method $this setLat(float $value)
+ * @method $this setLatestReelMedia(string $value)
  * @method $this setLeadGenFormId(string $value)
  * @method $this setLikeCount(int $value)
  * @method $this setLikers(User[] $value)
@@ -359,6 +368,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setLocation(Location $value)
  * @method $this setMaxNumVisiblePreviewComments(int $value)
  * @method $this setMedia(Media $value)
+ * @method $this setMediaCount(int $value)
  * @method $this setMediaId(string $value)
  * @method $this setMediaIds(string[] $value)
  * @method $this setMediaInfos(mixed $value)
@@ -382,6 +392,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setProductTags(ProductTags $value)
  * @method $this setReelMentions(ReelMention[] $value)
  * @method $this setReelShare(ReelShare $value)
+ * @method $this setReelType(string $value)
  * @method $this setSavedCollectionIds(string[] $value)
  * @method $this setSocialContext(string $value)
  * @method $this setSponsorTags(User[] $value)
@@ -400,6 +411,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setSupportsReelReactions(bool $value)
  * @method $this setTakenAt(string $value)
  * @method $this setThumbnailUrls(mixed $value)
+ * @method $this setTimestamp(string $value)
  * @method $this setTimezoneOffset(int $value)
  * @method $this setTopFollowers(string[] $value)
  * @method $this setTopFollowersCount(int $value)
@@ -486,6 +498,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetIsSidecarChild()
  * @method $this unsetLargeUrls()
  * @method $this unsetLat()
+ * @method $this unsetLatestReelMedia()
  * @method $this unsetLeadGenFormId()
  * @method $this unsetLikeCount()
  * @method $this unsetLikers()
@@ -496,6 +509,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetLocation()
  * @method $this unsetMaxNumVisiblePreviewComments()
  * @method $this unsetMedia()
+ * @method $this unsetMediaCount()
  * @method $this unsetMediaId()
  * @method $this unsetMediaIds()
  * @method $this unsetMediaInfos()
@@ -519,6 +533,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetProductTags()
  * @method $this unsetReelMentions()
  * @method $this unsetReelShare()
+ * @method $this unsetReelType()
  * @method $this unsetSavedCollectionIds()
  * @method $this unsetSocialContext()
  * @method $this unsetSponsorTags()
@@ -537,6 +552,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetSupportsReelReactions()
  * @method $this unsetTakenAt()
  * @method $this unsetThumbnailUrls()
+ * @method $this unsetTimestamp()
  * @method $this unsetTimezoneOffset()
  * @method $this unsetTopFollowers()
  * @method $this unsetTopFollowersCount()
@@ -725,6 +741,10 @@ class Item extends AutoPropertyMapper
         'inline_composer_display_condition'        => 'string',
         'highlight_reel_ids'                       => 'string[]',
         'total_screenshot_count'                   => 'int',
+        'reel_type'                                => 'string',
+        'latest_reel_media'                        => 'string',
+        'media_count'                              => 'int',
+        'timestamp'                                => 'string',
         /*
          * HTML color string such as "#812A2A".
          */

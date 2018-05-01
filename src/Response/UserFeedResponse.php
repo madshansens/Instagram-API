@@ -7,11 +7,11 @@ use InstagramAPI\Response;
 /**
  * UserFeedResponse.
  *
- * @method mixed getAutoLoadMoreEnabled()
+ * @method bool getAutoLoadMoreEnabled()
  * @method Model\Item[] getItems()
  * @method string getMaxId()
  * @method mixed getMessage()
- * @method mixed getMoreAvailable()
+ * @method bool getMoreAvailable()
  * @method string getNextMaxId()
  * @method int getNumResults()
  * @method string getStatus()
@@ -25,11 +25,11 @@ use InstagramAPI\Response;
  * @method bool isNumResults()
  * @method bool isStatus()
  * @method bool is_Messages()
- * @method $this setAutoLoadMoreEnabled(mixed $value)
+ * @method $this setAutoLoadMoreEnabled(bool $value)
  * @method $this setItems(Model\Item[] $value)
  * @method $this setMaxId(string $value)
  * @method $this setMessage(mixed $value)
- * @method $this setMoreAvailable(mixed $value)
+ * @method $this setMoreAvailable(bool $value)
  * @method $this setNextMaxId(string $value)
  * @method $this setNumResults(int $value)
  * @method $this setStatus(string $value)
@@ -48,9 +48,9 @@ class UserFeedResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'num_results'            => 'int',
-        'auto_load_more_enabled' => '',
+        'auto_load_more_enabled' => 'bool',
         'items'                  => 'Model\Item[]',
-        'more_available'         => '',
+        'more_available'         => 'bool',
         'next_max_id'            => 'string',
         'max_id'                 => 'string',
     ];

@@ -161,6 +161,20 @@ class Story extends RequestCollection
     }
 
     /**
+     * Get your archived story media feed.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\UserFeedResponse
+     */
+    public function getArchivedStoriesFeed()
+    {
+        return $this->ig->request('archive/reel/day_shells/')
+            ->addParam('include_cover', 0)
+            ->getResponse(new Response\UserFeedResponse());
+    }
+
+    /**
      * Get the list of users who have seen one of your story items.
      *
      * Note that this only works for your own story items. Instagram doesn't
