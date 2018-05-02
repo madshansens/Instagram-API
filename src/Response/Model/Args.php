@@ -12,18 +12,20 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getClicked()
  * @method string getCommentId()
  * @method string[] getCommentIds()
- * @method mixed getDestination()
+ * @method string getDestination()
  * @method InlineFollow getInlineFollow()
+ * @method string getLatestReelMedia()
  * @method Link[] getLinks()
  * @method Media[] getMedia()
  * @method string getProfileId()
  * @method string getProfileImage()
  * @method mixed getProfileImageDestination()
+ * @method string getProfileName()
  * @method mixed getRequestCount()
  * @method string getSecondProfileId()
  * @method mixed getSecondProfileImage()
  * @method string getText()
- * @method mixed getTimestamp()
+ * @method string getTimestamp()
  * @method string getTuuid()
  * @method bool isActionUrl()
  * @method bool isActions()
@@ -32,11 +34,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isCommentIds()
  * @method bool isDestination()
  * @method bool isInlineFollow()
+ * @method bool isLatestReelMedia()
  * @method bool isLinks()
  * @method bool isMedia()
  * @method bool isProfileId()
  * @method bool isProfileImage()
  * @method bool isProfileImageDestination()
+ * @method bool isProfileName()
  * @method bool isRequestCount()
  * @method bool isSecondProfileId()
  * @method bool isSecondProfileImage()
@@ -48,18 +52,20 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setClicked(bool $value)
  * @method $this setCommentId(string $value)
  * @method $this setCommentIds(string[] $value)
- * @method $this setDestination(mixed $value)
+ * @method $this setDestination(string $value)
  * @method $this setInlineFollow(InlineFollow $value)
+ * @method $this setLatestReelMedia(string $value)
  * @method $this setLinks(Link[] $value)
  * @method $this setMedia(Media[] $value)
  * @method $this setProfileId(string $value)
  * @method $this setProfileImage(string $value)
  * @method $this setProfileImageDestination(mixed $value)
+ * @method $this setProfileName(string $value)
  * @method $this setRequestCount(mixed $value)
  * @method $this setSecondProfileId(string $value)
  * @method $this setSecondProfileImage(mixed $value)
  * @method $this setText(string $value)
- * @method $this setTimestamp(mixed $value)
+ * @method $this setTimestamp(string $value)
  * @method $this setTuuid(string $value)
  * @method $this unsetActionUrl()
  * @method $this unsetActions()
@@ -68,11 +74,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetCommentIds()
  * @method $this unsetDestination()
  * @method $this unsetInlineFollow()
+ * @method $this unsetLatestReelMedia()
  * @method $this unsetLinks()
  * @method $this unsetMedia()
  * @method $this unsetProfileId()
  * @method $this unsetProfileImage()
  * @method $this unsetProfileImageDestination()
+ * @method $this unsetProfileName()
  * @method $this unsetRequestCount()
  * @method $this unsetSecondProfileId()
  * @method $this unsetSecondProfileImage()
@@ -83,23 +91,25 @@ use InstagramAPI\AutoPropertyMapper;
 class Args extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'media'                     => 'Media[]',
-        'links'                     => 'Link[]',
         'text'                      => 'string',
+        'action_url'                => 'string',
+        'destination'               => 'string',
+        'timestamp'                 => 'string',
+        'actions'                   => 'string[]',
         'profile_id'                => 'string',
         'profile_image'             => 'string',
-        'timestamp'                 => '', // TODO, INVESTIGATE: sometimes int, sometimes float
+        'tuuid'                     => 'string',
+        'clicked'                   => 'bool',
+        'profile_name'              => 'string',
+        'latest_reel_media'         => 'string',
+        'media'                     => 'Media[]',
+        'links'                     => 'Link[]',
         'comment_id'                => 'string',
         'request_count'             => '',
-        'action_url'                => 'string',
-        'destination'               => '',
         'inline_follow'             => 'InlineFollow',
         'comment_ids'               => 'string[]',
         'second_profile_id'         => 'string',
         'second_profile_image'      => '',
         'profile_image_destination' => '',
-        'tuuid'                     => 'string',
-        'clicked'                   => 'bool',
-        'actions'                   => 'string[]',
     ];
 }

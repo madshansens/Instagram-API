@@ -165,13 +165,13 @@ class Story extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\UserFeedResponse
+     * @return \InstagramAPI\Response\ArchivedStoriesFeedResponse
      */
     public function getArchivedStoriesFeed()
     {
         return $this->ig->request('archive/reel/day_shells/')
             ->addParam('include_cover', 0)
-            ->getResponse(new Response\UserFeedResponse());
+            ->getResponse(new Response\ArchivedStoriesFeedResponse());
     }
 
     /**

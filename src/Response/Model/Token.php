@@ -9,6 +9,7 @@ use InstagramAPI\AutoPropertyMapper;
  *
  * @method int getCarrierId()
  * @method string getCarrierName()
+ * @method mixed getDeadline()
  * @method mixed getEnabledWalletDefsKeys()
  * @method mixed getFeatures()
  * @method string getRequestTime()
@@ -17,6 +18,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method int getTtl()
  * @method bool isCarrierId()
  * @method bool isCarrierName()
+ * @method bool isDeadline()
  * @method bool isEnabledWalletDefsKeys()
  * @method bool isFeatures()
  * @method bool isRequestTime()
@@ -25,6 +27,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isTtl()
  * @method $this setCarrierId(int $value)
  * @method $this setCarrierName(string $value)
+ * @method $this setDeadline(mixed $value)
  * @method $this setEnabledWalletDefsKeys(mixed $value)
  * @method $this setFeatures(mixed $value)
  * @method $this setRequestTime(string $value)
@@ -33,6 +36,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setTtl(int $value)
  * @method $this unsetCarrierId()
  * @method $this unsetCarrierName()
+ * @method $this unsetDeadline()
  * @method $this unsetEnabledWalletDefsKeys()
  * @method $this unsetFeatures()
  * @method $this unsetRequestTime()
@@ -50,6 +54,7 @@ class Token extends AutoPropertyMapper
         'request_time'             => 'string',
         'token_hash'               => 'string',
         'rewrite_rules'            => '',
+        'deadline'                 => '',
         'enabled_wallet_defs_keys' => '',
     ];
 }

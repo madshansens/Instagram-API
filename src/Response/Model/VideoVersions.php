@@ -31,10 +31,10 @@ use InstagramAPI\AutoPropertyMapper;
 class VideoVersions extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'url'    => 'string',
         'type'   => 'int', // Some kinda internal type ID, such as int(102).
         'width'  => 'int',
         'height' => 'int',
+        'url'    => 'string',
         'id'     => 'string',
     ];
 }
