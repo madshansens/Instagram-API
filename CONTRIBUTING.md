@@ -414,7 +414,7 @@ You can use [http://jsoneditoronline.org](http://jsoneditoronline.org/) for a be
 
 (Alternatively, if you're an advanced user, you can create an empty response-class (with no defined properties yet), and then use its `->printJson()` function to look at its contents in a beautifully readable way.)
 
-So your new `src/Response/AwesomeResponse.php` class should contain one `JSON_PROPERTY_MAP` property named `items`. Our magical [LazyJsonMapper](https://github.com/SteveJobzniak/LazyJsonMapper) object mapping system needs a PHPdoc-style type-definition to tell us if the property is another class, a float, an int, a string, a string array, etc. By default, if you don't specify any type (if you set its value to `''`), it will treat the JSON value as whatever type PHP detected it as internally during JSON decoding (such as a string, int, float, bool, etc).
+So your new `src/Response/AwesomeResponse.php` class should contain one `JSON_PROPERTY_MAP` property named `items`. Our magical [LazyJsonMapper](https://github.com/lazyjsonmapper/lazyjsonmapper) object mapping system needs a PHPdoc-style type-definition to tell us if the property is another class, a float, an int, a string, a string array, etc. By default, if you don't specify any type (if you set its value to `''`), it will treat the JSON value as whatever type PHP detected it as internally during JSON decoding (such as a string, int, float, bool, etc).
 
 In this scenario, your `src/Response/AwesomeResponse.php` file and its property definitions should look as follows, since we want to map `items` to an array of `Suggestion` objects:
 
@@ -473,7 +473,7 @@ $awesome->printJson(); // Look at the object data.
 $awesome->printPropertyDescriptions(); // Look at all defined properties.
 ```
 
-And finally, how do you access the object's data? Via the magical [LazyJsonMapper](https://github.com/SteveJobzniak/LazyJsonMapper), which your Response and Model objects inherit from! It automatically creates getters and setters for all properties, and has a million other features!
+And finally, how do you access the object's data? Via the magical [LazyJsonMapper](https://github.com/lazyjsonmapper/lazyjsonmapper), which your Response and Model objects inherit from! It automatically creates getters and setters for all properties, and has a million other features!
 
 ```php
 $items = $awesome->getItems();
