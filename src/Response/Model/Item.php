@@ -47,6 +47,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getExploreHideComments()
  * @method string getExploreSourceToken()
  * @method string getFbPageUrl()
+ * @method Usertag getFbUserTags()
  * @method int getFilterType()
  * @method bool getForceOverlay()
  * @method Gating getGating()
@@ -110,6 +111,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method ReelMention[] getReelMentions()
  * @method ReelShare getReelShare()
  * @method string[] getSavedCollectionIds()
+ * @method mixed getScreenshotterUserIds()
  * @method bool getShowOneTapFbShareTooltip()
  * @method string getSocialContext()
  * @method User[] getSponsorTags()
@@ -188,6 +190,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isExploreHideComments()
  * @method bool isExploreSourceToken()
  * @method bool isFbPageUrl()
+ * @method bool isFbUserTags()
  * @method bool isFilterType()
  * @method bool isForceOverlay()
  * @method bool isGating()
@@ -251,6 +254,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isReelMentions()
  * @method bool isReelShare()
  * @method bool isSavedCollectionIds()
+ * @method bool isScreenshotterUserIds()
  * @method bool isShowOneTapFbShareTooltip()
  * @method bool isSocialContext()
  * @method bool isSponsorTags()
@@ -329,6 +333,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setExploreHideComments(bool $value)
  * @method $this setExploreSourceToken(string $value)
  * @method $this setFbPageUrl(string $value)
+ * @method $this setFbUserTags(Usertag $value)
  * @method $this setFilterType(int $value)
  * @method $this setForceOverlay(bool $value)
  * @method $this setGating(Gating $value)
@@ -392,6 +397,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setReelMentions(ReelMention[] $value)
  * @method $this setReelShare(ReelShare $value)
  * @method $this setSavedCollectionIds(string[] $value)
+ * @method $this setScreenshotterUserIds(mixed $value)
  * @method $this setShowOneTapFbShareTooltip(bool $value)
  * @method $this setSocialContext(string $value)
  * @method $this setSponsorTags(User[] $value)
@@ -470,6 +476,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetExploreHideComments()
  * @method $this unsetExploreSourceToken()
  * @method $this unsetFbPageUrl()
+ * @method $this unsetFbUserTags()
  * @method $this unsetFilterType()
  * @method $this unsetForceOverlay()
  * @method $this unsetGating()
@@ -533,6 +540,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetReelMentions()
  * @method $this unsetReelShare()
  * @method $this unsetSavedCollectionIds()
+ * @method $this unsetScreenshotterUserIds()
  * @method $this unsetShowOneTapFbShareTooltip()
  * @method $this unsetSocialContext()
  * @method $this unsetSponsorTags()
@@ -607,6 +615,7 @@ class Item extends AutoPropertyMapper
         'caption'                                  => 'Caption',
         'caption_is_edited'                        => 'bool',
         'photo_of_you'                             => 'bool',
+        'fb_user_tags'                             => 'Usertag',
         'can_viewer_save'                          => 'bool',
         'has_viewer_saved'                         => 'bool',
         'organic_tracking_token'                   => 'string',
@@ -711,6 +720,7 @@ class Item extends AutoPropertyMapper
         'viewer_cursor'                               => '',
         'total_viewer_count'                          => 'int',
         'multi_author_reel_names'                     => '',
+        'screenshotter_user_ids'                      => '',
         'reel_share'                                  => 'ReelShare',
         'organic_post_id'                             => 'string',
         'sponsor_tags'                                => 'User[]',

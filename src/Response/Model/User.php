@@ -75,6 +75,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getNeedsEmailConfirm()
  * @method string getPageId()
  * @method mixed getPageName()
+ * @method bool getPermission()
  * @method string getPhoneNumber()
  * @method string getPk()
  * @method mixed getProfileContext()
@@ -169,6 +170,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isNeedsEmailConfirm()
  * @method bool isPageId()
  * @method bool isPageName()
+ * @method bool isPermission()
  * @method bool isPhoneNumber()
  * @method bool isPk()
  * @method bool isProfileContext()
@@ -263,6 +265,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setNeedsEmailConfirm(mixed $value)
  * @method $this setPageId(string $value)
  * @method $this setPageName(mixed $value)
+ * @method $this setPermission(bool $value)
  * @method $this setPhoneNumber(string $value)
  * @method $this setPk(string $value)
  * @method $this setProfileContext(mixed $value)
@@ -357,6 +360,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetNeedsEmailConfirm()
  * @method $this unsetPageId()
  * @method $this unsetPageName()
+ * @method $this unsetPermission()
  * @method $this unsetPhoneNumber()
  * @method $this unsetPk()
  * @method $this unsetProfileContext()
@@ -392,6 +396,7 @@ class User extends AutoPropertyMapper
         'is_favorite'                         => 'bool',
         'profile_pic_url'                     => 'string',
         'profile_pic_id'                      => 'string',
+        'permission'                          => 'bool',
         'full_name'                           => 'string',
         'user_id'                             => 'string',
         'pk'                                  => 'string',

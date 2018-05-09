@@ -60,13 +60,13 @@ class Highlight extends RequestCollection
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\HighlightFeedResponse
+     * @return \InstagramAPI\Response\CreateHighlightResponse
      */
     public function create(
         array $mediaIds,
         $title = 'Highlights',
         $coverMediaId = null,
-        $module = 'story_viewer')
+        $module = 'self_profile')
     {
         if (empty($mediaIds)) {
             throw new \InvalidArgumentException('You must provide at least one media ID.');
@@ -87,13 +87,14 @@ class Highlight extends RequestCollection
 
         return $this->ig->request('highlights/create_reel/')
             ->addPost('source', $module)
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('creation_id', round(microtime(true) * 1000))
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('title', $title)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_uuid', $this->ig->uuid)
             ->addPost('cover', json_encode($cover))
+            ->addPost('title', $title)
             ->addPost('media_ids', json_encode(array_values($mediaIds)))
-            ->getResponse(new Response\HighlightFeedResponse());
+            ->getResponse(new Response\CreateHighlightResponse());
     }
 
     /**
