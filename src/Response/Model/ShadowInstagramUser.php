@@ -10,7 +10,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method BusinessManager getBusinessManager()
  * @method mixed getError()
  * @method string getId()
- * @method ProfilePicture getProfilePicture()
+ * @method Image getProfilePicture()
  * @method string getUsername()
  * @method bool isBusinessManager()
  * @method bool isError()
@@ -20,7 +20,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setBusinessManager(BusinessManager $value)
  * @method $this setError(mixed $value)
  * @method $this setId(string $value)
- * @method $this setProfilePicture(ProfilePicture $value)
+ * @method $this setProfilePicture(Image $value)
  * @method $this setUsername(string $value)
  * @method $this unsetBusinessManager()
  * @method $this unsetError()
@@ -33,7 +33,7 @@ class ShadowInstagramUser extends AutoPropertyMapper
     const JSON_PROPERTY_MAP = [
         'id'               => 'string',
         'username'         => 'string',
-        'profile_picture'  => 'ProfilePicture',
+        'profile_picture'  => 'Image',
         'business_manager' => 'BusinessManager',
         'error'            => '',
     ];

@@ -8,10 +8,10 @@ use InstagramAPI\Response;
  * FetchQPDataResponse.
  *
  * @method mixed getErrorMsg()
- * @method mixed getExtraInfo()
+ * @method string getExtraInfo()
  * @method mixed getMessage()
- * @method mixed getQpData()
- * @method mixed getRequestStatus()
+ * @method Model\QPData getQpData()
+ * @method string getRequestStatus()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
  * @method bool isErrorMsg()
@@ -22,10 +22,10 @@ use InstagramAPI\Response;
  * @method bool isStatus()
  * @method bool is_Messages()
  * @method $this setErrorMsg(mixed $value)
- * @method $this setExtraInfo(mixed $value)
+ * @method $this setExtraInfo(string $value)
  * @method $this setMessage(mixed $value)
- * @method $this setQpData(mixed $value)
- * @method $this setRequestStatus(mixed $value)
+ * @method $this setQpData(Model\QPData $value)
+ * @method $this setRequestStatus(string $value)
  * @method $this setStatus(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
  * @method $this unsetErrorMsg()
@@ -39,9 +39,9 @@ use InstagramAPI\Response;
 class FetchQPDataResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
-        'qp_data'        => '',
-        'request_status' => '',
-        'extra_info'     => '',
+        'request_status' => 'string',
+        'extra_info'     => 'string',
+        'qp_data'        => 'Model\QPData',
         'error_msg'      => '',
     ];
 }

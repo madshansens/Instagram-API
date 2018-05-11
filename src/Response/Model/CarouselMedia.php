@@ -19,6 +19,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getHideNuxText()
  * @method string getId()
  * @method Image_Versions2 getImageVersions2()
+ * @method int getIsDashEligible()
  * @method string getLink()
  * @method string getLinkHintText()
  * @method string getLinkText()
@@ -46,6 +47,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isHideNuxText()
  * @method bool isId()
  * @method bool isImageVersions2()
+ * @method bool isIsDashEligible()
  * @method bool isLink()
  * @method bool isLinkHintText()
  * @method bool isLinkText()
@@ -73,6 +75,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setHideNuxText(bool $value)
  * @method $this setId(string $value)
  * @method $this setImageVersions2(Image_Versions2 $value)
+ * @method $this setIsDashEligible(int $value)
  * @method $this setLink(string $value)
  * @method $this setLinkHintText(string $value)
  * @method $this setLinkText(string $value)
@@ -100,6 +103,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetHideNuxText()
  * @method $this unsetId()
  * @method $this unsetImageVersions2()
+ * @method $this unsetIsDashEligible()
  * @method $this unsetLink()
  * @method $this unsetLinkHintText()
  * @method $this unsetLinkText()
@@ -125,6 +129,7 @@ class CarouselMedia extends AutoPropertyMapper
         'pk'                  => 'string',
         'id'                  => 'string',
         'carousel_parent_id'  => 'string',
+        'is_dash_eligible'    => 'int',
         'image_versions2'     => 'Image_Versions2',
         'video_versions'      => 'VideoVersions[]',
         'has_audio'           => 'bool',

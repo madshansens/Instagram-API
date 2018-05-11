@@ -1092,22 +1092,31 @@ class Internal extends RequestCollection
     }
 
     /**
-     * Fetch qp data.
+     * Fetch quick promotions data.
+     *
+     * This is used by Instagram to fetch internal promotions or changes
+     * about the platform. Latest quick promotion known was the new GDPR
+     * policy where Instagram asks you to accept new policy and accept that
+     * you have 18 years old or more.
+     *
+     * @param int $surfaceParam
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\FetchQPDataResponse
      */
-    public function getQPFetch()
+    public function getQPFetch(
+        $surfaceParam)
     {
         return $this->ig->request('qp/fetch/')
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('vc_policy', 'default')
-            ->addPost('surface_param', Constants::SURFACE_PARAM)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('surface_param', $surfaceParam)
             ->addPost('version', 1)
-            ->addPost('query', "viewer() {\n  eligible_promotions.surface_nux_id(<surface>).external_gating_permitted_qps(<external_gating_permitted_qps>) {\n    edges {\n      priority,\n      time_range {\n        start,\n        end\n      },\n      node {\n        id,\n        promotion_id,\n        max_impressions,\n        triggers,\n        creatives {\n          title {\n            text\n          },\n          content {\n            text\n          },\n          footer {\n            text\n          },\n          social_context {\n            text\n          },\n          primary_action{\n            title {\n              text\n            },\n            url,\n            limit,\n            dismiss_promotion\n          },\n          secondary_action{\n            title {\n              text\n            },\n            url,\n            limit,\n            dismiss_promotion\n          },\n          dismiss_action{\n            title {\n              text\n            },\n            url,\n            limit,\n            dismiss_promotion\n          },\n          image {\n            uri\n          }\n        }\n      }\n    }\n  }\n}\n")
+            ->addPost('scale', 2)
+            ->addPost('query', 'viewer() {eligible_promotions.surface_nux_id(<surface>).external_gating_permitted_qps(<external_gating_permitted_qps>).supports_client_filters(true) {edges {priority,time_range {start,end},node {id,promotion_id,max_impressions,triggers,contextual_filters {clause_type,filters {filter_type,unknown_action,value {name,required,bool_value,int_value, string_value},extra_datas {name,required,bool_value,int_value, string_value}},clauses {clause_type,filters {filter_type,unknown_action,value {name,required,bool_value,int_value, string_value},extra_datas {name,required,bool_value,int_value, string_value}},clauses {clause_type,filters {filter_type,unknown_action,value {name,required,bool_value,int_value, string_value},extra_datas {name,required,bool_value,int_value, string_value}},clauses {clause_type,filters {filter_type,unknown_action,value {name,required,bool_value,int_value, string_value},extra_datas {name,required,bool_value,int_value, string_value}}}}}},template {name,parameters {name,required,bool_value,string_value,color_value,}},creatives {title {text},content {text},footer {text},social_context {text},primary_action{title {text},url,limit,dismiss_promotion},secondary_action{title {text},url,limit,dismiss_promotion},dismiss_action{title {text},url,limit,dismiss_promotion},image.scale(<scale>) {uri,width,height}}}}}}')
             ->getResponse(new Response\FetchQPDataResponse());
     }
 

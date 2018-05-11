@@ -1032,8 +1032,9 @@ class Instagram implements ExperimentsInterface
             $this->internal->getProfileNotice();
             //$this->internal->getMegaphoneLog();
             $this->people->getRecentActivityInbox();
-            $this->internal->getQPFetch();
+            $this->internal->getQPFetch(Constants::SURFACE_PARAM[0]);
             $this->media->getBlockedMedia();
+            $this->internal->getQPFetch(Constants::SURFACE_PARAM[1]);
             $this->discover->getExploreFeed(null, true);
             $this->internal->getFacebookOTA();
         } else {
