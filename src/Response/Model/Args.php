@@ -17,6 +17,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getLatestReelMedia()
  * @method Link[] getLinks()
  * @method Media[] getMedia()
+ * @method string getMediaDestination()
  * @method string getProfileId()
  * @method string getProfileImage()
  * @method mixed getProfileImageDestination()
@@ -37,6 +38,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isLatestReelMedia()
  * @method bool isLinks()
  * @method bool isMedia()
+ * @method bool isMediaDestination()
  * @method bool isProfileId()
  * @method bool isProfileImage()
  * @method bool isProfileImageDestination()
@@ -57,6 +59,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setLatestReelMedia(string $value)
  * @method $this setLinks(Link[] $value)
  * @method $this setMedia(Media[] $value)
+ * @method $this setMediaDestination(string $value)
  * @method $this setProfileId(string $value)
  * @method $this setProfileImage(string $value)
  * @method $this setProfileImageDestination(mixed $value)
@@ -77,6 +80,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetLatestReelMedia()
  * @method $this unsetLinks()
  * @method $this unsetMedia()
+ * @method $this unsetMediaDestination()
  * @method $this unsetProfileId()
  * @method $this unsetProfileImage()
  * @method $this unsetProfileImageDestination()
@@ -91,19 +95,20 @@ use InstagramAPI\AutoPropertyMapper;
 class Args extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
+        'media_destination'         => 'string',
         'text'                      => 'string',
-        'action_url'                => 'string',
-        'destination'               => 'string',
-        'timestamp'                 => 'string',
-        'actions'                   => 'string[]',
+        'links'                     => 'Link[]',
         'profile_id'                => 'string',
         'profile_image'             => 'string',
+        'media'                     => 'Media[]',
+        'timestamp'                 => 'string',
         'tuuid'                     => 'string',
         'clicked'                   => 'bool',
         'profile_name'              => 'string',
+        'action_url'                => 'string',
+        'destination'               => 'string',
+        'actions'                   => 'string[]',
         'latest_reel_media'         => 'string',
-        'media'                     => 'Media[]',
-        'links'                     => 'Link[]',
         'comment_id'                => 'string',
         'request_count'             => '',
         'inline_follow'             => 'InlineFollow',

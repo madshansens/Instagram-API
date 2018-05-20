@@ -7,29 +7,34 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * ExploreItemInfo.
  *
- * @method mixed getAspectRatio()
- * @method mixed getAutoplay()
- * @method mixed getNumColumns()
- * @method mixed getTotalNumColumns()
+ * @method int getAspectRatio()
+ * @method bool getAutoplay()
+ * @method string getDestinationView()
+ * @method int getNumColumns()
+ * @method int getTotalNumColumns()
  * @method bool isAspectRatio()
  * @method bool isAutoplay()
+ * @method bool isDestinationView()
  * @method bool isNumColumns()
  * @method bool isTotalNumColumns()
- * @method $this setAspectRatio(mixed $value)
- * @method $this setAutoplay(mixed $value)
- * @method $this setNumColumns(mixed $value)
- * @method $this setTotalNumColumns(mixed $value)
+ * @method $this setAspectRatio(int $value)
+ * @method $this setAutoplay(bool $value)
+ * @method $this setDestinationView(string $value)
+ * @method $this setNumColumns(int $value)
+ * @method $this setTotalNumColumns(int $value)
  * @method $this unsetAspectRatio()
  * @method $this unsetAutoplay()
+ * @method $this unsetDestinationView()
  * @method $this unsetNumColumns()
  * @method $this unsetTotalNumColumns()
  */
 class ExploreItemInfo extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'num_columns'       => '',
-        'total_num_columns' => '',
-        'aspect_ratio'      => '',
-        'autoplay'          => '',
+        'num_columns'       => 'int',
+        'total_num_columns' => 'int',
+        'aspect_ratio'      => 'int',
+        'autoplay'          => 'bool',
+        'destination_view'  => 'string',
     ];
 }

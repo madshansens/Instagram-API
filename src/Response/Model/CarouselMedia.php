@@ -13,6 +13,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method AndroidLinks[] getAndroidLinks()
  * @method string getCarouselParentId()
  * @method string getDominantColor()
+ * @method Usertag getFbUserTags()
  * @method bool getForceOverlay()
  * @method bool getHasAudio()
  * @method Headline getHeadline()
@@ -41,6 +42,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isAndroidLinks()
  * @method bool isCarouselParentId()
  * @method bool isDominantColor()
+ * @method bool isFbUserTags()
  * @method bool isForceOverlay()
  * @method bool isHasAudio()
  * @method bool isHeadline()
@@ -69,6 +71,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setAndroidLinks(AndroidLinks[] $value)
  * @method $this setCarouselParentId(string $value)
  * @method $this setDominantColor(string $value)
+ * @method $this setFbUserTags(Usertag $value)
  * @method $this setForceOverlay(bool $value)
  * @method $this setHasAudio(bool $value)
  * @method $this setHeadline(Headline $value)
@@ -97,6 +100,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetAndroidLinks()
  * @method $this unsetCarouselParentId()
  * @method $this unsetDominantColor()
+ * @method $this unsetFbUserTags()
  * @method $this unsetForceOverlay()
  * @method $this unsetHasAudio()
  * @method $this unsetHeadline()
@@ -129,6 +133,7 @@ class CarouselMedia extends AutoPropertyMapper
         'pk'                  => 'string',
         'id'                  => 'string',
         'carousel_parent_id'  => 'string',
+        'fb_user_tags'        => 'Usertag',
         'is_dash_eligible'    => 'int',
         'image_versions2'     => 'Image_Versions2',
         'video_versions'      => 'VideoVersions[]',
