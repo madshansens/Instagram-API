@@ -27,6 +27,22 @@ class Constants
     const X_IG_Connection_Type = 'WIFI';
     const X_IG_Capabilities = '3brTBw==';
 
+    // Supported Capabilities
+    const SUPPORTED_CAPABILITIES = [
+        [
+            'name'    => 'SUPPORTED_SDK_VERSIONS',
+            'value'   => '9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0',
+        ],
+        [
+            'name'  => 'FACE_TRACKER_VERSION',
+            'value' => '9',
+        ],
+        [
+            'name'  => 'segmentation',
+            'value' => 'segmentation_enabled',
+        ],
+    ];
+
     // Facebook Constants.
     const FACEBOOK_OTA_FIELDS = 'update%7Bdownload_uri%2Cdownload_uri_delta_base%2Cversion_code_delta_base%2Cdownload_uri_delta%2Cfallback_to_full_update%2Cfile_size_delta%2Cversion_code%2Cpublished_date%2Cfile_size%2Cota_bundle_type%2Cresources_checksum%7D';
     const FACEBOOK_ORCA_PROTOCOL_VERSION = 20150314;

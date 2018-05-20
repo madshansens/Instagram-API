@@ -119,6 +119,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method StoryCta[] getStoryCta()
  * @method mixed getStoryEvents()
  * @method mixed getStoryFeedMedia()
+ * @method mixed getStoryFriendLists()
  * @method StoryHashtag[] getStoryHashtags()
  * @method bool getStoryIsSavedToArchive()
  * @method StoryLocation[] getStoryLocations()
@@ -262,6 +263,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isStoryCta()
  * @method bool isStoryEvents()
  * @method bool isStoryFeedMedia()
+ * @method bool isStoryFriendLists()
  * @method bool isStoryHashtags()
  * @method bool isStoryIsSavedToArchive()
  * @method bool isStoryLocations()
@@ -405,6 +407,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setStoryCta(StoryCta[] $value)
  * @method $this setStoryEvents(mixed $value)
  * @method $this setStoryFeedMedia(mixed $value)
+ * @method $this setStoryFriendLists(mixed $value)
  * @method $this setStoryHashtags(StoryHashtag[] $value)
  * @method $this setStoryIsSavedToArchive(bool $value)
  * @method $this setStoryLocations(StoryLocation[] $value)
@@ -548,6 +551,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetStoryCta()
  * @method $this unsetStoryEvents()
  * @method $this unsetStoryFeedMedia()
+ * @method $this unsetStoryFriendLists()
  * @method $this unsetStoryHashtags()
  * @method $this unsetStoryIsSavedToArchive()
  * @method $this unsetStoryLocations()
@@ -740,6 +744,7 @@ class Item extends AutoPropertyMapper
         'creative_config'                             => '',
         'story_locations'                             => 'StoryLocation[]',
         'story_sliders'                               => '',
+        'story_friend_lists'                          => '',
         'story_product_items'                         => '',
         'story_questions'                             => '',
         'supports_reel_reactions'                     => 'bool',

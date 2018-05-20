@@ -136,6 +136,7 @@ class Story extends RequestCollection
      * Simply pass their `id` values as the argument to this API to get details.
      *
      * @param string|string[] $feedList List of numerical UserPK IDs, OR highlight IDs (such as `highlight:123882132324123`).
+     * @param string          $source   (optional) Source app-module where the request was made.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -144,7 +145,8 @@ class Story extends RequestCollection
      * @see Highlight::getUserFeed() More info about when to use this API for highlight-details.
      */
     public function getReelsMediaFeed(
-        $feedList)
+        $feedList,
+        $source = 'feed_timeline')
     {
         if (!is_array($feedList)) {
             $feedList = [$feedList];
@@ -156,6 +158,10 @@ class Story extends RequestCollection
         unset($value); // Clear reference.
 
         return $this->ig->request('feed/reels_media/')
+            ->addPost('supported_capabilities_new', json_encode(Constants::SUPPORTED_CAPABILITIES))
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('user_ids', $feedList) // Must be string[] array.
             ->getResponse(new Response\ReelsMediaResponse());
     }
