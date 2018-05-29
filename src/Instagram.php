@@ -623,7 +623,7 @@ class Instagram implements ExperimentsInterface
             $this->_setUser($username, $password);
         }
 
-        return $this->ig->request('accounts/send_two_factor_login_sms/')
+        return $this->request('accounts/send_two_factor_login_sms/')
             ->setNeedsAuth(false)
             ->addPost('two_factor_identifier', $twoFactorIdentifier)
             ->addPost('username', $username)
