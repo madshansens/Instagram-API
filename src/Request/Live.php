@@ -27,14 +27,21 @@ class Live extends RequestCollection
     /**
      * Get top live broadcasts.
      *
+     * @param null|string $maxId Next "maximum ID", used for pagination.
+     *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\DiscoverTopLiveResponse
      */
-    public function getDiscoverTopLive()
+    public function getDiscoverTopLive(
+        $maxId = null)
     {
-        return $this->ig->request('discover/top_live/')
-            ->getResponse(new Response\DiscoverTopLiveResponse());
+        $request = $this->ig->request('discover/top_live/');
+        if ($maxId !== null) {
+            $request->addParam('max_id', $maxId);
+        }
+
+        return $request->getResponse(new Response\DiscoverTopLiveResponse());
     }
 
     /**
