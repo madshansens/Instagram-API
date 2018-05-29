@@ -12,6 +12,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getCanReshare()
  * @method mixed getLastSeenBroadcastTs()
  * @method mixed getMuted()
+ * @method int getPeakViewerCount()
  * @method string getPk()
  * @method mixed getRankedPosition()
  * @method mixed getSeenRankedPosition()
@@ -21,6 +22,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isCanReshare()
  * @method bool isLastSeenBroadcastTs()
  * @method bool isMuted()
+ * @method bool isPeakViewerCount()
  * @method bool isPk()
  * @method bool isRankedPosition()
  * @method bool isSeenRankedPosition()
@@ -30,6 +32,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setCanReshare(mixed $value)
  * @method $this setLastSeenBroadcastTs(mixed $value)
  * @method $this setMuted(mixed $value)
+ * @method $this setPeakViewerCount(int $value)
  * @method $this setPk(string $value)
  * @method $this setRankedPosition(mixed $value)
  * @method $this setSeenRankedPosition(mixed $value)
@@ -39,6 +42,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetCanReshare()
  * @method $this unsetLastSeenBroadcastTs()
  * @method $this unsetMuted()
+ * @method $this unsetPeakViewerCount()
  * @method $this unsetPk()
  * @method $this unsetRankedPosition()
  * @method $this unsetSeenRankedPosition()
@@ -50,6 +54,7 @@ class PostLiveItem extends AutoPropertyMapper
         'pk'                     => 'string',
         'user'                   => 'User',
         'broadcasts'             => 'Broadcast[]',
+        'peak_viewer_count'      => 'int',
         'last_seen_broadcast_ts' => '',
         'can_reply'              => '',
         'ranked_position'        => '',

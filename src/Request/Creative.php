@@ -2,6 +2,7 @@
 
 namespace InstagramAPI\Request;
 
+use InstagramAPI\Constants;
 use InstagramAPI\Response;
 
 /**
@@ -66,7 +67,7 @@ class Creative extends RequestCollection
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('facetracker_model_version', 11)
+            ->addPost('aml_facetracker_model_version', 9)
             ->getResponse(new Response\FaceModelsResponse());
     }
 
@@ -88,8 +89,7 @@ class Creative extends RequestCollection
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('sdk_version', 14)
-            ->addPost('supported_capabilities', ['PVR_COMPRESSION'])
+            ->addPost('supported_capabilities_new', json_encode(Constants::SUPPORTED_CAPABILITIES))
             ->getResponse(new Response\FaceEffectsResponse());
     }
 }

@@ -37,6 +37,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getUnseenCount()
  * @method User[] getUsers()
  * @method bool getValuedRequest()
+ * @method bool getVcMuted()
  * @method string getViewerId()
  * @method bool isActionBadge()
  * @method bool isCanonical()
@@ -68,6 +69,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isUnseenCount()
  * @method bool isUsers()
  * @method bool isValuedRequest()
+ * @method bool isVcMuted()
  * @method bool isViewerId()
  * @method $this setActionBadge(ActionBadge $value)
  * @method $this setCanonical(bool $value)
@@ -99,6 +101,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setUnseenCount(mixed $value)
  * @method $this setUsers(User[] $value)
  * @method $this setValuedRequest(bool $value)
+ * @method $this setVcMuted(bool $value)
  * @method $this setViewerId(string $value)
  * @method $this unsetActionBadge()
  * @method $this unsetCanonical()
@@ -130,6 +133,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetUnseenCount()
  * @method $this unsetUsers()
  * @method $this unsetValuedRequest()
+ * @method $this unsetVcMuted()
  * @method $this unsetViewerId()
  */
 class DirectThread extends AutoPropertyMapper
@@ -151,6 +155,7 @@ class DirectThread extends AutoPropertyMapper
         'viewer_id'                     => 'string',
         'thread_title'                  => 'string',
         'pending_score'                 => 'string',
+        'vc_muted'                      => 'bool',
         'reshare_send_count'            => 'int',
         'reshare_receive_count'         => 'int',
         'expiring_media_send_count'     => 'int',
