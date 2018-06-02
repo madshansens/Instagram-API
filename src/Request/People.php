@@ -751,6 +751,89 @@ class People extends RequestCollection
     }
 
     /**
+     * Mute stories, posts or both from a user. It prevents user media from
+     * showing up in the timeline and/or story feed.
+     *
+     * @param string $userId Numerical UserPK ID.
+     * @param string $option Selection of what type of media are going to be muted.
+     *                       Available options: 'story', 'post' or 'all'.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FriendshipResponse
+     */
+    public function muteUserMedia(
+        $userId,
+        $option)
+    {
+        return $this->_muteOrUnmuteUserMedia($userId, $option, 'friendships/mute_posts_or_story_from_follow/');
+    }
+
+    /**
+     * Unmute stories, posts or both from a user.
+     *
+     * @param string $userId Numerical UserPK ID.
+     * @param string $option Selection of what type of media are going to be muted.
+     *                       Available options: 'story', 'post' or 'all'.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FriendshipResponse
+     */
+    public function unmuteUserMedia(
+        $userId,
+        $option)
+    {
+        return $this->_muteOrUnmuteUserMedia($userId, $option, 'friendships/unmute_posts_or_story_from_follow/');
+    }
+
+    /**
+     * Helper function to mute user media.
+     *
+     * @param string $userId   Numerical UserPK ID.
+     * @param string $option   Selection of what type of media are going to be muted.
+     *                         Available options: 'story', 'post' or 'all'.
+     * @param string $endpoint API endpoint for muting/unmuting user media.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FriendshipResponse
+     *
+     * @see People::muteStoryOrPost()
+     * @see People::unmuteStoryOrPost()
+     */
+    protected function _muteOrUnmuteUserMedia(
+        $userId,
+        $option,
+        $endpoint)
+    {
+        $request = $this->ig->request($endpoint)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken());
+
+        switch ($option) {
+            case 'story':
+                $request->addPost('target_reel_author_id', $userId);
+                break;
+            case 'post':
+                $request->addPost('target_posts_author_id', $userId);
+                break;
+            case 'all':
+                $request->addPost('target_reel_author_id', $userId);
+                $request->addPost('target_posts_author_id', $userId);
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf('"%s" is not a valid muting option.', $option));
+        }
+
+        return $request->getResponse(new Response\FriendshipResponse());
+    }
+
+    /**
      * Unblock a user.
      *
      * @param string $userId Numerical UserPK ID.
