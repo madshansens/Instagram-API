@@ -9,6 +9,7 @@ use GuzzleHttp\HandlerStack;
 use InstagramAPI\Exception\InstagramException;
 use InstagramAPI\Exception\LoginRequiredException;
 use InstagramAPI\Exception\ServerMessageThrower;
+use InstagramAPI\Middleware\FakeCookies;
 use LazyJsonMapper\Exception\LazyJsonMapperException;
 use Psr\Http\Message\RequestInterface as HttpRequestInterface;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
@@ -85,9 +86,9 @@ class Client
     private $_guzzleClient;
 
     /**
-     * @var \InstagramAPI\ClientMiddleware
+     * @var \InstagramAPI\Middleware\FakeCookies
      */
-    private $_clientMiddleware;
+    private $_fakeCookies;
 
     /**
      * @var \GuzzleHttp\Cookie\CookieJar
@@ -123,9 +124,9 @@ class Client
         // Guzzle's default middleware (cookie jar support, etc).
         $stack = HandlerStack::create();
 
-        // Create our custom Guzzle client middleware and add it to the stack.
-        $this->_clientMiddleware = new ClientMiddleware();
-        $stack->push($this->_clientMiddleware);
+        // Create our cookies middleware and add it to the stack.
+        $this->_fakeCookies = new FakeCookies();
+        $stack->push($this->_fakeCookies, 'fake_cookies');
 
         // Default request options (immutable after client creation).
         $this->_guzzleClient = new GuzzleClient([
@@ -802,12 +803,12 @@ class Client
     }
 
     /**
-     * Get the client middleware instance.
+     * Get the cookies middleware instance.
      *
-     * @return ClientMiddleware
+     * @return FakeCookies
      */
-    public function getMiddleware()
+    public function fakeCookies()
     {
-        return $this->_clientMiddleware;
+        return $this->_fakeCookies;
     }
 }

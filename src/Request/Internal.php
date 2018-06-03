@@ -1599,7 +1599,7 @@ class Internal extends RequestCollection
                 if ($targetFeed === Constants::FEED_TIMELINE_ALBUM && $sessionIDCookie !== null) {
                     // We'll add it with the default options ("single use")
                     // so the fake cookie is only added to THIS request.
-                    $this->ig->client->getMiddleware()->addFakeCookie('sessionid', $sessionIDCookie);
+                    $this->ig->client->fakeCookies()->add('sessionid', $sessionIDCookie);
                 }
 
                 // Perform the upload of the current chunk.
