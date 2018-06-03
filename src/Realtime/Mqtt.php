@@ -16,6 +16,7 @@ use InstagramAPI\React\PersistentTrait;
 use InstagramAPI\Realtime\Command\UpdateSubscriptions;
 use InstagramAPI\Realtime\Subscription\GraphQl\AppPresenceSubscription;
 use InstagramAPI\Realtime\Subscription\GraphQl\DirectTypingSubscription;
+use InstagramAPI\Realtime\Subscription\GraphQl\ZeroProvisionSubscription;
 use InstagramAPI\Realtime\Subscription\Skywalker\DirectSubscription;
 use InstagramAPI\Realtime\Subscription\Skywalker\LiveSubscription;
 use InstagramAPI\Signatures;
@@ -136,11 +137,12 @@ class Mqtt implements PersistentInterface
             Mqtt\Topics::REGION_HINT           => new Parser\RegionHintParser(),
         ];
         $this->_handlers = [
-            Handler\DirectHandler::MODULE     => new Handler\DirectHandler($this->_target),
-            Handler\LiveHandler::MODULE       => new Handler\LiveHandler($this->_target),
-            Handler\IrisHandler::MODULE       => new Handler\IrisHandler($this->_target),
-            Handler\PresenceHandler::MODULE   => new Handler\PresenceHandler($this->_target),
-            Handler\RegionHintHandler::MODULE => new Handler\RegionHintHandler($this->_target),
+            Handler\DirectHandler::MODULE        => new Handler\DirectHandler($this->_target),
+            Handler\LiveHandler::MODULE          => new Handler\LiveHandler($this->_target),
+            Handler\IrisHandler::MODULE          => new Handler\IrisHandler($this->_target),
+            Handler\PresenceHandler::MODULE      => new Handler\PresenceHandler($this->_target),
+            Handler\RegionHintHandler::MODULE    => new Handler\RegionHintHandler($this->_target),
+            Handler\ZeroProvisionHandler::MODULE => new Handler\ZeroProvisionHandler($this->_target),
         ];
     }
 
@@ -430,6 +432,8 @@ class Mqtt implements PersistentInterface
         $this->_doAddSubscription(new DirectSubscription($this->_auth->getUserId()), false);
 
         // Set up GraphQL topics.
+        $zeroProvisionSubscription = new ZeroProvisionSubscription($this->_auth->getDeviceId());
+        $this->_doAddSubscription($zeroProvisionSubscription, false);
         $graphQlTypingSubscription = new DirectTypingSubscription($this->_auth->getUserId());
         if ($this->_graphQlTypingEnabled) {
             $this->_doAddSubscription($graphQlTypingSubscription, false);

@@ -915,12 +915,15 @@ class Instagram implements ExperimentsInterface
      */
     protected function _sendPreLoginFlow()
     {
+        // Reset zero rating rewrite rules.
+        $this->client->zeroRating()->reset();
         // Calling this non-token API will put a csrftoken in our cookie
         // jar. We must do this before any functions that require a token.
         $this->internal->readMsisdnHeader();
         $this->internal->syncDeviceFeatures(true);
-        $this->internal->getZeroRatingTokenResult();
         $this->internal->logAttribution();
+        // We must fetch new token here, because it updates rewrite rules.
+        $this->internal->fetchZeroRatingToken();
         $this->account->setContactPointPrefill('prefill');
     }
 
@@ -1018,12 +1021,15 @@ class Instagram implements ExperimentsInterface
         //
         // You have been warned.
         if ($justLoggedIn) {
+            // Reset zero rating rewrite rules.
+            $this->client->zeroRating()->reset();
             // Perform the "user has just done a full login" API flow.
-            $this->internal->getZeroRatingTokenResult();
             $this->people->getBootstrapUsers();
             $this->story->getReelsTrayFeed();
             $this->timeline->getTimelineFeed(null, ['recovered_from_crash' => true]);
             $this->internal->syncUserFeatures();
+            // We must fetch new token here, because it updates rewrite rules.
+            $this->internal->fetchZeroRatingToken();
             $this->_registerPushChannels();
             $this->direct->getRankedRecipients('reshare', true);
             $this->direct->getRankedRecipients('raven', true);
@@ -1082,6 +1088,13 @@ class Instagram implements ExperimentsInterface
             if ($lastExperimentsTime === null || (time() - $lastExperimentsTime) > self::EXPERIMENTS_REFRESH) {
                 $this->internal->syncUserFeatures();
                 $this->internal->syncDeviceFeatures();
+            }
+
+            // Update zero rating token when it has been expired.
+            $expired = time() - (int) $this->settings->get('zr_expires');
+            if ($expired > 0) {
+                $this->client->zeroRating()->reset();
+                $this->internal->fetchZeroRatingToken($expired > 7200 ? 'token_stale' : 'token_expired');
             }
         }
 

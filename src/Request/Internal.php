@@ -10,6 +10,7 @@ use InstagramAPI\Exception\FeedbackRequiredException;
 use InstagramAPI\Exception\InstagramException;
 use InstagramAPI\Exception\LoginRequiredException;
 use InstagramAPI\Exception\NetworkException;
+use InstagramAPI\Exception\SettingsException;
 use InstagramAPI\Exception\ThrottledException;
 use InstagramAPI\Exception\UploadFailedException;
 use InstagramAPI\Media\MediaDetails;
@@ -1002,19 +1003,54 @@ class Internal extends RequestCollection
     }
 
     /**
+     * @param Response\Model\Token|null $token
+     */
+    protected function _saveZeroRatingToken(
+        Response\Model\Token $token = null)
+    {
+        if ($token === null) {
+            return;
+        }
+
+        $rules = [];
+        foreach ($token->getRewriteRules() as $rule) {
+            $rules[$rule->getMatcher()] = $rule->getReplacer();
+        }
+        $this->ig->client->zeroRating()->update($rules);
+
+        try {
+            $this->ig->settings->setRewriteRules($rules);
+            $this->ig->settings->set('zr_token', $token->getTokenHash());
+            $this->ig->settings->set('zr_expires', $token->expiresAt());
+        } catch (SettingsException $e) {
+            // Ignore storage errors.
+        }
+    }
+
+    /**
      * Get zero rating token hash result.
+     *
+     * @param string $reason One of: "token_expired", "mqtt_token_push", "token_stale", "provisioning_time_mismatch".
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\TokenResultResponse
      */
-    public function getZeroRatingTokenResult()
+    public function fetchZeroRatingToken(
+        $reason = 'token_expired')
     {
         $request = $this->ig->request('zr/token/result/')
             ->setNeedsAuth(false)
-            ->addParam('token_hash', '');
+            ->addParam('custom_device_id', $this->ig->uuid)
+            ->addParam('device_id', $this->ig->device_id)
+            ->addParam('fetch_reason', $reason)
+            ->addParam('token_hash', (string) $this->ig->settings->get('zr_token'));
 
-        return $request->getResponse(new Response\TokenResultResponse());
+        /** @var Response\TokenResultResponse $result */
+        $result = $request->getResponse(new Response\TokenResultResponse());
+        $this->_saveZeroRatingToken($result->getToken());
+
+        return $result;
     }
 
     /**

@@ -10,6 +10,7 @@ use InstagramAPI\Exception\InstagramException;
 use InstagramAPI\Exception\LoginRequiredException;
 use InstagramAPI\Exception\ServerMessageThrower;
 use InstagramAPI\Middleware\FakeCookies;
+use InstagramAPI\Middleware\ZeroRating;
 use LazyJsonMapper\Exception\LazyJsonMapperException;
 use Psr\Http\Message\RequestInterface as HttpRequestInterface;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
@@ -91,6 +92,11 @@ class Client
     private $_fakeCookies;
 
     /**
+     * @var \InstagramAPI\Middleware\ZeroRating
+     */
+    private $_zeroRating;
+
+    /**
      * @var \GuzzleHttp\Cookie\CookieJar
      */
     private $_cookieJar;
@@ -127,6 +133,9 @@ class Client
         // Create our cookies middleware and add it to the stack.
         $this->_fakeCookies = new FakeCookies();
         $stack->push($this->_fakeCookies, 'fake_cookies');
+
+        $this->_zeroRating = new ZeroRating();
+        $stack->push($this->_zeroRating, 'zero_rewrite');
 
         // Default request options (immutable after client creation).
         $this->_guzzleClient = new GuzzleClient([
@@ -168,6 +177,9 @@ class Client
         if ($this->getToken() === null) {
             $this->_parent->isMaybeLoggedIn = false;
         }
+
+        // Load rewrite rules (if any).
+        $this->zeroRating()->update($this->_parent->settings->getRewriteRules());
     }
 
     /**
@@ -731,7 +743,7 @@ class Client
 
             $this->_printDebug(
                 $request->getMethod(),
-                (string) $request->getUri(),
+                $this->_zeroRating->rewrite((string) $request->getUri()),
                 $uploadedBody,
                 $uploadedBytes,
                 $guzzleResponse,
@@ -810,5 +822,15 @@ class Client
     public function fakeCookies()
     {
         return $this->_fakeCookies;
+    }
+
+    /**
+     * Get the zero rating rewrite middleware instance.
+     *
+     * @return ZeroRating
+     */
+    public function zeroRating()
+    {
+        return $this->_zeroRating;
     }
 }

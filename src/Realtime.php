@@ -8,6 +8,7 @@ use InstagramAPI\React\Connector;
 use InstagramAPI\Realtime\Command\Direct as DirectCommand;
 use InstagramAPI\Realtime\Command\IrisSubscribe;
 use InstagramAPI\Realtime\Mqtt\Auth;
+use InstagramAPI\Realtime\Payload\ZeroProvisionEvent;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use React\EventLoop\LoopInterface;
@@ -31,6 +32,7 @@ use React\EventLoop\LoopInterface;
  *  - client-context-ack - Acknowledgment for client_context has been received.
  *  - unseen-count-update - Unseen count indicator has been updated.
  *  - region-hint - Preferred data center has been changed.
+ *  - zero-provision - Zero rating token has been updated.
  *  - warning - An exception of severity "warning" occurred.
  *  - error - An exception of severity "error" occurred.
  */
@@ -79,6 +81,18 @@ class Realtime implements EventEmitterInterface
         $this->on('region-hint', function ($region) {
             $this->_instagram->settings->set('datacenter', $region);
             $this->_client->setAdditionalOption('datacenter', $region);
+        });
+        $this->on('zero-provision', function (ZeroProvisionEvent $event) {
+            if ($event->getZeroProvisionedTime() === null) {
+                return;
+            }
+            if ($event->getProductName() !== 'select') {
+                return;
+            }
+            // TODO check whether we already have a fresh token.
+
+            $this->_instagram->client->zeroRating()->reset();
+            $this->_instagram->internal->fetchZeroRatingToken('mqtt_token_push');
         });
     }
 
