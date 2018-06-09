@@ -751,8 +751,9 @@ class People extends RequestCollection
     }
 
     /**
-     * Mute stories, posts or both from a user. It prevents user media from
-     * showing up in the timeline and/or story feed.
+     * Mute stories, posts or both from a user.
+     *
+     * It prevents user media from showing up in the timeline and/or story feed.
      *
      * @param string $userId Numerical UserPK ID.
      * @param string $option Selection of what type of media are going to be muted.
@@ -802,8 +803,8 @@ class People extends RequestCollection
      *
      * @return \InstagramAPI\Response\FriendshipResponse
      *
-     * @see People::muteStoryOrPost()
-     * @see People::unmuteStoryOrPost()
+     * @see People::muteUserMedia()
+     * @see People::unmuteUserMedia()
      */
     protected function _muteOrUnmuteUserMedia(
         $userId,
