@@ -123,6 +123,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method StoryHashtag[] getStoryHashtags()
  * @method bool getStoryIsSavedToArchive()
  * @method StoryLocation[] getStoryLocations()
+ * @method mixed getStoryMusicStickers()
  * @method mixed getStoryPollVoterInfos()
  * @method mixed getStoryPolls()
  * @method mixed getStoryProductItems()
@@ -267,6 +268,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isStoryHashtags()
  * @method bool isStoryIsSavedToArchive()
  * @method bool isStoryLocations()
+ * @method bool isStoryMusicStickers()
  * @method bool isStoryPollVoterInfos()
  * @method bool isStoryPolls()
  * @method bool isStoryProductItems()
@@ -411,6 +413,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setStoryHashtags(StoryHashtag[] $value)
  * @method $this setStoryIsSavedToArchive(bool $value)
  * @method $this setStoryLocations(StoryLocation[] $value)
+ * @method $this setStoryMusicStickers(mixed $value)
  * @method $this setStoryPollVoterInfos(mixed $value)
  * @method $this setStoryPolls(mixed $value)
  * @method $this setStoryProductItems(mixed $value)
@@ -555,6 +558,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetStoryHashtags()
  * @method $this unsetStoryIsSavedToArchive()
  * @method $this unsetStoryLocations()
+ * @method $this unsetStoryMusicStickers()
  * @method $this unsetStoryPollVoterInfos()
  * @method $this unsetStoryPolls()
  * @method $this unsetStoryProductItems()
@@ -747,6 +751,7 @@ class Item extends AutoPropertyMapper
         'story_friend_lists'                          => '',
         'story_product_items'                         => '',
         'story_questions'                             => '',
+        'story_music_stickers'                        => '',
         'supports_reel_reactions'                     => 'bool',
         'show_one_tap_fb_share_tooltip'               => 'bool',
         'has_shared_to_fb'                            => 'bool',
