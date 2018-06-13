@@ -16,7 +16,7 @@ class UserAgent
      *
      * @var string
      */
-    const USER_AGENT_FORMAT = 'Instagram %s Android (%s/%s; %s; %s; %s; %s; %s; %s; %s; %s)';
+    const USER_AGENT_FORMAT = 'Instagram %s Android (%s/%s; %s; %s; %s; %s; %s; %s; %s)';
 
     /**
      * Generates a User Agent string from a DeviceInterface.
@@ -41,7 +41,7 @@ class UserAgent
         // Generate the final User-Agent string.
         return sprintf(
             self::USER_AGENT_FORMAT,
-            $appVersion, // App version ("27.0.0.7.97").
+            $appVersion, // App version ("10.8.0").
             $device->getAndroidVersion(),
             $device->getAndroidRelease(),
             $device->getDPI(),
@@ -50,8 +50,7 @@ class UserAgent
             $device->getModel(),
             $device->getDevice(),
             $device->getCPU(),
-            $userLocale, // Locale ("en_US").
-            Constants::VERSION_CODE
+            $userLocale // Locale ("en_US").
         );
     }
 
