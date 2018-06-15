@@ -45,36 +45,23 @@ class Direct extends RequestCollection
     }
 
     /**
-     * Get visual inbox data.
-     *
-     * `NOTE:` This "visual" endpoint is only used for Direct stories.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\DirectVisualInboxResponse
-     *
-     * @deprecated Visual inbox has been superseded by the unified inbox.
-     * @see Direct::getInbox()
-     */
-    public function getVisualInbox()
-    {
-        return $this->ig->request('direct_v2/visual_inbox/')
-            ->addParam('persistentBadging', 'true')
-            ->getResponse(new Response\DirectVisualInboxResponse());
-    }
-
-    /**
      * Get pending inbox data.
+     *
+     * @param string|null $cursorId Next "cursor ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\DirectPendingInboxResponse
      */
-    public function getPendingInbox()
+    public function getPendingInbox(
+        $cursorId = null)
     {
         $request = $this->ig->request('direct_v2/pending_inbox/')
             ->addParam('persistentBadging', 'true')
             ->addParam('use_unified_inbox', 'true');
+        if ($cursorId !== null) {
+            $request->addParam('cursor', $cursorId);
+        }
 
         return $request->getResponse(new Response\DirectPendingInboxResponse());
     }

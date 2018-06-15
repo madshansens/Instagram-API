@@ -7,15 +7,15 @@ use InstagramAPI\Response;
 /**
  * TimelineFeedResponse.
  *
- * @method mixed getAutoLoadMoreEnabled()
+ * @method bool getAutoLoadMoreEnabled()
  * @method bool getClientFeedChangelistApplied()
  * @method mixed getClientGapEnforcerMatrix()
  * @method Model\FeedItem[] getFeedItems()
  * @method string getFeedPillText()
- * @method mixed getIsDirectV2Enabled()
+ * @method bool getIsDirectV2Enabled()
  * @method Model\FeedAysf getMegaphone()
  * @method mixed getMessage()
- * @method mixed getMoreAvailable()
+ * @method bool getMoreAvailable()
  * @method string getNextMaxId()
  * @method int getNumResults()
  * @method string getStatus()
@@ -35,15 +35,15 @@ use InstagramAPI\Response;
  * @method bool isStatus()
  * @method bool isViewStateVersion()
  * @method bool is_Messages()
- * @method $this setAutoLoadMoreEnabled(mixed $value)
+ * @method $this setAutoLoadMoreEnabled(bool $value)
  * @method $this setClientFeedChangelistApplied(bool $value)
  * @method $this setClientGapEnforcerMatrix(mixed $value)
  * @method $this setFeedItems(Model\FeedItem[] $value)
  * @method $this setFeedPillText(string $value)
- * @method $this setIsDirectV2Enabled(mixed $value)
+ * @method $this setIsDirectV2Enabled(bool $value)
  * @method $this setMegaphone(Model\FeedAysf $value)
  * @method $this setMessage(mixed $value)
- * @method $this setMoreAvailable(mixed $value)
+ * @method $this setMoreAvailable(bool $value)
  * @method $this setNextMaxId(string $value)
  * @method $this setNumResults(int $value)
  * @method $this setStatus(string $value)
@@ -68,9 +68,10 @@ class TimelineFeedResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
         'num_results'                    => 'int',
-        'is_direct_v2_enabled'           => '',
-        'auto_load_more_enabled'         => '',
-        'more_available'                 => '',
+        'client_gap_enforcer_matrix'     => '',
+        'is_direct_v2_enabled'           => 'bool',
+        'auto_load_more_enabled'         => 'bool',
+        'more_available'                 => 'bool',
         'next_max_id'                    => 'string',
         'feed_items'                     => 'Model\FeedItem[]',
         'megaphone'                      => 'Model\FeedAysf',

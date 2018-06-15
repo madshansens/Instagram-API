@@ -72,6 +72,7 @@ class Story extends RequestCollection
     {
         return $this->ig->request('feed/reels_tray/')
             ->setSignedPost(false)
+            ->addPost('supported_capabilities_new', json_encode(Constants::SUPPORTED_CAPABILITIES))
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\ReelsTrayFeedResponse());

@@ -12,6 +12,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method string getCustomTitle()
  * @method Hashtag getHashtag()
  * @method float getHeight()
+ * @method int getIsHidden()
  * @method int getIsPinned()
  * @method float getRotation()
  * @method float getWidth()
@@ -22,6 +23,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method bool isCustomTitle()
  * @method bool isHashtag()
  * @method bool isHeight()
+ * @method bool isIsHidden()
  * @method bool isIsPinned()
  * @method bool isRotation()
  * @method bool isWidth()
@@ -32,6 +34,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method $this setCustomTitle(string $value)
  * @method $this setHashtag(Hashtag $value)
  * @method $this setHeight(float $value)
+ * @method $this setIsHidden(int $value)
  * @method $this setIsPinned(int $value)
  * @method $this setRotation(float $value)
  * @method $this setWidth(float $value)
@@ -42,6 +45,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method $this unsetCustomTitle()
  * @method $this unsetHashtag()
  * @method $this unsetHeight()
+ * @method $this unsetIsHidden()
  * @method $this unsetIsPinned()
  * @method $this unsetRotation()
  * @method $this unsetWidth()
@@ -56,5 +60,6 @@ class StoryHashtag extends AutoPropertyMapper
         'hashtag'       => 'Hashtag',
         'attribution'   => 'string',
         'custom_title'  => 'string',
+        'is_hidden'     => 'int',
     ];
 }

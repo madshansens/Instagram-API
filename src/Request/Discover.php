@@ -2,6 +2,7 @@
 
 namespace InstagramAPI\Request;
 
+use InstagramAPI\Constants;
 use InstagramAPI\Exception\RequestHeadersTooLargeException;
 use InstagramAPI\Response;
 
@@ -28,7 +29,8 @@ class Discover extends RequestCollection
             ->addParam('is_prefetch', $isPrefetch)
             ->addParam('is_from_promote', false)
             ->addParam('timezone_offset', date('Z'))
-            ->addParam('session_id', $this->ig->session_id);
+            ->addParam('session_id', $this->ig->session_id)
+            ->addParam('supported_capabilities_new', json_encode(Constants::SUPPORTED_CAPABILITIES));
 
         if (!$isPrefetch) {
             if ($maxId === null) {

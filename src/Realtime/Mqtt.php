@@ -79,8 +79,6 @@ class Mqtt implements PersistentInterface
     protected $_inboxPresenceEnabled;
     /** @var bool */
     protected $_threadPresenceEnabled;
-    /** @var bool */
-    protected $_regionHintEnabled;
 
     /** @var ParserInterface[] */
     protected $_parsers;
@@ -386,7 +384,7 @@ class Mqtt implements PersistentInterface
         $this->_msgTypeBlacklist = $experiments->getExperimentParam(
             'ig_android_realtime_iris',
             'pubsub_msg_type_blacklist',
-            ''
+            'null'
         );
 
         // Live features.
@@ -408,12 +406,6 @@ class Mqtt implements PersistentInterface
         );
         $this->_threadPresenceEnabled = $experiments->isExperimentEnabled(
             'ig_android_direct_thread_presence',
-            'is_enabled'
-        );
-
-        // Various features.
-        $this->_regionHintEnabled = $experiments->isExperimentEnabled(
-            'ig_android_mqtt_region_hint_universe',
             'is_enabled'
         );
     }
@@ -460,17 +452,6 @@ class Mqtt implements PersistentInterface
             'app_version'   => Constants::IG_VERSION,
             'capabilities'  => Constants::X_IG_Capabilities,
         ];
-        // Everclear subscriptions.
-        $everclearSubscriptions = [];
-        if ($this->_inboxPresenceEnabled) {
-            $everclearSubscriptions[AppPresenceSubscription::ID] = AppPresenceSubscription::QUERY;
-        }
-        if (count($everclearSubscriptions)) {
-            $result['everclear_subscriptions'] = json_encode($everclearSubscriptions);
-        }
-        // Maintaining the order.
-        $result['User-Agent'] = $this->_device->getUserAgent();
-        $result['ig_mqtt_route'] = 'django';
         // PubSub message type blacklist.
         $msgTypeBlacklist = '';
         if ($this->_msgTypeBlacklist !== null && $this->_msgTypeBlacklist !== '') {
@@ -486,6 +467,17 @@ class Mqtt implements PersistentInterface
         if ($msgTypeBlacklist !== '') {
             $result['pubsub_msg_type_blacklist'] = $msgTypeBlacklist;
         }
+        // Everclear subscriptions.
+        $everclearSubscriptions = [];
+        if ($this->_inboxPresenceEnabled) {
+            $everclearSubscriptions[AppPresenceSubscription::ID] = AppPresenceSubscription::QUERY;
+        }
+        if (count($everclearSubscriptions)) {
+            $result['everclear_subscriptions'] = json_encode($everclearSubscriptions);
+        }
+        // Maintaining the order.
+        $result['User-Agent'] = $this->_device->getUserAgent();
+        $result['ig_mqtt_route'] = 'django';
         // Accept-Language must be the last one.
         $result['Accept-Language'] = Constants::ACCEPT_LANGUAGE;
 
@@ -502,9 +494,7 @@ class Mqtt implements PersistentInterface
         $topics = [
             Mqtt\Topics::PUBSUB,
         ];
-        if ($this->_regionHintEnabled) {
-            $topics[] = Mqtt\Topics::REGION_HINT;
-        }
+        $topics[] = Mqtt\Topics::REGION_HINT;
         if ($this->_graphQlTypingEnabled) {
             $topics[] = Mqtt\Topics::REALTIME_SUB;
         }

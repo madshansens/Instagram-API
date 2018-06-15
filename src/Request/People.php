@@ -165,8 +165,9 @@ class People extends RequestCollection
     public function getBootstrapUsers()
     {
         $surfaces = [
+            'coefficient_direct_closed_friends_ranking',
             'coefficient_direct_recipients_ranking_variant_2',
-            'coefficient_direct_recipients_ranking',
+            'coefficient_rank_recipient_user_suggestion',
             'coefficient_ios_section_test_bootstrap_ranking',
             'autocomplete_user_list',
         ];

@@ -10,6 +10,7 @@ use InstagramAPI\Response\PropertyCollection;
  *
  * @method string getAttribution()
  * @method float getHeight()
+ * @method int getIsHidden()
  * @method int getIsPinned()
  * @method Location getLocation()
  * @method float getRotation()
@@ -19,6 +20,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method float getZ()
  * @method bool isAttribution()
  * @method bool isHeight()
+ * @method bool isIsHidden()
  * @method bool isIsPinned()
  * @method bool isLocation()
  * @method bool isRotation()
@@ -28,6 +30,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method bool isZ()
  * @method $this setAttribution(string $value)
  * @method $this setHeight(float $value)
+ * @method $this setIsHidden(int $value)
  * @method $this setIsPinned(int $value)
  * @method $this setLocation(Location $value)
  * @method $this setRotation(float $value)
@@ -37,6 +40,7 @@ use InstagramAPI\Response\PropertyCollection;
  * @method $this setZ(float $value)
  * @method $this unsetAttribution()
  * @method $this unsetHeight()
+ * @method $this unsetIsHidden()
  * @method $this unsetIsPinned()
  * @method $this unsetLocation()
  * @method $this unsetRotation()
@@ -51,5 +55,6 @@ class StoryLocation extends AutoPropertyMapper
         PropertyCollection\Sticker::class,
         'location'    => 'Location',
         'attribution' => 'string',
+        'is_hidden'   => 'int',
     ];
 }

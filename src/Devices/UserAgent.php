@@ -16,7 +16,7 @@ class UserAgent
      *
      * @var string
      */
-    const USER_AGENT_FORMAT = 'Instagram %s Android (%s/%s; %s; %s; %s; %s; %s; %s; %s)';
+    const USER_AGENT_FORMAT = 'Instagram %s Android (%s/%s; %s; %s; %s; %s; %s; %s; %s; %s)';
 
     /**
      * Generates a User Agent string from a DeviceInterface.
@@ -41,7 +41,7 @@ class UserAgent
         // Generate the final User-Agent string.
         return sprintf(
             self::USER_AGENT_FORMAT,
-            $appVersion, // App version ("10.8.0").
+            $appVersion, // App version ("27.0.0.7.97").
             $device->getAndroidVersion(),
             $device->getAndroidRelease(),
             $device->getDPI(),
@@ -50,7 +50,8 @@ class UserAgent
             $device->getModel(),
             $device->getDevice(),
             $device->getCPU(),
-            $userLocale // Locale ("en_US").
+            $userLocale, // Locale ("en_US").
+            Constants::VERSION_CODE
         );
     }
 
@@ -114,6 +115,7 @@ class UserAgent
             'FBPN' => Constants::PACKAGE_NAME,
             'FBDV' => self::_escapeFbString($device->getModel()),
             'FBSV' => self::_escapeFbString($device->getAndroidRelease()),
+            'FBLR' => 0, // android.hardware.ram.low
             'FBBK' => 1, // Const (at least in 10.12.0).
             'FBCA' => self::_escapeFbString(GoodDevices::CPU_ABI),
         ];

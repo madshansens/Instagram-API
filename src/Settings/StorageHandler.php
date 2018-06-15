@@ -81,8 +81,12 @@ class StorageHandler
         'ig_android_ad_async_ads_universe',
         'ig_android_direct_inbox_presence',
         'ig_android_direct_thread_presence',
-        'ig_android_mqtt_region_hint_universe',
         'ig_android_rtc_reshare',
+        'ig_android_sidecar_photo_fbupload_universe',
+        'ig_android_fbupload_sidecar_video_universe',
+        'ig_android_skip_get_fbupload_photo_universe',
+        'ig_android_skip_get_fbupload_universe',
+        'ig_android_loom_universe',
     ];
 
     /**

@@ -919,11 +919,13 @@ class Instagram implements ExperimentsInterface
         $this->client->zeroRating()->reset();
         // Calling this non-token API will put a csrftoken in our cookie
         // jar. We must do this before any functions that require a token.
-        $this->internal->readMsisdnHeader();
+        $this->internal->readMsisdnHeader('ig_select_app');
         $this->internal->syncDeviceFeatures(true);
+        $this->internal->sendLauncherSync(true);
         $this->internal->logAttribution();
         // We must fetch new token here, because it updates rewrite rules.
         $this->internal->fetchZeroRatingToken();
+        // It must be at the end, because it's called when a user taps on login input.
         $this->account->setContactPointPrefill('prefill');
     }
 
@@ -1024,24 +1026,32 @@ class Instagram implements ExperimentsInterface
             // Reset zero rating rewrite rules.
             $this->client->zeroRating()->reset();
             // Perform the "user has just done a full login" API flow.
-            $this->people->getBootstrapUsers();
-            $this->story->getReelsTrayFeed();
-            $this->timeline->getTimelineFeed(null, ['recovered_from_crash' => true]);
+            $this->internal->sendLauncherSync(false);
             $this->internal->syncUserFeatures();
+            $this->timeline->getTimelineFeed(null, ['recovered_from_crash' => true]);
+            $this->story->getReelsTrayFeed();
+            $this->discover->getSuggestedSearches('users');
+            $this->discover->getRecentSearches();
+            $this->discover->getSuggestedSearches('blended');
+            //$this->story->getReelsMediaFeed();
             // We must fetch new token here, because it updates rewrite rules.
             $this->internal->fetchZeroRatingToken();
             $this->_registerPushChannels();
             $this->direct->getRankedRecipients('reshare', true);
             $this->direct->getRankedRecipients('raven', true);
             $this->direct->getInbox();
-            $this->account->getPresenceStatus();
-            $this->internal->getProfileNotice();
-            //$this->internal->getMegaphoneLog();
+            $this->direct->getPresences();
             $this->people->getRecentActivityInbox();
-            $this->internal->getQPFetch(Constants::SURFACE_PARAM[0]);
+            if ((int) $this->getExperimentParam('ig_android_loom_universe', 'cpu_sampling_rate_ms', 0) > 0) {
+                $this->internal->getLoomFetchConfig();
+            }
+            $this->internal->getProfileNotice();
             $this->media->getBlockedMedia();
-            $this->internal->getQPFetch(Constants::SURFACE_PARAM[1]);
+            $this->people->getBootstrapUsers();
+            //$this->internal->getQPCooldowns();
             $this->discover->getExploreFeed(null, true);
+            //$this->internal->getMegaphoneLog();
+            $this->internal->getQPFetch();
             $this->internal->getFacebookOTA();
         } else {
             $lastLoginTime = $this->settings->get('last_login');
@@ -1076,7 +1086,7 @@ class Instagram implements ExperimentsInterface
                 $this->_registerPushChannels();
                 //$this->internal->getMegaphoneLog();
                 $this->direct->getInbox();
-                $this->account->getPresenceStatus();
+                $this->direct->getPresences();
                 $this->people->getRecentActivityInbox();
                 $this->internal->getProfileNotice();
                 $this->discover->getExploreFeed();
@@ -1142,15 +1152,18 @@ class Instagram implements ExperimentsInterface
      *
      * @param string $experiment
      * @param string $param
+     * @param bool   $default
      *
      * @return bool
      */
     public function isExperimentEnabled(
         $experiment,
-        $param)
+        $param,
+        $default = false)
     {
         return isset($this->experiments[$experiment][$param])
-            && in_array($this->experiments[$experiment][$param], ['enabled', 'true', '1']);
+            ? in_array($this->experiments[$experiment][$param], ['enabled', 'true', '1'])
+            : $default;
     }
 
     /**
