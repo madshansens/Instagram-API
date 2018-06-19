@@ -627,9 +627,9 @@ class Instagram implements ExperimentsInterface
             ->setNeedsAuth(false)
             ->addPost('two_factor_identifier', $twoFactorIdentifier)
             ->addPost('username', $username)
-            ->addPost('device_id', $this->ig->device_id)
-            ->addPost('guid', $this->ig->uuid)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('device_id', $this->device_id)
+            ->addPost('guid', $this->uuid)
+            ->addPost('_csrftoken', $this->client->getToken())
             ->getResponse(new Response\TwoFactorLoginSMSResponse());
     }
 
