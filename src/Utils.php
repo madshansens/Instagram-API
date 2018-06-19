@@ -691,6 +691,36 @@ class Utils
     }
 
     /**
+     * Verifies an attached media.
+     *
+     * @param array[] $attachedMedia Array containing the attached media data.
+     *
+     * @throws \InvalidArgumentException If it's missing keys or has invalid values.
+     */
+    public static function throwIfInvalidAttachedMedia(
+        array $attachedMedia)
+    {
+        $attachedMedia = reset($attachedMedia);
+        $requiredKeys = ['media_id', 'is_sticker'];
+
+        // Ensure that all keys exist.
+        $missingKeys = array_keys(array_diff_key(['media_id' => 1, 'is_sticker' => 1], $attachedMedia));
+        if (count($missingKeys)) {
+            throw new \InvalidArgumentException(sprintf('Missing keys "%s" for attached media.', implode(', ', $missingKeys)));
+        }
+
+        if (!is_string($attachedMedia['media_id']) && !is_numeric($attachedMedia['media_id'])) {
+            throw new \InvalidArgumentException(sprintf('Invalid value "%s" for media_id.', $attachedMedia['media_id']));
+        }
+
+        if (!is_bool($attachedMedia['is_sticker']) && $attachedMedia['is_sticker'] !== true) {
+            throw new \InvalidArgumentException(sprintf('Invalid value "%s" for attached media.', $attachedMedia['is_sticker']));
+        }
+
+        self::_throwIfInvalidStoryStickerPlacement(array_diff_key($attachedMedia, array_flip($requiredKeys)), 'attached media');
+    }
+
+    /**
      * Verifies a story sticker's placement parameters.
      *
      * There are many kinds of story stickers, such as hashtags, locations,

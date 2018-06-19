@@ -41,6 +41,10 @@ class Constants
             'name'  => 'segmentation',
             'value' => 'segmentation_enabled',
         ],
+        [
+            'name'  => 'WORLD_TRACKER',
+            'value' => 'WORLD_TRACKER_ENABLED',
+        ],
     ];
 
     // Facebook Constants.

@@ -198,7 +198,8 @@ class Story extends RequestCollection
         $storyPk,
         $maxId = null)
     {
-        $request = $this->ig->request("media/{$storyPk}/list_reel_media_viewer/");
+        $request = $this->ig->request("media/{$storyPk}/list_reel_media_viewer/")
+            ->addParam('supported_capabilities_new', json_encode(Constants::SUPPORTED_CAPABILITIES));
         if ($maxId !== null) {
             $request->addParam('max_id', $maxId);
         }

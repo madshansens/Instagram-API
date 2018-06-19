@@ -215,6 +215,8 @@ class Internal extends RequestCollection
         $storyMentions = (isset($externalMetadata['story_mentions']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_mentions'] : null;
         /** @var array Story poll to use for the media. ONLY STORY MEDIA! */
         $storyPoll = (isset($externalMetadata['story_polls']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_polls'] : null;
+        /** @var array Attached media used to share media to story feed. ONLY STORY MEDIA! */
+        $attachedMedia = (isset($externalMetadata['attached_media']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['attached_media'] : null;
 
         // Fix very bad external user-metadata values.
         if (!is_string($captionText)) {
@@ -231,6 +233,7 @@ class Internal extends RequestCollection
 
         // Build the request...
         $request = $this->ig->request($endpoint)
+            ->addPost('supported_capabilities_new', json_encode(Constants::SUPPORTED_CAPABILITIES))
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_uuid', $this->ig->uuid)
@@ -305,6 +308,12 @@ class Internal extends RequestCollection
                         ->addPost('story_polls', json_encode($storyPoll))
                         ->addPost('internal_features', 'polling_sticker')
                         ->addPost('mas_opt_in', 'NOT_PROMPTED');
+                }
+                if ($attachedMedia !== null) {
+                    Utils::throwIfInvalidAttachedMedia($attachedMedia);
+                    $request
+                        ->addPost('attached_media', json_encode($attachedMedia))
+                        ->addPost('story_sticker_ids', 'media_simple_'.reset($attachedMedia)['media_id']);
                 }
                 break;
             case Constants::FEED_DIRECT_STORY:
@@ -596,6 +605,8 @@ class Internal extends RequestCollection
         $storyMentions = (isset($externalMetadata['story_mentions']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_mentions'] : null;
         /** @var array Story poll to use for the media. ONLY STORY MEDIA! */
         $storyPoll = (isset($externalMetadata['story_polls']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_polls'] : null;
+        /** @var array Attached media used to share media to story feed. ONLY STORY MEDIA! */
+        $attachedMedia = (isset($externalMetadata['attached_media']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['attached_media'] : null;
 
         // Fix very bad external user-metadata values.
         if (!is_string($captionText)) {
@@ -608,6 +619,7 @@ class Internal extends RequestCollection
         // Build the request...
         $request = $this->ig->request($endpoint)
             ->addParam('video', 1)
+            ->addPost('supported_capabilities_new', json_encode(Constants::SUPPORTED_CAPABILITIES))
             ->addPost('video_result', $internalMetadata->getVideoUploadResponse() !== null ? (string) $internalMetadata->getVideoUploadResponse()->getResult() : '')
             ->addPost('upload_id', $uploadId)
             ->addPost('poster_frame_index', 0)
@@ -672,6 +684,12 @@ class Internal extends RequestCollection
                         ->addPost('story_polls', json_encode($storyPoll))
                         ->addPost('internal_features', 'polling_sticker')
                         ->addPost('mas_opt_in', 'NOT_PROMPTED');
+                }
+                if ($attachedMedia !== null) {
+                    Utils::throwIfInvalidAttachedMedia($attachedMedia);
+                    $request
+                        ->addPost('attached_media', json_encode($attachedMedia))
+                        ->addPost('story_sticker_ids', 'media_simple_'.reset($attachedMedia)['media_id']);
                 }
                 break;
             case Constants::FEED_DIRECT_STORY:
