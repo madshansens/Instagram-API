@@ -164,6 +164,7 @@ class Story extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('user_ids', $feedList) // Must be string[] array.
+            ->addPost('source', $source)
             ->getResponse(new Response\ReelsMediaResponse());
     }
 

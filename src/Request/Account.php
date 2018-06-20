@@ -57,7 +57,7 @@ class Account extends RequestCollection
         $biography)
     {
         if (!is_string($biography) || strlen($biography) > 150) {
-            throw new InvalidArgumentException('Please provide a 0 to 150 character string as biography.');
+            throw new \InvalidArgumentException('Please provide a 0 to 150 character string as biography.');
         }
 
         return $this->ig->request('accounts/set_biography/')
@@ -426,7 +426,7 @@ class Account extends RequestCollection
     {
         $cleanNumber = '+'.preg_replace('/[^0-9]/', '', $phoneNumber);
 
-        $response = $this->ig->request('accounts/enable_sms_two_factor/')
+        $this->ig->request('accounts/enable_sms_two_factor/')
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
