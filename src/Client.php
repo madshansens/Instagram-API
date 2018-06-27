@@ -112,6 +112,13 @@ class Client
     private $_cookieJarLastSaved;
 
     /**
+     * The flag to force cURL to reopen a fresh connection.
+     *
+     * @var bool
+     */
+    private $_resetConnection;
+
+    /**
      * Constructor.
      *
      * @param \InstagramAPI\Instagram $parent
@@ -151,6 +158,8 @@ class Client
             // We'll instead MANUALLY be throwing on certain other HTTP codes.
             'http_errors'     => false,
         ]);
+
+        $this->_resetConnection = false;
     }
 
     /**
@@ -359,6 +368,7 @@ class Client
         $value)
     {
         $this->_proxy = $value;
+        $this->_resetConnection = true;
     }
 
     /**
@@ -386,6 +396,7 @@ class Client
         $value)
     {
         $this->_outputInterface = $value;
+        $this->_resetConnection = true;
     }
 
     /**
@@ -615,6 +626,10 @@ class Client
         // This option MUST be non-empty if set, otherwise it breaks cURL.
         if (is_string($this->_outputInterface) && $this->_outputInterface !== '') {
             $finalOptions['curl'][CURLOPT_INTERFACE] = $this->_outputInterface;
+        }
+        if ($this->_resetConnection) {
+            $finalOptions['curl'][CURLOPT_FRESH_CONNECT] = true;
+            $this->_resetConnection = false;
         }
 
         return $finalOptions;
