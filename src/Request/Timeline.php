@@ -223,6 +223,8 @@ class Timeline extends RequestCollection
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('is_prefetch', '0')
             ->addPost('phone_id', $this->ig->phone_id)
+            ->addPost('device_id', $this->ig->uuid)
+            ->addPost('client_session_id', $this->ig->session_id)
             ->addPost('battery_level', '100')
             ->addPost('is_charging', '1')
             ->addPost('will_sound_on', '1')
@@ -236,7 +238,11 @@ class Timeline extends RequestCollection
             ->addPost('is_async_ads_rti', (string) (int) ($asyncAds && $this->ig->isExperimentEnabled(
                 'ig_android_ad_async_ads_universe',
                 'is_rti_enabled'
-            )));
+            )))
+            ->addPost('rti_delivery_backend', (string) (int) $this->ig->getExperimentParam(
+                'ig_android_ad_async_ads_universe',
+                'rti_delivery_backend'
+            ));
 
         if (isset($options['latest_story_pk'])) {
             $request->addPost('latest_story_pk', $options['latest_story_pk']);
