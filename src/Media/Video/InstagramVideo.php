@@ -209,7 +209,12 @@ class InstagramVideo extends InstagramMedia
 
         // Cut too long videos.
         if ($this->_details->getDuration() > $this->_constraints->getMaxDuration()) {
-            $result[] = sprintf('-t %d', $this->_constraints->getMaxDuration());
+            // FFmpeg cuts video sticking to a closest frame. As a result we might
+            // end with a video that is longer than desired duration. To prevent this
+            // we must use a duration that is somewhat smaller than its maximum allowed
+            // value. 0.1 sec is 1 frame of 10 FPS video.
+            $maxDuration = $this->_constraints->getMaxDuration() - 0.1;
+            $result[] = sprintf('-t %.2F', $maxDuration);
         }
 
         // TODO Loop too short videos.
