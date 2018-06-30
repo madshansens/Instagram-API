@@ -10,6 +10,7 @@ use InstagramAPI\Response;
  * @method bool getAutoLoadMoreEnabled()
  * @method bool getClientFeedChangelistApplied()
  * @method mixed getClientGapEnforcerMatrix()
+ * @method string getClientSessionId()
  * @method Model\FeedItem[] getFeedItems()
  * @method string getFeedPillText()
  * @method bool getIsDirectV2Enabled()
@@ -24,6 +25,7 @@ use InstagramAPI\Response;
  * @method bool isAutoLoadMoreEnabled()
  * @method bool isClientFeedChangelistApplied()
  * @method bool isClientGapEnforcerMatrix()
+ * @method bool isClientSessionId()
  * @method bool isFeedItems()
  * @method bool isFeedPillText()
  * @method bool isIsDirectV2Enabled()
@@ -38,6 +40,7 @@ use InstagramAPI\Response;
  * @method $this setAutoLoadMoreEnabled(bool $value)
  * @method $this setClientFeedChangelistApplied(bool $value)
  * @method $this setClientGapEnforcerMatrix(mixed $value)
+ * @method $this setClientSessionId(string $value)
  * @method $this setFeedItems(Model\FeedItem[] $value)
  * @method $this setFeedPillText(string $value)
  * @method $this setIsDirectV2Enabled(bool $value)
@@ -52,6 +55,7 @@ use InstagramAPI\Response;
  * @method $this unsetAutoLoadMoreEnabled()
  * @method $this unsetClientFeedChangelistApplied()
  * @method $this unsetClientGapEnforcerMatrix()
+ * @method $this unsetClientSessionId()
  * @method $this unsetFeedItems()
  * @method $this unsetFeedPillText()
  * @method $this unsetIsDirectV2Enabled()
@@ -79,5 +83,6 @@ class TimelineFeedResponse extends Response
         'view_state_version'             => 'string',
         'feed_pill_text'                 => 'string',
         'client_gap_enforcer_matrix'     => '',
+        'client_session_id'              => 'string',
     ];
 }

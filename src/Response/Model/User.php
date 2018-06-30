@@ -50,6 +50,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getHasAnonymousProfilePicture()
  * @method bool getHasBiographyTranslation()
  * @method bool getHasChaining()
+ * @method bool getHasHighlightReels()
  * @method bool getHasProfileVideoFeed()
  * @method bool getHasUnseenBestiesMedia()
  * @method ImageCandidate getHdProfilePicUrlInfo()
@@ -57,10 +58,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getId()
  * @method mixed getIncludeDirectBlacklistStatus()
  * @method bool getIsActive()
+ * @method bool getIsBestie()
  * @method bool getIsBusiness()
  * @method bool getIsCallToActionEnabled()
  * @method bool getIsDirectappInstalled()
  * @method bool getIsFavorite()
+ * @method bool getIsFavoriteForHighlights()
+ * @method bool getIsFavoriteForStories()
  * @method bool getIsNeedy()
  * @method bool getIsPrivate()
  * @method bool getIsProfileActionNeeded()
@@ -148,6 +152,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isHasAnonymousProfilePicture()
  * @method bool isHasBiographyTranslation()
  * @method bool isHasChaining()
+ * @method bool isHasHighlightReels()
  * @method bool isHasProfileVideoFeed()
  * @method bool isHasUnseenBestiesMedia()
  * @method bool isHdProfilePicUrlInfo()
@@ -155,10 +160,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isId()
  * @method bool isIncludeDirectBlacklistStatus()
  * @method bool isIsActive()
+ * @method bool isIsBestie()
  * @method bool isIsBusiness()
  * @method bool isIsCallToActionEnabled()
  * @method bool isIsDirectappInstalled()
  * @method bool isIsFavorite()
+ * @method bool isIsFavoriteForHighlights()
+ * @method bool isIsFavoriteForStories()
  * @method bool isIsNeedy()
  * @method bool isIsPrivate()
  * @method bool isIsProfileActionNeeded()
@@ -246,6 +254,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setHasAnonymousProfilePicture(bool $value)
  * @method $this setHasBiographyTranslation(bool $value)
  * @method $this setHasChaining(bool $value)
+ * @method $this setHasHighlightReels(bool $value)
  * @method $this setHasProfileVideoFeed(bool $value)
  * @method $this setHasUnseenBestiesMedia(bool $value)
  * @method $this setHdProfilePicUrlInfo(ImageCandidate $value)
@@ -253,10 +262,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setId(string $value)
  * @method $this setIncludeDirectBlacklistStatus(mixed $value)
  * @method $this setIsActive(bool $value)
+ * @method $this setIsBestie(bool $value)
  * @method $this setIsBusiness(bool $value)
  * @method $this setIsCallToActionEnabled(bool $value)
  * @method $this setIsDirectappInstalled(bool $value)
  * @method $this setIsFavorite(bool $value)
+ * @method $this setIsFavoriteForHighlights(bool $value)
+ * @method $this setIsFavoriteForStories(bool $value)
  * @method $this setIsNeedy(bool $value)
  * @method $this setIsPrivate(bool $value)
  * @method $this setIsProfileActionNeeded(bool $value)
@@ -344,6 +356,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetHasAnonymousProfilePicture()
  * @method $this unsetHasBiographyTranslation()
  * @method $this unsetHasChaining()
+ * @method $this unsetHasHighlightReels()
  * @method $this unsetHasProfileVideoFeed()
  * @method $this unsetHasUnseenBestiesMedia()
  * @method $this unsetHdProfilePicUrlInfo()
@@ -351,10 +364,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetId()
  * @method $this unsetIncludeDirectBlacklistStatus()
  * @method $this unsetIsActive()
+ * @method $this unsetIsBestie()
  * @method $this unsetIsBusiness()
  * @method $this unsetIsCallToActionEnabled()
  * @method $this unsetIsDirectappInstalled()
  * @method $this unsetIsFavorite()
+ * @method $this unsetIsFavoriteForHighlights()
+ * @method $this unsetIsFavoriteForStories()
  * @method $this unsetIsNeedy()
  * @method $this unsetIsPrivate()
  * @method $this unsetIsProfileActionNeeded()
@@ -405,7 +421,10 @@ class User extends AutoPropertyMapper
     const JSON_PROPERTY_MAP = [
         'username'                            => 'string',
         'has_anonymous_profile_picture'       => 'bool',
+        'has_highlight_reels'                 => 'bool',
         'is_favorite'                         => 'bool',
+        'is_favorite_for_stories'             => 'bool',
+        'is_favorite_for_highlights'          => 'bool',
         'profile_pic_url'                     => 'string',
         'profile_pic_id'                      => 'string',
         'permission'                          => 'bool',
@@ -507,5 +526,6 @@ class User extends AutoPropertyMapper
         'screenshotted'                       => 'bool',
         'nametag'                             => 'Nametag',
         'school'                              => '',
+        'is_bestie'                           => 'bool',
     ];
 }

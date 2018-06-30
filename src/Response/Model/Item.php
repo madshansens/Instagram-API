@@ -19,6 +19,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getBoostUnavailableReason()
  * @method mixed getBoostedStatus()
  * @method bool getCanReshare()
+ * @method bool getCanViewMorePreviewComments()
  * @method bool getCanViewerReshare()
  * @method bool getCanViewerSave()
  * @method Caption getCaption()
@@ -164,6 +165,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isBoostUnavailableReason()
  * @method bool isBoostedStatus()
  * @method bool isCanReshare()
+ * @method bool isCanViewMorePreviewComments()
  * @method bool isCanViewerReshare()
  * @method bool isCanViewerSave()
  * @method bool isCaption()
@@ -309,6 +311,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setBoostUnavailableReason(mixed $value)
  * @method $this setBoostedStatus(mixed $value)
  * @method $this setCanReshare(bool $value)
+ * @method $this setCanViewMorePreviewComments(bool $value)
  * @method $this setCanViewerReshare(bool $value)
  * @method $this setCanViewerSave(bool $value)
  * @method $this setCaption(Caption $value)
@@ -454,6 +457,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetBoostUnavailableReason()
  * @method $this unsetBoostedStatus()
  * @method $this unsetCanReshare()
+ * @method $this unsetCanViewMorePreviewComments()
  * @method $this unsetCanViewerReshare()
  * @method $this unsetCanViewerSave()
  * @method $this unsetCaption()
@@ -642,6 +646,7 @@ class Item extends AutoPropertyMapper
         'view_count'                       => 'int',
         'viewer_count'                     => 'int',
         'comment_count'                    => 'int',
+        'can_view_more_preview_comments'   => 'bool',
         'has_more_comments'                => 'bool',
         'max_num_visible_preview_comments' => 'int',
         /*

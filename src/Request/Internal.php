@@ -966,7 +966,7 @@ class Internal extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\GenericResponse
+     * @return \InstagramAPI\Response\LauncherSyncResponse
      */
     public function sendLauncherSync(
         $prelogin)
@@ -986,7 +986,7 @@ class Internal extends RequestCollection
                 ->addPost('_csrftoken', $this->ig->client->getToken());
         }
 
-        return $request->getResponse(new Response\GenericResponse());
+        return $request->getResponse(new Response\LauncherSyncResponse());
     }
 
     /**
