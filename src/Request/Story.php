@@ -209,6 +209,42 @@ class Story extends RequestCollection
     }
 
     /**
+     * Get the list of users who have voted an option in a story poll.
+     *
+     * Note that this only works for your own story polls. Instagram doesn't
+     * allow you to see the results from other people's polls!
+     *
+     * @param string      $storyId      The story media item's ID in Instagram's internal format (ie "1542304813904481224_6112344004").
+     * @param string      $pollId       The poll ID in Instagram's internal format (ie "17956159684032257").
+     * @param int         $votingOption Value that represents the votion option of the voter. 0 for the first option, 1 for the second option.
+     * @param null|string $maxId        Next "maximum ID", used for pagination.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\StoryPollVotersResponse
+     */
+    public function getStoryPollVoters(
+        $storyId,
+        $pollId,
+        $votingOption,
+        $maxId = null)
+    {
+        if (($votingOption !== 0) && ($votingOption !== 1)) {
+            throw new \InvalidArgumentException('You must provide a valid value for voting option.');
+        }
+
+        $request = $this->ig->request("media/{$storyId}/{$pollId}/story_poll_voters/")
+            ->addParam('vote', $votingOption);
+
+        if ($maxId !== null) {
+            $request->addParam('max_id', $maxId);
+        }
+
+        return $request->getResponse(new Response\StoryPollVotersResponse());
+    }
+
+    /**
      * Mark story media items as seen.
      *
      * The various story-related endpoints only give you lists of story media.
