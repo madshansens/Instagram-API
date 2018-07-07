@@ -684,9 +684,6 @@ class Instagram implements ExperimentsInterface
     public function sendRecoveryEmail(
         $username)
     {
-        // Set active user (without pwd), and create database entry if new user.
-        $this->_setUserWithoutPassword($username);
-
         // Verify that they can use the recovery email option.
         $userLookup = $this->userLookup($username);
         if (!$userLookup->getCanEmailReset()) {
@@ -720,9 +717,6 @@ class Instagram implements ExperimentsInterface
     public function sendRecoverySMS(
         $username)
     {
-        // Set active user (without pwd), and create database entry if new user.
-        $this->_setUserWithoutPassword($username);
-
         // Verify that they can use the recovery SMS option.
         $userLookup = $this->userLookup($username);
         if (!$userLookup->getHasValidPhone() || !$userLookup->getCanSmsReset()) {
