@@ -673,7 +673,7 @@ class People extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\FavoriteResponse
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function favorite(
         $userId)
@@ -683,7 +683,7 @@ class People extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('user_id', $userId)
-            ->getResponse(new Response\FavoriteResponse());
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**
@@ -693,7 +693,7 @@ class People extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\FavoriteResponse
+     * @return \InstagramAPI\Response\GenericResponse
      */
     public function unfavorite(
         $userId)
@@ -703,7 +703,47 @@ class People extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('user_id', $userId)
-            ->getResponse(new Response\FavoriteResponse());
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
+     * Turn on story notifications.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function favoriteForStories(
+        $userId)
+    {
+        return $this->ig->request("friendships/favorite_for_stories/{$userId}/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('user_id', $userId)
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
+     * Turn off story notifications.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function unfavoriteForStories(
+        $userId)
+    {
+        return $this->ig->request("friendships/unfavorite_for_stories/{$userId}/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('user_id', $userId)
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**
