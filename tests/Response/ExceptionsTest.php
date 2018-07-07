@@ -6,6 +6,7 @@ use InstagramAPI\Client;
 use InstagramAPI\Exception\AccountDisabledException;
 use InstagramAPI\Exception\ChallengeRequiredException;
 use InstagramAPI\Exception\CheckpointRequiredException;
+use InstagramAPI\Exception\ConsentRequiredException;
 use InstagramAPI\Exception\FeedbackRequiredException;
 use InstagramAPI\Exception\IncorrectPasswordException;
 use InstagramAPI\Exception\InvalidSmsCodeException;
@@ -42,6 +43,14 @@ class ExceptionsTest extends TestCase
         $this->expectException(FeedbackRequiredException::class);
         $this->expectExceptionMessage('Feedback required');
         $response = $this->_makeResponse('{"message":"feedback_required","spam":true,"feedback_title":"You\u2019re Temporarily Blocked","feedback_message":"It looks like you were misusing this feature by going too fast. You\u2019ve been blocked from using it.\n\nLearn more about blocks in the Help Center. We restrict certain content and actions to protect our community. Tell us if you think we made a mistake.","feedback_url":"WUT","feedback_appeal_label":"Report problem","feedback_ignore_label":"OK","feedback_action":"report_problem","status":"fail"}');
+        ServerMessageThrower::autoThrow(null, $response->getMessage(), $response);
+    }
+
+    public function testConsentRequiredException()
+    {
+        $this->expectException(ConsentRequiredException::class);
+        $this->expectExceptionMessage('Consent required');
+        $response = $this->_makeResponse('{"message":"consent_required","consent_data":{"headline":"Updates to Our Terms and Data Policy","content":"We\'ve updated our Terms and made some changes to our Data Policy. Please take a moment to review these changes and let us know that you agree to them.\n\nYou need to finish reviewing this information before you can use Instagram.","button_text":"Review Now"},"status":"fail"}');
         ServerMessageThrower::autoThrow(null, $response->getMessage(), $response);
     }
 

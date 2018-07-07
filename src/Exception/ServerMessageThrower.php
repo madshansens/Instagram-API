@@ -62,6 +62,7 @@ class ServerMessageThrower
         ],
         'ChallengeRequiredException'   => ['challenge_required'],
         'FeedbackRequiredException'    => ['feedback_required'],
+        'ConsentRequiredException'     => ['consent_required'],
         'IncorrectPasswordException'   => [
             // "The password you entered is incorrect".
             '/password(.*?)incorrect/', // message

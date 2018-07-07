@@ -6,6 +6,7 @@ use GuzzleHttp\Psr7\LimitStream;
 use GuzzleHttp\Psr7\Stream;
 use InstagramAPI\Constants;
 use InstagramAPI\Exception\CheckpointRequiredException;
+use InstagramAPI\Exception\ConsentRequiredException;
 use InstagramAPI\Exception\FeedbackRequiredException;
 use InstagramAPI\Exception\InstagramException;
 use InstagramAPI\Exception\LoginRequiredException;
@@ -1351,6 +1352,8 @@ class Internal extends RequestCollection
                 throw $e;
             } catch (FeedbackRequiredException $e) {
                 throw $e;
+            } catch (ConsentRequiredException $e) {
+                throw $e;
             } catch (CheckpointRequiredException $e) {
                 throw $e;
             } catch (InstagramException $e) {
@@ -1469,6 +1472,8 @@ class Internal extends RequestCollection
                 } catch (LoginRequiredException $e) {
                     throw $e;
                 } catch (FeedbackRequiredException $e) {
+                    throw $e;
+                } catch (ConsentRequiredException $e) {
                     throw $e;
                 } catch (CheckpointRequiredException $e) {
                     throw $e;
@@ -1762,6 +1767,8 @@ class Internal extends RequestCollection
                 } catch (LoginRequiredException $e) {
                     throw $e;
                 } catch (FeedbackRequiredException $e) {
+                    throw $e;
+                } catch (ConsentRequiredException $e) {
                     throw $e;
                 } catch (\Exception $e) {
                     // Ignore everything else.
