@@ -609,7 +609,7 @@ class Internal extends RequestCollection
         /** @var array Attached media used to share media to story feed. ONLY STORY MEDIA! */
         $attachedMedia = (isset($externalMetadata['attached_media']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['attached_media'] : null;
         /** @var array Set wether the audio is muted or not. ONLY VIDEOS FOR TIMELINE! */
-        $audioMuted = (isset($externalMetadata['audio_muted']) && $targetFeed == Constants::FEED_TIMELINE) ? $externalMetadata['audio_muted'] : false;
+        $audioMuted = (isset($externalMetadata['audio_muted']) && $targetFeed == Constants::FEED_TIMELINE) && (is_bool($externalMetadata['audio_muted']) === true) ? $externalMetadata['audio_muted'] : false;
 
         // Fix very bad external user-metadata values.
         if (!is_string($captionText)) {
