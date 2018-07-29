@@ -18,6 +18,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getNonViolating()
  * @method mixed getProfilePicUrl()
  * @method mixed getRelatedTags()
+ * @method string getType()
  * @method bool isAllowFollowing()
  * @method bool isAllowMutingStory()
  * @method bool isDebugInfo()
@@ -29,6 +30,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isNonViolating()
  * @method bool isProfilePicUrl()
  * @method bool isRelatedTags()
+ * @method bool isType()
  * @method $this setAllowFollowing(mixed $value)
  * @method $this setAllowMutingStory(mixed $value)
  * @method $this setDebugInfo(mixed $value)
@@ -40,6 +42,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setNonViolating(mixed $value)
  * @method $this setProfilePicUrl(mixed $value)
  * @method $this setRelatedTags(mixed $value)
+ * @method $this setType(string $value)
  * @method $this unsetAllowFollowing()
  * @method $this unsetAllowMutingStory()
  * @method $this unsetDebugInfo()
@@ -51,6 +54,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetNonViolating()
  * @method $this unsetProfilePicUrl()
  * @method $this unsetRelatedTags()
+ * @method $this unsetType()
  */
 class Tag extends AutoPropertyMapper
 {
@@ -58,6 +62,7 @@ class Tag extends AutoPropertyMapper
         'id'                 => 'string',
         'name'               => 'string',
         'media_count'        => 'int',
+        'type'               => 'string',
         'follow_status'      => '',
         'following'          => '',
         'allow_following'    => '',

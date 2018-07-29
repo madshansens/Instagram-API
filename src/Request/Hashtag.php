@@ -32,6 +32,33 @@ class Hashtag extends RequestCollection
     }
 
     /**
+     * Get hashtags from a section.
+     *
+     * Available tab sections: 'top' and 'recent'.
+     *
+     * @param string $hashtag The hashtag, not including the "#".
+     * @param string $tab     Section tab for hashtags.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\TagFeedResponse
+     */
+    public function getSection(
+        $hashtag,
+        $tab)
+    {
+        Utils::throwIfInvalidHashtag($hashtag);
+        $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
+        if ($tab !== 'top' && $tab !== 'recent') {
+            throw new \InvalidArgumentException('Tab section must be \'top\' or \'recent\'.');
+        }
+
+        return $this->ig->request("tags/{$urlHashtag}/sections/")
+            ->getResponse(new Response\TagFeedResponse());
+    }
+
+    /**
      * Search for hashtags.
      *
      * Gives you search results ordered by best matches first.
