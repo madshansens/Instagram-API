@@ -55,6 +55,11 @@ class Hashtag extends RequestCollection
         }
 
         return $this->ig->request("tags/{$urlHashtag}/sections/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('tab', $tab)
+            ->addPost('include_persistent', true)
             ->getResponse(new Response\TagFeedResponse());
     }
 
