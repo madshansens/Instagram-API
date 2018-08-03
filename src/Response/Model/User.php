@@ -10,7 +10,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getAddressStreet()
  * @method mixed getAggregatePromoteEngagement()
  * @method mixed getAllowContactsSync()
- * @method mixed getAllowedCommenterType()
+ * @method string getAllowedCommenterType()
  * @method mixed getAutoExpandChaining()
  * @method int getBestiesCount()
  * @method string getBiography()
@@ -21,8 +21,10 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getByline()
  * @method bool getCanBeTaggedAsSponsor()
  * @method mixed getCanBoostPost()
- * @method mixed getCanConvertToBusiness()
+ * @method bool getCanClaimPage()
+ * @method bool getCanConvertToBusiness()
  * @method mixed getCanCreateSponsorTags()
+ * @method bool getCanCrosspostWithoutFbToken()
  * @method bool getCanFollowHashtag()
  * @method bool getCanLinkEntitiesInBio()
  * @method mixed getCanSeeOrganicInsights()
@@ -39,6 +41,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getExternalLynxUrl()
  * @method string getExternalUrl()
  * @method string getFbPageCallToActionId()
+ * @method int getFbPageCallToActionIxAppId()
+ * @method string getFbPageCallToActionIxPartner()
+ * @method string getFbPageCallToActionIxUrl()
  * @method mixed getFbuid()
  * @method int getFollowerCount()
  * @method int getFollowingCount()
@@ -98,10 +103,10 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getScreenshotted()
  * @method mixed getSearchSocialContext()
  * @method bool getShowBestiesBadge()
- * @method mixed getShowBusinessConversionIcon()
+ * @method bool getShowBusinessConversionIcon()
  * @method bool getShowConversionEditEntry()
  * @method mixed getShowFeedBizConversionIcon()
- * @method mixed getShowInsightsTerms()
+ * @method bool getShowInsightsTerms()
  * @method string getSocialContext()
  * @method mixed getUnseenCount()
  * @method string getUserId()
@@ -123,8 +128,10 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isByline()
  * @method bool isCanBeTaggedAsSponsor()
  * @method bool isCanBoostPost()
+ * @method bool isCanClaimPage()
  * @method bool isCanConvertToBusiness()
  * @method bool isCanCreateSponsorTags()
+ * @method bool isCanCrosspostWithoutFbToken()
  * @method bool isCanFollowHashtag()
  * @method bool isCanLinkEntitiesInBio()
  * @method bool isCanSeeOrganicInsights()
@@ -141,6 +148,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isExternalLynxUrl()
  * @method bool isExternalUrl()
  * @method bool isFbPageCallToActionId()
+ * @method bool isFbPageCallToActionIxAppId()
+ * @method bool isFbPageCallToActionIxPartner()
+ * @method bool isFbPageCallToActionIxUrl()
  * @method bool isFbuid()
  * @method bool isFollowerCount()
  * @method bool isFollowingCount()
@@ -214,7 +224,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setAddressStreet(string $value)
  * @method $this setAggregatePromoteEngagement(mixed $value)
  * @method $this setAllowContactsSync(mixed $value)
- * @method $this setAllowedCommenterType(mixed $value)
+ * @method $this setAllowedCommenterType(string $value)
  * @method $this setAutoExpandChaining(mixed $value)
  * @method $this setBestiesCount(int $value)
  * @method $this setBiography(string $value)
@@ -225,8 +235,10 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setByline(mixed $value)
  * @method $this setCanBeTaggedAsSponsor(bool $value)
  * @method $this setCanBoostPost(mixed $value)
- * @method $this setCanConvertToBusiness(mixed $value)
+ * @method $this setCanClaimPage(bool $value)
+ * @method $this setCanConvertToBusiness(bool $value)
  * @method $this setCanCreateSponsorTags(mixed $value)
+ * @method $this setCanCrosspostWithoutFbToken(bool $value)
  * @method $this setCanFollowHashtag(bool $value)
  * @method $this setCanLinkEntitiesInBio(bool $value)
  * @method $this setCanSeeOrganicInsights(mixed $value)
@@ -243,6 +255,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setExternalLynxUrl(string $value)
  * @method $this setExternalUrl(string $value)
  * @method $this setFbPageCallToActionId(string $value)
+ * @method $this setFbPageCallToActionIxAppId(int $value)
+ * @method $this setFbPageCallToActionIxPartner(string $value)
+ * @method $this setFbPageCallToActionIxUrl(string $value)
  * @method $this setFbuid(mixed $value)
  * @method $this setFollowerCount(int $value)
  * @method $this setFollowingCount(int $value)
@@ -302,10 +317,10 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setScreenshotted(bool $value)
  * @method $this setSearchSocialContext(mixed $value)
  * @method $this setShowBestiesBadge(bool $value)
- * @method $this setShowBusinessConversionIcon(mixed $value)
+ * @method $this setShowBusinessConversionIcon(bool $value)
  * @method $this setShowConversionEditEntry(bool $value)
  * @method $this setShowFeedBizConversionIcon(mixed $value)
- * @method $this setShowInsightsTerms(mixed $value)
+ * @method $this setShowInsightsTerms(bool $value)
  * @method $this setSocialContext(string $value)
  * @method $this setUnseenCount(mixed $value)
  * @method $this setUserId(string $value)
@@ -327,8 +342,10 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetByline()
  * @method $this unsetCanBeTaggedAsSponsor()
  * @method $this unsetCanBoostPost()
+ * @method $this unsetCanClaimPage()
  * @method $this unsetCanConvertToBusiness()
  * @method $this unsetCanCreateSponsorTags()
+ * @method $this unsetCanCrosspostWithoutFbToken()
  * @method $this unsetCanFollowHashtag()
  * @method $this unsetCanLinkEntitiesInBio()
  * @method $this unsetCanSeeOrganicInsights()
@@ -345,6 +362,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetExternalLynxUrl()
  * @method $this unsetExternalUrl()
  * @method $this unsetFbPageCallToActionId()
+ * @method $this unsetFbPageCallToActionIxAppId()
+ * @method $this unsetFbPageCallToActionIxPartner()
+ * @method $this unsetFbPageCallToActionIxUrl()
  * @method $this unsetFbuid()
  * @method $this unsetFollowerCount()
  * @method $this unsetFollowingCount()
@@ -461,11 +481,11 @@ class User extends AutoPropertyMapper
         'chaining_suggestions'                => 'ChainingSuggestion[]',
         'include_direct_blacklist_status'     => '',
         'can_see_organic_insights'            => '',
-        'can_convert_to_business'             => '',
+        'can_convert_to_business'             => 'bool',
         'convert_from_pages'                  => '',
-        'show_business_conversion_icon'       => '',
+        'show_business_conversion_icon'       => 'bool',
         'show_conversion_edit_entry'          => 'bool',
-        'show_insights_terms'                 => '',
+        'show_insights_terms'                 => 'bool',
         'can_create_sponsor_tags'             => '',
         'hd_profile_pic_url_info'             => 'ImageCandidate',
         'usertag_review_enabled'              => '',
@@ -509,12 +529,17 @@ class User extends AutoPropertyMapper
         'aggregate_promote_engagement'        => '',
         'fbuid'                               => '',
         'page_id'                             => 'string',
+        'can_claim_page'                      => 'bool',
+        'fb_page_call_to_action_ix_app_id'    => 'int',
+        'fb_page_call_to_action_ix_url'       => 'string',
+        'can_crosspost_without_fb_token'      => 'bool',
+        'fb_page_call_to_action_ix_partner'   => 'string',
         /*
          * Unix "taken_at" timestamp of the newest item in their story reel.
          */
         'latest_reel_media'                   => 'string',
         'has_unseen_besties_media'            => 'bool',
-        'allowed_commenter_type'              => '',
+        'allowed_commenter_type'              => 'string',
         'reel_auto_archive'                   => 'string',
         'is_directapp_installed'              => 'bool',
         'besties_count'                       => 'int',
