@@ -1351,10 +1351,18 @@ class Internal extends RequestCollection
         callable $configurator)
     {
         $attempt = 0;
+        $lastError = null;
         while (true) {
             // Check for max retry-limit, and throw if we exceeded it.
             if (++$attempt > self::MAX_CONFIGURE_RETRIES) {
-                throw new \RuntimeException('All configuration retries have failed.');
+                if ($lastError === null) {
+                    throw new \RuntimeException('All configuration retries have failed.');
+                }
+
+                throw new \RuntimeException(sprintf(
+                    'All configuration retries have failed. Last error: %s',
+                    $lastError
+                ));
             }
 
             $result = null;
@@ -1376,7 +1384,9 @@ class Internal extends RequestCollection
                 if ($e->hasResponse()) {
                     $result = $e->getResponse();
                 }
+                $lastError = $e;
             } catch (\Exception $e) {
+                $lastError = $e;
                 // Ignore everything else.
             }
 
