@@ -81,7 +81,7 @@ class StoryConstraints implements ConstraintsInterface
     const MIN_DURATION = 3.0;
 
     /**
-     * Minimum allowed video duration.
+     * Maximum allowed video duration.
      *
      * @var float
      */

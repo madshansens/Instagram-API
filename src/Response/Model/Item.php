@@ -93,6 +93,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getMediaInfos()
  * @method int getMediaType()
  * @method mixed getMultiAuthorReelNames()
+ * @method bool getNearlyCompleteCopyrightMatch()
  * @method string getNextMaxId()
  * @method int getNumberOfQualities()
  * @method string getOrganicPostId()
@@ -109,6 +110,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getPreview()
  * @method Comment[] getPreviewComments()
  * @method ProductTags getProductTags()
+ * @method string getProductType()
  * @method ReelMention[] getReelMentions()
  * @method ReelShare getReelShare()
  * @method string[] getSavedCollectionIds()
@@ -135,7 +137,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getSupportsReelReactions()
  * @method string getTakenAt()
  * @method mixed getThumbnailUrls()
+ * @method Thumbnail getThumbnails()
  * @method int getTimezoneOffset()
+ * @method string getTitle()
  * @method string[] getTopFollowers()
  * @method int getTopFollowersCount()
  * @method string[] getTopLikers()
@@ -239,6 +243,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isMediaInfos()
  * @method bool isMediaType()
  * @method bool isMultiAuthorReelNames()
+ * @method bool isNearlyCompleteCopyrightMatch()
  * @method bool isNextMaxId()
  * @method bool isNumberOfQualities()
  * @method bool isOrganicPostId()
@@ -255,6 +260,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isPreview()
  * @method bool isPreviewComments()
  * @method bool isProductTags()
+ * @method bool isProductType()
  * @method bool isReelMentions()
  * @method bool isReelShare()
  * @method bool isSavedCollectionIds()
@@ -281,7 +287,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isSupportsReelReactions()
  * @method bool isTakenAt()
  * @method bool isThumbnailUrls()
+ * @method bool isThumbnails()
  * @method bool isTimezoneOffset()
+ * @method bool isTitle()
  * @method bool isTopFollowers()
  * @method bool isTopFollowersCount()
  * @method bool isTopLikers()
@@ -385,6 +393,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setMediaInfos(mixed $value)
  * @method $this setMediaType(int $value)
  * @method $this setMultiAuthorReelNames(mixed $value)
+ * @method $this setNearlyCompleteCopyrightMatch(bool $value)
  * @method $this setNextMaxId(string $value)
  * @method $this setNumberOfQualities(int $value)
  * @method $this setOrganicPostId(string $value)
@@ -401,6 +410,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setPreview(string $value)
  * @method $this setPreviewComments(Comment[] $value)
  * @method $this setProductTags(ProductTags $value)
+ * @method $this setProductType(string $value)
  * @method $this setReelMentions(ReelMention[] $value)
  * @method $this setReelShare(ReelShare $value)
  * @method $this setSavedCollectionIds(string[] $value)
@@ -427,7 +437,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setSupportsReelReactions(bool $value)
  * @method $this setTakenAt(string $value)
  * @method $this setThumbnailUrls(mixed $value)
+ * @method $this setThumbnails(Thumbnail $value)
  * @method $this setTimezoneOffset(int $value)
+ * @method $this setTitle(string $value)
  * @method $this setTopFollowers(string[] $value)
  * @method $this setTopFollowersCount(int $value)
  * @method $this setTopLikers(string[] $value)
@@ -531,6 +543,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetMediaInfos()
  * @method $this unsetMediaType()
  * @method $this unsetMultiAuthorReelNames()
+ * @method $this unsetNearlyCompleteCopyrightMatch()
  * @method $this unsetNextMaxId()
  * @method $this unsetNumberOfQualities()
  * @method $this unsetOrganicPostId()
@@ -547,6 +560,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetPreview()
  * @method $this unsetPreviewComments()
  * @method $this unsetProductTags()
+ * @method $this unsetProductType()
  * @method $this unsetReelMentions()
  * @method $this unsetReelShare()
  * @method $this unsetSavedCollectionIds()
@@ -573,7 +587,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetSupportsReelReactions()
  * @method $this unsetTakenAt()
  * @method $this unsetThumbnailUrls()
+ * @method $this unsetThumbnails()
  * @method $this unsetTimezoneOffset()
+ * @method $this unsetTitle()
  * @method $this unsetTopFollowers()
  * @method $this unsetTopFollowersCount()
  * @method $this unsetTopLikers()
@@ -615,6 +631,8 @@ class Item extends AutoPropertyMapper
         'code'                                     => 'string',
         'client_cache_key'                         => 'string',
         'filter_type'                              => 'int',
+        'product_type'                             => 'string',
+        'nearly_complete_copyright_match'          => 'bool',
         'image_versions2'                          => 'Image_Versions2',
         'original_width'                           => 'int',
         'original_height'                          => 'int',
@@ -625,6 +643,7 @@ class Item extends AutoPropertyMapper
         'video_duration'                           => 'float',
         'user'                                     => 'User',
         'caption'                                  => 'Caption',
+        'title'                                    => 'string',
         'caption_is_edited'                        => 'bool',
         'photo_of_you'                             => 'bool',
         'fb_user_tags'                             => 'Usertag',
@@ -635,6 +654,7 @@ class Item extends AutoPropertyMapper
         'is_dash_eligible'                         => 'int',
         'video_dash_manifest'                      => 'string',
         'number_of_qualities'                      => 'int',
+        'thumbnails'                               => 'Thumbnail',
         'can_reshare'                              => 'bool',
         'can_viewer_reshare'                       => 'bool',
         'visibility'                               => '',

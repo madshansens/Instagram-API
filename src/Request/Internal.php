@@ -438,6 +438,7 @@ class Internal extends RequestCollection
         if ($targetFeed !== Constants::FEED_TIMELINE
             && $targetFeed !== Constants::FEED_STORY
             && $targetFeed !== Constants::FEED_DIRECT_STORY
+            && $targetFeed !== Constants::FEED_TV
         ) {
             throw new \InvalidArgumentException(sprintf('Bad target feed "%s".', $targetFeed));
         }
@@ -580,6 +581,9 @@ class Internal extends RequestCollection
         case Constants::FEED_STORY:
             $endpoint = 'media/configure_to_story/';
             break;
+        case Constants::FEED_TV:
+            $endpoint = 'media/configure_to_igtv/';
+            break;
         default:
             throw new \InvalidArgumentException(sprintf('Bad target feed "%s".', $targetFeed));
         }
@@ -610,6 +614,8 @@ class Internal extends RequestCollection
         $attachedMedia = (isset($externalMetadata['attached_media']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['attached_media'] : null;
         /** @var array Set wether the audio is muted or not. ONLY VIDEOS FOR TIMELINE! */
         $audioMuted = (isset($externalMetadata['audio_muted']) && $targetFeed == Constants::FEED_TIMELINE) && (is_bool($externalMetadata['audio_muted']) === true) ? $externalMetadata['audio_muted'] : false;
+        /** @var array Title of the media uploaded to your channel. ONLY TV MEDIA! */
+        $title = (isset($externalMetadata['title']) && $targetFeed == Constants::FEED_TV) ? $externalMetadata['title'] : null;
 
         // Fix very bad external user-metadata values.
         if (!is_string($captionText)) {
@@ -703,6 +709,14 @@ class Internal extends RequestCollection
                     ->addPost('story_media_creation_date', time() - mt_rand(10, 20))
                     ->addPost('client_shared_at', time() - mt_rand(3, 10))
                     ->addPost('client_timestamp', time());
+                break;
+            case Constants::FEED_TV:
+                if ($title === null) {
+                    throw new \InvalidArgumentException('You must provide a title for the media.');
+                }
+                $request
+                    ->addPost('title', $title)
+                    ->addPost('caption', $captionText);
                 break;
         }
 
@@ -2031,6 +2045,9 @@ class Internal extends RequestCollection
                     0
                 );
                 break;
+            case Constants::FEED_TV:
+                $minDuration = 150;
+                break;
             default:
                 $minDuration = 31536000; // 1 year.
         }
@@ -2056,6 +2073,9 @@ class Internal extends RequestCollection
                 $result = $this->ig->isExperimentEnabled(
                     'ig_android_reel_raven_video_segmented_upload_universe',
                     'segment_enabled_story_raven');
+                break;
+            case Constants::FEED_TV:
+                $result = true;
                 break;
             default:
                 $result = $this->ig->isExperimentEnabled(
@@ -2105,6 +2125,9 @@ class Internal extends RequestCollection
                     'ig_android_upload_reliability_universe',
                     'is_enabled_fbupload_story_share');
                 break;
+            case Constants::FEED_TV:
+                $result = true;
+                break;
             default:
                 $result = $this->ig->isExperimentEnabled(
                     'ig_android_upload_reliability_universe',
@@ -2145,7 +2168,7 @@ class Internal extends RequestCollection
         $result = [
             'upload_id'         => (string) $internalMetadata->getUploadId(),
             'retry_context'     => json_encode($this->_getRetryContext()),
-            'image_compression' => '{"lib_name":"jt","lib_version":"1.3.0","quality":"87"}',
+            'image_compression' => '{"lib_name":"moz","lib_version":"3.1.m","quality":"87"}',
             'xsharing_user_ids' => json_encode([]),
             'media_type'        => $internalMetadata->getVideoDetails() !== null
                 ? (string) Response\Model\Item::VIDEO
@@ -2202,6 +2225,9 @@ class Internal extends RequestCollection
                 break;
             case Constants::FEED_DIRECT_STORY:
                 $result['for_direct_story'] = '1';
+                break;
+            case Constants::FEED_TV:
+                $result['is_igtv_video'] = '1';
                 break;
             default:
         }
@@ -2331,6 +2357,9 @@ class Internal extends RequestCollection
                     'target_segment_duration_story_raven',
                     2
                 );
+                break;
+            case Constants::FEED_TV:
+                $duration = 100;
                 break;
             default:
                 throw new \InvalidArgumentException("Unsupported feed {$targetFeed}.");

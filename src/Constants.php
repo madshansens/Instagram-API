@@ -71,6 +71,7 @@ class Constants
     const FEED_STORY = 3;
     const FEED_DIRECT = 4;
     const FEED_DIRECT_STORY = 5;
+    const FEED_TV = 6;
 
     // General Constants.
     const SRC_DIR = __DIR__; // Absolute path to the "src" folder.
