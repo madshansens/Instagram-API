@@ -612,8 +612,6 @@ class Internal extends RequestCollection
         $storyPoll = (isset($externalMetadata['story_polls']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_polls'] : null;
         /** @var array Attached media used to share media to story feed. ONLY STORY MEDIA! */
         $attachedMedia = (isset($externalMetadata['attached_media']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['attached_media'] : null;
-        /** @var array Set wether the audio is muted or not. ONLY VIDEOS FOR TIMELINE! */
-        $audioMuted = (isset($externalMetadata['audio_muted']) && $targetFeed == Constants::FEED_TIMELINE) && (is_bool($externalMetadata['audio_muted']) === true) ? $externalMetadata['audio_muted'] : false;
         /** @var array Title of the media uploaded to your channel. ONLY TV MEDIA! */
         $title = (isset($externalMetadata['title']) && $targetFeed == Constants::FEED_TV) ? $externalMetadata['title'] : null;
 
@@ -633,7 +631,7 @@ class Internal extends RequestCollection
             ->addPost('upload_id', $uploadId)
             ->addPost('poster_frame_index', 0)
             ->addPost('length', round($videoDetails->getDuration(), 1))
-            ->addPost('audio_muted', $audioMuted)
+            ->addPost('audio_muted', $videoDetails->getAudioCodec() === null)
             ->addPost('filter_type', 0)
             ->addPost('source_type', 4)
             ->addPost('device',
