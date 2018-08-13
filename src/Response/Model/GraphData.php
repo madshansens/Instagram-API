@@ -5,21 +5,21 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
- * GraphQuery.
+ * GraphData.
  *
  * @method mixed getError()
- * @method QueryResponse getResponse()
+ * @method ShadowInstagramUser getUser()
  * @method bool isError()
- * @method bool isResponse()
+ * @method bool isUser()
  * @method $this setError(mixed $value)
- * @method $this setResponse(QueryResponse $value)
+ * @method $this setUser(ShadowInstagramUser $value)
  * @method $this unsetError()
- * @method $this unsetResponse()
+ * @method $this unsetUser()
  */
-class GraphQuery extends AutoPropertyMapper
+class GraphData extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'response' => 'QueryResponse',
+        'user'     => 'ShadowInstagramUser',
         'error'    => '',
     ];
 }
