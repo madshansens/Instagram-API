@@ -7,7 +7,7 @@ use InstagramAPI\Response;
 /**
  * InsightsResponse.
  *
- * @method Model\Insights[] getInstagramUser()
+ * @method Model\Insights getInstagramUser()
  * @method mixed getMessage()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
@@ -15,7 +15,7 @@ use InstagramAPI\Response;
  * @method bool isMessage()
  * @method bool isStatus()
  * @method bool is_Messages()
- * @method $this setInstagramUser(Model\Insights[] $value)
+ * @method $this setInstagramUser(Model\Insights $value)
  * @method $this setMessage(mixed $value)
  * @method $this setStatus(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
@@ -27,6 +27,6 @@ use InstagramAPI\Response;
 class InsightsResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
-        'instagram_user' => 'Model\Insights[]',
+        'instagram_user' => 'Model\Insights',
     ];
 }
