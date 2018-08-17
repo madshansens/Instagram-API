@@ -2244,6 +2244,30 @@ class Internal extends RequestCollection
     }
 
     /**
+     * Find the segments after ffmpeg processing.
+     *
+     * @param string $outputDirectory The directory to look in.
+     * @param string $prefix          The filename prefix.
+     *
+     * @return array
+     */
+    protected function _findSegments(
+        $outputDirectory,
+        $prefix)
+    {
+        // Video segments will be uploaded before the audio one.
+        $result = glob("{$outputDirectory}/{$prefix}.video.*.mp4");
+
+        // Audio always goes into one segment, so we can use is_file() here.
+        $audioTrack = "{$outputDirectory}/{$prefix}.audio.mp4";
+        if (is_file($audioTrack)) {
+            $result[] = $audioTrack;
+        }
+
+        return $result;
+    }
+
+    /**
      * Split the video file into segments.
      *
      * @param int          $targetFeed      One of the FEED_X constants.
@@ -2277,8 +2301,6 @@ class Internal extends RequestCollection
         }
 
         $prefix = sha1($videoDetails->getFilename().uniqid('', true));
-        // Video segments will be uploaded before the audio one, hence the number.
-        $pattern = "{$outputDirectory}/{$prefix}_{0video,1audio}.*.mp4";
 
         try {
             // Split the video stream into a multiple segments by time.
@@ -2287,7 +2309,7 @@ class Internal extends RequestCollection
                 Args::escape($videoDetails->getFilename()),
                 $this->_getTargetSegmentDuration($targetFeed),
                 Args::escape(sprintf(
-                    '%s%s%s_0video.%%03d.mp4',
+                    '%s%s%s.video.%%03d.mp4',
                     $outputDirectory,
                     DIRECTORY_SEPARATOR,
                     $prefix
@@ -2300,7 +2322,7 @@ class Internal extends RequestCollection
                     '-i %s -c:a copy -vn -dn -sn -f mp4 %s',
                     Args::escape($videoDetails->getFilename()),
                     Args::escape(sprintf(
-                        '%s%s%s_1audio.000.mp4',
+                        '%s%s%s.audio.mp4',
                         $outputDirectory,
                         DIRECTORY_SEPARATOR,
                         $prefix
@@ -2309,7 +2331,7 @@ class Internal extends RequestCollection
             }
         } catch (\RuntimeException $e) {
             // Find and remove all segments (if any).
-            $files = glob($pattern, GLOB_BRACE);
+            $files = $this->_findSegments($outputDirectory, $prefix);
             foreach ($files as $file) {
                 @unlink($file);
             }
@@ -2318,7 +2340,10 @@ class Internal extends RequestCollection
         }
 
         // Collect segments.
-        $files = glob($pattern, GLOB_BRACE);
+        $files = $this->_findSegments($outputDirectory, $prefix);
+        if (empty($files)) {
+            throw new \RuntimeException('Something went wrong while splitting the video into segments.');
+        }
         $result = [];
 
         try {
