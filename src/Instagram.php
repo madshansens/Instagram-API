@@ -494,6 +494,7 @@ class Instagram implements ExperimentsInterface
                     ->addPost('adid', $this->advertising_id)
                     ->addPost('guid', $this->uuid)
                     ->addPost('device_id', $this->device_id)
+                    ->addPost('google_tokens', '[]')
                     ->addPost('password', $this->password)
                     ->addPost('login_attempt_count', 0)
                     ->getResponse(new Response\LoginResponse());
@@ -576,6 +577,8 @@ class Instagram implements ExperimentsInterface
             ->addPost('verification_code', $verificationCode)
             ->addPost('two_factor_identifier', $twoFactorIdentifier)
             ->addPost('_csrftoken', $this->client->getToken())
+            ->addPost('_uid', $this->account_id)
+            ->addPost('_uuid', $this->uuid)
             ->addPost('username', $this->username)
             ->addPost('device_id', $this->device_id)
             ->addPost('guid', $this->uuid)
