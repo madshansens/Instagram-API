@@ -303,6 +303,26 @@ class People extends RequestCollection
     }
 
     /**
+     * Mark user over age in order to see sensitive content.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FriendshipResponse
+     */
+    public function markUserOverage(
+        $userId)
+    {
+        return $this->ig->request("friendships/mark_user_overage/{$userId}/feed/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('user_id', $userId)
+            ->getResponse(new Response\FriendshipResponse());
+    }
+
+    /**
      * Get list of who a user is following.
      *
      * @param string      $userId      Numerical UserPK ID.
