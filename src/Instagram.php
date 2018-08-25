@@ -411,6 +411,9 @@ class Instagram implements ExperimentsInterface
      * two-factor login example to see how to handle that.
      *
      * @param string $username           Your Instagram username.
+     *                                   You can also use your email or phone,
+     *                                   but take in mind that they won't work
+     *                                   when you have two factor auth enabled.
      * @param string $password           Your Instagram password.
      * @param int    $appRefreshInterval How frequently `login()` should act
      *                                   like an Instagram app that's been
@@ -494,7 +497,6 @@ class Instagram implements ExperimentsInterface
                     ->addPost('adid', $this->advertising_id)
                     ->addPost('guid', $this->uuid)
                     ->addPost('device_id', $this->device_id)
-                    ->addPost('google_tokens', '[]')
                     ->addPost('password', $this->password)
                     ->addPost('login_attempt_count', 0)
                     ->getResponse(new Response\LoginResponse());
@@ -530,6 +532,7 @@ class Instagram implements ExperimentsInterface
      * you will be logged in after this function call.
      *
      * @param string $username            Your Instagram username.
+     *                                    Email and phone aren't allowed here.
      * @param string $password            Your Instagram password.
      * @param string $twoFactorIdentifier Two factor identifier, obtained in
      *                                    login() response. Format: `123456`.
@@ -577,8 +580,6 @@ class Instagram implements ExperimentsInterface
             ->addPost('verification_code', $verificationCode)
             ->addPost('two_factor_identifier', $twoFactorIdentifier)
             ->addPost('_csrftoken', $this->client->getToken())
-            ->addPost('_uid', $this->account_id)
-            ->addPost('_uuid', $this->uuid)
             ->addPost('username', $this->username)
             ->addPost('device_id', $this->device_id)
             ->addPost('guid', $this->uuid)
