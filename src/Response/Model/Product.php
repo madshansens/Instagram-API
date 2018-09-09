@@ -7,6 +7,7 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * Product.
  *
+ * @method string getCheckoutStyle()
  * @method string getCurrentPrice()
  * @method string getDescription()
  * @method string getExternalUrl()
@@ -19,6 +20,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method ProductImage[] getProductImages()
  * @method string getReviewStatus()
  * @method ProductImage getThumbnailImage()
+ * @method bool isCheckoutStyle()
  * @method bool isCurrentPrice()
  * @method bool isDescription()
  * @method bool isExternalUrl()
@@ -31,6 +33,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isProductImages()
  * @method bool isReviewStatus()
  * @method bool isThumbnailImage()
+ * @method $this setCheckoutStyle(string $value)
  * @method $this setCurrentPrice(string $value)
  * @method $this setDescription(string $value)
  * @method $this setExternalUrl(string $value)
@@ -43,6 +46,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setProductImages(ProductImage[] $value)
  * @method $this setReviewStatus(string $value)
  * @method $this setThumbnailImage(ProductImage $value)
+ * @method $this unsetCheckoutStyle()
  * @method $this unsetCurrentPrice()
  * @method $this unsetDescription()
  * @method $this unsetExternalUrl()
@@ -74,6 +78,7 @@ class Product extends AutoPropertyMapper
         'thumbnail_image'  => 'ProductImage',
         'product_images'   => 'ProductImage[]',
         'external_url'     => 'string',
+        'checkout_style'   => 'string',
         'review_status'    => 'string',
     ];
 }

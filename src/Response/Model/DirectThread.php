@@ -14,6 +14,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getHasNewer()
  * @method bool getHasOlder()
  * @method User getInviter()
+ * @method bool getIsGroup()
  * @method bool getIsPin()
  * @method bool getIsSpam()
  * @method DirectThreadItem[] getItems()
@@ -46,6 +47,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isHasNewer()
  * @method bool isHasOlder()
  * @method bool isInviter()
+ * @method bool isIsGroup()
  * @method bool isIsPin()
  * @method bool isIsSpam()
  * @method bool isItems()
@@ -78,6 +80,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setHasNewer(bool $value)
  * @method $this setHasOlder(bool $value)
  * @method $this setInviter(User $value)
+ * @method $this setIsGroup(bool $value)
  * @method $this setIsPin(bool $value)
  * @method $this setIsSpam(bool $value)
  * @method $this setItems(DirectThreadItem[] $value)
@@ -110,6 +113,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetHasNewer()
  * @method $this unsetHasOlder()
  * @method $this unsetInviter()
+ * @method $this unsetIsGroup()
  * @method $this unsetIsPin()
  * @method $this unsetIsSpam()
  * @method $this unsetItems()
@@ -156,6 +160,7 @@ class DirectThread extends AutoPropertyMapper
         'thread_title'                  => 'string',
         'pending_score'                 => 'string',
         'vc_muted'                      => 'bool',
+        'is_group'                      => 'bool',
         'reshare_send_count'            => 'int',
         'reshare_receive_count'         => 'int',
         'expiring_media_send_count'     => 'int',

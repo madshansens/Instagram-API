@@ -19,6 +19,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getBlockAt()
  * @method string getBusinessContactMethod()
  * @method mixed getByline()
+ * @method bool getCanBeReportedAsFraud()
  * @method bool getCanBeTaggedAsSponsor()
  * @method mixed getCanBoostPost()
  * @method bool getCanClaimPage()
@@ -102,11 +103,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getSchool()
  * @method bool getScreenshotted()
  * @method mixed getSearchSocialContext()
+ * @method int getShoppablePostsCount()
  * @method bool getShowBestiesBadge()
  * @method bool getShowBusinessConversionIcon()
  * @method bool getShowConversionEditEntry()
  * @method mixed getShowFeedBizConversionIcon()
  * @method bool getShowInsightsTerms()
+ * @method bool getShowShoppableFeed()
  * @method string getSocialContext()
  * @method mixed getUnseenCount()
  * @method string getUserId()
@@ -126,6 +129,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isBlockAt()
  * @method bool isBusinessContactMethod()
  * @method bool isByline()
+ * @method bool isCanBeReportedAsFraud()
  * @method bool isCanBeTaggedAsSponsor()
  * @method bool isCanBoostPost()
  * @method bool isCanClaimPage()
@@ -209,11 +213,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isSchool()
  * @method bool isScreenshotted()
  * @method bool isSearchSocialContext()
+ * @method bool isShoppablePostsCount()
  * @method bool isShowBestiesBadge()
  * @method bool isShowBusinessConversionIcon()
  * @method bool isShowConversionEditEntry()
  * @method bool isShowFeedBizConversionIcon()
  * @method bool isShowInsightsTerms()
+ * @method bool isShowShoppableFeed()
  * @method bool isSocialContext()
  * @method bool isUnseenCount()
  * @method bool isUserId()
@@ -233,6 +239,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setBlockAt(mixed $value)
  * @method $this setBusinessContactMethod(string $value)
  * @method $this setByline(mixed $value)
+ * @method $this setCanBeReportedAsFraud(bool $value)
  * @method $this setCanBeTaggedAsSponsor(bool $value)
  * @method $this setCanBoostPost(mixed $value)
  * @method $this setCanClaimPage(bool $value)
@@ -316,11 +323,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setSchool(mixed $value)
  * @method $this setScreenshotted(bool $value)
  * @method $this setSearchSocialContext(mixed $value)
+ * @method $this setShoppablePostsCount(int $value)
  * @method $this setShowBestiesBadge(bool $value)
  * @method $this setShowBusinessConversionIcon(bool $value)
  * @method $this setShowConversionEditEntry(bool $value)
  * @method $this setShowFeedBizConversionIcon(mixed $value)
  * @method $this setShowInsightsTerms(bool $value)
+ * @method $this setShowShoppableFeed(bool $value)
  * @method $this setSocialContext(string $value)
  * @method $this setUnseenCount(mixed $value)
  * @method $this setUserId(string $value)
@@ -340,6 +349,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetBlockAt()
  * @method $this unsetBusinessContactMethod()
  * @method $this unsetByline()
+ * @method $this unsetCanBeReportedAsFraud()
  * @method $this unsetCanBeTaggedAsSponsor()
  * @method $this unsetCanBoostPost()
  * @method $this unsetCanClaimPage()
@@ -423,11 +433,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetSchool()
  * @method $this unsetScreenshotted()
  * @method $this unsetSearchSocialContext()
+ * @method $this unsetShoppablePostsCount()
  * @method $this unsetShowBestiesBadge()
  * @method $this unsetShowBusinessConversionIcon()
  * @method $this unsetShowConversionEditEntry()
  * @method $this unsetShowFeedBizConversionIcon()
  * @method $this unsetShowInsightsTerms()
+ * @method $this unsetShowShoppableFeed()
  * @method $this unsetSocialContext()
  * @method $this unsetUnseenCount()
  * @method $this unsetUserId()
@@ -445,6 +457,7 @@ class User extends AutoPropertyMapper
         'is_favorite'                         => 'bool',
         'is_favorite_for_stories'             => 'bool',
         'is_favorite_for_highlights'          => 'bool',
+        'can_be_reported_as_fraud'            => 'bool',
         'profile_pic_url'                     => 'string',
         'profile_pic_id'                      => 'string',
         'permission'                          => 'bool',
@@ -534,6 +547,8 @@ class User extends AutoPropertyMapper
         'fb_page_call_to_action_ix_url'       => 'string',
         'can_crosspost_without_fb_token'      => 'bool',
         'fb_page_call_to_action_ix_partner'   => 'string',
+        'shoppable_posts_count'               => 'int',
+        'show_shoppable_feed'                 => 'bool',
         /*
          * Unix "taken_at" timestamp of the newest item in their story reel.
          */

@@ -16,6 +16,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method RewriteRule[] getRewriteRules()
  * @method string getTokenHash()
  * @method int getTtl()
+ * @method int getZeroCmsFetchIntervalSeconds()
  * @method bool isCarrierId()
  * @method bool isCarrierName()
  * @method bool isDeadline()
@@ -25,6 +26,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isRewriteRules()
  * @method bool isTokenHash()
  * @method bool isTtl()
+ * @method bool isZeroCmsFetchIntervalSeconds()
  * @method $this setCarrierId(int $value)
  * @method $this setCarrierName(string $value)
  * @method $this setDeadline(string $value)
@@ -34,6 +36,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setRewriteRules(RewriteRule[] $value)
  * @method $this setTokenHash(string $value)
  * @method $this setTtl(int $value)
+ * @method $this setZeroCmsFetchIntervalSeconds(int $value)
  * @method $this unsetCarrierId()
  * @method $this unsetCarrierName()
  * @method $this unsetDeadline()
@@ -43,19 +46,21 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetRewriteRules()
  * @method $this unsetTokenHash()
  * @method $this unsetTtl()
+ * @method $this unsetZeroCmsFetchIntervalSeconds()
  */
 class Token extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'carrier_name'             => 'string',
-        'carrier_id'               => 'int',
-        'ttl'                      => 'int',
-        'features'                 => '',
-        'request_time'             => 'string',
-        'token_hash'               => 'string',
-        'rewrite_rules'            => 'RewriteRule[]',
-        'deadline'                 => 'string',
-        'enabled_wallet_defs_keys' => '',
+        'carrier_name'                    => 'string',
+        'carrier_id'                      => 'int',
+        'ttl'                             => 'int',
+        'features'                        => '',
+        'request_time'                    => 'string',
+        'token_hash'                      => 'string',
+        'rewrite_rules'                   => 'RewriteRule[]',
+        'enabled_wallet_defs_keys'        => '',
+        'deadline'                        => 'string',
+        'zero_cms_fetch_interval_seconds' => 'int',
     ];
 
     const DEFAULT_TTL = 3600;

@@ -17,6 +17,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getSocialContext()
  * @method string[] getThumbnailUrls()
  * @method User getUser()
+ * @method string getUuid()
  * @method float getValue()
  * @method bool isAlgorithm()
  * @method bool isCaption()
@@ -28,6 +29,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isSocialContext()
  * @method bool isThumbnailUrls()
  * @method bool isUser()
+ * @method bool isUuid()
  * @method bool isValue()
  * @method $this setAlgorithm(string $value)
  * @method $this setCaption(mixed $value)
@@ -39,6 +41,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setSocialContext(string $value)
  * @method $this setThumbnailUrls(string[] $value)
  * @method $this setUser(User $value)
+ * @method $this setUuid(string $value)
  * @method $this setValue(float $value)
  * @method $this unsetAlgorithm()
  * @method $this unsetCaption()
@@ -50,6 +53,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetSocialContext()
  * @method $this unsetThumbnailUrls()
  * @method $this unsetUser()
+ * @method $this unsetUuid()
  * @method $this unsetValue()
  */
 class Suggestion extends AutoPropertyMapper
@@ -66,5 +70,6 @@ class Suggestion extends AutoPropertyMapper
         'media_ids'         => '',
         'icon'              => '',
         'is_new_suggestion' => 'bool',
+        'uuid'              => 'string',
     ];
 }

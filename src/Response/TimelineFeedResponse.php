@@ -19,6 +19,7 @@ use InstagramAPI\Response;
  * @method bool getMoreAvailable()
  * @method string getNextMaxId()
  * @method int getNumResults()
+ * @method mixed getPaginationInfo()
  * @method string getStatus()
  * @method string getViewStateVersion()
  * @method Model\_Message[] get_Messages()
@@ -34,6 +35,7 @@ use InstagramAPI\Response;
  * @method bool isMoreAvailable()
  * @method bool isNextMaxId()
  * @method bool isNumResults()
+ * @method bool isPaginationInfo()
  * @method bool isStatus()
  * @method bool isViewStateVersion()
  * @method bool is_Messages()
@@ -49,6 +51,7 @@ use InstagramAPI\Response;
  * @method $this setMoreAvailable(bool $value)
  * @method $this setNextMaxId(string $value)
  * @method $this setNumResults(int $value)
+ * @method $this setPaginationInfo(mixed $value)
  * @method $this setStatus(string $value)
  * @method $this setViewStateVersion(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
@@ -64,6 +67,7 @@ use InstagramAPI\Response;
  * @method $this unsetMoreAvailable()
  * @method $this unsetNextMaxId()
  * @method $this unsetNumResults()
+ * @method $this unsetPaginationInfo()
  * @method $this unsetStatus()
  * @method $this unsetViewStateVersion()
  * @method $this unset_Messages()
@@ -77,6 +81,7 @@ class TimelineFeedResponse extends Response
         'auto_load_more_enabled'         => 'bool',
         'more_available'                 => 'bool',
         'next_max_id'                    => 'string',
+        'pagination_info'                => '',
         'feed_items'                     => 'Model\FeedItem[]',
         'megaphone'                      => 'Model\FeedAysf',
         'client_feed_changelist_applied' => 'bool',
