@@ -34,11 +34,12 @@ class Hashtag extends RequestCollection
     /**
      * Get hashtags from a section.
      *
-     * Available tab sections: 'top' and 'recent'.
+     * Available tab sections: 'top', 'recent' or 'places'.
      *
-     * @param string     $hashtag      The hashtag, not including the "#".
-     * @param string     $tab          Section tab for hashtags.
-     * @param null|int[] $nextMediaIds Used for pagination.
+     * @param string      $hashtag      The hashtag, not including the "#".
+     * @param string      $rankToken    The feed UUID. You must use the same value for all pages of the feed.
+     * @param null|string $tab          Section tab for hashtags.
+     * @param null|int[]  $nextMediaIds Used for pagination.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -47,21 +48,26 @@ class Hashtag extends RequestCollection
      */
     public function getSection(
         $hashtag,
-        $tab,
+        $rankToken,
+        $tab = null,
         $nextMediaIds = null)
     {
         Utils::throwIfInvalidHashtag($hashtag);
         $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
-        if ($tab !== 'top' && $tab !== 'recent') {
-            throw new \InvalidArgumentException('Tab section must be \'top\' or \'recent\'.');
-        }
 
         $request = $this->ig->request("tags/{$urlHashtag}/sections/")
+            ->setSignedPost(false)
+            ->addPost('supported_tabs', "['top','recent','places']")
             ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('tab', $tab)
             ->addPost('include_persistent', true);
+
+        if ($tab !== null) {
+            if ($tab !== 'top' && $tab !== 'recent' && $tab !== 'places') {
+                throw new \InvalidArgumentException('Tab section must be \'top\', \'recent\' or \'places\'.');
+            }
+            $request->addPost('tab', $tab);
+        }
 
         if ($nextMediaIds !== null) {
             if (!is_array($nextMediaIds) || !array_filter($nextMediaIds, 'is_int')) {
