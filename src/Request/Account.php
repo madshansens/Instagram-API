@@ -26,9 +26,6 @@ class Account extends RequestCollection
     {
         return $this->ig->request('accounts/current_user/')
             ->addParam('edit', true)
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\UserInfoResponse());
     }
 
