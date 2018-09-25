@@ -704,6 +704,23 @@ class Media extends RequestCollection
     }
 
     /**
+     * Get media permalink.
+     *
+     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\PermalinkResponse
+     */
+    public function getPermalink(
+        $mediaId)
+    {
+        return $this->ig->request("media/{$mediaId}/permalink/")
+            ->addParam('share_to_app', 'copy_link')
+            ->getResponse(new Response\PermalinkResponse());
+    }
+
+    /**
      * Validate and update the parameters for a like or unlike request.
      *
      * @param string  $type      What type of request this is (can be "like" or "unlike").
