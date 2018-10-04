@@ -213,6 +213,8 @@ class Instagram implements ExperimentsInterface
     public $people;
     /** @var Request\Push Collection of Push related functions. */
     public $push;
+    /** @var Request\Shopping Collection of Shopping related functions. */
+    public $shopping;
     /** @var Request\Story Collection of Story related functions. */
     public $story;
     /** @var Request\Timeline Collection of Timeline related functions. */
@@ -293,6 +295,7 @@ class Instagram implements ExperimentsInterface
         $this->media = new Request\Media($this);
         $this->people = new Request\People($this);
         $this->push = new Request\Push($this);
+        $this->shopping = new Request\Shopping($this);
         $this->story = new Request\Story($this);
         $this->timeline = new Request\Timeline($this);
         $this->usertag = new Request\Usertag($this);
