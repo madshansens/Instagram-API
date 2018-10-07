@@ -5,21 +5,21 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
- * Users.
+ * UserList.
  *
- * @method mixed getPosition()
+ * @method int getPosition()
  * @method User getUser()
  * @method bool isPosition()
  * @method bool isUser()
- * @method $this setPosition(mixed $value)
+ * @method $this setPosition(int $value)
  * @method $this setUser(User $value)
  * @method $this unsetPosition()
  * @method $this unsetUser()
  */
-class Users extends AutoPropertyMapper
+class UserList extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'position' => '',
+        'position' => 'int',
         'user'     => 'User',
     ];
 }
