@@ -32,6 +32,25 @@ class Hashtag extends RequestCollection
     }
 
     /**
+     * Get hashtag story.
+     *
+     * @param string $hashtag The hashtag, not including the "#".
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\TagsStoryResponse
+     */
+    public function getStory(
+        $hashtag)
+    {
+        Utils::throwIfInvalidHashtag($hashtag);
+        $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
+        return $this->ig->request("tags/{$urlHashtag}/story/")
+            ->getResponse(new Response\TagsStoryResponse());
+    }
+
+    /**
      * Get hashtags from a section.
      *
      * Available tab sections: 'top', 'recent' or 'places'.
