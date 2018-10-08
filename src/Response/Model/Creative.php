@@ -5,7 +5,7 @@ namespace InstagramAPI\Response\Model;
 use InstagramAPI\AutoPropertyMapper;
 
 /**
- * Creatives.
+ * Creative.
  *
  * @method Text getContent()
  * @method mixed getDismissAction()
@@ -40,7 +40,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetSocialContext()
  * @method $this unsetTitle()
  */
-class Creatives extends AutoPropertyMapper
+class Creative extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
         'title'            => 'Text',

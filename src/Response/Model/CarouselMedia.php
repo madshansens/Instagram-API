@@ -13,6 +13,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method AndroidLinks[] getAndroidLinks()
  * @method string getCarouselParentId()
  * @method string getDominantColor()
+ * @method string getDynamicItemId()
  * @method Usertag getFbUserTags()
  * @method bool getForceOverlay()
  * @method bool getHasAudio()
@@ -44,6 +45,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isAndroidLinks()
  * @method bool isCarouselParentId()
  * @method bool isDominantColor()
+ * @method bool isDynamicItemId()
  * @method bool isFbUserTags()
  * @method bool isForceOverlay()
  * @method bool isHasAudio()
@@ -75,6 +77,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setAndroidLinks(AndroidLinks[] $value)
  * @method $this setCarouselParentId(string $value)
  * @method $this setDominantColor(string $value)
+ * @method $this setDynamicItemId(string $value)
  * @method $this setFbUserTags(Usertag $value)
  * @method $this setForceOverlay(bool $value)
  * @method $this setHasAudio(bool $value)
@@ -106,6 +109,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetAndroidLinks()
  * @method $this unsetCarouselParentId()
  * @method $this unsetDominantColor()
+ * @method $this unsetDynamicItemId()
  * @method $this unsetFbUserTags()
  * @method $this unsetForceOverlay()
  * @method $this unsetHasAudio()
@@ -158,6 +162,7 @@ class CarouselMedia extends AutoPropertyMapper
          * constants!
          */
         'media_type'          => 'int',
+        'dynamic_item_id'     => 'string',
         'usertags'            => 'Usertag',
         'preview'             => 'string',
         'headline'            => 'Headline',

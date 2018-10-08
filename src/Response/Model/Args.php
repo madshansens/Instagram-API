@@ -12,7 +12,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getClicked()
  * @method string getCommentId()
  * @method string[] getCommentIds()
+ * @method string getCommentNotifType()
  * @method string getDestination()
+ * @method string getIconUrl()
  * @method InlineFollow getInlineFollow()
  * @method string getLatestReelMedia()
  * @method Link[] getLinks()
@@ -23,6 +25,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getProfileImageDestination()
  * @method string getProfileName()
  * @method mixed getRequestCount()
+ * @method string getRichText()
  * @method string getSecondProfileId()
  * @method mixed getSecondProfileImage()
  * @method string getText()
@@ -33,7 +36,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isClicked()
  * @method bool isCommentId()
  * @method bool isCommentIds()
+ * @method bool isCommentNotifType()
  * @method bool isDestination()
+ * @method bool isIconUrl()
  * @method bool isInlineFollow()
  * @method bool isLatestReelMedia()
  * @method bool isLinks()
@@ -44,6 +49,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isProfileImageDestination()
  * @method bool isProfileName()
  * @method bool isRequestCount()
+ * @method bool isRichText()
  * @method bool isSecondProfileId()
  * @method bool isSecondProfileImage()
  * @method bool isText()
@@ -54,7 +60,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setClicked(bool $value)
  * @method $this setCommentId(string $value)
  * @method $this setCommentIds(string[] $value)
+ * @method $this setCommentNotifType(string $value)
  * @method $this setDestination(string $value)
+ * @method $this setIconUrl(string $value)
  * @method $this setInlineFollow(InlineFollow $value)
  * @method $this setLatestReelMedia(string $value)
  * @method $this setLinks(Link[] $value)
@@ -65,6 +73,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setProfileImageDestination(mixed $value)
  * @method $this setProfileName(string $value)
  * @method $this setRequestCount(mixed $value)
+ * @method $this setRichText(string $value)
  * @method $this setSecondProfileId(string $value)
  * @method $this setSecondProfileImage(mixed $value)
  * @method $this setText(string $value)
@@ -75,7 +84,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetClicked()
  * @method $this unsetCommentId()
  * @method $this unsetCommentIds()
+ * @method $this unsetCommentNotifType()
  * @method $this unsetDestination()
+ * @method $this unsetIconUrl()
  * @method $this unsetInlineFollow()
  * @method $this unsetLatestReelMedia()
  * @method $this unsetLinks()
@@ -86,6 +97,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetProfileImageDestination()
  * @method $this unsetProfileName()
  * @method $this unsetRequestCount()
+ * @method $this unsetRichText()
  * @method $this unsetSecondProfileId()
  * @method $this unsetSecondProfileImage()
  * @method $this unsetText()
@@ -97,10 +109,13 @@ class Args extends AutoPropertyMapper
     const JSON_PROPERTY_MAP = [
         'media_destination'         => 'string',
         'text'                      => 'string',
+        'icon_url'                  => 'string',
         'links'                     => 'Link[]',
+        'rich_text'                 => 'string',
         'profile_id'                => 'string',
         'profile_image'             => 'string',
         'media'                     => 'Media[]',
+        'comment_notif_type'        => 'string',
         'timestamp'                 => 'string',
         'tuuid'                     => 'string',
         'clicked'                   => 'bool',

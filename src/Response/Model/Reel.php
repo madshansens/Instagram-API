@@ -11,13 +11,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getCanReply()
  * @method bool getCanReshare()
  * @method CoverMedia getCoverMedia()
- * @method mixed getExpiringAt()
+ * @method string getExpiringAt()
  * @method bool getHasBestiesMedia()
  * @method string getId()
  * @method Item[] getItems()
  * @method string getLatestReelMedia()
  * @method Location getLocation()
- * @method mixed getPrefetchCount()
+ * @method int getPrefetchCount()
  * @method string getRankedPosition()
  * @method string getReelType()
  * @method string getSeen()
@@ -45,13 +45,13 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setCanReply(bool $value)
  * @method $this setCanReshare(bool $value)
  * @method $this setCoverMedia(CoverMedia $value)
- * @method $this setExpiringAt(mixed $value)
+ * @method $this setExpiringAt(string $value)
  * @method $this setHasBestiesMedia(bool $value)
  * @method $this setId(string $value)
  * @method $this setItems(Item[] $value)
  * @method $this setLatestReelMedia(string $value)
  * @method $this setLocation(Location $value)
- * @method $this setPrefetchCount(mixed $value)
+ * @method $this setPrefetchCount(int $value)
  * @method $this setRankedPosition(string $value)
  * @method $this setReelType(string $value)
  * @method $this setSeen(string $value)
@@ -98,10 +98,10 @@ class Reel extends AutoPropertyMapper
         'ranked_position'      => 'string',
         'title'                => 'string',
         'seen_ranked_position' => 'string',
-        'expiring_at'          => '',
+        'expiring_at'          => 'string',
         'has_besties_media'    => 'bool', // Uses int(0) for false and 1 for true.
         'location'             => 'Location',
-        'prefetch_count'       => '',
+        'prefetch_count'       => 'int',
         'broadcast'            => 'Broadcast',
     ];
 }

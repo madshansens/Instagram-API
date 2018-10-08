@@ -16,6 +16,7 @@ use InstagramAPI\Response;
  * @method int getStickerVersion()
  * @method bool getStoriesViewerGesturesNuxEligible()
  * @method string getStoryRankingToken()
+ * @method Model\TraySuggestions[] getSuggestions()
  * @method Model\StoryTray[] getTray()
  * @method Model\_Message[] get_Messages()
  * @method bool isBroadcasts()
@@ -27,6 +28,7 @@ use InstagramAPI\Response;
  * @method bool isStickerVersion()
  * @method bool isStoriesViewerGesturesNuxEligible()
  * @method bool isStoryRankingToken()
+ * @method bool isSuggestions()
  * @method bool isTray()
  * @method bool is_Messages()
  * @method $this setBroadcasts(Model\Broadcast[] $value)
@@ -38,6 +40,7 @@ use InstagramAPI\Response;
  * @method $this setStickerVersion(int $value)
  * @method $this setStoriesViewerGesturesNuxEligible(bool $value)
  * @method $this setStoryRankingToken(string $value)
+ * @method $this setSuggestions(Model\TraySuggestions[] $value)
  * @method $this setTray(Model\StoryTray[] $value)
  * @method $this set_Messages(Model\_Message[] $value)
  * @method $this unsetBroadcasts()
@@ -49,6 +52,7 @@ use InstagramAPI\Response;
  * @method $this unsetStickerVersion()
  * @method $this unsetStoriesViewerGesturesNuxEligible()
  * @method $this unsetStoryRankingToken()
+ * @method $this unsetSuggestions()
  * @method $this unsetTray()
  * @method $this unset_Messages()
  */
@@ -63,5 +67,6 @@ class ReelsTrayFeedResponse extends Response
         'face_filter_nux_version'              => 'int',
         'stories_viewer_gestures_nux_eligible' => 'bool',
         'has_new_nux_story'                    => 'bool',
+        'suggestions'                          => 'Model\TraySuggestions[]',
     ];
 }

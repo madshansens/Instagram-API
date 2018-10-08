@@ -8,7 +8,7 @@ use InstagramAPI\AutoPropertyMapper;
  * QPNode.
  *
  * @method ContextualFilters getContextualFilters()
- * @method Creatives getCreatives()
+ * @method Creative[] getCreatives()
  * @method string getId()
  * @method int getMaxImpressions()
  * @method string getPromotionId()
@@ -22,7 +22,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isTemplate()
  * @method bool isTriggers()
  * @method $this setContextualFilters(ContextualFilters $value)
- * @method $this setCreatives(Creatives $value)
+ * @method $this setCreatives(Creative[] $value)
  * @method $this setId(string $value)
  * @method $this setMaxImpressions(int $value)
  * @method $this setPromotionId(string $value)
@@ -45,6 +45,6 @@ class QPNode extends AutoPropertyMapper
         'triggers'           => 'string[]',
         'contextual_filters' => 'ContextualFilters',
         'template'           => 'Template',
-        'creatives'          => 'Creatives',
+        'creatives'          => 'Creative[]',
     ];
 }

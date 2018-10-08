@@ -26,6 +26,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getCaptionIsEdited()
  * @method float getCaptionPosition()
  * @method CarouselMedia[] getCarouselMedia()
+ * @method int getCarouselMediaCount()
  * @method mixed getCarouselMediaType()
  * @method Channel getChannel()
  * @method string getClientCacheKey()
@@ -37,11 +38,14 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getCommentingDisabledForViewer()
  * @method Comment[] getComments()
  * @method mixed getCommentsDisabled()
+ * @method string getConnectionId()
  * @method CoverMedia getCoverMedia()
  * @method mixed getCreativeConfig()
  * @method string getDeviceTimestamp()
+ * @method bool getDirectReplyToAuthorEnabled()
  * @method string getDominantColor()
  * @method int getDrAdType()
+ * @method string getDynamicItemId()
  * @method string getExpiringAt()
  * @method Explore getExplore()
  * @method string getExploreContext()
@@ -50,6 +54,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getFbPageUrl()
  * @method Usertag getFbUserTags()
  * @method int getFilterType()
+ * @method Hashtag getFollowHashtagInfo()
  * @method bool getForceOverlay()
  * @method Gating getGating()
  * @method bool getHasAudio()
@@ -86,6 +91,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getLinkText()
  * @method float getLng()
  * @method Location getLocation()
+ * @method bool getMainFeedCarouselHasUnseenCoverMedia()
+ * @method string getMainFeedCarouselStartingMediaId()
  * @method int getMaxNumVisiblePreviewComments()
  * @method Media getMedia()
  * @method string getMediaId()
@@ -176,6 +183,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isCaptionIsEdited()
  * @method bool isCaptionPosition()
  * @method bool isCarouselMedia()
+ * @method bool isCarouselMediaCount()
  * @method bool isCarouselMediaType()
  * @method bool isChannel()
  * @method bool isClientCacheKey()
@@ -187,11 +195,14 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isCommentingDisabledForViewer()
  * @method bool isComments()
  * @method bool isCommentsDisabled()
+ * @method bool isConnectionId()
  * @method bool isCoverMedia()
  * @method bool isCreativeConfig()
  * @method bool isDeviceTimestamp()
+ * @method bool isDirectReplyToAuthorEnabled()
  * @method bool isDominantColor()
  * @method bool isDrAdType()
+ * @method bool isDynamicItemId()
  * @method bool isExpiringAt()
  * @method bool isExplore()
  * @method bool isExploreContext()
@@ -200,6 +211,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isFbPageUrl()
  * @method bool isFbUserTags()
  * @method bool isFilterType()
+ * @method bool isFollowHashtagInfo()
  * @method bool isForceOverlay()
  * @method bool isGating()
  * @method bool isHasAudio()
@@ -236,6 +248,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isLinkText()
  * @method bool isLng()
  * @method bool isLocation()
+ * @method bool isMainFeedCarouselHasUnseenCoverMedia()
+ * @method bool isMainFeedCarouselStartingMediaId()
  * @method bool isMaxNumVisiblePreviewComments()
  * @method bool isMedia()
  * @method bool isMediaId()
@@ -326,6 +340,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setCaptionIsEdited(bool $value)
  * @method $this setCaptionPosition(float $value)
  * @method $this setCarouselMedia(CarouselMedia[] $value)
+ * @method $this setCarouselMediaCount(int $value)
  * @method $this setCarouselMediaType(mixed $value)
  * @method $this setChannel(Channel $value)
  * @method $this setClientCacheKey(string $value)
@@ -337,11 +352,14 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setCommentingDisabledForViewer(mixed $value)
  * @method $this setComments(Comment[] $value)
  * @method $this setCommentsDisabled(mixed $value)
+ * @method $this setConnectionId(string $value)
  * @method $this setCoverMedia(CoverMedia $value)
  * @method $this setCreativeConfig(mixed $value)
  * @method $this setDeviceTimestamp(string $value)
+ * @method $this setDirectReplyToAuthorEnabled(bool $value)
  * @method $this setDominantColor(string $value)
  * @method $this setDrAdType(int $value)
+ * @method $this setDynamicItemId(string $value)
  * @method $this setExpiringAt(string $value)
  * @method $this setExplore(Explore $value)
  * @method $this setExploreContext(string $value)
@@ -350,6 +368,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setFbPageUrl(string $value)
  * @method $this setFbUserTags(Usertag $value)
  * @method $this setFilterType(int $value)
+ * @method $this setFollowHashtagInfo(Hashtag $value)
  * @method $this setForceOverlay(bool $value)
  * @method $this setGating(Gating $value)
  * @method $this setHasAudio(bool $value)
@@ -386,6 +405,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setLinkText(string $value)
  * @method $this setLng(float $value)
  * @method $this setLocation(Location $value)
+ * @method $this setMainFeedCarouselHasUnseenCoverMedia(bool $value)
+ * @method $this setMainFeedCarouselStartingMediaId(string $value)
  * @method $this setMaxNumVisiblePreviewComments(int $value)
  * @method $this setMedia(Media $value)
  * @method $this setMediaId(string $value)
@@ -476,6 +497,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetCaptionIsEdited()
  * @method $this unsetCaptionPosition()
  * @method $this unsetCarouselMedia()
+ * @method $this unsetCarouselMediaCount()
  * @method $this unsetCarouselMediaType()
  * @method $this unsetChannel()
  * @method $this unsetClientCacheKey()
@@ -487,11 +509,14 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetCommentingDisabledForViewer()
  * @method $this unsetComments()
  * @method $this unsetCommentsDisabled()
+ * @method $this unsetConnectionId()
  * @method $this unsetCoverMedia()
  * @method $this unsetCreativeConfig()
  * @method $this unsetDeviceTimestamp()
+ * @method $this unsetDirectReplyToAuthorEnabled()
  * @method $this unsetDominantColor()
  * @method $this unsetDrAdType()
+ * @method $this unsetDynamicItemId()
  * @method $this unsetExpiringAt()
  * @method $this unsetExplore()
  * @method $this unsetExploreContext()
@@ -500,6 +525,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetFbPageUrl()
  * @method $this unsetFbUserTags()
  * @method $this unsetFilterType()
+ * @method $this unsetFollowHashtagInfo()
  * @method $this unsetForceOverlay()
  * @method $this unsetGating()
  * @method $this unsetHasAudio()
@@ -536,6 +562,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetLinkText()
  * @method $this unsetLng()
  * @method $this unsetLocation()
+ * @method $this unsetMainFeedCarouselHasUnseenCoverMedia()
+ * @method $this unsetMainFeedCarouselStartingMediaId()
  * @method $this unsetMaxNumVisiblePreviewComments()
  * @method $this unsetMedia()
  * @method $this unsetMediaId()
@@ -628,6 +656,7 @@ class Item extends AutoPropertyMapper
          * against the `Item::PHOTO`, `Item::VIDEO` and `Item::ALBUM` constants!
          */
         'media_type'                               => 'int',
+        'dynamic_item_id'                          => 'string',
         'code'                                     => 'string',
         'client_cache_key'                         => 'string',
         'filter_type'                              => 'int',
@@ -650,6 +679,7 @@ class Item extends AutoPropertyMapper
         'can_viewer_save'                          => 'bool',
         'has_viewer_saved'                         => 'bool',
         'organic_tracking_token'                   => 'string',
+        'follow_hashtag_info'                      => 'Hashtag',
         'expiring_at'                              => 'string',
         'is_dash_eligible'                         => 'int',
         'video_dash_manifest'                      => 'string',
@@ -691,6 +721,7 @@ class Item extends AutoPropertyMapper
         'next_max_id'                                 => 'string',
         'carousel_media'                              => 'CarouselMedia[]',
         'carousel_media_type'                         => '',
+        'carousel_media_count'                        => 'int',
         'likers'                                      => 'User[]',
         'like_count'                                  => 'int',
         'preview'                                     => 'string',
@@ -704,6 +735,7 @@ class Item extends AutoPropertyMapper
         'media'                                       => 'Media',
         'stories'                                     => 'Stories',
         'top_likers'                                  => 'string[]',
+        'direct_reply_to_author_enabled'              => 'bool',
         'suggested_users'                             => 'SuggestedUsers',
         'is_new_suggestion'                           => 'bool',
         'comment_likes_enabled'                       => 'bool',
@@ -715,6 +747,7 @@ class Item extends AutoPropertyMapper
         'injected'                                    => 'Injected',
         'placeholder'                                 => 'Placeholder',
         'algorithm'                                   => 'string',
+        'connection_id'                               => 'string',
         'social_context'                              => 'string',
         'icon'                                        => '',
         'media_ids'                                   => 'string[]',
@@ -780,6 +813,8 @@ class Item extends AutoPropertyMapper
         'supports_reel_reactions'                     => 'bool',
         'show_one_tap_fb_share_tooltip'               => 'bool',
         'has_shared_to_fb'                            => 'bool',
+        'main_feed_carousel_starting_media_id'        => 'string',
+        'main_feed_carousel_has_unseen_cover_media'   => 'bool',
         'inventory_source'                            => 'string',
         'is_eof'                                      => 'bool',
         'top_followers'                               => 'string[]',

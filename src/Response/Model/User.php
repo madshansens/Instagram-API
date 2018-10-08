@@ -28,7 +28,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getCanCrosspostWithoutFbToken()
  * @method bool getCanFollowHashtag()
  * @method bool getCanLinkEntitiesInBio()
- * @method mixed getCanSeeOrganicInsights()
+ * @method bool getCanSeeOrganicInsights()
  * @method string getCategory()
  * @method ChainingSuggestion[] getChainingSuggestions()
  * @method string getCityId()
@@ -57,6 +57,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getHasBiographyTranslation()
  * @method bool getHasChaining()
  * @method bool getHasHighlightReels()
+ * @method bool getHasPlacedOrders()
  * @method bool getHasProfileVideoFeed()
  * @method bool getHasUnseenBestiesMedia()
  * @method ImageCandidate getHdProfilePicUrlInfo()
@@ -82,7 +83,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method float getLongitude()
  * @method int getMaxNumLinkedEntitiesInBio()
  * @method int getMediaCount()
- * @method mixed getMutualFollowersCount()
+ * @method int getMutualFollowersCount()
  * @method Nametag getNametag()
  * @method string getNationalNumber()
  * @method mixed getNeedsEmailConfirm()
@@ -103,6 +104,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getSchool()
  * @method bool getScreenshotted()
  * @method mixed getSearchSocialContext()
+ * @method string getSearchSubtitle()
  * @method int getShoppablePostsCount()
  * @method bool getShowBestiesBadge()
  * @method bool getShowBusinessConversionIcon()
@@ -167,6 +169,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isHasBiographyTranslation()
  * @method bool isHasChaining()
  * @method bool isHasHighlightReels()
+ * @method bool isHasPlacedOrders()
  * @method bool isHasProfileVideoFeed()
  * @method bool isHasUnseenBestiesMedia()
  * @method bool isHdProfilePicUrlInfo()
@@ -213,6 +216,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isSchool()
  * @method bool isScreenshotted()
  * @method bool isSearchSocialContext()
+ * @method bool isSearchSubtitle()
  * @method bool isShoppablePostsCount()
  * @method bool isShowBestiesBadge()
  * @method bool isShowBusinessConversionIcon()
@@ -248,7 +252,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setCanCrosspostWithoutFbToken(bool $value)
  * @method $this setCanFollowHashtag(bool $value)
  * @method $this setCanLinkEntitiesInBio(bool $value)
- * @method $this setCanSeeOrganicInsights(mixed $value)
+ * @method $this setCanSeeOrganicInsights(bool $value)
  * @method $this setCategory(string $value)
  * @method $this setChainingSuggestions(ChainingSuggestion[] $value)
  * @method $this setCityId(string $value)
@@ -277,6 +281,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setHasBiographyTranslation(bool $value)
  * @method $this setHasChaining(bool $value)
  * @method $this setHasHighlightReels(bool $value)
+ * @method $this setHasPlacedOrders(bool $value)
  * @method $this setHasProfileVideoFeed(bool $value)
  * @method $this setHasUnseenBestiesMedia(bool $value)
  * @method $this setHdProfilePicUrlInfo(ImageCandidate $value)
@@ -302,7 +307,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setLongitude(float $value)
  * @method $this setMaxNumLinkedEntitiesInBio(int $value)
  * @method $this setMediaCount(int $value)
- * @method $this setMutualFollowersCount(mixed $value)
+ * @method $this setMutualFollowersCount(int $value)
  * @method $this setNametag(Nametag $value)
  * @method $this setNationalNumber(string $value)
  * @method $this setNeedsEmailConfirm(mixed $value)
@@ -323,6 +328,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setSchool(mixed $value)
  * @method $this setScreenshotted(bool $value)
  * @method $this setSearchSocialContext(mixed $value)
+ * @method $this setSearchSubtitle(string $value)
  * @method $this setShoppablePostsCount(int $value)
  * @method $this setShowBestiesBadge(bool $value)
  * @method $this setShowBusinessConversionIcon(bool $value)
@@ -387,6 +393,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetHasBiographyTranslation()
  * @method $this unsetHasChaining()
  * @method $this unsetHasHighlightReels()
+ * @method $this unsetHasPlacedOrders()
  * @method $this unsetHasProfileVideoFeed()
  * @method $this unsetHasUnseenBestiesMedia()
  * @method $this unsetHdProfilePicUrlInfo()
@@ -433,6 +440,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetSchool()
  * @method $this unsetScreenshotted()
  * @method $this unsetSearchSocialContext()
+ * @method $this unsetSearchSubtitle()
  * @method $this unsetShoppablePostsCount()
  * @method $this unsetShowBestiesBadge()
  * @method $this unsetShowBusinessConversionIcon()
@@ -473,8 +481,9 @@ class User extends AutoPropertyMapper
         'byline'                              => '',
         'search_social_context'               => '',
         'unseen_count'                        => '',
-        'mutual_followers_count'              => '',
+        'mutual_followers_count'              => 'int',
         'follower_count'                      => 'int',
+        'search_subtitle'                     => 'string',
         'social_context'                      => 'string',
         'media_count'                         => 'int',
         'following_count'                     => 'int',
@@ -493,7 +502,8 @@ class User extends AutoPropertyMapper
         'has_chaining'                        => 'bool',
         'chaining_suggestions'                => 'ChainingSuggestion[]',
         'include_direct_blacklist_status'     => '',
-        'can_see_organic_insights'            => '',
+        'can_see_organic_insights'            => 'bool',
+        'has_placed_orders'                   => 'bool',
         'can_convert_to_business'             => 'bool',
         'convert_from_pages'                  => '',
         'show_business_conversion_icon'       => 'bool',
