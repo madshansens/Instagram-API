@@ -489,6 +489,22 @@ class People extends RequestCollection
     }
 
     /**
+     * Get business account details.
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\AccountDetailsResponse
+     */
+    public function getAccountDetails(
+        $userId)
+    {
+        return $this->ig->request("users/{$userId}/account_details/")
+            ->getResponse(new Response\AccountDetailsResponse());
+    }
+
+    /**
      * Search for users by linking your address book to Instagram.
      *
      * WARNING: You must unlink your current address book before you can link
