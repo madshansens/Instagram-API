@@ -112,6 +112,7 @@ class Timeline extends RequestCollection
 
             // If usertags are provided, verify that the entries are valid.
             if (isset($item['usertags'])) {
+                $item['usertags'] = ['in' => $item['usertags']];
                 Utils::throwIfInvalidUsertags($item['usertags']);
             }
 
