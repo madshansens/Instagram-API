@@ -543,6 +543,8 @@ class Instagram implements ExperimentsInterface
      *                                    via SMS.
      * @param int    $appRefreshInterval  See `login()` for description of this
      *                                    parameter.
+     * @param int    $usernameHandler     Your Instagram username, used when logging in
+     *                                    with an email using Two Factor login.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -554,7 +556,8 @@ class Instagram implements ExperimentsInterface
         $password,
         $twoFactorIdentifier,
         $verificationCode,
-        $appRefreshInterval = 1800)
+        $appRefreshInterval = 1800,
+        $usernameHandler = null)
     {
         if (empty($username) || empty($password)) {
             throw new \InvalidArgumentException('You must provide a username and password to finishTwoFactorLogin().');
@@ -572,6 +575,8 @@ class Instagram implements ExperimentsInterface
         if ($this->username !== $username || $this->password !== $password) {
             $this->_setUser($username, $password);
         }
+
+        $username = ($usernameHandler !== null) ? $usernameHandler : $username;
 
         // Remove all whitespace from the verification code.
         $verificationCode = preg_replace('/\s+/', '', $verificationCode);
