@@ -83,7 +83,7 @@ class Highlight extends RequestCollection
 
         $cover = [
                     'media_id'  => $coverMediaId,
-                    'crop_rect' => '[0.0,0.21818182,1.0,0.7801653]',
+                    'crop_rect' => '[0.0,0.19545822,1.0,0.8037307]',
                 ];
 
         return $this->ig->request('highlights/create_reel/')
@@ -132,7 +132,7 @@ class Highlight extends RequestCollection
         }
         $cover = [
                     'media_id'  => $params['cover_media_id'],
-                    'crop_rect' => '[0.0,0.21854913,1.0,0.7805326]',
+                    'crop_rect' => '[0.0,0.19545822,1.0,0.8037307]',
                 ];
 
         return $this->ig->request("highlights/{$highlightReelId}/edit_reel/")
