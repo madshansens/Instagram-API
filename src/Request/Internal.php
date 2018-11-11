@@ -824,7 +824,6 @@ class Internal extends RequestCollection
                     ],
                 ];
 
-                // This usertag per-file EXTERNAL metadata is only supported for PHOTOS!
                 if (isset($item['usertags'])) {
                     // NOTE: These usertags were validated in Timeline::uploadAlbum.
                     $photoConfig['usertags'] = json_encode(['in' => $item['usertags']]);
@@ -857,6 +856,11 @@ class Internal extends RequestCollection
                         'trim_type'       => 0,
                     ],
                 ];
+
+                if (isset($item['usertags'])) {
+                    // NOTE: These usertags were validated in Timeline::uploadAlbum.
+                    $videoConfig['usertags'] = json_encode(['in' => $item['usertags']]);
+                }
 
                 $childrenMetadata[] = $videoConfig;
                 break;
