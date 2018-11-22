@@ -236,7 +236,6 @@ class Internal extends RequestCollection
 
         // Build the request...
         $request = $this->ig->request($endpoint)
-            ->addPost('supported_capabilities_new', json_encode(Constants::SUPPORTED_CAPABILITIES))
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_uuid', $this->ig->uuid)
@@ -261,7 +260,11 @@ class Internal extends RequestCollection
 
         switch ($targetFeed) {
             case Constants::FEED_TIMELINE:
+                $date = date('Y:m:d H:i:s');
                 $request
+                    ->addParam('timezone_offset', date('Z'))
+                    ->addPost('date_time_original', $date)
+                    ->addPost('date_time_digitalized', $date)
                     ->addPost('caption', $captionText)
                     ->addPost('source_type', '4')
                     ->addPost('media_folder', 'Camera')
