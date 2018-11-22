@@ -91,7 +91,6 @@ class Hashtag extends RequestCollection
         }
 
         if ($nextMediaIds !== null) {
-            var_dump($nextMediaIds);
             if (!is_array($nextMediaIds) || !array_filter($nextMediaIds, 'is_int')) {
                 throw new \InvalidArgumentException('Next media IDs must be an Int[].');
             }
