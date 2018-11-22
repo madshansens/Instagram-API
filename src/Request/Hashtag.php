@@ -59,6 +59,7 @@ class Hashtag extends RequestCollection
      * @param string      $rankToken    The feed UUID. You must use the same value for all pages of the feed.
      * @param null|string $tab          Section tab for hashtags.
      * @param null|int[]  $nextMediaIds Used for pagination.
+     * @param null|string $maxId        Next "maximum ID", used for pagination.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -69,7 +70,8 @@ class Hashtag extends RequestCollection
         $hashtag,
         $rankToken,
         $tab = null,
-        $nextMediaIds = null)
+        $nextMediaIds = null,
+        $maxId = null)
     {
         Utils::throwIfInvalidHashtag($hashtag);
         $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
@@ -89,10 +91,14 @@ class Hashtag extends RequestCollection
         }
 
         if ($nextMediaIds !== null) {
+            var_dump($nextMediaIds);
             if (!is_array($nextMediaIds) || !array_filter($nextMediaIds, 'is_int')) {
                 throw new \InvalidArgumentException('Next media IDs must be an Int[].');
             }
-            $request->addPost('next_media_ids', $nextMediaIds);
+            $request->addPost('next_media_ids', json_encode($nextMediaIds));
+        }
+        if ($maxId !== null) {
+            $request->addPost('max_id', $maxId);
         }
 
         return $request->getResponse(new Response\TagFeedResponse());
