@@ -14,6 +14,7 @@ class Shopping extends RequestCollection
      *
      * @param string $productId   The product ID.
      * @param string $mediaId     The media ID in Instagram's internal format (ie "1820978425064383299").
+     * @param string $merchantId  The merchant ID in Instagram's internal format (ie "20100000").
      * @param int    $deviceWidth Device width (optional).
      *
      * @throws \InstagramAPI\Exception\InstagramException
@@ -23,10 +24,12 @@ class Shopping extends RequestCollection
     public function getOnTagProductInfo(
         $productId,
         $mediaId,
+        $merchantId,
         $deviceWidth = 720)
     {
         return $this->ig->request("commerce/products/{$productId}/on_tag/")
             ->addParam('media_id', $mediaId)
+            ->addParam('merchant_id', $merchantId)
             ->addParam('device_width', $deviceWidth)
             ->getResponse(new Response\OnTagProductResponse());
     }
