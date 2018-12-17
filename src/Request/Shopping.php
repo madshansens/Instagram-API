@@ -2,8 +2,8 @@
 
 namespace InstagramAPI\Request;
 
-use InstagramAPI\Response;
 use InstagramAPI\Constants;
+use InstagramAPI\Response;
 
 /**
  * Functions related to Shopping and catalogs.
@@ -74,7 +74,7 @@ class Shopping extends RequestCollection
     {
         if ($offset !== null) {
             if ($offset % 20 !== 0) {
-                throw new \InvalidArgumentException("Offset must be multiple of 20.");
+                throw new \InvalidArgumentException('Offset must be multiple of 20.');
             }
             $offset = [
                 'offset' => $offset,
