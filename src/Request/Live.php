@@ -161,6 +161,75 @@ class Live extends RequestCollection
     }
 
     /**
+     * Show question in a live broadcast.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param string $questionId  The question ID in Instagram's internal format (ie "17854587811139572").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function showQuestion(
+        $broadcastId,
+        $questionId)
+    {
+        return $this->ig->request("live/{$broadcastId}/question/{$questionId}/activate")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
+     * Hide question in a live broadcast.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param string $questionId  The question ID in Instagram's internal format (ie "17854587811139572").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function hideQuestion(
+        $broadcastId,
+        $questionId)
+    {
+        return $this->ig->request("live/{$broadcastId}/question/{$questionId}/deactivate")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
+     * Get all received questions in live broadcasts.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BroadcastQuestionsResponse
+     */
+    public function getQuestions()
+    {
+        return $this->ig->request('live/get_questions/')
+            ->getResponse(new Response\BroadcastQuestionsResponse());
+    }
+
+    /**
+     * Get questions from a current live broadcast.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BroadcastQuestionsResponse
+     */
+    public function getLiveBroadcastQuestions(
+        $broadcastId)
+    {
+        return $this->ig->request("live/{$broadcastId}/questions/")
+            ->getResponse(new Response\BroadcastQuestionsResponse());
+    }
+
+    /**
      * Post a comment to a live broadcast.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
