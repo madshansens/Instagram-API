@@ -226,6 +226,7 @@ class Live extends RequestCollection
         $broadcastId)
     {
         return $this->ig->request("live/{$broadcastId}/questions/")
+            ->addParam('sources', 'story')
             ->getResponse(new Response\BroadcastQuestionsResponse());
     }
 
