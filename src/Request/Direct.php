@@ -864,6 +864,7 @@ class Direct extends RequestCollection
      *                           of numerical UserPK IDs. To use an existing thread
      *                           instead, provide "thread" with the thread ID.
      * @param string $storyId    The story ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string $reelId     The reel ID in Instagram's internal format (ie "highlight:12970012453081168")
      * @param array  $options    An associative array of additional parameters, including:
      *                           "media_type" (required) - either "photo" or "video";
      *                           "client_context" - predefined UUID used to prevent double-posting;
@@ -879,10 +880,20 @@ class Direct extends RequestCollection
     public function sendStory(
         array $recipients,
         $storyId,
+        $reelId = null,
         array $options = [])
     {
         if (!preg_match('#^\d+_\d+$#D', $storyId)) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a valid story ID.', $storyId));
+        }
+        if ($reelId !== null) {
+            if (!preg_match('#^highlight:\d+$#D', $reelId)) {
+                throw new \InvalidArgumentException(sprintf('"%s" is not a valid reel ID.', $reelId));
+            }
+            $options = array_merge($options,
+                [
+                    'reel_id' => $reelId,
+                ]);
         }
         if (!isset($options['media_type'])) {
             throw new \InvalidArgumentException('Please provide media_type in options.');
@@ -1315,6 +1326,10 @@ class Direct extends RequestCollection
                     throw new \InvalidArgumentException('No story_media_id provided.');
                 }
                 $request->addPost('story_media_id', $options['story_media_id']);
+                // Set text if provided.
+                if (isset($options['reel_id'])) {
+                    $request->addPost('reel_id', $options['reel_id']);
+                }
                 // Set text if provided.
                 if (isset($options['text']) && strlen($options['text'])) {
                     $request->addPost('text', $options['text']);
