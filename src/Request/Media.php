@@ -27,10 +27,6 @@ class Media extends RequestCollection
         $mediaId)
     {
         return $this->ig->request("media/{$mediaId}/info/")
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('media_id', $mediaId)
             ->getResponse(new Response\MediaInfoResponse());
     }
 
