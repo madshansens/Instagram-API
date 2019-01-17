@@ -112,7 +112,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getShowFeedBizConversionIcon()
  * @method bool getShowInsightsTerms()
  * @method bool getShowShoppableFeed()
- * @method string getSocialContext()
+ * @method mixed getSocialContext()
  * @method mixed getUnseenCount()
  * @method string getUserId()
  * @method string getUsername()
@@ -484,7 +484,7 @@ class User extends AutoPropertyMapper
         'mutual_followers_count'              => 'int',
         'follower_count'                      => 'int',
         'search_subtitle'                     => 'string',
-        'social_context'                      => 'string',
+        'social_context'                      => '',
         'media_count'                         => 'int',
         'following_count'                     => 'int',
         'following_tag_count'                 => 'int',
