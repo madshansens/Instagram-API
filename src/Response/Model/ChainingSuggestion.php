@@ -91,7 +91,7 @@ namespace InstagramAPI\Response\Model;
  * @method bool getPermission()
  * @method string getPhoneNumber()
  * @method string getPk()
- * @method string getProfileChainingSecondaryLabel()
+ * @method mixed getProfileChainingSecondaryLabel()
  * @method mixed getProfileContext()
  * @method Link[] getProfileContextLinksWithUserIds()
  * @method string[] getProfileContextMutualFollowIds()
@@ -469,6 +469,6 @@ class ChainingSuggestion extends User
        /*
         * This currently always contains the same value as "full_name".
         */
-       'profile_chaining_secondary_label' => 'string',
+       'profile_chaining_secondary_label' => '',
    ];
 }
