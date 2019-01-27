@@ -1040,6 +1040,23 @@ class Internal extends RequestCollection
     }
 
     /**
+     * TODO.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function logResurrectAttribution()
+    {
+        return $this->ig->request('attribution/log_resurrect_attribution/')
+            ->addPost('adid', $this->ig->advertising_id)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
      * Reads MSISDN header.
      *
      * @param string      $usage    Desired usage, either "ig_select_app" or "default".

@@ -336,7 +336,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setShowFeedBizConversionIcon(mixed $value)
  * @method $this setShowInsightsTerms(bool $value)
  * @method $this setShowShoppableFeed(bool $value)
- * @method $this setSocialContext(string $value)
+ * @method $this setSocialContext(mixed $value)
  * @method $this setUnseenCount(mixed $value)
  * @method $this setUserId(string $value)
  * @method $this setUsername(string $value)

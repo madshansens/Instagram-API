@@ -701,4 +701,23 @@ class Account extends RequestCollection
             ->addPost('phone_id', $this->ig->phone_id)
             ->getResponse(new Response\BadgeNotificationsResponse());
     }
+
+    /**
+     * TODO.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function getProcessContactPointSignals()
+    {
+        return $this->ig->request('accounts/process_contact_point_signals/')
+            ->addPost('google_tokens', '[]')
+            ->addPost('phone_id', $this->ig->phone_id)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('device_id', $this->ig->device_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->getResponse(new Response\GenericResponse());
+    }
 }

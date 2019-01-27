@@ -1057,6 +1057,7 @@ class Instagram implements ExperimentsInterface
             $this->direct->getRankedRecipients('reshare', true);
             $this->direct->getRankedRecipients('raven', true);
             $this->direct->getInbox();
+            //$this->internal->logResurrectAttribution();
             $this->direct->getPresences();
             $this->people->getRecentActivityInbox();
             if ((int) $this->getExperimentParam('ig_android_loom_universe', 'cpu_sampling_rate_ms', 0) > 0) {
@@ -1064,6 +1065,7 @@ class Instagram implements ExperimentsInterface
             }
             $this->internal->getProfileNotice();
             $this->media->getBlockedMedia();
+            //$this->account->getProcessContactPointSignals();
             $this->people->getBootstrapUsers();
             //$this->internal->getQPCooldowns();
             $this->discover->getExploreFeed(null, true);
