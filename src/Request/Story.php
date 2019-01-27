@@ -209,6 +209,71 @@ class Story extends RequestCollection
     }
 
     /**
+     * Vote on a story poll.
+     *
+     * Note that once you vote on a story poll, you cannot change your vote.
+     *
+     * @param string $storyId      The story media item's ID in Instagram's internal format (ie "1542304813904481224_6112344004").
+     * @param string $pollId       The poll ID in Instagram's internal format (ie "17956159684032257").
+     * @param int    $votingOption Value that represents the voting option of the voter. 0 for the first option, 1 for the second option.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ReelMediaViewerResponse
+     */
+    public function votePollStory(
+        $storyId,
+        $pollId,
+        $votingOption)
+    {
+        if (($votingOption !== 0) && ($votingOption !== 1)) {
+            throw new \InvalidArgumentException('You must provide a valid value for voting option.');
+        }
+
+        return $this->ig->request("media/{$storyId}/{$pollId}/story_poll_vote/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('radio_type', 'wifi-none')
+            ->addPost('vote', $votingOption)
+            ->getResponse(new Response\ReelMediaViewerResponse());
+    }
+
+    /**
+     * Vote on a story slider.
+     *
+     * Note that once you vote on a story poll, you cannot change your vote.
+     *
+     *
+     * @param string $storyId      The story media item's ID in Instagram's internal format (ie "1542304813904481224_6112344004").
+     * @param string $sliderId     The slider ID in Instagram's internal format (ie "17956159684032257").
+     * @param float  $votingOption Value that represents the voting option of the voter. Should be a float from 0 to 1 (ie "0.25").
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ReelMediaViewerResponse
+     */
+    public function voteSliderStory(
+        $storyId,
+        $sliderId,
+        $votingOption)
+    {
+        if ($votingOption < 0 || $votingOption > 1) {
+            throw new \InvalidArgumentException('You must provide a valid value from 0 to 1 for voting option.');
+        }
+
+        return $this->ig->request("media/{$storyId}/{$sliderId}/story_slider_vote/")
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('radio_type', 'wifi-none')
+            ->addPost('vote', $votingOption)
+            ->getResponse(new Response\ReelMediaViewerResponse());
+    }
+
+    /**
      * Get the list of users who have voted an option in a story poll.
      *
      * Note that this only works for your own story polls. Instagram doesn't
@@ -216,7 +281,7 @@ class Story extends RequestCollection
      *
      * @param string      $storyId      The story media item's ID in Instagram's internal format (ie "1542304813904481224_6112344004").
      * @param string      $pollId       The poll ID in Instagram's internal format (ie "17956159684032257").
-     * @param int         $votingOption Value that represents the votion option of the voter. 0 for the first option, 1 for the second option.
+     * @param int         $votingOption Value that represents the voting option of the voter. 0 for the first option, 1 for the second option.
      * @param null|string $maxId        Next "maximum ID", used for pagination.
      *
      * @throws \InvalidArgumentException
