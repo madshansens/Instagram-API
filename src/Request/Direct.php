@@ -908,6 +908,35 @@ class Direct extends RequestCollection
     }
 
     /**
+     * Share an occurring or archived live stream via direct message to a user's inbox.
+     *
+     * You are able to share your own broadcasts, as well as broadcasts from
+     * other people.
+     *
+     * @param array  $recipients  An array with "users" or "thread" keys.
+     *                            To start a new thread, provide "users" as an array
+     *                            of numerical UserPK IDs. To use an existing thread
+     *                            instead, provide "thread" with the thread ID.
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param array  $options     An associative array of optional parameters, including:
+     *                            "client_context" - predefined UUID used to prevent double-posting.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return Response\DirectSendItemResponse
+     */
+    public function sendLive(
+        array $recipients,
+        $broadcastId,
+        array $options = [])
+    {
+        return $this->_sendDirectItem('live', $recipients, array_merge($options, [
+            'broadcast_id' => $broadcastId,
+        ]));
+    }
+
+    /**
      * Delete a reaction to an existing thread item.
      *
      * @param string $threadId     Thread identifier.
@@ -1103,7 +1132,7 @@ class Direct extends RequestCollection
      * Send a direct message to specific users or thread.
      *
      * @param string $type       One of: "message", "like", "hashtag", "location", "profile", "photo",
-     *                           "video", "links".
+     *                           "video", "links", "live".
      * @param array  $recipients An array with "users" or "thread" keys.
      *                           To start a new thread, provide "users" as an array
      *                           of numerical UserPK IDs. To use an existing thread
@@ -1117,6 +1146,7 @@ class Direct extends RequestCollection
      *                           "photo" uses "client_context" and "filepath";
      *                           "video" uses "client_context", "upload_id" and "video_result";
      *                           "links" uses "client_context", "link_text" and "link_urls".
+     *                           "live" uses "client_context" and "text".
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -1235,6 +1265,18 @@ class Direct extends RequestCollection
                     throw new \InvalidArgumentException('No node_type provided.');
                 }
                 $request->addPost('node_type', $options['node_type']);
+                break;
+            case 'live':
+                $request = $this->ig->request('direct_v2/threads/broadcast/live_viewer_invite/');
+                // Check and set broadcast id.
+                if (!isset($options['broadcast_id'])) {
+                    throw new \InvalidArgumentException('No broadcast_id provided.');
+                }
+                $request->addPost('broadcast_id', $options['broadcast_id']);
+                // Set text if provided.
+                if (isset($options['text']) && strlen($options['text'])) {
+                    $request->addPost('text', $options['text']);
+                }
                 break;
             default:
                 throw new \InvalidArgumentException('Unsupported _sendDirectItem() type.');
