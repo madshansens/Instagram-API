@@ -185,10 +185,13 @@ class Location extends RequestCollection
      * location is a very specific place such as a specific night club, it will
      * usually only include media from that exact location.
      *
-     * @param string      $locationId The internal ID of a location (from a field
-     *                                such as "pk", "external_id" or "facebook_places_id").
-     * @param string      $rankToken  The feed UUID. Use must use the same value for all pages of the feed.
-     * @param null|string $maxId      Next "maximum ID", used for pagination.
+     * @param string      $locationId   The internal ID of a location (from a field
+     *                                  such as "pk", "external_id" or "facebook_places_id").
+     * @param string      $rankToken    The feed UUID. Use must use the same value for all pages of the feed.
+     * @param null|string $tab          Section tab for locations. Values: "ranked" and "recent"
+     * @param null|int[]  $nextMediaIds Used for pagination.
+     * @param null|int    $pageId       Used for pagination.
+     * @param null|string $maxId        Next "maximum ID", used for pagination.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -201,13 +204,36 @@ class Location extends RequestCollection
     public function getFeed(
         $locationId,
         $rankToken,
+        $tab = 'ranked',
+        $nextMediaIds = null,
+        $pageId = null,
         $maxId = null)
     {
         Utils::throwIfInvalidRankToken($rankToken);
-        $locationFeed = $this->ig->request("feed/location/{$locationId}/")
-            ->addParam('rank_token', $rankToken);
+        if ($tab !== 'ranked' && $tab !== 'recent') {
+            throw new \InvalidArgumentException('The provided section tab is invalid.');
+        }
+
+        $locationFeed = $this->ig->request("locations/{$locationId}/sections/")
+            ->addPost('rank_token', $rankToken)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('session_id', $this->ig->session_id)
+            ->addPost('tab', $tab);
+
+        if ($nextMediaIds !== null) {
+            if (!is_array($nextMediaIds) || !array_filter($nextMediaIds, 'is_int')) {
+                throw new \InvalidArgumentException('Next media IDs must be an Int[].');
+            }
+            $locationFeed->addPost('next_media_ids', json_encode($nextMediaIds));
+        }
+
+        if ($pageId !== null) {
+            $locationFeed->addPost('page', $pageId);
+        }
+
         if ($maxId !== null) {
-            $locationFeed->addParam('max_id', $maxId);
+            $locationFeed->addPost('max_id', $maxId);
         }
 
         return $locationFeed->getResponse(new Response\LocationFeedResponse());
