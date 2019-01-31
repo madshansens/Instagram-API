@@ -282,6 +282,10 @@ class Internal extends RequestCollection
                 }
                 break;
             case Constants::FEED_STORY:
+                if ($internalMetadata->isBestieMedia()) {
+                    $request->addPost('audience', 'besties');
+                }
+
                 $request
                     ->addPost('client_shared_at', (string) time())
                     ->addPost('source_type', '3')
@@ -671,6 +675,10 @@ class Internal extends RequestCollection
                 $request->addPost('caption', $captionText);
                 break;
             case Constants::FEED_STORY:
+                if ($internalMetadata->isBestieMedia()) {
+                    $request->addPost('audience', 'besties');
+                }
+
                 $request
                     ->addPost('configure_mode', 1) // 1 - REEL_SHARE
                     ->addPost('story_media_creation_date', time() - mt_rand(10, 20))

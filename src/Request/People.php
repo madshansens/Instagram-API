@@ -1058,4 +1058,62 @@ class People extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\FriendshipResponse());
     }
+
+    /**
+     * Get the list of users on your close friends list.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CloseFriendsResponse
+     */
+    public function getCloseFriends()
+    {
+        return $this->ig->request('friendships/besties/')
+            ->getResponse(new Response\CloseFriendsResponse());
+    }
+
+    /**
+     * Get the list of suggested users for your close friends list.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CloseFriendsResponse
+     */
+    public function getSuggestedCloseFriends()
+    {
+        return $this->ig->request('friendships/bestie_suggestions/')
+            ->getResponse(new Response\CloseFriendsResponse());
+    }
+
+    /**
+     * Add or Remove users from your close friends list.
+     *
+     * Note: You probably shouldn't touch $module and $source as there is only one way to modify your close friends.
+     *
+     * @param array  $add    Users to add to your close friends list.
+     * @param array  $remove Users to remove from your close friends list.
+     * @param string $module (optional) From which app module (page) you have change your close friends list.
+     * @param string $source (optional) Source page of app-module of where you changed your close friends list.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function setCloseFriends(
+        array $add,
+        array $remove,
+        $module = 'favorites_home_list',
+        $source = 'audience_manager')
+    {
+        return $this->ig->request('friendships/set_besties/')
+            ->setSignedPost(true)
+            ->addPost('module', $module)
+            ->addPost('source', $source)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('remove', $remove)
+            ->addPost('add', $add)
+            ->getResponse(new Response\GenericResponse());
+    }
 }

@@ -3,7 +3,9 @@
 namespace InstagramAPI\Request;
 
 use InstagramAPI\Constants;
+use InstagramAPI\Request\Metadata\Internal as InternalMetadata;
 use InstagramAPI\Response;
+use InstagramAPI\Utils;
 
 /**
  * Functions for managing your story and interacting with other stories.
@@ -34,6 +36,31 @@ class Story extends RequestCollection
     }
 
     /**
+     * Uploads a photo to your Instagram close friends story.
+     *
+     * @param string $photoFilename    The photo filename.
+     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see Internal::configureSinglePhoto() for available metadata fields.
+     * @see https://help.instagram.com/2183694401643300
+     */
+    public function uploadCloseFriendsPhoto(
+        $photoFilename,
+        array $externalMetadata = [])
+    {
+        $internalMetadata = new InternalMetadata(Utils::generateUploadId(true));
+        $internalMetadata->setBestieMedia(true);
+
+        return $this->ig->internal->uploadSinglePhoto(Constants::FEED_STORY, $photoFilename, $internalMetadata, $externalMetadata);
+    }
+
+    /**
      * Uploads a video to your Instagram story.
      *
      * @param string $videoFilename    The video filename.
@@ -53,6 +80,32 @@ class Story extends RequestCollection
         array $externalMetadata = [])
     {
         return $this->ig->internal->uploadSingleVideo(Constants::FEED_STORY, $videoFilename, null, $externalMetadata);
+    }
+
+    /**
+     * Uploads a video to your Instagram close friends story.
+     *
+     * @param string $videoFilename    The video filename.
+     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException If the video upload fails.
+     *
+     * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see Internal::configureSingleVideo() for available metadata fields.
+     * @see https://help.instagram.com/2183694401643300
+     */
+    public function uploadCloseFriendsVideo(
+        $videoFilename,
+        array $externalMetadata = [])
+    {
+        $internalMetadata = new InternalMetadata();
+        $internalMetadata->setBestieMedia(true);
+
+        return $this->ig->internal->uploadSingleVideo(Constants::FEED_STORY, $videoFilename, $internalMetadata, $externalMetadata);
     }
 
     /**
