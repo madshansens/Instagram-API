@@ -19,7 +19,7 @@ use InstagramAPI\AutoPropertyMapper;
 class FormerUsername extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'former_username' => 'string',
+        'former_username'  => 'string',
         'change_timestamp' => 'string',
     ];
 }

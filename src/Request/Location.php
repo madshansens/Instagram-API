@@ -190,7 +190,7 @@ class Location extends RequestCollection
      * @param string      $rankToken    The feed UUID. Use must use the same value for all pages of the feed.
      * @param null|string $tab          Section tab for locations. Values: "ranked" and "recent"
      * @param null|int[]  $nextMediaIds Used for pagination.
-     * @param null|int    $pageId       Used for pagination.
+     * @param null|int    $nextPage     Used for pagination.
      * @param null|string $maxId        Next "maximum ID", used for pagination.
      *
      * @throws \InvalidArgumentException
@@ -206,7 +206,7 @@ class Location extends RequestCollection
         $rankToken,
         $tab = 'ranked',
         $nextMediaIds = null,
-        $pageId = null,
+        $nextPage = null,
         $maxId = null)
     {
         Utils::throwIfInvalidRankToken($rankToken);
@@ -228,8 +228,8 @@ class Location extends RequestCollection
             $locationFeed->addPost('next_media_ids', json_encode($nextMediaIds));
         }
 
-        if ($pageId !== null) {
-            $locationFeed->addPost('page', $pageId);
+        if ($nextPage !== null) {
+            $locationFeed->addPost('page', $nextPage);
         }
 
         if ($maxId !== null) {
