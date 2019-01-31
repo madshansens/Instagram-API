@@ -505,6 +505,112 @@ class People extends RequestCollection
     }
 
     /**
+     * Get a business account's former username(s).
+     *
+     * @param string $userId Numerical UserPK ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\FormerUsernamesResponse
+     */
+    public function getFormerUsernames(
+        $userId)
+    {
+        return $this->ig->request("users/{$userId}/former_usernames/")
+            ->getResponse(new Response\FormerUsernamesResponse());
+    }
+
+    /**
+     * Get a business account's shared follower base with similar accounts.
+     *
+     * @param string $userId Numerical UserPk ID.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\SharedFollowersResponse
+     */
+    public function getSharedFollowers(
+        $userId)
+    {
+        return $this->ig->request("users/{$userId}/shared_follower_accounts/")
+            ->getResponse(new Response\SharedFollowersResponse());
+    }
+
+    /**
+     * Get a business account's active ads on feed.
+     *
+     * @param string      $targetUserId Numerical UserPk ID.
+     * @param null|string $maxId        Next "maximum ID", used for pagination.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ActiveFeedAdsResponse
+     */
+    public function getActiveFeedAds(
+        $targetUserId,
+        $maxId = null)
+    {
+        return $this->_getActiveAds($targetUserId, '35', $maxId);
+    }
+
+    /**
+     * Get a business account's active ads on stories.
+     *
+     * @param string      $targetUserId Numerical UserPk ID.
+     * @param null|string $maxId        Next "maximum ID", used for pagination.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ActiveReelAdsResponse
+     */
+    public function getActiveStoryAds(
+        $targetUserId,
+        $maxId = null)
+    {
+        return $this->_getActiveAds($targetUserId, '49', $maxId);
+    }
+
+    /**
+     * Helper function for getting active ads for business accounts.
+     *
+     * @param string      $targetUserId Numerical UserPk ID.
+     * @param string      $pageType     Content-type id(?) of the ad. 35 is feed ads and 49 is story ads.
+     * @param null|string $maxId        Next "maximum ID", used for pagination.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return Response
+     */
+    protected function _getActiveAds(
+        $targetUserId,
+        $pageType,
+        $maxId = null)
+    {
+        $request = $this->ig->request('ads/view_ads/')
+            ->setSignedPost(false)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('target_user_id', $targetUserId)
+            ->addPost('page_type', $pageType);
+        if ($maxId !== null) {
+            $request->addPost('next_max_id', $maxId);
+        }
+        $request->addPost('ig_user_id', $this->ig->account_id);
+
+        switch ($pageType) {
+            case '35':
+                return $request->getResponse(new Response\ActiveFeedAdsResponse());
+                break;
+            case '49':
+                return $request->getResponse(new Response\ActiveReelAdsResponse());
+                break;
+            default:
+                throw new \InvalidArgumentException('Invalid page type.');
+        }
+    }
+
+    /**
      * Search for users by linking your address book to Instagram.
      *
      * WARNING: You must unlink your current address book before you can link
