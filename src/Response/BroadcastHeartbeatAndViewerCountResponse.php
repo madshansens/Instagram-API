@@ -8,7 +8,7 @@ use InstagramAPI\Response;
  * BroadcastHeartbeatAndViewerCountResponse.
  *
  * @method string getBroadcastStatus()
- * @method mixed getCobroadcasterIds()
+ * @method string[] getCobroadcasterIds()
  * @method int getIsTopLiveEligible()
  * @method mixed getMessage()
  * @method int getOffsetToVideoStart()
@@ -26,7 +26,7 @@ use InstagramAPI\Response;
  * @method bool isViewerCount()
  * @method bool is_Messages()
  * @method $this setBroadcastStatus(string $value)
- * @method $this setCobroadcasterIds(mixed $value)
+ * @method $this setCobroadcasterIds(string[] $value)
  * @method $this setIsTopLiveEligible(int $value)
  * @method $this setMessage(mixed $value)
  * @method $this setOffsetToVideoStart(int $value)
@@ -52,6 +52,6 @@ class BroadcastHeartbeatAndViewerCountResponse extends Response
         'offset_to_video_start'     => 'int',
         'total_unique_viewer_count' => 'int',
         'is_top_live_eligible'      => 'int',
-        'cobroadcaster_ids'         => '',
+        'cobroadcaster_ids'         => 'string[]',
     ];
 }

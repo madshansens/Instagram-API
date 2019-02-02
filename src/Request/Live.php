@@ -539,6 +539,7 @@ class Live extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('end_after_copyright_warning', "false") // TODO: Understand what this means
             ->getResponse(new Response\GenericResponse());
     }
 
