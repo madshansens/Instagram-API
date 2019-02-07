@@ -233,6 +233,30 @@ class Live extends RequestCollection
     }
 
     /**
+     * Acknowledges (waves at) a new user after they join.
+     *
+     * Note: This can only be done once to a user, per stream. Additionally, the user must have joined the stream.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param string $viewerId    Numerical UserPK ID of the user to wave to.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function wave(
+        $broadcastId,
+        $viewerId)
+    {
+        return $this->ig->request("live/{$broadcastId}/wave/")
+            ->addPost('viewer_id', $viewerId)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
      * Post a comment to a live broadcast.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
@@ -541,7 +565,7 @@ class Live extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('end_after_copyright_warning', "false") // TODO: Understand what this means
+            ->addPost('end_after_copyright_warning', 'false') // TODO: Understand what this means
             ->getResponse(new Response\GenericResponse());
     }
 
