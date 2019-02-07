@@ -174,7 +174,8 @@ class Live extends RequestCollection
         $broadcastId,
         $questionId)
     {
-        return $this->ig->request("live/{$broadcastId}/question/{$questionId}/activate")
+        return $this->ig->request("live/{$broadcastId}/question/{$questionId}/activate/")
+            ->setSignedPost(false)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\GenericResponse());
@@ -194,7 +195,8 @@ class Live extends RequestCollection
         $broadcastId,
         $questionId)
     {
-        return $this->ig->request("live/{$broadcastId}/question/{$questionId}/deactivate")
+        return $this->ig->request("live/{$broadcastId}/question/{$questionId}/deactivate/")
+            ->setSignedPost(false)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\GenericResponse());
