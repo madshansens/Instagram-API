@@ -215,6 +215,7 @@ class Location extends RequestCollection
         }
 
         $locationFeed = $this->ig->request("locations/{$locationId}/sections/")
+            ->setSignedPost(false)
             ->addPost('rank_token', $rankToken)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
