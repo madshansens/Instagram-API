@@ -137,7 +137,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method mixed getStoryPollVoterInfos()
  * @method mixed getStoryPolls()
  * @method mixed getStoryProductItems()
- * @method mixed getStoryQuestions()
+ * @method StoryQuestionResponderInfos[] getStoryQuestionResponderInfos()
+ * @method StoryQuestions[] getStoryQuestions()
  * @method mixed getStorySliders()
  * @method mixed getStorySoundOn()
  * @method SuggestedUsers getSuggestedUsers()
@@ -294,6 +295,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isStoryPollVoterInfos()
  * @method bool isStoryPolls()
  * @method bool isStoryProductItems()
+ * @method bool isStoryQuestionResponderInfos()
  * @method bool isStoryQuestions()
  * @method bool isStorySliders()
  * @method bool isStorySoundOn()
@@ -451,7 +453,8 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setStoryPollVoterInfos(mixed $value)
  * @method $this setStoryPolls(mixed $value)
  * @method $this setStoryProductItems(mixed $value)
- * @method $this setStoryQuestions(mixed $value)
+ * @method $this setStoryQuestionResponderInfos(StoryQuestionResponderInfos[] $value)
+ * @method $this setStoryQuestions(StoryQuestions[] $value)
  * @method $this setStorySliders(mixed $value)
  * @method $this setStorySoundOn(mixed $value)
  * @method $this setSuggestedUsers(SuggestedUsers $value)
@@ -608,6 +611,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetStoryPollVoterInfos()
  * @method $this unsetStoryPolls()
  * @method $this unsetStoryProductItems()
+ * @method $this unsetStoryQuestionResponderInfos()
  * @method $this unsetStoryQuestions()
  * @method $this unsetStorySliders()
  * @method $this unsetStorySoundOn()
@@ -808,7 +812,8 @@ class Item extends AutoPropertyMapper
         'story_sliders'                               => '',
         'story_friend_lists'                          => '',
         'story_product_items'                         => '',
-        'story_questions'                             => '',
+        'story_questions'                             => 'StoryQuestions[]',
+        'story_question_responder_infos'              => 'StoryQuestionResponderInfos[]',
         'story_music_stickers'                        => '',
         'supports_reel_reactions'                     => 'bool',
         'show_one_tap_fb_share_tooltip'               => 'bool',

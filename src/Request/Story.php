@@ -363,6 +363,31 @@ class Story extends RequestCollection
     }
 
     /**
+     * Respond to a question sticker on a story.
+     *
+     * @param string $storyId      The story media item's ID in Instagram's internal format (ie "1542304813904481224_6112344004").
+     * @param string $questionId   The question ID in Instagram's internal format (ie "17956159684032257").
+     * @param string $responseText The text to respond to the question with. (Note: Android App limits this to 94 characters).
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function answerStoryQuestion(
+        $storyId,
+        $questionId,
+        $responseText)
+    {
+        return $this->ig->request("media/{$storyId}/{$questionId}/story_question_response/")
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('response', $responseText)
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('type', 'text')
+            ->addPost('_uuid', $this->ig->uuid)
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
      * Mark story media items as seen.
      *
      * The various story-related endpoints only give you lists of story media.
