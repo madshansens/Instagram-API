@@ -328,7 +328,7 @@ class Internal extends RequestCollection
                     Utils::throwIfInvalidStorySlider($storySlider);
                     $request
                         ->addPost('story_sliders', json_encode($storySlider))
-                        ->addPost('story_sticker_ids', $storySlider[0]['emoji']);
+                        ->addPost('story_sticker_ids', 'emoji_slider_'.$storySlider[0]['emoji']);
                 }
                 if ($attachedMedia !== null) {
                     Utils::throwIfInvalidAttachedMedia($attachedMedia);
@@ -631,6 +631,8 @@ class Internal extends RequestCollection
         /** @var array Story poll to use for the media. ONLY STORY MEDIA! */
         $storyPoll = (isset($externalMetadata['story_polls']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_polls'] : null;
         /** @var array Attached media used to share media to story feed. ONLY STORY MEDIA! */
+        $storySlider = (isset($externalMetadata['story_sliders']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_sliders'] : null;
+        /** @var array Attached media used to share media to story feed. ONLY STORY MEDIA! */
         $attachedMedia = (isset($externalMetadata['attached_media']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['attached_media'] : null;
         /** @var array Title of the media uploaded to your channel. ONLY TV MEDIA! */
         $title = (isset($externalMetadata['title']) && $targetFeed == Constants::FEED_TV) ? $externalMetadata['title'] : null;
@@ -715,6 +717,12 @@ class Internal extends RequestCollection
                         ->addPost('story_polls', json_encode($storyPoll))
                         ->addPost('internal_features', 'polling_sticker')
                         ->addPost('mas_opt_in', 'NOT_PROMPTED');
+                }
+                if ($storySlider !== null) {
+                    Utils::throwIfInvalidStorySlider($storySlider);
+                    $request
+                        ->addPost('story_sliders', json_encode($storySlider))
+                        ->addPost('story_sticker_ids', 'emoji_slider_'.$storySlider[0]['emoji']);
                 }
                 if ($attachedMedia !== null) {
                     Utils::throwIfInvalidAttachedMedia($attachedMedia);
