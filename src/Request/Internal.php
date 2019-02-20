@@ -218,6 +218,8 @@ class Internal extends RequestCollection
         $storyPoll = (isset($externalMetadata['story_polls']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_polls'] : null;
         /** @var array Story slider to use for the media. ONLY STORY MEDIA! */
         $storySlider = (isset($externalMetadata['story_sliders']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_sliders'] : null;
+        /** @var array Story question to use for the media. ONLY STORY MEDIA */
+        $storyQuestion = (isset($externalMetadata['story_questions']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_questions'] : null;
         /** @var array Attached media used to share media to story feed. ONLY STORY MEDIA! */
         $attachedMedia = (isset($externalMetadata['attached_media']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['attached_media'] : null;
         /** @var array Product Tags to use for the media. ONLY FOR TIMELINE PHOTOS! */
@@ -329,6 +331,12 @@ class Internal extends RequestCollection
                     $request
                         ->addPost('story_sliders', json_encode($storySlider))
                         ->addPost('story_sticker_ids', 'emoji_slider_'.$storySlider[0]['emoji']);
+                }
+                if ($storyQuestion !== null) {
+                    Utils::throwIfInvalidStoryQuestion($storyQuestion);
+                    $request
+                        ->addPost('story_questions', json_encode($storyQuestion))
+                        ->addPost('story_sticker_ids', 'question_sticker_ama');
                 }
                 if ($attachedMedia !== null) {
                     Utils::throwIfInvalidAttachedMedia($attachedMedia);
@@ -632,6 +640,8 @@ class Internal extends RequestCollection
         $storyPoll = (isset($externalMetadata['story_polls']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_polls'] : null;
         /** @var array Attached media used to share media to story feed. ONLY STORY MEDIA! */
         $storySlider = (isset($externalMetadata['story_sliders']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_sliders'] : null;
+        /** @var array Story question to use for the media. ONLY STORY MEDIA */
+        $storyQuestion = (isset($externalMetadata['story_questions']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_questions'] : null;
         /** @var array Attached media used to share media to story feed. ONLY STORY MEDIA! */
         $attachedMedia = (isset($externalMetadata['attached_media']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['attached_media'] : null;
         /** @var array Title of the media uploaded to your channel. ONLY TV MEDIA! */
@@ -723,6 +733,12 @@ class Internal extends RequestCollection
                     $request
                         ->addPost('story_sliders', json_encode($storySlider))
                         ->addPost('story_sticker_ids', 'emoji_slider_'.$storySlider[0]['emoji']);
+                }
+                if ($storyQuestion !== null) {
+                    Utils::throwIfInvalidStoryQuestion($storyQuestion);
+                    $request
+                        ->addPost('story_questions', json_encode($storyQuestion))
+                        ->addPost('story_sticker_ids', 'question_sticker_ama');
                 }
                 if ($attachedMedia !== null) {
                     Utils::throwIfInvalidAttachedMedia($attachedMedia);
