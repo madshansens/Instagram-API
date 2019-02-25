@@ -195,6 +195,8 @@ class Internal extends RequestCollection
         // Available external metadata parameters:
         /** @var string Caption to use for the media. */
         $captionText = isset($externalMetadata['caption']) ? $externalMetadata['caption'] : '';
+        /** @var string Accesibility caption to use for the media. */
+        $altText = isset($externalMetadata['custom_accessibility_caption']) ? $externalMetadata['custom_accessibility_caption'] : null;
         /** @var Response\Model\Location|null A Location object describing where
          * the media was taken. */
         $location = (isset($externalMetadata['location'])) ? $externalMetadata['location'] : null;
@@ -281,6 +283,9 @@ class Internal extends RequestCollection
                 if ($productTags !== null) {
                     Utils::throwIfInvalidProductTags($productTags);
                     $request->addPost('product_tags', json_encode($productTags));
+                }
+                if ($altText !== null) {
+                    $request->addPost('custom_accessibility_caption', $altText);
                 }
                 break;
             case Constants::FEED_STORY:
