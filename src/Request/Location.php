@@ -251,7 +251,7 @@ class Location extends RequestCollection
      *
      * @return \InstagramAPI\Response\LocationStoryResponse
      */
-    public function getStory(
+    public function getStoryFeed(
         $locationId)
     {
         return $this->ig->request("locations/{$locationId}/story/")
