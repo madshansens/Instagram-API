@@ -241,6 +241,24 @@ class Location extends RequestCollection
     }
 
     /**
+     * Get the story feed for a location.
+     *
+     * @param string $locationId The internal ID of a location (from a field
+     *                           such as "pk", "external_id" or "facebook_places_id").
+     *
+     * @throws \InvalidArgumentException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\LocationStoryResponse
+     */
+    public function getStory(
+        $locationId)
+    {
+        return $this->ig->request("locations/{$locationId}/story/")
+            ->getResponse(new Response\LocationStoryResponse());
+    }
+
+    /**
      * Mark LocationFeedResponse story media items as seen.
      *
      * The "story" property of a `LocationFeedResponse` only gives you a
