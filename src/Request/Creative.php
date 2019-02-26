@@ -18,7 +18,7 @@ class Creative extends RequestCollection
      * apply them MANUALLY via some external image/video editor or library!
      *
      * @param string     $stickerType Type of sticker (currently only "static_stickers").
-     * @param null|array $location    (optional) Array containing lat, lng and horizontalAccuracy.
+     * @param array|null $location    (optional) Array containing lat, lng and horizontalAccuracy.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException

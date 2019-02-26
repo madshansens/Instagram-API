@@ -20,7 +20,7 @@ class Location extends RequestCollection
      *
      * @param string      $latitude  Latitude.
      * @param string      $longitude Longitude.
-     * @param null|string $query     (optional) If provided, Instagram does a
+     * @param string|null $query     (optional) If provided, Instagram does a
      *                               worldwide location text search, but lists
      *                               locations closest to your lat/lng first.
      *
@@ -188,10 +188,10 @@ class Location extends RequestCollection
      * @param string      $locationId   The internal ID of a location (from a field
      *                                  such as "pk", "external_id" or "facebook_places_id").
      * @param string      $rankToken    The feed UUID. Use must use the same value for all pages of the feed.
-     * @param null|string $tab          Section tab for locations. Values: "ranked" and "recent"
-     * @param null|int[]  $nextMediaIds Used for pagination.
-     * @param null|int    $nextPage     Used for pagination.
-     * @param null|string $maxId        Next "maximum ID", used for pagination.
+     * @param string|null $tab          Section tab for locations. Values: "ranked" and "recent"
+     * @param int[]|null  $nextMediaIds Used for pagination.
+     * @param int|null    $nextPage     Used for pagination.
+     * @param string|null $maxId        Next "maximum ID", used for pagination.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException

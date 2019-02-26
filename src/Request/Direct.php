@@ -189,7 +189,7 @@ class Direct extends RequestCollection
      *
      * @param string      $mode        Either "reshare" or "raven".
      * @param bool        $showThreads Whether to include existing threads into response.
-     * @param null|string $query       (optional) The user to search for.
+     * @param string|null $query       (optional) The user to search for.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *

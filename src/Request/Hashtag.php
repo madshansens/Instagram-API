@@ -57,9 +57,9 @@ class Hashtag extends RequestCollection
      *
      * @param string      $hashtag      The hashtag, not including the "#".
      * @param string      $rankToken    The feed UUID. You must use the same value for all pages of the feed.
-     * @param null|string $tab          Section tab for hashtags.
-     * @param null|int[]  $nextMediaIds Used for pagination.
-     * @param null|string $maxId        Next "maximum ID", used for pagination.
+     * @param string|null $tab          Section tab for hashtags.
+     * @param int[]|null  $nextMediaIds Used for pagination.
+     * @param string|null $maxId        Next "maximum ID", used for pagination.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -235,7 +235,7 @@ class Hashtag extends RequestCollection
      *
      * @param string      $hashtag   The hashtag, not including the "#".
      * @param string      $rankToken The feed UUID. You must use the same value for all pages of the feed.
-     * @param null|string $maxId     Next "maximum ID", used for pagination.
+     * @param string|null $maxId     Next "maximum ID", used for pagination.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException

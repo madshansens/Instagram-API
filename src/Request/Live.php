@@ -27,7 +27,7 @@ class Live extends RequestCollection
     /**
      * Get top live broadcasts.
      *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param string|null $maxId Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -124,7 +124,7 @@ class Live extends RequestCollection
      * Get the viewer list of a post-live (saved replay) broadcast.
      *
      * @param string      $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param null|string $maxId       Next "maximum ID", used for pagination.
+     * @param string|null $maxId       Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *

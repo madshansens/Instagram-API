@@ -242,7 +242,7 @@ class Story extends RequestCollection
      * allow you to see the viewer list for other people's stories!
      *
      * @param string      $storyPk The story media item's PK in Instagram's internal format (ie "3482384834").
-     * @param null|string $maxId   Next "maximum ID", used for pagination.
+     * @param string|null $maxId   Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -335,7 +335,7 @@ class Story extends RequestCollection
      * @param string      $storyId      The story media item's ID in Instagram's internal format (ie "1542304813904481224_6112344004").
      * @param string      $pollId       The poll ID in Instagram's internal format (ie "17956159684032257").
      * @param int         $votingOption Value that represents the voting option of the voter. 0 for the first option, 1 for the second option.
-     * @param null|string $maxId        Next "maximum ID", used for pagination.
+     * @param string|null $maxId        Next "maximum ID", used for pagination.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -446,8 +446,8 @@ class Story extends RequestCollection
      * @param string      $messagePrefs      Who can reply to your story. Valid values are "anyone" (meaning
      *                                       your followers), "following" (followers that you follow back),
      *                                       or "off" (meaning that nobody can reply to your story).
-     * @param null|bool   $allowStoryReshare Allow story reshare.
-     * @param null|string $autoArchive       Auto archive stories for viewing them later. It will appear in your
+     * @param bool|null   $allowStoryReshare Allow story reshare.
+     * @param string|null $autoArchive       Auto archive stories for viewing them later. It will appear in your
      *                                       archive once it has disappeared from your story feed. Valid values
      *                                       "on" and "off".
      *

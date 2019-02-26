@@ -183,8 +183,8 @@ class Timeline extends RequestCollection
      *
      * This is the feed of recent timeline posts from people you follow.
      *
-     * @param null|string $maxId   Next "maximum ID", used for pagination.
-     * @param null|array  $options An associative array with following keys (all
+     * @param string|null $maxId   Next "maximum ID", used for pagination.
+     * @param array|null  $options An associative array with following keys (all
      *                             of them are optional):
      *                             "latest_story_pk" The media ID in Instagram's
      *                             internal format (ie "3482384834_43294");
@@ -309,7 +309,7 @@ class Timeline extends RequestCollection
      * Get a user's timeline feed.
      *
      * @param string      $userId Numerical UserPK ID.
-     * @param null|string $maxId  Next "maximum ID", used for pagination.
+     * @param string|null $maxId  Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -331,7 +331,7 @@ class Timeline extends RequestCollection
     /**
      * Get your own timeline feed.
      *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param string|null $maxId Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *

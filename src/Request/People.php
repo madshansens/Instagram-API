@@ -135,7 +135,7 @@ class People extends RequestCollection
      * This feed has information about the people you follow, such as what posts
      * they've liked or that they've started following other people.
      *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param string|null $maxId Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -327,8 +327,8 @@ class People extends RequestCollection
      *
      * @param string      $userId      Numerical UserPK ID.
      * @param string      $rankToken   The list UUID. You must use the same value for all pages of the list.
-     * @param null|string $searchQuery Limit the userlist to ones matching the query.
-     * @param null|string $maxId       Next "maximum ID", used for pagination.
+     * @param string|null $searchQuery Limit the userlist to ones matching the query.
+     * @param string|null $maxId       Next "maximum ID", used for pagination.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -362,8 +362,8 @@ class People extends RequestCollection
      *
      * @param string      $userId      Numerical UserPK ID.
      * @param string      $rankToken   The list UUID. You must use the same value for all pages of the list.
-     * @param null|string $searchQuery Limit the userlist to ones matching the query.
-     * @param null|string $maxId       Next "maximum ID", used for pagination.
+     * @param string|null $searchQuery Limit the userlist to ones matching the query.
+     * @param string|null $maxId       Next "maximum ID", used for pagination.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -396,8 +396,8 @@ class People extends RequestCollection
      * Get list of who you are following.
      *
      * @param string      $rankToken   The list UUID. You must use the same value for all pages of the list.
-     * @param null|string $searchQuery Limit the userlist to ones matching the query.
-     * @param null|string $maxId       Next "maximum ID", used for pagination.
+     * @param string|null $searchQuery Limit the userlist to ones matching the query.
+     * @param string|null $maxId       Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -418,8 +418,8 @@ class People extends RequestCollection
      * Get list of your own followers.
      *
      * @param string      $rankToken   The list UUID. You must use the same value for all pages of the list.
-     * @param null|string $searchQuery Limit the userlist to ones matching the query.
-     * @param null|string $maxId       Next "maximum ID", used for pagination.
+     * @param string|null $searchQuery Limit the userlist to ones matching the query.
+     * @param string|null $maxId       Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -540,7 +540,7 @@ class People extends RequestCollection
      * Get a business account's active ads on feed.
      *
      * @param string      $targetUserId Numerical UserPk ID.
-     * @param null|string $maxId        Next "maximum ID", used for pagination.
+     * @param string|null $maxId        Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -557,7 +557,7 @@ class People extends RequestCollection
      * Get a business account's active ads on stories.
      *
      * @param string      $targetUserId Numerical UserPk ID.
-     * @param null|string $maxId        Next "maximum ID", used for pagination.
+     * @param string|null $maxId        Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -575,7 +575,7 @@ class People extends RequestCollection
      *
      * @param string      $targetUserId Numerical UserPk ID.
      * @param string      $pageType     Content-type id(?) of the ad. 35 is feed ads and 49 is story ads.
-     * @param null|string $maxId        Next "maximum ID", used for pagination.
+     * @param string|null $maxId        Next "maximum ID", used for pagination.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -658,7 +658,7 @@ class People extends RequestCollection
      * This matches you with other people using multiple algorithms such as
      * "friends of friends", "location", "people using similar hashtags", etc.
      *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param string|null $maxId Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -1040,7 +1040,7 @@ class People extends RequestCollection
     /**
      * Get a list of all blocked users.
      *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param string|null $maxId Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *

@@ -78,7 +78,7 @@ class Account extends RequestCollection
      * @param string      $biography   Biography text. Use "" for nothing.
      * @param string      $email       Email. Required!
      * @param int         $gender      Gender (1 = male, 2 = female, 3 = unknown). Required!
-     * @param null|string $newUsername (optional) Rename your account to a new username,
+     * @param string|null $newUsername (optional) Rename your account to a new username,
      *                                 which you've already verified with checkUsername().
      *
      * @throws \InstagramAPI\Exception\InstagramException

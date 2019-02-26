@@ -17,7 +17,7 @@ class Collection extends RequestCollection
     /**
      * Get a list of all of your collections.
      *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param string|null $maxId Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -38,7 +38,7 @@ class Collection extends RequestCollection
      * Get the feed of one of your collections.
      *
      * @param string      $collectionId The collection ID.
-     * @param null|string $maxId        Next "maximum ID", used for pagination.
+     * @param string|null $maxId        Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *

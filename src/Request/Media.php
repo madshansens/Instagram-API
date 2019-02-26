@@ -62,7 +62,7 @@ class Media extends RequestCollection
      *
      * @param string     $mediaId     The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param string     $captionText Caption to use for the media.
-     * @param null|array $metadata    (optional) Associative array of optional metadata to edit:
+     * @param array|null $metadata    (optional) Associative array of optional metadata to edit:
      *                                "usertags" - special array with user tagging instructions,
      *                                if you want to modify the user tags;
      *                                "location" - a Location model object to set the media location,
@@ -197,7 +197,7 @@ class Media extends RequestCollection
     /**
      * Get feed of your liked media.
      *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param string|null $maxId Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -621,7 +621,7 @@ class Media extends RequestCollection
     /**
      * Get saved media items feed.
      *
-     * @param null|string $maxId Next "maximum ID", used for pagination.
+     * @param string|null $maxId Next "maximum ID", used for pagination.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
