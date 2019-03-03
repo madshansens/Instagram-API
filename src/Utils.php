@@ -862,6 +862,69 @@ class Utils
     }
 
     /**
+     * Verifies an array of story countdown.
+     *
+     * @param array $storyCountdown Array with story countdown key-value pairs.
+     *
+     * @throws \InvalidArgumentException If it's missing keys or has invalid values.
+     */
+    public static function throwIfInvalidStoryCountdown(
+        array $storyCountdown)
+    {
+        $requiredKeys = ['z', 'text', 'text_color', 'start_background_color', 'end_background_color', 'digit_color', 'digit_card_color', 'end_ts', 'following_enabled', 'is_sticker'];
+
+        if (count($storyCountdown) !== 1) {
+            throw new \InvalidArgumentException(sprintf('Only one story countdown is permitted. You added %d story countdowns.', count($storyCountdown)));
+        }
+
+        // Ensure that all keys exist.
+        $missingKeys = array_keys(array_diff_key(['z' => 1, 'text' => 1, 'text_color' => 1, 'start_background_color' => 1, 'end_background_color' => 1, 'digit_color' => 1, 'digit_card_color' => 1, 'end_ts' => 1, 'following_enabled' => 1, 'is_sticker' => 1], $storyCountdown[0]));
+        if (count($missingKeys)) {
+            throw new \InvalidArgumentException(sprintf('Missing keys "%s" for story countdown array.', implode(', ', $missingKeys)));
+        }
+
+        foreach ($storyCountdown[0] as $k => $v) {
+            switch ($k) {
+                case 'z': // May be used for AR in the future, for now it's always 0.
+                    if ($v !== 0) {
+                        throw new \InvalidArgumentException(sprintf('Invalid value "%s" for story countdown array-key "%s".', $v, $k));
+                    }
+                    break;
+                case 'text':
+                    if (!is_string($v)) {
+                        throw new \InvalidArgumentException(sprintf('Invalid value "%s" for story countdown array-key "%s".', $v, $k));
+                    }
+                    break;
+                case 'text_color':
+                case 'start_background_color':
+                case 'end_background_color':
+                case 'digit_color':
+                case 'digit_card_color':
+                    if (!preg_match('/^[0-9a-fA-F]{6}$/', substr($v, 1))) {
+                        throw new \InvalidArgumentException(sprintf('Invalid value "%s" for story countdown array-key "%s".', $v, $k));
+                    }
+                    break;
+                case 'end_ts':
+                    if (!is_int($v)) {
+                        throw new \InvalidArgumentException(sprintf('Invalid value "%s" for story countdown array-key "%s".', $v, $k));
+                    }
+                    break;
+                case 'following_enabled':
+                    if (!is_bool($v)) {
+                        throw new \InvalidArgumentException(sprintf('Invalid value "%s" for story countdown array-key "%s".', $v, $k));
+                    }
+                    break;
+                case 'is_sticker':
+                    if (!is_bool($v) && $v !== true) {
+                        throw new \InvalidArgumentException(sprintf('Invalid value "%s" for story countdown array-key "%s".', $v, $k));
+                    }
+                    break;
+            }
+        }
+        self::_throwIfInvalidStoryStickerPlacement(array_diff_key($storyCountdown[0], array_flip($requiredKeys)), 'countdowns');
+    }
+
+    /**
      * Verifies if tallies are valid.
      *
      * @param array[] $tallies Array with story poll key-value pairs.

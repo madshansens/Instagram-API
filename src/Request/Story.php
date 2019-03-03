@@ -388,6 +388,57 @@ class Story extends RequestCollection
     }
 
     /**
+     * Gets the created story countdowns of the current account.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\StoryCountdownsResponse
+     */
+    public function getStoryCountdowns()
+    {
+        return $this->ig->request('media/story_countdowns/')
+            ->getResponse(new Response\StoryCountdownsResponse());
+    }
+
+    /**
+     * Follows a story countdown to subscribe to a notification when the countdown is finished.
+     *
+     * @param string $countdownId The countdown ID in Instagram's internal format (ie "17956159684032257").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function followStoryCountdown(
+        $countdownId)
+    {
+        return $this->ig->request("media/{$countdownId}/follow_story_countdown/")
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
+     * Unfollows a story countdown to unsubscribe from a notification when the countdown is finished.
+     *
+     * @param string $countdownId The countdown ID in Instagram's internal format (ie "17956159684032257").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function unfollowStoryCountdown(
+        $countdownId)
+    {
+        return $this->ig->request("media/{$countdownId}/unfollow_story_countdown/")
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
      * Mark story media items as seen.
      *
      * The various story-related endpoints only give you lists of story media.

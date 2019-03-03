@@ -129,6 +129,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getSocialContext()
  * @method User[] getSponsorTags()
  * @method Stories getStories()
+ * @method StoryCountdowns[] getStoryCountdowns()
  * @method StoryCta[] getStoryCta()
  * @method mixed getStoryEvents()
  * @method mixed getStoryFeedMedia()
@@ -291,6 +292,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isSocialContext()
  * @method bool isSponsorTags()
  * @method bool isStories()
+ * @method bool isStoryCountdowns()
  * @method bool isStoryCta()
  * @method bool isStoryEvents()
  * @method bool isStoryFeedMedia()
@@ -453,6 +455,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setSocialContext(string $value)
  * @method $this setSponsorTags(User[] $value)
  * @method $this setStories(Stories $value)
+ * @method $this setStoryCountdowns(StoryCountdowns[] $value)
  * @method $this setStoryCta(StoryCta[] $value)
  * @method $this setStoryEvents(mixed $value)
  * @method $this setStoryFeedMedia(mixed $value)
@@ -615,6 +618,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetSocialContext()
  * @method $this unsetSponsorTags()
  * @method $this unsetStories()
+ * @method $this unsetStoryCountdowns()
  * @method $this unsetStoryCta()
  * @method $this unsetStoryEvents()
  * @method $this unsetStoryFeedMedia()
@@ -833,6 +837,7 @@ class Item extends AutoPropertyMapper
         'story_product_items'                         => '',
         'story_questions'                             => 'StoryQuestions[]',
         'story_question_responder_infos'              => 'StoryQuestionResponderInfos[]',
+        'story_countdowns'                            => 'StoryCountdowns[]',
         'story_music_stickers'                        => '',
         'supports_reel_reactions'                     => 'bool',
         'show_one_tap_fb_share_tooltip'               => 'bool',
