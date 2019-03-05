@@ -7,7 +7,7 @@ use InstagramAPI\Response;
 /**
  * StoryCountdownsResponse.
  *
- * @method Model\Broadcast[] getCountdowns()
+ * @method Model\CountdownSticker[] getCountdowns()
  * @method mixed getMessage()
  * @method string getStatus()
  * @method Model\_Message[] get_Messages()
@@ -15,7 +15,7 @@ use InstagramAPI\Response;
  * @method bool isMessage()
  * @method bool isStatus()
  * @method bool is_Messages()
- * @method $this setCountdowns(Model\Broadcast[] $value)
+ * @method $this setCountdowns(Model\CountdownSticker[] $value)
  * @method $this setMessage(mixed $value)
  * @method $this setStatus(string $value)
  * @method $this set_Messages(Model\_Message[] $value)
