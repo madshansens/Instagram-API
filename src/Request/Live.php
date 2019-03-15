@@ -485,6 +485,7 @@ class Live extends RequestCollection
      * @param int    $previewHeight    (optional) Height.
      * @param string $broadcastMessage (optional) Title to use for the broadcast.
      *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\CreateLiveResponse
