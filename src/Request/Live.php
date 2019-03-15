@@ -526,8 +526,7 @@ class Live extends RequestCollection
      * which your broadcasting software MUST output properly (FFmpeg DOESN'T do
      * it without special patching!), OR by calling the `end()` function.
      *
-     * @param string $broadcastId       The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param bool   $sendNotifications (optional) Whether to send notifications about the broadcast to your followers.
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -537,13 +536,11 @@ class Live extends RequestCollection
      * @see Live::end()
      */
     public function start(
-        $broadcastId,
-        $sendNotifications = true)
+        $broadcastId)
     {
         return $this->ig->request("live/{$broadcastId}/start/")
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('should_send_notifications', (int) $sendNotifications)
             ->getResponse(new Response\StartLiveResponse());
     }
 
