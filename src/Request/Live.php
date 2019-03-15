@@ -482,7 +482,7 @@ class Live extends RequestCollection
      *
      * @param int    $previewWidth     (optional) Width.
      * @param int    $previewHeight    (optional) Height.
-     * @param string $broadcastMessage (optional) Message to use for the broadcast.
+     * @param string $broadcastMessage (optional) Title to use for the broadcast.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -496,13 +496,17 @@ class Live extends RequestCollection
         $previewHeight = 1184,
         $broadcastMessage = '')
     {
+        if (mb_strlen($broadcastMessage, 'utf8') > 30) {
+            throw new \InvalidArgumentException('Broadcast Message must be between 1 and 30 characters.');
+        }
+
         return $this->ig->request('live/create/')
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('preview_height', $previewHeight)
             ->addPost('preview_width', $previewWidth)
             ->addPost('broadcast_message', $broadcastMessage)
-            ->addPost('broadcast_type', 'RTMP')
+            ->addPost('broadcast_type', 'RTMP_SWAP_ENABLED')
             ->addPost('internal_only', 0)
             ->getResponse(new Response\CreateLiveResponse());
     }
