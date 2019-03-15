@@ -29,6 +29,11 @@ class Highlight extends RequestCollection
         $userId)
     {
         return $this->ig->request("highlights/{$userId}/highlights_tray/")
+            ->addParam('supported_capabilities_new', json_encode(Constants::SUPPORTED_CAPABILITIES))
+            ->addParam('phone_id', $this->ig->phone_id)
+            ->addParam('battery_level', mt_rand(25, 100))
+            ->addParam('is_charging', '0')
+            ->addParam('will_sound_on', '1')
             ->getResponse(new Response\HighlightFeedResponse());
     }
 
@@ -84,7 +89,6 @@ class Highlight extends RequestCollection
 
         $cover = [
             'media_id'  => $coverMediaId,
-            'crop_rect' => '[0.0,0.19545822,1.0,0.8037307]',
         ];
 
         return $this->ig->request('highlights/create_reel/')
@@ -133,7 +137,6 @@ class Highlight extends RequestCollection
         }
         $cover = [
             'media_id'  => $params['cover_media_id'],
-            'crop_rect' => '[0.0,0.19545822,1.0,0.8037307]',
         ];
 
         return $this->ig->request("highlights/{$highlightReelId}/edit_reel/")
