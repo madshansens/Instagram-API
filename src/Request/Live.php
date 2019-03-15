@@ -157,6 +157,7 @@ class Live extends RequestCollection
         return $this->ig->request("live/{$broadcastId}/heartbeat_and_get_viewer_count/")
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('offset_to_video_start', 0)
             ->getResponse(new Response\BroadcastHeartbeatAndViewerCountResponse());
     }
 
