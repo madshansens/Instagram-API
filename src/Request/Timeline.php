@@ -364,7 +364,7 @@ class Timeline extends RequestCollection
      *
      * @param string     $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param string|int $mediaType The type of the media item you are deleting. One of: "PHOTO", "VIDEO"
-     *                              "ALBUM", or the raw value of the Item's "getMediaType()" function.
+     *                              "CAROUSEL", or the raw value of the Item's "getMediaType()" function.
      * @param bool       $onlyMe    If true, archives your media so that it's only visible to you.
      *                              Otherwise, if false, makes the media public to everyone again.
      *
@@ -388,7 +388,7 @@ class Timeline extends RequestCollection
         case 'VIDEO':
             $mediaCode = 2;
             break;
-        case 'ALBUM':
+        case 'CAROUSEL':
             $mediaCode = 8;
             break;
         default:
@@ -447,7 +447,7 @@ class Timeline extends RequestCollection
             $mediaFiles = []; // Reset queue.
             foreach ($myTimeline->getItems() as $item) {
                 $itemDate = date('Y-m-d \a\t H.i.s O', $item->getTakenAt());
-                if ($item->getMediaType() == Response\Model\Item::ALBUM) {
+                if ($item->getMediaType() == Response\Model\Item::CAROUSEL) {
                     // Albums contain multiple items which must all be queued.
                     // NOTE: We won't name them by their subitem's getIds, since
                     // those Ids have no meaning outside of the album and they

@@ -664,7 +664,7 @@ class Item extends AutoPropertyMapper
 {
     const PHOTO = 1;
     const VIDEO = 2;
-    const ALBUM = 8;
+    const CAROUSEL = 8;
 
     const JSON_PROPERTY_MAP = [
         /*
@@ -677,7 +677,7 @@ class Item extends AutoPropertyMapper
         'device_timestamp'                 => 'string',
         /*
          * A number describing what type of media this is. Should be compared
-         * against the `Item::PHOTO`, `Item::VIDEO` and `Item::ALBUM` constants!
+         * against the `Item::PHOTO`, `Item::VIDEO` and `Item::CAROUSEL` constants!
          */
         'media_type'                               => 'int',
         'dynamic_item_id'                          => 'string',
