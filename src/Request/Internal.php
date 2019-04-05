@@ -303,7 +303,7 @@ class Internal extends RequestCollection
                     ->addPost('upload_id', $uploadId);
 
                 if (is_string($link) && Utils::hasValidWebURLSyntax($link)) {
-                    $story_cta = '[{"links":[{"webUri":'.json_encode($link).'}]}]';
+                    $story_cta = '[{"links":[{"linkType": 1, "webUri":'.json_encode($link).', "androidClass": "", "package": "", "deeplinkUri": "", "callToActionTitle": "", "redirectUri": null, "leadGenFormId": "", "igUserId": "", "appInstallObjectiveInvalidationBehavior": null}]}]';
                     $request->addPost('story_cta', $story_cta);
                 }
                 if ($hashtags !== null && $captionText !== '') {
@@ -713,7 +713,7 @@ class Internal extends RequestCollection
                     ->addPost('client_timestamp', time());
 
                 if (is_string($link) && Utils::hasValidWebURLSyntax($link)) {
-                    $story_cta = '[{"links":[{"webUri":'.json_encode($link).'}]}]';
+                    $story_cta = '[{"links":[{"linkType": 1, "webUri":'.json_encode($link).', "androidClass": "", "package": "", "deeplinkUri": "", "callToActionTitle": "", "redirectUri": null, "leadGenFormId": "", "igUserId": "", "appInstallObjectiveInvalidationBehavior": null}]}]';
                     $request->addPost('story_cta', $story_cta);
                 }
                 if ($hashtags !== null && $captionText !== '') {
