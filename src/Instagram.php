@@ -494,7 +494,7 @@ class Instagram implements ExperimentsInterface
             try {
                 $response = $this->request('accounts/login/')
                     ->setNeedsAuth(false)
-                    ->addPost('country_codes', '[{"country_code":"1","source":["default"]}]')
+                    ->addPost('country_codes', '[{"country_code":"1","source":["default","sim"]}]')
                     ->addPost('phone_id', $this->phone_id)
                     ->addPost('_csrftoken', $this->client->getToken())
                     ->addPost('username', $this->username)
@@ -1153,6 +1153,7 @@ class Instagram implements ExperimentsInterface
     public function logout()
     {
         $response = $this->request('accounts/logout/')
+            ->setSignedPost(false)
             ->addPost('phone_id', $this->phone_id)
             ->addPost('_csrftoken', $this->client->getToken())
             ->addPost('guid', $this->uuid)
