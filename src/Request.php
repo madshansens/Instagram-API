@@ -640,6 +640,7 @@ class Request
             if ($this->_isBodyCompressed) {
                 return stream_for(zlib_encode((string) $this->_body, ZLIB_ENCODING_GZIP));
             }
+
             return $this->_body;
         }
         // We have no POST data and no files.
@@ -660,6 +661,7 @@ class Request
         if ($this->_isBodyCompressed) {
             return stream_for(zlib_encode((string) $this->_body, ZLIB_ENCODING_GZIP));
         }
+
         return $result;
     }
 

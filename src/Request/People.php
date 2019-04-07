@@ -617,7 +617,7 @@ class People extends RequestCollection
      * another one to search again, otherwise you will just keep getting the
      * same response about your currently linked address book every time!
      *
-     * @param array $contacts
+     * @param array  $contacts
      * @param string $module
      *
      * @throws \InstagramAPI\Exception\InstagramException
