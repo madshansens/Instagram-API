@@ -123,6 +123,15 @@ class Request
     protected $_isMultiResponse;
 
     /**
+     * Whether this API call needs gz-compressing of the POST data.
+     *
+     * Off by default
+     *
+     * @var bool
+     */
+    protected $_isBodyCompressed;
+
+    /**
      * Opened file handles.
      *
      * @var resource[]
@@ -168,6 +177,7 @@ class Request
         $this->_signedPost = true;
         $this->_signedGet = false;
         $this->_isMultiResponse = false;
+        $this->_isBodyCompressed = false;
         $this->_excludeSigned = [];
         $this->_defaultHeaders = true;
     }
@@ -494,6 +504,21 @@ class Request
     }
 
     /**
+     *  Set gz-compressed request params flag.
+     *
+     * @param bool $isBodyCompressed
+     *
+     * @return self
+     */
+    public function setIsBodyCompressed(
+        $isBodyCompressed = false)
+    {
+        $this->_isBodyCompressed = $isBodyCompressed;
+
+        return $this;
+    }
+
+    /**
      * Get a Stream for the given file.
      *
      * @param array $file
@@ -612,6 +637,9 @@ class Request
     {
         // Check and return raw body stream if set.
         if ($this->_body !== null) {
+            if ($this->_isBodyCompressed) {
+                return stream_for(zlib_encode((string) $this->_body, ZLIB_ENCODING_GZIP));
+            }
             return $this->_body;
         }
         // We have no POST data and no files.
@@ -629,6 +657,9 @@ class Request
             $result = $this->_getMultipartBody(); // Throws.
         }
 
+        if ($this->_isBodyCompressed) {
+            return stream_for(zlib_encode((string) $this->_body, ZLIB_ENCODING_GZIP));
+        }
         return $result;
     }
 
