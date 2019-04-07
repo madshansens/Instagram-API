@@ -618,6 +618,7 @@ class People extends RequestCollection
      * same response about your currently linked address book every time!
      *
      * @param array $contacts
+     * @param string $module
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -626,13 +627,18 @@ class People extends RequestCollection
      * @see People::unlinkAddressBook()
      */
     public function linkAddressBook(
-        array $contacts)
+        array $contacts,
+        $module = 'find_friends_contacts')
     {
         return $this->ig->request('address_book/link/')
+            ->setIsBodyCompressed(true)
             ->setSignedPost(false)
+            ->addPost('phone_id', $this->ig->phone_id)
+            ->addPost('module', $module)
             ->addPost('contacts', json_encode($contacts))
-            ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('device_id', $this->ig->device_id)
+            ->addPost('_uuid', $this->ig->uuid)
             ->getResponse(new Response\LinkAddressBookResponse());
     }
 
