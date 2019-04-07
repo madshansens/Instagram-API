@@ -215,6 +215,7 @@ class Timeline extends RequestCollection
 
         $request = $this->ig->request('feed/timeline/')
             ->setSignedPost(false)
+            ->setIsBodyCompressed(true)
             //->addHeader('X-CM-Bandwidth-KBPS', '-1.000')
             //->addHeader('X-CM-Latency', '0.000')
             ->addHeader('X-Ads-Opt-Out', '0')
@@ -226,12 +227,15 @@ class Timeline extends RequestCollection
             ->addPost('phone_id', $this->ig->phone_id)
             ->addPost('device_id', $this->ig->uuid)
             ->addPost('client_session_id', $this->ig->session_id)
-            ->addPost('battery_level', '100')
-            ->addPost('is_charging', '1')
+            ->addPost('battery_level', mt_rand(25, 100))
+            ->addPost('is_charging', '0')
             ->addPost('will_sound_on', '1')
             ->addPost('is_on_screen', 'true')
             ->addPost('timezone_offset', date('Z'))
-            ->addPost('is_async_ads', (string) (int) $asyncAds)
+            ->addPost('is_async_ads_in_headload_enabled', (string) (int) ($asyncAds && $this->ig->isExperimentEnabled(
+                    'ig_android_ad_async_ads_universe',
+                    'is_async_ads_in_headload_enabled'
+                )))
             ->addPost('is_async_ads_double_request', (string) (int) ($asyncAds && $this->ig->isExperimentEnabled(
                 'ig_android_ad_async_ads_universe',
                 'is_double_request_enabled'
