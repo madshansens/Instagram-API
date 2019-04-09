@@ -515,6 +515,8 @@ class Request
     {
         $this->_isBodyCompressed = $isBodyCompressed;
 
+        $this->_headers['Content-Encoding'] = 'gzip';
+
         return $this;
     }
 
