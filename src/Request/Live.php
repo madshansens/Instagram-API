@@ -155,6 +155,7 @@ class Live extends RequestCollection
         $broadcastId)
     {
         return $this->ig->request("live/{$broadcastId}/heartbeat_and_get_viewer_count/")
+            ->setSignedPost(false)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('offset_to_video_start', 0)
@@ -483,7 +484,7 @@ class Live extends RequestCollection
      *
      * @param int    $previewWidth     (optional) Width.
      * @param int    $previewHeight    (optional) Height.
-     * @param string $broadcastMessage (optional) Title to use for the broadcast.
+     * @param string $broadcastMessage (optional) Don't use.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -503,6 +504,7 @@ class Live extends RequestCollection
         }
 
         return $this->ig->request('live/create/')
+            ->setSignedPost(false)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('preview_height', $previewHeight)
@@ -540,10 +542,20 @@ class Live extends RequestCollection
     public function start(
         $broadcastId)
     {
-        return $this->ig->request("live/{$broadcastId}/start/")
+        $response = $this->ig->request("live/{$broadcastId}/start/")
+            ->setSignedPost(false)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\StartLiveResponse());
+
+        $this->ig->request("live/{$broadcastId}/question_status/")
+            ->setSignedPost(false)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('allow_question_submission', true)
+            ->getResponse(new Response\GenericResponse());
+
+        return $response;
     }
 
     /**
