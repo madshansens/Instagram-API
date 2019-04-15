@@ -504,7 +504,7 @@ class Request
     }
 
     /**
-     *  Set gz-compressed request params flag.
+     * Set gz-compressed request params flag.
      *
      * @param bool $isBodyCompressed
      *
@@ -515,7 +515,11 @@ class Request
     {
         $this->_isBodyCompressed = $isBodyCompressed;
 
-        $this->_headers['Content-Encoding'] = 'gzip';
+        if ($isBodyCompressed === true) {
+            $this->_headers['Content-Encoding'] = 'gzip';
+        } elseif ($isBodyCompressed === false && $this->_headers['Content-Encoding'] === 'gzip') {
+            unset($this->_headers['Content-Encoding']);
+        }
 
         return $this;
     }
