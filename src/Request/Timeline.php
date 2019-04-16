@@ -368,10 +368,10 @@ class Timeline extends RequestCollection
      * Marking media as "archived" will hide it from everyone except yourself.
      * You can unmark the media again at any time, to make it public again.
      *
-     * @param string $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
-     *                          "ALBUM", or the raw value of the Item's "getMediaType()" function.
-     * @param bool   $onlyMe    If true, archives your media so that it's only visible to you.
-     *                          Otherwise, if false, makes the media public to everyone again.
+     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     *                        "ALBUM", or the raw value of the Item's "getMediaType()" function.
+     * @param bool   $onlyMe  If true, archives your media so that it's only visible to you.
+     *                        Otherwise, if false, makes the media public to everyone again.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
