@@ -78,16 +78,18 @@ class Hashtag extends RequestCollection
 
         $request = $this->ig->request("tags/{$urlHashtag}/sections/")
             ->setSignedPost(false)
-            ->addPost('supported_tabs', "['top','recent','places']")
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('rank_token', $rankToken)
             ->addPost('include_persistent', true);
 
         if ($tab !== null) {
-            if ($tab !== 'top' && $tab !== 'recent' && $tab !== 'places') {
-                throw new \InvalidArgumentException('Tab section must be \'top\', \'recent\' or \'places\'.');
+            if ($tab !== 'top' && $tab !== 'recent' && $tab !== 'places' && $tab !== 'discover') {
+                throw new \InvalidArgumentException('Tab section must be \'top\', \'recent\', \'places\' or \'discover\'.');
             }
             $request->addPost('tab', $tab);
+        } else {
+            $request->addPost('supported_tabs', '["top","recent","places","discover"]');
         }
 
         if ($nextMediaIds !== null) {

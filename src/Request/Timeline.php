@@ -323,7 +323,9 @@ class Timeline extends RequestCollection
         $userId,
         $maxId = null)
     {
-        $request = $this->ig->request("feed/user/{$userId}/");
+        $request = $this->ig->request("feed/user/{$userId}/")
+            ->addParam('exclude_comment', true)
+            ->addParam('only_fetch_first_carousel_media', false);
 
         if ($maxId !== null) {
             $request->addParam('max_id', $maxId);
@@ -367,7 +369,6 @@ class Timeline extends RequestCollection
      * You can unmark the media again at any time, to make it public again.
      *
      * @param string     $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string|int $mediaType The type of the media item you are deleting. One of: "PHOTO", "VIDEO"
      *                              "ALBUM", or the raw value of the Item's "getMediaType()" function.
      * @param bool       $onlyMe    If true, archives your media so that it's only visible to you.
      *                              Otherwise, if false, makes the media public to everyone again.
@@ -379,29 +380,11 @@ class Timeline extends RequestCollection
      */
     public function archiveMedia(
         $mediaId,
-        $mediaType = 'PHOTO',
         $onlyMe = true)
     {
-        $mediaType = Utils::checkMediaType($mediaType);
-
         $endpoint = $onlyMe ? 'only_me' : 'undo_only_me';
-        switch ($mediaType) {
-        case 'PHOTO':
-            $mediaCode = 1;
-            break;
-        case 'VIDEO':
-            $mediaCode = 2;
-            break;
-        case 'ALBUM':
-            $mediaCode = 8;
-            break;
-        default:
-            throw new \InvalidArgumentException(sprintf('Unknown media type (%s).', $mediaType));
-            break;
-        }
 
         return $this->ig->request("media/{$mediaId}/{$endpoint}/")
-            ->addParam('media_type', $mediaCode)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())

@@ -346,6 +346,7 @@ class People extends RequestCollection
     {
         Utils::throwIfInvalidRankToken($rankToken);
         $request = $this->ig->request("friendships/{$userId}/following/")
+            ->addParam('includes_hashtags', true)
             ->addParam('rank_token', $rankToken);
         if ($searchQuery !== null) {
             $request->addParam('query', $searchQuery);
@@ -784,6 +785,7 @@ class People extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('user_id', $userId)
             ->addPost('radio_type', 'wifi-none')
+            ->addPost('device_id', $this->ig->device_id)
             ->getResponse(new Response\FriendshipResponse());
     }
 

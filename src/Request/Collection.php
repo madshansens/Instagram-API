@@ -26,7 +26,8 @@ class Collection extends RequestCollection
     public function getList(
         $maxId = null)
     {
-        $request = $this->ig->request('collections/list/');
+        $request = $this->ig->request('collections/list/')
+        ->addParam('collection_types', '["ALL_MEDIA_AUTO_COLLECTION","MEDIA","PRODUCT_AUTO_COLLECTION"]');
         if ($maxId !== null) {
             $request->addParam('max_id', $maxId);
         }
@@ -60,7 +61,6 @@ class Collection extends RequestCollection
      * Create a new collection of your bookmarked (saved) media.
      *
      * @param string   $name       Name of the collection.
-     * @param string[] $mediaIds   (optional) Array with one or more media IDs in Instagram's internal format (ie ["3482384834_43294"]).
      * @param string   $moduleName (optional) From which app module (page) you're performing this action.
      *
      * @throws \InstagramAPI\Exception\InstagramException
@@ -69,16 +69,15 @@ class Collection extends RequestCollection
      */
     public function create(
         $name,
-        array $mediaIds = [],
-        $moduleName = 'feed_contextual_post')
+        $moduleName = 'collection_create')
     {
         return $this->ig->request('collections/create/')
             ->addPost('module_name', $moduleName)
-            ->addPost('added_media_ids', json_encode(array_values($mediaIds)))
+            ->addPost('collection_visibility', '0') //Instagram is planning for public collections soon
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uid', $this->ig->account_id)
             ->addPost('name', $name)
             ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\CreateCollectionResponse());
     }
 
