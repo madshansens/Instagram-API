@@ -79,7 +79,7 @@ class Creative extends RequestCollection
      * NOTE: The files are some strange binary format that only the Instagram
      * app understands. If anyone figures out the format, please contact us.
      *
-     * @param array|null $location    (optional) Array containing lat, lng and horizontalAccuracy.
+     * @param array|null $location (optional) Array containing lat, lng and horizontalAccuracy.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -101,6 +101,6 @@ class Creative extends RequestCollection
                 ->addPost('horizontalAccuracy', $location['horizontalAccuracy']);
         }
 
-            return $request->getResponse(new Response\FaceEffectsResponse());
+        return $request->getResponse(new Response\FaceEffectsResponse());
     }
 }

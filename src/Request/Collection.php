@@ -60,8 +60,8 @@ class Collection extends RequestCollection
     /**
      * Create a new collection of your bookmarked (saved) media.
      *
-     * @param string   $name       Name of the collection.
-     * @param string   $moduleName (optional) From which app module (page) you're performing this action.
+     * @param string $name       Name of the collection.
+     * @param string $moduleName (optional) From which app module (page) you're performing this action.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
