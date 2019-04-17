@@ -497,7 +497,6 @@ class Live extends RequestCollection
         $previewWidth = 720,
         $previewHeight = 1184)
     {
-
         return $this->ig->request('live/create/')
             ->setSignedPost(false)
             ->addPost('_uuid', $this->ig->uuid)
