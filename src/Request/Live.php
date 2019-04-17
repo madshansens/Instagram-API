@@ -482,9 +482,8 @@ class Live extends RequestCollection
      *
      * Read the description of `start()` for proper usage.
      *
-     * @param int    $previewWidth     (optional) Width.
-     * @param int    $previewHeight    (optional) Height.
-     * @param string $broadcastMessage (optional) Don't use.
+     * @param int    $previewWidth  (optional) Width.
+     * @param int    $previewHeight (optional) Height.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -496,12 +495,8 @@ class Live extends RequestCollection
      */
     public function create(
         $previewWidth = 720,
-        $previewHeight = 1184,
-        $broadcastMessage = '')
+        $previewHeight = 1184)
     {
-        if (mb_strlen($broadcastMessage, 'utf8') > 30) {
-            throw new \InvalidArgumentException('Broadcast Message must be between 1 and 30 characters.');
-        }
 
         return $this->ig->request('live/create/')
             ->setSignedPost(false)
@@ -509,7 +504,7 @@ class Live extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('preview_height', $previewHeight)
             ->addPost('preview_width', $previewWidth)
-            ->addPost('broadcast_message', $broadcastMessage)
+            ->addPost('broadcast_message', '')
             ->addPost('broadcast_type', 'RTMP_SWAP_ENABLED')
             ->addPost('internal_only', 0)
             ->getResponse(new Response\CreateLiveResponse());

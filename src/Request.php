@@ -517,7 +517,7 @@ class Request
 
         if ($isBodyCompressed === true) {
             $this->_headers['Content-Encoding'] = 'gzip';
-        } elseif ($isBodyCompressed === false && $this->_headers['Content-Encoding'] === 'gzip') {
+        } elseif (isset($this->_headers['Content-Encoding']) && $this->_headers['Content-Encoding'] === 'gzip') {
             unset($this->_headers['Content-Encoding']);
         }
 

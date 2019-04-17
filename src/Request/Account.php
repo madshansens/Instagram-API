@@ -660,8 +660,6 @@ class Account extends RequestCollection
             ->setNeedsAuth(false)
             ->addPost('phone_id', $this->ig->phone_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_uuid', $this->ig->uuid)
             ->addPost('usage', $usage)
             ->getResponse(new Response\GenericResponse());
     }
