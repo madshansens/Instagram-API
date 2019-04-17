@@ -482,8 +482,8 @@ class Live extends RequestCollection
      *
      * Read the description of `start()` for proper usage.
      *
-     * @param int    $previewWidth  (optional) Width.
-     * @param int    $previewHeight (optional) Height.
+     * @param int $previewWidth  (optional) Width.
+     * @param int $previewHeight (optional) Height.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
