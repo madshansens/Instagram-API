@@ -155,8 +155,10 @@ class Live extends RequestCollection
         $broadcastId)
     {
         return $this->ig->request("live/{$broadcastId}/heartbeat_and_get_viewer_count/")
+            ->setSignedPost(false)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('offset_to_video_start', 0)
             ->getResponse(new Response\BroadcastHeartbeatAndViewerCountResponse());
     }
 
@@ -480,10 +482,10 @@ class Live extends RequestCollection
      *
      * Read the description of `start()` for proper usage.
      *
-     * @param int    $previewWidth     (optional) Width.
-     * @param int    $previewHeight    (optional) Height.
-     * @param string $broadcastMessage (optional) Message to use for the broadcast.
+     * @param int $previewWidth  (optional) Width.
+     * @param int $previewHeight (optional) Height.
      *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\CreateLiveResponse
@@ -493,16 +495,16 @@ class Live extends RequestCollection
      */
     public function create(
         $previewWidth = 720,
-        $previewHeight = 1184,
-        $broadcastMessage = '')
+        $previewHeight = 1184)
     {
         return $this->ig->request('live/create/')
+            ->setSignedPost(false)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('preview_height', $previewHeight)
             ->addPost('preview_width', $previewWidth)
-            ->addPost('broadcast_message', $broadcastMessage)
-            ->addPost('broadcast_type', 'RTMP')
+            ->addPost('broadcast_message', '')
+            ->addPost('broadcast_type', 'RTMP_SWAP_ENABLED')
             ->addPost('internal_only', 0)
             ->getResponse(new Response\CreateLiveResponse());
     }
@@ -522,8 +524,7 @@ class Live extends RequestCollection
      * which your broadcasting software MUST output properly (FFmpeg DOESN'T do
      * it without special patching!), OR by calling the `end()` function.
      *
-     * @param string $broadcastId       The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param bool   $sendNotifications (optional) Whether to send notifications about the broadcast to your followers.
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -533,14 +534,22 @@ class Live extends RequestCollection
      * @see Live::end()
      */
     public function start(
-        $broadcastId,
-        $sendNotifications = true)
+        $broadcastId)
     {
-        return $this->ig->request("live/{$broadcastId}/start/")
+        $response = $this->ig->request("live/{$broadcastId}/start/")
+            ->setSignedPost(false)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('should_send_notifications', (int) $sendNotifications)
             ->getResponse(new Response\StartLiveResponse());
+
+        $this->ig->request("live/{$broadcastId}/question_status/")
+            ->setSignedPost(false)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('allow_question_submission', true)
+            ->getResponse(new Response\GenericResponse());
+
+        return $response;
     }
 
     /**

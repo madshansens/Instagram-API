@@ -50,10 +50,11 @@ class Media extends RequestCollection
 
         return $this->ig->request("media/{$mediaId}/delete/")
             ->addParam('media_type', $mediaType)
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('igtv_feed_preview', false)
             ->addPost('media_id', $mediaId)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_uuid', $this->ig->uuid)
             ->getResponse(new Response\MediaDeleteResponse());
     }
 
@@ -155,7 +156,8 @@ class Media extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('media_id', $mediaId)
             ->addPost('radio_type', 'wifi-none')
-            ->addPost('module_name', $module);
+            ->addPost('module_name', $module)
+            ->addPost('device_id', $this->ig->device_id);
 
         $this->_parseLikeParameters('like', $request, $module, $extraData);
 
@@ -323,7 +325,8 @@ class Media extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('comment_text', $commentText)
             ->addPost('containermodule', $module)
-            ->addPost('radio_type', 'wifi-none');
+            ->addPost('radio_type', 'wifi-none')
+            ->addPost('device_id', $this->ig->device_id);
 
         if ($replyCommentId !== null) {
             if ($commentText[0] !== '@') {

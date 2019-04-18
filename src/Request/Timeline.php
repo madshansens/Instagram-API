@@ -215,6 +215,7 @@ class Timeline extends RequestCollection
 
         $request = $this->ig->request('feed/timeline/')
             ->setSignedPost(false)
+            ->setIsBodyCompressed(true)
             //->addHeader('X-CM-Bandwidth-KBPS', '-1.000')
             //->addHeader('X-CM-Latency', '0.000')
             ->addHeader('X-Ads-Opt-Out', '0')
@@ -231,7 +232,10 @@ class Timeline extends RequestCollection
             ->addPost('will_sound_on', '1')
             ->addPost('is_on_screen', 'true')
             ->addPost('timezone_offset', date('Z'))
-            ->addPost('is_async_ads', (string) (int) $asyncAds)
+            ->addPost('is_async_ads_in_headload_enabled', (string) (int) ($asyncAds && $this->ig->isExperimentEnabled(
+                    'ig_android_ad_async_ads_universe',
+                    'is_async_ads_in_headload_enabled'
+                )))
             ->addPost('is_async_ads_double_request', (string) (int) ($asyncAds && $this->ig->isExperimentEnabled(
                 'ig_android_ad_async_ads_universe',
                 'is_double_request_enabled'
@@ -319,7 +323,9 @@ class Timeline extends RequestCollection
         $userId,
         $maxId = null)
     {
-        $request = $this->ig->request("feed/user/{$userId}/");
+        $request = $this->ig->request("feed/user/{$userId}/")
+            ->addParam('exclude_comment', true)
+            ->addParam('only_fetch_first_carousel_media', false);
 
         if ($maxId !== null) {
             $request->addParam('max_id', $maxId);
@@ -362,11 +368,10 @@ class Timeline extends RequestCollection
      * Marking media as "archived" will hide it from everyone except yourself.
      * You can unmark the media again at any time, to make it public again.
      *
-     * @param string     $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string|int $mediaType The type of the media item you are deleting. One of: "PHOTO", "VIDEO"
-     *                              "CAROUSEL", or the raw value of the Item's "getMediaType()" function.
-     * @param bool       $onlyMe    If true, archives your media so that it's only visible to you.
-     *                              Otherwise, if false, makes the media public to everyone again.
+     * @param string $mediaId The media ID in Instagram's internal format (ie "3482384834_43294").
+     *                        "ALBUM", or the raw value of the Item's "getMediaType()" function.
+     * @param bool   $onlyMe  If true, archives your media so that it's only visible to you.
+     *                        Otherwise, if false, makes the media public to everyone again.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -375,29 +380,11 @@ class Timeline extends RequestCollection
      */
     public function archiveMedia(
         $mediaId,
-        $mediaType = 'PHOTO',
         $onlyMe = true)
     {
-        $mediaType = Utils::checkMediaType($mediaType);
-
         $endpoint = $onlyMe ? 'only_me' : 'undo_only_me';
-        switch ($mediaType) {
-        case 'PHOTO':
-            $mediaCode = 1;
-            break;
-        case 'VIDEO':
-            $mediaCode = 2;
-            break;
-        case 'CAROUSEL':
-            $mediaCode = 8;
-            break;
-        default:
-            throw new \InvalidArgumentException(sprintf('Unknown media type (%s).', $mediaType));
-            break;
-        }
 
         return $this->ig->request("media/{$mediaId}/{$endpoint}/")
-            ->addParam('media_type', $mediaCode)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())

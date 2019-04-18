@@ -61,6 +61,7 @@ class Account extends RequestCollection
             ->addPost('raw_text', $biography)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
+            ->addPost('device_id', $this->ig->device_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\UserInfoResponse());
     }
@@ -125,30 +126,8 @@ class Account extends RequestCollection
             ->addPost('biography', $biography)
             ->addPost('email', $email)
             ->addPost('gender', $gender)
+            ->addPost('device_id', $this->ig->device_id)
             ->getResponse(new Response\UserInfoResponse());
-    }
-
-    /**
-     * Set your account's name and phone.
-     *
-     * @param string $name  Your name.
-     * @param string $phone Your phone number (optional).
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\GenericResponse
-     */
-    public function setNameAndPhone(
-        $name = '',
-        $phone = '')
-    {
-        return $this->ig->request('accounts/set_phone_and_name/')
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_uid', $this->ig->account_id)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('first_name', $name)
-            ->addPost('phone_number', $phone)
-            ->getResponse(new Response\GenericResponse());
     }
 
     /**
@@ -680,8 +659,8 @@ class Account extends RequestCollection
         return $this->ig->request('accounts/contact_point_prefill/')
             ->setNeedsAuth(false)
             ->addPost('phone_id', $this->ig->phone_id)
-            ->addPost('usage', $usage)
             ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('usage', $usage)
             ->getResponse(new Response\GenericResponse());
     }
 
@@ -695,6 +674,7 @@ class Account extends RequestCollection
     public function getBadgeNotifications()
     {
         return $this->ig->request('notifications/badge/')
+            ->setSignedPost(false)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('users_ids', $this->ig->account_id)

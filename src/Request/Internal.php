@@ -303,7 +303,7 @@ class Internal extends RequestCollection
                     ->addPost('upload_id', $uploadId);
 
                 if (is_string($link) && Utils::hasValidWebURLSyntax($link)) {
-                    $story_cta = '[{"links":[{"webUri":'.json_encode($link).'}]}]';
+                    $story_cta = '[{"links":[{"linkType": 1, "webUri":'.json_encode($link).', "androidClass": "", "package": "", "deeplinkUri": "", "callToActionTitle": "", "redirectUri": null, "leadGenFormId": "", "igUserId": "", "appInstallObjectiveInvalidationBehavior": null}]}]';
                     $request->addPost('story_cta', $story_cta);
                 }
                 if ($hashtags !== null && $captionText !== '') {
@@ -713,7 +713,7 @@ class Internal extends RequestCollection
                     ->addPost('client_timestamp', time());
 
                 if (is_string($link) && Utils::hasValidWebURLSyntax($link)) {
-                    $story_cta = '[{"links":[{"webUri":'.json_encode($link).'}]}]';
+                    $story_cta = '[{"links":[{"linkType": 1, "webUri":'.json_encode($link).', "androidClass": "", "package": "", "deeplinkUri": "", "callToActionTitle": "", "redirectUri": null, "leadGenFormId": "", "igUserId": "", "appInstallObjectiveInvalidationBehavior": null}]}]';
                     $request->addPost('story_cta', $story_cta);
                 }
                 if ($hashtags !== null && $captionText !== '') {
@@ -1358,6 +1358,7 @@ class Internal extends RequestCollection
      *                                        If NULL, we automatically use the
      *                                        user's profile ID from each Item
      *                                        object as the source ID.
+     * @param string                $module   Module where the story was found.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -1370,7 +1371,8 @@ class Internal extends RequestCollection
      */
     public function markStoryMediaSeen(
         array $items,
-        $sourceId = null)
+        $sourceId = null,
+        $module = 'feed_timeline')
     {
         // Build the list of seen media, with human randomization of seen-time.
         $reels = [];
@@ -1413,11 +1415,17 @@ class Internal extends RequestCollection
 
         return $this->ig->request('media/seen/')
             ->setVersion(2)
+            ->setIsBodyCompressed(true)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('container_module', $module)
             ->addPost('reels', $reels)
+            ->addPost('reel_media_skipped', [])
             ->addPost('live_vods', [])
+            ->addPost('live_vods_skipped', [])
+            ->addPost('nuxes', [])
+            ->addPost('nuxes_skipped', [])
             ->addParam('reel', 1)
             ->addParam('live_vod', 0)
             ->getResponse(new Response\MediaSeenResponse());

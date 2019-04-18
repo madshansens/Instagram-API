@@ -28,10 +28,11 @@ class Shopping extends RequestCollection
         $merchantId,
         $deviceWidth = 720)
     {
-        return $this->ig->request("commerce/products/{$productId}/")
-            ->addParam('media_id', $mediaId)
+        return $this->ig->request("commerce/products/{$productId}/details/")
+            ->addParam('source_media_id', $mediaId)
             ->addParam('merchant_id', $merchantId)
             ->addParam('device_width', $deviceWidth)
+            ->addParam('hero_carousel_enabled', false)
             ->getResponse(new Response\OnTagProductResponse());
     }
 

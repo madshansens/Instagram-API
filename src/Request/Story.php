@@ -126,8 +126,9 @@ class Story extends RequestCollection
         return $this->ig->request('feed/reels_tray/')
             ->setSignedPost(false)
             ->addPost('supported_capabilities_new', json_encode(Constants::SUPPORTED_CAPABILITIES))
-            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('reason', 'pull_to_refresh')
             ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uuid', $this->ig->uuid)
             ->getResponse(new Response\ReelsTrayFeedResponse());
     }
 
@@ -176,6 +177,7 @@ class Story extends RequestCollection
         $userId)
     {
         return $this->ig->request("feed/user/{$userId}/story/")
+            ->addParam('supported_capabilities_new', json_encode(Constants::SUPPORTED_CAPABILITIES))
             ->getResponse(new Response\UserStoryFeedResponse());
     }
 
@@ -231,7 +233,10 @@ class Story extends RequestCollection
     public function getArchivedStoriesFeed()
     {
         return $this->ig->request('archive/reel/day_shells/')
+            ->addParam('include_suggested_highlights', false)
+            ->addParam('is_in_archive_home', true)
             ->addParam('include_cover', 0)
+            ->addParam('timezone_offset', date('Z'))
             ->getResponse(new Response\ArchivedStoriesFeedResponse());
     }
 

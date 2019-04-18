@@ -346,6 +346,7 @@ class People extends RequestCollection
     {
         Utils::throwIfInvalidRankToken($rankToken);
         $request = $this->ig->request("friendships/{$userId}/following/")
+            ->addParam('includes_hashtags', true)
             ->addParam('rank_token', $rankToken);
         if ($searchQuery !== null) {
             $request->addParam('query', $searchQuery);
@@ -617,7 +618,8 @@ class People extends RequestCollection
      * another one to search again, otherwise you will just keep getting the
      * same response about your currently linked address book every time!
      *
-     * @param array $contacts
+     * @param array  $contacts
+     * @param string $module
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -626,13 +628,18 @@ class People extends RequestCollection
      * @see People::unlinkAddressBook()
      */
     public function linkAddressBook(
-        array $contacts)
+        array $contacts,
+        $module = 'find_friends_contacts')
     {
         return $this->ig->request('address_book/link/')
+            ->setIsBodyCompressed(true)
             ->setSignedPost(false)
+            ->addPost('phone_id', $this->ig->phone_id)
+            ->addPost('module', $module)
             ->addPost('contacts', json_encode($contacts))
-            ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('device_id', $this->ig->device_id)
+            ->addPost('_uuid', $this->ig->uuid)
             ->getResponse(new Response\LinkAddressBookResponse());
     }
 
@@ -778,6 +785,7 @@ class People extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('user_id', $userId)
             ->addPost('radio_type', 'wifi-none')
+            ->addPost('device_id', $this->ig->device_id)
             ->getResponse(new Response\FriendshipResponse());
     }
 

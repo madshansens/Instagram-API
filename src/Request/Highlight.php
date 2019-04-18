@@ -31,8 +31,8 @@ class Highlight extends RequestCollection
         return $this->ig->request("highlights/{$userId}/highlights_tray/")
             ->addParam('supported_capabilities_new', json_encode(Constants::SUPPORTED_CAPABILITIES))
             ->addParam('phone_id', $this->ig->phone_id)
-            ->addParam('battery_level', mt_rand(25, 100))
-            ->addParam('is_charging', '0')
+            ->addParam('battery_level', '100')
+            ->addParam('is_charging', '1')
             ->addParam('will_sound_on', '1')
             ->getResponse(new Response\HighlightFeedResponse());
     }

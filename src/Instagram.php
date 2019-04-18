@@ -494,6 +494,7 @@ class Instagram implements ExperimentsInterface
             try {
                 $response = $this->request('accounts/login/')
                     ->setNeedsAuth(false)
+                    ->addPost('country_codes', '[{"country_code":"1","source":["default","sim"]}]')
                     ->addPost('phone_id', $this->phone_id)
                     ->addPost('_csrftoken', $this->client->getToken())
                     ->addPost('username', $this->username)
@@ -501,6 +502,7 @@ class Instagram implements ExperimentsInterface
                     ->addPost('guid', $this->uuid)
                     ->addPost('device_id', $this->device_id)
                     ->addPost('password', $this->password)
+                    ->addPost('google_tokens', '[]')
                     ->addPost('login_attempt_count', 0)
                     ->getResponse(new Response\LoginResponse());
             } catch (\InstagramAPI\Exception\InstagramException $e) {
@@ -1151,6 +1153,7 @@ class Instagram implements ExperimentsInterface
     public function logout()
     {
         $response = $this->request('accounts/logout/')
+            ->setSignedPost(false)
             ->addPost('phone_id', $this->phone_id)
             ->addPost('_csrftoken', $this->client->getToken())
             ->addPost('guid', $this->uuid)
