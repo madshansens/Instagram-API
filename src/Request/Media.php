@@ -35,7 +35,7 @@ class Media extends RequestCollection
      *
      * @param string     $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param string|int $mediaType The type of the media item you are deleting. One of: "PHOTO", "VIDEO"
-     *                              "ALBUM", or the raw value of the Item's "getMediaType()" function.
+     *                              "CAROUSEL", or the raw value of the Item's "getMediaType()" function.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -69,7 +69,7 @@ class Media extends RequestCollection
      *                                "location" - a Location model object to set the media location,
      *                                or boolean FALSE to remove any location from the media.
      * @param string|int $mediaType   The type of the media item you are editing. One of: "PHOTO", "VIDEO"
-     *                                "ALBUM", or the raw value of the Item's "getMediaType()" function.
+     *                                "CAROUSEL", or the raw value of the Item's "getMediaType()" function.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -116,7 +116,7 @@ class Media extends RequestCollection
                     ->addPost('media_latitude', $metadata['location']->getLat())
                     ->addPost('media_longitude', $metadata['location']->getLng());
 
-                if ($mediaType === 'ALBUM') { // Albums need special handling.
+                if ($mediaType === 'CAROUSEL') { // Albums need special handling.
                     $request
                         ->addPost('exif_latitude', 0.0)
                         ->addPost('exif_longitude', 0.0);

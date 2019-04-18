@@ -1167,11 +1167,11 @@ class Utils
      * Checks and validates a media item's type.
      *
      * @param string|int $mediaType The type of the media item. One of: "PHOTO", "VIDEO"
-     *                              "ALBUM", or the raw value of the Item's "getMediaType()" function.
+     *                              "CAROUSEL", or the raw value of the Item's "getMediaType()" function.
      *
      * @throws \InvalidArgumentException If the type is invalid.
      *
-     * @return string The verified final type; either "PHOTO", "VIDEO" or "ALBUM".
+     * @return string The verified final type; either "PHOTO", "VIDEO" or "CAROUSEL".
      */
     public static function checkMediaType(
         $mediaType)
@@ -1181,11 +1181,11 @@ class Utils
                 $mediaType = 'PHOTO';
             } elseif ($mediaType == Item::VIDEO) {
                 $mediaType = 'VIDEO';
-            } elseif ($mediaType == Item::ALBUM) {
-                $mediaType = 'ALBUM';
+            } elseif ($mediaType == Item::CAROUSEL) {
+                $mediaType = 'CAROUSEL';
             }
         }
-        if (!in_array($mediaType, ['PHOTO', 'VIDEO', 'ALBUM'], true)) {
+        if (!in_array($mediaType, ['PHOTO', 'VIDEO', 'CAROUSEL'], true)) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a valid media type.', $mediaType));
         }
 

@@ -227,8 +227,8 @@ class Timeline extends RequestCollection
             ->addPost('phone_id', $this->ig->phone_id)
             ->addPost('device_id', $this->ig->uuid)
             ->addPost('client_session_id', $this->ig->session_id)
-            ->addPost('battery_level', '100')
-            ->addPost('is_charging', '1')
+            ->addPost('battery_level', mt_rand(25, 100))
+            ->addPost('is_charging', '0')
             ->addPost('will_sound_on', '1')
             ->addPost('is_on_screen', 'true')
             ->addPost('timezone_offset', date('Z'))
@@ -434,7 +434,7 @@ class Timeline extends RequestCollection
             $mediaFiles = []; // Reset queue.
             foreach ($myTimeline->getItems() as $item) {
                 $itemDate = date('Y-m-d \a\t H.i.s O', $item->getTakenAt());
-                if ($item->getMediaType() == Response\Model\Item::ALBUM) {
+                if ($item->getMediaType() == Response\Model\Item::CAROUSEL) {
                     // Albums contain multiple items which must all be queued.
                     // NOTE: We won't name them by their subitem's getIds, since
                     // those Ids have no meaning outside of the album and they

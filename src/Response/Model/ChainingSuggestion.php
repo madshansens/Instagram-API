@@ -96,7 +96,7 @@ namespace InstagramAPI\Response\Model;
  * @method bool getPermission()
  * @method string getPhoneNumber()
  * @method string getPk()
- * @method string getProfileChainingSecondaryLabel()
+ * @method mixed getProfileChainingSecondaryLabel()
  * @method mixed getProfileContext()
  * @method Link[] getProfileContextLinksWithUserIds()
  * @method string[] getProfileContextMutualFollowIds()
@@ -340,7 +340,7 @@ namespace InstagramAPI\Response\Model;
  * @method $this setPermission(bool $value)
  * @method $this setPhoneNumber(string $value)
  * @method $this setPk(string $value)
- * @method $this setProfileChainingSecondaryLabel(string $value)
+ * @method $this setProfileChainingSecondaryLabel(mixed $value)
  * @method $this setProfileContext(mixed $value)
  * @method $this setProfileContextLinksWithUserIds(Link[] $value)
  * @method $this setProfileContextMutualFollowIds(string[] $value)
@@ -498,9 +498,6 @@ class ChainingSuggestion extends User
 {
     const JSON_PROPERTY_MAP = [
        'chaining_info'                    => 'ChainingInfo',
-       /*
-        * This currently always contains the same value as "full_name".
-        */
-       'profile_chaining_secondary_label' => 'string',
+       'profile_chaining_secondary_label' => '',
    ];
 }
