@@ -259,9 +259,9 @@ class Location extends RequestCollection
     }
 
     /**
-     * Mark LocationFeedResponse story media items as seen.
+     * Mark LocationStoryResponse story media items as seen.
      *
-     * The "story" property of a `LocationFeedResponse` only gives you a
+     * The "story" property of a `LocationStoryResponse` only gives you a
      * list of story media. It doesn't actually mark any stories as "seen",
      * so the user doesn't know that you've seen their story. Actually
      * marking the story as "seen" is done via this endpoint instead. The
@@ -273,16 +273,16 @@ class Location extends RequestCollection
      * if you request the same location feed multiple times.
      *
      * Tip: You can pass in the whole "getItems()" array from the location's
-     * "story" property, to easily mark all of the LocationFeedResponse's story
+     * "story" property, to easily mark all of the LocationStoryResponse's story
      * media items as seen.
      *
-     * @param Response\LocationFeedResponse $locationFeed The location feed
-     *                                                    response object which
-     *                                                    the story media items
-     *                                                    came from. The story
-     *                                                    items MUST belong to it.
-     * @param Response\Model\Item[]         $items        Array of one or more
-     *                                                    story media Items.
+     * @param Response\LocationStoryResponse $locationFeed The location feed
+     *                                                     response object which
+     *                                                     the story media items
+     *                                                     came from. The story
+     *                                                     items MUST belong to it.
+     * @param Response\Model\Item[]          $items        Array of one or more
+     *                                                     story media Items.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -293,7 +293,7 @@ class Location extends RequestCollection
      * @see Hashtag::markStoryMediaSeen()
      */
     public function markStoryMediaSeen(
-        Response\LocationFeedResponse $locationFeed,
+        Response\LocationStoryResponse $locationFeed,
         array $items)
     {
         // Extract the Location Story-Tray ID from the user's location response.
@@ -304,7 +304,7 @@ class Location extends RequestCollection
             $sourceId = $locationFeed->getStory()->getId();
         }
         if (!strlen($sourceId)) {
-            throw new \InvalidArgumentException('Your provided LocationFeedResponse is invalid and does not contain any Location Story-Tray ID.');
+            throw new \InvalidArgumentException('Your provided LocationStoryResponse is invalid and does not contain any Location Story-Tray ID.');
         }
 
         // Ensure they only gave us valid items for this location response.
@@ -317,7 +317,7 @@ class Location extends RequestCollection
             // NOTE: We only check Items here. Other data is rejected by Internal.
             if ($item instanceof Response\Model\Item && !isset($validIds[$item->getId()])) {
                 throw new \InvalidArgumentException(sprintf(
-                    'The item with ID "%s" does not belong to this LocationFeedResponse.',
+                    'The item with ID "%s" does not belong to this LocationStoryResponse.',
                     $item->getId()
                 ));
             }
