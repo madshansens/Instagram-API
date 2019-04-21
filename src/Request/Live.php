@@ -205,6 +205,30 @@ class Live extends RequestCollection
     }
 
     /**
+     * Asks a question to the host of the broadcast.
+     *
+     * Note: This function is only used by the viewers of a broadcast.
+     *
+     * @param string $broadcastId  The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param string $questionText Your question text.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function question(
+        $broadcastId,
+        $questionText)
+    {
+        return $this->ig->request("live/{$broadcastId}/questions")
+            ->setSignedPost(false)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('text', $questionText)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
      * Get all received responses from a story question.
      *
      * @throws \InstagramAPI\Exception\InstagramException
