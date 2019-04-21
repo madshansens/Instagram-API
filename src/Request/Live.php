@@ -205,7 +205,7 @@ class Live extends RequestCollection
     }
 
     /**
-     * Get all received questions in live broadcasts.
+     * Get all received responses from a story question.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -218,7 +218,7 @@ class Live extends RequestCollection
     }
 
     /**
-     * Get questions from a current live broadcast.
+     * Get all received responses from the current broadcast and a story question.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
      *
@@ -230,7 +230,7 @@ class Live extends RequestCollection
         $broadcastId)
     {
         return $this->ig->request("live/{$broadcastId}/questions/")
-            ->addParam('sources', 'story')
+            ->addParam('sources', 'story_and_live')
             ->getResponse(new Response\BroadcastQuestionsResponse());
     }
 
