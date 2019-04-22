@@ -20,54 +20,13 @@ class Live extends RequestCollection
      */
     public function getSuggestedBroadcasts()
     {
-        return $this->ig->request('live/get_suggested_broadcasts/')
+        $endpoint = 'live/get_suggested_broadcasts/';
+        if ($this->ig->isExperimentEnabled('ig_android_live_suggested_live_expansion', 'is_enabled')) {
+            $endpoint = 'live/get_suggested_live_and_post_live/';
+        }
+
+        return $this->ig->request($endpoint)
             ->getResponse(new Response\SuggestedBroadcastsResponse());
-    }
-
-    /**
-     * Get top live broadcasts.
-     *
-     * @param string|null $maxId Next "maximum ID", used for pagination.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\DiscoverTopLiveResponse
-     */
-    public function getDiscoverTopLive(
-        $maxId = null)
-    {
-        $request = $this->ig->request('discover/top_live/');
-        if ($maxId !== null) {
-            $request->addParam('max_id', $maxId);
-        }
-
-        return $request->getResponse(new Response\DiscoverTopLiveResponse());
-    }
-
-    /**
-     * Get status for a list of top broadcast ids.
-     *
-     * @param string|string[] $broadcastIds One or more numeric broadcast IDs.
-     *
-     * @throws \InstagramAPI\Exception\InstagramException
-     *
-     * @return \InstagramAPI\Response\TopLiveStatusResponse
-     */
-    public function getTopLiveStatus(
-        $broadcastIds)
-    {
-        if (!is_array($broadcastIds)) {
-            $broadcastIds = [$broadcastIds];
-        }
-
-        foreach ($broadcastIds as &$value) {
-            $value = (string) $value;
-        }
-        unset($value); // Clear reference.
-
-        return $this->ig->request('discover/top_live_status/')
-            ->addPost('broadcast_ids', $broadcastIds) // Must be string[] array.
-            ->getResponse(new Response\TopLiveStatusResponse());
     }
 
     /**
