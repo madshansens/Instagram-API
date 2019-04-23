@@ -393,6 +393,31 @@ class Story extends RequestCollection
     }
 
     /**
+     * Get all responses of a story question.
+     *
+     * @param string      $storyId    The story media item's ID in Instagram's internal format (ie "1542304813904481224_6112344004").
+     * @param string      $questionId The question ID in Instagram's internal format (ie "17956159684032257").
+     * @param string|null $maxId      Next "maximum ID", used for pagination.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\StoryAnswersResponse
+     */
+    public function getStoryAnswers(
+         $storyId,
+         $questionId,
+         $maxId = null)
+    {
+        $request = $this->ig->request("media/{$storyId}/{$questionId}/story_question_responses/");
+
+        if ($maxId !== null) {
+            $request->addParam('max_id', $maxId);
+        }
+
+        return $request->getResponse(new Response\StoryAnswersResponse());
+    }
+
+    /**
      * Gets the created story countdowns of the current account.
      *
      * @throws \InstagramAPI\Exception\InstagramException
