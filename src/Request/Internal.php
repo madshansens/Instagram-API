@@ -1061,7 +1061,7 @@ class Internal extends RequestCollection
     {
         $request = $this->ig->request('launcher/sync/')
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('configs', '');
+            ->addPost('configs', 'ig_android_felix_release_players,ig_user_mismatch_soft_error,ig_android_os_version_blocking_config,ig_android_carrier_signals_killswitch,fizz_ig_android,ig_mi_block_expired_events,ig_android_killswitch_perm_direct_ssim,ig_fbns_blocked');
         if ($prelogin) {
             $request
                 ->setNeedsAuth(false)
