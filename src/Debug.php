@@ -56,11 +56,12 @@ class Debug
     public static function printPostData(
         $post)
     {
+        $gzip = 0 === mb_strpos($post, "\x1f" . "\x8b" . "\x08", 0, "US-ASCII");
         if (PHP_SAPI === 'cli') {
-            $dat = Utils::colouredString('DATA: ', 'yellow');
+            $dat = Utils::colouredString(($gzip ? 'DECODED ' : '') . 'DATA: ', 'yellow');
         } else {
             $dat = 'DATA: ';
         }
-        echo $dat.urldecode($post)."\n";
+        echo $dat.urldecode(($gzip ? zlib_decode($post) : $post))."\n";
     }
 }
