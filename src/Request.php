@@ -665,7 +665,7 @@ class Request
         }
 
         if ($this->_isBodyCompressed) {
-            return stream_for(zlib_encode((string) $this->_body, ZLIB_ENCODING_GZIP));
+            return stream_for(zlib_encode((string) $result, ZLIB_ENCODING_GZIP));
         }
 
         return $result;
