@@ -124,6 +124,9 @@ class Live extends RequestCollection
     /**
      * Get a live broadcast's join request counts.
      *
+     * Note: This request **will** return null if there have been no pending
+     * join requests have been made. Please have your code check for null.
+     *
      * @param string $broadcastId    The broadcast ID in Instagram's internal format (ie "17854587811139572").
      * @param int    $lastTotalCount Last join request count (optional).
      * @param int    $lastSeenTs     Last seen timestamp (optional).
@@ -131,7 +134,7 @@ class Live extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return \InstagramAPI\Response\BroadcastJoinRequestCountResponse
+     * @return null|\InstagramAPI\Response\BroadcastJoinRequestCountResponse
      */
     public function getJoinRequestCounts(
         $broadcastId,
@@ -139,11 +142,15 @@ class Live extends RequestCollection
         $lastSeenTs = 0,
         $lastFetchTs = 0)
     {
-        return $this->ig->request("live/{$broadcastId}/get_join_request_counts/")
-            ->addParam('last_total_count', $lastTotalCount)
-            ->addParam('last_seen_ts', $lastSeenTs)
-            ->addParam('last_fetch_ts', $lastFetchTs)
-            ->getResponse(new Response\BroadcastJoinRequestCountResponse());
+        try {
+            return $this->ig->request("live/{$broadcastId}/get_join_request_counts/")
+                ->addParam('last_total_count', $lastTotalCount)
+                ->addParam('last_seen_ts', $lastSeenTs)
+                ->addParam('last_fetch_ts', $lastFetchTs)
+                ->getResponse(new Response\BroadcastJoinRequestCountResponse());
+        } catch (\InstagramAPI\Exception\EmptyResponseException $e) {
+            return null;
+        }
     }
 
     /**

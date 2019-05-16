@@ -35,7 +35,7 @@ class BroadcastJoinRequestCountResponse extends Response
         'fetch_ts'            => 'string',
         'num_total_requests'  => 'int',
         'num_new_requests'    => 'int',
-        'users'               => 'User[]',
+        'users'               => 'Model\User[]',
         'num_unseen_requests' => 'int',
     ];
 }
