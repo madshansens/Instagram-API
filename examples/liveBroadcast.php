@@ -87,7 +87,7 @@ try {
 
         // Check to see if the livestream has been flagged for a policy violation.
         if ($heartbeatResponse->isIsPolicyViolation() && (int) $heartbeatResponse->getIsPolicyViolation() === 1) {
-            echo 'Instagram has flagged your content as a policy violation with the following reason: '.($heartbeatResponse->getPolicyViolationReason() == null ? "Unknown" : $heartbeatResponse->getPolicyViolationReason())."\n";
+            echo 'Instagram has flagged your content as a policy violation with the following reason: '.($heartbeatResponse->getPolicyViolationReason() == null ? 'Unknown' : $heartbeatResponse->getPolicyViolationReason())."\n";
             // Change this to false if disagree with the policy violation and would would like to continue streaming.
             // - Note: In this example, the violation is always accepted.
             //   In your use case, you may want to prompt the user if
