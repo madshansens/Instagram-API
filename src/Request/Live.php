@@ -122,6 +122,31 @@ class Live extends RequestCollection
     }
 
     /**
+     * Get a live broadcast's join request counts.
+     *
+     * @param string $broadcastId    The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param int    $lastTotalCount Last join request count (optional).
+     * @param int    $lastSeenTs     Last seen timestamp (optional).
+     * @param int    $lastFetchTs    Last fetch timestamp (optional).
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\BroadcastJoinRequestCountResponse
+     */
+    public function getJoinRequestCounts(
+        $broadcastId,
+        $lastTotalCount = 0,
+        $lastSeenTs = 0,
+        $lastFetchTs = 0)
+    {
+        return $this->ig->request("live/{$broadcastId}/get_join_request_counts/")
+            ->addParam('last_total_count', $lastTotalCount)
+            ->addParam('last_seen_ts', $lastSeenTs)
+            ->addParam('last_fetch_ts', $lastFetchTs)
+            ->getResponse(new Response\BroadcastJoinRequestCountResponse());
+    }
+
+    /**
      * Show question in a live broadcast.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
@@ -542,7 +567,7 @@ class Live extends RequestCollection
      * which was assigned to you in the `create()` response.
      *
      * @param string $broadcastId      The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param bool   $copyrightWarning True when broadcast is ended via a copyright notice.
+     * @param bool   $copyrightWarning True when broadcast is ended via a copyright notice (optional).
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
