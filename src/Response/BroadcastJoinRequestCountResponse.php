@@ -28,7 +28,6 @@ use InstagramAPI\Response;
  * @method $this unsetNumUnseenRequests()
  * @method $this unsetUsers()
  */
-
 class BroadcastJoinRequestCountResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
