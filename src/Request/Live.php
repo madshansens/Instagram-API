@@ -561,6 +561,28 @@ class Live extends RequestCollection
     }
 
     /**
+     * Acknowledges a copyright warning from Instagram after detected via a heartbeat request.
+     *
+     * `NOTE:` It is recommended that you view the `liveBroadcast` example
+     * to see the proper usage of this function.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    public function resumeBroadcastAfterContentMatch(
+        $broadcastId)
+    {
+        return $this->ig->request("live/{$broadcastId}/resume_broadcast_after_content_match/")
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uid', $this->ig->account_id)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->getResponse(new Response\GenericResponse());
+    }
+
+    /**
      * End a live broadcast.
      *
      * `NOTE:` To end your broadcast, you MUST use the `broadcast_id` value
