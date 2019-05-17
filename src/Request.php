@@ -5,11 +5,11 @@ namespace InstagramAPI;
 use GuzzleHttp\Psr7\MultipartStream;
 use GuzzleHttp\Psr7\Request as HttpRequest;
 use GuzzleHttp\Psr7\Stream;
-use function GuzzleHttp\Psr7\stream_for;
 use InstagramAPI\Exception\InstagramException;
 use InstagramAPI\Exception\LoginRequiredException;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use function GuzzleHttp\Psr7\stream_for;
 
 /**
  * Bridge between Instagram Client calls, the object mapper & response objects.
