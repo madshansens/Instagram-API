@@ -134,7 +134,7 @@ class Live extends RequestCollection
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
-     * @return null|\InstagramAPI\Response\BroadcastJoinRequestCountResponse
+     * @return \InstagramAPI\Response\BroadcastJoinRequestCountResponse|null
      */
     public function getJoinRequestCounts(
         $broadcastId,
