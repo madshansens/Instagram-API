@@ -557,12 +557,14 @@ class Live extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\StartLiveResponse());
 
-        $this->ig->request("live/{$broadcastId}/question_status/")
-            ->setSignedPost(false)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('allow_question_submission', true)
-            ->getResponse(new Response\GenericResponse());
+        if ($this->ig->isExperimentEnabled('ig_android_live_qa_broadcaster_v1_universe', 'is_enabled')) {
+            $this->ig->request("live/{$broadcastId}/question_status/")
+                ->setSignedPost(false)
+                ->addPost('_csrftoken', $this->ig->client->getToken())
+                ->addPost('_uuid', $this->ig->uuid)
+                ->addPost('allow_question_submission', true)
+                ->getResponse(new Response\GenericResponse());
+        }
 
         return $response;
     }
