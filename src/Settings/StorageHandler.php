@@ -87,6 +87,8 @@ class StorageHandler
         'ig_android_skip_get_fbupload_photo_universe',
         'ig_android_skip_get_fbupload_universe',
         'ig_android_loom_universe',
+        'ig_android_live_suggested_live_expansion',
+        'ig_android_live_qa_broadcaster_v1_universe',
     ];
 
     /**
