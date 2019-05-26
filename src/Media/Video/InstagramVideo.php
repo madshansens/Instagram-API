@@ -99,8 +99,13 @@ class InstagramVideo extends InstagramMedia
         Dimensions $canvas,
         $outputFile)
     {
+        // ffmpeg has a bug - https://trac.ffmpeg.org/ticket/6370 - it preserves rotate tag
+        // in the output video when the input video has display matrix with rotate
+        // and rotation was overridden manually.
+        $shouldAutorotate = $this->_ffmpeg->hasNoAutorotate() && $this->_details->hasRotationMatrix();
+
         // Swap to correct dimensions if the video pixels are stored rotated.
-        if ($this->_details->hasSwappedAxes()) {
+        if (!$shouldAutorotate && $this->_details->hasSwappedAxes()) {
             $srcRect = $srcRect->withSwappedAxes();
             $dstRect = $dstRect->withSwappedAxes();
             $canvas = $canvas->withSwappedAxes();
@@ -114,23 +119,22 @@ class InstagramVideo extends InstagramMedia
             sprintf('pad=w=%d:h=%d:x=%d:y=%d:color=%s', $canvas->getWidth(), $canvas->getHeight(), $dstRect->getX(), $dstRect->getY(), $bgColor),
         ];
 
+        // Rotate the video (if needed to).
+        $rotationFilters = $this->_getRotationFilters();
+        $noAutorotate = false;
+        if (!empty($rotationFilters) && !$shouldAutorotate) {
+            $filters = array_merge($filters, $rotationFilters);
+            $noAutorotate = $this->_ffmpeg->hasNoAutorotate();
+        }
+
         $attempt = 0;
         do {
             ++$attempt;
 
-            // Reset the messageline-array to avoid mixing runs.
-            $ffmpegOutput = [];
-
             // Get the flags to apply to the input file.
             $inputFlags = $this->_getInputFlags($attempt);
-
-            // Rotate the video (if needed to).
-            $rotationFilters = $this->_getRotationFilters();
-            if (count($rotationFilters)) {
-                if ($this->_ffmpeg->hasNoAutorotate()) {
-                    $inputFlags[] = '-noautorotate';
-                }
-                $filters = array_merge($filters, $rotationFilters);
+            if ($noAutorotate) {
+                $inputFlags[] = '-noautorotate';
             }
 
             // Video format can't copy since we always need to re-encode due to video filtering.
