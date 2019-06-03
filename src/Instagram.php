@@ -536,8 +536,7 @@ class Instagram implements ExperimentsInterface
      * regular `login()` function. If you successfully answer their challenge,
      * you will be logged in after this function call.
      *
-     * @param string $username            Your Instagram username.
-     *                                    Email and phone aren't allowed here.
+     * @param string $username            Your Instagram username used for logging
      * @param string $password            Your Instagram password.
      * @param string $twoFactorIdentifier Two factor identifier, obtained in
      *                                    login() response. Format: `123456`.
@@ -547,8 +546,9 @@ class Instagram implements ExperimentsInterface
      *                                    2 is backup codes and 3 is TOTP.
      * @param int    $appRefreshInterval  See `login()` for description of this
      *                                    parameter.
-     * @param int    $usernameHandler     Your Instagram username, used when logging in
-     *                                    with an email using Two Factor login.
+     * @param string $usernameHandler     Instagram username sent in the login response,
+     *                                    Email and phone aren't allowed here.
+     *                                    Default value is the first argument $username
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -596,7 +596,7 @@ class Instagram implements ExperimentsInterface
             ->addPost('verification_code', $verificationCode)
             ->addPost('two_factor_identifier', $twoFactorIdentifier)
             ->addPost('_csrftoken', $this->client->getToken())
-            ->addPost('username', $this->username)
+            ->addPost('username', $username)
             ->addPost('device_id', $this->device_id)
             ->addPost('guid', $this->uuid)
             ->getResponse(new Response\LoginResponse());
@@ -621,6 +621,9 @@ class Instagram implements ExperimentsInterface
      * @param string $password            Your Instagram password.
      * @param string $twoFactorIdentifier Two factor identifier, obtained in
      *                                    `login()` response.
+     * @param string $usernameHandler     Instagram username sent in the login response,
+     *                                    Email and phone aren't allowed here.
+     *                                    Default value is the first argument $username
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -629,7 +632,8 @@ class Instagram implements ExperimentsInterface
     public function sendTwoFactorLoginSMS(
         $username,
         $password,
-        $twoFactorIdentifier)
+        $twoFactorIdentifier,
+        $usernameHandler = null)
     {
         if (empty($username) || empty($password)) {
             throw new \InvalidArgumentException('You must provide a username and password to sendTwoFactorLoginSMS().');
@@ -647,6 +651,8 @@ class Instagram implements ExperimentsInterface
         if ($this->username !== $username || $this->password !== $password) {
             $this->_setUser($username, $password);
         }
+
+        $username = ($usernameHandler !== null) ? $usernameHandler : $username;
 
         return $this->request('accounts/send_two_factor_login_sms/')
             ->setNeedsAuth(false)
