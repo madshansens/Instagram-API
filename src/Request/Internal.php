@@ -249,8 +249,8 @@ class Internal extends RequestCollection
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('edits',
                 [
-                    'crop_original_size'    => [$photoWidth, $photoHeight],
-                    'crop_zoom'             => 1,
+                    'crop_original_size'    => [(float) $photoWidth, (float) $photoHeight],
+                    'crop_zoom'             => 1.0,
                     'crop_center'           => [0.0, -0.0],
                 ])
             ->addPost('device',
@@ -661,6 +661,8 @@ class Internal extends RequestCollection
         $attachedMedia = (isset($externalMetadata['attached_media']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['attached_media'] : null;
         /** @var array Title of the media uploaded to your channel. ONLY TV MEDIA! */
         $title = (isset($externalMetadata['title']) && $targetFeed == Constants::FEED_TV) ? $externalMetadata['title'] : null;
+        /** @var bool Whether or not a preview should be posted to your feed. ONLY TV MEDIA! */
+        $shareToFeed = (isset($externalMetadata['share_to_feed']) && $targetFeed == Constants::FEED_TV) ? $externalMetadata['share_to_feed'] : false;
 
         // Fix very bad external user-metadata values.
         if (!is_string($captionText)) {
@@ -780,6 +782,12 @@ class Internal extends RequestCollection
             case Constants::FEED_TV:
                 if ($title === null) {
                     throw new \InvalidArgumentException('You must provide a title for the media.');
+                }
+                if ($shareToFeed) {
+                    if ($internalMetadata->getVideoDetails()->getDurationInMsec() < 60000) {
+                        throw new \InvalidArgumentException('Your media must be at least a minute long to preview to feed.');
+                    }
+                    $request->addPost('igtv_share_preview_to_feed', '1');
                 }
                 $request
                     ->addPost('title', $title)
