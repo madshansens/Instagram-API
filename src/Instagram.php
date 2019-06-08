@@ -1068,9 +1068,7 @@ class Instagram implements ExperimentsInterface
             //$this->internal->logResurrectAttribution();
             $this->direct->getPresences();
             $this->people->getRecentActivityInbox();
-            if ((int) $this->getExperimentParam('ig_android_loom_universe', 'cpu_sampling_rate_ms', 0) > 0) {
-                $this->internal->getLoomFetchConfig();
-            }
+            $this->internal->getLoomFetchConfig();
             $this->internal->getProfileNotice();
             $this->media->getBlockedMedia();
             //$this->account->getProcessContactPointSignals();
