@@ -129,6 +129,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getSocialContext()
  * @method User[] getSponsorTags()
  * @method Stories getStories()
+ * @method StoryAppAttribution getStoryAppAttribution()
  * @method StoryCountdowns[] getStoryCountdowns()
  * @method StoryCta[] getStoryCta()
  * @method mixed getStoryEvents()
@@ -292,6 +293,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isSocialContext()
  * @method bool isSponsorTags()
  * @method bool isStories()
+ * @method bool isStoryAppAttribution()
  * @method bool isStoryCountdowns()
  * @method bool isStoryCta()
  * @method bool isStoryEvents()
@@ -455,6 +457,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setSocialContext(string $value)
  * @method $this setSponsorTags(User[] $value)
  * @method $this setStories(Stories $value)
+ * @method $this setStoryAppAttribution(StoryAppAttribution $value)
  * @method $this setStoryCountdowns(StoryCountdowns[] $value)
  * @method $this setStoryCta(StoryCta[] $value)
  * @method $this setStoryEvents(mixed $value)
@@ -618,6 +621,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetSocialContext()
  * @method $this unsetSponsorTags()
  * @method $this unsetStories()
+ * @method $this unsetStoryAppAttribution()
  * @method $this unsetStoryCountdowns()
  * @method $this unsetStoryCta()
  * @method $this unsetStoryEvents()
@@ -858,7 +862,8 @@ class Item extends AutoPropertyMapper
         /*
          * HTML color string such as "#812A2A".
          */
-        'dominant_color'                   => 'string',
+        'dominant_color'                              => 'string',
+        'story_app_attribution'                       => 'StoryAppAttribution',
     ];
 
     /**
