@@ -1078,8 +1078,7 @@ class Internal extends RequestCollection
             $request
                 ->addPost('id', $this->ig->account_id)
                 ->addPost('_uuid', $this->ig->uuid)
-                ->addPost('_uid', $this->ig->account_id)
-                ->addPost('_csrftoken', $this->ig->client->getToken());
+                ->addPost('_uid', $this->ig->account_id);
         }
 
         return $request->getResponse(new Response\LauncherSyncResponse());
