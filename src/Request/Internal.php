@@ -1068,7 +1068,6 @@ class Internal extends RequestCollection
         $prelogin)
     {
         $request = $this->ig->request('launcher/sync/')
-            ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('configs', Constants::LAUNCHER_CONFIGS);
         if ($prelogin) {
             $request
@@ -1078,7 +1077,8 @@ class Internal extends RequestCollection
             $request
                 ->addPost('id', $this->ig->account_id)
                 ->addPost('_uuid', $this->ig->uuid)
-                ->addPost('_uid', $this->ig->account_id);
+                ->addPost('_uid', $this->ig->account_id)
+                ->addPost('_csrftoken', $this->ig->client->getToken());
         }
 
         return $request->getResponse(new Response\LauncherSyncResponse());
