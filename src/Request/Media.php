@@ -302,15 +302,18 @@ class Media extends RequestCollection
      *
      * @param string      $mediaId        The media ID in Instagram's internal format (ie "3482384834_43294").
      * @param string      $commentText    Your comment text.
-     * @param string      $replyCommentId (optional) The comment ID you are replying to, if this is a reply (ie "17895795823020906");
+     * @param string|null $replyCommentId (optional) The comment ID you are replying to, if this is a reply (ie "17895795823020906");
      *                                    when replying, your $commentText MUST contain an @-mention at the start (ie "@theirusername Hello!").
-     * @param string|null $module         (optional) From which app module (page) you're performing this action.
-     *                                    "comments_v2_feed_timeline",
-     *                                    "comments_v2_feed_contextual_hashtag",
-     *                                    "comments_v2_photo_view_profile",
-     *                                    "comments_v2_video_view_profile",
-     *                                    "comments_v2_media_view_profile",
-     *                                    "comments_v2_feed_contextual_location".
+     * @param string      $module         (optional) From which app module (page) you're performing this action.
+     *                                    "comments_v2" - In App: clicking on comments button,
+     *                                    "self_comments_v2" - In App: commenting on your own post,
+     *                                    "comments_v2_feed_timeline" - Unknown,
+     *                                    "comments_v2_feed_contextual_hashtag" - Unknown,
+     *                                    "comments_v2_photo_view_profile" - Unknown,
+     *                                    "comments_v2_video_view_profile" - Unknown,
+     *                                    "comments_v2_media_view_profile" - Unknown,
+     *                                    "comments_v2_feed_contextual_location" - Unknown,
+     *                                    "modal_comment_composer_feed_timeline" - In App: clicking on prompt from timeline.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -321,7 +324,7 @@ class Media extends RequestCollection
         $mediaId,
         $commentText,
         $replyCommentId = null,
-        $module = 'comments_feed_timeline')
+        $module = 'comments_v2')
     {
         $request = $this->ig->request("media/{$mediaId}/comment/")
             ->addPost('user_breadcrumb', Utils::generateUserBreadcrumb(mb_strlen($commentText)))
@@ -330,14 +333,11 @@ class Media extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('comment_text', $commentText)
-            ->addPost('containermodule', $module)
+            ->addPost('container_module', $module)
             ->addPost('radio_type', 'wifi-none')
             ->addPost('device_id', $this->ig->device_id);
 
         if ($replyCommentId !== null) {
-            if ($commentText[0] !== '@') {
-                throw new \InvalidArgumentException('When replying to a comment, your text must begin with an @-mention to their username.');
-            }
             $request->addPost('replied_to_comment_id', $replyCommentId);
         }
 
