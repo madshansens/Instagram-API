@@ -53,7 +53,7 @@ class Account extends RequestCollection
     public function setBiography(
         $biography)
     {
-        if (!is_string($biography) || strlen($biography) > 150) {
+        if (!is_string($biography) || mb_strlen($biography, 'utf8') > 150) {
             throw new \InvalidArgumentException('Please provide a 0 to 150 character string as biography.');
         }
 

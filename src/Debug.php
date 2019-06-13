@@ -47,7 +47,7 @@ class Debug
         } else {
             $res = 'RESPONSE: ';
         }
-        if ($truncated && strlen($response) > 1000) {
+        if ($truncated && mb_strlen($response, 'utf8') > 1000) {
             $response = substr($response, 0, 1000).'...';
         }
         echo $res.$response."\n\n";
