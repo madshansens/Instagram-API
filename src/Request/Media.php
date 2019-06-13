@@ -300,11 +300,17 @@ class Media extends RequestCollection
     /**
      * Post a comment on a media item.
      *
-     * @param string $mediaId        The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string $commentText    Your comment text.
-     * @param string $replyCommentId (optional) The comment ID you are replying to, if this is a reply (ie "17895795823020906");
-     *                               when replying, your $commentText MUST contain an @-mention at the start (ie "@theirusername Hello!").
-     * @param string $module         (optional) From which app module (page) you're performing this action.
+     * @param string      $mediaId        The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param string      $commentText    Your comment text.
+     * @param string      $replyCommentId (optional) The comment ID you are replying to, if this is a reply (ie "17895795823020906");
+     *                                    when replying, your $commentText MUST contain an @-mention at the start (ie "@theirusername Hello!").
+     * @param string|null $module         (optional) From which app module (page) you're performing this action.
+     *                                    "comments_v2_feed_timeline",
+     *                                    "comments_v2_feed_contextual_hashtag",
+     *                                    "comments_v2_photo_view_profile",
+     *                                    "comments_v2_video_view_profile",
+     *                                    "comments_v2_media_view_profile",
+     *                                    "comments_v2_feed_contextual_location".
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
