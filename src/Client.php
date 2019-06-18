@@ -6,6 +6,7 @@ use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\HandlerStack;
+use function GuzzleHttp\Psr7\modify_request;
 use InstagramAPI\Exception\InstagramException;
 use InstagramAPI\Exception\LoginRequiredException;
 use InstagramAPI\Exception\ServerMessageThrower;
@@ -14,7 +15,6 @@ use InstagramAPI\Middleware\ZeroRating;
 use LazyJsonMapper\Exception\LazyJsonMapperException;
 use Psr\Http\Message\RequestInterface as HttpRequestInterface;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
-use function GuzzleHttp\Psr7\modify_request;
 
 /**
  * This class handles core API network communication.

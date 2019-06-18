@@ -7,9 +7,9 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * VoiceMedia.
  *
- * @method Item getMedia()
+ * @method DirectThreadItemMedia getMedia()
  * @method bool isMedia()
- * @method $this setMedia(Item $value)
+ * @method $this setMedia(DirectThreadItemMedia $value)
  * @method $this unsetMedia()
  */
 class VoiceMedia extends AutoPropertyMapper

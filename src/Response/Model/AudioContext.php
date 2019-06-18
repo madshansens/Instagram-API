@@ -21,6 +21,5 @@ class AudioContext extends AutoPropertyMapper
     const JSON_PROPERTY_MAP = [
         'audio_src'                            => 'string',
         'duration'                             => 'int',
-
     ];
 }

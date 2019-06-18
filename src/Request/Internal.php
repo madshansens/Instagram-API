@@ -4,6 +4,7 @@ namespace InstagramAPI\Request;
 
 use GuzzleHttp\Psr7\LimitStream;
 use GuzzleHttp\Psr7\Stream;
+use function GuzzleHttp\Psr7\stream_for;
 use InstagramAPI\Constants;
 use InstagramAPI\Exception\CheckpointRequiredException;
 use InstagramAPI\Exception\ConsentRequiredException;
@@ -24,7 +25,6 @@ use InstagramAPI\Response;
 use InstagramAPI\Signatures;
 use InstagramAPI\Utils;
 use Winbox\Args;
-use function GuzzleHttp\Psr7\stream_for;
 
 /**
  * Collection of various INTERNAL library functions.
