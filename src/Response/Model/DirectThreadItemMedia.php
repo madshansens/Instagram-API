@@ -7,6 +7,7 @@ use InstagramAPI\AutoPropertyMapper;
 /**
  * DirectThreadItemMedia.
  *
+ * @method AudioContext getAudio()
  * @method Image_Versions2 getImageVersions2()
  * @method int getMediaType()
  * @method int getOriginalHeight()
@@ -14,6 +15,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method VideoVersions[] getVideoVersions()
  * @method bool isImageVersions2()
  * @method bool isMediaType()
+ * @method bool isAudio()
  * @method bool isOriginalHeight()
  * @method bool isOriginalWidth()
  * @method bool isVideoVersions()
@@ -23,6 +25,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setOriginalWidth(int $value)
  * @method $this setVideoVersions(VideoVersions[] $value)
  * @method $this unsetImageVersions2()
+ * @method $this unsetAudio()
  * @method $this unsetMediaType()
  * @method $this unsetOriginalHeight()
  * @method $this unsetOriginalWidth()
@@ -32,6 +35,7 @@ class DirectThreadItemMedia extends AutoPropertyMapper
 {
     const PHOTO = 1;
     const VIDEO = 2;
+    const AUDIO = 11;
 
     const JSON_PROPERTY_MAP = [
         /*
@@ -44,5 +48,6 @@ class DirectThreadItemMedia extends AutoPropertyMapper
         'video_versions'  => 'VideoVersions[]',
         'original_width'  => 'int',
         'original_height' => 'int',
+        'audio'           => 'AudioContext',
     ];
 }

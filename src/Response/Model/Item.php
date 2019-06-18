@@ -24,6 +24,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool getCanViewMorePreviewComments()
  * @method bool getCanViewerReshare()
  * @method bool getCanViewerSave()
+ * @method AudioContext getAudio()
  * @method Caption getCaption()
  * @method bool getCaptionIsEdited()
  * @method float getCaptionPosition()
@@ -180,6 +181,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isAlgorithm()
  * @method bool isAndroidLinks()
  * @method bool isAttribution()
+ * @method bool isAudio()
  * @method bool isBoostUnavailableReason()
  * @method bool isBoostedStatus()
  * @method bool isCanReply()
@@ -344,6 +346,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setAlgorithm(string $value)
  * @method $this setAndroidLinks(AndroidLinks[] $value)
  * @method $this setAttribution(Attribution $value)
+ * @method $this setAudio(AudioContext $value)
  * @method $this setBoostUnavailableReason(mixed $value)
  * @method $this setBoostedStatus(mixed $value)
  * @method $this setCanReply(bool $value)
@@ -508,6 +511,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetAlgorithm()
  * @method $this unsetAndroidLinks()
  * @method $this unsetAttribution()
+ * @method $this unsetAudio()
  * @method $this unsetBoostUnavailableReason()
  * @method $this unsetBoostedStatus()
  * @method $this unsetCanReply()
@@ -669,6 +673,7 @@ class Item extends AutoPropertyMapper
     const PHOTO = 1;
     const VIDEO = 2;
     const CAROUSEL = 8;
+    const AUDIO = 11;
 
     const JSON_PROPERTY_MAP = [
         /*
@@ -864,6 +869,7 @@ class Item extends AutoPropertyMapper
          */
         'dominant_color'                              => 'string',
         'story_app_attribution'                       => 'StoryAppAttribution',
+        'audio'                                       => 'AudioContext',
     ];
 
     /**

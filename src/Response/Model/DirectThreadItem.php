@@ -144,6 +144,7 @@ class DirectThreadItem extends AutoPropertyMapper
     const LIVE_VIEWER_INVITE = 'live_viewer_invite';
     const PRODUCT_SHARE = 'product_share';
     const VIDEO_CALL_EVENT = 'video_call_event';
+    const VOICE_MEDIA = 'voice_media';
 
     const JSON_PROPERTY_MAP = [
         'item_id'                       => 'string',
@@ -175,5 +176,6 @@ class DirectThreadItem extends AutoPropertyMapper
         'product_share'                 => 'ProductShare',
         'animated_media'                => 'AnimatedMedia',
         'felix_share'                   => 'FelixShare',
+        'voice_media'                   => 'VoiceMedia',
     ];
 }
