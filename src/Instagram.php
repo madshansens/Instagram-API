@@ -3,7 +3,7 @@
 namespace InstagramAPI;
 
 /**
- * Instagram's Private API v5.
+ * Instagram's Private API v6.1.0.
  *
  * TERMS OF USE:
  * - This code is in no way affiliated with, authorized, maintained, sponsored
