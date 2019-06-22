@@ -87,7 +87,6 @@ class TimelineFeedResponse extends Response
         'client_feed_changelist_applied' => 'bool',
         'view_state_version'             => 'string',
         'feed_pill_text'                 => 'string',
-        'client_gap_enforcer_matrix'     => '',
         'client_session_id'              => 'string',
     ];
 }
