@@ -26,6 +26,10 @@ This is Instagram's private API. It has almost all the features the Instagram ap
 ----------
 ## Installation
 
+### Dependencies
+
+Install/enable the required php extentions and depedencies. You can learn how to do so [here](https://github.com/mgp25/Instagram-API/wiki/Dependencies).
+
 ### Using Composer
 
 ```sh
