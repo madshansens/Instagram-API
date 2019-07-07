@@ -67,6 +67,36 @@ class Account extends RequestCollection
     }
 
     /**
+     * Edit your gender.
+     *
+     * WARNING: Remember to also call `editProfile()` *after* using this
+     * function, so that you act like the real app!
+     *
+     * @param string $gender this can be male, female, empty or null for 'prefer not to say' or anything else for custom
+     *
+     * @return \InstagramAPI\Response\UserInfoResponse
+     */
+    public function setGender(
+        $gender = '')
+    {
+        switch (strtolower($gender)) {
+            case 'male':$gender_id = 1; break;
+            case 'female':$gender_id = 2; break;
+            case null:
+            case '':$gender_id = 3; break;
+            default:$gender_id = 4;
+        }
+
+        return $this->ig->request('accounts/set_gender/')
+            ->setSignedPost(false)
+            ->addPost('gender', $gender_id)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('custom_gender', $gender_id === 4 ? $gender : '')
+            ->getResponse(new Response\UserInfoResponse());
+    }
+
+    /**
      * Edit your profile.
      *
      * Warning: You must provide ALL parameters to this function. The values
