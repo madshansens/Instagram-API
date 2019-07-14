@@ -55,8 +55,8 @@ class People extends RequestCollection
      *
      * NOTE: The real app only uses this endpoint for profiles opened via "@mentions".
      *
-     * @param string      $username Username as string (NOT as a numerical ID).
-     * @param string|null $module   From which app module (page) you have opened the profile.
+     * @param string $username Username as string (NOT as a numerical ID).
+     * @param string $module   From which app module (page) you have opened the profile.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -66,14 +66,11 @@ class People extends RequestCollection
      */
     public function getInfoByName(
         $username,
-        $module = null)
+        $module = 'feed_timeline')
     {
-        $request = $this->ig->request("users/{$username}/usernameinfo/");
-        if ($module !== null) {
-            $request->addParam('from_module', $module);
-        }
-
-        return $request->getResponse(new Response\UserInfoResponse());
+        return $this->ig->request("users/{$username}/usernameinfo/")
+            ->addParam('from_module', $module)
+            ->getResponse(new Response\UserInfoResponse());
     }
 
     /**
