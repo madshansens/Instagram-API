@@ -16,7 +16,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getMediaId()
  * @method string getPk()
  * @method bool getShareEnabled()
- * @method mixed getStatus()
+ * @method string getStatus()
  * @method string getText()
  * @method int getType()
  * @method User getUser()
@@ -44,7 +44,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setMediaId(string $value)
  * @method $this setPk(string $value)
  * @method $this setShareEnabled(bool $value)
- * @method $this setStatus(mixed $value)
+ * @method $this setStatus(string $value)
  * @method $this setText(string $value)
  * @method $this setType(int $value)
  * @method $this setUser(User $value)
@@ -67,7 +67,7 @@ use InstagramAPI\AutoPropertyMapper;
 class Caption extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'status'             => '',
+        'status'             => 'string',
         'user_id'            => 'string',
         'created_at_utc'     => 'string',
         'created_at'         => 'string',

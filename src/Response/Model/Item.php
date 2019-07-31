@@ -101,6 +101,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getMainFeedCarouselStartingMediaId()
  * @method int getMaxNumVisiblePreviewComments()
  * @method Media getMedia()
+ * @method mixed getMediaCroppingInfo()
  * @method string getMediaId()
  * @method string[] getMediaIds()
  * @method mixed getMediaInfos()
@@ -269,6 +270,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isMainFeedCarouselStartingMediaId()
  * @method bool isMaxNumVisiblePreviewComments()
  * @method bool isMedia()
+ * @method bool isMediaCroppingInfo()
  * @method bool isMediaId()
  * @method bool isMediaIds()
  * @method bool isMediaInfos()
@@ -437,6 +439,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setMainFeedCarouselStartingMediaId(string $value)
  * @method $this setMaxNumVisiblePreviewComments(int $value)
  * @method $this setMedia(Media $value)
+ * @method $this setMediaCroppingInfo(mixed $value)
  * @method $this setMediaId(string $value)
  * @method $this setMediaIds(string[] $value)
  * @method $this setMediaInfos(mixed $value)
@@ -605,6 +608,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this unsetMainFeedCarouselStartingMediaId()
  * @method $this unsetMaxNumVisiblePreviewComments()
  * @method $this unsetMedia()
+ * @method $this unsetMediaCroppingInfo()
  * @method $this unsetMediaId()
  * @method $this unsetMediaIds()
  * @method $this unsetMediaInfos()
@@ -885,6 +889,7 @@ class Item extends AutoPropertyMapper
         'audio'                                       => 'AudioContext',
         'follower_count'                              => 'int',
         'post_count'                                  => 'int',
+        'media_cropping_info'                         => '',
     ];
 
     /**
