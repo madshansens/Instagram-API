@@ -360,7 +360,13 @@ class Internal extends RequestCollection
                 break;
             case Constants::FEED_DIRECT_STORY:
                 $request
-                    ->addPost('recipient_users', $internalMetadata->getDirectUsers())
+                    ->addPost('recipient_users', $internalMetadata->getDirectUsers());
+
+                if ($internalMetadata->getStoryViewMode() !== null) {
+                    $request->addPost('view_mode', $internalMetadata->getStoryViewMode());
+                }
+
+                $request
                     ->addPost('thread_ids', $internalMetadata->getDirectThreads())
                     ->addPost('client_shared_at', (string) time())
                     ->addPost('source_type', '3')
@@ -773,7 +779,13 @@ class Internal extends RequestCollection
             case Constants::FEED_DIRECT_STORY:
                 $request
                     ->addPost('configure_mode', 2) // 2 - DIRECT_STORY_SHARE
-                    ->addPost('recipient_users', $internalMetadata->getDirectUsers())
+                    ->addPost('recipient_users', $internalMetadata->getDirectUsers());
+
+                if ($internalMetadata->getStoryViewMode() !== null) {
+                    $request->addPost('view_mode', $internalMetadata->getStoryViewMode());
+                }
+
+                $request
                     ->addPost('thread_ids', $internalMetadata->getDirectThreads())
                     ->addPost('story_media_creation_date', time() - mt_rand(10, 20))
                     ->addPost('client_shared_at', time() - mt_rand(3, 10))

@@ -84,4 +84,8 @@ class Constants
 
     // General Constants.
     const SRC_DIR = __DIR__; // Absolute path to the "src" folder.
+
+    // Story view modes.
+    const STORY_VIEW_MODE_ONCE = 'once';
+    const STORY_VIEW_MODE_REPLAYABLE = 'replayable';
 }

@@ -612,6 +612,37 @@ class Direct extends RequestCollection
     {
         $internalMetadata = new InternalMetadata();
         $internalMetadata->setDirectRecipients($this->_prepareRecipients($recipients, true));
+        $internalMetadata->setStoryViewMode(Constants::STORY_VIEW_MODE_ONCE);
+
+        return $this->ig->internal->uploadSinglePhoto(Constants::FEED_DIRECT_STORY, $photoFilename, $internalMetadata, $externalMetadata);
+    }
+
+    /**
+     * Send a replayable photo (upload) via direct message to a user's inbox.
+     *
+     * @param array  $recipients       An array with "users" or "thread" keys.
+     *                                 To start a new thread, provide "users" as an array
+     *                                 of numerical UserPK IDs. To use an existing thread
+     *                                 instead, provide "thread" with the thread ID.
+     * @param string $photoFilename    The photo filename.
+     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see Internal::configureSinglePhoto() for available metadata fields.
+     */
+    public function sendReplayablePhoto(
+        array $recipients,
+        $photoFilename,
+        array $externalMetadata = [])
+    {
+        $internalMetadata = new InternalMetadata();
+        $internalMetadata->setDirectRecipients($this->_prepareRecipients($recipients, true));
+        $internalMetadata->setStoryViewMode(Constants::STORY_VIEW_MODE_REPLAYABLE);
 
         return $this->ig->internal->uploadSinglePhoto(Constants::FEED_DIRECT_STORY, $photoFilename, $internalMetadata, $externalMetadata);
     }
@@ -707,6 +738,38 @@ class Direct extends RequestCollection
     {
         $internalMetadata = new InternalMetadata();
         $internalMetadata->setDirectRecipients($this->_prepareRecipients($recipients, true));
+        $internalMetadata->setStoryViewMode(Constants::STORY_VIEW_MODE_ONCE);
+
+        return $this->ig->internal->uploadSingleVideo(Constants::FEED_DIRECT_STORY, $videoFilename, $internalMetadata, $externalMetadata);
+    }
+
+    /**
+     * Send a replayable video (upload) via direct message to a user's inbox.
+     *
+     * @param array  $recipients       An array with "users" or "thread" keys.
+     *                                 To start a new thread, provide "users" as an array
+     *                                 of numerical UserPK IDs. To use an existing thread
+     *                                 instead, provide "thread" with the thread ID.
+     * @param string $videoFilename    The video filename.
+     * @param array  $externalMetadata (optional) User-provided metadata key-value pairs.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \InstagramAPI\Exception\InstagramException
+     * @throws \InstagramAPI\Exception\UploadFailedException If the video upload fails.
+     *
+     * @return \InstagramAPI\Response\ConfigureResponse
+     *
+     * @see Internal::configureSingleVideo() for available metadata fields.
+     */
+    public function sendReplayableVideo(
+        array $recipients,
+        $videoFilename,
+        array $externalMetadata = [])
+    {
+        $internalMetadata = new InternalMetadata();
+        $internalMetadata->setDirectRecipients($this->_prepareRecipients($recipients, true));
+        $internalMetadata->setStoryViewMode(Constants::STORY_VIEW_MODE_REPLAYABLE);
 
         return $this->ig->internal->uploadSingleVideo(Constants::FEED_DIRECT_STORY, $videoFilename, $internalMetadata, $externalMetadata);
     }
