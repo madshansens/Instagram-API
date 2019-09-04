@@ -39,7 +39,6 @@ use InstagramAPI\Response;
 class FBSearchResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
-        'has_more'              => 'bool',
         'list'                  => 'Model\UserList[]',
         'clear_client_cache'    => 'bool',
         'has_more'              => 'bool',
