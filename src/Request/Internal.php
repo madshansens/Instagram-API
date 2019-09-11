@@ -648,7 +648,7 @@ class Internal extends RequestCollection
         /** @var string[]|null Array of numerical UserPK IDs of people tagged in
          * your video. ONLY USED IN STORY VIDEOS! TODO: Actually, it's not even
          * implemented for stories. */
-        $usertags = (isset($externalMetadata['usertags']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['usertags'] : null;
+        $usertags = (isset($externalMetadata['usertags'])) ? $externalMetadata['usertags'] : null;
         /** @var Response\Model\Location|null A Location object describing where
          * the media was taken. */
         $location = (isset($externalMetadata['location'])) ? $externalMetadata['location'] : null;
@@ -717,6 +717,13 @@ class Internal extends RequestCollection
         switch ($targetFeed) {
             case Constants::FEED_TIMELINE:
                 $request->addPost('caption', $captionText);
+                if ($usertags !== null) {
+                    $in = [];
+                    foreach ($usertags as $userId) {
+                        $in[] = ['user_id' => $userId];
+                    }
+                    $request->addPost('usertags', $in);
+                }
                 break;
             case Constants::FEED_STORY:
                 if ($internalMetadata->isBestieMedia()) {
