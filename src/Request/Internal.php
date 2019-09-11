@@ -224,6 +224,8 @@ class Internal extends RequestCollection
         $storyQuestion = (isset($externalMetadata['story_questions']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_questions'] : null;
         /** @var array Story countdown to use for the media. ONLY STORY MEDIA */
         $storyCountdown = (isset($externalMetadata['story_countdowns']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_countdowns'] : null;
+        /** @var array Story fundraiser to use for the media. ONLY STORY MEDIA */
+        $storyFundraisers = (isset($externalMetadata['story_fundraisers']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_fundraisers'] : null;
         /** @var array Attached media used to share media to story feed. ONLY STORY MEDIA! */
         $attachedMedia = (isset($externalMetadata['attached_media']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['attached_media'] : null;
         /** @var array Product Tags to use for the media. ONLY FOR TIMELINE PHOTOS! */
@@ -350,6 +352,11 @@ class Internal extends RequestCollection
                     $request
                         ->addPost('story_countdowns', json_encode($storyCountdown))
                         ->addPost('story_sticker_ids', 'countdown_sticker_time');
+                }
+                if ($storyFundraisers !== null) {
+                    $request
+                        ->addPost('story_fundraisers', json_encode($storyFundraisers))
+                        ->addPost('story_sticker_ids', 'fundraiser_sticker_id');
                 }
                 if ($attachedMedia !== null) {
                     Utils::throwIfInvalidAttachedMedia($attachedMedia);
@@ -663,6 +670,8 @@ class Internal extends RequestCollection
         $storyQuestion = (isset($externalMetadata['story_questions']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_questions'] : null;
         /** @var array Story countdown to use for the media. ONLY STORY MEDIA */
         $storyCountdown = (isset($externalMetadata['story_countdowns']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_countdowns'] : null;
+        /** @var array Story fundraiser to use for the media. ONLY STORY MEDIA */
+        $storyFundraisers = (isset($externalMetadata['story_fundraisers']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['story_fundraisers'] : null;
         /** @var array Attached media used to share media to story feed. ONLY STORY MEDIA! */
         $attachedMedia = (isset($externalMetadata['attached_media']) && $targetFeed == Constants::FEED_STORY) ? $externalMetadata['attached_media'] : null;
         /** @var array Title of the media uploaded to your channel. ONLY TV MEDIA! */
@@ -768,6 +777,11 @@ class Internal extends RequestCollection
                     $request
                         ->addPost('story_countdowns', json_encode($storyCountdown))
                         ->addPost('story_sticker_ids', 'countdown_sticker_time');
+                }
+                if ($storyFundraisers !== null) {
+                    $request
+                        ->addPost('story_fundraisers', json_encode($storyFundraisers))
+                        ->addPost('story_sticker_ids', 'fundraiser_sticker_id');
                 }
                 if ($attachedMedia !== null) {
                     Utils::throwIfInvalidAttachedMedia($attachedMedia);
