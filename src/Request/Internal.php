@@ -1198,8 +1198,7 @@ class Internal extends RequestCollection
             ->setNeedsAuth(false)
             ->addPost('mobile_subno_usage', $usage)
             // UUID is used as device_id intentionally.
-            ->addPost('device_id', $this->ig->uuid)
-            ->addPost('_csrftoken', $this->ig->client->getToken());
+            ->addPost('device_id', $this->ig->uuid);
 
         return $request->getResponse(new Response\MsisdnHeaderResponse());
     }
@@ -1358,8 +1357,6 @@ class Internal extends RequestCollection
      */
     public function getQPFetch()
     {
-        $query = 'viewer() {eligible_promotions.surface_nux_id(<surface>).external_gating_permitted_qps(<external_gating_permitted_qps>).supports_client_filters(true) {edges {priority,time_range {start,end},node {id,promotion_id,max_impressions,triggers,contextual_filters {clause_type,filters {filter_type,unknown_action,value {name,required,bool_value,int_value, string_value},extra_datas {name,required,bool_value,int_value, string_value}},clauses {clause_type,filters {filter_type,unknown_action,value {name,required,bool_value,int_value, string_value},extra_datas {name,required,bool_value,int_value, string_value}},clauses {clause_type,filters {filter_type,unknown_action,value {name,required,bool_value,int_value, string_value},extra_datas {name,required,bool_value,int_value, string_value}},clauses {clause_type,filters {filter_type,unknown_action,value {name,required,bool_value,int_value, string_value},extra_datas {name,required,bool_value,int_value, string_value}}}}}},template {name,parameters {name,required,bool_value,string_value,color_value,}},creatives {title {text},content {text},footer {text},social_context {text},primary_action{title {text},url,limit,dismiss_promotion},secondary_action{title {text},url,limit,dismiss_promotion},dismiss_action{title {text},url,limit,dismiss_promotion},image.scale(<scale>) {uri,width,height}}}}}}';
-
         return $this->ig->request('qp/batch_fetch/')
             ->addPost('vc_policy', 'default')
             ->addPost('_csrftoken', $this->ig->client->getToken())
@@ -1367,12 +1364,20 @@ class Internal extends RequestCollection
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('surfaces_to_queries', json_encode(
                 [
-                    Constants::SURFACE_PARAM[0] => $query,
-                    Constants::SURFACE_PARAM[1] => $query,
+                    Constants::BATCH_SURFACES[0][0] => Constants::BATCH_QUERY,
+                    Constants::BATCH_SURFACES[1][0] => Constants::BATCH_QUERY,
+                    Constants::BATCH_SURFACES[2][0] => Constants::BATCH_QUERY,
                 ]
             ))
-            ->addPost('version', 1)
-            ->addPost('scale', 2)
+            ->addPost('surfaces_to_triggers', json_encode(
+                [
+                    Constants::BATCH_SURFACES[0][0] => Constants::BATCH_SURFACES[0][1],
+                    Constants::BATCH_SURFACES[1][0] => Constants::BATCH_SURFACES[1][1],
+                    Constants::BATCH_SURFACES[2][0] => Constants::BATCH_SURFACES[2][1],
+                ]
+            ))
+            ->addPost('version', Constants::BATCH_VERSION)
+            ->addPost('scale', Constants::BATCH_SCALE)
             ->getResponse(new Response\FetchQPDataResponse());
     }
 
@@ -1484,6 +1489,7 @@ class Internal extends RequestCollection
 
         return $this->ig->request('media/seen/')
             ->setVersion(2)
+            ->setIsBodyCompressed(true)
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
@@ -1494,8 +1500,8 @@ class Internal extends RequestCollection
             ->addPost('live_vods_skipped', [])
             ->addPost('nuxes', [])
             ->addPost('nuxes_skipped', [])
-            ->addParam('reel', 1)
-            ->addParam('live_vod', 0)
+//            ->addParam('reel', 1)
+//            ->addParam('live_vod', 0)
             ->getResponse(new Response\MediaSeenResponse());
     }
 

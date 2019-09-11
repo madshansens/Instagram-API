@@ -472,6 +472,125 @@ class Story extends RequestCollection
     }
 
     /**
+     * Get list of charities for use in the donation sticker on stories.
+     *
+     * @param string|null $maxId Next "maximum ID", used for pagination.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CharitiesListResponse
+     */
+    public function getCharities(
+        $maxId = null)
+    {
+        $request = $this->ig->request('fundraiser/story_charities_nullstate/');
+
+        if ($maxId !== null) {
+            $request->addParam('max_id', $maxId);
+        }
+
+        return $request->getResponse(new Response\CharitiesListResponse());
+    }
+
+    /**
+     * Searches a list of charities for use in the donation sticker on stories.
+     *
+     * @param string      $query Search query.
+     * @param string|null $maxId Next "maximum ID", used for pagination.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CharitiesListResponse
+     */
+    public function searchCharities(
+        $query,
+        $maxId = null)
+    {
+        $request = $this->ig->request('fundraiser/story_charities_search/')
+            ->addParam('query', $query);
+
+        if ($maxId !== null) {
+            $request->addParam('max_id', $maxId);
+        }
+
+        return $request->getResponse(new Response\CharitiesListResponse());
+    }
+
+    /**
+     * Creates the array for a donation sticker.
+     *
+     * @param \InstagramAPI\Response\Model\User $charityUser          The User object of the charity's Instagram account.
+     * @param float                             $x
+     * @param float                             $y
+     * @param float                             $width
+     * @param float                             $height
+     * @param float                             $rotation
+     * @param string|null                       $title                The title of the donation sticker.
+     * @param string                            $titleColor           Hex color code for the title color.
+     * @param string                            $subtitleColor        Hex color code for the subtitle color.
+     * @param string                            $buttonTextColor      Hex color code for the button text color.
+     * @param string                            $startBackgroundColor
+     * @param string                            $endBackgroundColor
+     *
+     * @return array
+     *
+     * @see Story::getCharities()
+     * @see Story::searchCharities()
+     * @see Story::uploadPhoto()
+     * @see Story::uploadVideo()
+     */
+    public function createDonateSticker(
+        $charityUser,
+        $x = 0.5,
+        $y = 0.5,
+        $width = 0.6805556,
+        $height = 0.254738,
+        $rotation = 0.0,
+        $title = null,
+        $titleColor = '#000000',
+        $subtitleColor = '#999999ff',
+        $buttonTextColor = '#3897f0',
+        $startBackgroundColor = '#fafafa',
+        $endBackgroundColor = '#fafafa')
+    {
+        return [
+            [
+                'x'                      => $x,
+                'y'                      => $y,
+                'z'                      => 0,
+                'width'                  => $width,
+                'height'                 => $height,
+                'rotation'               => $rotation,
+                'title'                  => ($title !== null ? strtoupper($title) : ('HELP SUPPORT '.strtoupper($charityUser->getFullName()))),
+                'ig_charity_id'          => $charityUser->getPk(),
+                'title_color'            => $titleColor,
+                'subtitle_color'         => $subtitleColor,
+                'button_text_color'      => $buttonTextColor,
+                'start_background_color' => $startBackgroundColor,
+                'end_background_color'   => $endBackgroundColor,
+                'source_name'            => 'sticker_tray',
+                'user'                   => [
+                    'username'                      => $charityUser->getUsername(),
+                    'full_name'                     => $charityUser->getFullName(),
+                    'profile_pic_url'               => $charityUser->getProfilePicUrl(),
+                    'profile_pic_id'                => $charityUser->getProfilePicId(),
+                    'has_anonymous_profile_picture' => $charityUser->getHasAnonymousProfilePicture(),
+                    'id'                            => $charityUser->getPk(),
+                    'usertag_review_enabled'        => false,
+                    'mutual_followers_count'        => $charityUser->getMutualFollowersCount(),
+                    'show_besties_badge'            => false,
+                    'is_private'                    => $charityUser->getIsPrivate(),
+                    'allowed_commenter_type'        => 'any',
+                    'is_verified'                   => $charityUser->getIsVerified(),
+                    'is_new'                        => false,
+                    'feed_post_reshare_disabled'    => false,
+                ],
+                'is_sticker' => true,
+            ],
+        ];
+    }
+
+    /**
      * Mark story media items as seen.
      *
      * The various story-related endpoints only give you lists of story media.

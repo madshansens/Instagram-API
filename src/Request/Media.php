@@ -134,9 +134,11 @@ class Media extends RequestCollection
     /**
      * Like a media item.
      *
-     * @param string $mediaId   The media ID in Instagram's internal format (ie "3482384834_43294").
-     * @param string $module    (optional) From which app module (page) you're performing this action.
-     * @param array  $extraData (optional) Depending on the module name, additional data is required.
+     * @param string $mediaId        The media ID in Instagram's internal format (ie "3482384834_43294").
+     * @param int    $feedPosition   The position of the media in the feed.
+     * @param string $module         (optional) From which app module (page) you're performing this action.
+     * @param bool   $carouselBumped (optional) If the media is carousel bumped.
+     * @param array  $extraData      (optional) Depending on the module name, additional data is required.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -147,7 +149,9 @@ class Media extends RequestCollection
      */
     public function like(
         $mediaId,
+        $feedPosition,
         $module = 'feed_timeline',
+        $carouselBumped = false,
         array $extraData = [])
     {
         $request = $this->ig->request("media/{$mediaId}/like/")
@@ -156,9 +160,16 @@ class Media extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('media_id', $mediaId)
             ->addPost('radio_type', 'wifi-none')
-            ->addPost('module_name', $module)
+            ->addPost('container_module', $module)
+            ->addPost('feed_position', $feedPosition)
+            ->addPost('is_carousel_bumped_post', $carouselBumped)
             ->addPost('device_id', $this->ig->device_id);
 
+        if (isset($extraData['carousel_media'])) {
+            $request->addPost('carousel_index', $extraData['carousel_index']);
+        }
+
+        $extraData['media_id'] = $mediaId;
         $this->_parseLikeParameters('like', $request, $module, $extraData);
 
         return $request->getResponse(new Response\GenericResponse());
@@ -314,6 +325,9 @@ class Media extends RequestCollection
      *                                    "comments_v2_media_view_profile" - Unknown,
      *                                    "comments_v2_feed_contextual_location" - Unknown,
      *                                    "modal_comment_composer_feed_timeline" - In App: clicking on prompt from timeline.
+     * @param int         $carouselIndex  (optional) The image selected in a carousel while liking an image.
+     * @param int         $feedPosition   (optional) The position of the media in the feed.
+     * @param bool        $feedBumped     (optional) If Instagram bumped this post to the top of your feed.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -324,19 +338,24 @@ class Media extends RequestCollection
         $mediaId,
         $commentText,
         $replyCommentId = null,
-        $module = 'comments_v2')
+        $module = 'comments_v2',
+        $carouselIndex = 0,
+        $feedPosition = 0,
+        $feedBumped = false)
     {
         $request = $this->ig->request("media/{$mediaId}/comment/")
             ->addPost('user_breadcrumb', Utils::generateUserBreadcrumb(mb_strlen($commentText)))
-            ->addPost('idempotence_token', Signatures::generateUUID(true))
+            ->addPost('idempotence_token', Signatures::generateUUID())
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('comment_text', $commentText)
             ->addPost('container_module', $module)
             ->addPost('radio_type', 'wifi-none')
-            ->addPost('device_id', $this->ig->device_id);
-
+            ->addPost('device_id', $this->ig->device_id)
+            ->addPost('carousel_index', $carouselIndex)
+            ->addPost('feed_position', $feedPosition)
+            ->addPost('is_carousel_bumped_post', $feedBumped);
         if ($replyCommentId !== null) {
             $request->addPost('replied_to_comment_id', $replyCommentId);
         }
@@ -494,38 +513,52 @@ class Media extends RequestCollection
     /**
      * Like a comment.
      *
-     * @param string $commentId The comment's ID.
+     * @param string $commentId    The comment's ID.
+     * @param int    $feedPosition The position of the media item in the feed.
+     * @param string $module       From which module you're preforming this action.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\CommentLikeUnlikeResponse
      */
     public function likeComment(
-        $commentId)
+        $commentId,
+        $feedPosition,
+        $module = 'self_comments_v2')
     {
         return $this->ig->request("media/{$commentId}/comment_like/")
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('is_carousel_bumped_post', false)
+            ->addPost('container_module', $module)
+            ->addPost('feed_position', $feedPosition)
             ->getResponse(new Response\CommentLikeUnlikeResponse());
     }
 
     /**
      * Unlike a comment.
      *
-     * @param string $commentId The comment's ID.
+     * @param string $commentId    The comment's ID.
+     * @param int    $feedPosition The position of the media item in the feed.
+     * @param string $module       From which module you're preforming this action.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\CommentLikeUnlikeResponse
      */
     public function unlikeComment(
-        $commentId)
+        $commentId,
+        $feedPosition,
+        $module = 'self_comments_v2')
     {
         return $this->ig->request("media/{$commentId}/comment_unlike/")
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('is_carousel_bumped_post', false)
+            ->addPost('container_module', $module)
+            ->addPost('feed_position', $feedPosition)
             ->getResponse(new Response\CommentLikeUnlikeResponse());
     }
 
