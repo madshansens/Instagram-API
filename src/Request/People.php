@@ -1227,4 +1227,18 @@ class People extends RequestCollection
             ->addPost('add', $add)
             ->getResponse(new Response\GenericResponse());
     }
+
+    /**
+     * Gets a list of ranked users to display in Android's share UI.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\SharePrefillResponse
+     */
+    public function getSharePrefill()
+    {
+        return $this->ig->request('banyan/banyan/')
+            ->addParam('views', '["story_share_sheet","threads_people_picker","reshare_share_sheet"]')
+            ->getResponse(new Response\SharePrefillResponse());
+    }
 }

@@ -115,18 +115,21 @@ class Story extends RequestCollection
      * still have stories. So it's always safer to call getUserStoryFeed() if
      * a specific user's story feed matters to you.
      *
+     * @param string $reason (optional) Reason for the request.
+     *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\ReelsTrayFeedResponse
      *
      * @see Story::getUserStoryFeed()
      */
-    public function getReelsTrayFeed()
+    public function getReelsTrayFeed(
+        $reason = 'pull_to_refresh')
     {
         return $this->ig->request('feed/reels_tray/')
             ->setSignedPost(false)
             ->addPost('supported_capabilities_new', json_encode(Constants::SUPPORTED_CAPABILITIES))
-            ->addPost('reason', 'pull_to_refresh')
+            ->addPost('reason', $reason)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('_uuid', $this->ig->uuid)
             ->getResponse(new Response\ReelsTrayFeedResponse());

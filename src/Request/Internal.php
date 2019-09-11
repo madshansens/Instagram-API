@@ -1019,25 +1019,29 @@ class Internal extends RequestCollection
      * Perform an Instagram "feature synchronization" call for device.
      *
      * @param bool $prelogin
+     * @param bool $useCsrfToken
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\SyncResponse
      */
     public function syncDeviceFeatures(
-        $prelogin = false)
+        $prelogin = false,
+        $useCsrfToken = false)
     {
         $request = $this->ig->request('qe/sync/')
             ->addHeader('X-DEVICE-ID', $this->ig->uuid)
             ->addPost('id', $this->ig->uuid)
             ->addPost('experiments', Constants::LOGIN_EXPERIMENTS);
+        if ($useCsrfToken) {
+            $request->addPost('_csrftoken', $this->ig->client->getToken());
+        }
         if ($prelogin) {
             $request->setNeedsAuth(false);
         } else {
             $request
                 ->addPost('_uuid', $this->ig->uuid)
-                ->addPost('_uid', $this->ig->account_id)
-                ->addPost('_csrftoken', $this->ig->client->getToken());
+                ->addPost('_uid', $this->ig->account_id);
         }
 
         return $request->getResponse(new Response\SyncResponse());
@@ -1070,30 +1074,51 @@ class Internal extends RequestCollection
     /**
      * Send launcher sync.
      *
-     * @param bool $prelogin Indicates if the request is done before login request.
+     * @param bool $prelogin     Indicates if the request is done before login request.
+     * @param bool $idIsUuid     Indicates if the id parameter is the user's id.
+     * @param bool $useCsrfToken Indicates if a csrf token should be included.
+     * @param bool $loginConfigs Indicates if login configs should be used.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\LauncherSyncResponse
      */
     public function sendLauncherSync(
-        $prelogin)
+        $prelogin,
+        $idIsUuid = true,
+        $useCsrfToken = false,
+        $loginConfigs = false)
     {
         $request = $this->ig->request('launcher/sync/')
-            ->addPost('configs', Constants::LAUNCHER_CONFIGS);
+            ->addPost('configs', $loginConfigs ? Constants::LAUNCHER_LOGIN_CONFIGS : Constants::LAUNCHER_CONFIGS)
+            ->addPost('id', ($idIsUuid ? $this->ig->uuid : $this->ig->account_id));
+        if ($useCsrfToken) {
+            $request->addPost('_csrftoken', $this->ig->client->getToken());
+        }
         if ($prelogin) {
-            $request
-                ->setNeedsAuth(false)
-                ->addPost('id', $this->ig->uuid);
+            $request->setNeedsAuth(false);
         } else {
             $request
-                ->addPost('id', $this->ig->account_id)
                 ->addPost('_uuid', $this->ig->uuid)
-                ->addPost('_uid', $this->ig->account_id)
-                ->addPost('_csrftoken', $this->ig->client->getToken());
+                ->addPost('_uid', $this->ig->account_id);
         }
 
         return $request->getResponse(new Response\LauncherSyncResponse());
+    }
+
+    /**
+     * Get decisions about device capabilities.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CapabilitiesDecisionsResponse
+     */
+    public function getDeviceCapabilitiesDecisions()
+    {
+        return $this->ig->request('device_capabilities/decisions/')
+            ->addParam('signed_body', Signatures::generateSignature(json_encode((object) []).'.{}'))
+            ->addParam('ig_sig_key_version', Constants::SIG_KEY_VERSION)
+            ->getResponse(new Response\CapabilitiesDecisionsResponse());
     }
 
     /**
@@ -1131,8 +1156,8 @@ class Internal extends RequestCollection
     /**
      * Reads MSISDN header.
      *
-     * @param string      $usage    Desired usage, either "ig_select_app" or "default".
-     * @param string|null $subnoKey Encoded subscriber number.
+     * @param string $usage        Desired usage, either "ig_select_app" or "default".
+     * @param bool   $useCsrfToken (Optional) Decides to include a csrf token in this request.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -1140,7 +1165,7 @@ class Internal extends RequestCollection
      */
     public function readMsisdnHeader(
         $usage,
-        $subnoKey = null)
+        $useCsrfToken = false)
     {
         $request = $this->ig->request('accounts/read_msisdn_header/')
             ->setNeedsAuth(false)
@@ -1148,8 +1173,8 @@ class Internal extends RequestCollection
             // UUID is used as device_id intentionally.
             ->addPost('device_id', $this->ig->uuid)
             ->addPost('mobile_subno_usage', $usage);
-        if ($subnoKey !== null) {
-            $request->addPost('subno_key', $subnoKey);
+        if ($useCsrfToken) {
+            $request->addPost('_csrftoken', $this->ig->client->getToken());
         }
 
         return $request->getResponse(new Response\MsisdnHeaderResponse());
@@ -1352,6 +1377,20 @@ class Internal extends RequestCollection
     }
 
     /**
+     * Get Arlink download info.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\ArlinkDownloadInfoResponse
+     */
+    public function getArlinkDownloadInfo()
+    {
+        return $this->ig->request('users/arlink_download_info/')
+            ->addParam('version_override', '2.2.1')
+            ->getResponse(new Response\ArlinkDownloadInfoResponse());
+    }
+
+    /**
      * Get quick promotions cooldowns.
      *
      * @throws \InstagramAPI\Exception\InstagramException
@@ -1364,6 +1403,17 @@ class Internal extends RequestCollection
             ->addParam('signed_body', Signatures::generateSignature(json_encode((object) []).'.{}'))
             ->addParam('ig_sig_key_version', Constants::SIG_KEY_VERSION)
             ->getResponse(new Response\QPCooldownsResponse());
+    }
+
+    public function storeClientPushPermissions()
+    {
+        return $this->ig->request('notifications/store_client_push_permissions/')
+            ->setSignedPost(false)
+            ->addPost('enabled', 'true')
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('device_id', $this->ig->device_id)
+            ->addPost('_uuid', $this->ig->uuid)
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**
