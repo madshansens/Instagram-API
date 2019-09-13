@@ -62,9 +62,9 @@ class FriendshipStatus extends AutoPropertyMapper
         'is_private'       => 'bool',
         'is_blocking_reel' => 'bool',
         'is_muting_reel'   => 'bool',
+        'is_restricted'    => 'bool',
         'blocking'         => 'bool',
         'muting'           => 'bool',
         'is_bestie'        => 'bool',
-        'is_restricted'    => 'bool',
     ];
 }

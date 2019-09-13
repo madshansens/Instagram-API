@@ -47,6 +47,7 @@ class Creative extends AutoPropertyMapper
         'content'          => 'Text',
         'footer'           => 'Text',
         'social_context'   => 'Text',
+        'content'          => 'Text',
         'primary_action'   => 'Action',
         'secondary_action' => 'Action',
         'dismiss_action'   => '',
