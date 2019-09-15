@@ -6,6 +6,8 @@ use InstagramAPI\Constants;
 use InstagramAPI\Exception\InstagramException;
 use InstagramAPI\Exception\ThrottledException;
 use InstagramAPI\Exception\UploadFailedException;
+use InstagramAPI\Media\Constraints\ConstraintsFactory;
+use InstagramAPI\Media\Photo\PhotoDetails;
 use InstagramAPI\Request\Metadata\Internal as InternalMetadata;
 use InstagramAPI\Response;
 use InstagramAPI\Signatures;
@@ -599,6 +601,11 @@ class Direct extends RequestCollection
             throw new \InvalidArgumentException(sprintf('File "%s" is not available for reading.', $photoFilename));
         }
 
+        // validate width, height and aspect ratio of photo
+        $photoDetails = new PhotoDetails($photoFilename);
+        $photoDetails->validate(ConstraintsFactory::createFor(Constants::FEED_DIRECT));
+
+        // uplaod it
         return $this->_sendDirectItem('photo', $recipients, array_merge($options, [
             'filepath' => $photoFilename,
         ]));
