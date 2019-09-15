@@ -25,20 +25,37 @@ class Direct extends RequestCollection
     /**
      * Get direct inbox messages for your account.
      *
-     * @param string|null $cursorId Next "cursor ID", used for pagination.
+     * @param string|null $cursorId           Next "cursor ID", used for pagination.
+     * @param int         $limit              Number of threads. From 0 to 20.
+     * @param int|null    $threadMessageLimit (optional) Number of messages per thread
+     * @param bool        $prefetch           (optional) Indicates if the request is called from prefetch.
      *
+     * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\DirectInboxResponse
      */
     public function getInbox(
-        $cursorId = null)
+        $cursorId = null,
+        $limit = 0,
+        $threadMessageLimit = null,
+        $prefetch = false)
     {
+        if ($limit < 0 || $limit > 20) {
+            throw new \InvalidArgumentException('Invalid value provided to limit.');
+        }
         $request = $this->ig->request('direct_v2/inbox/')
             ->addParam('persistentBadging', 'true')
-            ->addParam('use_unified_inbox', 'true');
+            ->addParam('visual_message_return_type', 'unseen')
+            ->addParam('limit', $limit);
         if ($cursorId !== null) {
             $request->addParam('cursor', $cursorId);
+        }
+        if ($prefetch) {
+            $request->addHeader('X-IG-Prefetch-Request', 'foreground');
+        }
+        if ($threadMessageLimit !== null) {
+            $request->addParam('thread_message_limit', $threadMessageLimit);
         }
 
         return $request->getResponse(new Response\DirectInboxResponse());

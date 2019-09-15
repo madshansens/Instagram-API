@@ -730,4 +730,50 @@ class Account extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->getResponse(new Response\GenericResponse());
     }
+
+    /**
+     *  Get prefill candidates.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\PrefillCandidatesResponse
+     */
+    public function getPrefillCandidates()
+    {
+        return $this->ig->request('accounts/get_prefill_candidates/')
+            ->setNeedsAuth(false)
+            ->addPost('android_device_id', $this->ig->device_id)
+            ->addPost('device_id', $this->ig->uuid)
+            ->addPost('usages', '["account_recovery_omnibox"]')
+            ->getResponse(new Response\PrefillCandidatesResponse());
+    }
+
+    /**
+     * Get details about child and main IG accounts.
+     *
+     * @param bool $useAuth Indicates if auth is required for this request
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\UserInfoResponse
+     */
+    public function getAccountFamily(
+        $useAuth = true)
+    {
+        return $this->ig->request('multiple_accounts/get_account_family/')
+            ->getResponse(new Response\MultipleAccountFamilyResponse());
+    }
+
+    /**
+     * Get linked accounts status.
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\LinkageStatusResponse
+     */
+    public function getLinkageStatus()
+    {
+        return $this->ig->request('linked_accounts/get_linkage_status/')
+            ->getResponse(new Response\LinkageStatusResponse());
+    }
 }

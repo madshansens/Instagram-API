@@ -105,20 +105,27 @@ class Live extends RequestCollection
      * Get a live broadcast's heartbeat and viewer count.
      *
      * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param bool   $isViewer    Indicates if this request is being ran as a viewer (optional).
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
      * @return \InstagramAPI\Response\BroadcastHeartbeatAndViewerCountResponse
      */
     public function getHeartbeatAndViewerCount(
-        $broadcastId)
+        $broadcastId,
+        $isViewer = false)
     {
-        return $this->ig->request("live/{$broadcastId}/heartbeat_and_get_viewer_count/")
+        $request = $this->ig->request("live/{$broadcastId}/heartbeat_and_get_viewer_count/")
             ->setSignedPost(false)
             ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('offset_to_video_start', 0)
-            ->getResponse(new Response\BroadcastHeartbeatAndViewerCountResponse());
+            ->addPost('_csrftoken', $this->ig->client->getToken());
+        if ($isViewer) {
+            $request->addPost('live_with_eligibility', 1);
+        } else {
+            $request->addPost('offset_to_video_start', 0);
+        }
+
+        return $request->getResponse(new Response\BroadcastHeartbeatAndViewerCountResponse());
     }
 
     /**
@@ -360,7 +367,7 @@ class Live extends RequestCollection
     {
         return $this->ig->request("live/{$broadcastId}/get_comment/")
             ->addParam('last_comment_ts', $lastCommentTs)
-            ->addParam('num_comments_requested', $commentsRequested)
+//            ->addParam('num_comments_requested', $commentsRequested)
             ->getResponse(new Response\BroadcastCommentsResponse());
     }
 
@@ -427,8 +434,9 @@ class Live extends RequestCollection
     /**
      * Like a broadcast.
      *
-     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
-     * @param int    $likeCount   Number of likes ("hearts") to send (optional).
+     * @param string $broadcastId    The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param int    $likeCount      Number of likes ("hearts") to send (optional).
+     * @param int    $burstLikeCount Number of burst likes ("hearts") to send (optional).
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -437,7 +445,8 @@ class Live extends RequestCollection
      */
     public function like(
         $broadcastId,
-        $likeCount = 1)
+        $likeCount = 1,
+        $burstLikeCount = 0)
     {
         if ($likeCount < 1 || $likeCount > 6) {
             throw new \InvalidArgumentException('Like count must be a number from 1 to 6.');
@@ -448,6 +457,8 @@ class Live extends RequestCollection
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('user_like_count', $likeCount)
+            ->addPost('user_like_burst_count', $burstLikeCount)
+            ->addPost('offset_to_video_start', 0)
             ->getResponse(new Response\BroadcastLikeResponse());
     }
 
@@ -509,8 +520,8 @@ class Live extends RequestCollection
      * @see Live::end()
      */
     public function create(
-        $previewWidth = 720,
-        $previewHeight = 1184)
+        $previewWidth = 1080,
+        $previewHeight = 2076)
     {
         return $this->ig->request('live/create/')
             ->setSignedPost(false)
@@ -518,7 +529,6 @@ class Live extends RequestCollection
             ->addPost('_csrftoken', $this->ig->client->getToken())
             ->addPost('preview_height', $previewHeight)
             ->addPost('preview_width', $previewWidth)
-            ->addPost('broadcast_message', '')
             ->addPost('broadcast_type', 'RTMP_SWAP_ENABLED')
             ->addPost('internal_only', 0)
             ->getResponse(new Response\CreateLiveResponse());
@@ -539,7 +549,9 @@ class Live extends RequestCollection
      * which your broadcasting software MUST output properly (FFmpeg DOESN'T do
      * it without special patching!), OR by calling the `end()` function.
      *
-     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param string      $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     * @param string|null $latitude    (optional) Latitude.
+     * @param string|null $longitude   (optional) Longitude.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -549,24 +561,47 @@ class Live extends RequestCollection
      * @see Live::end()
      */
     public function start(
-        $broadcastId)
+        $broadcastId,
+        $latitude = null,
+        $longitude = null)
     {
         $response = $this->ig->request("live/{$broadcastId}/start/")
             ->setSignedPost(false)
             ->addPost('_uuid', $this->ig->uuid)
-            ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->getResponse(new Response\StartLiveResponse());
+            ->addPost('_csrftoken', $this->ig->client->getToken());
+
+        if ($latitude !== null && $longitude !== null) {
+            $response->addPost('latitude', $latitude)
+                ->addPost('longitude', $longitude);
+        }
+
+        $response = $response->getResponse(new Response\StartLiveResponse());
 
         if ($this->ig->isExperimentEnabled('ig_android_live_qa_broadcaster_v1_universe', 'is_enabled')) {
-            $this->ig->request("live/{$broadcastId}/question_status/")
-                ->setSignedPost(false)
-                ->addPost('_csrftoken', $this->ig->client->getToken())
-                ->addPost('_uuid', $this->ig->uuid)
-                ->addPost('allow_question_submission', true)
-                ->getResponse(new Response\GenericResponse());
+            $this->_getQuestionStatus($broadcastId);
         }
 
         return $response;
+    }
+
+    /**
+     * Get question status.
+     *
+     * @param string $broadcastId The broadcast ID in Instagram's internal format (ie "17854587811139572").
+     *
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\GenericResponse
+     */
+    private function _getQuestionStatus(
+        $broadcastId)
+    {
+        return $this->ig->request("live/{$broadcastId}/question_status/")
+            ->setSignedPost(false)
+            ->addPost('_csrftoken', $this->ig->client->getToken())
+            ->addPost('_uuid', $this->ig->uuid)
+            ->addPost('allow_question_submission', true)
+            ->getResponse(new Response\GenericResponse());
     }
 
     /**

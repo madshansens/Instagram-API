@@ -16,9 +16,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method string getMediaId()
  * @method string getPk()
  * @method bool getShareEnabled()
- * @method string getStatus()
+ * @method mixed getStatus()
  * @method string getText()
- * @method int getType()
+ * @method mixed getType()
  * @method User getUser()
  * @method string getUserId()
  * @method bool isBitFlags()
@@ -44,9 +44,9 @@ use InstagramAPI\AutoPropertyMapper;
  * @method $this setMediaId(string $value)
  * @method $this setPk(string $value)
  * @method $this setShareEnabled(bool $value)
- * @method $this setStatus(string $value)
+ * @method $this setStatus(mixed $value)
  * @method $this setText(string $value)
- * @method $this setType(int $value)
+ * @method $this setType(mixed $value)
  * @method $this setUser(User $value)
  * @method $this setUserId(string $value)
  * @method $this unsetBitFlags()
@@ -67,7 +67,7 @@ use InstagramAPI\AutoPropertyMapper;
 class Caption extends AutoPropertyMapper
 {
     const JSON_PROPERTY_MAP = [
-        'status'             => 'string',
+        'status'             => '',
         'user_id'            => 'string',
         'created_at_utc'     => 'string',
         'created_at'         => 'string',
@@ -75,11 +75,11 @@ class Caption extends AutoPropertyMapper
         'user'               => 'User',
         'content_type'       => '',
         'text'               => 'string',
+        'share_enabled'      => 'bool',
         'media_id'           => 'string',
         'pk'                 => 'string',
-        'type'               => 'int',
+        'type'               => '',
         'has_translation'    => 'bool',
         'did_report_as_spam' => 'bool',
-        'share_enabled'      => 'bool',
     ];
 }

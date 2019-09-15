@@ -9,7 +9,7 @@ use InstagramAPI\AutoPropertyMapper;
  *
  * @method Ad4ad getAd4ad()
  * @method int getAdLinkType()
- * @method EndOfFeedDemarcator getEndOfFeedDemarcator()
+ * @method mixed getEndOfFeedDemarcator()
  * @method Item getMediaOrAd()
  * @method StoriesNetego getStoriesNetego()
  * @method SuggestedUsers getSuggestedUsers()
@@ -21,7 +21,7 @@ use InstagramAPI\AutoPropertyMapper;
  * @method bool isSuggestedUsers()
  * @method $this setAd4ad(Ad4ad $value)
  * @method $this setAdLinkType(int $value)
- * @method $this setEndOfFeedDemarcator(EndOfFeedDemarcator $value)
+ * @method $this setEndOfFeedDemarcator(mixed $value)
  * @method $this setMediaOrAd(Item $value)
  * @method $this setStoriesNetego(StoriesNetego $value)
  * @method $this setSuggestedUsers(SuggestedUsers $value)
@@ -39,7 +39,7 @@ class FeedItem extends AutoPropertyMapper
         'stories_netego'         => 'StoriesNetego',
         'ad4ad'                  => 'Ad4ad',
         'suggested_users'        => 'SuggestedUsers',
-        'end_of_feed_demarcator' => 'EndOfFeedDemarcator',
+        'end_of_feed_demarcator' => '',
         'ad_link_type'           => 'int',
     ];
 }
