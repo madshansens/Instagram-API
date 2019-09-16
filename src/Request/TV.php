@@ -47,10 +47,6 @@ class TV extends RequestCollection
 
         $response = $request->getResponse(new Response\TVGuideResponse());
 
-        if ($response->getBannerToken() !== $this->ig->settings->get('banner_token')) {
-            $this->ig->settings->set('banner_token', $response->getBannerToken());
-        }
-
         return $response;
     }
 
