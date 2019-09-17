@@ -789,7 +789,6 @@ class Client
                 // Keep the API's HTTPS connection alive in Guzzle for future
                 // re-use, to greatly speed up all further queries after this.
                 'Connection'       => 'Keep-Alive',
-                'X-FB-HTTP-Engine' => Constants::X_FB_HTTP_Engine,
                 'Accept'           => '*/*',
                 'Accept-Encoding'  => Constants::ACCEPT_ENCODING,
                 'Accept-Language'  => Constants::ACCEPT_LANGUAGE,
