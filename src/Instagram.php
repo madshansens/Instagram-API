@@ -1065,7 +1065,8 @@ class Instagram implements ExperimentsInterface
             $this->internal->sendLauncherSync(false, false, true, true);
             $this->story->getReelsMediaFeed($this->account_id);
             $this->people->getRecentActivityInbox();
-            $this->internal->logResurrectAttribution();
+            //TODO: Figure out why this isn't sending...
+//            $this->internal->logResurrectAttribution();
             $this->internal->getLoomFetchConfig();
             $this->internal->getDeviceCapabilitiesDecisions();
             $this->people->getBootstrapUsers();
