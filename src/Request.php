@@ -836,4 +836,14 @@ class Request
 
         return $responseObject;
     }
+
+    /**
+     * Returns the endpoint URL (absolute or relative) of this request.
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->_url;
+    }
 }
