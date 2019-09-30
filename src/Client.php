@@ -119,6 +119,16 @@ class Client
     private $_resetConnection;
 
     /**
+     * The most recent request processed.
+     *
+     * Used for debugging failed requests in exceptions without needing to
+     * enable debug mode.
+     *
+     * @var Request
+     */
+    private $_lastRequest;
+
+    /**
      * Constructor.
      *
      * @param \InstagramAPI\Instagram $parent
@@ -846,5 +856,26 @@ class Client
     public function zeroRating()
     {
         return $this->_zeroRating;
+    }
+
+    /**
+     * Sets the last processed request.
+     *
+     * @param Request $endpoint The last processed request
+     */
+    public function setLastRequest(
+        $endpoint)
+    {
+        $this->_lastRequest = $endpoint;
+    }
+
+    /**
+     * Gets the last processed point.
+     *
+     * @return Request
+     */
+    public function getLastRequest()
+    {
+        return $this->_lastRequest;
     }
 }
