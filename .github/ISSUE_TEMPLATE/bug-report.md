@@ -36,7 +36,7 @@ INSERT YOUR CODE HERE
 ``` 
 
 ### Debug Log
-Please post your debug log in the section below; You can enable the debug log by using `new Instagram(true)` instead of `new Instagram()`:
+Please post your debug log in the section below; You can enable the debug log by using `new Instagram(true)` instead of `new Instagram()`. Additionally, you can do `\InstagramAPI\Debug::$debugLog = true;` for the debug log to be saved to a file:
 ```php
 INSERT YOUR DEBUG LOG HERE
 ```

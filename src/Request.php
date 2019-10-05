@@ -825,6 +825,8 @@ class Request
     public function getResponse(
         Response $responseObject)
     {
+        // Set this request as the most recently processed request
+        $this->_parent->client->setLastRequest($this);
         // Check for API response success and put its response in the object.
         $this->_parent->client->mapServerResponse( // Throws.
             $responseObject,
@@ -833,5 +835,15 @@ class Request
         );
 
         return $responseObject;
+    }
+
+    /**
+     * Returns the endpoint URL (absolute or relative) of this request.
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->_url;
     }
 }
