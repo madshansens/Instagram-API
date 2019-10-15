@@ -421,6 +421,34 @@ class Media extends RequestCollection
     }
 
     /**
+     * Get summary information about comments.
+     *
+     * @param string|string[] $mediaIds One or more media IDs in Instagram's internal format (ie "3482384834_43294"). Can be an array of strings or a single string.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \InstagramAPI\Exception\InstagramException
+     *
+     * @return \InstagramAPI\Response\CommentInfosResponse
+     */
+    public function getCommentInfos(
+        $mediaIds)
+    {
+        if ($mediaIds === null) {
+            throw new \InvalidArgumentException('You can not pass null to mediaIds!');
+        }
+
+        if (is_array($mediaIds)) {
+            $mediaIds = implode(',', $mediaIds);
+        }
+
+        $request = $this->ig->request('media/comment_infos')
+            ->addParam('media_ids', $mediaIds);
+
+        return $request->getResponse(new Response\CommentInfosResponse());
+    }
+
+    /**
      * Get the replies to a specific media comment.
      *
      * You should be sure that the comment actually HAS more replies before
