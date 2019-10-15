@@ -173,6 +173,28 @@ class Factory
 
             $storageInstance = new Storage\Memcached();
             break;
+        case 'redis':
+            // Look for allowed command-line values related to this backend.
+            $cmdOptions = self::getCmdOptions([
+                'settings_redishost::',
+                'settings_redisport::',
+                'settings_redisauth::',
+            ]);
+
+            if (isset($storageConfig['redis'])) {
+                // If "redis" is set in the factory config, assume the user wants
+                // to re-use an existing Redis connection. In that case we ignore
+                // the host/port/auth parameters and use their Redis.
+                $locationConfig['redis'] = $storageConfig['redis'];
+            } else {
+                // Make a new connection. Optional settings for it:
+                $locationConfig['redishost'] = self::getUserConfig('redishost', $storageConfig, $cmdOptions);
+                $locationConfig['redisport'] = self::getUserConfig('redisport', $storageConfig, $cmdOptions);
+                $locationConfig['redisauth'] = self::getUserConfig('redisauth', $storageConfig, $cmdOptions);
+            }
+
+            $storageInstance = new Storage\Redis();
+            break;
         case 'custom':
             // Custom storage classes can only be configured via the main array.
             // When using a custom class, you must provide a StorageInterface:
