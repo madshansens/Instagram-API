@@ -693,7 +693,7 @@ class User extends AutoPropertyMapper
         'fb_page_call_to_action_ix_label_bundle' => '',
         'fb_page_call_to_action_ix_url'          => 'string',
         'fb_page_call_to_action_ix_partner'      => 'string',
-        'is_call_to_action_enabled_by_surface'   => 'bool',
+        'is_call_to_action_enabled_by_surface'   => '',
         'can_crosspost_without_fb_token'         => 'bool',
         'num_of_admined_pages'                   => 'int',
         'shoppable_posts_count'                  => 'int',
