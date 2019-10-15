@@ -442,10 +442,9 @@ class Media extends RequestCollection
             $mediaIds = implode(',', $mediaIds);
         }
 
-        $request = $this->ig->request('media/comment_infos')
-            ->addParam('media_ids', $mediaIds);
-
-        return $request->getResponse(new Response\CommentInfosResponse());
+        return $this->ig->request('media/comment_infos')
+            ->addParam('media_ids', $mediaIds)
+            ->getResponse(new Response\CommentInfosResponse());
     }
 
     /**
