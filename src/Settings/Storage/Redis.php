@@ -39,10 +39,11 @@ class Redis implements StorageInterface
             if (!$locationConfig['redis'] instanceof PHPRedis) {
                 throw new SettingsException('The custom Redis object is invalid.');
             }
-            // Check connection, throws if pre-provided connection no longer alive.
-            $this->_checkConnection();
             $this->_isSharedRedis = true;
             $this->_redis = $locationConfig['redis'];
+
+            // Check connection, throws if pre-provided connection no longer alive.
+            $this->_checkConnection();
         } else {
             $this->_isSharedRedis = false;
             $this->_redis = new PHPRedis();
