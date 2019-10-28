@@ -179,7 +179,12 @@ class Factory
                 'settings_redishost::',
                 'settings_redisport::',
                 'settings_redisauth::',
+                'settings_redishash::',
             ]);
+
+            // These settings are optional, and can be provided regardless of
+            // connection method:
+            $locationConfig['redishash'] = self::getUserConfig('redishash', $storageConfig, $cmdOptions);
 
             if (isset($storageConfig['redis'])) {
                 // If "redis" is set in the factory config, assume the user wants
