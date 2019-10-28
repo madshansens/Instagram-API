@@ -35,7 +35,7 @@ use InstagramAPI\Response;
 class SharePrefillResponse extends Response
 {
     const JSON_PROPERTY_MAP = [
-        'ranking'             => 'Model\Ranking',
+        'ranking'             => 'Model\Ranking[]',
         'entities'            => 'Model\ServerDataInfo',
         'failed_view_names'   => '',
     ];
