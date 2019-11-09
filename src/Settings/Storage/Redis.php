@@ -37,7 +37,7 @@ class Redis implements StorageInterface
         array $locationConfig)
     {
         // Prefix to the hash, makes users searchable by the hash prefix
-        $this->_hashPrefix = $locationConfig['redishash'] ?? 'InstagramAPI:';
+        $this->_hashPrefix = ((isset($locationConfig['redishash'])) ? $locationConfig['redishash'] : 'InstagramAPI:');
 
         if (isset($locationConfig['redis'])) {
             // Pre-provided connection to re-use instead of creating a new one.
@@ -54,8 +54,8 @@ class Redis implements StorageInterface
             $this->_redis = new PHPRedis();
 
             // Use default connection if none provided.
-            $address = $locationConfig['redishost'] ?? '127.0.0.1';
-            $port = $locationConfig['redisport'] ?? '6379';
+            $address = ((isset($locationConfig['redishost'])) ? $locationConfig['redishost'] : '127.0.0.1');
+            $port = ((isset($locationConfig['redisport'])) ? $locationConfig['redisport'] : '6379');
 
             // Connect.
             if (!$this->_redis->connect($address, $port)) {
