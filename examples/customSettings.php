@@ -49,7 +49,7 @@ $ig = new \InstagramAPI\Instagram($debug, $truncatedDebug, [
     'dbtablename' => 'mysettings',
 ]);
 $ig = new \InstagramAPI\Instagram($debug, $truncatedDebug, [
-    'storage'   => 'redis',
+    'storage'        => 'redis',
     'redishost'      => 'some.redis.provider.com',
     'redisport'      => 1234,
     'redisauth'      => 'xXxMyPasSw0rdxXx',

@@ -34,8 +34,8 @@ class Redis implements StorageInterface
      * {@inheritdoc}
      */
     public function openLocation(
-        array $locationConfig
-    ) {
+        array $locationConfig)
+    {
         // Prefix to the hash, makes users searchable by the hash prefix
         $this->_hashPrefix = $locationConfig['redishash'] ?? 'InstagramAPI:';
 
@@ -81,8 +81,8 @@ class Redis implements StorageInterface
      * {@inheritdoc}
      */
     public function hasUser(
-        $username
-    ) {
+        $username)
+    {
         $hash = $this->_gethash($username);
 
         return  $this->_redis->hExists($hash, 'settings');
@@ -95,8 +95,8 @@ class Redis implements StorageInterface
      */
     public function moveUser(
         $oldUsername,
-        $newUsername
-    ) {
+        $newUsername)
+    {
         // Get username hashes
         $oldHash = $this->_getHash($oldUsername);
         $newHash = $this->_getHash($newUsername);
@@ -128,10 +128,10 @@ class Redis implements StorageInterface
             ->exec();
 
         // Throw Exceptions from response
-        if (false === $response[0]) {
+        if ($response[0] === false) {
             throw new SettingsException('Redis failed to move user data');
         }
-        if (0 === $response[1]) {
+        if ($response[1] === 0) {
             throw new SettingsException('Redis failed to delete user data during move');
         }
     }
@@ -142,11 +142,11 @@ class Redis implements StorageInterface
      * {@inheritdoc}
      */
     public function deleteUser(
-        $username
-    ) {
+        $username)
+    {
         $hash = $this->_getHash($username);
         $response = $this->_redis->hDel($hash, 'settings', 'cookies');
-        if (0 === $response) {
+        if ($response === 0) {
             throw new SettingsException('Redis failed to delete user data');
         }
     }
@@ -157,8 +157,8 @@ class Redis implements StorageInterface
      * {@inheritdoc}
      */
     public function openUser(
-        $username
-    ) {
+        $username)
+    {
         $hash = $this->_getHash($username);
 
         $this->_username = $username;
@@ -166,7 +166,7 @@ class Redis implements StorageInterface
         $userData = $this->_redis->hmGet($hash, ['settings', 'cookies']);
         $this->_cache = [
             'settings' => empty($userData['settings']) ? null : $userData['settings'],
-            'cookies' => empty($userData['cookies']) ? null : $userData['cookies'],
+            'cookies'  => empty($userData['cookies']) ? null : $userData['cookies'],
         ];
     }
 
@@ -198,15 +198,15 @@ class Redis implements StorageInterface
      */
     public function saveUserSettings(
         array $userSettings,
-        $triggerKey
-    ) {
+        $triggerKey)
+    {
         $hash = $this->_getHash($this->_username);
 
         // Store the settings as a JSON blob.
         $encodedData = json_encode($userSettings);
         $response = $this->_redis->hSet($hash, 'settings', $encodedData);
 
-        if (false === $response) {
+        if ($response === false) {
             throw new SettingsException('Redis failed to save user settings');
         }
     }
@@ -256,7 +256,7 @@ class Redis implements StorageInterface
         // Store the raw cookie data as-provided.
         $response = $this->_redis->hSet($hash, 'cookies', $rawData);
 
-        if (false === $response) {
+        if ($response === false) {
             throw new SettingsException('Redis failed to save user cookies');
         }
     }
@@ -309,7 +309,8 @@ class Redis implements StorageInterface
      *
      * @return string
      */
-    private function _getHash($username)
+    private function _getHash(
+        $username)
     {
         return $this->_hashPrefix.$username;
     }
