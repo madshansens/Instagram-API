@@ -4,7 +4,6 @@ namespace InstagramAPI\Request;
 
 use InstagramAPI\Exception\RequestHeadersTooLargeException;
 use InstagramAPI\Response;
-use InstagramAPI\Signatures;
 use InstagramAPI\Utils;
 
 /**
@@ -235,6 +234,10 @@ class Hashtag extends RequestCollection
     /**
      * Get the feed for a hashtag.
      *
+     * @deprecated The feed endpoint has been removed in favor of the hashtag section API.
+     * This function is now just wrapping Hashtag::getSection() and will be removed shortly.
+     * Please use Hashtag::getSection().
+     *
      * @param string      $hashtag   The hashtag, not including the "#".
      * @param string      $rankToken The feed UUID. You must use the same value for all pages of the feed.
      * @param string|null $maxId     Next "maximum ID", used for pagination.
@@ -244,8 +247,7 @@ class Hashtag extends RequestCollection
      *
      * @return \InstagramAPI\Response\TagFeedResponse
      *
-     * @see Signatures::generateUUID() To create a UUID.
-     * @see examples/rankTokenUsage.php For an example.
+     * @see Hashtag::getSection() To see the function that will replace this one in the future.
      */
     public function getFeed(
         $hashtag,
@@ -254,14 +256,8 @@ class Hashtag extends RequestCollection
     {
         Utils::throwIfInvalidHashtag($hashtag);
         Utils::throwIfInvalidRankToken($rankToken);
-        $urlHashtag = urlencode($hashtag); // Necessary for non-English chars.
-        $hashtagFeed = $this->ig->request("feed/tag/{$urlHashtag}/")
-            ->addParam('rank_token', $rankToken);
-        if ($maxId !== null) {
-            $hashtagFeed->addParam('max_id', $maxId);
-        }
 
-        return $hashtagFeed->getResponse(new Response\TagFeedResponse());
+        return $this->getSection($hashtag, $rankToken, 'top', $maxId);
     }
 
     /**
