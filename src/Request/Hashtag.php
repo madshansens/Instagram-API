@@ -319,12 +319,13 @@ class Hashtag extends RequestCollection
      * "story" property, to easily mark all of the TagFeedResponse's story
      * media items as seen.
      *
-     * @param Response\TagFeedResponse $hashtagFeed The hashtag feed response
-     *                                              object which the story media
-     *                                              items came from. The story
-     *                                              items MUST belong to it.
-     * @param Response\Model\Item[]    $items       Array of one or more story
-     *                                              media Items.
+     * @param Response\TagsStoryResponse $hashtagFeed The hashtag story feed
+     *                                                response object which the
+     *                                                story media items came
+     *                                                from. The story items
+     *                                                MUST belong to it.
+     * @param Response\Model\Item[]      $items       Array of one or more story
+     *                                                media Items.
      *
      * @throws \InvalidArgumentException
      * @throws \InstagramAPI\Exception\InstagramException
@@ -335,16 +336,13 @@ class Hashtag extends RequestCollection
      * @see Location::markStoryMediaSeen()
      */
     public function markStoryMediaSeen(
-        Response\TagFeedResponse $hashtagFeed,
+        Response\TagsStoryResponse $hashtagFeed,
         array $items)
     {
-        // Extract the Hashtag Story-Tray ID from the user's hashtag response.
+        // Extract the Hashtag Story-Tray ID from the user's hashtag story response.
         // NOTE: This can NEVER fail if the user has properly given us the exact
-        // same hashtag response that they got the story items from!
-        $sourceId = '';
-        if ($hashtagFeed->getStory() instanceof Response\Model\StoryTray) {
-            $sourceId = $hashtagFeed->getStory()->getId();
-        }
+        // same sotry response that they got the story items from!
+        $sourceId = $hashtagFeed->getStory()->getId();
         if (!strlen($sourceId)) {
             throw new \InvalidArgumentException('Your provided TagFeedResponse is invalid and does not contain any Hashtag Story-Tray ID.');
         }
