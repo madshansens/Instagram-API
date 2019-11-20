@@ -257,7 +257,7 @@ class Hashtag extends RequestCollection
         Utils::throwIfInvalidHashtag($hashtag);
         Utils::throwIfInvalidRankToken($rankToken);
 
-        return $this->getSection($hashtag, $rankToken, 'top', $maxId);
+        return $this->getSection($hashtag, $rankToken, 'top', null, $maxId);
     }
 
     /**
