@@ -60,7 +60,9 @@
         "winbox/args": "1.0.0"
     },
     "suggest": {
-        "ext-event": "Installing PHP's native Event extension enables faster Realtime class event handling."
+        "ext-event": "Installing PHP's native Event extension enables faster Realtime class event handling.",
+        "ext-pdo": "Installing ext-pdo allows for Postgres settings storage.",
+        "ext-redis": "Installing ext-pdo allows for Redis settings storage."
     },
     "require-dev": {
         "react/http": "^0.7.2",
