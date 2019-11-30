@@ -25,7 +25,8 @@ class PostgreSQL extends PDOStorage
      *
      * {@inheritdoc}
      */
-    protected function _createPDO(array $locationConfig)
+    protected function _createPDO(
+        array $locationConfig)
     {
         $username = ($locationConfig['dbusername'] ? $locationConfig['dbusername'] : 'root');
         $password = ($locationConfig['dbpassword'] ? $locationConfig['dbpassword'] : '');
