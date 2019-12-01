@@ -22,9 +22,6 @@ jobs:
     - name: Validate class documentation
       run: ./vendor/bin/lazydoctor -c composer.json -pfo --validate-only >/dev/null
     
-    - name: Validate php-cs-fixer
-      run: ./vendor/bin/php-cs-fixer fix --config=.php_cs.dist --allow-risky yes --dry-run
-    
     - name: Validate checkStyle script
       run: /usr/bin/env php devtools/checkStyle.php x
 
