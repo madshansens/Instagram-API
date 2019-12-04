@@ -1087,6 +1087,7 @@ class People extends RequestCollection
      * Block a user's ability to see your stories.
      *
      * @param string $userId Numerical UserPK ID.
+     * @param string $source (optional) The source where this request was triggered.
      *
      * @throws \InstagramAPI\Exception\InstagramException
      *
@@ -1095,13 +1096,14 @@ class People extends RequestCollection
      * @see People::muteFriendStory()
      */
     public function blockMyStory(
-        $userId)
+        $userId,
+        $source = 'profile')
     {
         return $this->ig->request("friendships/block_friend_reel/{$userId}/")
             ->addPost('_uuid', $this->ig->uuid)
             ->addPost('_uid', $this->ig->account_id)
             ->addPost('_csrftoken', $this->ig->client->getToken())
-            ->addPost('source', 'profile')
+            ->addPost('source', $source)
             ->getResponse(new Response\FriendshipResponse());
     }
 
