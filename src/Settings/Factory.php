@@ -208,6 +208,7 @@ class Factory
                 'settings_dbpassword::',
                 'settings_dbhost::',
                 'settings_dbname::',
+                'settings_dbport::',
                 'settings_dbtablename::',
             ]);
 
@@ -235,6 +236,7 @@ class Factory
                 $locationConfig['dbpassword'] = self::getUserConfig('dbpassword', $storageConfig, $cmdOptions);
                 $locationConfig['dbhost'] = self::getUserConfig('dbhost', $storageConfig, $cmdOptions);
                 $locationConfig['dbname'] = self::getUserConfig('dbname', $storageConfig, $cmdOptions);
+                $locationConfig['dbport'] = self::getUserConfig('dbport', $storageConfig, $cmdOptions);
             }
 
             $storageInstance = new Storage\PostgreSQL();
