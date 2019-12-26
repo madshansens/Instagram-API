@@ -118,7 +118,8 @@ class FFmpeg
     public function runAsync(
         $command)
     {
-        $fullCommand = sprintf('%s -v error %s', Args::escape($this->_ffmpegBinary), $command);
+        $fullCommand = $command;
+        array_unshift($fullCommand, $this->_ffmpegBinary, '-v', 'error');
 
         $process = new Process($fullCommand);
         if (is_int(self::$defaultTimeout) && self::$defaultTimeout > 60) {
@@ -138,7 +139,7 @@ class FFmpeg
      */
     public function version()
     {
-        return $this->run('-version')[0];
+        return $this->run(['-version'])[0];
     }
 
     /**
