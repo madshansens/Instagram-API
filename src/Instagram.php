@@ -2,6 +2,8 @@
 
 namespace InstagramAPI;
 
+use InstagramAPI\Utils;
+
 /**
  * Instagram's Private API v7.0.1.
  *
@@ -494,6 +496,7 @@ class Instagram implements ExperimentsInterface
             try {
                 $response = $this->request('accounts/login/')
                     ->setNeedsAuth(false)
+                    ->addPost('jazoest', Utils::generateJazoest($this->phone_id))
                     ->addPost('country_codes', '[{"country_code":"1","source":["default"]}]')
                     ->addPost('phone_id', $this->phone_id)
                     ->addPost('_csrftoken', $this->client->getToken())
