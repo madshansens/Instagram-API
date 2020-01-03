@@ -44,6 +44,8 @@ class StorageHandler
         'zr_token', // Zero rating token.
         'zr_expires', // Zero rating token expiration timestamp.
         'zr_rules', // Zero rating rewrite rules.
+        'public_key', // Public Key for login authentication.
+        'public_key_id', // Public Key ID for login authentication.
     ];
 
     /**
