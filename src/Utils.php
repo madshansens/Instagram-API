@@ -196,6 +196,27 @@ class Utils
     }
 
     /**
+     * Generates jazoest value for login.
+     *
+     * @param string $phoneId
+     *
+     * @return string
+     */
+    public static function generateJazoest(
+        $phoneId)
+    {
+        $jazoestPrefix = '2';
+        $array = str_split($phoneId);
+
+        $i = 0;
+        foreach ($array as $char) {
+            $i += ord($char);
+        }
+
+        return $jazoestPrefix . strval($i);
+    }
+
+    /**
      * Converts a hours/minutes/seconds timestamp to seconds.
      *
      * @param string $timeStr Either `HH:MM:SS[.###]` (24h-clock) or
