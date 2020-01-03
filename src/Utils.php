@@ -213,15 +213,15 @@ class Utils
             $i += ord($char);
         }
 
-        return $jazoestPrefix . strval($i);
+        return $jazoestPrefix.strval($i);
     }
 
     /**
      * Encrypt password for authentication.
      *
-     * @param string $password      Password.
-     * @param string $publicKeyId   Public Key ID.
-     * @param string $publicKey     Public Key.
+     * @param string $password    Password.
+     * @param string $publicKeyId Public Key ID.
+     * @param string $publicKey   Public Key.
      *
      * @return string
      */
@@ -234,12 +234,12 @@ class Utils
         $iv = openssl_random_pseudo_bytes(12);
         $time = time();
 
-        #$pubKey = openssl_pkey_get_public(Constants::IG_LOGIN_DEFAULT_ANDROID_PUBLIC_KEY);
+        //$pubKey = openssl_pkey_get_public(Constants::IG_LOGIN_DEFAULT_ANDROID_PUBLIC_KEY);
 
-        openssl_public_encrypt($key ,$encryptedAesKey, base64_decode($publicKey));
+        openssl_public_encrypt($key, $encryptedAesKey, base64_decode($publicKey));
         $encrypted = openssl_encrypt($password, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag, strval($time));
 
-        $payload = base64_encode("\x01" | pack('n', intval($publicKeyId)) . $iv . pack('s', strlen($encryptedAesKey)) . $encryptedAesKey . $tag . $encrypted);
+        $payload = base64_encode("\x01" | pack('n', intval($publicKeyId)).$iv.pack('s', strlen($encryptedAesKey)).$encryptedAesKey.$tag.$encrypted);
 
         return sprintf('#PWD_INSTAGRAM:4:%s:%s', $time, $payload);
     }

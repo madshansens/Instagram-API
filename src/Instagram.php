@@ -2,8 +2,6 @@
 
 namespace InstagramAPI;
 
-use InstagramAPI\Utils;
-
 /**
  * Instagram's Private API v7.0.1.
  *
